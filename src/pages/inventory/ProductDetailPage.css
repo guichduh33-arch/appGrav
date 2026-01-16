@@ -1,0 +1,4 @@
+.progress-bar-fill {
+    width: var(--progress-width, 0%);
+    transition: width 0.3s ease;
+}

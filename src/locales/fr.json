@@ -1,0 +1,361 @@
+{
+    "common": {
+        "loading": "Chargement...",
+        "no_data": "Aucune donnée.",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "edit": "Modifier",
+        "search": "Rechercher",
+        "confirm": "Valider",
+        "close": "Fermer",
+        "login": "Connexion",
+        "logout": "Déconnexion",
+        "settings": "Paramètres",
+        "date": "Date",
+        "export_pdf": "Exporter PDF",
+        "actions": "Actions"
+    },
+    "pos": {
+        "header": {
+            "user_label": "Utilisateur",
+            "dine_in": "Sur place",
+            "takeaway": "À emporter",
+            "delivery": "Livraison"
+        },
+        "products": {
+            "title_all": "Tous les produits",
+            "search_placeholder": "Rechercher un produit...",
+            "options_label": "options"
+        },
+        "footer": {
+            "on_hold": "En attente",
+            "orders": "Commandes",
+            "ticket": "Ticket",
+            "session": "Session",
+            "kds": "KDS"
+        },
+        "toasts": {
+            "no_items_send": "Aucun article à envoyer",
+            "order_updated": "Commande mise à jour avec succès !",
+            "order_sent": "Commande {{number}} envoyée en cuisine !",
+            "order_held": "Commande {{number}} mise en attente",
+            "order_restored": "Commande {{number}} restaurée"
+        },
+        "held_orders": {
+            "title": "Commandes en attente ({{count}})",
+            "empty": "Aucune commande en attente",
+            "more_items": "+{{count}} autres articles",
+            "resume": "Reprendre"
+        }
+    },
+    "cart": {
+        "order_number": "Commande",
+        "table": "Table",
+        "in_kitchen": "En cuisine",
+        "empty_text": "Votre panier est vide. Sélectionnez des produits.",
+        "subtotal": "Sous-total",
+        "discount": "Remise",
+        "total": "TOTAL",
+        "client": "Client",
+        "add_to_order": "Ajouter à commande",
+        "send_to_kitchen": "Envoyer Cuisine",
+        "hold": "En Attente",
+        "checkout": "ENCAISSER",
+        "qty_decrease": "Diminuer",
+        "qty_increase": "Augmenter",
+        "qty_pin_required": "PIN requis pour réduire",
+        "qty_prefix": "x",
+        "remove": "Supprimer",
+        "remove_pin_required": "PIN requis pour supprimer",
+        "clear_title": "Effacer le panier",
+        "hold_error_locked": "Impossible avec une commande en cuisine",
+        "pin_modal_title": "Suppression d'article",
+        "pin_modal_message": "Cet article est en cuisine. PIN manager requis."
+    },
+    "payment": {
+        "title": "Encaissement",
+        "subtitle": "Commande en cours",
+        "amount_to_pay": "Montant à payer",
+        "method_title": "MODE DE PAIEMENT",
+        "cash": "Espèces",
+        "card": "Carte",
+        "qris": "QRIS",
+        "amount_received": "MONTANT REÇU",
+        "exact_amount": "Montant exact",
+        "change_given": "Rendu monnaie",
+        "manual_input": "SAISIE MANUELLE",
+        "cancel": "Annuler",
+        "complete": "Valider le paiement",
+        "processing": "Traitement...",
+        "success_title": "Paiement réussi !",
+        "success_subtitle": "Commande validée",
+        "print": "Imprimer",
+        "print_toast": "Impression en cours...",
+        "new_order": "Nouvelle commande",
+        "toast_error": "Erreur lors du paiement",
+        "toast_new_ready": "Nouvelle commande prête!"
+    },
+    "modifiers": {
+        "subtitle": "Personnalisez votre commande",
+        "notes_label": "Notes cuisine",
+        "notes_placeholder": "Instructions spéciales...",
+        "quantity_label": "Quantité",
+        "add_to_cart": "Ajouter au panier",
+        "groups": {
+            "temperature": "Température",
+            "milk": "Type de lait",
+            "extras": "Options",
+            "toast": "Niveau de Toastage",
+            "bread": "Type de pain"
+        },
+        "options": {
+            "hot": "Chaud",
+            "iced": "Glacé",
+            "normal": "Normal",
+            "fresh_milk": "Lait frais",
+            "oat": "Avoine",
+            "soy": "Soja",
+            "almond": "Amande",
+            "none": "Sans lait",
+            "extra_shot": "Extra Shot Espresso",
+            "no_sugar": "Sans Sucre",
+            "whipped_cream": "Chantilly",
+            "not_toasted": "Non toasté",
+            "lightly": "Légèrement",
+            "well_done": "Bien toasté",
+            "white": "Pain Blanc",
+            "whole": "Pain Complet",
+            "sourdough": "Pain au Levain"
+        }
+    },
+    "kds_page": {
+        "station_barista": "Barista",
+        "station_cuisine": "Cuisine",
+        "station_display": "Display",
+        "placeholder_title": "KDS en développement",
+        "placeholder_text": "L'interface Kitchen Display System sera bientôt disponible.",
+        "placeholder_hint": "Cette page affichera les commandes en temps réel pour la station sélectionnée."
+    },
+    "inventory": {
+        "wastage": "Pertes",
+        "restock": "Approvisionnement",
+        "procurement": "Approvisionnement",
+        "recipe": "Fiche technique",
+        "product_sheet": "Fiche technique",
+        "inventory_turnover": "Rotation des stocks",
+        "product": "Produit",
+        "stock": "Stock",
+        "quantity": "Quantité",
+        "cost": "Coût",
+        "price": "Prix",
+        "retail_price": "Prix de vente",
+        "ingredient": "Ingrédient",
+        "supplier": "Fournisseur",
+        "category": "Catégorie",
+        "low_stock": "Stock bas",
+        "out_of_stock": "Rupture",
+        "sku": "SKU",
+        "unit": "Unité",
+        "stock_movement": "Mouvement de stock",
+        "current_stock": "Stock actuel",
+        "min_stock": "Stock min"
+    },
+    "inventory_page": {
+        "title": "Gestion des Stocks",
+        "subtitle": "Suivi et ajustement des inventaires",
+        "all": "Tout",
+        "raw_materials": "Matières Premières",
+        "finished_products": "Produits Finis",
+        "low_stock": "Stock Bas",
+        "stock_opname": "Inventaires (Opname)"
+    },
+    "inventory_table": {
+        "loading": "Chargement du stock...",
+        "search_placeholder": "Rechercher par nom, SKU...",
+        "items_count": "articles",
+        "product": "Produit",
+        "sku": "SKU",
+        "category": "Catégorie",
+        "type": "Type",
+        "current_stock": "Stock Actuel",
+        "actions": "Actions",
+        "low_stock": "Stock Bas",
+        "no_category": "Sans catégorie",
+        "view_details": "Voir détails",
+        "adjust_stock": "Ajuster le stock",
+        "no_items": "Aucun article trouvé",
+        "type_finished": "Produit Fini",
+        "type_raw_material": "Matière Première",
+        "type_semi_finished": "Semi-fini",
+        "type_unknown": "Inconnu"
+    },
+    "reporting": {
+        "title": "Rapports & Analytique",
+        "subtitle": "Vue d'ensemble des performances de Breakery",
+        "tabs": {
+            "overview": "Vue d'ensemble",
+            "sales": "Ventes",
+            "inventory": "Stocks & Pertes",
+            "audit": "Audit & Logs"
+        },
+        "overview": {
+            "revenue_7d": "Chiffre d'affaires (7j)",
+            "orders": "Commandes",
+            "avg_basket": "Panier Moyen",
+            "trend": "Tendance"
+        },
+        "sales": {
+            "payment_methods_7d": "Méthodes de Paiement (7j)",
+            "period_comparison": "Comparaison Période (Semaine)",
+            "week": "Semaine",
+            "previous": "Précédent",
+            "revenue": "Revenus",
+            "net": "Net",
+            "payment_method_detail": "Détail par Méthode de Paiement"
+        },
+        "inventory": {
+            "stock_value_cost": "Valeur Stock (Coût)",
+            "stock_value_retail": "Valeur Stock (Vente)",
+            "references": "références",
+            "potential": "Potentiel",
+            "items_in_stock": "Articles en Stock",
+            "wastage_distribution": "Répartition des Pertes (Valeur)",
+            "wastage_detail": "Détail des Pertes"
+        },
+        "audit": {
+            "title": "Journal d'Audit (50 dernières entrées)",
+            "no_suspicious_activity": "Aucune activité suspecte détectée.",
+            "severity": {
+                "critical": "Critique",
+                "warning": "Attention",
+                "info": "Info"
+            }
+        }
+    },
+    "table": {
+        "product": "Produit",
+        "reason": "Raison",
+        "qty": "Qté",
+        "cost": "Coût",
+        "method": "Méthode",
+        "transactions": "Transactions",
+        "total": "Total",
+        "action": "Action",
+        "date": "Date",
+        "user": "Utilisateur"
+    },
+    "logs": {
+        "order_created": "Commande créée",
+        "order_updated": "Commande mise à jour",
+        "order_cancelled": "Commande annulée",
+        "payment_processed": "Paiement effectué",
+        "stock_adjusted": "Stock ajusté",
+        "shift_opened": "Session ouverte",
+        "shift_closed": "Session fermée",
+        "system_error": "Erreur système",
+        "database_error": "Erreur de base de données",
+        "unauthorized_access": "Tentative d'accès non autorisé"
+    },
+    "nav": {
+        "operations": "Opérations",
+        "management": "Gestion",
+        "admin": "Admin",
+        "pos_terminal": "POS Terminal",
+        "kitchen_display": "Kitchen Display",
+        "stock_inventory": "Stock & Inventaire",
+        "order_history": "Historique",
+        "production": "Production",
+        "b2b_wholesale": "B2B / Wholesale",
+        "purchases": "Achats",
+        "reports": "Rapports",
+        "team": "Équipe",
+        "settings": "Paramètres",
+        "expand_menu": "Agrandir le menu",
+        "collapse_menu": "Réduire le menu"
+    },
+    "product_detail": {
+        "back": "Retour",
+        "save_changes": "Enregistrer les modifications",
+        "saving": "Sauvegarde...",
+        "tabs": {
+            "general": "Général",
+            "units": "Unités (UOM)",
+            "recipe": "Recette",
+            "costing": "Coût & Marge",
+            "history": "Historique"
+        },
+        "general": {
+            "product_identity": "Identité du Produit",
+            "name": "Nom",
+            "category": "Catégorie",
+            "description": "Description",
+            "select": "Sélectionner...",
+            "finance_pos": "Finance & POS",
+            "retail_price": "Prix Vente",
+            "fixed_cost": "Coût Fixe",
+            "pos_visible": "Visible sur le POS",
+            "pos_visible_hint": "Si décoché, le produit ne sera pas proposé aux vendeurs."
+        },
+        "units": {
+            "title": "Gestion des Unités (UOM)",
+            "description": "Définissez ici les unités d'achat ou de consommation (ex: Carton, Pack) et leur relation avec l'unité de base.",
+            "base_unit": "Unité de Base (Stock)",
+            "base_unit_hint": "Toutes les conversions se font par rapport à cette unité.",
+            "base_unit_examples": "(ex: gr, ml, pcs)",
+            "unit_name": "Nom de l'Unité",
+            "conversion_factor": "Facteur de Conversion",
+            "explanation": "Explication",
+            "no_alternative_units": "Aucune unité alternative définie.",
+            "add_unit": "Ajouter une Unité"
+        },
+        "recipe": {
+            "title": "Ingrédients de la recette",
+            "add_ingredient": "Ajouter un ingrédient",
+            "select_ingredient": "Sélectionner un ingrédient",
+            "material": "Matériau",
+            "quantity": "Quantité",
+            "unit": "Unité",
+            "no_ingredients": "Aucun ingrédient. Ajoutez des matières premières pour définir la recette."
+        },
+        "costing": {
+            "title": "Analyse des Coûts",
+            "material_cost": "Coût Matières (Est.)",
+            "selling_price": "Prix de Vente",
+            "gross_margin": "Marge Brute",
+            "detail_title": "Détail des Coûts par Matière Première",
+            "ingredient": "Ingrédient",
+            "qty_used": "Qté Utilisée",
+            "unit_cost": "Coût Unitaire",
+            "subtotal": "Sous-total",
+            "pct_of_cost": "% du Coût",
+            "no_ingredients_costing": "Aucun ingrédient dans la recette. Ajoutez des matières premières dans l'onglet Recette.",
+            "total_material_cost": "Total Coût Matières:",
+            "financial_summary": "Résumé Financier",
+            "gross_profit": "Bénéfice Brut",
+            "margin_analysis": "Analyse de la Marge",
+            "threshold": "seuil",
+            "ingredients_count": "Ingrédients",
+            "avg_cost_per_ingredient": "Coût Moyen/Ingrédient",
+            "warning_loss": "Attention: Le coût des matières dépasse le prix de vente. Ce produit génère une perte.",
+            "warning_low_margin": "Avertissement: La marge est inférieure à 30%. Envisagez d'ajuster le prix ou les coûts."
+        },
+        "history": {
+            "title": "Historique des Mouvements",
+            "current_stock": "Stock Actuel",
+            "date": "Date",
+            "type": "Type",
+            "quantity": "Quantité",
+            "reason_ref": "Raison / Réf"
+        },
+        "messages": {
+            "product_updated": "Produit mis à jour avec succès",
+            "save_error": "Erreur lors de la sauvegarde:",
+            "uom_add_error": "Erreur ajout UOM:",
+            "delete_uom_confirm": "Supprimer cette unité ?",
+            "uom_delete_error": "Erreur suppression:",
+            "not_found": "Produit introuvable",
+            "back_to_list": "Retour à la liste"
+        }
+    }
+}

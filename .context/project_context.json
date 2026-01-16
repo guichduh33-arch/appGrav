@@ -1,0 +1,47 @@
+{
+  "project_name": "AppGrav - The Breakery ERP",
+  "last_updated": "2026-01-16T18:52:23.468490",
+  "tech_stack": {
+    "frontend": "React",
+    "backend": "FastAPI (Python)",
+    "database": "Supabase (PostgreSQL)",
+    "state_management": "React Hooks",
+    "styling": "Tailwind CSS"
+  },
+  "coding_standards": {
+    "python": {
+      "style": "PEP 8",
+      "max_line_length": 100,
+      "type_hints": "required",
+      "docstrings": "Google style",
+      "naming": "snake_case"
+    },
+    "javascript": {
+      "style": "ESLint + Prettier",
+      "components": "PascalCase",
+      "functions": "camelCase",
+      "max_file_lines": 300,
+      "prefer": "functional components"
+    },
+    "database": {
+      "naming": "snake_case",
+      "primary_keys": "id (uuid)",
+      "timestamps": "created_at, updated_at",
+      "soft_delete": false
+    }
+  },
+  "patterns": {
+    "component_naming": "PascalCase",
+    "function_naming": "camelCase",
+    "api_naming": "snake_case",
+    "file_organization": "by_feature"
+  },
+  "architecture": {
+    "frontend_path": "",
+    "backend_path": "",
+    "database_path": "",
+    "components_pattern": "src/components/",
+    "api_pattern": "api/"
+  },
+  "business_rules": {}
+}

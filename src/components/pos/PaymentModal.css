@@ -1,0 +1,320 @@
+.modal-lg {
+    width: 700px;
+    max-width: 95vw;
+}
+
+.modal-sm {
+    width: 400px;
+    max-width: 90vw;
+}
+
+/* Payment Body */
+.payment-body {
+    padding: 0 !important;
+}
+
+.payment-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+    padding: var(--space-lg);
+}
+
+.payment-left,
+.payment-right {
+    display: flex;
+    flex-direction: column;
+}
+
+.payment-section-title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-gris-chaud);
+    margin-bottom: var(--space-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Amount Display */
+.payment-amount-display {
+    text-align: center;
+    padding: var(--space-xl);
+    background: var(--color-blanc-creme-dark);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-lg);
+    border: 1px solid var(--color-border);
+}
+
+.payment-amount-display__label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-xs);
+}
+
+.payment-amount-display__value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--color-primary);
+}
+
+/* Payment Methods */
+.payment-methods {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.payment-method {
+    flex: 1;
+}
+
+.payment-method input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.payment-method__label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+    background: white;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.payment-method__label:hover {
+    border-color: var(--color-primary-light);
+    background: var(--color-blanc-creme);
+}
+
+.payment-method input:checked+.payment-method__label {
+    border-color: var(--color-primary);
+    background: rgba(30, 64, 175, 0.05);
+    color: var(--color-primary);
+    box-shadow: var(--shadow-2);
+}
+
+/* Vibrant Left Borders for Methods */
+#payCash+.payment-method__label {
+    border-left: 6px solid var(--cat-green);
+}
+
+#payCard+.payment-method__label {
+    border-left: 6px solid var(--cat-blue);
+}
+
+#payQris+.payment-method__label {
+    border-left: 6px solid var(--cat-orange);
+}
+
+.payment-method__icon {
+    font-size: 2rem;
+    margin-bottom: var(--space-sm);
+}
+
+.payment-method__name {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Quick Amounts */
+.quick-amounts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.quick-amount-btn {
+    padding: var(--space-sm) var(--space-md);
+    background: white;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.quick-amount-btn:hover {
+    border-color: var(--color-rose-poudre);
+    background: rgba(186, 144, 162, 0.05);
+}
+
+.quick-amount-btn.is-exact {
+    grid-column: 1 / -1;
+    background: var(--color-blanc-creme-dark);
+}
+
+/* Change Display */
+.payment-change {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-md);
+    background: var(--color-success-bg);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-success);
+}
+
+.payment-change__label {
+    font-size: var(--text-sm);
+    color: var(--color-success);
+    font-weight: 500;
+}
+
+.payment-change__value {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-success);
+}
+
+/* Amount Input */
+.amount-input {
+    margin-bottom: var(--space-md);
+}
+
+.amount-input input {
+    width: 100%;
+    height: 56px;
+    padding: 0 var(--space-md);
+    text-align: right;
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-brun-chocolat);
+    background: white;
+    border: 1px solid var(--color-beige-sable);
+    border-radius: var(--radius-sm);
+}
+
+/* Numpad */
+.numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-sm);
+}
+
+.numpad__key {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-blanc-creme-dark);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.numpad__key:hover {
+    background: var(--color-beige-sable);
+}
+
+.numpad__key:active {
+    transform: scale(0.95);
+}
+
+.numpad__key.clear {
+    background: var(--color-urgent-bg);
+    color: var(--color-urgent);
+}
+
+.numpad__key.backspace {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+}
+
+/* Payment Footer */
+.payment-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-md);
+}
+
+.btn-primary-lg {
+    height: 56px;
+    padding: 0 var(--space-xl);
+    font-size: var(--text-lg);
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    min-width: 200px;
+}
+
+.btn-primary-lg:hover:not(:disabled) {
+    box-shadow: var(--shadow-3);
+    transform: translateY(-2px);
+}
+
+.btn-primary-lg:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Success Modal */
+.success-modal {
+    text-align: center;
+}
+
+.success-content {
+    padding: var(--space-2xl) !important;
+}
+
+.success-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-lg);
+}
+
+.success-content h2 {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+}
+
+.success-subtitle {
+    color: var(--color-gris-chaud);
+    margin-bottom: var(--space-lg);
+}
+
+.success-change {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-md);
+    background: var(--color-success-bg);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-lg);
+}
+
+.success-change__label {
+    font-size: var(--text-sm);
+    color: var(--color-success);
+}
+
+.success-change__value {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-success);
+}
+
+.success-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.success-actions .btn {
+    flex: 1;
+    height: 48px;
+}

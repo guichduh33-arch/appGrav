@@ -1,0 +1,81 @@
+.inventory-page {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg-primary);
+}
+
+.inventory-header {
+    padding: 1.5rem 2rem;
+    background: white;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.inventory-title h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 0.25rem;
+}
+
+.inventory-title p {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+.inventory-tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: var(--color-bg-primary);
+    padding: 0.25rem;
+    border-radius: 12px;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    background: transparent;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab-btn:hover {
+    color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.tab-btn.is-active {
+    background: white;
+    color: var(--color-primary);
+    box-shadow: var(--shadow-1);
+}
+
+.tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: var(--color-urgent);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.inventory-content {
+    flex: 1;
+    padding: 2rem;
+    overflow: hidden;
+}

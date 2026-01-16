@@ -1,0 +1,908 @@
+﻿Title,Product,Material,Materiall: uom,Quantity
+recipe_Capuccino,Capuccino,Coffee bean,Gr,18
+recipe_Capuccino,Capuccino,Coffee bean,Gr,18
+recipe_Capuccino,Capuccino,Coffee bean,Gr,18
+recipe_Capuccino,Capuccino,Coffee bean,Gr,18
+recipe_Capuccino,Capuccino,Coffee bean,Gr,18
+recipe_Capuccino,Capuccino,Coffee bean,Gr,18
+recipe_Affogato,Affogato,Coffee bean,Gr,18
+recipe_Affogato,Affogato,Ice Cream Vanilla,Gr,170
+recipe_Aioli Sauce,Aioli Sauce,Mayonnaise,Gr,900
+recipe_Aioli Sauce,Aioli Sauce,Oregano,Gr,2
+recipe_Aioli Sauce,Aioli Sauce,GARLIC,Gr,50
+recipe_Almond Biscuit,Almond Biscuit,Almond Ground,Gr,284
+recipe_Almond Biscuit,Almond Biscuit,Ice Sugar,Gr,148
+recipe_Almond Biscuit,Almond Biscuit,White Flour,Gr,284
+recipe_Almond Biscuit,Almond Biscuit,Cooking Butter,Gr,284
+recipe_Almond Cream,Almond Cream,Almond Ground,Gr,25
+recipe_Almond Cream,Almond Cream,White Sugar,Gr,250
+recipe_Almond Cream,Almond Cream,Mix Butter,Gr,250
+recipe_American Bagel,American Bagel,Cheddar Cheese,Gr,15
+recipe_American Bagel,American Bagel,Smoked Beef,Gr,25
+recipe_American Bagel,American Bagel,Caramelized Onion,Gr,25
+recipe_American Sandwich,American Sandwich,Minced Beef,Gr,150
+recipe_American Sandwich,American Sandwich,Caramelized Onion,Gr,30
+recipe_American Sandwich,American Sandwich,LETTUCE,Gr,30
+recipe_American Sandwich,American Sandwich,TOMATO,Gr,30
+recipe_American Sandwich,American Sandwich,Aioli Sauce,Gr,35
+recipe_American Sandwich,American Sandwich,Cheddar Cheese,Gr,20
+recipe_Americano,Americano,Coffee bean,Gr,18
+recipe_Americano,Americano,Coffee bean,Gr,18
+recipe_Asian Pickles,Asian Pickles,RADISH,Gr,500
+recipe_Asian Pickles,Asian Pickles,CARROT,Gr,500
+recipe_Asian Pickles,Asian Pickles,LIME,Gr,100
+recipe_Asian Pickles,Asian Pickles,Salt,Gr,2
+recipe_Asian Pickles,Asian Pickles,White Sugar,Gr,30
+recipe_Bagels,Bagels,White Flour,Gr,78
+recipe_Bagels,Bagels,Maizena Flour,Gr,23
+recipe_Bagels,Bagels,Mix Butter,Gr,5
+recipe_Bagels,Bagels,Salt,Gr,14
+recipe_Bagels,Bagels,Yeast,Gr,11
+recipe_Bagels,Bagels,White Sugar,Gr,54
+recipe_Bagels,Bagels,White Sesame Seed,Gr,25
+recipe_Bagels,Bagels,Black Sesame Seed,Gr,25
+recipe_Baguette 280gr,Baguette 280gr,FLOUR AMOURETTE,Gr,20
+recipe_Baguette 280gr,Baguette 280gr,White Flour,Gr,200
+recipe_Baguette 280gr,Baguette 280gr,Yeast,Gr,2
+recipe_Baguette Poolish 280gr,Baguette Poolish 280gr,Poolish Starter,Gr,203
+recipe_Baguette Poolish 280gr,Baguette Poolish 280gr,Salt,Gr,4
+recipe_Baguette Poolish 280gr,Baguette Poolish 280gr,Sourdough Starter Liquid,Gr,51
+recipe_Baguette Poolish 280gr,Baguette Poolish 280gr,White Flour,Gr,86
+recipe_Banh Mi Croissant,Banh Mi Croissant,LETTUCE,Gr,10
+recipe_Banh Mi Croissant,Banh Mi Croissant,Chicken Banh Mi Marinated,Gr,40
+recipe_Banh Mi Croissant,Banh Mi Croissant,CORIANDER,Gr,5
+recipe_Banh Mi Croissant,Banh Mi Croissant,Asian Pickles,Gr,20
+recipe_Banh Mi Croissant,Banh Mi Croissant,Aioli Sauce,Gr,30
+recipe_Bechamel Sauce,Bechamel Sauce,Cooking Butter,Gr,83
+recipe_Bechamel Sauce,Bechamel Sauce,Nutmeg,Gr,2
+recipe_Bechamel Sauce,Bechamel Sauce,Pepper,Gr,2
+recipe_Bechamel Sauce,Bechamel Sauce,Salt,Gr,2
+recipe_Bechamel Sauce,Bechamel Sauce,White Flour,Gr,83
+recipe_Beef Cheese Croissant,Beef Cheese Croissant,Smoked Beef,Gr,25
+recipe_Beef Cheese Croissant,,,,30
+recipe_Beef Cheese Croissant,Beef Cheese Croissant,Mozarella Cheese,Gr,30
+recipe_Black Forest BIG 24cm,Black Forest BIG 24cm,Chocolat Sponge Cake,Gr,1.134
+recipe_Black Forest BIG 24cm,Black Forest BIG 24cm,Chantilly,Gr,585
+recipe_Black Forest BIG 24cm,Black Forest BIG 24cm,Strawberry Jam,Gr,135
+recipe_Black Forest BIG 24cm,Black Forest BIG 24cm,Chocolate Dark Couverture,Gr,180
+recipe_Black Forest Small 18cm,Black Forest Small 18cm,Chocolate Dark Couverture,Gr,80
+recipe_Black Forest Small 18cm,Black Forest Small 18cm,Chocolat Sponge Cake,Gr,504
+recipe_Black Forest Small 18cm,Black Forest Small 18cm,Chantilly,Gr,250
+recipe_Black Forest Small 18cm,Black Forest Small 18cm,Strawberry Jam,Gr,50
+recipe_Black Forest,Black Forest,Chocolat Sponge Cake,Gr,126
+recipe_Black Forest,Black Forest,Chantilly,Gr,50
+recipe_Black Forest,Black Forest,Strawberry Jam,Gr,15
+recipe_Black Forest,Black Forest,Chocolate Dark Couverture,Gr,20
+recipe_Breakery Cloud,Breakery Cloud,Chantilly,Gr,20
+recipe_Breakery Cloud,Breakery Cloud,Choux Dough,Gr,25
+recipe_Breakery Cloud,Breakery Cloud,Pearl Sugar,Gr,2
+recipe_Breakery Sauce,Breakery Sauce,Garlic Powder,Gr,10
+recipe_Breakery Sauce,Breakery Sauce,Onion Powder,Gr,10
+recipe_Breakery Sauce,Breakery Sauce,Ice Sugar,Gr,5
+recipe_Breakery Sauce,Breakery Sauce,Mayonnaise,Gr,750
+recipe_Breakery Sauce,Breakery Sauce,Zucchini Pickles,Gr,195
+recipe_Breakery Sauce,Breakery Sauce,Paprika Powder,Gr,5
+recipe_Brown Bread,Brown Bread,White Flour,Gr,"33,333"
+recipe_Brown Bread,Brown Bread,Brown Bread Flour,Gr,"3,333"
+recipe_Brown Bread,Brown Bread,Salt,Gr,6
+recipe_Brown Bread,Brown Bread,Yeast,Gr,467
+recipe_Burger,Burger,Cheddar Cheese,Gr,15
+recipe_Burger,Burger,LETTUCE,Gr,20
+recipe_Burger,Burger,Minced Beef,Gr,150
+recipe_Burger,Burger,TOMATO,Gr,20
+recipe_Burger,Burger,Caramelized Onion,Gr,20
+recipe_Burger,Burger,Smoked Beef,Gr,25
+recipe_Burger Buns,Burger Buns,White Flour,Gr,572
+recipe_Burger Buns,Burger Buns,Mix Butter,Gr,34
+recipe_Burger Buns,Burger Buns,Salt,Gr,11
+recipe_Burger Buns,Burger Buns,White Sugar,Gr,29
+recipe_Burger Buns,Burger Buns,Yeast,Gr,9
+recipe_Burger Buns,Burger Buns,White Sesame Seed,Gr,4
+recipe_Capsicum Marinated,Capsicum Marinated,CAPSICUM,Gr,1.499
+recipe_Capsicum Marinated,Capsicum Marinated,Oregano,Gr,1
+recipe_Capsicum Marinated,Capsicum Marinated,Pepper,Gr,1
+recipe_Capsicum Marinated,Capsicum Marinated,GARLIC,Gr,9
+recipe_Capsicum Marinated,Capsicum Marinated,Salt,Gr,1
+recipe_Capsicum Marinated,Capsicum Marinated,LEMON,Gr,58
+recipe_Capuccino,Capuccino,Coffee bean,Gr,18
+recipe_Capuccino,Capuccino,Coffee bean,Gr,18
+recipe_Capuccino,Capuccino,Coffee bean,Gr,18
+recipe_Capuccino,Capuccino,Coffee bean,Gr,18
+recipe_Caramel Cream,Caramel Cream,White Sugar,Gr,400
+recipe_Caramel Cream,Caramel Cream,Cooking Butter,Gr,200
+recipe_Caramel Garnish,Caramel Garnish,White Sugar,Gr,1
+recipe_Caramel Latte,Caramel Latte,Coffee bean,Gr,18
+recipe_Caramel Latte,Caramel Latte,Coffee bean,Gr,18
+recipe_Caramel Latte,Caramel Latte,Coffee bean,Gr,18
+recipe_Caramel Latte,Caramel Latte,Coffee bean,Gr,18
+recipe_Caramel Latte,Caramel Latte,Coffee bean,Gr,18
+recipe_Caramel Latte,Caramel Latte,Coffee bean,Gr,18
+recipe_Caramelized Onion,Caramelized Onion,ONION,Gr,1.754
+recipe_Caramelized Onion,Caramelized Onion,Cooking Butter,Gr,47
+recipe_Chantilly,Chantilly,Ice Sugar,Gr,320
+recipe_Cheesy Brie,Cheesy Brie,Camembert,Gr,50
+recipe_Cheesy Brie,Cheesy Brie,Cooking Butter,Gr,5
+recipe_Cheesy Brie,Cheesy Brie,Red Onion Jam,Gr,30
+recipe_Cheesy Brie,Cheesy Brie,LETTUCE,Gr,15
+recipe_Chicken Baguette Sandwich,Chicken Baguette Sandwich,Roasted Chicken,Gr,80
+recipe_Chicken Baguette Sandwich,Chicken Baguette Sandwich,LETTUCE,Gr,20
+recipe_Chicken Baguette Sandwich,Chicken Baguette Sandwich,Capsicum Marinated,Gr,20
+recipe_Chicken Baguette Sandwich,Chicken Baguette Sandwich,Mozarella Cheese,Gr,30
+recipe_Chicken Baguette Sandwich,Chicken Baguette Sandwich,Aioli Sauce,Gr,35
+recipe_Chicken Baguette Sandwich,Chicken Baguette Sandwich,Caramelized Onion,Gr,30
+recipe_Chicken Banh Mi,Chicken Banh Mi,Chicken Banh Mi Marinated,Gr,80
+recipe_Chicken Banh Mi,Chicken Banh Mi,LETTUCE,Gr,25
+recipe_Chicken Banh Mi,Chicken Banh Mi,Asian Pickles,Gr,30
+recipe_Chicken Banh Mi,Chicken Banh Mi,CORIANDER,Gr,3
+recipe_Chicken Banh Mi,Chicken Banh Mi,Aioli Sauce,Gr,30
+recipe_Chicken Banh Mi Marinated,Chicken Banh Mi Marinated,GARLIC,Gr,1.4
+recipe_Chicken Banh Mi Marinated,Chicken Banh Mi Marinated,GINGER,Gr,100
+recipe_Chicken Curry,Chicken Curry,Roasted Chicken,Gr,650
+recipe_Chicken Curry,Chicken Curry,Curry Powder,Gr,16
+recipe_Chicken Curry Panini,Chicken Curry Panini,Chicken Curry,Gr,110
+recipe_Chicken Curry Panini,Chicken Curry Panini,TOMATO,Gr,20
+recipe_Chicken Curry Panini,Chicken Curry Panini,Mozarella Cheese,Gr,30
+recipe_Choco Pie 16cm,Choco Pie 16cm,Sugar Dough,Gr,166
+recipe_Choco Pie 16cm,Choco Pie 16cm,Chocolat Pie Mix,Gr,200
+recipe_Choco Pie 16cm,Choco Pie 16cm,Chocolat Ganache,Gr,200
+recipe_Choco Pie 24cm,Choco Pie 24cm,Sugar Dough,Gr,"3,735"
+recipe_Choco Pie 24cm,Choco Pie 24cm,Chocolat Pie Mix,Gr,450
+recipe_Choco Pie 24cm,Choco Pie 24cm,Chocolat Ganache,Gr,450
+recipe_Chocolat Cloud,Chocolat Cloud,Chocolat Ganache,Gr,20
+recipe_Chocolat Cloud,Chocolat Cloud,Choux Dough,Gr,25
+recipe_Chocolat Cloud,Chocolat Cloud,Chocolate Dark Couverture,Gr,10
+recipe_Chocolat Ganache,Chocolat Ganache,Chocolate Dark Couverture,Gr,222
+recipe_Chocolat Ganache,Chocolat Ganache,Ice Sugar,Gr,111
+recipe_Chocolat Peanut,Chocolat Peanut,Chocolate Dark Couverture,Gr,400
+recipe_Chocolat Peanut,Chocolat Peanut,Peanut,Gr,600
+recipe_Chocolat Pie,Chocolat Pie,Sugar Dough,Gr,415
+recipe_Chocolat Pie,Chocolat Pie,Chocolat Pie Mix,Gr,50
+recipe_Chocolat Pie,Chocolat Pie,Chocolat Ganache,Gr,50
+recipe_Chocolat Pie Mix,Chocolat Pie Mix,Chocolate Dark Couverture,Gr,185
+recipe_Chocolat Pie Mix,Chocolat Pie Mix,Ice Sugar,Gr,74
+recipe_Chocolat Sponge Cake,Chocolat Sponge Cake,Cocoa Powder,Gr,24
+recipe_Chocolat Sponge Cake,Chocolat Sponge Cake,Ice Sugar,Gr,206
+recipe_Chocolat Sponge Cake,Chocolat Sponge Cake,White Flour,Gr,206
+recipe_Chocolat Sponge Cake,Chocolat Sponge Cake,Cooking Butter,Gr,48
+recipe_Chocolate latte,Chocolate latte,Cacao Powder Cafe,Gr,30
+recipe_Chocolate latte,Chocolate latte,Cacao Powder Cafe,Gr,30
+recipe_Chocolate latte,Chocolate latte,Cacao Powder Cafe,Gr,30
+recipe_Chocolate latte,Chocolate latte,Cacao Powder Cafe,Gr,30
+recipe_Chocolate latte,Chocolate latte,Cacao Powder Cafe,Gr,30
+recipe_Chocolate latte,Chocolate latte,Cacao Powder Cafe,Gr,30
+recipe_Chocolatine Almond,Chocolatine Almond,Almond Cream,Gr,25
+recipe_Chocolatine Almond,Chocolatine Almond,Almond Slice,Gr,5
+recipe_Chocolatine Prod,Chocolatine Prod,Chocolate Stick,Gr,10
+recipe_Chocolatine Prod,Chocolatine Prod,Croissant Dough,Gr,90
+recipe_Choux Dough,Choux Dough,White Sugar,Gr,60
+recipe_Choux Dough,Choux Dough,Salt,Gr,4
+recipe_Choux Dough,Choux Dough,Cooking Butter,Gr,140
+recipe_Choux Dough,Choux Dough,White Flour,Gr,200
+recipe_Ciabatta,Ciabatta,White Flour,Gr,87
+recipe_Ciabatta,Ciabatta,Salt,Gr,"1,636"
+recipe_Ciabatta,Ciabatta,Yeast,Gr,127
+recipe_Coconut Biscuit,Coconut Biscuit,Almond Ground,Gr,231
+recipe_Coconut Biscuit,Coconut Biscuit,Dry Coconut,Gr,154
+recipe_Coconut Biscuit,Coconut Biscuit,White Flour,Gr,77
+recipe_Coconut Biscuit,Coconut Biscuit,Mix Butter,Gr,308
+recipe_Coconut Biscuit,Coconut Biscuit,Ice Sugar,Gr,231
+recipe_Coconut Cream,Coconut Cream,Ice Sugar,Gr,132
+recipe_Coconut Cream,Coconut Cream,Dry Coconut,Gr,46
+recipe_Coffee Bean Pack 250gr,Coffee Bean Pack 250gr,Coffee bean,Gr,250
+recipe_Coffee Bean Pack 500gr,Coffee Bean Pack 500gr,Coffee bean,Gr,500
+recipe_Coffee Cream,Coffee Cream,Coffee bean,Gr,49
+recipe_Coffee Cream,Coffee Cream,Ice Sugar,Gr,304
+recipe_Countryside sourdough medium,Countryside sourdough medium,White Flour,Gr,138
+recipe_Countryside sourdough medium,Countryside sourdough medium,Salt,Gr,8
+recipe_Countryside sourdough medium,Countryside sourdough medium,Yeast,Gr,33
+recipe_Countryside sourdough medium,Countryside sourdough medium,Sourdough Starter Hard,Gr,83
+recipe_Countryside sourdough medium,Countryside sourdough medium,Sourdough Starter Liquid,Gr,83
+recipe_Countryside sourdough medium,Countryside sourdough medium,Pain De Campagne Flour,Gr,138
+recipe_Countryside Sourdough Small,Countryside Sourdough Small,White Flour,Gr,92
+recipe_Countryside Sourdough Small,Countryside Sourdough Small,Salt,Gr,6
+recipe_Countryside Sourdough Small,Countryside Sourdough Small,Yeast,Gr,14
+recipe_Countryside Sourdough Small,Countryside Sourdough Small,Pain De Campagne Flour,Gr,92
+recipe_Countryside Sourdough Small,Countryside Sourdough Small,Sourdough Starter Hard,Gr,55
+recipe_Countryside Sourdough Small,Countryside Sourdough Small,Sourdough Starter Liquid,Gr,55
+recipe_Cream Cheese Sauce,Cream Cheese Sauce,Cream Cheese,Gr,625
+recipe_Cream Cheese Sauce,Cream Cheese Sauce,PARSLEY,Gr,143
+recipe_Cream Cheese Sauce,Cream Cheese Sauce,Pepper,Gr,6
+recipe_Cream Cheese Sauce,Cream Cheese Sauce,GARLIC,Gr,143
+recipe_Cream Cheese Sauce,Cream Cheese Sauce,LEMON,Gr,464
+recipe_Cream Cheese Sauce,Cream Cheese Sauce,Salt,Gr,6
+recipe_Croissant Almond,Croissant Almond,Almond Cream,Gr,25
+recipe_Croissant Almond,Croissant Almond,Almond Slice,Gr,5
+recipe_Croissant Dough,Croissant Dough,Butter Sheet Croissant,Gr,240
+recipe_Croissant Dough,Croissant Dough,Yeast,Gr,8
+recipe_Croissant Dough,Croissant Dough,White Sugar,Gr,61
+recipe_Croissant Dough,Croissant Dough,Mix Butter,Gr,25
+recipe_Croissant Dough,Croissant Dough,White Flour,Gr,411
+recipe_Croissant Dough,Croissant Dough,Milk Powder,Gr,21
+recipe_Croissant Dough,Croissant Dough,Salt,Gr,8
+recipe_Croissant Nutella,Croissant Nutella,Cocoa Powder,Gr,5
+recipe_Croissant Nutella,Croissant Nutella,Nutella,Gr,25
+recipe_Croissant Nutella,Croissant Nutella,Croissant Dough,Gr,90
+recipe_Croissant stock,Croissant stock,Croissant Dough,Gr,90
+recipe_Croque-Monsieur,Croque-Monsieur,Smoked Beef,Gr,25
+recipe_Croque-Monsieur,Croque-Monsieur,Mozarella Cheese,Gr,30
+recipe_Croque-Monsieur,Croque-Monsieur,Bechamel Sauce,Gr,30
+recipe_Cruffin,Cruffin,Croissant Dough,Gr,90
+recipe_Cruffin,Cruffin,Nutella,Gr,25
+recipe_Danish Raisin,Danish Raisin,Croissant Dough,Gr,90
+recipe_Danish Raisin,Danish Raisin,Pastry Cream,Gr,43
+recipe_Danish Raisin,Danish Raisin,Kismis/Raisins,Gr,5
+recipe_Double expresso,Double expresso,Coffee bean,Gr,18
+recipe_Dressing Sauce,Dressing Sauce,Mustard,Gr,19
+recipe_Dressing Sauce,Dressing Sauce,Pepper,Gr,3
+recipe_Dressing Sauce,Dressing Sauce,Salt,Gr,3
+recipe_Dulce praline Tartelette,Dulce praline Tartelette,Sugar Dough,Gr,415
+recipe_Dulce praline Tartelette,Dulce praline Tartelette,Chocolat Ganache,Gr,30
+recipe_Dulce praline Tartelette,Dulce praline Tartelette,Praline Cream,Gr,30
+recipe_Egg Benedict,Egg Benedict,Smoked Beef,Gr,50
+recipe_Egg Benedict,Egg Benedict,Hollandaise Sauce,Gr,60
+recipe_Egg Benedict,Egg Benedict,CARROT,Gr,20
+recipe_Egg Benedict,Egg Benedict,CUCUMBER,Gr,20
+recipe_Egg Benedict,Egg Benedict,RED ONION,Gr,20
+recipe_Egg Benedict,Egg Benedict,Dressing Sauce,Gr,30
+recipe_Egg Benedict,Egg Benedict,LETTUCE,Gr,20
+recipe_Egg Benedict,Egg Benedict,TOMATO,Gr,20
+recipe_Expresso,Expresso,Coffee bean,Gr,9
+recipe_Flat white,Flat white,Coffee bean,Gr,18
+recipe_Flat white,Flat white,Coffee bean,Gr,18
+recipe_Flat white,Flat white,Coffee bean,Gr,18
+recipe_Flat white,Flat white,Coffee bean,Gr,18
+recipe_Flat white,Flat white,Coffee bean,Gr,18
+recipe_Flat white,Flat white,Coffee bean,Gr,18
+recipe_Flat white,Flat white,Coffee bean,Gr,18
+recipe_Flat white,Flat white,Coffee bean,Gr,18
+recipe_Flat white,Flat white,Coffee bean,Gr,18
+recipe_French Fries,French Fries,POTATO,Gr,"27,777"
+recipe_French Fries,French Fries,Salt,Gr,1
+recipe_French Fries,French Fries,Pepper,Gr,1
+recipe_Frenchy,Frenchy,Camembert,Gr,50
+recipe_Frenchy,Frenchy,Cooking Butter,Gr,10
+recipe_Frenchy,Frenchy,Smoked Beef,Gr,25
+recipe_Frenchy,Frenchy,LETTUCE,Gr,20
+recipe_Frenchy,Frenchy,TOMATO,Gr,30
+recipe_Fresh Juice,Fresh Juice,BANANA,Gr,200
+recipe_Fresh Juice,Fresh Juice,LIME,Gr,150
+recipe_Fresh Juice,Fresh Juice,MANGO,Gr,150
+recipe_Fresh Juice,Fresh Juice,ORANGE,Gr,450
+recipe_Fresh Juice,Fresh Juice,PINAPPLE,Gr,200
+recipe_Fresh Juice,Fresh Juice,STRAWBERRY,Gr,150
+recipe_Fresh Juice,Fresh Juice,WATER MELON,Gr,500
+recipe_Hazelnut Latte,Hazelnut Latte,Coffee bean,Gr,18
+recipe_Hazelnut Latte,Hazelnut Latte,Coffee bean,Gr,18
+recipe_Hazelnut Latte,Hazelnut Latte,Coffee bean,Gr,18
+recipe_Hazelnut Latte,Hazelnut Latte,Coffee bean,Gr,18
+recipe_Hazelnut Latte,Hazelnut Latte,Coffee bean,Gr,18
+recipe_Hazelnut Latte,Hazelnut Latte,Coffee bean,Gr,18
+recipe_Hollandaise Sauce,Hollandaise Sauce,Pepper,Gr,4
+recipe_Hollandaise Sauce,Hollandaise Sauce,Cooking Butter,Gr,400
+recipe_Hollandaise Sauce,Hollandaise Sauce,LEMON,Gr,440
+recipe_Hollandaise Sauce,Hollandaise Sauce,Salt,Gr,25
+recipe_Hot Dog buns,Hot Dog buns,White Flour,Gr,572
+recipe_Hot Dog buns,Hot Dog buns,Mix Butter,Gr,34
+recipe_Hot Dog buns,Hot Dog buns,Salt,Gr,11
+recipe_Hot Dog buns,Hot Dog buns,White Sugar,Gr,29
+recipe_Hot Dog buns,Hot Dog buns,Yeast,Gr,9
+recipe_Hot Dog sandwich,Hot Dog sandwich,Sausage Hotdog,Gr,59
+recipe_Hot Dog sandwich,Hot Dog sandwich,Cheddar Orange Slice,Gr,20
+recipe_Hot Dog sandwich,Hot Dog sandwich,Breakery Sauce,Gr,30
+recipe_Hot Dog sandwich,Hot Dog sandwich,Onion Crispy,Gr,20
+recipe_Italian Panini,Italian Panini,Roasted Chicken,Gr,80
+recipe_Italian Panini,Italian Panini,Dry Tomato,Gr,20
+recipe_Italian Panini,Italian Panini,Mozarella Cheese,Gr,30
+recipe_Italian Panini,Italian Panini,Pesto Sauce,Gr,30
+recipe_Italian Panini,Italian Panini,Sunflower Seed,Gr,5
+recipe_Italian Panini,Italian Panini,TOMATO,Gr,20
+recipe_Italian Panini,Italian Panini,Parmesan,Gr,10
+recipe_Italian Panini,Italian Panini,BASIL LEAF,Gr,1
+recipe_Latte,Latte,Coffee bean,Gr,18
+recipe_Latte,Latte,Coffee bean,Gr,18
+recipe_Latte,Latte,Coffee bean,Gr,18
+recipe_Latte,Latte,Coffee bean,Gr,18
+recipe_Latte,Latte,Coffee bean,Gr,18
+recipe_Latte,Latte,Coffee bean,Gr,18
+recipe_Latte,Latte,Coffee bean,Gr,18
+recipe_Latte,Latte,Coffee bean,Gr,18
+recipe_Lemon cheesecake,Lemon cheesecake,Almond Biscuit,Gr,55
+recipe_Lemon cheesecake,Lemon cheesecake,Lemon Cheesecake Mix,Gr,"7,083"
+recipe_Lemon cheesecake,Lemon cheesecake,Lemon Glazing,Gr,"3,366"
+recipe_Lemon cheesecake 24cm,Lemon cheesecake 24cm,Almond Biscuit,Gr,495
+recipe_Lemon cheesecake 24cm,Lemon cheesecake 24cm,Lemon Cheesecake Mix,Gr,"63,747"
+recipe_Lemon cheesecake 24cm,Lemon cheesecake 24cm,Lemon Glazing,Gr,303
+recipe_Lemon Cheesecake Mix,Lemon Cheesecake Mix,Cream Cheese,Gr,353
+recipe_Lemon Cheesecake Mix,Lemon Cheesecake Mix,LEMON,Gr,379
+recipe_Lemon Cheesecake Mix,Lemon Cheesecake Mix,Ice Sugar,Gr,118
+recipe_Lemon Cheesecake Small 16cm,Lemon Cheesecake Small 16cm,Almond Biscuit,Gr,220
+recipe_Lemon Cheesecake Small 16cm,Lemon Cheesecake Small 16cm,Lemon Cheesecake Mix,Gr,284
+recipe_Lemon Cheesecake Small 16cm,Lemon Cheesecake Small 16cm,Lemon Glazing,Gr,136
+recipe_Lemon Cream,Lemon Cream,LEMON,Gr,"5,345"
+recipe_Lemon Cream,Lemon Cream,Cooking Butter,Gr,190
+recipe_Lemon Cream,Lemon Cream,White Flour,Gr,38
+recipe_Lemon Cream,Lemon Cream,Ice Sugar,Gr,238
+recipe_Lemon Glazing,Lemon Glazing,LEMON,Gr,321
+recipe_Lemon Glazing,Lemon Glazing,White Sugar,Gr,99
+recipe_Lemon Meringue Pie,Lemon Meringue Pie,Sugar Dough,Gr,415
+recipe_Lemon Meringue Pie,Lemon Meringue Pie,Lemon Cream,Gr,65
+recipe_Lemon Meringue Pie,Lemon Meringue Pie,Meringue,Gr,30
+recipe_Lemon Meringue Pie 16cm,Lemon Meringue Pie 16cm,Sugar Dough,Gr,166
+recipe_Lemon Meringue Pie 16cm,Lemon Meringue Pie 16cm,Lemon Cream,Gr,260
+recipe_Lemon Meringue Pie 16cm,Lemon Meringue Pie 16cm,Meringue,Gr,120
+recipe_Lemon Meringue Pie 24cm,Lemon Meringue Pie 24cm,Sugar Dough,Gr,"3,735"
+recipe_Lemon Meringue Pie 24cm,Lemon Meringue Pie 24cm,Lemon Cream,Gr,585
+recipe_Lemon Meringue Pie 24cm,Lemon Meringue Pie 24cm,Meringue,Gr,270
+recipe_Long Black,Long Black,Coffee bean,Gr,18
+recipe_Long Black,Long Black,Coffee bean,Gr,18
+recipe_Madelaine,Madelaine,White Sugar,Gr,53
+recipe_Madelaine,Madelaine,White Flour,Gr,4
+recipe_Madelaine,Madelaine,Almond Ground,Gr,11
+recipe_Madelaine,Madelaine,LEMON,Gr,5
+recipe_Madelaine,Madelaine,Cooking Butter,Gr,126
+recipe_Matcha Latte,Matcha Latte,Matcha Powder,Gr,30
+recipe_Matcha Latte,Matcha Latte,Matcha Powder,Gr,30
+recipe_Matcha Latte,Matcha Latte,Matcha Powder,Gr,30
+recipe_Matcha Latte,Matcha Latte,Matcha Powder,Gr,30
+recipe_Matcha Latte,Matcha Latte,Matcha Powder,Gr,30
+recipe_Matcha Latte,Matcha Latte,Matcha Powder,Gr,30
+recipe_Mayonnaise,Mayonnaise,Mustard,Gr,16
+recipe_Mayonnaise,Mayonnaise,Salt,Gr,2
+recipe_Meat Quiche,Meat Quiche,Quiche Mix,Gr,60
+recipe_Meat Quiche,Meat Quiche,Quiche Dough,Gr,555
+recipe_Meat Quiche,Meat Quiche,Caramelized Onion,Gr,15
+recipe_Meat Quiche,Meat Quiche,Mozarella Cheese,Gr,15
+recipe_Meat Quiche,Meat Quiche,Smoked Beef,Gr,125
+recipe_Meringue,Meringue,Ice Sugar,Gr,500
+recipe_Meringue,Meringue,Salt,Gr,5
+recipe_Milk shake,Milk shake,Ice Cream Vanilla,Gr,227
+recipe_Milk shake,Milk shake,BANANA,Gr,200
+recipe_Milk shake,Milk shake,Ice Cream Vanilla,Gr,227
+recipe_Milk shake,Milk shake,Cacao Powder Cafe,Gr,35
+recipe_Milk shake,Milk shake,Ice Cream Vanilla,Gr,227
+recipe_Milk shake,Milk shake,LIME,Gr,150
+recipe_Milk shake,Milk shake,Ice Cream Vanilla,Gr,227
+recipe_Milk shake,Milk shake,MANGO,Gr,150
+recipe_Milk shake,Milk shake,Ice Cream Vanilla,Gr,227
+recipe_Milk shake,Milk shake,ORANGE,Gr,425
+recipe_Milk shake,Milk shake,Ice Cream Vanilla,Gr,227
+recipe_Milk shake,Milk shake,PINAPPLE,Gr,200
+recipe_Milk shake,Milk shake,Ice Cream Vanilla,Gr,227
+recipe_Milk shake,Milk shake,STRAWBERRY,Gr,150
+recipe_Milk shake,Milk shake,Ice Cream Vanilla,Gr,227
+recipe_Milk shake,Milk shake,WATER MELON,Gr,500
+recipe_Mini Almond Croissant,Mini Almond Croissant,Almond Cream,Gr,15
+recipe_Mini Almond Croissant,Mini Almond Croissant,Almond Slice,Gr,5
+recipe_Mini burger buns,Mini burger buns,White Flour,Gr,"33,334"
+recipe_Mini burger buns,Mini burger buns,Mix Butter,Gr,2
+recipe_Mini burger buns,Mini burger buns,Salt,Gr,7
+recipe_Mini burger buns,Mini burger buns,White Sugar,Gr,17
+recipe_Mini burger buns,Mini burger buns,Yeast,Gr,5
+recipe_Mini burger buns,Mini burger buns,White Sesame Seed,Gr,2
+recipe_Mini choco almond,Mini choco almond,Almond Cream,Gr,15
+recipe_Mini choco almond,Mini choco almond,Almond Slice,Gr,3
+recipe_Mini Chocolatine Prod,Mini Chocolatine Prod,Chocolate Stick,Gr,5
+recipe_Mini Chocolatine Prod,Mini Chocolatine Prod,Croissant Dough,Gr,45
+recipe_Mini Croissant Prod,Mini Croissant Prod,Croissant Dough,Gr,45
+recipe_Mini Toast Bread,Mini Toast Bread,White Flour,Gr,325
+recipe_Mini Toast Bread,Mini Toast Bread,Mix Butter,Gr,20
+recipe_Mini Toast Bread,Mini Toast Bread,Salt,Gr,7
+recipe_Mini Toast Bread,Mini Toast Bread,White Sugar,Gr,13
+recipe_Mini Toast Bread,Mini Toast Bread,Yeast,Gr,5
+recipe_Moka latte,Moka latte,Coffee bean,Gr,18
+recipe_Moka latte,Moka latte,Coffee bean,Gr,18
+recipe_Moka latte,Moka latte,Coffee bean,Gr,18
+recipe_Moka latte,Moka latte,Coffee bean,Gr,18
+recipe_Moka latte,Moka latte,Coffee bean,Gr,18
+recipe_Moka latte,Moka latte,Coffee bean,Gr,18
+recipe_Moka latte,Moka latte,Coffee bean,Gr,18
+recipe_Moka latte,Moka latte,Coffee bean,Gr,18
+recipe_Mushroom Sautee,Mushroom Sautee,MUSHROOM,Gr,1.724
+recipe_Mushroom Sautee,Mushroom Sautee,Pepper,Gr,1
+recipe_Mushroom Sautee,Mushroom Sautee,Salt,Gr,2
+recipe_Mushroom Sautee,Mushroom Sautee,PARSLEY,Gr,86
+recipe_Mushroom Sautee,Mushroom Sautee,GARLIC,Gr,17
+recipe_New york Roll Caramel,New york Roll Caramel,Caramel Cream,Gr,30
+recipe_New york Roll Caramel,New york Roll Caramel,New York Roll Dough,Gr,925
+recipe_New york Roll Chocolat,New york Roll Chocolat,New York Roll Dough,Gr,925
+recipe_New york Roll Chocolat,New york Roll Chocolat,Nutella,Gr,30
+recipe_New York Roll Dough,New York Roll Dough,White Flour,Gr,541
+recipe_New York Roll Dough,New York Roll Dough,Butter Sheet Croissant,Gr,270
+recipe_New York Roll Dough,New York Roll Dough,Yeast,Gr,11
+recipe_New York Roll Dough,New York Roll Dough,Salt,Gr,11
+recipe_New York Roll Dough,New York Roll Dough,Mix Butter,Gr,54
+recipe_New York Roll Dough,New York Roll Dough,White Sugar,Gr,59
+recipe_New york Roll pistaccio,New york Roll pistaccio,Pistacchio Cream,Gr,30
+recipe_New york Roll pistaccio,New york Roll pistaccio,New York Roll Dough,Gr,925
+recipe_New York Roll Plain,New York Roll Plain,New York Roll Dough,Gr,925
+recipe_New york Roll Strawberry,New york Roll Strawberry,Strawberry Jam,Gr,30
+recipe_New york Roll Strawberry,New york Roll Strawberry,New York Roll Dough,Gr,925
+recipe_Nutella Cream,Nutella Cream,Nutella,Gr,667
+recipe_Nutella Cream,Nutella Cream,Chocolate Dark Couverture,Gr,333
+recipe_Omelette,Omelette,Mushroom Sautee,Gr,20
+recipe_Omelette,Omelette,Parmesan,Gr,5
+recipe_Omelette,Omelette,SPINACH,Gr,50
+recipe_Omelette,Omelette,GARLIC,Gr,5
+recipe_Omelette,Omelette,Cooking Butter,Gr,10
+recipe_Onion Crispy,Onion Crispy,ONION,Gr,2.5
+recipe_Onion Crispy,Onion Crispy,White Flour,Gr,2.5
+recipe_Onion Crispy,Onion Crispy,Milk (Uht),Ml,2.5
+recipe_Onion Crispy,Onion Crispy,Paprika Powder,Gr,50
+recipe_Onion Crispy,Onion Crispy,Salt,Gr,50
+recipe_Opera,Opera,Chocolat Ganache,Gr,"2,916"
+recipe_Opera,Opera,Coffee Cream,Gr,"2,916"
+recipe_Opera,Opera,Chocolate Dark Couverture,Gr,8
+recipe_Opera,Opera,Chocolat Peanut,Gr,"2,083"
+recipe_Opera,Opera,Sponge Cake,Gr,50
+recipe_Opera Cake Big,Opera Cake Big,Sponge Cake,Gr,600
+recipe_Opera Cake Big,Opera Cake Big,Chocolat Ganache,Gr,350
+recipe_Opera Cake Big,Opera Cake Big,Coffee Cream,Gr,350
+recipe_Opera Cake Big,Opera Cake Big,Chocolat Peanut,Gr,250
+recipe_Opera Cake Big,Opera Cake Big,Chocolate Dark Couverture,Gr,100
+recipe_Opera Cake Small,Opera Cake Small,Sponge Cake,Gr,300
+recipe_Opera Cake Small,Opera Cake Small,Chocolat Ganache,Gr,225
+recipe_Opera Cake Small,Opera Cake Small,Chocolat Peanut,Gr,125
+recipe_Opera Cake Small,Opera Cake Small,Coffee Cream,Gr,165
+recipe_Opera Cake Small,Opera Cake Small,Chocolate Dark Couverture,Gr,50
+recipe_Panini 3 cheese,Panini 3 cheese,Cheddar Cheese,Gr,25
+recipe_Panini 3 cheese,Panini 3 cheese,Goat Cheese,Gr,30
+recipe_Panini 3 cheese,Panini 3 cheese,Mozarella Cheese,Gr,30
+recipe_Paris-Brest,Paris-Brest,Choux Dough,Gr,75
+recipe_Paris-Brest,Paris-Brest,Almond Slice,Gr,3
+recipe_Paris-Brest,Paris-Brest,Praline Cream,Gr,60
+recipe_Passion Fruit Cream,Passion Fruit Cream,Ice Sugar,Gr,138
+recipe_Passion Fruit Cream,Passion Fruit Cream,Passion Fruit,Gr,172
+recipe_Passion Fruit Filling,Passion Fruit Filling,Passion Fruit,Gr,385
+recipe_Passion Fruit Filling,Passion Fruit Filling,White Sugar,Gr,192
+recipe_Passion Fruit Filling,Passion Fruit Filling,White Flour,Gr,38
+recipe_Pastry Cream,Pastry Cream,White Flour,Gr,63
+recipe_Pastry Cream,Pastry Cream,White Sugar,Gr,125
+recipe_Piccolo,Piccolo,Coffee bean,Gr,18
+recipe_Pistacchio Cream,Pistacchio Cream,Pistacio Seed,Gr,250
+recipe_Pistacchio Cream,Pistacchio Cream,Pastry Cream,Gr,500
+recipe_Pistacchio Cream,Pistacchio Cream,Ice Sugar,Gr,163
+recipe_Pizza Dough,Pizza Dough,Salt,Gr,10
+recipe_Pizza Dough,Pizza Dough,White Flour,Gr,581
+recipe_Pizza Dough,Pizza Dough,Yeast,Gr,8
+recipe_Pizza Sauce,Pizza Sauce,Tomato Peeled,Gr,906
+recipe_Pizza Sauce,Pizza Sauce,BASIL LEAF,Gr,4
+recipe_Pizza Sauce,Pizza Sauce,GARLIC,Gr,18
+recipe_Pizza Sauce,Pizza Sauce,ONION,Gr,72
+recipe_Pizza Slice,Pizza Slice,Pizza Dough,Gr,75
+recipe_Pizza Slice,Pizza Slice,Pizza Sauce,Gr,29
+recipe_Pizza Slice,Pizza Slice,TOMATO,Gr,8
+recipe_Pizza Slice,Pizza Slice,ONION,Gr,13
+recipe_Pizza Slice,Pizza Slice,Oregano,Gr,1
+recipe_Pizza Slice,Pizza Slice,Mozarella Cheese,Gr,25
+recipe_Poolish Starter,Poolish Starter,White Flour,Gr,1
+recipe_Poolish Starter,Poolish Starter,Yeast,Gr,1
+recipe_Praline Cream,Praline Cream,Praline Paste,Gr,167
+recipe_Praline Cream,Praline Cream,Chantilly,Gr,833
+recipe_Praline Paste,Praline Paste,Almond Slice,Gr,188
+recipe_Praline Paste,Praline Paste,Walnut,Gr,125
+recipe_Praline Paste,Praline Paste,Peanut,Gr,188
+recipe_Praline Paste,Praline Paste,White Sugar,Gr,500
+recipe_Quiche Dough,Quiche Dough,White Flour,Gr,500
+recipe_Quiche Dough,Quiche Dough,Mix Butter,Gr,300
+recipe_Quiche Dough,Quiche Dough,Salt,Gr,1
+recipe_Quiche Mix,Quiche Mix,Pepper,Gr,2
+recipe_Quiche Mix,Quiche Mix,Salt,Gr,2
+recipe_Red Onion Jam,Red Onion Jam,RED ONION,Gr,538
+recipe_Red Onion Jam,Red Onion Jam,Brown Sugar,Gr,81
+recipe_Red Onion Jam,Red Onion Jam,Balsamic Vinegar,Ml,108
+recipe_Red Onion Jam,Red Onion Jam,Salt,Gr,3
+recipe_Red Onion Jam,Red Onion Jam,Pepper,Gr,1
+recipe_Roasted Chicken,Roasted Chicken,Chicken,Gr,1.4
+recipe_Roasted Chicken,Roasted Chicken,Oregano,Gr,5
+recipe_Roasted Chicken,Roasted Chicken,Pepper,Gr,5
+recipe_Roasted Chicken,Roasted Chicken,Rosemary,Gr,5
+recipe_Roasted Chicken,Roasted Chicken,GARLIC,Gr,25
+recipe_Roasted Chicken,Roasted Chicken,LEMON,Gr,75
+recipe_Roasted Chicken,Roasted Chicken,Salt,Gr,8
+recipe_Rye sourdough medium,Rye sourdough medium,White Flour,Gr,133
+recipe_Rye sourdough medium,Rye sourdough medium,Salt,Gr,8
+recipe_Rye sourdough medium,Rye sourdough medium,Pumpkin Seed,Gr,5
+recipe_Rye sourdough medium,Rye sourdough medium,Sunflower Seed,Gr,5
+recipe_Rye sourdough medium,Rye sourdough medium,Flax Seeds Brown,Gr,11
+recipe_Rye sourdough medium,Rye sourdough medium,Yeast,Gr,33
+recipe_Rye sourdough medium,Rye sourdough medium,Crusty Rye Flour,Gr,133
+recipe_Rye sourdough medium,Rye sourdough medium,Sourdough Starter Hard,Gr,80
+recipe_Rye sourdough medium,Rye sourdough medium,Sourdough Starter Liquid,Gr,80
+recipe_Rye Sourdough Small,Rye Sourdough Small,White Flour,Gr,88
+recipe_Rye Sourdough Small,Rye Sourdough Small,Salt,Gr,5
+recipe_Rye Sourdough Small,Rye Sourdough Small,Pumpkin Seed,Gr,4
+recipe_Rye Sourdough Small,Rye Sourdough Small,Sunflower Seed,Gr,4
+recipe_Rye Sourdough Small,Rye Sourdough Small,Flax Seeds Brown,Gr,7
+recipe_Rye Sourdough Small,Rye Sourdough Small,Yeast,Gr,14
+recipe_Rye Sourdough Small,Rye Sourdough Small,Crusty Rye Flour,Gr,88
+recipe_Rye Sourdough Small,Rye Sourdough Small,Sourdough Starter Hard,Gr,53
+recipe_Rye Sourdough Small,Rye Sourdough Small,Sourdough Starter Liquid,Gr,53
+recipe_Salade Special,Salade Special,LETTUCE,Gr,50
+recipe_Salade Special,Salade Special,TOMATO,Gr,50
+recipe_Salade Special,Salade Special,CUCUMBER,Gr,50
+recipe_Salade Special,Salade Special,RED ONION,Gr,25
+recipe_Salade Special,Salade Special,CARROT,Gr,25
+recipe_Salade Special,Salade Special,Parmesan,Gr,15
+recipe_Salade Special,Salade Special,Capsicum Marinated,Gr,25
+recipe_Salade Special,Salade Special,Sunflower Seed,Gr,10
+recipe_Salade Special,Salade Special,Pumpkin Seed,Gr,10
+recipe_Salade Special,Salade Special,Dressing Sauce,Gr,50
+recipe_Small baguette,Small baguette,FLOUR AMOURETTE,Gr,10
+recipe_Small baguette,Small baguette,White Flour,Gr,100
+recipe_Small baguette,Small baguette,Yeast,Gr,1
+recipe_Small Baguette Poolish,Small Baguette Poolish,Poolish Starter,Gr,101
+recipe_Small Baguette Poolish,Small Baguette Poolish,Salt,Gr,2
+recipe_Small Baguette Poolish,Small Baguette Poolish,Sourdough Starter Liquid,Gr,25
+recipe_Small Baguette Poolish,Small Baguette Poolish,White Flour,Gr,43
+recipe_Smoky Fish,Smoky Fish,LETTUCE,Gr,20
+recipe_Smoky Fish,Smoky Fish,RED ONION,Gr,15
+recipe_Smoky Fish,Smoky Fish,"Smoked Mahi""",Gr,50
+recipe_Smoky Fish,Smoky Fish,Cream Cheese Sauce,Gr,35
+recipe_Sourdough Starter Hard,Sourdough Starter Hard,White Flour,Gr,667
+recipe_Sourdough Starter Hard,Sourdough Starter Hard,Yeast,Gr,2
+recipe_Sourdough Starter Liquid,Sourdough Starter Liquid,White Flour,Gr,500
+recipe_Sponge Cake,Sponge Cake,White Sugar,Gr,167
+recipe_Sponge Cake,Sponge Cake,White Flour,Gr,333
+recipe_Strawberry Cheesecake,Strawberry Cheesecake,Strawberry Cheesecake Mix,Gr,708
+recipe_Strawberry Cheesecake,Strawberry Cheesecake,Strawberry Glazing,Gr,"5,371"
+recipe_Strawberry Cheesecake,Strawberry Cheesecake,Almond Biscuit,Gr,55
+recipe_Strawberry Cheesecake Mix,Strawberry Cheesecake Mix,Cream Cheese,Gr,357
+recipe_Strawberry Cheesecake Mix,Strawberry Cheesecake Mix,STRAWBERRY,Gr,179
+recipe_Strawberry Cheesecake Mix,Strawberry Cheesecake Mix,Ice Sugar,Gr,119
+recipe_Strawberry Cheesecake Small 16cm,Strawberry Cheesecake Small 16cm,Almond Biscuit,Gr,220
+recipe_Strawberry Cheesecake Small 16cm,Strawberry Cheesecake Small 16cm,Strawberry Cheesecake Mix,Gr,283
+recipe_Strawberry Cheesecake Small 16cm,Strawberry Cheesecake Small 16cm,Strawberry Glazing,Gr,"21,483"
+recipe_Strawberry Cheesecakes Big 24cm,Strawberry Cheesecakes Big 24cm,Almond Biscuit,Gr,495
+recipe_Strawberry Cheesecakes Big 24cm,Strawberry Cheesecakes Big 24cm,Strawberry Cheesecake Mix,Gr,637
+recipe_Strawberry Cheesecakes Big 24cm,Strawberry Cheesecakes Big 24cm,Strawberry Glazing,Gr,"4,835"
+recipe_Strawberry Glazing,Strawberry Glazing,STRAWBERRY,Gr,465
+recipe_Strawberry Glazing,Strawberry Glazing,White Sugar,Gr,62
+recipe_Strawberry Jam,Strawberry Jam,STRAWBERRY,Gr,667
+recipe_Strawberry Jam,Strawberry Jam,White Sugar,Gr,333
+recipe_Sugar Dough,Sugar Dough,White Flour,Gr,482
+recipe_Sugar Dough,Sugar Dough,Mix Butter,Gr,241
+recipe_Sugar Dough,Sugar Dough,Ice Sugar,Gr,157
+recipe_Toast Bread,Toast Bread,White Flour,Gr,650
+recipe_Toast Bread,Toast Bread,Mix Butter,Gr,39
+recipe_Toast Bread,Toast Bread,Salt,Gr,13
+recipe_Toast Bread,Toast Bread,White Sugar,Gr,26
+recipe_Toast Bread,Toast Bread,Yeast,Gr,10
+recipe_Tropical Fruit Cake,Tropical Fruit Cake,Coconut Biscuit,Gr,32
+recipe_Tropical Fruit Cake,Tropical Fruit Cake,Coconut Cream,Gr,38
+recipe_Tropical Fruit Cake,Tropical Fruit Cake,Passion Fruit Filling,Gr,17
+recipe_Tropical Fruit Cake,Tropical Fruit Cake,Passion Fruit Cream,Gr,36
+recipe_Tropical Fruit Cake 16cm,,Coconut Biscuit,Gr,130
+recipe_Tropical Fruit Cake 16cm,,Passion Fruit Filling,Gr,100
+recipe_Tropical Fruit Cake 16cm,,Coconut Cream,Gr,152
+recipe_Tropical Fruit Cake 16cm,,Passion Fruit Cream,Gr,145
+recipe_Tropical Fruit Cake 24cm,,Coconut Biscuit,Gr,260
+recipe_Tropical Fruit Cake 24cm,,Passion Fruit Filling,Gr,200
+recipe_Tropical Fruit Cake 24cm,,Coconut Cream,Gr,305
+recipe_Tropical Fruit Cake 24cm,,Passion Fruit Cream,Gr,290
+recipe_Vanilla Latte,Vanilla Latte,Coffee bean,Gr,18
+recipe_Vanilla Latte,Vanilla Latte,Coffee bean,Gr,18
+recipe_Vanilla Latte,Vanilla Latte,Coffee bean,Gr,18
+recipe_Vanilla Latte,Vanilla Latte,Coffee bean,Gr,18
+recipe_Vanilla Latte,Vanilla Latte,Coffee bean,Gr,18
+recipe_Vanilla Latte,Vanilla Latte,Coffee bean,Gr,18
+recipe_Vegetarian Bagel,Vegetarian Bagel,LETTUCE,Gr,20
+recipe_Vegetarian Bagel,Vegetarian Bagel,TOMATO,Gr,20
+recipe_Vegetarian Bagel,Vegetarian Bagel,CUCUMBER,Gr,25
+recipe_Vegetarian Bagel,Vegetarian Bagel,Capsicum Marinated,Gr,20
+recipe_Vegetarian Bagel,Vegetarian Bagel,Aioli Sauce,Gr,30
+recipe_Vegetarian Bagel,Vegetarian Bagel,RED ONION,Gr,15
+recipe_Vegetarian Baguette Sandwich,Vegetarian Baguette Sandwich,CUCUMBER,Gr,30
+recipe_Vegetarian Baguette Sandwich,Vegetarian Baguette Sandwich,LETTUCE,Gr,30
+recipe_Vegetarian Baguette Sandwich,Vegetarian Baguette Sandwich,Parmesan,Gr,10
+recipe_Vegetarian Baguette Sandwich,Vegetarian Baguette Sandwich,Capsicum Marinated,Gr,25
+recipe_Vegetarian Baguette Sandwich,Vegetarian Baguette Sandwich,Aioli Sauce,Gr,35
+recipe_Vegetarian Baguette Sandwich,Vegetarian Baguette Sandwich,TOMATO,Gr,30
+recipe_Vegetarian Baguette Sandwich,Vegetarian Baguette Sandwich,RED ONION,Gr,20
+recipe_Vegetarian Quiche,Vegetarian Quiche,Quiche Dough,Gr,555
+recipe_Vegetarian Quiche,Vegetarian Quiche,Quiche Mix,Gr,60
+recipe_Vegetarian Quiche,Vegetarian Quiche,Caramelized Onion,Gr,15
+recipe_Vegetarian Quiche,Vegetarian Quiche,Mozarella Cheese,Gr,15
+recipe_White Poolish Bread Medium,White Poolish Bread Medium,Poolish Starter,Gr,354
+recipe_White Poolish Bread Medium,White Poolish Bread Medium,White Flour,Gr,150
+recipe_White Poolish Bread Medium,White Poolish Bread Medium,Sourdough Starter Liquid,Gr,88
+recipe_White Poolish Bread Medium,White Poolish Bread Medium,Salt,Gr,7
+recipe_White Poolish Bread Medium,White Poolish Bread Medium,Yeast,Gr,33
+recipe_White poolish small,White poolish small,Poolish Starter,Gr,236
+recipe_White poolish small,White poolish small,White Flour,Gr,100
+recipe_White poolish small,White poolish small,Sourdough Starter Liquid,Gr,59
+recipe_White poolish small,White poolish small,Salt,Gr,5
+recipe_White poolish small,White poolish small,Yeast,Gr,14
+recipe_White sourdough medium,White sourdough medium,White Flour,Gr,275
+recipe_White sourdough medium,White sourdough medium,Salt,Gr,8
+recipe_White sourdough medium,White sourdough medium,Sourdough Starter Hard,Gr,83
+recipe_White sourdough medium,White sourdough medium,Sourdough Starter Liquid,Gr,83
+recipe_White sourdough medium,White sourdough medium,Yeast,Gr,33
+recipe_White Sourdough Small,White Sourdough Small,White Flour,Gr,183
+recipe_White Sourdough Small,White Sourdough Small,Salt,Gr,6
+recipe_White Sourdough Small,White Sourdough Small,Sourdough Starter Hard,Gr,55
+recipe_White Sourdough Small,White Sourdough Small,Sourdough Starter Liquid,Gr,55
+recipe_White Sourdough Small,White Sourdough Small,Yeast,Gr,14
+recipe_Zucchini Pickles,Zucchini Pickles,ONION,Gr,405
+recipe_Zucchini Pickles,Zucchini Pickles,ZUCCHINI,Gr,476
+recipe_Zucchini Pickles,Zucchini Pickles,Curry Powder,Gr,5
+recipe_Aioli Sauce,Aioli Sauce,Olive Oil,Ml,83
+recipe_American Bagel,American Bagel,Bbq Sauce,Ml,35
+recipe_Asian Pickles,Asian Pickles,Vinegar,Ml,100
+recipe_Asian Pickles,Asian Pickles,Water,Ml,500
+recipe_Bagels,Bagels,Milk (Uht),Ml,12
+recipe_Bagels,Bagels,Olive Oil,Ml,2
+recipe_Bagels,Bagels,Water,Ml,404
+recipe_Baguette 280gr,Baguette 280gr,Water,Ml,124
+recipe_Bechamel Sauce,Bechamel Sauce,Milk (Uht),Ml,833
+recipe_Breakery Sauce,Breakery Sauce,Bbq Sauce,Ml,75
+recipe_Breakery Sauce,Breakery Sauce,Vinegar,Ml,5
+recipe_Brown Bread,Brown Bread,Water,Ml,"21,667"
+recipe_Burger,Burger,Bbq Sauce,Ml,30
+recipe_Burger Buns,Burger Buns,Milk (Uht),Ml,172
+recipe_Burger Buns,Burger Buns,Water,Ml,172
+recipe_Capsicum Marinated,Capsicum Marinated,Olive Oil,Ml,129
+recipe_Capuccino,Capuccino,Fresh Milk,Ml,200
+recipe_Capuccino,Capuccino,Fresh Milk,Ml,200
+recipe_Capuccino,Capuccino,Oat Milk,Ml,200
+recipe_Capuccino,Capuccino,Fresh Milk,Ml,200
+recipe_Capuccino,Capuccino,Oat Milk,Ml,200
+recipe_Capuccino,Capuccino,Fresh Milk,Ml,200
+recipe_Caramel Cream,Caramel Cream,Whipping Cream,Ml,400
+recipe_Caramel Latte,Caramel Latte,Fresh Milk,Ml,200
+recipe_Caramel Latte,Caramel Latte,Syrup Caramel,Ml,30
+recipe_Caramel Latte,Caramel Latte,Syrup Caramel,Ml,30
+recipe_Caramel Latte,Caramel Latte,Fresh Milk,Ml,200
+recipe_Caramel Latte,Caramel Latte,Syrup Caramel,Ml,30
+recipe_Caramel Latte,Caramel Latte,Oat Milk,Ml,200
+recipe_Caramel Latte,Caramel Latte,Syrup Caramel,Ml,30
+recipe_Caramel Latte,Caramel Latte,Fresh Milk,Ml,200
+recipe_Caramel Latte,Caramel Latte,Fresh Milk,Ml,200
+recipe_Caramel Latte,Caramel Latte,Syrup Caramel,Ml,30
+recipe_Caramel Latte,Caramel Latte,Oat Milk,Ml,200
+recipe_Caramel Latte,Caramel Latte,Syrup Caramel,Ml,30
+recipe_Caramelized Onion,Caramelized Onion,Olive Oil,Ml,19
+recipe_Chantilly,Chantilly,Whipping Cream,Ml,680
+recipe_Chicken Banh Mi Marinated,Chicken Banh Mi Marinated,Sweet Soya Sauce,Ml,100
+recipe_Chicken Banh Mi Marinated,Chicken Banh Mi Marinated,Fish Sauce,Ml,100
+recipe_Chicken Banh Mi Marinated,Chicken Banh Mi Marinated,Olive Oil,Ml,100
+recipe_Chicken Banh Mi Marinated,Chicken Banh Mi Marinated,Soya sauce,Ml,100
+recipe_Chicken Curry,Chicken Curry,Coconut Milk,Ml,325
+recipe_Chicken Curry,Chicken Curry,Water,Ml,8
+recipe_Chocolat Ganache,Chocolat Ganache,Whipping Cream,Ml,667
+recipe_Chocolat Pie Mix,Chocolat Pie Mix,Whipping Cream,Ml,278
+recipe_Chocolat Pie Mix,Chocolat Pie Mix,Milk (Uht),Ml,278
+recipe_Chocolate latte,Chocolate latte,Fresh Milk,Ml,200
+recipe_Chocolate latte,Chocolate latte,Fresh Milk,Ml,200
+recipe_Chocolate latte,Chocolate latte,Oat Milk,Ml,200
+recipe_Chocolate latte,Chocolate latte,Fresh Milk,Ml,200
+recipe_Chocolate latte,Chocolate latte,Fresh Milk,Ml,200
+recipe_Chocolate latte,Chocolate latte,Oat Milk,Ml,200
+recipe_Choux Dough,Choux Dough,Milk (Uht),Ml,340
+recipe_Ciabatta,Ciabatta,Olive Oil,Ml,435
+recipe_Ciabatta,Ciabatta,Water,Ml,57
+recipe_Coconut Cream,Coconut Cream,Whipping Cream,Ml,658
+recipe_Coconut Cream,Coconut Cream,Coconut Milk,Ml,164
+recipe_Coffee Cream,Coffee Cream,Whipping Cream,Ml,647
+recipe_Countryside sourdough medium,Countryside sourdough medium,Water,Ml,151
+recipe_Countryside Sourdough Small,Countryside Sourdough Small,Water,Ml,101
+recipe_Cream Cheese Sauce,Cream Cheese Sauce,Milk (Uht),Ml,429
+recipe_Croissant Dough,Croissant Dough,Water,Ml,226
+recipe_Dressing Sauce,Dressing Sauce,Balsamic Vinegar,Ml,201
+recipe_Dressing Sauce,Dressing Sauce,Salade Oil,Ml,795
+recipe_Flat white,Flat white,Fresh Milk,Ml,200
+recipe_Flat white,Flat white,Fresh Milk,Ml,200
+recipe_Flat white,Flat white,Oat Milk,Ml,200
+recipe_Flat white,Flat white,Oat Milk,Ml,200
+recipe_Flat white,Flat white,Fresh Milk,Ml,200
+recipe_Flat white,Flat white,Fresh Milk,Ml,200
+recipe_Flat white,Flat white,Oat Milk,Ml,200
+recipe_Flat white,Flat white,Oat Milk,Ml,200
+recipe_Hazelnut Latte,Hazelnut Latte,Fresh Milk,Ml,200
+recipe_Hazelnut Latte,Hazelnut Latte,Syrup Hazelnut,Ml,30
+recipe_Hazelnut Latte,Hazelnut Latte,Syrup Hazelnut,Ml,30
+recipe_Hazelnut Latte,Hazelnut Latte,Fresh Milk,Ml,200
+recipe_Hazelnut Latte,Hazelnut Latte,Syrup Hazelnut,Ml,30
+recipe_Hazelnut Latte,Hazelnut Latte,Oat Milk,Ml,200
+recipe_Hazelnut Latte,Hazelnut Latte,Fresh Milk,Ml,200
+recipe_Hazelnut Latte,Hazelnut Latte,Syrup Hazelnut,Ml,30
+recipe_Hazelnut Latte,Hazelnut Latte,Syrup Hazelnut,Ml,30
+recipe_Hazelnut Latte,Hazelnut Latte,Fresh Milk,Ml,200
+recipe_Hazelnut Latte,Hazelnut Latte,Syrup Hazelnut,Ml,30
+recipe_Hazelnut Latte,Hazelnut Latte,Oat Milk,Ml,200
+recipe_Hollandaise Sauce,Hollandaise Sauce,Water,Ml,38
+recipe_Hot Dog buns,Hot Dog buns,Milk (Uht),Ml,172
+recipe_Hot Dog buns,Hot Dog buns,Water,Ml,172
+recipe_Latte,Latte,Fresh Milk,Ml,200
+recipe_Latte,Latte,Fresh Milk,Ml,200
+recipe_Latte,Latte,Fresh Milk,Ml,200
+recipe_Latte,Latte,Oat Milk,Ml,200
+recipe_Latte,Latte,Fresh Milk,Ml,200
+recipe_Latte,Latte,Fresh Milk,Ml,200
+recipe_Latte,Latte,Oat Milk,Ml,200
+recipe_Lemon cheesecake 24cm,Lemon cheesecake 24cm,Whipping Cream,Ml,300
+recipe_Lemon Cheesecake Mix,Lemon Cheesecake Mix,Whipping Cream,Ml,353
+recipe_Lemon Glazing,Lemon Glazing,Water,Ml,743
+recipe_Matcha Latte,Matcha Latte,Fresh Milk,Ml,200
+recipe_Matcha Latte,Matcha Latte,Fresh Milk,Ml,200
+recipe_Matcha Latte,Matcha Latte,Oat Milk,Ml,200
+recipe_Matcha Latte,Matcha Latte,Fresh Milk,Ml,200
+recipe_Matcha Latte,Matcha Latte,Fresh Milk,Ml,200
+recipe_Matcha Latte,Matcha Latte,Oat Milk,Ml,200
+recipe_Mayonnaise,Mayonnaise,Salade Oil,Ml,817
+recipe_Mayonnaise,Mayonnaise,Vinegar,Ml,2
+recipe_Mini burger buns,Mini burger buns,Milk (Uht),Ml,5
+recipe_Mini burger buns,Mini burger buns,Water,Ml,133
+recipe_Mini Toast Bread,Mini Toast Bread,Milk (Uht),Ml,111
+recipe_Mini Toast Bread,Mini Toast Bread,Water,Ml,81
+recipe_Moka latte,Moka latte,Fresh Milk,Ml,200
+recipe_Moka latte,Moka latte,Fresh Milk,Ml,200
+recipe_Moka latte,Moka latte,Oat Milk,Ml,200
+recipe_Moka latte,Moka latte,Oat Milk,Ml,200
+recipe_Moka latte,Moka latte,Fresh Milk,Ml,200
+recipe_Moka latte,Moka latte,Fresh Milk,Ml,200
+recipe_Moka latte,Moka latte,Oat Milk,Ml,200
+recipe_Moka latte,Moka latte,Oat Milk,Ml,200
+recipe_Mushroom Sautee,Mushroom Sautee,Olive Oil,Ml,17
+recipe_New York Roll Dough,New York Roll Dough,Milk (Uht),Ml,54
+recipe_Omelette,Omelette,Milk (Uht),Ml,50
+recipe_Omelette,Omelette,Olive Oil,Ml,10
+recipe_Panini 3 cheese,Panini 3 cheese,Olive Oil,Ml,25
+recipe_Passion Fruit Cream,Passion Fruit Cream,Whipping Cream,Ml,690
+recipe_Passion Fruit Filling,Passion Fruit Filling,Water,Ml,385
+recipe_Pastry Cream,Pastry Cream,Milk (Uht),Ml,625
+recipe_Pistacchio Cream,Pistacchio Cream,Water,Ml,88
+recipe_Pizza Dough,Pizza Dough,Water,Ml,377
+recipe_Pizza Dough,Pizza Dough,Olive Oil,Ml,23
+recipe_Poolish Starter,Poolish Starter,Water,Ml,1
+recipe_Quiche Dough,Quiche Dough,Water,Ml,100
+recipe_Quiche Mix,Quiche Mix,Milk (Uht),Ml,312
+recipe_Quiche Mix,Quiche Mix,Cooking Cream,Ml,312
+recipe_Red Onion Jam,Red Onion Jam,Olive Oil,Ml,54
+recipe_Red Onion Jam,Red Onion Jam,Water,Ml,215
+recipe_Roasted Chicken,Roasted Chicken,Olive Oil,Ml,200
+recipe_Rye sourdough medium,Rye sourdough medium,Water,Ml,146
+recipe_Rye Sourdough Small,Rye Sourdough Small,Water,Ml,97
+recipe_Small baguette,Small baguette,Water,Ml,62
+recipe_Sourdough Starter Hard,Sourdough Starter Hard,Water,Ml,300
+recipe_Sourdough Starter Liquid,Sourdough Starter Liquid,Water,Ml,500
+recipe_Strawberry Cheesecake Mix,Strawberry Cheesecake Mix,Whipping Cream,Ml,357
+recipe_Strawberry Glazing,Strawberry Glazing,Water,Ml,465
+recipe_Toast Bread,Toast Bread,Milk (Uht),Ml,223
+recipe_Toast Bread,Toast Bread,Water,Ml,163
+recipe_Vanilla Latte,Vanilla Latte,Fresh Milk,Ml,200
+recipe_Vanilla Latte,Vanilla Latte,Syrup Vanilla,Ml,30
+recipe_Vanilla Latte,Vanilla Latte,Syrup Vanilla,Ml,30
+recipe_Vanilla Latte,Vanilla Latte,Fresh Milk,Ml,200
+recipe_Vanilla Latte,Vanilla Latte,Syrup Vanilla,Ml,30
+recipe_Vanilla Latte,Vanilla Latte,Oat Milk,Ml,200
+recipe_Vanilla Latte,Vanilla Latte,Fresh Milk,Ml,200
+recipe_Vanilla Latte,Vanilla Latte,Syrup Vanilla,Ml,30
+recipe_Vanilla Latte,Vanilla Latte,Syrup Vanilla,Ml,30
+recipe_Vanilla Latte,Vanilla Latte,Fresh Milk,Ml,200
+recipe_Vanilla Latte,Vanilla Latte,Syrup Vanilla,Ml,30
+recipe_Vanilla Latte,Vanilla Latte,Oat Milk,Ml,200
+recipe_White sourdough medium,White sourdough medium,Water,Ml,151
+recipe_White Sourdough Small,White Sourdough Small,Water,Ml,101
+recipe_Zucchini Pickles,Zucchini Pickles,Vinegar,Ml,119
+recipe_Capuccino,Capuccino,Fresh Milk,Ml,20
+recipe_Capuccino,Capuccino,Fresh Milk,Ml,200
+recipe_Capuccino,Capuccino,Oat Milk,Ml,200
+recipe_Capuccino,Capuccino,Fresh Milk,Ml,20
+recipe_Capuccino,Capuccino,Fresh Milk,Ml,200
+recipe_Capuccino,Capuccino,Oat Milk,Ml,200
+recipe_Almond Cream,Almond Cream,Egg,Pcs,5
+recipe_American Bagel,American Bagel,Egg,Pcs,1
+recipe_American Bagel,American Bagel,Bagels,Pcs,1
+recipe_American Sandwich,American Sandwich,French Fries,Pcs,1
+recipe_American Sandwich,American Sandwich,Small Baguette Poolish,Pcs,1
+recipe_Bagels,Bagels,Egg,Pcs,334
+recipe_Baguette Poolish 280gr,Baguette Poolish 280gr,Paper Bag Baguette,Pcs,1
+recipe_Banh Mi Croissant,Banh Mi Croissant,Croissant stock,Pcs,1
+recipe_Beef Cheese Croissant,Beef Cheese Croissant,Croissant stock,Pcs,1
+recipe_Black Forest BIG 24cm,Black Forest BIG 24cm,Cake Box 25X25 Cm,Pcs,1
+recipe_Black Forest BIG 24cm,Black Forest BIG 24cm,Cake Cardboard 24 Cm,Pcs,1
+recipe_Black Forest Small 18cm,Black Forest Small 18cm,Cake Box 25X25 Cm,Pcs,1
+recipe_Black Forest Small 18cm,Black Forest Small 18cm,Cake Cardboard 24 Cm,Pcs,1
+recipe_Black Forest,Black Forest,Cake Cardboard Round,Pcs,1
+recipe_Breakery Cloud,Breakery Cloud,Cup Breakery Cloud,Pcs,1
+recipe_Burger,Burger,Burger Buns,Pcs,1
+recipe_Burger,Burger,French Fries,Pcs,1
+recipe_Burger Buns,Burger Buns,Egg,Pcs,1
+recipe_Cheesy Brie,Cheesy Brie,Bagels,Pcs,1
+recipe_Chicken Baguette Sandwich,Chicken Baguette Sandwich,Small Baguette Poolish,Pcs,1
+recipe_Chicken Banh Mi,Chicken Banh Mi,Small Baguette Poolish,Pcs,1
+recipe_Chicken Curry Panini,Chicken Curry Panini,Ciabatta,Pcs,1
+recipe_Choco Pie 16cm,Choco Pie 16cm,Cake Box 16 Cm,Pcs,1
+recipe_Choco Pie 16cm,Choco Pie 16cm,Cake Cardboard 16 Cm,Pcs,1
+recipe_Choco Pie 24cm,Choco Pie 24cm,Cake Box 25X25 Cm,Pcs,1
+recipe_Choco Pie 24cm,Choco Pie 24cm,Cake Cardboard 24 Cm,Pcs,1
+recipe_Chocolat Cloud,Chocolat Cloud,Cup Breakery Cloud,Pcs,1
+recipe_Chocolat Pie,Chocolat Pie,Cake Cardboard Round,Pcs,1
+recipe_Chocolat Pie Mix,Chocolat Pie Mix,Egg,Pcs,37
+recipe_Chocolat Sponge Cake,Chocolat Sponge Cake,Egg,Pcs,10
+recipe_Choux Dough,Choux Dough,Egg,Pcs,6
+recipe_Croffel,Croffel,Croissant stock,Pcs,1
+recipe_Croissant,Croissant,Croissant stock,Pcs,1
+recipe_Croissant Almond,Croissant Almond,Croissant stock,Pcs,1
+recipe_Croque-Monsieur,Croque-Monsieur,Toast Bread,Pcs,66
+recipe_Cruffin,Cruffin,Cup Cruffin,Pcs,1
+recipe_Dulce praline Tartelette,Dulce praline Tartelette,Pastry Cardboard Rectangle,Pcs,1
+recipe_Egg Benedict,Egg Benedict,Egg,Pcs,2
+recipe_Egg Benedict,Egg Benedict,White Poolish Bread Medium,Pcs,13
+recipe_Frenchy,Frenchy,Small Baguette Poolish,Pcs,1
+recipe_Hollandaise Sauce,Hollandaise Sauce,Egg,Pcs,8
+recipe_Hot Dog buns,Hot Dog buns,Egg,Pcs,1
+recipe_Hot Dog sandwich,Hot Dog sandwich,Hot Dog buns,Pcs,1
+recipe_Italian Panini,Italian Panini,Ciabatta,Pcs,1
+recipe_Lemon cheesecake,Lemon cheesecake,Cake Cardboard Round,Pcs,1
+recipe_Lemon cheesecake 24cm,Lemon cheesecake 24cm,Cake Box 25X25 Cm,Pcs,1
+recipe_Lemon Cream,Lemon Cream,Egg,Pcs,6
+recipe_Lemon Meringue Pie,Lemon Meringue Pie,Cake Cardboard Round,Pcs,1
+recipe_Lemon Meringue Pie 16cm,Lemon Meringue Pie 16cm,Cake Cardboard 16 Cm,Pcs,1
+recipe_Lemon Meringue Pie 16cm,Lemon Meringue Pie 16cm,Cake Box 16 Cm,Pcs,1
+recipe_Lemon Meringue Pie 24cm,Lemon Meringue Pie 24cm,Cake Cardboard 24 Cm,Pcs,1
+recipe_Lemon Meringue Pie 24cm,Lemon Meringue Pie 24cm,Cake Box 25X25 Cm,Pcs,1
+recipe_Madelaine,Madelaine,Egg,Pcs,134
+recipe_Mayonnaise,Mayonnaise,Egg,Pcs,326
+recipe_Meringue,Meringue,Egg,Pcs,20
+recipe_Mini burger buns,Mini burger buns,Egg,Pcs,67
+recipe_Mini choco almond,Mini choco almond,Mini Chocolatine Prod,Pcs,1
+recipe_Mini Chocolatine,Mini Chocolatine,Mini Chocolatine Prod,Pcs,1
+recipe_Mini Croissant,Mini Croissant,Mini Croissant Prod,Pcs,1
+recipe_New york Roll Caramel,New york Roll Caramel,Box New York Roll,Pcs,1
+recipe_New york Roll Chocolat,New york Roll Chocolat,Box New York Roll,Pcs,1
+recipe_New york Roll pistaccio,New york Roll pistaccio,Box New York Roll,Pcs,1
+recipe_New york Roll Strawberry,New york Roll Strawberry,Box New York Roll,Pcs,1
+recipe_Omelette,Omelette,Egg,Pcs,3
+recipe_Omelette,Omelette,French Fries,Pcs,2
+recipe_Omelette,Omelette,White Poolish Bread Medium,Pcs,13
+recipe_Opera,Opera,Pastry Cardboard Rectangle,Pcs,1
+recipe_Opera Cake Big,Opera Cake Big,Cake Box 25X25 Cm,Pcs,1
+recipe_Opera Cake Big,Opera Cake Big,Cake Cardboard 24 Cm,Pcs,1
+recipe_Opera Cake Small,Opera Cake Small,Cake Cardboard 24 Cm,Pcs,1
+recipe_Opera Cake Small,Opera Cake Small,Cake Box 25X25 Cm,Pcs,1
+recipe_Panini 3 cheese,Panini 3 cheese,Ciabatta,Pcs,1
+recipe_Paris-Brest,Paris-Brest,Pastry Cardboard Rectangle,Pcs,1
+recipe_Pastry Cream,Pastry Cream,Egg,Pcs,236
+recipe_Quiche Dough,Quiche Dough,Egg,Pcs,2
+recipe_Quiche Mix,Quiche Mix,Egg,Pcs,748
+recipe_Salade Special,Salade Special,Egg,Pcs,1
+recipe_Smoky Fish,Smoky Fish,Bagels,Pcs,1
+recipe_Sponge Cake,Sponge Cake,Egg,Pcs,10
+recipe_Strawberry Cheesecake,Strawberry Cheesecake,Cake Cardboard Round,Pcs,1
+recipe_Strawberry Cheesecake Small 16cm,Strawberry Cheesecake Small 16cm,Cake Box 16 Cm,Pcs,1
+recipe_Strawberry Cheesecake Small 16cm,Strawberry Cheesecake Small 16cm,Cake Cardboard 16 Cm,Pcs,1
+recipe_Strawberry Cheesecakes Big 24cm,Strawberry Cheesecakes Big 24cm,Cake Box 25X25 Cm,Pcs,1
+recipe_Strawberry Cheesecakes Big 24cm,Strawberry Cheesecakes Big 24cm,Cake Cardboard 24 Cm,Pcs,1
+recipe_Sugar Dough,Sugar Dough,Egg,Pcs,24
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tea,Tea,Tea Bag,Pcs,1
+recipe_Tropical Fruit Cake,Tropical Fruit Cake,Cake Cardboard Round,Pcs,1
+recipe_Tropical Fruit Cake 16cm,,Cake Cardboard 16 Cm,Pcs,1
+recipe_Tropical Fruit Cake 16cm,,Cake Box 16 Cm,Pcs,1
+recipe_Tropical Fruit Cake 24cm,,Cake Box 25X25 Cm,Pcs,1
+recipe_Tropical Fruit Cake 24cm,,Cake Cardboard 24 Cm,Pcs,1
+recipe_Vegetarian Bagel,Vegetarian Bagel,Bagels,Pcs,1
+recipe_Vegetarian Baguette Sandwich,Vegetarian Baguette Sandwich,Egg,Pcs,1
+recipe_Vegetarian Baguette Sandwich,Vegetarian Baguette Sandwich,Small Baguette Poolish,Pcs,1
+recipe_Chocolatine,Chocolatine,Chocolatine Prod,Pcs,1
+recipe_Chocolatine Almond,Chocolatine Almond,Chocolatine Prod,Pcs,1
+recipe_Lemon cheesecake 24cm,Lemon cheesecake 24cm,Cake Cardboard 24 Cm,Pcs,1
+recipe_Madelaine,Madelaine,Salt,Gr,3
+recipe_Mini Almond Croissant,Mini Almond Croissant,Mini Croissant Prod,Pcs,1
+recipe_Vegetarian Bagel,Vegetarian Bagel,Egg,Pcs,1

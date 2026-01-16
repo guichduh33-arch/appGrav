@@ -1,0 +1,401 @@
+name,classification_id,category,variant_label,variant_names,buy_price,pos_sell_price,track_inventory,stock_qty,hold_qty,low_stock_alert,uom,published,pos_hidden,description,photo_1
+Lemon Cheesecake Small 16cm,9901,Cake,,,0,250000,0,0,0,0,Pcs,0,0,,
+Aluminium Foil,9901,KITCHEN SUPLLIES,,,36000,0,0,0,0,0,,0,0,,
+Coffee Bean Pack 500gr,9901,Coffee,,,0,250000,0,0,0,0,Bag,0,0,,
+Tea Bag,9901,BEVERAGE,,,4400,0,1,85,0,0,Pcs,0,0,,
+Gelatin,9901,CONDIMENT,,,292.8,0,0,0,0,0,gr,0,0,,
+Agar-Agar,9901,CONDIMENT,,,584.89,0,0,0,0,0,gr,0,0,,
+White Sugar Sachset,9901,DRY,,,190.27,0,0,0,0,0,Pcs,0,0,,
+Brown Sugar Sachset,9901,DRY,,,241.44,0,0,0,0,0,Pcs,0,0,,
+Cup Breakery Cloud,9901,PACKAGING,,,30,0,0,0,0,0,Pcs,0,0,,
+Caramel Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Hot,Fresh milk",0,50000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6890221c7ceee.jpg
+Caramel Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Hot,oat milk",0,60000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6890221c7ceee.jpg
+Caramel Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Ice,fresh milk",0,50000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6890221c7ceee.jpg
+Caramel Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Ice,Oat milk",0,60000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6890221c7ceee.jpg
+Vanilla Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Hot,Fresh milk",0,50000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689022e068c37.jpg
+Vanilla Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Hot,oat milk",0,60000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689022e068c37.jpg
+Vanilla Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Ice,fresh milk",0,50000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689022e068c37.jpg
+Vanilla Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Ice,Oat milk",0,60000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689022e068c37.jpg
+Hazelnut Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Hot,Fresh milk",0,50000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689021c0c8506.jpg
+Hazelnut Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Hot,oat milk",0,60000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689021c0c8506.jpg
+Hazelnut Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Ice,fresh milk",0,50000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689021c0c8506.jpg
+Hazelnut Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Ice,Oat milk",0,60000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689021c0c8506.jpg
+Chocolate latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Hot,Fresh milk",0,50000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689024170ecc5.jpg
+Chocolate latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Hot,oat milk",0,60000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689024170ecc5.jpg
+Chocolate latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Ice,fresh milk",0,50000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689024170ecc5.jpg
+Chocolate latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Ice,Oat milk",0,60000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689024170ecc5.jpg
+Matcha Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Hot,Fresh milk",0,50000,0,0,0,0,PCS,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689023eadd94e.jpg
+Matcha Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Hot,oat milk",0,60000,0,0,0,0,PCS,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689023eadd94e.jpg
+Matcha Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Ice,fresh milk",0,50000,0,0,0,0,PCS,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689023eadd94e.jpg
+Matcha Latte,2902,Speciale Latte,"hot/ice,Fresh/oat","Ice,Oat milk",0,60000,0,0,0,0,PCS,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_689023eadd94e.jpg
+Mini Croissant Prod,9901,SFG,,,2948.3,0,1,32,0,0,Pcs,0,1,,
+Mini Chocolatine Prod,9901,SFG,,,4269.03,0,1,14,0,0,Pcs,0,1,,
+Chocolatine Prod,9901,SFG,,,8538.06,0,1,55,0,0,Pcs,0,1,,
+Croissant stock,9901,SFG,,,5896.6,0,1,59,0,0,Pcs,0,1,,
+New York Roll Dough,9901,SFG,,,75615.71,0,1,3.565,0,0,kg,0,1,,
+WRAPPING PLASTIC 45 CM,9901,KITCHEN SUPLLIES,,,0,0,0,0,0,0,ROLL,0,1,,
+WRAPPING PLASTIC 30CM,9901,KITCHEN SUPLLIES,,,0,0,0,0,0,0,ROLL,0,1,,
+THERMAL PAPER,9901,KITCHEN SUPLLIES,,,0,0,0,0,0,0,ROLL,0,1,,
+Mika Roll,9901,KITCHEN SUPLLIES,,,0,0,0,0,0,0,ROLL,0,1,,
+Kitchen Towel Roll,9901,CLEANING,,,18843.75,0,0,0,0,0,ROLL,0,1,,
+BAKING PAPER,9901,KITCHEN SUPLLIES,,,0,0,0,0,0,0,ROLL,0,1,,
+WOODEN SPOON,9901,KITCHEN SUPLLIES,,,0,0,0,0,0,0,Pcs,0,1,,
+White Sourdough Small,9901,Sourdough Breads,,,2646.29,40000,1,2,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f8ba29244.jpg
+White sourdough medium,9901,Sourdough Breads,,,3986.15,52000,1,3,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a03825a385.jpg
+White poolish small,9901,Sourdough Breads,,,3889.4,40000,1,8,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b32bc162af.jpg
+White Poolish Bread Medium,9901,Sourdough Breads,,,5840.31,52000,1,32.7,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b32636d8fc.jpg
+Vegetarian Quiche,9901,Savouries,,,7067.94,42000,1,5,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879ff134c78c.jpg
+Vegetarian Baguette Sandwich,2901,Sandwiches Baguette,,,0,60000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f87099207.jpg
+Vegetarian Bagel,9901,Bagel,,,0,60000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f82316781.jpg
+VANILLY PANIFOLIA,9901,CONDIMENT,,,0,0,1,0,0,0,Pcs,0,1,,
+Tropical Fruit Cake 24CM,9901,Cake,,,0,350000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a1374f3552.jpg
+Tropical Fruit Cake 16cm,9901,Cake,,,0,250000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a13c571d25.jpg
+Tropical Fruit Cake,9901,Individual Pastries,,,9773.35,47000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a05d6aecca.jpg
+Toast Bread,9901,Classic Breads,,,14143.4,60000,1,1.454,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f7fc34a67.jpg
+Strawberry tartelette,9901,Individual Pastries,,,0,45000,1,0,0,0,Pcs,1,0,,
+Strawberry Cheesecakes Big 24cm,9901,Cake,,,0,400000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a118a70d76.jpg
+Strawberry Cheesecake Small 16cm,9901,Cake,,,0,250000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a10a9b437e.jpg
+Strawberry Cheesecake,9901,Individual Pastries,,,13343.22,42000,1,6,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b862d40d9d.jpg
+Smoky Fish,9901,Bagel,,,0,85000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0088b2c4b.jpg
+Small Brioche,9901,Others Viennoiserie,,,0,15000,1,0,0,0,Pcs,1,0,,
+Small Baguette Poolish,9901,Classic Breads,,,1671.95,12000,1,2,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a09c14f5e5.jpg
+Small baguette,9901,Classic Breads,,,2269.83,12000,1,-1,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a08f01b6e8.jpg
+Salade Special,9901,Simple Plate,,,0,48000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f7cca1680.jpg
+Rye Sourdough Small,9901,Sourdough Breads,,,11666.42,42000,1,1,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f7a713ad5.jpg
+Rye sourdough medium,9901,Sourdough Breads,,,17478.83,52000,1,3,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f77d95b0d.jpg
+Pizza Slice,9901,Savouries,,,5021.8,22000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f73cc3606.jpg
+Pastry Cardboard Rectangle,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Passion Fruit Jam,9901,HASIL BOHEMI,,,74250,110000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b0aa723667.jpeg
+Paris-Brest,9901,Individual Pastries,,,8963.64,47000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0597c567b.jpg
+Paper Cup 16 Oz,9901,PACKAGING,,,1700,0,0,0,0,0,Pcs,0,1,,
+Paper Cup 12 Oz,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Paper bag tali,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Paper Bag Small,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Paper Bag Medium,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Paper Bag Baguette,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Panini 3 cheese,2901,Panini,,,0,90000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f6d4e0a37.jpg
+Opera Cake Small,9901,Cake,,,0,250000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a11e1b9c7d.jpg
+Opera Cake Big,9901,Cake,,,0,420000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a11d6163fb.jpg
+Opera,9901,Individual Pastries,,,13488.43,42000,1,12,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879ffbc22b8f.jpg
+Omelette,9901,Simple Plate,,,0,65000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f3fcde747.jpg
+New york Roll Strawberry,9901,Others Viennoiserie,,,8327.53,35000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0728cfa62.jpg
+New York Roll Plain,9901,Others Viennoiserie,,,0,30000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a07a483e19.jpg
+New york Roll pistaccio,9901,Others Viennoiserie,,,11730.45,35000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a071c6c8a8.jpg
+New york Roll Chocolat,9901,Others Viennoiserie,,,12290.45,35000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0703bf5b3.jpg
+New york Roll Caramel,9901,Others Viennoiserie,,,10422.2,35000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a076ae8e13.jpg
+Mini Toast Bread,9901,Classic Breads,,,7029.35,40000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f6605af2e.jpg
+Mini Croissant,9901,Classic Viennoiserie,,,2951.06,15000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f63b180fd.jpg
+Mini Chocolatine,9901,Classic Viennoiserie,,,4310.99,20000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f61790b5f.jpg
+mini choco almond,9901,Classic Viennoiserie,,,5867.41,20000,1,1,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f5f361330.jpg
+Mini burger buns,9901,Buns,,,761.64,8500,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0a1cf301d.jpg
+Mini Almond Croissant,9901,Classic Viennoiserie,,,4880.64,20000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f53f9ec54.jpg
+Meat Quiche,9901,Savouries,,,8234.12,47000,1,3,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0c863c484.jpg
+Madelaine,9901,Others Viennoiserie,,,4813.29,10000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f5c837b26.jpg
+Lemon Meringue Pie 24cm,9901,Cake,,,0,350000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a1390e0460.jpg
+Lemon Meringue Pie 16cm,9901,Cake,,,0,250000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a13cb6716c.jpg
+Lemon Meringue Pie,9901,Individual Pastries,,,7887.05,42000,1,2,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a05270fcd6.jpg
+Lemon cheesecake 24cm,9901,Cake,,,0,400000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a11217df5d.jpg
+Lemon cheesecake,9901,Individual Pastries,,,14206.93,42000,1,5,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0d90918d5.jpg
+Kombucha,2902,Special Drinks,,,18000,40000,1,22,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b80aa430cb.jpg
+Italian Panini,2901,Panini,,,31543.78,85000,1,1,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a045346c42.jpg
+Hot Dog sandwich,2901,Classic Sandwiches,,,0,55000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0283d0271.jpg
+Hot Dog buns,9901,Buns,,,1474.16,12000,1,5,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a01a0de548.jpg
+Granola,9901,HASIL BOHEMI,,,81000,116000,1,3,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b0cd3602ff.jpeg
+Gable Box Small,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Fresh Juice,9901,Other drinks,FRUIT,ORANGE,0,30000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bef8bc59.jpg
+Fresh Juice,9901,Other drinks,FRUIT,MANGGO,0,30000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bef8bc59.jpg
+Fresh Juice,9901,Other drinks,FRUIT,WATERMELON,0,30000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bef8bc59.jpg
+Fresh Juice,9901,Other drinks,FRUIT,LIME,0,30000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bef8bc59.jpg
+Fresh Juice,9901,Other drinks,FRUIT,STRAWBERRY,0,30000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bef8bc59.jpg
+Fresh Juice,9901,Other drinks,FRUIT,PINNEAPPLE,0,30000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bef8bc59.jpg
+Fresh Juice,9901,Other drinks,FRUIT,BANANA,0,30000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bef8bc59.jpg
+Frenchy,2901,Sandwiches Baguette,,,0,90000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0235ed414.jpg
+French Fries,9901,Savoury Croissant,,,6170.16,35000,1,15.8,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a08a76f8d1.jpg
+Egg Benedict,9901,Simple Plate,,,0,75000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f59f2538a.jpg
+Dulce praline Tartelette,9901,Individual Pastries,,,7999.05,42000,1,1,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687afc12e7a26.jpg
+Dark Choco Peanut Butter,9901,HASIL BOHEMI,,,74250,110000,1,1,0,0,Pcs,1,0,,
+Danish Raisin,9901,Classic Viennoiserie,,,6695.75,30000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a04390b1c7.jpg
+Cup sauce take away,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Cup Holder Single,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Cup Holder Double,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Cup Cruffin,9901,PACKAGING,,,570,0,0,0,0,0,Pcs,0,1,,
+Crunchy Peanut Butter,9901,HASIL BOHEMI,,,51750,75000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b0c94d06e9.jpg
+Cruffin,9901,Others Viennoiserie,,,10370.77,35000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a013fd26b1.jpg
+Croque-Monsieur,9901,Savouries,,,8613.18,37000,1,6,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a00ef08b3c.jpg
+Croissant Nutella,9901,Others Viennoiserie,,,10113.75,35000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f575aa4b3.jpg
+Croissant Almond,9901,Classic Viennoiserie,,,8560.57,30000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879feb536ea0.jpg
+Croissant,9901,Classic Viennoiserie,,,5902.12,25000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879fe7ace724.jpg
+Croffel,9901,Others Viennoiserie,,,5896.6,30000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a060e95670.jpg
+Countryside Sourdough Small,9901,Sourdough Breads,,,6610.26,42000,1,7,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b2f06ee657.jpg
+Countryside sourdough medium,9901,Sourdough Breads,,,9927.04,52000,1,4,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b2f1382f7e.jpg
+Ciabatta,9901,Buns,,,1480.97,12000,1,16,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a09f3cdf82.jpg
+Chocolatine Almond,9901,Classic Viennoiserie,,,11202.03,32000,1,-2,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879fc6780f56.jpg
+Chocolatine,9901,Classic Viennoiserie,,,8627.8,30000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879feda899eb.jpg
+Chocolat Pie,9901,Individual Pastries,,,13289.68,47000,1,1,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b0520dd9ab.jpg
+Chocolat Cloud,9901,Individual Pastries,,,6828.65,22000,1,7,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0d0490aa3.jpg
+Choco Pie 24cm,9901,Cake,,,0,350000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a14dca0872.jpg
+Choco Pie 16cm,9901,Cake,,,0,250000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a107517afc.jpg
+Chicken Curry Panini,2901,Panini,,,16380.75,85000,1,1,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0468e8d05.jpg
+Chicken Banh Mi,2901,Sandwiches Baguette,,,0,85000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879fde9b12db.jpg
+Chicken Baguette Sandwich,2901,Sandwiches Baguette,,,0,85000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879fe2c3f679.jpg
+Cheesy Brie,9901,Bagel,,,0,70000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879fd8767785.jpg
+Cake Cardboard Round,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Cake Cardboard 24 Cm,9901,PACKAGING,,,2499.67,0,0,0,0,0,Pcs,0,1,,
+Cake Cardboard 16 Cm,9901,PACKAGING,,,1492.92,0,0,0,0,0,Pcs,0,1,,
+Cake Box 25X25 Cm,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Cake Box 16 Cm,9901,PACKAGING,,,7564.12,0,0,0,0,0,Pcs,0,1,,
+Burger Buns,9901,Buns,,,1423.24,12000,1,16,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879fcbc7f322.jpg
+Burger,2901,Classic Sandwiches,,,37414.94,100000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a01cc6b01e.jpg
+Brown Bread,9901,Classic Breads,,,6067.99,40000,1,18,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a002076c8d.jpg
+Breakery Cloud,9901,Individual Pastries,,,3658.09,20000,1,6,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879ff7b3189f.jpg
+Box Small,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Box New York Roll,9901,PACKAGING,,,611,0,0,0,0,0,Pcs,0,1,,
+Box Medium,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Box Breakery Cloud,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Box Big,9901,PACKAGING,,,0,0,0,0,0,0,Pcs,0,1,,
+Black Forest,9901,Individual Pastries,,,15232.94,48000,1,1,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a04dd63a07.jpg
+Black Burger Buns gr,9901,Buns,,,0,10000,1,0,0,0,Pcs,1,0,,
+Black  Forest Small 18cm,9901,Cake,,,0,300000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a104523352.jpg
+Black  Forest BIG 24cm,9901,Cake,,,0,400000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a125ce45dd.jpg
+Beef Cheese Croissant,9901,Savoury Croissant,,,0,45000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f3a62df21.jpg
+Banh Mi Croissant,9901,Savoury Croissant,,,0,50000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879fff45e02c.jpg
+Baguette Poolish 280gr,9901,Classic Breads,,,3362.96,24000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a00b7ec31c.jpg
+Baguette 280gr,9901,Classic Breads,,,4511.44,24000,1,0,0,0,Pcs,1,1,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a09957d7ac.jpg
+Bagels,9901,Buns,,,2423.15,12000,1,10,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f4d542680.jpg
+American Sandwich,2901,Sandwiches Baguette,,,0,100000,0,0,0,0,,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f498af0dd.jpg
+American Bagel,9901,Bagel,,,0,70000,0,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_6879f46e546ed.jpg
+Almond Butter,9901,HASIL BOHEMI,,,96750,140000,1,0,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b0ca461747.jpg
+TRASH BAG,9901,CLEANING,,,0,0,0,0,0,0,PACK,0,1,,
+Toilet Paper,9901,CLEANING,,,16577.38,0,0,0,0,0,PACK,0,1,,
+STRAW,9901,KITCHEN SUPLLIES,,,0,0,0,0,0,0,PACK,0,1,,
+SPONG,9901,CLEANING,,,0,0,0,0,0,0,PACK,0,1,,
+Pipping Bag,9901,KITCHEN SUPLLIES,,,0,0,0,0,0,0,PACK,0,1,,
+Hand Towel,9901,CLEANING,,,7304.79,0,0,0,0,0,PACK,0,1,,
+HAND GLOVE,9901,CLEANING,,,0,0,0,0,0,0,Pcs,0,1,,
+Whipping Cream,9901,DAIRY,,,121729.01,0,1,4.687,0,0,lt,0,1,,
+Water,9901,BEVERAGE,,,609.78,0,1,2998.607,0,0,lt,0,1,,
+Vinegar,9901,CONDIMENT,,,44389.98,0,1,0.949,0,0,lt,0,1,,
+Tomato Peeled,9901,SAUCE,,,31531.5,0,1,5,0,0,kg,0,1,,
+Syrup Vanilla,9901,BEVERAGE,,,155855,0,1,1.69,0,0,lt,0,1,,
+Syrup Hazelnut,9901,BEVERAGE,,,180180,0,1,1.34,0,0,lt,0,1,,
+Syrup Caramel,9901,BEVERAGE,,,180180,0,1,1.4,0,0,lt,0,1,,
+Sweet Soya Sauce,9901,SAUCE,,,0,0,1,0,0,0,lt,0,1,,
+Soya sauce,9901,SAUCE,,,58200,0,1,0.27,0,0,lt,0,1,,
+Scale off,9901,CLEANING,,,0,0,0,0,0,0,lt,0,1,,
+Sauce Sambal,9901,SAUCE,,,19983.64,0,1,3.74,0,0,l,0,1,,
+Sauce Ketchup,9901,SAUCE,,,16727.27,0,1,4.3,0,0,l,0,1,,
+Salade Oil,9901,DRY,,,49405.75,0,1,12.016,0,0,lt,0,1,,
+Rinser Machin,9901,CLEANING,,,0,0,0,0,0,0,lt,0,1,,
+Pesto Sauce,9901,SAUCE,,,318865.77,0,1,0.64,0,0,kg,0,1,,
+Olive Oil,9901,DRY,,,100264.31,0,1,3.213,0,0,lt,0,1,,
+Oat Milk,9901,DAIRY,,,29818,0,1,32.8,0,0,lt,0,1,,
+Milk (Uht),9901,DAIRY,,,15949.7,0,1,16.64,0,0,lt,0,1,,
+Hand Soap,9901,CLEANING,,,0,0,0,0,0,0,lt,0,1,,
+Greezaway,9901,CLEANING,,,0,0,0,0,0,0,lt,0,1,,
+General Cleaner,9901,CLEANING,,,0,0,0,0,0,0,lt,0,1,,
+Fried oil,9901,DRY,,,19020.15,0,1,19.13,0,18,lt,0,1,,
+Fresh Milk,9901,DAIRY,,,20500,0,1,58.4,0,0,lt,0,1,,
+Fish Sauce,9901,SAUCE,,,45142.86,0,1,0.48,0,0,l,0,1,,
+Dishes Liquid,9901,CLEANING,,,15582.84,0,0,0,0,0,lt,0,1,,
+Dish Cleaner Machin,9901,CLEANING,,,0,0,0,0,0,0,lt,0,1,,
+Cooking Cream,9901,DAIRY,,,90000,0,1,2.791,0,0,lt,0,1,,
+Coconut Milk,9901,DRY,,,79445.33,0,1,1.48,0,0.3,lt,0,1,,
+Bbq Sauce,9901,SAUCE,,,84909.68,0,1,1.625,0,0,lt,0,1,,
+Balsamic Vinegar,9901,CONDIMENT,,,0,0,1,0.36,0,0,l,0,1,,
+Zucchini Pickles,9901,SFG,,,0,0,1,0,0,0,kg,0,1,,
+ZUCCHINI,9901,VEGETABLE,,,25828.15,0,1,0.67,0,0,kg,0,1,,
+Yeast,9901,DRY,,,95000,0,1,6.108,0,0,kg,0,1,,
+White Sugar,9901,DRY,,,18000,0,1,18.23,0,0,kg,0,1,,
+White Sesame Seed,9901,SEED,,,49032.92,0,1,1.505,0,0,kg,0,1,,
+White Flour,9901,FLOUR,,,10116.6,0,1,237.986,0,0,kg,0,1,,
+White Chocolate Couverture,9901,CHOCOLAT,,,311837.55,0,1,1.9,0,0,kg,0,1,,
+WATER MELON,9901,FRUIT,,,12500,0,1,9.31,0,0,kg,0,1,,
+Walnut,9901,SEED,,,0,0,1,1.17,0,0,kg,0,1,,
+Tuna Chunk,9901,meat,,,0,0,1,0,0,0,kg,0,1,,
+Tomme Cheese,9901,DAIRY,,,251000,0,1,0,0,0,kg,0,1,,
+TOMATO,9901,VEGETABLE,,,19764.37,0,1,3.934,0,0,kg,0,1,,
+Sunflower  Seed,9901,SEED,,,48985.38,0,1,0.192,0,0,kg,0,1,,
+Sugar Dough,9901,SFG,,,28415.21,0,1,0.345,0,0,kg,0,1,,
+Strawberry Jam,9901,SFG,,,24069.25,0,1,0.22,0,0,kg,0,1,,
+Strawberry Glazing,9901,SFG,,,13993.47,0,1,0,0,0,kg,0,1,,
+Strawberry Cheesecake Mix,9901,SFG,,,99121.73,0,1,0.001,0,0,kg,0,1,,
+STRAWBERRY,9901,FRUIT,,,27099.33,0,1,3.78,0,0,kg,0,1,,
+Sponge Cake,9901,SFG,,,24709.63,0,1,0,0,0,kg,0,1,,
+SPINACH,9901,VEGETABLE,,,8688.54,0,1,0.32,0,0,kg,0,1,,
+Sourdough Starter Liquid,9901,SFG,,,5363.19,0,1,1.996,0,0,kg,0,1,,
+Sourdough Starter Hard,9901,SFG,,,7120.71,0,1,0.606,0,0,kg,0,1,,
+"Smoked Mahi""",9901,meat,,,281000,0,1,1.2,0,0,kg,0,1,,
+Smoked Beef,9901,meat,,,134619.43,0,1,5.198,0,0,kg,0,1,,
+Sausage Hotdog,9901,meat,,,85000,0,1,-1.82,0,0,kg,0,1,,
+Salt,9901,CONDIMENT,,,5666.9,0,1,20.732,0,0,kg,0,1,,
+RUCOLA,9901,VEGETABLE,,,65000,0,1,0.49,0,0,kg,0,1,,
+Rosemary,9901,CONDIMENT,,,279936.36,0,1,0.04,0,0,kg,0,1,,
+Roasted Chicken,9901,SFG,,,117316.87,0,1,1.316,0,0,kg,0,1,,
+Red Onion Jam,9901,SFG,,,40658.56,0,1,0.02,0,0,kg,0,1,,
+RED ONION,9901,VEGETABLE,,,58000,0,1,0.245,0,0,kg,0,1,,
+RADISH,9901,VEGETABLE,,,18000,0,1,0.5,0,0,kg,0,1,,
+Quiche Mix,9901,SFG,,,47444.72,0,1,0.055,0,0,kg,0,1,,
+Quiche Dough,9901,SFG,,,27591.94,0,1,0.34,0,0,kg,0,1,,
+Pumpkin Seed,9901,SEED,,,109303.13,0,1,1.079,0,0,kg,0,1,,
+Praline Paste,9901,SFG,,,52271.66,0,1,0.34,0,0,kg,0,1,,
+Praline Cream,9901,SFG,,,83357.83,0,1,0.04,0,0,kg,0,1,,
+POTATO,9901,VEGETABLE,,,20000,0,1,5,0,0,kg,0,1,,
+Poolish Starter,9901,SFG,,,10821.38,0,1,1.95,0,0,kg,0,1,,
+Pizza Sauce,9901,SFG,,,31696.09,0,1,0.372,0,0,kg,0,1,,
+Pizza Dough,9901,SFG,,,9225.62,0,1,0.45,0,0,kg,0,1,,
+Pistacio Seed,9901,SEED,,,510000,0,1,0.28,0,0,kg,0,1,,
+Pistacchio Cream,9901,SFG,,,137499.93,0,1,0.03,0,0,kg,0,1,,
+PINAPPLE,9901,FRUIT,,,26836.79,0,1,1.11,0,0,kg,0,1,,
+Pepper,9901,CONDIMENT,,,331325.3,0,0,0,0,0,kg,0,1,,
+Pearl Sugar,9901,DRY,,,329690,0,1,0.6,0,0,kg,0,1,,
+Peanut,9901,SEED,,,59461.83,0,1,1.31,0,0,kg,0,1,,
+Pastry Cream,9901,SFG,,,12950.97,0,1,0.192,0,0,kg,0,1,,
+Passion Fruit Filling,9901,SFG,,,27085.38,0,1,0,0,0,kg,0,1,,
+Passion Fruit Cream,9901,SFG,,,97396.72,0,1,0,0,0,kg,0,1,,
+Passion Fruit,9901,FRUIT,,,59793.81,0,1,0,0,0,kg,0,1,,
+PARSLEY,9901,VEGETABLE,,,30000,0,1,0.017,0,0,kg,0,1,,
+Parmesan,9901,DAIRY,,,259457.19,0,1,0.38,0,0,kg,0,1,,
+Paprika Powder,9901,CONDIMENT,,,371201.34,0,1,0.03,0,0,kg,0,1,,
+Pain De Campagne Flour,9901,FLOUR,,,53200.02,0,1,9.3,0,0,kg,0,1,,
+Oregano,9901,CONDIMENT,,,722506.1,0,1,0.009,0,0,kg,0,1,,
+ORANGE,9901,FRUIT,,,21496.36,0,1,11.06,0,0,kg,0,1,,
+Onion Powder,9901,CONDIMENT,,,294000,0,1,0.09,0,0,kg,0,1,,
+Onion Crispy,9901,SFG,,,56527.77,0,1,0,0,0,kg,0,1,,
+ONION,9901,VEGETABLE,,,28528.95,0,1,3.124,0,0,kg,0,1,,
+Nutmeg,9901,CONDIMENT,,,430000,0,1,0.159,0,0,kg,0,1,,
+Nutella Cream,9901,SFG,,,194621.1,0,1,0,0,0,kg,0,1,,
+Nutella,9901,CHOCOLAT,,,156166.67,0,1,6.885,0,0,kg,0,1,,
+Mustard Seed,9901,SEED,,,0,0,1,0,0,0,kg,0,1,,
+Mustard,9901,CONDIMENT,,,148621.37,0,1,1.975,0,0,kg,0,1,,
+Mushroom Sautee,9901,SFG,,,96543.15,0,1,0.229,0,0,kg,0,1,,
+MUSHROOM,9901,VEGETABLE,,,53000,0,1,0.571,0,0,kg,0,1,,
+Mozarella Cheese,9901,DAIRY,,,112377.89,0,1,15.21,0,0,kg,0,1,,
+Mix Butter,9901,DAIRY,,,62666.78,0,1,35.786,0,0,kg,0,1,,
+Minced Beef,9901,meat,,,127500,0,1,4.82,0,0,kg,0,1,,
+Milk Powder,9901,DAIRY,,,52753.6,0,1,5.187,0,0,kg,0,1,,
+Meringue,9901,SFG,,,49551.3,0,1,0.12,0,0,kg,0,1,,
+Mayonnaise,9901,SFG,,,48819.7,0,1,0.039,0,0,kg,0,1,,
+Matcha Powder,9901,BEVERAGE,,,202702,0,1,2.45,0,0,kg,0,1,,
+MANGO,9901,FRUIT,,,46666.67,0,1,0.79,0,0,kg,0,1,,
+Maizena Flour,9901,FLOUR,,,21099.66,0,1,1.202,0,0,kg,0,1,,
+LIME,9901,FRUIT,,,18982.36,0,1,0.43,0,0,kg,0,1,,
+LETTUCE,9901,VEGETABLE,,,29405.25,0,1,0.91,0,0,kg,0,1,,
+Lemon Glazing,9901,SFG,,,18151.8,0,1,0,0,0,kg,0,1,,
+Lemon Cream,9901,SFG,,,80327.35,0,1,0,0,0,kg,0,1,,
+Lemon Cheesecake Mix,9901,SFG,,,111621.15,0,1,0,0,0,kg,0,1,,
+LEMON,9901,FRUIT,,,49997.82,0,1,1.719,0,0,kg,0,1,,
+Kismis/Raisins,9901,SEED,,,48450.7,0,1,9.57,0,0,kg,0,1,,
+Jam,9901,DRY,,,180713.09,0,1,2.87,0,0,kg,0,1,,
+Ice Sugar,9901,DRY,,,25706.74,0,1,0.916,0,0,kg,0,1,,
+Ice Cream Vanilla,9901,BEVERAGE,,,40950,0,1,4.239,0,0,kg,0,1,,
+Ice Cream Chocolate,9901,BEVERAGE,,,0,0,1,0,0,0,kg,0,1,,
+Hollandaise Sauce,9901,SFG,,,114157.02,0,1,0.02,0,0,kg,0,1,,
+Goat Cheese,9901,DAIRY,,,362812.28,0,1,0.6,0,0,kg,0,1,,
+GINGER,9901,VEGETABLE,,,30006.62,0,1,0.23,0,0,kg,0,1,,
+Garlic Powder,9901,CONDIMENT,,,225.89,0,1,0.16,0,0,kg,0,1,,
+GARLIC,9901,VEGETABLE,,,32000,0,1,0.859,0,0,kg,0,1,,
+Flour t65,9901,FLOUR,,,36000,0,1,0,0,0,kg,0,1,,
+FLOUR AMOURETTE,9901,FLOUR,,,111203.7,0,1,22.5,0,0,kg,0,1,,
+Flax Seeds Brown,9901,SEED,,,45000,0,1,1,0,0,kg,0,1,,
+Egg,9901,DAIRY,,,1833.48,0,1,172.048,0,0,Pcs,0,1,,
+Dry Tomato,9901,CONDIMENT,,,223001.22,0,1,1.47,0,0,kg,0,1,,
+Dry Coconut,9901,DRY,,,101622,0,1,1.16,0,0.25,kg,0,1,,
+Dressing Sauce,9901,SFG,,,43112.35,0,1,0.23,0,0,kg,0,1,,
+Curry Powder,9901,CONDIMENT,,,0,0,1,0.06,0,0,kg,0,1,,
+Cumin,9901,CONDIMENT,,,71,0,1,0,0,0,kg,0,1,,
+CUCUMBER,9901,VEGETABLE,,,8425.49,0,1,1.36,0,0,kg,0,1,,
+Crusty Rye Flour,9901,FLOUR,,,106603.5,0,1,1.526,0,0,kg,0,1,,
+Croissant Dough,9901,SFG,,,65517.82,0,1,43.53,0,0,kg,0,1,,
+Cream Cheese Sauce,9901,SFG,,,124509.29,0,1,0.045,0,0,kg,0,1,,
+Cream Cheese,9901,DAIRY,,,133766.35,0,1,5.117,0,0,kg,0,1,,
+CORIANDER,9901,VEGETABLE,,,100000,0,1,0.074,0,0,kg,0,1,,
+Cooking Butter,9901,DAIRY,,,189999.99,0,1,6.362,0,0,kg,0,1,,
+Coffee Cream,9901,SFG,,,98092.68,0,1,0,0,0,kg,0,1,,
+Coffee bean,9901,BEVERAGE,,,240002.29,0,1,12.441,0,0,kg,0,1,,
+Coconut Cream,9901,SFG,,,87427.73,0,1,0,0,0,kg,0,1,,
+Coconut Biscuit,9901,SFG,,,77636.49,0,1,0,0,0,kg,0,1,,
+Cocoa Powder,9901,CHOCOLAT,,,156490.4,0,1,0.988,0,0,kg,0,1,,
+Choux Dough,9901,SFG,,,46149.76,0,1,0,0,0,kg,0,1,,
+Chocolate Stick,9901,CHOCOLAT,,,264145.54,0,1,3.68,0,0,kg,0,1,,
+Chocolate Dark Couverture,9901,CHOCOLAT,,,274634.87,0,1,3.999,0,0,kg,0,1,,
+Chocolat Sponge Cake,9901,SFG,,,38426.9,0,1,0,0,0,kg,0,1,,
+Chocolat Pie Mix,9901,SFG,,,97768.31,0,1,0,0,0,kg,0,1,,
+Chocolat Peanut,9901,SFG,,,142553.95,0,1,0,0,0,kg,0,1,,
+Chocolat Ganache,9901,SFG,,,145015.64,0,1,0.08,0,0,kg,0,1,,
+Chicken Curry,9901,SFG,,,102078.06,0,1,0,0,0,kg,0,1,,
+Chicken Banh Mi Marinated,9901,SFG,,,112570.8,0,1,0.21,0,0,kg,0,1,,
+Chicken,9901,meat,,,43000,0,1,6.638,0,0,kg,0,1,,
+CHERRY,9901,FRUIT,,,0,0,1,0,0,0,kg,0,1,,
+Cheddar Orange Slice,9901,DAIRY,,,156799.45,0,1,0.57,0,0,kg,0,1,,
+Cheddar Cheese,9901,DAIRY,,,251000,0,1,0.74,0,0,kg,0,1,,
+Chantilly,9901,SFG,,,91001.88,0,1,0.15,0,0,kg,0,1,,
+CARROT,9901,VEGETABLE,,,20025.99,0,1,0.48,0,0,kg,0,1,,
+Caramelized Onion,9901,SFG,,,60959.31,0,1,0.047,0,0,kg,0,1,,
+Caramel Garnish,9901,SFG,,,18000,0,1,0,0,0,kg,0,1,,
+Caramel Cream,9901,SFG,,,93891.6,0,1,0.09,0,0,kg,0,1,,
+Capsicum Marinated,9901,SFG,,,92131.47,0,1,0.37,0,0,kg,0,1,,
+CAPSICUM,9901,VEGETABLE,,,50000,0,1,0.378,0,0,kg,0,1,,
+Camembert,9901,DAIRY,,,322000,0,1,2.48,0,0,kg,0,1,,
+Cacao Powder Cafe,9901,BEVERAGE,,,153603,0,1,2.05,0,0,kg,0,1,,
+Butter Sheet Croissant,9901,DAIRY,,,236029.64,0,1,61.43,0,0,kg,0,1,,
+Brown Sugar,9901,DRY,,,44000,0,1,1.69,0,1,kg,0,1,,
+Brown Bread Flour,9901,FLOUR,,,62587.73,0,1,11.6,0,0,kg,0,1,,
+Breakery Sauce,9901,SFG,,,0,0,1,0,0,0,kg,0,1,,
+BLUBERRY,9901,FRUIT,,,0,0,1,100,0,0,kg,0,1,,
+Black Sesame Seed,9901,SEED,,,85438.6,0,1,2.097,0,0,kg,0,1,,
+Bechamel Sauce,9901,SFG,,,31429.76,0,1,0.1,0,0,kg,0,1,,
+BASIL LEAF,9901,VEGETABLE,,,45482.6,0,1,0.076,0,0,kg,0,1,,
+BANANA,9901,FRUIT,,,6889.39,0,1,1,0,0,kg,0,1,,
+Asian Pickles,9901,SFG,,,26530.02,0,1,0.47,0,0,kg,0,1,,
+Almond Slice,9901,SEED,,,166978.21,0,1,5.44,0,0,kg,0,1,,
+Almond Ground,9901,SEED,,,175316.4,0,1,14.684,0,0,kg,0,1,,
+Almond Cream,9901,SFG,,,73163.19,0,1,1.85,0,0,kg,0,1,,
+Almond Biscuit,9901,SFG,,,110427.57,0,1,0,0,0,kg,0,1,,
+Aioli Sauce,9901,SFG,,,55304.68,0,1,0.565,0,0,kg,0,1,,
+Tea,9901,Other drinks,"tea,hot/ice","Early grey,hot",0,35000,0,0,0,0,Cup,1,0,,
+Tea,9901,Other drinks,"tea,hot/ice","Early grey,ice",0,35000,0,0,0,0,Cup,1,0,,
+Tea,9901,Other drinks,"tea,hot/ice","Green,hot",0,35000,0,0,0,0,Cup,1,0,,
+Tea,9901,Other drinks,"tea,hot/ice","Green,ice",0,35000,0,0,0,0,Cup,1,0,,
+Tea,9901,Other drinks,"tea,hot/ice","Jasmin,hot",0,35000,0,0,0,0,Cup,1,0,,
+Tea,9901,Other drinks,"tea,hot/ice","Jasmin,ice",0,35000,0,0,0,0,Cup,1,0,,
+Tea,9901,Other drinks,"tea,hot/ice","English breakfasty,hot",0,35000,0,0,0,0,Cup,1,0,,
+Tea,9901,Other drinks,"tea,hot/ice","English breakfast,ice",0,35000,0,0,0,0,Cup,1,0,,
+Tea,9901,Other drinks,"tea,hot/ice","Ginger lemon,hot",0,35000,0,0,0,0,Cup,1,0,,
+Tea,9901,Other drinks,"tea,hot/ice","Ginger lemon,ice",0,35000,0,0,0,0,Cup,1,0,,
+Tea,9901,Other drinks,"tea,hot/ice","Darjheling,hot",0,35000,0,0,0,0,Cup,1,0,,
+Tea,9901,Other drinks,"tea,hot/ice","Darjheling,ice",0,35000,0,0,0,0,Cup,1,0,,
+Piccolo,9901,Coffee,,,0,35000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0ab0d371c.jpg
+Moka latte,9901,Coffee,"hot/ice,Fresh/oat","Hot,Fresh milk",0,50000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b841762ed4.jpg
+Moka latte,9901,Coffee,"hot/ice,Fresh/oat","Hot,oat milk",0,60000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b841762ed4.jpg
+Moka latte,9901,Coffee,"hot/ice,Fresh/oat","Ice,fresh milk",0,50000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b841762ed4.jpg
+Moka latte,9901,Coffee,"hot/ice,Fresh/oat","Ice,Oat milk",0,60000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b841762ed4.jpg
+Milk shake,9901,Other drinks,FRUIT,ORANGE,0,45000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bc6938ee.jpg
+Milk shake,9901,Other drinks,FRUIT,MANGGO,0,45000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bc6938ee.jpg
+Milk shake,9901,Other drinks,FRUIT,WATERMELON,0,45000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bc6938ee.jpg
+Milk shake,9901,Other drinks,FRUIT,LIME,0,45000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bc6938ee.jpg
+Milk shake,9901,Other drinks,FRUIT,STRAWBERRY,0,45000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bc6938ee.jpg
+Milk shake,9901,Other drinks,FRUIT,PINNEAPPLE,0,45000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bc6938ee.jpg
+Milk shake,9901,Other drinks,FRUIT,Chocolat,0,45000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bc6938ee.jpg
+Milk shake,9901,Other drinks,FRUIT,BANANA,0,45000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0bc6938ee.jpg
+Long Black,9901,Coffee,HOT/ICE,HOT,0,35000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b8518a3096.jpg
+Long Black,9901,Coffee,HOT/ICE,ICE,0,35000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b8518a3096.jpg
+Latte,9901,Coffee,"hot/ice,Fresh/oat","Hot,Fresh milk",0,40000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b84279f70b.jpg
+Latte,9901,Coffee,"hot/ice,Fresh/oat","Hot,oat milk",0,50000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b84279f70b.jpg
+Latte,9901,Coffee,"hot/ice,Fresh/oat","Ice,fresh milk",0,40000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b84279f70b.jpg
+Latte,9901,Coffee,"hot/ice,Fresh/oat","Ice,Oat milk",0,50000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b84279f70b.jpg
+Flat white,9901,Coffee,"hot/ice,Fresh/oat","Hot,Fresh milk",0,35000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b814c1445a.jpg
+Flat white,9901,Coffee,"hot/ice,Fresh/oat","Hot,oat milk",0,45000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b814c1445a.jpg
+Flat white,9901,Coffee,"hot/ice,Fresh/oat","Ice,fresh milk",0,35000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b814c1445a.jpg
+Flat white,9901,Coffee,"hot/ice,Fresh/oat","Ice,Oat milk",0,45000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b814c1445a.jpg
+Expresso,9901,Coffee,,,0,25000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b7f0e0c067.jpg
+Double expresso,9901,Coffee,,,0,30000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b7ef9701ab.jpg
+Capuccino,9901,Coffee,"hot/ice,Fresh/oat","Hot,Fresh milk",0,35000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0a8cdb0ea.jpg
+Capuccino,9901,Coffee,"hot/ice,Fresh/oat","Hot,oat milk",0,45000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0a8cdb0ea.jpg
+Capuccino,9901,Coffee,"hot/ice,Fresh/oat","Ice,fresh milk",0,35000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0a8cdb0ea.jpg
+Capuccino,9901,Coffee,"hot/ice,Fresh/oat","Ice,Oat milk",0,45000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0a8cdb0ea.jpg
+Babyccino,9901,Coffee,,,0,25000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0b8a4b56e.jpg
+Americano,9901,Coffee,hot/ice,hot,0,35000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0b2c69a9c.jpg
+Americano,9901,Coffee,hot/ice,ICED,0,35000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0b2c69a9c.jpg
+Affogato,9901,Coffee,,,0,40000,0,0,0,0,Cup,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687a0b47bcd17.jpg
+Ginger soda,2902,Special Drinks,,,25000,40000,1,23,0,0,Pcs,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b807c2aa1c.jpg
+Coffee Bean Pack 250gr,9901,Coffee,,,0,150000,0,0,0,0,Bag,1,0,,https://d1d8o7q9jg8pjk.cloudfront.net/p/lg_687b0f4047838.jpg

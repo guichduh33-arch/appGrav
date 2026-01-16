@@ -1,0 +1,360 @@
+{
+    "common": {
+        "loading": "Loading...",
+        "no_data": "No data available.",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "search": "Search",
+        "confirm": "Confirm",
+        "close": "Close",
+        "login": "Login",
+        "logout": "Logout",
+        "settings": "Settings",
+        "date": "Date",
+        "export_pdf": "Export PDF",
+        "actions": "Actions"
+    },
+    "pos": {
+        "header": {
+            "user_label": "User",
+            "dine_in": "Dine In",
+            "takeaway": "Takeaway",
+            "delivery": "Delivery"
+        },
+        "products": {
+            "title_all": "All Products",
+            "search_placeholder": "Search a product...",
+            "options_label": "options"
+        },
+        "footer": {
+            "on_hold": "Held",
+            "orders": "Orders",
+            "ticket": "Ticket",
+            "session": "Session",
+            "kds": "KDS"
+        },
+        "toasts": {
+            "no_items_send": "No items to send",
+            "order_updated": "Order updated successfully!",
+            "order_sent": "Order {{number}} sent to kitchen!",
+            "order_held": "Order {{number}} put on hold",
+            "order_restored": "Order {{number}} restored"
+        },
+        "held_orders": {
+            "title": "Held Orders ({{count}})",
+            "empty": "No orders on hold",
+            "more_items": "+{{count}} more items",
+            "resume": "Resume"
+        }
+    },
+    "cart": {
+        "order_number": "Order",
+        "table": "Table",
+        "in_kitchen": "In Kitchen",
+        "empty_text": "Your cart is empty. Select products.",
+        "subtotal": "Subtotal",
+        "discount": "Discount",
+        "total": "TOTAL",
+        "client": "Customer",
+        "add_to_order": "Add to order",
+        "send_to_kitchen": "Send to Kitchen",
+        "hold": "Hold",
+        "checkout": "CHECKOUT",
+        "qty_decrease": "Decrease",
+        "qty_increase": "Increase",
+        "qty_pin_required": "PIN required to decrease",
+        "qty_prefix": "x",
+        "remove": "Remove",
+        "remove_pin_required": "PIN required to remove",
+        "clear_title": "Clear cart",
+        "hold_error_locked": "Wait not possible while items are in kitchen",
+        "pin_modal_title": "Item removal",
+        "pin_modal_message": "This item is in the kitchen. Manager PIN required."
+    },
+    "payment": {
+        "title": "Checkout",
+        "subtitle": "Ongoing order",
+        "amount_to_pay": "Amount to pay",
+        "method_title": "PAYMENT METHOD",
+        "cash": "Cash",
+        "card": "Card",
+        "qris": "QRIS",
+        "amount_received": "AMOUNT RECEIVED",
+        "exact_amount": "Exact amount",
+        "change_given": "Change given",
+        "manual_input": "MANUAL ENTRY",
+        "cancel": "Cancel",
+        "complete": "Complete Payment",
+        "processing": "Processing...",
+        "success_title": "Payment successful!",
+        "success_subtitle": "Order validated",
+        "print": "Print",
+        "print_toast": "Printing in progress...",
+        "new_order": "New Order",
+        "toast_error": "Error during payment",
+        "toast_new_ready": "New order ready!"
+    },
+    "modifiers": {
+        "subtitle": "Customize your order",
+        "notes_label": "Kitchen notes",
+        "notes_placeholder": "Special instructions...",
+        "quantity_label": "Quantity",
+        "add_to_cart": "Add to cart",
+        "groups": {
+            "temperature": "Temperature",
+            "milk": "Milk Type",
+            "extras": "Extras",
+            "toast": "Toast Level",
+            "bread": "Bread Type"
+        },
+        "options": {
+            "hot": "Hot",
+            "iced": "Iced",
+            "normal": "Normal",
+            "fresh_milk": "Fresh milk",
+            "oat": "Oat",
+            "soy": "Soy",
+            "almond": "Almond",
+            "none": "None",
+            "extra_shot": "Extra Shot Espresso",
+            "no_sugar": "No Sugar",
+            "whipped_cream": "Whipped Cream",
+            "not_toasted": "Not toasted",
+            "lightly": "Lightly",
+            "well_done": "Well done",
+            "white": "White Bread",
+            "whole": "Whole Bread",
+            "sourdough": "Sourdough"
+        }
+    },
+    "kds_page": {
+        "station_barista": "Barista",
+        "station_cuisine": "Cuisine",
+        "station_display": "Display",
+        "placeholder_title": "KDS under development",
+        "placeholder_text": "The Kitchen Display System interface will be available soon.",
+        "placeholder_hint": "This page will display orders in real-time for the selected station."
+    },
+    "inventory": {
+        "wastage": "Wastage",
+        "restock": "Restock",
+        "procurement": "Procurement",
+        "recipe": "Recipe",
+        "product_sheet": "Product Sheet",
+        "inventory_turnover": "Inventory Turnover",
+        "product": "Product",
+        "stock": "Stock",
+        "quantity": "Quantity",
+        "cost": "Cost",
+        "price": "Price",
+        "retail_price": "Retail Price",
+        "ingredient": "Ingredient",
+        "supplier": "Supplier",
+        "category": "Category",
+        "low_stock": "Low Stock",
+        "out_of_stock": "Out of Stock",
+        "sku": "SKU",
+        "unit": "Unit",
+        "stock_movement": "Stock Movement",
+        "current_stock": "Current Stock",
+        "min_stock": "Min Stock"
+    },
+    "inventory_page": {
+        "title": "Stock Management",
+        "subtitle": "Tracking and adjusting inventories",
+        "all": "All",
+        "raw_materials": "Raw Materials",
+        "finished_products": "Finished Products",
+        "low_stock": "Low Stock",
+        "stock_opname": "Stock Opname"
+    },
+    "inventory_table": {
+        "loading": "Loading stock...",
+        "search_placeholder": "Search by name, SKU...",
+        "items_count": "items",
+        "product": "Product",
+        "sku": "SKU",
+        "category": "Category",
+        "type": "Type",
+        "current_stock": "Current Stock",
+        "actions": "Actions",
+        "low_stock": "Low Stock",
+        "no_category": "No category",
+        "view_details": "View details",
+        "adjust_stock": "Adjust stock",
+        "no_items": "No items found",
+        "type_finished": "Finished Product",
+        "type_raw_material": "Raw Material",
+        "type_semi_finished": "Semi-finished",
+        "type_unknown": "Unknown"
+    },
+    "reporting": {
+        "title": "Reports & Analytics",
+        "subtitle": "Overview of Breakery performance",
+        "tabs": {
+            "overview": "Overview",
+            "sales": "Sales",
+            "inventory": "Stock & Wastage",
+            "audit": "Audit & Logs"
+        },
+        "overview": {
+            "revenue_7d": "Revenue (7d)",
+            "orders": "Orders",
+            "avg_basket": "Average Transaction Value (ATV)",
+            "trend": "Trend"
+        },
+        "sales": {
+            "payment_methods_7d": "Payment Methods (7d)",
+            "period_comparison": "Period Comparison (Week)",
+            "week": "Week",
+            "previous": "Previous",
+            "revenue": "Revenue",
+            "net": "Net",
+            "payment_method_detail": "Payment Method Detail"
+        },
+        "inventory": {
+            "stock_value_cost": "Stock Value (Cost)",
+            "stock_value_retail": "Stock Value (Retail)",
+            "references": "references",
+            "potential": "Potential",
+            "items_in_stock": "Items in Stock",
+            "wastage_distribution": "Wastage Distribution (Value)",
+            "wastage_detail": "Wastage Detail"
+        },
+        "audit": {
+            "title": "Audit Logs (Last 50 entries)",
+            "no_suspicious_activity": "No suspicious activity detected.",
+            "severity": {
+                "critical": "Critical",
+                "warning": "Warning",
+                "info": "Info"
+            }
+        }
+    },
+    "table": {
+        "product": "Product",
+        "reason": "Reason",
+        "qty": "Qty",
+        "cost": "Cost",
+        "method": "Method",
+        "transactions": "Transactions",
+        "total": "Total",
+        "action": "Action",
+        "date": "Date",
+        "user": "User"
+    },
+    "logs": {
+        "order_created": "Order created",
+        "order_updated": "Order updated",
+        "order_cancelled": "Order cancelled",
+        "payment_processed": "Payment processed",
+        "stock_adjusted": "Stock adjusted",
+        "shift_opened": "Shift opened",
+        "shift_closed": "Shift closed",
+        "system_error": "System error",
+        "database_error": "Database connection error"
+    },
+    "nav": {
+        "operations": "Operations",
+        "management": "Management",
+        "admin": "Admin",
+        "pos_terminal": "POS Terminal",
+        "kitchen_display": "Kitchen Display",
+        "stock_inventory": "Stock & Inventory",
+        "order_history": "Order History",
+        "production": "Production",
+        "b2b_wholesale": "B2B / Wholesale",
+        "purchases": "Purchases",
+        "reports": "Reports",
+        "team": "Team",
+        "settings": "Settings",
+        "expand_menu": "Expand menu",
+        "collapse_menu": "Collapse menu"
+    },
+    "product_detail": {
+        "back": "Back",
+        "save_changes": "Save changes",
+        "saving": "Saving...",
+        "tabs": {
+            "general": "General",
+            "units": "Units (UOM)",
+            "recipe": "Recipe",
+            "costing": "Cost & Margin",
+            "history": "History"
+        },
+        "general": {
+            "product_identity": "Product Identity",
+            "name": "Name",
+            "category": "Category",
+            "description": "Description",
+            "select": "Select...",
+            "finance_pos": "Finance & POS",
+            "retail_price": "Retail Price",
+            "fixed_cost": "Fixed Cost",
+            "pos_visible": "Visible on POS",
+            "pos_visible_hint": "If unchecked, the product will not be available to sellers."
+        },
+        "units": {
+            "title": "Unit Management (UOM)",
+            "description": "Define purchase or consumption units (e.g., Carton, Pack) and their relationship with the base unit.",
+            "base_unit": "Base Unit (Stock)",
+            "base_unit_hint": "All conversions are relative to this unit.",
+            "base_unit_examples": "(e.g., g, ml, pcs)",
+            "unit_name": "Unit Name",
+            "conversion_factor": "Conversion Factor",
+            "explanation": "Explanation",
+            "no_alternative_units": "No alternative units defined.",
+            "add_unit": "Add a Unit"
+        },
+        "recipe": {
+            "title": "Recipe Ingredients",
+            "add_ingredient": "Add an ingredient",
+            "select_ingredient": "Select an ingredient",
+            "material": "Material",
+            "quantity": "Quantity",
+            "unit": "Unit",
+            "no_ingredients": "No ingredients. Add raw materials to define the recipe."
+        },
+        "costing": {
+            "title": "Cost Analysis",
+            "material_cost": "Material Cost (Est.)",
+            "selling_price": "Selling Price",
+            "gross_margin": "Gross Margin",
+            "detail_title": "Cost Breakdown by Raw Material",
+            "ingredient": "Ingredient",
+            "qty_used": "Qty Used",
+            "unit_cost": "Unit Cost",
+            "subtotal": "Subtotal",
+            "pct_of_cost": "% of Cost",
+            "no_ingredients_costing": "No ingredients in recipe. Add raw materials in the Recipe tab.",
+            "total_material_cost": "Total Material Cost:",
+            "financial_summary": "Financial Summary",
+            "gross_profit": "Gross Profit",
+            "margin_analysis": "Margin Analysis",
+            "threshold": "threshold",
+            "ingredients_count": "Ingredients",
+            "avg_cost_per_ingredient": "Avg Cost/Ingredient",
+            "warning_loss": "Warning: Material cost exceeds selling price. This product generates a loss.",
+            "warning_low_margin": "Warning: Margin is below 30%. Consider adjusting price or costs."
+        },
+        "history": {
+            "title": "Movement History",
+            "current_stock": "Current Stock",
+            "date": "Date",
+            "type": "Type",
+            "quantity": "Quantity",
+            "reason_ref": "Reason / Ref"
+        },
+        "messages": {
+            "product_updated": "Product updated successfully",
+            "save_error": "Error saving:",
+            "uom_add_error": "Error adding UOM:",
+            "delete_uom_confirm": "Delete this unit?",
+            "uom_delete_error": "Error deleting:",
+            "not_found": "Product Not Found",
+            "back_to_list": "Back to List"
+        }
+    }
+}

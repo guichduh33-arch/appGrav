@@ -1,0 +1,72 @@
+.kds-app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    background: #1a1a1a;
+    color: white;
+}
+
+.kds-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    padding: 0 var(--space-lg);
+    background: #2a2a2a;
+    border-bottom: 1px solid #333;
+}
+
+.kds-header__logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-rose-poudre);
+}
+
+.kds-header__station {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--color-rose-poudre);
+    border-radius: var(--radius-xl);
+}
+
+.kds-header__time {
+    font-family: var(--font-mono);
+    font-size: var(--text-xl);
+}
+
+.kds-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kds-placeholder {
+    text-align: center;
+    padding: var(--space-2xl);
+}
+
+.kds-placeholder__icon {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: var(--space-lg);
+}
+
+.kds-placeholder h2 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-md);
+}
+
+.kds-placeholder p {
+    color: #888;
+}
+
+.kds-placeholder__hint {
+    margin-top: var(--space-lg);
+    font-size: var(--text-sm);
+}

@@ -1,0 +1,226 @@
+.inventory-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 1rem;
+}
+
+/* Controls */
+.inventory-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow-1);
+}
+
+.inventory-search {
+    position: relative;
+    width: 300px;
+}
+
+.inventory-search__icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-secondary);
+}
+
+.inventory-search__input {
+    width: 100%;
+    padding: 10px 10px 10px 40px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.inventory-search__input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.inventory-stats {
+    display: flex;
+    gap: 1rem;
+}
+
+.inventory-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--color-bg-secondary);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+/* Table */
+.inventory-table-wrapper {
+    flex: 1;
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow-1);
+    overflow: auto;
+}
+
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.inventory-table th {
+    position: sticky;
+    top: 0;
+    background: var(--color-bg-secondary);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    border-bottom: 2px solid var(--color-border);
+    z-index: 10;
+}
+
+.inventory-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+}
+
+.inventory-table tbody tr:hover {
+    background: var(--color-bg-primary);
+}
+
+.inventory-table .is-low-stock {
+    background: #fff5f5;
+}
+
+.inventory-table .is-low-stock:hover {
+    background: #ffebeb;
+}
+
+/* Cells */
+.product-cell {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.product-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: var(--color-bg-secondary);
+}
+
+.product-thumb-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background: var(--color-bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.product-name {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.stock-warning {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--color-urgent);
+    margin-top: 0.25rem;
+}
+
+.cell-sku {
+    font-family: monospace;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+.category-badge {
+    padding: 0.25rem 0.75rem;
+    background: var(--color-bg-secondary);
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+.cell-type {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+}
+
+.stock-value {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.stock-unit {
+    margin-left: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-urgent {
+    color: var(--color-urgent);
+}
+
+.btn-icon-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background: white;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+    transition: all 0.2s;
+}
+
+.btn-icon-sm:hover {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.inventory-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: var(--color-text-secondary);
+    gap: 1rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}

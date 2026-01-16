@@ -1,0 +1,56 @@
+{
+  "actions": [
+    {
+      "type": "add_error_handling",
+      "file": "src\\appgrav_swarm.py",
+      "status": "simulated"
+    },
+    {
+      "type": "add_error_handling",
+      "file": "src\\config.py",
+      "status": "simulated"
+    },
+    {
+      "type": "add_error_handling",
+      "file": "node_modules\\flatted\\python\\flatted.py",
+      "status": "simulated"
+    },
+    {
+      "type": "add_error_handling",
+      "file": "src\\agents\\audit_agent.py",
+      "status": "simulated"
+    },
+    {
+      "type": "add_error_handling",
+      "file": "src\\agents\\backend_agent.py",
+      "status": "simulated"
+    },
+    {
+      "type": "add_error_handling",
+      "file": "src\\agents\\context_agent.py",
+      "status": "simulated"
+    },
+    {
+      "type": "add_error_handling",
+      "file": "src\\agents\\database_agent.py",
+      "status": "simulated"
+    },
+    {
+      "type": "add_error_handling",
+      "file": "src\\agents\\deployment_agent.py",
+      "status": "simulated"
+    },
+    {
+      "type": "add_error_handling",
+      "file": "src\\agents\\documentation_agent.py",
+      "status": "simulated"
+    },
+    {
+      "type": "add_error_handling",
+      "file": "src\\agents\\frontend_agent.py",
+      "status": "simulated"
+    }
+  ],
+  "duplications": [],
+  "optimizations": []
+}

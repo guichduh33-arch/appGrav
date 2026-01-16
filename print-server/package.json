@@ -1,0 +1,26 @@
+{
+    "name": "breakery-print-server",
+    "version": "1.0.0",
+    "description": "Print Server for The Breakery POS System",
+    "main": "src/index.js",
+    "scripts": {
+        "start": "node src/index.js",
+        "dev": "node --watch src/index.js",
+        "test": "node src/test-print.js"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "uuid": "^9.0.0",
+        "winston": "^3.11.0",
+        "winston-daily-rotate-file": "^4.7.1"
+    },
+    "devDependencies": {},
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "author": "The Breakery",
+    "license": "UNLICENSED",
+    "private": true
+}

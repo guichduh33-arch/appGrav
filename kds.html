@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Breakery - Kitchen Display System</title>
+    <meta name="description" content="Écran de cuisine pour The Breakery - Affichage des commandes en temps réel">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@500&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/kds.css">
+</head>
+
+<body>
+    <div class="kds-app">
+
+        <!-- ============================================
+         HEADER
+         ============================================ -->
+        <header class="kds-header">
+            <div class="kds-header__left">
+                <div class="kds-header__station">
+                    <span class="kds-header__station-icon">☕</span>
+                    <span>Station Barista</span>
+                </div>
+            </div>
+
+            <div class="kds-header__center" id="currentTime">12:34</div>
+
+            <div class="kds-header__right">
+                <button class="kds-header__sound" id="soundToggle">
+                    <i data-lucide="volume-2" width="18" height="18"></i>
+                    <span>Son ON</span>
+                </button>
+                <button class="kds-header__refresh" id="refreshBtn" title="Actualiser">
+                    <i data-lucide="refresh-cw" width="20" height="20"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- ============================================
+         STATS BAR
+         ============================================ -->
+        <div class="kds-stats">
+            <div class="kds-stat">
+                <span class="kds-stat__icon waiting"></span>
+                <span class="kds-stat__label">En attente:</span>
+                <span class="kds-stat__value" id="statWaiting">4</span>
+            </div>
+            <div class="kds-stat">
+                <span class="kds-stat__icon preparing"></span>
+                <span class="kds-stat__label">En préparation:</span>
+                <span class="kds-stat__value" id="statPreparing">2</span>
+            </div>
+            <div class="kds-stat">
+                <span class="kds-stat__icon ready"></span>
+                <span class="kds-stat__label">Prêt:</span>
+                <span class="kds-stat__value" id="statReady">1</span>
+            </div>
+            <div class="kds-stat">
+                <span class="kds-stat__icon late"></span>
+                <span class="kds-stat__label">En retard:</span>
+                <span class="kds-stat__value" id="statLate">0</span>
+            </div>
+        </div>
+
+        <!-- ============================================
+         ORDERS GRID
+         ============================================ -->
+        <main class="kds-orders">
+            <div class="kds-orders-grid" id="ordersGrid">
+                <!-- Orders will be rendered here -->
+            </div>
+        </main>
+
+        <!-- ============================================
+         FOOTER
+         ============================================ -->
+        <footer class="kds-footer">
+            <div class="kds-footer__stats">
+                <div class="kds-footer__stat">
+                    <i data-lucide="clock" width="16" height="16"></i>
+                    Temps moyen: <span class="kds-footer__stat-value" id="avgTime">3:24</span>
+                </div>
+                <div class="kds-footer__stat">
+                    <i data-lucide="check-circle" width="16" height="16"></i>
+                    Aujourd'hui: <span class="kds-footer__stat-value" id="todayCount">127</span>
+                </div>
+                <div class="kds-footer__stat">
+                    <i data-lucide="target" width="16" height="16"></i>
+                    Objectif: <span class="kds-footer__stat-value">150</span>
+                </div>
+            </div>
+            <a href="index.html" class="kds-footer__link">
+                <i data-lucide="arrow-left" width="16" height="16"></i>
+                Retour au POS
+            </a>
+        </footer>
+
+    </div>
+
+    <!-- ============================================
+       TOAST CONTAINER
+       ============================================ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ============================================
+        // SAMPLE ORDERS DATA
+        // ============================================
+        const SAMPLE_ORDERS = [
+            {
+                id: 1,
+                number: '#0042',
+                type: 'dine-in',
+                table: 'T5',
+                status: 'preparing',
+                createdAt: new Date(Date.now() - 2 * 60 * 1000 - 34 * 1000), // 2:34 ago
+                items: [
+                    { name: 'Cappuccino', qty: 2, mods: ['Glacé', 'Lait Avoine', 'Extra Shot'], note: null },
+                    { name: 'Matcha Latte', qty: 1, mods: ['Glacé'], note: null }
+                ]
+            },
+            {
+                id: 2,
+                number: '#0043',
+                type: 'takeaway',
+                table: null,
+                status: 'preparing',
+                createdAt: new Date(Date.now() - 45 * 1000), // 0:45 ago
+                items: [
+                    { name: 'Latte', qty: 1, mods: ['Chaud', 'Lait Avoine'], note: null },
+                    { name: 'Americano', qty: 2, mods: ['Glacé'], note: null }
+                ]
+            },
+            {
+                id: 3,
+                number: '#0041',
+                type: 'dine-in',
+                table: 'T3',
+                status: 'ready',
+                createdAt: new Date(Date.now() - 4 * 60 * 1000), // 4:00 ago
+                items: [
+                    { name: 'Matcha Latte', qty: 1, mods: ['Glacé'], note: null, done: true }
+                ]
+            },
+            {
+                id: 4,
+                number: '#0044',
+                type: 'takeaway',
+                table: null,
+                status: 'waiting',
+                createdAt: new Date(Date.now() - 20 * 1000), // 0:20 ago
+                items: [
+                    { name: 'Espresso', qty: 3, mods: ['Double Shot'], note: null }
+                ]
+            },
+            {
+                id: 5,
+                number: '#0045',
+                type: 'dine-in',
+                table: 'T8',
+                status: 'waiting',
+                createdAt: new Date(Date.now() - 5 * 1000), // 0:05 ago
+                items: [
+                    { name: 'Flat White', qty: 1, mods: [], note: null },
+                    { name: 'Hot Chocolate', qty: 1, mods: ['Sans Sucre'], note: null }
+                ]
+            },
+            {
+                id: 6,
+                number: '#0040',
+                type: 'delivery',
+                table: null,
+                status: 'waiting',
+                createdAt: new Date(Date.now() - 12 * 60 * 1000 - 45 * 1000), // 12:45 ago - LATE!
+                items: [
+                    { name: 'Cappuccino', qty: 2, mods: ['Normal'], note: 'URGENT - Client en attente!' }
+                ]
+            }
+        ];
+
+        let orders = [...SAMPLE_ORDERS];
+        let soundEnabled = true;
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function formatTimer(date) {
+            const diff = Date.now() - date.getTime();
+            const minutes = Math.floor(diff / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function getTimerStatus(date, status) {
+            if (status === 'ready') return 'ready';
+
+            const minutes = (Date.now() - date.getTime()) / 60000;
+
+            if (minutes < 2) return 'new';
+            if (minutes < 5) return 'ok';
+            if (minutes < 8) return 'attention';
+            if (minutes < 10) return 'urgent';
+            return 'late';
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+
+            const icons = { success: '✓', error: '✗', warning: '⚠', info: 'ℹ' };
+            toast.innerHTML = `<span>${icons[type]}</span> ${message}`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ============================================
+        // RENDER FUNCTIONS
+        // ============================================
+        function renderOrders() {
+            const grid = document.getElementById('ordersGrid');
+
+            if (orders.length === 0) {
+                grid.innerHTML = `
+          <div class="kds-empty">
+            <span class="kds-empty__icon">🎉</span>
+            <h3 class="kds-empty__title">Aucune commande en attente</h3>
+            <p class="kds-empty__text">Les nouvelles commandes apparaîtront ici</p>
+          </div>
+        `;
+                return;
+            }
+
+            // Sort: late first, then by creation time
+            const sortedOrders = [...orders].sort((a, b) => {
+                const statusA = getTimerStatus(a.createdAt, a.status);
+                const statusB = getTimerStatus(b.createdAt, b.status);
+
+                // Late orders first
+                if (statusA === 'late' && statusB !== 'late') return -1;
+                if (statusB === 'late' && statusA !== 'late') return 1;
+
+                // Ready orders last
+                if (a.status === 'ready' && b.status !== 'ready') return 1;
+                if (b.status === 'ready' && a.status !== 'ready') return -1;
+
+                // Otherwise by creation time (oldest first)
+                return a.createdAt - b.createdAt;
+            });
+
+            grid.innerHTML = sortedOrders.map(order => {
+                const timerStatus = getTimerStatus(order.createdAt, order.status);
+                const timerText = order.status === 'ready' ? 'PRÊT' : formatTimer(order.createdAt);
+
+                const typeLabels = {
+                    'dine-in': 'Sur place',
+                    'takeaway': 'À emporter',
+                    'delivery': 'Livraison'
+                };
+
+                let actionButton = '';
+                if (order.status === 'waiting') {
+                    actionButton = `<button class="kds-card__action action-start" data-action="start" data-order-id="${order.id}">
+            <i data-lucide="play" width="18" height="18"></i>
+            COMMENCER
+          </button>`;
+                } else if (order.status === 'preparing') {
+                    actionButton = `<button class="kds-card__action action-complete" data-action="complete" data-order-id="${order.id}">
+            <i data-lucide="check" width="18" height="18"></i>
+            TERMINER
+          </button>`;
+                } else if (order.status === 'ready') {
+                    actionButton = `<button class="kds-card__action action-call" data-action="call" data-order-id="${order.id}">
+            <i data-lucide="bell" width="18" height="18"></i>
+            APPELER
+          </button>`;
+                }
+
+                return `
+          <div class="kds-card status-${timerStatus}" data-order-id="${order.id}">
+            <div class="kds-card__header">
+              <div class="kds-card__order-info">
+                <span class="kds-card__number">${order.number}</span>
+                <div class="kds-card__timer">
+                  <span class="kds-card__timer-dot"></span>
+                  <span>${timerText}</span>
+                </div>
+              </div>
+              <div class="kds-card__type">
+                <span class="kds-card__type-badge">${typeLabels[order.type]}</span>
+                ${order.table ? `<span>- ${order.table}</span>` : ''}
+              </div>
+            </div>
+            
+            <div class="kds-card__items">
+              ${order.items.map(item => `
+                <div class="kds-card__item ${item.done ? 'is-done' : ''}">
+                  <div class="kds-card__item-main">
+                    <span class="kds-card__item-qty">${item.qty}×</span>
+                    <span class="kds-card__item-name">${item.name}</span>
+                  </div>
+                  ${item.mods.length > 0 ? `<div class="kds-card__item-mods">${item.mods.join(', ')}</div>` : ''}
+                  ${item.note ? `<div class="kds-card__item-note">⚠️ ${item.note}</div>` : ''}
+                </div>
+              `).join('')}
+            </div>
+            
+            <div class="kds-card__footer">
+              ${actionButton}
+            </div>
+          </div>
+        `;
+            }).join('');
+
+            // Re-init Lucide icons
+            lucide.createIcons();
+
+            // Add action handlers
+            grid.querySelectorAll('[data-action]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const orderId = parseInt(btn.dataset.orderId);
+                    const action = btn.dataset.action;
+                    handleOrderAction(orderId, action);
+                });
+            });
+        }
+
+        function updateStats() {
+            const waiting = orders.filter(o => o.status === 'waiting').length;
+            const preparing = orders.filter(o => o.status === 'preparing').length;
+            const ready = orders.filter(o => o.status === 'ready').length;
+            const late = orders.filter(o => getTimerStatus(o.createdAt, o.status) === 'late').length;
+
+            document.getElementById('statWaiting').textContent = waiting;
+            document.getElementById('statPreparing').textContent = preparing;
+            document.getElementById('statReady').textContent = ready;
+            document.getElementById('statLate').textContent = late;
+        }
+
+        // ============================================
+        // ACTION HANDLERS
+        // ============================================
+        function handleOrderAction(orderId, action) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            switch (action) {
+                case 'start':
+                    order.status = 'preparing';
+                    showToast(`Commande ${order.number} en préparation`, 'info');
+                    break;
+                case 'complete':
+                    order.status = 'ready';
+                    showToast(`Commande ${order.number} prête!`, 'success');
+                    if (soundEnabled) playNotificationSound();
+                    break;
+                case 'call':
+                    // Remove order after calling
+                    orders = orders.filter(o => o.id !== orderId);
+                    showToast(`Client appelé pour ${order.number}`, 'info');
+                    break;
+            }
+
+            renderOrders();
+            updateStats();
+        }
+
+        function playNotificationSound() {
+            // Simple beep using Web Audio API
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            gainNode.gain.value = 0.3;
+
+            oscillator.start();
+            setTimeout(() => oscillator.stop(), 150);
+        }
+
+        // ============================================
+        // TIMER UPDATE
+        // ============================================
+        function updateTimers() {
+            orders.forEach(order => {
+                if (order.status !== 'ready') {
+                    const card = document.querySelector(`.kds-card[data-order-id="${order.id}"]`);
+                    if (card) {
+                        const timerEl = card.querySelector('.kds-card__timer span:last-child');
+                        if (timerEl) {
+                            timerEl.textContent = formatTimer(order.createdAt);
+                        }
+
+                        // Update status class
+                        const newStatus = getTimerStatus(order.createdAt, order.status);
+                        card.className = `kds-card status-${newStatus}`;
+                    }
+                }
+            });
+
+            updateStats();
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        function init() {
+            // Initialize Lucide icons
+            lucide.createIcons();
+
+            // Update time
+            updateTime();
+            setInterval(updateTime, 1000);
+
+            // Update timers every second
+            setInterval(updateTimers, 1000);
+
+            // Sound toggle
+            document.getElementById('soundToggle').addEventListener('click', function () {
+                soundEnabled = !soundEnabled;
+                this.classList.toggle('is-muted', !soundEnabled);
+                this.querySelector('span').textContent = soundEnabled ? 'Son ON' : 'Son OFF';
+                this.querySelector('i').setAttribute('data-lucide', soundEnabled ? 'volume-2' : 'volume-x');
+                lucide.createIcons();
+            });
+
+            // Refresh button
+            document.getElementById('refreshBtn').addEventListener('click', () => {
+                renderOrders();
+                updateStats();
+                showToast('Actualisé', 'info');
+            });
+
+            // Initial render
+            renderOrders();
+            updateStats();
+
+            console.log('☕ The Breakery KDS initialized');
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

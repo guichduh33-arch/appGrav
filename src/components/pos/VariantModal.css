@@ -1,0 +1,101 @@
+.variant-modal {
+    max-width: 500px;
+}
+
+.variant-modal__product-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.variant-modal__image {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+/* Variant Section */
+.variant-section {
+    margin-bottom: 1.5rem;
+}
+
+.variant-section__title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Variant Options Grid */
+.variant-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+}
+
+.variant-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border: 2px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-bg-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 80px;
+}
+
+.variant-option:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+}
+
+.variant-option.is-selected {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+}
+
+.variant-option__icon {
+    font-size: 1.5rem;
+}
+
+.variant-option__label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+.variant-option__price {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    color: var(--color-success);
+}
+
+.variant-option.is-selected .variant-option__price {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Price Display */
+.variant-price-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--color-bg-secondary);
+    border-radius: 8px;
+    margin-top: 1rem;
+    font-size: 1.1rem;
+}
+
+.variant-price-display strong {
+    font-size: 1.3rem;
+    color: var(--color-primary);
+}
