@@ -58,7 +58,7 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                         <div className="adjustment-type-grid">
                             <button
                                 type="button"
-                                className={`adjustment-type-btn ${type === 'purchase' ? 'is-active' : ''}`}
+                                className={`adjustment-type-btn type-purchase ${type === 'purchase' ? 'is-active' : ''}`}
                                 onClick={() => setType('purchase')}
                             >
                                 <span className="adjustment-type-icon">📥</span>
@@ -69,7 +69,7 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                             </button>
                             <button
                                 type="button"
-                                className={`adjustment-type-btn ${type === 'waste' ? 'is-active' : ''}`}
+                                className={`adjustment-type-btn type-waste ${type === 'waste' ? 'is-active' : ''}`}
                                 onClick={() => setType('waste')}
                             >
                                 <span className="adjustment-type-icon">🗑️</span>
@@ -80,7 +80,7 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                             </button>
                             <button
                                 type="button"
-                                className={`adjustment-type-btn ${type === 'adjustment_in' ? 'is-active' : ''}`}
+                                className={`adjustment-type-btn type-adj-in ${type === 'adjustment_in' ? 'is-active' : ''}`}
                                 onClick={() => setType('adjustment_in')}
                             >
                                 <span className="adjustment-type-icon">➕</span>
@@ -91,7 +91,7 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                             </button>
                             <button
                                 type="button"
-                                className={`adjustment-type-btn ${type === 'adjustment_out' ? 'is-active' : ''}`}
+                                className={`adjustment-type-btn type-adj-out ${type === 'adjustment_out' ? 'is-active' : ''}`}
                                 onClick={() => setType('adjustment_out')}
                             >
                                 <span className="adjustment-type-icon">➖</span>

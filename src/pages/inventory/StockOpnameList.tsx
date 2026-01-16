@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, CheckCircle, Clock, XCircle } from 'lucide-react'
+import { Plus, CheckCircle, Clock, XCircle, ArrowRight } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import type { InventoryCount } from '../../types/database'
-import './InventoryPage.css' // Reuse styles
+import './StockOpname.css'
 
 export default function StockOpnameList() {
     const navigate = useNavigate()
@@ -49,54 +49,55 @@ export default function StockOpnameList() {
         }
     }
 
-    if (loading) return <div className="p-8 text-center text-gray-500">Chargement...</div>
+    if (loading) return <div className="opname-container"><div className="p-8 text-center text-gray-500">Chargement...</div></div>
 
     return (
-        <div className="inventory-page">
-            <header className="inventory-header">
-                <div>
-                    <h1 className="text-2xl font-bold">Inventaires Physiques (Opname)</h1>
-                    <p className="text-gray-500">Historique des comptages</p>
+        <div className="opname-container">
+            <header className="opname-header">
+                <div className="opname-title">
+                    <h1>Inventaires Physiques (Opname)</h1>
+                    <p className="opname-subtitle">Historique des comptages</p>
                 </div>
                 <button
                     onClick={createNewSession}
-                    className="btn-primary flex items-center gap-2"
+                    className="btn btn-primary"
                 >
                     <Plus size={18} /> Nouvel Inventaire
                 </button>
             </header>
 
-            <main className="inventory-content p-6">
-                <div className="card">
-                    <table className="w-full text-left">
-                        <thead className="bg-gray-100 uppercase text-sm text-gray-600">
+            <main className="opname-content">
+                <div className="opname-table-card">
+                    <table className="opname-table">
+                        <thead>
                             <tr>
-                                <th className="p-3">Numéro</th>
-                                <th className="p-3">Date</th>
-                                <th className="p-3">Statut</th>
-                                <th className="p-3">Notes</th>
-                                <th className="p-3 text-right">Action</th>
+                                <th>Numéro</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                                <th>Notes</th>
+                                <th className="text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {counts.map(session => (
-                                <tr key={session.id} className="border-b hover:bg-gray-50">
-                                    <td className="p-3 font-medium">{session.count_number}</td>
-                                    <td className="p-3">
+                                <tr key={session.id}>
+                                    <td className="font-medium">{session.count_number}</td>
+                                    <td>
                                         {new Date(session.created_at).toLocaleDateString()}
                                     </td>
-                                    <td className="p-3">
+                                    <td>
                                         <StatusBadge status={session.status} />
                                     </td>
-                                    <td className="p-3 text-gray-500 italic">
+                                    <td className="text-muted italic">
                                         {session.notes || '-'}
                                     </td>
-                                    <td className="p-3 text-right">
+                                    <td className="text-right">
                                         <button
                                             onClick={() => navigate(`/inventory/stock-opname/${session.id}`)}
-                                            className="btn-secondary btn-sm"
+                                            className="btn btn-secondary btn-sm"
                                         >
                                             {session.status === 'draft' ? 'Continuer' : 'Voir Détails'}
+                                            <ArrowRight size={14} className="ml-1" />
                                         </button>
                                     </td>
                                 </tr>
@@ -104,7 +105,7 @@ export default function StockOpnameList() {
                             {counts.length === 0 && (
                                 <tr>
                                     <td colSpan={5} className="p-8 text-center text-gray-400">
-                                        Aucun inventaire trouvé.
+                                        Aucun inventaire trouvé. Commencez par en créer un.
                                     </td>
                                 </tr>
                             )}
@@ -119,12 +120,12 @@ export default function StockOpnameList() {
 function StatusBadge({ status }: { status: string }) {
     switch (status) {
         case 'draft':
-            return <span className="flex items-center gap-1 text-blue-600 bg-blue-100 px-2 py-1 rounded text-xs font-bold uppercase"><Clock size={12} /> Brouillon</span>
+            return <span className="status-badge draft"><Clock size={12} /> Brouillon</span>
         case 'completed':
-            return <span className="flex items-center gap-1 text-green-600 bg-green-100 px-2 py-1 rounded text-xs font-bold uppercase"><CheckCircle size={12} /> Validé</span>
+            return <span className="status-badge completed"><CheckCircle size={12} /> Validé</span>
         case 'cancelled':
-            return <span className="flex items-center gap-1 text-red-600 bg-red-100 px-2 py-1 rounded text-xs font-bold uppercase"><XCircle size={12} /> Annulé</span>
+            return <span className="status-badge cancelled"><XCircle size={12} /> Annulé</span>
         default:
-            return <span>{status}</span>
+            return <span className="status-badge">{status}</span>
     }
 }

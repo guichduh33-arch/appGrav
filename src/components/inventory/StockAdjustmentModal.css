@@ -1,82 +1,148 @@
+/* ============================================
+   STOCK ADJUSTMENT MODAL - MODERN DESIGN
+   ============================================ */
+
+/* The Modal Structure should be using global modal classes from index.css ideally, 
+   but we'll refine specific components here */
+
 .adjustment-type-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    gap: 1rem;
     margin-top: 0.5rem;
 }
 
 .adjustment-type-btn {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    background: var(--color-bg-secondary);
-    border: 2px solid transparent;
-    border-radius: 8px;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
     cursor: pointer;
     text-align: left;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
 
 .adjustment-type-btn:hover {
-    background: var(--color-bg-primary);
-    border-color: var(--color-border);
+    border-color: var(--color-primary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .adjustment-type-btn.is-active {
-    background: var(--color-primary-light);
+    background: var(--color-primary-50);
     border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-100);
+}
+
+/* Specific styling for active states can be handled via JS classes if needed */
+.adjustment-type-btn.is-active.type-waste {
+    background: var(--color-danger-bg);
+    border-color: var(--color-danger);
+    box-shadow: 0 0 0 2px var(--color-danger-border);
 }
 
 .adjustment-type-icon {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+}
+
+.adjustment-type-btn.is-active .adjustment-type-icon {
+    background: white;
 }
 
 .adjustment-type-label {
     display: block;
     font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--color-text-primary);
+    font-size: 0.95rem;
+    color: var(--color-gray-900);
+    margin-bottom: 0.125rem;
 }
 
 .adjustment-type-desc {
     display: block;
     font-size: 0.75rem;
-    color: var(--color-text-secondary);
+    color: var(--color-gray-500);
+    line-height: 1.2;
 }
 
+/* Form Layout */
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .form-label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
-    color: var(--color-text-primary);
+    font-size: 0.875rem;
+    color: var(--color-gray-700);
 }
 
 .form-input,
 .form-select,
 .form-textarea {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
     background: white;
+    color: var(--color-gray-900);
+    transition: all 0.2s ease;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-100);
 }
 
 .form-textarea {
-    min-height: 80px;
+    min-height: 100px;
     resize: vertical;
 }
 
-.btn-danger {
-    background: var(--color-urgent);
-    color: white;
+/* Button variants */
+.btn-block {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem;
+    font-size: 1rem;
 }
 
-.btn-danger:hover {
-    background: #c0392b;
+.btn-danger {
+    background-color: var(--color-danger);
+    color: white;
+    border-color: transparent;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background-color: #dc2626;
+}
+
+.btn-primary:disabled,
+.btn-danger:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .adjustment-type-grid {
+        grid-template-columns: 1fr;
+    }
 }

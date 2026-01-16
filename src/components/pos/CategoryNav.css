@@ -1,107 +1,68 @@
+/* CategoryNav.css - Full Color Buttons */
+
 .pos-categories {
-    width: 120px;
-    background: #f8fafc;
-    border-right: 1px solid var(--color-border);
-    overflow-y: auto;
-    flex-shrink: 0;
-    padding: 0;
+    padding: var(--space-md);
+    gap: 12px;
+}
+
+.pos-categories__item.is-all {
+    --category-color: #334155;
 }
 
 .pos-categories__item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     width: 100%;
-    height: 100px;
-    padding: var(--space-sm);
-    background: transparent;
+    display: flex;
+    align-items: center;
+    padding: 20px 24px;
+    min-height: 80px;
+    background: var(--category-color, white);
+    /* Full background color */
     border: none;
-    border-bottom: 1px solid var(--color-border);
+    /* No border needed if full color */
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all var(--duration-fast) var(--ease-standard);
-    color: var(--color-secondary);
+    text-align: left;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+    /* Text styling */
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    /* Ensure readability on light colors */
+
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.pos-categories__item:hover {
-    background: white;
-    filter: brightness(1.05);
-}
-
-.pos-categories__item.is-active {
-    background: white !important;
-    color: var(--color-primary);
-    border-left: 5px solid var(--color-primary-light);
+.pos-categories__item span {
+    font-size: 1.1rem;
     font-weight: 700;
-}
-
-/* Category Colors - as seen in ABACUS inspiration */
-.pos-categories__item:nth-of-type(1) {
-    background-color: rgba(253, 224, 71, 0.4);
-}
-
-/* Yellow */
-.pos-categories__item:nth-of-type(2) {
-    background-color: rgba(239, 68, 68, 0.4);
-}
-
-/* Red */
-.pos-categories__item:nth-of-type(3) {
-    background-color: rgba(34, 197, 94, 0.4);
-}
-
-/* Green */
-.pos-categories__item:nth-of-type(4) {
-    background-color: rgba(59, 130, 246, 0.4);
-}
-
-/* Blue */
-.pos-categories__item:nth-of-type(5) {
-    background-color: rgba(249, 115, 22, 0.4);
-}
-
-/* Orange */
-.pos-categories__item:nth-of-type(6) {
-    background-color: rgba(168, 85, 247, 0.4);
-}
-
-/* Purple */
-.pos-categories__item:nth-of-type(7) {
-    background-color: rgba(236, 72, 153, 0.4);
-}
-
-/* Pink */
-
-.pos-categories__icon {
-    display: none;
-}
-
-.pos-categories__label {
-    font-size: 12px;
-    font-weight: 600;
-    text-align: center;
-    line-height: 1.3;
+    letter-spacing: -0.01em;
     text-transform: uppercase;
 }
 
-/* Skeleton loading */
-.pos-categories__item-skeleton {
-    width: 100%;
-    height: 80px;
-    background: linear-gradient(90deg,
-            var(--color-blanc-creme-dark) 25%,
-            var(--color-blanc-creme) 50%,
-            var(--color-blanc-creme-dark) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
+/* Hover State */
+.pos-categories__item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    filter: brightness(1.1);
+    /* Slightly lighter/brighter on hover */
 }
 
-@keyframes shimmer {
-    0% {
-        background-position: 200% 0;
-    }
+/* Active State */
+.pos-categories__item.is-active {
+    box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.3), 0 8px 16px rgba(0, 0, 0, 0.2);
+    /* "Pressed" or "Highlighted" look */
+    transform: scale(1.02);
+    z-index: 2;
+}
 
-    100% {
-        background-position: -200% 0;
-    }
+/* Skeleton Loading */
+.pos-categories__item-skeleton {
+    height: 80px;
+    width: 100%;
+    background: var(--color-gray-100);
+    border-radius: var(--radius-md);
+    margin-bottom: 12px;
+    animation: pulse 2s infinite;
 }

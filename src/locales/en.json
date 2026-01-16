@@ -168,7 +168,18 @@
         "raw_materials": "Raw Materials",
         "finished_products": "Finished Products",
         "low_stock": "Low Stock",
-        "stock_opname": "Stock Opname"
+        "stock_opname": "Stock Opname",
+        "stats": {
+            "total_products": "Total Products",
+            "raw_materials": "Raw Materials",
+            "finished_products": "Finished Products",
+            "low_stock_alerts": "Low Stock Alerts",
+            "in_stock": "In stock",
+            "ingredients": "Ingredients",
+            "ready_to_sell": "Ready to sell",
+            "needs_attention": "Needs attention",
+            "all_ok": "All OK"
+        }
     },
     "inventory_table": {
         "loading": "Loading stock...",
@@ -282,7 +293,8 @@
             "units": "Units (UOM)",
             "recipe": "Recipe",
             "costing": "Cost & Margin",
-            "history": "History"
+            "stock": "Stock Movements",
+            "prices": "Price History"
         },
         "general": {
             "product_identity": "Product Identity",
@@ -346,6 +358,15 @@
             "type": "Type",
             "quantity": "Quantity",
             "reason_ref": "Reason / Ref"
+        },
+        "prices": {
+            "title": "Purchase Price History",
+            "current_price_est": "Current Price (Est.)",
+            "order_date": "Order Date",
+            "supplier": "Supplier",
+            "unit_price": "Unit Price",
+            "total_line": "Total Line",
+            "no_history": "No purchase history found."
         },
         "messages": {
             "product_updated": "Product updated successfully",

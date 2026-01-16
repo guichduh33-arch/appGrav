@@ -42,6 +42,7 @@ interface CartState {
 
     // Actions
     addItem: (product: Product, quantity: number, modifiers: CartModifier[], notes: string) => void
+    updateItem: (itemId: string, modifiers: CartModifier[], notes: string) => void
     updateItemQuantity: (itemId: string, quantity: number) => void
     removeItem: (itemId: string) => void
     clearCart: () => void

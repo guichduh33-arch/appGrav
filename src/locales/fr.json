@@ -168,7 +168,18 @@
         "raw_materials": "Matières Premières",
         "finished_products": "Produits Finis",
         "low_stock": "Stock Bas",
-        "stock_opname": "Inventaires (Opname)"
+        "stock_opname": "Inventaires (Opname)",
+        "stats": {
+            "total_products": "Total Produits",
+            "raw_materials": "Matières Premières",
+            "finished_products": "Produits Finis",
+            "low_stock_alerts": "Alertes Stock Bas",
+            "in_stock": "En stock",
+            "ingredients": "Ingrédients",
+            "ready_to_sell": "Prêts à vendre",
+            "needs_attention": "Attention requise",
+            "all_ok": "Tout est OK"
+        }
     },
     "inventory_table": {
         "loading": "Chargement du stock...",
@@ -283,7 +294,8 @@
             "units": "Unités (UOM)",
             "recipe": "Recette",
             "costing": "Coût & Marge",
-            "history": "Historique"
+            "stock": "Mouvements Stock",
+            "prices": "Historique Prix"
         },
         "general": {
             "product_identity": "Identité du Produit",
@@ -347,6 +359,15 @@
             "type": "Type",
             "quantity": "Quantité",
             "reason_ref": "Raison / Réf"
+        },
+        "prices": {
+            "title": "Historique des Prix d'Achat",
+            "current_price_est": "Prix Actuel (Estimé)",
+            "order_date": "Date Commande",
+            "supplier": "Fournisseur",
+            "unit_price": "Prix Unitaire",
+            "total_line": "Total Ligne",
+            "no_history": "Aucun historique d'achat trouvé."
         },
         "messages": {
             "product_updated": "Produit mis à jour avec succès",

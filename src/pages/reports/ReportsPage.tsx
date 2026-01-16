@@ -1,82 +1,141 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Download, LayoutGrid, DollarSign, Package, ShieldAlert } from 'lucide-react';
+import { ChevronRight, ArrowLeft, Download } from 'lucide-react';
 import { OverviewTab } from './components/OverviewTab';
 import { SalesTab } from './components/SalesTab';
 import { InventoryTab } from './components/InventoryTab';
 import { AuditTab } from './components/AuditTab';
+import { REPORT_CATEGORIES, ReportCategory, ReportDefinition } from './ReportsConfig';
 import './ReportsPage.css';
 
 const ReportsPage = () => {
     const { t } = useTranslation();
-    const [activeTab, setActiveTab] = useState<'overview' | 'sales' | 'inventory' | 'audit'>('overview');
+    const [activeCategoryId, setActiveCategoryId] = useState<string>('sales');
+    const [activeReportId, setActiveReportId] = useState<string | null>(null);
+
+    const activeCategory = REPORT_CATEGORIES.find(c => c.id === activeCategoryId) || REPORT_CATEGORIES[0];
+    const activeReport = activeCategory.reports.find(r => r.id === activeReportId);
+
+    // Component Mapping
+    const renderReportComponent = (reportId: string) => {
+        switch (reportId) {
+            case 'dashboard':
+                return <OverviewTab />;
+            case 'sales_dashboard':
+                return <SalesTab />;
+            case 'inventory_dashboard':
+                return <InventoryTab />;
+            case 'audit_log':
+                return <AuditTab />;
+            // Placeholders for new reports
+            default:
+                return (
+                    <div className="flex flex-col items-center justify-center h-96 text-gray-400">
+                        <div className="p-4 bg-gray-50 rounded-full mb-4">
+                            {activeReport?.icon && <activeReport.icon size={48} className="text-gray-300" />}
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900">Report Under Construction</h3>
+                        <p className="mt-1">Use the existing dashboards for now.</p>
+                    </div>
+                );
+        }
+    };
 
     return (
-        <div className="reports-page p-6 max-w-7xl mx-auto">
-            <header className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900">{t('reporting.title')}</h1>
-                    <p className="text-gray-500 text-sm mt-1">{t('reporting.subtitle')}</p>
+        <div className="reports-layout">
+            {/* Sidebar */}
+            <aside className="reports-sidebar">
+                <div className="reports-sidebar__header">
+                    <h1 className="reports-sidebar__title">{t('reporting.title')}</h1>
+                    <p className="reports-sidebar__subtitle">Analytics & Logs</p>
                 </div>
-                <div className="flex gap-2">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 text-sm font-medium transition-colors shadow-sm">
-                        <Download size={18} />
-                        {t('common.export_pdf')}
-                    </button>
+                <nav className="reports-sidebar__nav">
+                    {REPORT_CATEGORIES.map((category) => (
+                        <button
+                            key={category.id}
+                            onClick={() => {
+                                setActiveCategoryId(category.id);
+                                setActiveReportId(null); // Reset report when changing category
+                            }}
+                            className={`reports-nav-item ${activeCategoryId === category.id ? 'active' : ''}`}
+                        >
+                            <category.icon size={18} className="reports-nav-item__icon" />
+                            <span className="reports-nav-item__label">{t(category.title, category.title)}</span>
+                            {activeCategoryId === category.id && <ChevronRight size={14} className="reports-nav-item__arrow" />}
+                        </button>
+                    ))}
+                </nav>
+            </aside>
+
+            {/* Main Content */}
+            <main className="reports-main">
+                {/* Header */}
+                <header className="reports-header">
+                    <div className="reports-header__left">
+                        {activeReportId ? (
+                            <>
+                                <button
+                                    onClick={() => setActiveReportId(null)}
+                                    className="reports-back-btn"
+                                    aria-label="Back to categories"
+                                    title="Retour"
+                                >
+                                    <ArrowLeft size={20} />
+                                </button>
+                                <div>
+                                    <h2 className="reports-header__title">{activeReport?.title}</h2>
+                                    <p className="reports-header__subtitle">{activeReport?.description}</p>
+                                </div>
+                            </>
+                        ) : (
+                            <div>
+                                <h2 className="reports-header__title">{t(activeCategory.title, activeCategory.title)}</h2>
+                                <p className="reports-header__subtitle">Select a report to view details</p>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="reports-header__actions">
+                        {activeReportId && (
+                            <button className="btn btn-secondary">
+                                <Download size={16} />
+                                <span>Export</span>
+                            </button>
+                        )}
+                    </div>
+                </header>
+
+                {/* Content Body */}
+                <div className="reports-content">
+                    {activeReportId ? (
+                        <div className="reports-content__container animate-fade-in">
+                            {renderReportComponent(activeReportId)}
+                        </div>
+                    ) : (
+                        <div className="reports-content__container">
+                            <div className="reports-grid">
+                                {activeCategory.reports.map((report) => (
+                                    <button
+                                        key={report.id}
+                                        onClick={() => setActiveReportId(report.id)}
+                                        className="report-card-btn group"
+                                    >
+                                        <div className="report-card-btn__icon-wrapper">
+                                            <report.icon size={24} />
+                                        </div>
+                                        <h3 className="report-card-btn__title">
+                                            {report.title}
+                                        </h3>
+                                        <p className="report-card-btn__desc">
+                                            {report.description}
+                                        </p>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
-            </header>
-
-            {/* Tabs Navigation */}
-            <div className="flex overflow-x-auto gap-4 mb-8 border-b border-gray-200 pb-1">
-                <button
-                    onClick={() => setActiveTab('overview')}
-                    className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'overview'
-                        ? 'border-blue-600 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                        }`}
-                >
-                    <LayoutGrid size={18} />
-                    {t('reporting.tabs.overview')}
-                </button>
-                <button
-                    onClick={() => setActiveTab('sales')}
-                    className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'sales'
-                        ? 'border-blue-600 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                        }`}
-                >
-                    <DollarSign size={18} />
-                    {t('reporting.tabs.sales')}
-                </button>
-                <button
-                    onClick={() => setActiveTab('inventory')}
-                    className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'inventory'
-                        ? 'border-blue-600 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                        }`}
-                >
-                    <Package size={18} />
-                    {t('reporting.tabs.inventory')}
-                </button>
-                <button
-                    onClick={() => setActiveTab('audit')}
-                    className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'audit'
-                        ? 'border-blue-600 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
-                        }`}
-                >
-                    <ShieldAlert size={18} />
-                    {t('reporting.tabs.audit')}
-                </button>
-            </div>
-
-            {/* Content Area */}
-            <div className="min-h-[500px]">
-                {activeTab === 'overview' && <OverviewTab />}
-                {activeTab === 'sales' && <SalesTab />}
-                {activeTab === 'inventory' && <InventoryTab />}
-                {activeTab === 'audit' && <AuditTab />}
-            </div>
+            </main>
         </div>
     );
 };

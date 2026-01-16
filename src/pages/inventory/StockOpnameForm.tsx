@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Save, CheckCheck, Search, Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import type { InventoryCount, InventoryCountItem, Product } from '../../types/database'
-import './StockOpname.css' // We might create this, or assume shared styles
+import './StockOpname.css'
 
 export default function StockOpnameForm() {
     const { id } = useParams<{ id: string }>()
@@ -43,7 +43,7 @@ export default function StockOpnameForm() {
                 .from('inventory_count_items')
                 .select('*, product:products(*)')
                 .eq('inventory_count_id', id)
-                .order('product(name)' as any) // workaround for sorting join
+                .order('product(name)' as any)
                 .returns<(InventoryCountItem & { product: Product })[]>()
 
             if (iErr) throw iErr
@@ -52,7 +52,6 @@ export default function StockOpnameForm() {
             if (sess.status === 'draft' && (!existingItems || existingItems.length === 0)) {
                 await initializeItems(id)
             } else {
-                // Cast to any to handle the join type
                 setItems(existingItems as any || [])
             }
         } catch (error) {
@@ -64,7 +63,6 @@ export default function StockOpnameForm() {
     }
 
     async function initializeItems(sessionId: string) {
-        // Fetch all active products
         const { data: products } = await supabase
             .from('products')
             .select('*')
@@ -73,7 +71,6 @@ export default function StockOpnameForm() {
 
         if (!products) return
 
-        // Create item entries
         const records = products.map(p => ({
             inventory_count_id: sessionId,
             product_id: p.id,
@@ -81,7 +78,6 @@ export default function StockOpnameForm() {
             unit: p.unit
         }))
 
-        // Insert in batches if needed, but for now single call
         const { error } = await supabase
             .from('inventory_count_items')
             .insert(records as any)
@@ -92,7 +88,6 @@ export default function StockOpnameForm() {
             throw error
         }
 
-        // Reload items properly
         const { data: reloaded } = await supabase
             .from('inventory_count_items')
             .select('*, product:products(*)')
@@ -100,8 +95,6 @@ export default function StockOpnameForm() {
 
         setItems(reloaded as any || [])
     }
-
-    // --- Actions ---
 
     async function handleUpdateCount(itemId: string, actual: number | null) {
         // Optimistic update
@@ -113,22 +106,17 @@ export default function StockOpnameForm() {
             return i
         })
         setItems(newItems)
-
-        // Debounce or just save on blur? For now simple implementation: won't save instantly to DB to avoid spam
-        // But we rely on "Save Draft" button for persistence usually in Opname
     }
 
     async function saveDraft() {
         if (!session) return
         setStatus('saving')
         try {
-            // Bulk update (upsert) currently changed or all?
-            // Supabase upsert requires primary keys.
             const updates = items.map(i => ({
                 id: i.id,
                 inventory_count_id: session.id,
                 product_id: i.product_id,
-                system_stock: i.system_stock, // Keep original snapshot
+                system_stock: i.system_stock,
                 actual_stock: i.actual_stock,
                 variance: i.variance,
                 updated_at: new Date().toISOString()
@@ -140,7 +128,6 @@ export default function StockOpnameForm() {
 
             if (error) throw error
 
-            // Update session note maybe?
             alert('Brouillon sauvegardé')
         } catch (e: any) {
             alert('Erreur sauvegarde: ' + e.message)
@@ -154,10 +141,8 @@ export default function StockOpnameForm() {
 
         setStatus('saving')
         try {
-            // 1. Ensure everything is saved first
             await saveDraft()
 
-            // 2. Call RPC
             const { error } = await supabase.rpc('finalize_inventory_count', {
                 count_uuid: id!,
                 user_uuid: (await supabase.auth.getUser()).data.user?.id || ''
@@ -173,31 +158,28 @@ export default function StockOpnameForm() {
         }
     }
 
-    // --- Filtering ---
     const filteredItems = items.filter(i =>
         i.product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         i.product.sku.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
-    if (!session) return <div>Chargement...</div>
+    if (!session) return <div className="opname-container"><div className="p-8 text-center text-gray-500">Chargement...</div></div>
 
     const isLocked = session.status !== 'draft'
 
     return (
-        <div className="product-detail-page"> {/* Reusing layout class */}
-            <header className="detail-header sticky top-0 bg-white z-10 shadow-sm p-4">
+        <div className="opname-container">
+            <header className="opname-header sticky top-0 z-10">
                 <div className="flex items-center gap-4">
-                    <button onClick={() => navigate('/inventory/stock-opname')} className="btn-icon" aria-label="Retour">
-                        <ArrowLeft />
+                    <button onClick={() => navigate('/inventory/stock-opname')} className="btn-back" aria-label="Retour">
+                        <ArrowLeft size={20} />
                     </button>
                     <div>
                         <div className="flex items-center gap-2">
                             <h1 className="text-xl font-bold">{session.count_number}</h1>
-                            <span className={`text-xs px-2 py-1 rounded font-bold uppercase ${session.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                                {session.status}
-                            </span>
+                            <StatusBadge status={session.status} />
                         </div>
-                        <p className="text-sm text-gray-500">
+                        <p className="opname-subtitle">
                             {new Date(session.created_at).toLocaleDateString()}
                         </p>
                     </div>
@@ -209,14 +191,14 @@ export default function StockOpnameForm() {
                             <button
                                 onClick={saveDraft}
                                 disabled={status === 'saving'}
-                                className="btn-secondary flex items-center gap-2"
+                                className="btn btn-secondary"
                             >
                                 <Save size={16} /> Enregistrer
                             </button>
                             <button
                                 onClick={finalizeCount}
                                 disabled={status === 'saving'}
-                                className="btn-primary flex items-center gap-2"
+                                className="btn btn-primary"
                             >
                                 <CheckCheck size={16} /> Finaliser
                             </button>
@@ -225,14 +207,14 @@ export default function StockOpnameForm() {
                 </div>
             </header>
 
-            <div className="p-6">
+            <div className="opname-content">
 
                 {/* Controls */}
-                <div className="flex justify-between items-center mb-6">
-                    <div className="relative w-1/3">
-                        <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                <div className="controls-bar">
+                    <div className="search-input-wrapper">
+                        <Search className="search-icon" size={18} />
                         <input
-                            className="pl-10 w-full"
+                            className="search-input"
                             placeholder="Rechercher un produit..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
@@ -243,7 +225,7 @@ export default function StockOpnameForm() {
                         <label className="flex items-center gap-2 cursor-pointer select-none">
                             <button
                                 onClick={() => setBlindMode(!blindMode)}
-                                className={`flex items-center gap-2 px-3 py-1 rounded border ${blindMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-700'}`}
+                                className={`btn btn-sm ${blindMode ? 'btn-primary' : 'btn-secondary'}`}
                             >
                                 {blindMode ? <EyeOff size={16} /> : <Eye size={16} />}
                                 {blindMode ? 'Mode Aveugle (ON)' : 'Mode Aveugle (OFF)'}
@@ -253,46 +235,46 @@ export default function StockOpnameForm() {
                 </div>
 
                 {/* Table */}
-                <div className="card overflow-hidden">
-                    <table className="w-full text-left">
-                        <thead className="bg-gray-50 border-b">
+                <div className="opname-table-card">
+                    <table className="opname-table">
+                        <thead>
                             <tr>
-                                <th className="p-3">Produit</th>
-                                <th className="p-3 text-right">Stock Système</th>
-                                <th className="p-3 text-right bg-blue-50 w-48">Réel (Physique)</th>
-                                <th className="p-3 text-right">Ecart</th>
+                                <th>Produit</th>
+                                <th className="text-right">Stock Système</th>
+                                <th className="text-right real-stock-col">Réel (Physique)</th>
+                                <th className="text-right">Ecart</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredItems.map(item => (
-                                <tr key={item.id} className="border-b hover:bg-gray-50">
-                                    <td className="p-3">
-                                        <div className="font-medium">{item.product.name}</div>
+                                <tr key={item.id}>
+                                    <td>
+                                        <div className="font-medium text-gray-900">{item.product.name}</div>
                                         <div className="text-xs text-gray-500">{item.product.sku}</div>
                                     </td>
-                                    <td className="p-3 text-right">
+                                    <td className="text-right">
                                         {blindMode && !isLocked ? (
-                                            <span className="text-gray-300 italic">Masqué</span>
+                                            <span className="text-muted italic">Masqué</span>
                                         ) : (
-                                            <span>{item.system_stock} {item.unit}</span>
+                                            <span className="font-medium">{item.system_stock} {item.unit}</span>
                                         )}
                                     </td>
-                                    <td className="p-3 text-right bg-blue-50">
+                                    <td className="text-right real-stock-col">
                                         {isLocked ? (
                                             <span className="font-bold">{item.actual_stock}</span>
                                         ) : (
                                             <input
                                                 type="number"
-                                                className="w-full text-right p-1 border border-blue-200 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white"
+                                                className="count-input"
                                                 value={item.actual_stock ?? ''}
                                                 placeholder="-"
                                                 onChange={e => handleUpdateCount(item.id, e.target.value ? parseFloat(e.target.value) : null)}
                                             />
                                         )}
                                     </td>
-                                    <td className={`p-3 text-right font-medium`}>
+                                    <td className="text-right">
                                         {item.variance !== null && !blindMode ? (
-                                            <span className={item.variance === 0 ? 'text-gray-400' : (item.variance > 0 ? 'text-green-600' : 'text-red-600')}>
+                                            <span className={item.variance === 0 ? 'variance-neutral' : (item.variance > 0 ? 'variance-positive' : 'variance-negative')}>
                                                 {item.variance > 0 ? '+' : ''}{item.variance} {item.unit}
                                             </span>
                                         ) : (
@@ -308,4 +290,17 @@ export default function StockOpnameForm() {
             </div>
         </div>
     )
+}
+
+function StatusBadge({ status }: { status: string }) {
+    switch (status) {
+        case 'draft':
+            return <span className="status-badge draft">Brouillon</span>
+        case 'completed':
+            return <span className="status-badge completed">Validé</span>
+        case 'cancelled':
+            return <span className="status-badge cancelled">Annulé</span>
+        default:
+            return <span className="status-badge">{status}</span>
+    }
 }

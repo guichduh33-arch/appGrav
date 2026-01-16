@@ -64,55 +64,33 @@ export default function ProductGrid({ products, onProductClick, isLoading }: Pro
         )
     }
 
-    // Group products by base name
-    const groupedProducts = groupProducts(products)
-
     return (
         <div className="products-grid">
-            {Array.from(groupedProducts.entries()).map(([baseName, variants]) => {
-                const representativeProduct = getRepresentativeProduct(variants)
-                const hasVariants = variants.length > 1
-                const priceRange = getPriceRange(variants)
-
-                return (
-                    <button
-                        key={baseName}
-                        className="pos-product-card"
-                        onClick={() => onProductClick(representativeProduct, hasVariants ? variants : undefined)}
-                    >
-                        {/* Variant badge */}
-                        {hasVariants && (
-                            <span className="pos-product-card__badge variant-badge">
-                                {variants.length} {t('pos.products.options_label')}
-                            </span>
+            {products.map((product) => (
+                <button
+                    key={product.id}
+                    className="pos-product-card"
+                    onClick={() => onProductClick(product)}
+                >
+                    {/* Product image or emoji */}
+                    <div className="pos-product-card__image">
+                        {product.image_url ? (
+                            <img src={product.image_url} alt={product.name} />
+                        ) : (
+                            <span>{getProductEmoji(product)}</span>
                         )}
+                    </div>
 
-                        {/* Product image or emoji */}
-                        <div className="pos-product-card__image">
-                            {representativeProduct.image_url ? (
-                                <img src={representativeProduct.image_url} alt={baseName} />
-                            ) : (
-                                <span>{getProductEmoji(representativeProduct)}</span>
-                            )}
-                        </div>
+                    {/* Product info */}
+                    <div className="pos-product-card__name">
+                        {product.name}
+                    </div>
 
-                        {/* Product info */}
-                        <div className="pos-product-card__name">
-                            {baseName}
-                        </div>
-
-                        <div className="pos-product-card__price">
-                            {priceRange.min === priceRange.max ? (
-                                formatPrice(priceRange.min)
-                            ) : (
-                                <>
-                                    {formatPrice(priceRange.min)} - {formatPrice(priceRange.max)}
-                                </>
-                            )}
-                        </div>
-                    </button>
-                )
-            })}
+                    <div className="pos-product-card__price">
+                        {formatPrice(product.retail_price || 0)}
+                    </div>
+                </button>
+            ))}
         </div>
     )
 }

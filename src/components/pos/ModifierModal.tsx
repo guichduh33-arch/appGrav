@@ -1,14 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Check, Plus, Minus } from 'lucide-react'
 import type { Product } from '../../types/database'
-import { useCartStore, type CartModifier } from '../../stores/cartStore'
+import { useCartStore, type CartModifier, type CartItem } from '../../stores/cartStore'
 import { formatPrice } from '../../utils/helpers'
 import './ModifierModal.css'
 
 interface ModifierModalProps {
     product: Product
     onClose: () => void
+    editItem?: CartItem
 }
 
 // Modifier configuration by category
@@ -17,18 +18,16 @@ const MODIFIER_CONFIG: Record<string, ModifierGroup[]> = {
         {
             name: 'temperature',
             label: 'Température',
-            icon: '🌡️',
             type: 'single',
             required: true,
             options: [
-                { id: 'hot', label: 'Chaud', icon: '🔥', price: 0, default: true },
-                { id: 'iced', label: 'Glacé', icon: '🧊', price: 5000 },
+                { id: 'hot', label: 'Chaud', price: 0, default: true },
+                { id: 'iced', label: 'Glacé', price: 5000 },
             ],
         },
         {
             name: 'milk',
             label: 'Type de lait',
-            icon: '🥛',
             type: 'single',
             required: true,
             options: [
@@ -42,7 +41,6 @@ const MODIFIER_CONFIG: Record<string, ModifierGroup[]> = {
         {
             name: 'extras',
             label: 'Options',
-            icon: '⚡',
             type: 'multiple',
             required: false,
             options: [
@@ -56,7 +54,6 @@ const MODIFIER_CONFIG: Record<string, ModifierGroup[]> = {
         {
             name: 'toast',
             label: 'Niveau de Toastage',
-            icon: '🔥',
             type: 'single',
             required: true,
             options: [
@@ -70,7 +67,6 @@ const MODIFIER_CONFIG: Record<string, ModifierGroup[]> = {
         {
             name: 'bread',
             label: 'Type de pain',
-            icon: '🍞',
             type: 'single',
             required: true,
             options: [
@@ -85,7 +81,6 @@ const MODIFIER_CONFIG: Record<string, ModifierGroup[]> = {
 interface ModifierGroup {
     name: string
     label: string
-    icon: string
     type: 'single' | 'multiple'
     required: boolean
     options: ModifierOption[]
@@ -94,21 +89,40 @@ interface ModifierGroup {
 interface ModifierOption {
     id: string
     label: string
-    icon?: string
     price: number
     default?: boolean
 }
 
-export default function ModifierModal({ product, onClose }: ModifierModalProps) {
+export default function ModifierModal({ product, onClose, editItem }: ModifierModalProps) {
     const { t } = useTranslation()
-    const addItem = useCartStore(state => state.addItem)
+    const { addItem, updateItem } = useCartStore()
 
     // Get modifiers for this product's category
     const categoryName = (product as any).category?.name || 'default'
     const modifierGroups = MODIFIER_CONFIG[categoryName] || []
 
-    // Initialize selections with defaults
+    // Initialize selections
     const [selections, setSelections] = useState<Record<string, string | string[]>>(() => {
+        // If editing, reconstruct selections from existing modifiers
+        if (editItem) {
+            const initial: Record<string, string | string[]> = {}
+            modifierGroups.forEach(group => {
+                if (group.type === 'single') {
+                    // Find the modifier that matches this group
+                    const mod = editItem.modifiers.find(m => m.groupName === group.name)
+                    initial[group.name] = mod?.optionId || (group.options.find(o => o.default) || group.options[0])?.id || ''
+                } else {
+                    // Find all modifiers for this group
+                    const modIds = editItem.modifiers
+                        .filter(m => m.groupName === group.name)
+                        .map(m => m.optionId)
+                    initial[group.name] = modIds
+                }
+            })
+            return initial
+        }
+
+        // Default initialization
         const initial: Record<string, string | string[]> = {}
         modifierGroups.forEach(group => {
             if (group.type === 'single') {
@@ -121,8 +135,8 @@ export default function ModifierModal({ product, onClose }: ModifierModalProps) 
         return initial
     })
 
-    const [quantity, setQuantity] = useState(1)
-    const [notes, setNotes] = useState('')
+    const [quantity, setQuantity] = useState(editItem?.quantity || 1)
+    const [notes, setNotes] = useState(editItem?.notes || '')
 
     // Calculate total price
     const basePrice = product.retail_price || 0
@@ -160,8 +174,8 @@ export default function ModifierModal({ product, onClose }: ModifierModalProps) 
         })
     }
 
-    // Handle add to cart
-    const handleAddToCart = () => {
+    // Handle confirm (Add or Update)
+    const handleConfirm = () => {
         const modifiers: CartModifier[] = []
 
         modifierGroups.forEach(group => {
@@ -191,7 +205,22 @@ export default function ModifierModal({ product, onClose }: ModifierModalProps) 
             }
         })
 
-        addItem(product, quantity, modifiers, notes)
+        if (editItem) {
+            updateItem(editItem.id, modifiers, notes)
+            // Quantity update handled separately if needed, but for now we might focus on modifiers/notes
+            // If quantity logic needs to be unified, updateItem could accept quantity too.
+            // Based on cartStore updateItem signature: (itemId, modifiers, notes).
+            // Let's assume quantity change is done via main cart buttons, OR we should update store to accept quantity in updateItem.
+            // *Correction*: Store `updateItem` currently doesn't take quantity.
+            // *Decision*: I will stick to modifiers/notes update here. If user changes quantity in modal, we should probably call `updateItemQuantity` too.
+            // Let's check `updateItem` signature again in my previous turn... yes it's (itemId, modifiers, notes).
+            // I'll add `updateItemQuantity` call if quantity changed.
+            if (quantity !== editItem.quantity) {
+                useCartStore.getState().updateItemQuantity(editItem.id, quantity)
+            }
+        } else {
+            addItem(product, quantity, modifiers, notes)
+        }
         onClose()
     }
 
@@ -201,8 +230,7 @@ export default function ModifierModal({ product, onClose }: ModifierModalProps) 
                 <div className="modal__header">
                     <div>
                         <h3 className="modal__title">
-                            <span>{getProductEmoji(product)}</span>
-                            <span>{product.name}</span>
+                            {product.name}
                         </h3>
                         <p className="modal__subtitle">{t('modifiers.subtitle')}</p>
                     </div>
@@ -216,7 +244,7 @@ export default function ModifierModal({ product, onClose }: ModifierModalProps) 
                     {modifierGroups.map(group => (
                         <div key={group.name} className="modifier-section">
                             <h4 className="modifier-section__title">
-                                {group.icon} {t(`modifiers.groups.${group.name}`)}
+                                {t(`modifiers.groups.${group.name}`)}
                                 {group.required && <span className="required">*</span>}
                             </h4>
 
@@ -232,7 +260,6 @@ export default function ModifierModal({ product, onClose }: ModifierModalProps) 
                                                 onChange={() => handleSingleSelect(group.name, option.id)}
                                             />
                                             <label htmlFor={`${group.name}-${option.id}`} className="modifier-option__label">
-                                                {option.icon && <span className="modifier-option__icon">{option.icon}</span>}
                                                 <span className="modifier-option__text">{t(`modifiers.options.${option.id.replace(/-/g, '_')}`)}</span>
                                                 {option.price > 0 && (
                                                     <span className="modifier-option__price">+{formatPrice(option.price)}</span>
@@ -261,7 +288,7 @@ export default function ModifierModal({ product, onClose }: ModifierModalProps) 
 
                     {/* Notes */}
                     <div className="modifier-section">
-                        <h4 className="modifier-section__title">📝 {t('modifiers.notes_label')}</h4>
+                        <h4 className="modifier-section__title">{t('modifiers.notes_label')}</h4>
                         <textarea
                             className="form-textarea"
                             placeholder={t('modifiers.notes_placeholder')}
@@ -272,7 +299,7 @@ export default function ModifierModal({ product, onClose }: ModifierModalProps) 
 
                     {/* Quantity */}
                     <div className="modifier-section">
-                        <h4 className="modifier-section__title">📦 {t('modifiers.quantity_label')}</h4>
+                        <h4 className="modifier-section__title">{t('modifiers.quantity_label')}</h4>
                         <div className="qty-selector">
                             <button
                                 className="qty-selector__btn"
@@ -296,22 +323,12 @@ export default function ModifierModal({ product, onClose }: ModifierModalProps) 
                 </div>
 
                 <div className="modal__footer">
-                    <button className="btn btn-primary btn-block" onClick={handleAddToCart}>
+                    <button className="btn btn-primary btn-block" onClick={handleConfirm}>
                         <Check size={18} />
-                        {t('modifiers.add_to_cart')} • {formatPrice(totalPrice)}
+                        {editItem ? t('modifiers.update_item') : t('modifiers.add_to_cart')} • {formatPrice(totalPrice)}
                     </button>
                 </div>
             </div>
         </div>
     )
-}
-
-function getProductEmoji(product: Product): string {
-    const name = product.name.toLowerCase()
-    if (name.includes('cappuccino') || name.includes('latte') || name.includes('espresso')) return '☕'
-    if (name.includes('matcha')) return '🍵'
-    if (name.includes('croissant')) return '🥐'
-    if (name.includes('bagel')) return '🥯'
-    if (name.includes('sandwich')) return '🥪'
-    return '🥐'
 }

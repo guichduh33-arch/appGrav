@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { Settings, Search, PauseCircle, ClipboardList, Printer, BarChart2, Monitor, CheckCircle, AlertCircle, LayoutGrid } from 'lucide-react'
+import { Search, PauseCircle, CheckCircle, AlertCircle } from 'lucide-react'
 import { useAuthStore } from '../../stores/authStore'
 import { useCartStore } from '../../stores/cartStore'
 import { useOrderStore } from '../../stores/orderStore'
 import { useProducts, useCategories } from '../../hooks/useProducts'
-import { formatTime } from '../../utils/helpers'
 import CategoryNav from '../../components/pos/CategoryNav'
 import ProductGrid from '../../components/pos/ProductGrid'
 import Cart from '../../components/pos/Cart'
+import POSMenu from '../../components/pos/POSMenu'
 import ModifierModal from '../../components/pos/ModifierModal'
 import PaymentModal from '../../components/pos/PaymentModal'
 import VariantModal from '../../components/pos/VariantModal'
@@ -22,23 +22,23 @@ export default function POSMainPage() {
     const navigate = useNavigate()
     const { user } = useAuthStore()
     const {
-        items, orderType, setOrderType, tableNumber, customerId, customerName,
-        subtotal, discountAmount, total, itemCount, clearCart,
+        items, itemCount, clearCart,
         activeOrderId, activeOrderNumber, restoreCartState, lockedItemIds
     } = useCartStore()
-    const { holdOrder, getHeldOrdersCount, restoreHeldOrder } = useOrderStore()
+    const { holdOrder, restoreHeldOrder } = useOrderStore()
 
-    const [currentTime, setCurrentTime] = useState(new Date())
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
     const [searchQuery, setSearchQuery] = useState('')
 
     // Modal states
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+    const [editItem, setEditItem] = useState<CartItem | undefined>(undefined)
     const [productVariants, setProductVariants] = useState<Product[] | null>(null)
     const [showModifierModal, setShowModifierModal] = useState(false)
     const [showPaymentModal, setShowPaymentModal] = useState(false)
     const [showVariantModal, setShowVariantModal] = useState(false)
     const [showHeldOrdersModal, setShowHeldOrdersModal] = useState(false)
+    const [showMenu, setShowMenu] = useState(false)
 
     // Toast state
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
@@ -62,6 +62,7 @@ export default function POSMainPage() {
 
     // Handle product click
     const handleProductClick = (product: Product, variants?: Product[]) => {
+        setEditItem(undefined) // Reset edit item when adding new
         setSelectedProduct(product)
         if (variants && variants.length > 1) {
             // Product has variants - show variant modal
@@ -72,6 +73,12 @@ export default function POSMainPage() {
             setProductVariants(null)
             setShowModifierModal(true)
         }
+    }
+
+    const handleCartItemClick = (item: CartItem) => {
+        setEditItem(item)
+        setSelectedProduct(item.product)
+        setShowModifierModal(true)
     }
 
     // Handle variant selection complete
@@ -175,53 +182,6 @@ export default function POSMainPage() {
 
     return (
         <div className="pos-app">
-            {/* Header */}
-            <header className="pos-header">
-                <div className="pos-header__left">
-                    <div className="pos-header__logo">
-                        <span className="pos-header__logo-icon">🥐</span>
-                        <span>The Breakery</span>
-                    </div>
-                    <div className="pos-header__user">
-                        <div className="avatar avatar-sm">{user?.name?.[0] || 'U'}</div>
-                        <span className="pos-header__user-name">{user?.name || t('pos.header.user_label')}</span>
-                    </div>
-                </div>
-
-                <div className="pos-header__center">
-                    <div className="order-type-selector">
-                        <button
-                            className={`order-type-selector__option ${orderType === 'dine_in' ? 'is-active' : ''}`}
-                            onClick={() => setOrderType('dine_in')}
-                        >
-                            {t('pos.header.dine_in')}
-                        </button>
-                        <button
-                            className={`order-type-selector__option ${orderType === 'takeaway' ? 'is-active' : ''}`}
-                            onClick={() => setOrderType('takeaway')}
-                        >
-                            {t('pos.header.takeaway')}
-                        </button>
-                        <button
-                            className={`order-type-selector__option ${orderType === 'delivery' ? 'is-active' : ''}`}
-                            onClick={() => setOrderType('delivery')}
-                        >
-                            {t('pos.header.delivery')}
-                        </button>
-                    </div>
-                    <div className="pos-header__time">{formatTime(currentTime)}</div>
-                </div>
-
-                <div className="pos-header__right">
-                    <button className="btn-icon" title={t('nav.back_office')} onClick={() => navigate('/inventory')}>
-                        <LayoutGrid size={20} />
-                    </button>
-                    <button className="btn-icon" title={t('nav.settings')} onClick={() => navigate('/settings')}>
-                        <Settings size={20} />
-                    </button>
-                </div>
-            </header>
-
             {/* Main Content (3 Zones) */}
             <main className="pos-main">
                 {/* Zone 1: Categories Sidebar */}
@@ -230,6 +190,7 @@ export default function POSMainPage() {
                     selectedCategory={selectedCategory}
                     onSelectCategory={setSelectedCategory}
                     isLoading={categoriesLoading}
+                    onOpenMenu={() => setShowMenu(true)}
                 />
 
                 {/* Zone 2: Products Grid */}
@@ -261,44 +222,21 @@ export default function POSMainPage() {
                     </div>
                 </section>
 
-                {/* Zone 3: Cart Sidebar */}
+                {/* Zone 3: Cart Sidebar with integrated Menu Button */}
                 <Cart
                     onCheckout={handleCheckout}
                     onSendToKitchen={handleSendToKitchen}
                     onHoldOrder={handleHoldOrder}
+                    onItemClick={handleCartItemClick}
                 />
             </main>
 
-            {/* Footer */}
-            <footer className="pos-footer">
-                <div className="pos-footer__left">
-                    <button className="footer-btn" onClick={() => setShowHeldOrdersModal(true)}>
-                        <PauseCircle size={18} />
-                        {t('pos.footer.on_hold')}
-                        {getHeldOrdersCount() > 0 && (
-                            <span className="footer-btn__badge">{getHeldOrdersCount()}</span>
-                        )}
-                    </button>
-                    <button className="footer-btn">
-                        <ClipboardList size={18} />
-                        {t('pos.footer.orders')}
-                    </button>
-                </div>
-                <div className="pos-footer__right">
-                    <button className="footer-btn">
-                        <Printer size={18} />
-                        {t('pos.footer.ticket')}
-                    </button>
-                    <button className="footer-btn">
-                        <BarChart2 size={18} />
-                        {t('pos.footer.session')}
-                    </button>
-                    <button className="footer-btn" onClick={() => window.open('/kds', '_blank')}>
-                        <Monitor size={18} />
-                        {t('pos.footer.kds')}
-                    </button>
-                </div>
-            </footer>
+            {/* Global Menu */}
+            <POSMenu
+                isOpen={showMenu}
+                onClose={() => setShowMenu(false)}
+                onShowHeldOrders={() => setShowHeldOrdersModal(true)}
+            />
 
             {/* Toast Notifications */}
             {toast && (
@@ -322,9 +260,11 @@ export default function POSMainPage() {
             {showModifierModal && selectedProduct && (
                 <ModifierModal
                     product={selectedProduct}
+                    editItem={editItem}
                     onClose={() => {
                         setShowModifierModal(false)
                         setSelectedProduct(null)
+                        setEditItem(undefined)
                     }}
                 />
             )}

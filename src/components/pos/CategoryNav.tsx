@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { Menu } from 'lucide-react'
 import type { Category } from '../../types/database'
 import './CategoryNav.css'
 
@@ -7,6 +8,7 @@ interface CategoryNavProps {
     selectedCategory: string | null
     onSelectCategory: (categoryId: string | null) => void
     isLoading?: boolean
+    onOpenMenu?: () => void
 }
 
 
@@ -14,7 +16,8 @@ export default function CategoryNav({
     categories,
     selectedCategory,
     onSelectCategory,
-    isLoading
+    isLoading,
+    onOpenMenu
 }: CategoryNavProps) {
     const { t } = useTranslation()
     if (isLoading) {
@@ -29,9 +32,15 @@ export default function CategoryNav({
 
     return (
         <aside className="pos-categories">
-            {/* All Products */}
+            {/* Menu Button */}
+            <div className="pos-categories__header">
+                <button className="pos-menu-btn" onClick={onOpenMenu} title="Menu">
+                    <Menu size={28} />
+                </button>
+            </div>
+
             <button
-                className={`pos-categories__item ${selectedCategory === null ? 'is-active' : ''}`}
+                className={`pos-categories__item is-all ${selectedCategory === null ? 'is-active' : ''}`}
                 onClick={() => onSelectCategory(null)}
             >
                 <span className="pos-categories__label">{t('inventory_page.all')}</span>
@@ -43,6 +52,9 @@ export default function CategoryNav({
                     key={category.id}
                     className={`pos-categories__item ${selectedCategory === category.id ? 'is-active' : ''}`}
                     onClick={() => onSelectCategory(category.id)}
+                    style={{
+                        '--category-color': category.color
+                    } as React.CSSProperties}
                 >
                     <span className="pos-categories__label">
                         {category.name}

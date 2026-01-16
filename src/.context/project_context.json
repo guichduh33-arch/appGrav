@@ -1,0 +1,45 @@
+{
+  "project_name": "The Breakery POS",
+  "last_updated": "2026-01-16T22:40:38.963566",
+  "tech_stack": {
+    "frontend": "React 18 + Vite + TypeScript",
+    "state_management": "Zustand + React Query",
+    "styling": "Tailwind CSS",
+    "backend": "Supabase (Edge Functions - Deno/TS)",
+    "database": "Supabase (PostgreSQL)",
+    "print_server": "Node.js (ESC/POS)"
+  },
+  "coding_standards": {
+    "frontend": {
+      "framework": "React Functional Components",
+      "language": "TypeScript",
+      "style": "Tailwind CSS (utility-first)",
+      "state": "Zustand for global, React Query for server state"
+    },
+    "backend": {
+      "platform": "Supabase Edge Functions",
+      "language": "TypeScript (Deno)",
+      "db_access": "Supabase JS Client / Postgres Triggers"
+    },
+    "database": {
+      "migrations": "Numbered SQL files (001_name.sql)",
+      "auth": "RLS (Row Level Security)"
+    }
+  },
+  "architecture": {
+    "frontend_path": "src",
+    "components_path": "src/components",
+    "pages_path": "src/pages",
+    "services_path": "src/services",
+    "hooks_path": "src/hooks",
+    "backend_path": "supabase/functions",
+    "migrations_path": "supabase/migrations"
+  },
+  "business_rules": {
+    "financial": {
+      "currency": "IDR",
+      "tax_rate": 0.1,
+      "rounding": "to_nearest_100"
+    }
+  }
+}

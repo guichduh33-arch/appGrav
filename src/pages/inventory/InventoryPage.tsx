@@ -1,7 +1,16 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Package, Coffee, AlertCircle, ClipboardCheck } from 'lucide-react'
+import {
+    LayoutDashboard,
+    Package,
+    Coffee,
+    AlertCircle,
+    ClipboardCheck,
+    Boxes,
+    TrendingUp,
+    AlertTriangle
+} from 'lucide-react'
 import InventoryTable from '../../components/inventory/InventoryTable'
 import StockAdjustmentModal from '../../components/inventory/StockAdjustmentModal'
 import { useInventoryItems } from '../../hooks/useInventory'
@@ -16,6 +25,16 @@ export default function InventoryPage() {
     const [activeTab, setActiveTab] = useState<TabType>('all')
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
     const navigate = useNavigate()
+
+    // Calculate stats
+    const stats = useMemo(() => {
+        const totalItems = items.length
+        const rawMaterials = items.filter(i => i.product_type === 'raw_material').length
+        const finishedProducts = items.filter(i => i.product_type === 'finished').length
+        const lowStockItems = items.filter(i => i.current_stock <= i.min_stock_level).length
+
+        return { totalItems, rawMaterials, finishedProducts, lowStockItems }
+    }, [items])
 
     // Filter items based on active tab
     const filteredItems = items.filter(item => {
@@ -63,9 +82,9 @@ export default function InventoryPage() {
                         >
                             <AlertCircle size={18} />
                             {t('inventory_page.low_stock')}
-                            {items.filter(i => i.current_stock <= i.min_stock_level).length > 0 && (
+                            {stats.lowStockItems > 0 && (
                                 <span className="tab-badge">
-                                    {items.filter(i => i.current_stock <= i.min_stock_level).length}
+                                    {stats.lowStockItems}
                                 </span>
                             )}
                         </button>
@@ -83,12 +102,73 @@ export default function InventoryPage() {
             </header>
 
             <main className="inventory-content">
-                <InventoryTable
-                    items={filteredItems}
-                    isLoading={isLoading}
-                    onAdjustStock={setSelectedProduct}
-                    onViewDetails={(product) => navigate(`/inventory/product/${product.id}`)}
-                />
+                {/* KPI Stats Cards */}
+                <div className="inventory-stats-grid">
+                    <div className="stat-card">
+                        <div className="stat-icon total">
+                            <Boxes size={24} />
+                        </div>
+                        <div className="stat-info">
+                            <div className="stat-label">{t('inventory_page.stats.total_products')}</div>
+                            <div className="stat-value">{stats.totalItems}</div>
+                            <div className="stat-trend up">
+                                <TrendingUp size={12} />
+                                {t('inventory_page.stats.in_stock')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="stat-card">
+                        <div className="stat-icon raw">
+                            <Package size={24} />
+                        </div>
+                        <div className="stat-info">
+                            <div className="stat-label">{t('inventory_page.stats.raw_materials')}</div>
+                            <div className="stat-value">{stats.rawMaterials}</div>
+                            <div className="stat-trend up">
+                                {t('inventory_page.stats.ingredients')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="stat-card">
+                        <div className="stat-icon finished">
+                            <Coffee size={24} />
+                        </div>
+                        <div className="stat-info">
+                            <div className="stat-label">{t('inventory_page.stats.finished_products')}</div>
+                            <div className="stat-value">{stats.finishedProducts}</div>
+                            <div className="stat-trend up">
+                                {t('inventory_page.stats.ready_to_sell')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="stat-card">
+                        <div className="stat-icon alert">
+                            <AlertTriangle size={24} />
+                        </div>
+                        <div className="stat-info">
+                            <div className="stat-label">{t('inventory_page.stats.low_stock_alerts')}</div>
+                            <div className="stat-value">{stats.lowStockItems}</div>
+                            <div className={`stat-trend ${stats.lowStockItems > 0 ? 'down' : 'up'}`}>
+                                {stats.lowStockItems > 0
+                                    ? t('inventory_page.stats.needs_attention')
+                                    : t('inventory_page.stats.all_ok')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Inventory Table */}
+                <div className="inventory-table-section">
+                    <InventoryTable
+                        items={filteredItems}
+                        isLoading={isLoading}
+                        onAdjustStock={setSelectedProduct}
+                        onViewDetails={(product) => navigate(`/inventory/product/${product.id}`)}
+                    />
+                </div>
             </main>
 
             {selectedProduct && (
@@ -97,8 +177,6 @@ export default function InventoryPage() {
                     onClose={() => setSelectedProduct(null)}
                 />
             )}
-
-
         </div>
     )
 }

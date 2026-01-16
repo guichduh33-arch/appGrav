@@ -6,17 +6,21 @@ import { formatPrice } from '../../utils/helpers'
 import PinVerificationModal from './PinVerificationModal'
 import './Cart.css'
 
+import type { CartItem } from '../../stores/cartStore'
+
 interface CartProps {
     onCheckout: () => void
     onSendToKitchen?: () => void
     onHoldOrder?: () => void
+    onItemClick?: (item: CartItem) => void
 }
 
-export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder }: CartProps) {
+export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder, onItemClick }: CartProps) {
     const { t } = useTranslation()
     const {
         items,
         orderType,
+        setOrderType,
         tableNumber,
         subtotal,
         discountAmount,
@@ -34,12 +38,6 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder }: CartP
     // PIN verification state
     const [showPinModal, setShowPinModal] = useState(false)
     const [pendingDeleteItemId, setPendingDeleteItemId] = useState<string | null>(null)
-
-    const orderTypeLabels = {
-        dine_in: t('pos.header.dine_in'),
-        takeaway: t('pos.header.takeaway'),
-        delivery: t('pos.header.delivery'),
-    }
 
     // Use active order number if available, otherwise generate temp number
     const displayOrderNumber = activeOrderNumber || `#${String(Date.now()).slice(-4)}`
@@ -83,18 +81,11 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder }: CartP
         <aside className="pos-cart">
             {/* Header */}
             <div className="pos-cart__header">
-                <div className="pos-cart__order-info">
+                <div className="pos-cart__header-top">
                     <span className="pos-cart__order-number">
                         {displayOrderNumber}
                         {hasLockedItems && <Lock size={14} className="order-lock-icon" />}
                     </span>
-                    <span className="pos-cart__order-type">
-                        {orderTypeLabels[orderType]}
-                        {tableNumber && ` - ${t('cart.table')} ${tableNumber}`}
-                        {hasLockedItems && ` • ${t('cart.in_kitchen')}`}
-                    </span>
-                </div>
-                <div className="pos-cart__actions">
                     <button
                         className="btn-icon btn-icon-sm"
                         title={t('cart.clear_title')}
@@ -103,6 +94,19 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder }: CartP
                     >
                         <Trash2 size={18} />
                     </button>
+                </div>
+
+                {/* Order Type Selector */}
+                <div className="pos-cart__types">
+                    {(['dine_in', 'takeaway', 'delivery'] as const).map((type) => (
+                        <button
+                            key={type}
+                            className={`order-type-btn ${orderType === type ? 'is-active' : ''}`}
+                            onClick={() => setOrderType(type)}
+                        >
+                            {t(`pos.header.${type}`)}
+                        </button>
+                    ))}
                 </div>
             </div>
 
@@ -119,7 +123,11 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder }: CartP
                     items.map(item => {
                         const isLocked = isItemLocked(item.id)
                         return (
-                            <div key={item.id} className={`cart-item ${isLocked ? 'is-locked' : ''}`}>
+                            <div
+                                key={item.id}
+                                className={`cart-item ${isLocked ? 'is-locked' : ''}`}
+                                onClick={() => !isLocked && onItemClick?.(item)}
+                            >
                                 <div className="cart-item__info">
                                     <div className="cart-item__name">
                                         {isLocked && <Lock size={12} className="cart-item__lock-icon" />}
