@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import { Search, PauseCircle, CheckCircle, AlertCircle } from 'lucide-react'
-import { useAuthStore } from '../../stores/authStore'
-import { useCartStore } from '../../stores/cartStore'
+
+import { Search, PauseCircle, CheckCircle, AlertCircle, Clock } from 'lucide-react'
+
+import { useCartStore, CartItem } from '../../stores/cartStore'
 import { useOrderStore } from '../../stores/orderStore'
 import { useProducts, useCategories } from '../../hooks/useProducts'
+import { useShift } from '../../hooks/useShift'
 import CategoryNav from '../../components/pos/CategoryNav'
 import ProductGrid from '../../components/pos/ProductGrid'
 import Cart from '../../components/pos/Cart'
@@ -14,21 +15,37 @@ import ModifierModal from '../../components/pos/ModifierModal'
 import PaymentModal from '../../components/pos/PaymentModal'
 import VariantModal from '../../components/pos/VariantModal'
 import HeldOrdersModal from '../../components/pos/HeldOrdersModal'
+import OpenShiftModal from '../../components/pos/OpenShiftModal'
+import CloseShiftModal from '../../components/pos/CloseShiftModal'
+import ShiftReconciliationModal from '../../components/pos/ShiftReconciliationModal'
 import type { Product } from '../../types/database'
 import './POSMainPage.css'
 
 export default function POSMainPage() {
     const { t } = useTranslation()
-    const navigate = useNavigate()
-    const { user } = useAuthStore()
+
     const {
         items, itemCount, clearCart,
-        activeOrderId, activeOrderNumber, restoreCartState, lockedItemIds
+        activeOrderId, activeOrderNumber, restoreCartState, lockedItemIds,
+        subtotal, discountAmount, total, orderType, tableNumber, customerId, customerName
     } = useCartStore()
     const { holdOrder, restoreHeldOrder } = useOrderStore()
 
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
     const [searchQuery, setSearchQuery] = useState('')
+
+    // Shift management
+    const {
+        hasOpenShift,
+        currentSession,
+        sessionStats: shiftStats,
+        openShift,
+        closeShift,
+        reconciliationData,
+        clearReconciliation,
+        isOpeningShift,
+        isClosingShift
+    } = useShift()
 
     // Modal states
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
@@ -39,6 +56,8 @@ export default function POSMainPage() {
     const [showVariantModal, setShowVariantModal] = useState(false)
     const [showHeldOrdersModal, setShowHeldOrdersModal] = useState(false)
     const [showMenu, setShowMenu] = useState(false)
+    const [showOpenShiftModal, setShowOpenShiftModal] = useState(false)
+    const [showCloseShiftModal, setShowCloseShiftModal] = useState(false)
 
     // Toast state
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
@@ -48,10 +67,7 @@ export default function POSMainPage() {
     const { data: products = [], isLoading: productsLoading } = useProducts(selectedCategory)
 
     // Update time every minute
-    useEffect(() => {
-        const timer = setInterval(() => setCurrentTime(new Date()), 60000)
-        return () => clearInterval(timer)
-    }, [])
+
 
     // Filter products by search
     const filteredProducts = products.filter(product =>
@@ -236,6 +252,9 @@ export default function POSMainPage() {
                 isOpen={showMenu}
                 onClose={() => setShowMenu(false)}
                 onShowHeldOrders={() => setShowHeldOrdersModal(true)}
+                hasOpenShift={hasOpenShift}
+                onOpenShift={() => setShowOpenShiftModal(true)}
+                onCloseShift={() => setShowCloseShiftModal(true)}
             />
 
             {/* Toast Notifications */}
@@ -280,6 +299,54 @@ export default function POSMainPage() {
                     onClose={() => setShowHeldOrdersModal(false)}
                     onRestore={handleRestoreHeldOrder}
                 />
+            )}
+
+            {/* Shift Modals */}
+            {showOpenShiftModal && (
+                <OpenShiftModal
+                    onOpen={async (openingCash, terminalId, notes) => {
+                        await openShift(openingCash, terminalId, notes)
+                        setShowOpenShiftModal(false)
+                    }}
+                    onClose={() => setShowOpenShiftModal(false)}
+                    isLoading={isOpeningShift}
+                />
+            )}
+
+            {showCloseShiftModal && currentSession && (
+                <CloseShiftModal
+                    sessionStats={shiftStats}
+                    openingCash={currentSession.opening_cash}
+                    onClose={() => setShowCloseShiftModal(false)}
+                    onConfirm={async (actualCash, actualQris, actualEdc, notes) => {
+                        await closeShift(actualCash, actualQris, actualEdc, notes)
+                        setShowCloseShiftModal(false)
+                    }}
+                    isLoading={isClosingShift}
+                />
+            )}
+
+            {reconciliationData && (
+                <ShiftReconciliationModal
+                    reconciliation={reconciliationData}
+                    totalSales={shiftStats.totalSales}
+                    transactionCount={shiftStats.transactionCount}
+                    onClose={clearReconciliation}
+                />
+            )}
+
+            {/* Shift Required Banner */}
+            {!hasOpenShift && (
+                <div className="pos-shift-banner">
+                    <Clock size={20} />
+                    <span>{t('shift.no_shift_open', 'Aucun shift ouvert. Veuillez ouvrir un shift pour commencer.')}</span>
+                    <button
+                        className="pos-shift-banner__btn"
+                        onClick={() => setShowOpenShiftModal(true)}
+                    >
+                        {t('shift.open_title', 'Ouvrir un Shift')}
+                    </button>
+                </div>
             )}
         </div>
     )

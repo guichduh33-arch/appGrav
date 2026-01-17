@@ -274,3 +274,45 @@
     z-index: 1000;
     animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* Shift Banner */
+.pos-shift-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 24px;
+    background: linear-gradient(90deg, #F59E0B, #D97706);
+    color: #0F172A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-weight: 600;
+    z-index: 1100;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.pos-shift-banner__btn {
+    padding: 6px 16px;
+    background: #0F172A;
+    color: #F59E0B;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pos-shift-banner__btn:hover {
+    background: #1E293B;
+}
