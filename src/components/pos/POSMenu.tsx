@@ -83,14 +83,17 @@ export default function POSMenu({
                         <span>{t('pos.menu.held_orders')}</span>
                     </button>
 
-                    <button
-                        className="pos-menu__item"
-                        onClick={() => { onClose(); onShowTransactionHistory(); }}
-                        disabled={!hasOpenShift}
-                    >
-                        <Receipt size={20} />
-                        <span>{t('pos.menu.transactions', 'Historique Transactions')}</span>
-                    </button>
+                    {/* Transaction history - Manager/Admin only */}
+                    {(user?.role === 'manager' || user?.role === 'admin') && (
+                        <button
+                            className="pos-menu__item"
+                            onClick={() => { onClose(); onShowTransactionHistory(); }}
+                            disabled={!hasOpenShift}
+                        >
+                            <Receipt size={20} />
+                            <span>{t('pos.menu.transactions', 'Historique Transactions')}</span>
+                        </button>
+                    )}
 
                     <button className="pos-menu__item" onClick={() => navigate('/reports')}>
                         <FileText size={20} />
