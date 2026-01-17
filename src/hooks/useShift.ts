@@ -8,6 +8,7 @@ export interface PosSession {
     id: string
     session_number: string
     user_id: string
+    user_name?: string
     terminal_id: string | null
     status: 'open' | 'closed' | 'reconciled'
     opened_at: string
@@ -37,6 +38,7 @@ export interface ShiftTransaction {
     payment_method: string
     status: string
     created_at: string
+    cashier_id?: string
 }
 
 export interface ReconciliationData {
@@ -53,25 +55,45 @@ export interface CloseShiftResult {
     reconciliation: ReconciliationData
 }
 
+export interface ShiftUser {
+    id: string
+    name: string
+    role: string
+}
+
+// Get or generate a terminal ID for this browser/device
+function getTerminalId(): string {
+    let terminalId = localStorage.getItem('pos_terminal_id')
+    if (!terminalId) {
+        terminalId = `TERM-${Date.now().toString(36).toUpperCase()}`
+        localStorage.setItem('pos_terminal_id', terminalId)
+    }
+    return terminalId
+}
+
 export function useShift() {
     const queryClient = useQueryClient()
     const { user } = useAuthStore()
     const [reconciliationData, setReconciliationData] = useState<ReconciliationData | null>(null)
+    const [activeShiftUserId, setActiveShiftUserId] = useState<string | null>(null)
 
-    // Fetch current open session for the user
+    const terminalId = getTerminalId()
+
+    // Fetch current user's open session
     const {
         data: currentSession,
         isLoading: isLoadingSession,
         refetch: refetchSession
     } = useQuery({
-        queryKey: ['current-shift', user?.id],
+        queryKey: ['current-shift', activeShiftUserId || user?.id],
         queryFn: async () => {
-            if (!user?.id) return null
+            const userId = activeShiftUserId || user?.id
+            if (!userId) return null
 
             const { data, error } = await supabase
                 .from('pos_sessions')
                 .select('*')
-                .eq('user_id', user.id)
+                .eq('user_id', userId)
                 .eq('status', 'open')
                 .single()
 
@@ -82,7 +104,31 @@ export function useShift() {
 
             return data as PosSession | null
         },
-        enabled: !!user?.id
+        enabled: !!(activeShiftUserId || user?.id)
+    })
+
+    // Fetch ALL open sessions on this terminal (multi-user support)
+    const {
+        data: terminalSessions = [],
+        isLoading: isLoadingTerminalSessions,
+        refetch: refetchTerminalSessions
+    } = useQuery({
+        queryKey: ['terminal-shifts', terminalId],
+        queryFn: async () => {
+            const { data, error } = await supabase
+                .from('pos_sessions')
+                .select('*')
+                .eq('terminal_id', terminalId)
+                .eq('status', 'open')
+                .order('opened_at', { ascending: false })
+
+            if (error) {
+                console.error('Error fetching terminal sessions:', error)
+                return []
+            }
+
+            return data as PosSession[]
+        }
     })
 
     // Fetch transactions for current session
@@ -97,14 +143,25 @@ export function useShift() {
 
             const { data, error } = await supabase
                 .from('orders')
-                .select('id, order_number, total_amount, payment_method, status, created_at')
-                .gte('created_at', currentSession.opened_at)
+                .select('id, order_number, total_amount, payment_method, status, created_at, cashier_id')
+                .eq('pos_session_id', currentSession.id)
                 .eq('status', 'completed')
                 .order('created_at', { ascending: false })
 
             if (error) {
-                console.error('Error fetching transactions:', error)
-                return []
+                // Fallback: query by time range if pos_session_id doesn't exist yet
+                const { data: fallbackData, error: fallbackError } = await supabase
+                    .from('orders')
+                    .select('id, order_number, total_amount, payment_method, status, created_at')
+                    .gte('created_at', currentSession.opened_at)
+                    .eq('status', 'completed')
+                    .order('created_at', { ascending: false })
+
+                if (fallbackError) {
+                    console.error('Error fetching transactions:', fallbackError)
+                    return []
+                }
+                return fallbackData as ShiftTransaction[]
             }
 
             return data as ShiftTransaction[]
@@ -122,28 +179,44 @@ export function useShift() {
         duration: currentSession ? Math.floor((Date.now() - new Date(currentSession.opened_at).getTime()) / 1000 / 60) : 0
     }
 
-    // Open shift mutation
+    // Open shift mutation - now accepts a specific user
     const openShiftMutation = useMutation({
-        mutationFn: async ({ openingCash, terminalId, notes }: {
+        mutationFn: async ({ openingCash, userId, userName, notes }: {
             openingCash: number
-            terminalId?: string
+            userId: string
+            userName: string
             notes?: string
         }) => {
-            if (!user?.id) throw new Error('User not authenticated')
+            // Check if this user already has an open shift
+            const { data: existingShift } = await supabase
+                .from('pos_sessions')
+                .select('id')
+                .eq('user_id', userId)
+                .eq('status', 'open')
+                .single()
+
+            if (existingShift) {
+                throw new Error(`${userName} a déjà un shift ouvert`)
+            }
 
             const { data, error } = await (supabase.rpc as any)('open_shift', {
-                p_user_id: user.id,
+                p_user_id: userId,
                 p_opening_cash: openingCash,
-                p_terminal_id: terminalId || null,
+                p_terminal_id: terminalId,
                 p_notes: notes || null
             })
 
             if (error) throw error
-            return data
+
+            // Set the active shift user
+            setActiveShiftUserId(userId)
+
+            return { ...data, userName }
         },
-        onSuccess: () => {
-            toast.success('Shift ouvert avec succès')
+        onSuccess: (data) => {
+            toast.success(`Shift ouvert pour ${data.userName}`)
             queryClient.invalidateQueries({ queryKey: ['current-shift'] })
+            queryClient.invalidateQueries({ queryKey: ['terminal-shifts'] })
         },
         onError: (error: any) => {
             toast.error(error.message || 'Erreur lors de l\'ouverture du shift')
@@ -152,20 +225,20 @@ export function useShift() {
 
     // Close shift mutation
     const closeShiftMutation = useMutation({
-        mutationFn: async ({ actualCash, actualQris, actualEdc, notes }: {
+        mutationFn: async ({ sessionId, actualCash, actualQris, actualEdc, closedBy, notes }: {
+            sessionId: string
             actualCash: number
             actualQris: number
             actualEdc: number
+            closedBy: string
             notes?: string
         }) => {
-            if (!currentSession?.id || !user?.id) throw new Error('No active session')
-
             const { data, error } = await (supabase.rpc as any)('close_shift', {
-                p_session_id: currentSession.id,
+                p_session_id: sessionId,
                 p_actual_cash: actualCash,
                 p_actual_qris: actualQris,
                 p_actual_edc: actualEdc,
-                p_closed_by: user.id,
+                p_closed_by: closedBy,
                 p_notes: notes || null
             })
 
@@ -175,7 +248,9 @@ export function useShift() {
         onSuccess: (data) => {
             toast.success('Shift fermé avec succès')
             setReconciliationData(data.reconciliation)
+            setActiveShiftUserId(null)
             queryClient.invalidateQueries({ queryKey: ['current-shift'] })
+            queryClient.invalidateQueries({ queryKey: ['terminal-shifts'] })
             queryClient.invalidateQueries({ queryKey: ['shift-transactions'] })
         },
         onError: (error: any) => {
@@ -188,14 +263,12 @@ export function useShift() {
         data: recentSessions = [],
         isLoading: isLoadingHistory
     } = useQuery({
-        queryKey: ['shift-history', user?.id],
+        queryKey: ['shift-history', terminalId],
         queryFn: async () => {
-            if (!user?.id) return []
-
             const { data, error } = await supabase
                 .from('pos_sessions')
                 .select('*')
-                .eq('user_id', user.id)
+                .eq('terminal_id', terminalId)
                 .neq('status', 'open')
                 .order('closed_at', { ascending: false })
                 .limit(10)
@@ -206,17 +279,31 @@ export function useShift() {
             }
 
             return data as PosSession[]
-        },
-        enabled: !!user?.id
+        }
     })
 
-    const openShift = useCallback((openingCash: number, terminalId?: string, notes?: string) => {
-        return openShiftMutation.mutateAsync({ openingCash, terminalId, notes })
+    // Open shift for a specific user (after PIN verification)
+    const openShift = useCallback((openingCash: number, userId: string, userName: string, notes?: string) => {
+        return openShiftMutation.mutateAsync({ openingCash, userId, userName, notes })
     }, [openShiftMutation])
 
-    const closeShift = useCallback((actualCash: number, actualQris: number, actualEdc: number, notes?: string) => {
-        return closeShiftMutation.mutateAsync({ actualCash, actualQris, actualEdc, notes })
-    }, [closeShiftMutation])
+    // Close shift
+    const closeShift = useCallback((actualCash: number, actualQris: number, actualEdc: number, closedBy: string, notes?: string) => {
+        if (!currentSession?.id) throw new Error('No active session')
+        return closeShiftMutation.mutateAsync({
+            sessionId: currentSession.id,
+            actualCash,
+            actualQris,
+            actualEdc,
+            closedBy,
+            notes
+        })
+    }, [closeShiftMutation, currentSession])
+
+    // Switch to a different user's shift on this terminal
+    const switchToShift = useCallback((userId: string) => {
+        setActiveShiftUserId(userId)
+    }, [])
 
     const clearReconciliation = useCallback(() => {
         setReconciliationData(null)
@@ -227,6 +314,10 @@ export function useShift() {
         currentSession,
         hasOpenShift: !!currentSession,
         isLoadingSession,
+        terminalSessions,
+        isLoadingTerminalSessions,
+        terminalId,
+        activeShiftUserId,
         sessionTransactions,
         isLoadingTransactions,
         sessionStats,
@@ -237,9 +328,11 @@ export function useShift() {
         // Actions
         openShift,
         closeShift,
+        switchToShift,
         clearReconciliation,
         refetchSession,
         refetchTransactions,
+        refetchTerminalSessions,
 
         // Mutation states
         isOpeningShift: openShiftMutation.isPending,
