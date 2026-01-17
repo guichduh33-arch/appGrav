@@ -77,7 +77,8 @@ class UIDesignAgent:
                 "100": "#FEE2E2",
                 "500": "#EF4444",
                 "600": "#DC2626",
-                "700": "#B91C1C"
+                "700": "#B91C1C",
+                "800": "#991B1B"
             },
             "neutral": {
                 "0": "#FFFFFF",
@@ -237,10 +238,10 @@ class UIDesignAgent:
                 "description": "Bouton principal de l'application",
                 "variants": {
                     "primary": {
-                        "bg": self.DESIGN_TOKENS["colors"]["primary"]["500"],
+                        "bg": self.DESIGN_TOKENS["colors"]["primary"]["600"],  # WCAG AA: 4.5:1+ avec blanc
                         "text": "#FFFFFF",
-                        "hover": self.DESIGN_TOKENS["colors"]["primary"]["600"],
-                        "active": self.DESIGN_TOKENS["colors"]["primary"]["700"],
+                        "hover": self.DESIGN_TOKENS["colors"]["primary"]["700"],
+                        "active": self.DESIGN_TOKENS["colors"]["primary"]["800"],
                         "border": "none"
                     },
                     "secondary": {
@@ -258,14 +259,14 @@ class UIDesignAgent:
                         "border": "none"
                     },
                     "danger": {
-                        "bg": self.DESIGN_TOKENS["colors"]["danger"]["500"],
+                        "bg": self.DESIGN_TOKENS["colors"]["danger"]["600"],  # WCAG AA: 4.5:1+ avec blanc
                         "text": "#FFFFFF",
-                        "hover": self.DESIGN_TOKENS["colors"]["danger"]["600"],
-                        "active": self.DESIGN_TOKENS["colors"]["danger"]["700"],
+                        "hover": self.DESIGN_TOKENS["colors"]["danger"]["700"],
+                        "active": self.DESIGN_TOKENS["colors"]["danger"]["800"],
                         "border": "none"
                     },
                     "success": {
-                        "bg": self.DESIGN_TOKENS["colors"]["success"]["500"],
+                        "bg": self.DESIGN_TOKENS["colors"]["success"]["700"],  # WCAG AA: 4.5:1+ avec blanc
                         "text": "#FFFFFF",
                         "hover": self.DESIGN_TOKENS["colors"]["success"]["600"],
                         "active": self.DESIGN_TOKENS["colors"]["success"]["700"],
@@ -326,7 +327,7 @@ import { Button } from '@/components/ui/Button';
 """,
                 "example_tailwind": """
 <!-- Primary Button -->
-<button class="bg-blue-500 hover:bg-blue-600 active:bg-blue-700
+<button class="bg-blue-600 hover:bg-blue-700 active:bg-blue-800
                text-white font-medium px-6 py-3 rounded-lg
                transition-colors duration-200
                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
@@ -1226,14 +1227,14 @@ module.exports = {{
             "summary": {"passed": 0, "failed": 0, "warnings": 0}
         }
 
-        # Vérifications de contraste à effectuer
+        # Vérifications de contraste à effectuer (avec couleurs WCAG-compliant)
         contrast_checks = [
-            ("primary.500", "#FFFFFF", "Texte blanc sur primary"),
+            ("primary.600", "#FFFFFF", "Texte blanc sur primary button"),
             ("secondary.100", "neutral.900", "Texte sur bouton crème"),
             ("neutral.50", "neutral.900", "Texte principal sur fond clair"),
             ("neutral.50", "neutral.600", "Texte secondaire sur fond clair"),
-            ("danger.500", "#FFFFFF", "Texte blanc sur danger"),
-            ("success.500", "#FFFFFF", "Texte blanc sur success"),
+            ("danger.600", "#FFFFFF", "Texte blanc sur danger button"),
+            ("success.700", "#FFFFFF", "Texte blanc sur success button"),
         ]
 
         for bg_token, fg_token, description in contrast_checks:
@@ -1624,7 +1625,7 @@ Ce guide définit les standards visuels et les composants UI pour l'application 
 
 #### Primary Button
 ```jsx
-<button className="bg-blue-500 hover:bg-blue-600 text-white
+<button className="bg-blue-600 hover:bg-blue-700 text-white
                    px-6 py-3 rounded-lg font-medium
                    transition-colors duration-200">
   Confirmer
