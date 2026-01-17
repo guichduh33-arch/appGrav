@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/authStore'
@@ -71,11 +71,30 @@ function getTerminalId(): string {
     return terminalId
 }
 
+// Get or set active shift user ID from localStorage
+function getStoredActiveShiftUserId(): string | null {
+    return localStorage.getItem('pos_active_shift_user_id')
+}
+
+function setStoredActiveShiftUserId(userId: string | null) {
+    if (userId) {
+        localStorage.setItem('pos_active_shift_user_id', userId)
+    } else {
+        localStorage.removeItem('pos_active_shift_user_id')
+    }
+}
+
 export function useShift() {
     const queryClient = useQueryClient()
     const { user } = useAuthStore()
     const [reconciliationData, setReconciliationData] = useState<ReconciliationData | null>(null)
-    const [activeShiftUserId, setActiveShiftUserId] = useState<string | null>(null)
+    const [activeShiftUserId, setActiveShiftUserIdState] = useState<string | null>(getStoredActiveShiftUserId())
+
+    // Wrapper to persist activeShiftUserId
+    const setActiveShiftUserId = (userId: string | null) => {
+        setActiveShiftUserIdState(userId)
+        setStoredActiveShiftUserId(userId)
+    }
 
     const terminalId = getTerminalId()
 
@@ -130,6 +149,21 @@ export function useShift() {
             return data as PosSession[]
         }
     })
+
+    // Auto-recover shift: if no active shift but there are open sessions on terminal, select the first one
+    useEffect(() => {
+        if (!isLoadingTerminalSessions && terminalSessions.length > 0) {
+            const storedUserId = getStoredActiveShiftUserId()
+
+            // Check if stored user has an open shift
+            const storedUserHasShift = storedUserId && terminalSessions.some(s => s.user_id === storedUserId)
+
+            if (!storedUserHasShift) {
+                // Auto-select the first open shift on this terminal
+                setActiveShiftUserId(terminalSessions[0].user_id)
+            }
+        }
+    }, [terminalSessions, isLoadingTerminalSessions])
 
     // Fetch transactions for current session
     const {
