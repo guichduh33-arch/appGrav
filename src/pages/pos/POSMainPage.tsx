@@ -19,6 +19,7 @@ import OpenShiftModal from '../../components/pos/OpenShiftModal'
 import CloseShiftModal from '../../components/pos/CloseShiftModal'
 import ShiftReconciliationModal from '../../components/pos/ShiftReconciliationModal'
 import PinVerificationModal from '../../components/pos/PinVerificationModal'
+import TransactionHistoryModal from '../../components/pos/TransactionHistoryModal'
 import type { Product } from '../../types/database'
 import './POSMainPage.css'
 
@@ -68,6 +69,7 @@ export default function POSMainPage() {
     const [showPinModal, setShowPinModal] = useState(false)
     const [pinModalAction, setPinModalAction] = useState<'open' | 'close'>('open')
     const [showShiftSelector, setShowShiftSelector] = useState(false)
+    const [showTransactionHistory, setShowTransactionHistory] = useState(false)
 
     // Toast state
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
@@ -353,6 +355,7 @@ export default function POSMainPage() {
                 isOpen={showMenu}
                 onClose={() => setShowMenu(false)}
                 onShowHeldOrders={() => setShowHeldOrdersModal(true)}
+                onShowTransactionHistory={() => setShowTransactionHistory(true)}
                 hasOpenShift={hasOpenShift}
                 onOpenShift={handleOpenShiftRequest}
                 onCloseShift={handleCloseShiftRequest}
@@ -453,6 +456,15 @@ export default function POSMainPage() {
                     totalSales={shiftStats.totalSales}
                     transactionCount={shiftStats.transactionCount}
                     onClose={clearReconciliation}
+                />
+            )}
+
+            {/* Transaction History Modal */}
+            {showTransactionHistory && currentSession && (
+                <TransactionHistoryModal
+                    sessionId={currentSession.id}
+                    sessionOpenedAt={currentSession.opened_at}
+                    onClose={() => setShowTransactionHistory(false)}
                 />
             )}
 

@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
-    Settings, LogOut, FileText, History,
+    Settings, LogOut, FileText, History, Receipt,
     LayoutGrid, Monitor, Clock, Lock, X
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/authStore'
@@ -12,6 +12,7 @@ interface POSMenuProps {
     isOpen: boolean
     onClose: () => void
     onShowHeldOrders: () => void
+    onShowTransactionHistory: () => void
     hasOpenShift: boolean
     onOpenShift: () => void
     onCloseShift: () => void
@@ -21,6 +22,7 @@ export default function POSMenu({
     isOpen,
     onClose,
     onShowHeldOrders,
+    onShowTransactionHistory,
     hasOpenShift,
     onOpenShift,
     onCloseShift
@@ -81,7 +83,16 @@ export default function POSMenu({
                         <span>{t('pos.menu.held_orders')}</span>
                     </button>
 
-                    <button className="pos-menu__item">
+                    <button
+                        className="pos-menu__item"
+                        onClick={() => { onClose(); onShowTransactionHistory(); }}
+                        disabled={!hasOpenShift}
+                    >
+                        <Receipt size={20} />
+                        <span>{t('pos.menu.transactions', 'Historique Transactions')}</span>
+                    </button>
+
+                    <button className="pos-menu__item" onClick={() => navigate('/reports')}>
                         <FileText size={20} />
                         <span>{t('pos.menu.reports')}</span>
                     </button>
