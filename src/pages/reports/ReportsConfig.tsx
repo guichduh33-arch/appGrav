@@ -6,11 +6,15 @@ import {
     ShoppingCart,
     FileText,
     TrendingUp,
+    TrendingDown,
     Calendar,
     Users,
     AlertTriangle,
     History,
-    ClipboardList
+    ClipboardList,
+    Clock,
+    CreditCard,
+    List
 } from 'lucide-react';
 
 export type ReportDefinition = {
@@ -21,8 +25,6 @@ export type ReportDefinition = {
     component?: React.ReactNode;
 };
 
-// Helper to handle icon imports if needed, for now using lucide directly.
-const UnwantedIcon = AlertTriangle; // Placeholder
 
 export type ReportCategory = {
     id: string;
@@ -51,28 +53,70 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
         icon: DollarSign,
         reports: [
             {
-                id: 'sales_dashboard',
-                title: 'Sales Dashboard',
-                description: 'Comprehensive sales analytics and charts',
-                icon: TrendingUp
+                id: 'all_in_one_sales',
+                title: 'All in 1 Sales Summary',
+                description: 'Comprehensive sales overview',
+                icon: FileText
             },
             {
                 id: 'daily_sales',
                 title: 'Daily Sales',
-                description: 'Sales breakdown by day and time',
+                description: 'Sales breakdown by day',
                 icon: Calendar
             },
             {
+                id: 'sales_by_date',
+                title: 'Sales By Date',
+                description: 'Detailed sales log by date',
+                icon: Calendar
+            },
+            {
+                id: 'sales_items_by_date',
+                title: 'Sales Items By Date',
+                description: 'Itemized sales log',
+                icon: List
+            },
+            {
                 id: 'product_performance',
-                title: 'Product Performance',
-                description: 'Top selling items and profit margins',
+                title: 'Product Sales By SKU',
+                description: 'Revenue and quantity per product',
                 icon: Package
             },
             {
-                id: 'employee_sales',
-                title: 'Employee Sales',
-                description: 'Staff performance and shift stats',
+                id: 'sales_by_category',
+                title: 'Product Sales By Category',
+                description: 'Performance by product category',
+                icon: LayoutGrid
+            },
+            {
+                id: 'sales_by_brand',
+                title: 'Product Sales By Brand',
+                description: 'Performance by brand',
+                icon: LayoutGrid
+            },
+            {
+                id: 'sales_by_customer',
+                title: 'Sales By Customer',
+                description: 'Revenue per customer',
                 icon: Users
+            },
+            {
+                id: 'sales_by_hour',
+                title: 'Sales Details By Hours',
+                description: 'Peak hour analysis',
+                icon: Clock
+            },
+            {
+                id: 'sales_cancellation',
+                title: 'Sales Cancellation Details',
+                description: 'Voided and cancelled orders',
+                icon: AlertTriangle
+            },
+            {
+                id: 'profit_loss',
+                title: 'Profit Loss',
+                description: 'Income vs Expense analysis',
+                icon: TrendingUp
             }
         ]
     },
@@ -82,66 +126,139 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
         icon: Package,
         reports: [
             {
-                id: 'inventory_dashboard',
-                title: 'Inventory Dashboard',
-                description: 'Stock valuation and overflow',
+                id: 'stock_balance',
+                title: 'Product Stock Balance',
+                description: 'Current stock levels and valuation',
                 icon: LayoutGrid
-            },
-            {
-                id: 'low_stock',
-                title: 'Low Stock Alert',
-                description: 'Items below minimum quantity',
-                icon: AlertTriangle
             },
             {
                 id: 'stock_movement',
                 title: 'Stock Movement',
-                description: 'In/Out logs and adjustments',
+                description: 'History of all stock changes',
                 icon: History
             },
             {
-                id: 'wastage',
-                title: 'Wastage Report',
-                description: 'Tracking lost, damaged, or expired stock',
-                icon: UnwantedIcon
+                id: 'incoming_stock',
+                title: 'Incoming Stocks',
+                description: 'Purchases and internal transfers in',
+                icon: TrendingUp
+            },
+            {
+                id: 'outgoing_stock',
+                title: 'Outgoing Stocks',
+                description: 'Sales, wastage, and transfers out',
+                icon: TrendingDown
+            },
+            {
+                id: 'stock_warning',
+                title: 'Product Stock Warning',
+                description: 'Low stock and reorder alerts',
+                icon: AlertTriangle
+            },
+            {
+                id: 'unsold_products',
+                title: 'Product Unsold',
+                description: 'Items with no sales in period',
+                icon: AlertTriangle
+            },
+            {
+                id: 'expired_stock',
+                title: 'Expired Stock',
+                description: 'tracked lots that have expired',
+                icon: AlertTriangle
             }
         ]
     },
     {
         id: 'purchase',
-        title: 'Purchases', // Need translation
+        title: 'Purchases',
         icon: ShoppingCart,
         reports: [
             {
-                id: 'purchase_orders',
-                title: 'Purchase Orders',
-                description: 'History of supplier orders and receipts',
+                id: 'purchase_details',
+                title: 'Purchase Details',
+                description: 'Detailed purchase logs',
                 icon: ClipboardList
             },
             {
-                id: 'supplier_stats',
-                title: 'Supplier Performance',
-                description: 'Cost analysis by supplier',
+                id: 'purchase_by_date',
+                title: 'Purchase By Date',
+                description: 'Purchase history timeline',
+                icon: Calendar
+            },
+            {
+                id: 'purchase_by_supplier',
+                title: 'Purchase By Supplier',
+                description: 'Supplier performance and costs',
                 icon: Users
+            },
+            {
+                id: 'purchase_returns',
+                title: 'Purchase Returns',
+                description: 'Items returned to suppliers',
+                icon: TrendingDown
+            },
+            {
+                id: 'outstanding_purchase_payment',
+                title: 'Outstanding Payment',
+                description: 'Unpaid purchase invoices',
+                icon: DollarSign
+            }
+        ]
+    },
+    {
+        id: 'finance',
+        title: 'Finance & Payments',
+        icon: CreditCard,
+        reports: [
+            {
+                id: 'payment_by_method',
+                title: 'Payment By Method',
+                description: 'Cash, Card, QRIS, etc.',
+                icon: CreditCard
+            },
+            {
+                id: 'cash_balance',
+                title: 'Sales Cash Balance',
+                description: 'Cash drawer reconciliation',
+                icon: DollarSign
+            },
+            {
+                id: 'receivables',
+                title: 'Receivables',
+                description: 'Customer debts and credit',
+                icon: FileText
+            },
+            {
+                id: 'expenses',
+                title: 'Expenses by Date',
+                description: 'Operational expenses',
+                icon: TrendingDown
             }
         ]
     },
     {
         id: 'logs',
-        title: 'Logs & Audit', // Need translation
+        title: 'Logs & Audit',
         icon: ShieldAlert,
         reports: [
             {
-                id: 'audit_log',
-                title: 'Security Audit',
-                description: 'Sensitive actions and system modifications',
-                icon: ShieldAlert
+                id: 'price_changes',
+                title: 'Price Changes',
+                description: 'History of product price updates',
+                icon: DollarSign
             },
             {
-                id: 'shift_logs',
-                title: 'Shift Logs',
-                description: 'Register open/close periods',
+                id: 'deleted_products',
+                title: 'Product Deleted',
+                description: 'Log of removed items',
                 icon: FileText
+            },
+            {
+                id: 'audit_log',
+                title: 'General Audit Log',
+                description: 'System-wide security events',
+                icon: ShieldAlert
             }
         ]
     }

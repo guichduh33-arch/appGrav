@@ -2,8 +2,8 @@ import { useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
-    Settings, LogOut, User, FileText, History,
-    BarChart2, LayoutGrid, Monitor, ShieldCheck, X
+    Settings, LogOut, FileText, History,
+    LayoutGrid, Monitor, ShieldCheck, X
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/authStore'
 import './POSMenu.css'
