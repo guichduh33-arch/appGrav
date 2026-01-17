@@ -68,7 +68,7 @@ export default function TransactionHistoryModal({
                     subtotal,
                     discount_amount,
                     tax_amount,
-                    total_amount,
+                    total,
                     payment_method,
                     cash_received,
                     change_given,
@@ -84,9 +84,9 @@ export default function TransactionHistoryModal({
                         modifiers_total
                     )
                 `)
-                .eq('status', 'completed')
                 .order('created_at', { ascending: false })
 
+            // Filter by session opened_at if provided
             if (sessionOpenedAt) {
                 query = query.gte('created_at', sessionOpenedAt)
             }
@@ -98,8 +98,10 @@ export default function TransactionHistoryModal({
                 return []
             }
 
+            // Map total to total_amount for consistency
             return (data || []).map((order: any) => ({
                 ...order,
+                total_amount: order.total,
                 items: order.order_items || []
             })) as OrderWithItems[]
         }
