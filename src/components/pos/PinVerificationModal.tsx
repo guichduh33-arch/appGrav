@@ -66,7 +66,7 @@ export default function PinVerificationModal({
                 name: matchingUser.name!,
                 role: matchingUser.role!
             })
-            onClose()
+            // Don't call onClose here - let parent handle modal closure
         } else {
             setError('Code PIN invalide ou rôle non autorisé')
             setIsShaking(true)

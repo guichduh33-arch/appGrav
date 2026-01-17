@@ -234,6 +234,7 @@ export default function POSMainPage() {
     // Handle PIN verification result
     const handlePinVerified = (verified: boolean, user?: { id: string; name: string; role: string }) => {
         if (verified && user) {
+            setShowPinModal(false) // Close PIN modal first
             setVerifiedUser(user)
             if (pinModalAction === 'open') {
                 setShowOpenShiftModal(true)
