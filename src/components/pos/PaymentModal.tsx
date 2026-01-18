@@ -126,7 +126,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                 </div>
 
                 <div className="modal__body payment-body">
-                    <div className="payment-grid">
+                    <div className={`payment-grid ${paymentMethod === 'cash' ? 'has-numpad' : 'full-width'}`}>
                         {/* Left: Amount & Methods */}
                         <div className="payment-left">
                             {/* Amount Display */}
