@@ -412,6 +412,7 @@ export default function ProductDetailPage() {
                         onAddIngredient={addIngredient}
                         onRemoveIngredient={removeIngredient}
                         onUpdateQuantity={updateRecipeQuantity}
+                        productType={product.product_type}
                     />
                 )}
                 {activeTab === 'costing' && (

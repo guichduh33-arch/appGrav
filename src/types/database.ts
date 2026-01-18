@@ -309,6 +309,8 @@ export interface Database {
                     quantity_produced: number
                     quantity_waste: number
                     production_date: string
+                    section_id: string | null
+                    created_by: string | null
                     staff_id: string | null
                     staff_name: string | null
                     stock_updated: boolean
@@ -324,6 +326,8 @@ export interface Database {
                     quantity_produced: number
                     quantity_waste?: number
                     production_date?: string
+                    section_id?: string | null
+                    created_by?: string | null
                     staff_id?: string | null
                     staff_name?: string | null
                     stock_updated?: boolean
@@ -356,6 +360,7 @@ export interface Database {
                     conversion_factor: number
                     is_purchase_unit: boolean
                     is_consumption_unit: boolean
+                    is_stock_opname_unit: boolean
                     barcode: string | null
                     is_active: boolean
                     created_at: string
@@ -367,6 +372,7 @@ export interface Database {
                     conversion_factor: number
                     is_purchase_unit?: boolean
                     is_consumption_unit?: boolean
+                    is_stock_opname_unit?: boolean
                     barcode?: string | null
                     is_active?: boolean
                     created_at?: string

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Product, Category, Section } from '../../../types/database'
-import { Star } from 'lucide-react'
+import { Star, Factory, ShoppingCart, Warehouse, Check, Layers } from 'lucide-react'
 
 interface GeneralTabProps {
     product: Product
@@ -25,26 +25,37 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
 }) => {
     const handleSectionToggle = (sectionId: string) => {
         if (selectedSections.includes(sectionId)) {
-            // Remove section
             const newSections = selectedSections.filter(id => id !== sectionId)
             onSectionsChange(newSections)
-            // If removed section was primary, set new primary
             if (primarySectionId === sectionId) {
                 onPrimarySectionChange(newSections[0] || null)
             }
         } else {
-            // Add section
             const newSections = [...selectedSections, sectionId]
             onSectionsChange(newSections)
-            // If no primary set, make this the primary
             if (!primarySectionId) {
                 onPrimarySectionChange(sectionId)
             }
         }
     }
 
-    const handlePrimaryChange = (sectionId: string) => {
+    const handlePrimaryChange = (sectionId: string, e: React.MouseEvent) => {
+        e.stopPropagation()
         onPrimarySectionChange(sectionId)
+    }
+
+    const getSectionIcon = (section: Section) => {
+        if (section.is_production_point) return <Factory size={20} />
+        if (section.is_sales_point) return <ShoppingCart size={20} />
+        if (section.is_warehouse) return <Warehouse size={20} />
+        return <Layers size={20} />
+    }
+
+    const getSectionColor = (section: Section) => {
+        if (section.is_production_point) return { bg: '#FEF3C7', color: '#D97706', border: '#FCD34D' }
+        if (section.is_sales_point) return { bg: '#D1FAE5', color: '#059669', border: '#6EE7B7' }
+        if (section.is_warehouse) return { bg: '#DBEAFE', color: '#2563EB', border: '#93C5FD' }
+        return { bg: '#F3F4F6', color: '#6B7280', border: '#D1D5DB' }
     }
 
     return (
@@ -86,76 +97,6 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                                 ))}
                             </select>
                         </div>
-                    </div>
-
-                    {/* Multi-Section Selection */}
-                    <div className="form-group">
-                        <label className="text-sm font-medium text-gray-700 mb-2 block">
-                            Sections d'utilisation
-                        </label>
-                        <p className="text-xs text-gray-500 mb-3">
-                            Sélectionnez les sections où ce produit peut être utilisé. L'étoile indique la section principale (stock déduit lors d'une vente).
-                        </p>
-                        <div className="space-y-2">
-                            {sections?.map(section => {
-                                const isSelected = selectedSections.includes(section.id)
-                                const isPrimary = primarySectionId === section.id
-                                return (
-                                    <div
-                                        key={section.id}
-                                        className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer ${
-                                            isSelected
-                                                ? 'border-rose-300 bg-rose-50'
-                                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                                        }`}
-                                        onClick={() => handleSectionToggle(section.id)}
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            className="w-5 h-5 rounded accent-rose-500"
-                                            checked={isSelected}
-                                            onChange={() => {}}
-                                        />
-                                        <div className="flex-1">
-                                            <span className={`font-medium ${isSelected ? 'text-gray-900' : 'text-gray-700'}`}>
-                                                {section.name}
-                                            </span>
-                                            <div className="flex gap-2 mt-1">
-                                                {section.is_production_point && (
-                                                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Production</span>
-                                                )}
-                                                {section.is_sales_point && (
-                                                    <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Vente</span>
-                                                )}
-                                                {section.is_warehouse && (
-                                                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Entrepôt</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                        {isSelected && (
-                                            <button
-                                                type="button"
-                                                className={`p-2 rounded-full transition-colors ${
-                                                    isPrimary
-                                                        ? 'bg-amber-100 text-amber-600'
-                                                        : 'bg-gray-100 text-gray-400 hover:bg-amber-50 hover:text-amber-500'
-                                                }`}
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    handlePrimaryChange(section.id)
-                                                }}
-                                                title={isPrimary ? 'Section principale' : 'Définir comme section principale'}
-                                            >
-                                                <Star size={16} fill={isPrimary ? 'currentColor' : 'none'} />
-                                            </button>
-                                        )}
-                                    </div>
-                                )
-                            })}
-                        </div>
-                        {sections?.length === 0 && (
-                            <p className="text-sm text-gray-500 italic">Aucune section configurée. Créez des sections dans les paramètres.</p>
-                        )}
                     </div>
 
                     <div className="form-group">
@@ -220,6 +161,186 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                         </label>
                     </div>
                 </div>
+            </div>
+
+            {/* Sections Card - Full Width */}
+            <div className="card col-span-2">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                    <div>
+                        <h3 className="card-title" style={{ marginBottom: '0.25rem' }}>Sections d'utilisation</h3>
+                        <p style={{ fontSize: '0.8125rem', color: '#8B7355', margin: 0 }}>
+                            Sélectionnez où ce produit peut être utilisé. Cliquez sur l'étoile pour définir la section principale.
+                        </p>
+                    </div>
+                    {selectedSections.length > 0 && (
+                        <div style={{
+                            padding: '0.5rem 1rem',
+                            background: 'linear-gradient(135deg, #BA90A2 0%, #D4A5B5 100%)',
+                            borderRadius: '2rem',
+                            color: 'white',
+                            fontSize: '0.875rem',
+                            fontWeight: 600
+                        }}>
+                            {selectedSections.length} section{selectedSections.length > 1 ? 's' : ''} sélectionnée{selectedSections.length > 1 ? 's' : ''}
+                        </div>
+                    )}
+                </div>
+
+                {sections?.length === 0 ? (
+                    <div style={{
+                        textAlign: 'center',
+                        padding: '3rem',
+                        background: '#F9FAFB',
+                        borderRadius: '0.75rem',
+                        border: '2px dashed #E5E7EB'
+                    }}>
+                        <Layers size={48} style={{ color: '#D1D5DB', margin: '0 auto 1rem' }} />
+                        <p style={{ color: '#6B7280', margin: 0 }}>Aucune section configurée.</p>
+                        <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                            Créez des sections dans Paramètres → Sections
+                        </p>
+                    </div>
+                ) : (
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                        gap: '1rem'
+                    }}>
+                        {sections?.map(section => {
+                            const isSelected = selectedSections.includes(section.id)
+                            const isPrimary = primarySectionId === section.id
+                            const colors = getSectionColor(section)
+
+                            return (
+                                <div
+                                    key={section.id}
+                                    onClick={() => handleSectionToggle(section.id)}
+                                    style={{
+                                        position: 'relative',
+                                        padding: '1.25rem',
+                                        borderRadius: '1rem',
+                                        border: `2px solid ${isSelected ? '#BA90A2' : '#E5E7EB'}`,
+                                        background: isSelected ? 'linear-gradient(135deg, rgba(186,144,162,0.08) 0%, rgba(212,165,181,0.08) 100%)' : 'white',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease',
+                                        transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                                        boxShadow: isSelected ? '0 4px 12px rgba(186,144,162,0.2)' : 'none'
+                                    }}
+                                >
+                                    {/* Selection indicator */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '0.75rem',
+                                        right: '0.75rem',
+                                        width: '24px',
+                                        height: '24px',
+                                        borderRadius: '50%',
+                                        border: `2px solid ${isSelected ? '#BA90A2' : '#D1D5DB'}`,
+                                        background: isSelected ? '#BA90A2' : 'white',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        transition: 'all 0.2s ease'
+                                    }}>
+                                        {isSelected && <Check size={14} color="white" strokeWidth={3} />}
+                                    </div>
+
+                                    {/* Icon */}
+                                    <div style={{
+                                        width: '48px',
+                                        height: '48px',
+                                        borderRadius: '12px',
+                                        background: colors.bg,
+                                        color: colors.color,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        marginBottom: '0.75rem'
+                                    }}>
+                                        {getSectionIcon(section)}
+                                    </div>
+
+                                    {/* Name */}
+                                    <h4 style={{
+                                        margin: '0 0 0.5rem 0',
+                                        fontSize: '1rem',
+                                        fontWeight: 600,
+                                        color: '#4A3728'
+                                    }}>
+                                        {section.name}
+                                    </h4>
+
+                                    {/* Type badges */}
+                                    <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+                                        {section.is_production_point && (
+                                            <span style={{
+                                                fontSize: '0.625rem',
+                                                padding: '0.125rem 0.5rem',
+                                                borderRadius: '1rem',
+                                                background: '#FEF3C7',
+                                                color: '#D97706',
+                                                fontWeight: 600,
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.025em'
+                                            }}>Production</span>
+                                        )}
+                                        {section.is_sales_point && (
+                                            <span style={{
+                                                fontSize: '0.625rem',
+                                                padding: '0.125rem 0.5rem',
+                                                borderRadius: '1rem',
+                                                background: '#D1FAE5',
+                                                color: '#059669',
+                                                fontWeight: 600,
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.025em'
+                                            }}>Vente</span>
+                                        )}
+                                        {section.is_warehouse && (
+                                            <span style={{
+                                                fontSize: '0.625rem',
+                                                padding: '0.125rem 0.5rem',
+                                                borderRadius: '1rem',
+                                                background: '#DBEAFE',
+                                                color: '#2563EB',
+                                                fontWeight: 600,
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.025em'
+                                            }}>Entrepôt</span>
+                                        )}
+                                    </div>
+
+                                    {/* Primary star button */}
+                                    {isSelected && (
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handlePrimaryChange(section.id, e)}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.375rem',
+                                                padding: '0.5rem 0.75rem',
+                                                borderRadius: '0.5rem',
+                                                border: 'none',
+                                                background: isPrimary ? 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)' : '#F3F4F6',
+                                                color: isPrimary ? 'white' : '#6B7280',
+                                                fontSize: '0.75rem',
+                                                fontWeight: 600,
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s ease',
+                                                width: '100%',
+                                                justifyContent: 'center'
+                                            }}
+                                        >
+                                            <Star size={14} fill={isPrimary ? 'white' : 'none'} />
+                                            {isPrimary ? 'Section Principale' : 'Définir comme principale'}
+                                        </button>
+                                    )}
+                                </div>
+                            )
+                        })}
+                    </div>
+                )}
             </div>
         </div>
     )
