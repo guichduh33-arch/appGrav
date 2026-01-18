@@ -526,233 +526,121 @@ const SettingsPage = () => {
 
             {/* Section Modal */}
             {showSectionModal && (
-                <div
-                    className="section-modal-overlay"
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 9999
-                    }}
-                    onClick={() => setShowSectionModal(false)}
-                >
-                    <div
-                        style={{
-                            backgroundColor: 'white',
-                            borderRadius: '12px',
-                            width: '100%',
-                            maxWidth: '500px',
-                            maxHeight: '90vh',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-                        }}
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            padding: '24px',
-                            borderBottom: '1px solid #e5e7eb'
-                        }}>
-                            <h2 style={{ fontSize: '18px', fontWeight: 600, margin: 0 }}>
-                                {editingSection ? 'Modifier la Section' : 'Nouvelle Section'}
-                            </h2>
-                            <button
-                                onClick={() => setShowSectionModal(false)}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    padding: '8px'
-                                }}
-                            >
+                <div className="section-modal-overlay" onClick={() => setShowSectionModal(false)}>
+                    <div className="section-modal" onClick={e => e.stopPropagation()}>
+                        <div className="section-modal__header">
+                            <div className="section-modal__header-icon">
+                                <Layers size={24} />
+                            </div>
+                            <div>
+                                <h2 className="section-modal__title">
+                                    {editingSection ? 'Modifier la Section' : 'Nouvelle Section'}
+                                </h2>
+                                <p className="section-modal__subtitle">
+                                    {editingSection ? 'Modifiez les informations de la section' : 'Créez une nouvelle section pour organiser vos stocks'}
+                                </p>
+                            </div>
+                            <button className="section-modal__close" onClick={() => setShowSectionModal(false)}>
                                 <X size={24} />
                             </button>
                         </div>
 
-                        <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
-                            <div style={{ marginBottom: '20px' }}>
-                                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>
+                        <div className="section-modal__content">
+                            <div className="section-form__group">
+                                <label className="section-form__label">
                                     Nom de la section *
                                 </label>
                                 <input
                                     type="text"
+                                    className="section-form__input"
                                     value={sectionForm.name}
                                     onChange={(e) => handleSectionNameChange(e.target.value)}
                                     placeholder="Ex: Cuisine, Bar, Entrepôt..."
                                     autoFocus
-                                    style={{
-                                        width: '100%',
-                                        height: '48px',
-                                        padding: '0 16px',
-                                        border: '1px solid #e5e7eb',
-                                        borderRadius: '8px',
-                                        fontSize: '16px',
-                                        boxSizing: 'border-box'
-                                    }}
                                 />
                             </div>
 
-                            <div style={{ marginBottom: '20px' }}>
-                                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>
+                            <div className="section-form__group">
+                                <label className="section-form__label">
                                     Identifiant (slug)
                                 </label>
                                 <input
                                     type="text"
+                                    className="section-form__input section-form__input--mono"
                                     value={sectionForm.slug}
                                     onChange={(e) => setSectionForm({ ...sectionForm, slug: e.target.value })}
                                     placeholder="cuisine"
-                                    style={{
-                                        width: '100%',
-                                        height: '48px',
-                                        padding: '0 16px',
-                                        border: '1px solid #e5e7eb',
-                                        borderRadius: '8px',
-                                        fontSize: '16px',
-                                        fontFamily: 'monospace',
-                                        boxSizing: 'border-box'
-                                    }}
                                 />
-                                <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
-                                    Identifiant unique utilisé en interne.
+                                <p className="section-form__hint">
+                                    Identifiant unique utilisé en interne. Auto-généré à partir du nom.
                                 </p>
                             </div>
 
-                            <div>
-                                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, marginBottom: '12px' }}>
-                                    Type de section
-                                </label>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                    <label style={{
-                                        display: 'flex',
-                                        alignItems: 'flex-start',
-                                        gap: '12px',
-                                        padding: '16px',
-                                        border: sectionForm.is_sales_point ? '2px solid #BA90A2' : '1px solid #e5e7eb',
-                                        borderRadius: '8px',
-                                        cursor: 'pointer',
-                                        backgroundColor: sectionForm.is_sales_point ? 'rgba(186, 144, 162, 0.05)' : 'white'
-                                    }}>
+                            <div className="section-form__group">
+                                <label className="section-form__label">Type de section</label>
+                                <div className="section-form__types">
+                                    <label className={`section-type-card ${sectionForm.is_sales_point ? 'is-selected' : ''}`}>
                                         <input
                                             type="checkbox"
                                             checked={sectionForm.is_sales_point}
                                             onChange={(e) => setSectionForm({ ...sectionForm, is_sales_point: e.target.checked })}
-                                            style={{ marginTop: '2px', width: '18px', height: '18px' }}
                                         />
-                                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                                            <ShoppingCart size={20} style={{ color: '#059669', flexShrink: 0 }} />
-                                            <div>
-                                                <span style={{ display: 'block', fontWeight: 500 }}>Point de Vente</span>
-                                                <span style={{ display: 'block', fontSize: '12px', color: '#6b7280' }}>
-                                                    Cette section peut vendre des produits
-                                                </span>
-                                            </div>
+                                        <div className="section-type-card__icon section-type-card__icon--sales">
+                                            <ShoppingCart size={20} />
+                                        </div>
+                                        <div className="section-type-card__content">
+                                            <span className="section-type-card__title">Point de Vente</span>
+                                            <span className="section-type-card__desc">
+                                                Cette section peut vendre des produits directement aux clients
+                                            </span>
                                         </div>
                                     </label>
 
-                                    <label style={{
-                                        display: 'flex',
-                                        alignItems: 'flex-start',
-                                        gap: '12px',
-                                        padding: '16px',
-                                        border: sectionForm.is_production_point ? '2px solid #BA90A2' : '1px solid #e5e7eb',
-                                        borderRadius: '8px',
-                                        cursor: 'pointer',
-                                        backgroundColor: sectionForm.is_production_point ? 'rgba(186, 144, 162, 0.05)' : 'white'
-                                    }}>
+                                    <label className={`section-type-card ${sectionForm.is_production_point ? 'is-selected' : ''}`}>
                                         <input
                                             type="checkbox"
                                             checked={sectionForm.is_production_point}
                                             onChange={(e) => setSectionForm({ ...sectionForm, is_production_point: e.target.checked })}
-                                            style={{ marginTop: '2px', width: '18px', height: '18px' }}
                                         />
-                                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                                            <Factory size={20} style={{ color: '#D97706', flexShrink: 0 }} />
-                                            <div>
-                                                <span style={{ display: 'block', fontWeight: 500 }}>Point de Production</span>
-                                                <span style={{ display: 'block', fontSize: '12px', color: '#6b7280' }}>
-                                                    Cette section fabrique ou prépare des produits
-                                                </span>
-                                            </div>
+                                        <div className="section-type-card__icon section-type-card__icon--production">
+                                            <Factory size={20} />
+                                        </div>
+                                        <div className="section-type-card__content">
+                                            <span className="section-type-card__title">Point de Production</span>
+                                            <span className="section-type-card__desc">
+                                                Cette section fabrique ou prépare des produits
+                                            </span>
                                         </div>
                                     </label>
 
-                                    <label style={{
-                                        display: 'flex',
-                                        alignItems: 'flex-start',
-                                        gap: '12px',
-                                        padding: '16px',
-                                        border: sectionForm.is_warehouse ? '2px solid #BA90A2' : '1px solid #e5e7eb',
-                                        borderRadius: '8px',
-                                        cursor: 'pointer',
-                                        backgroundColor: sectionForm.is_warehouse ? 'rgba(186, 144, 162, 0.05)' : 'white'
-                                    }}>
+                                    <label className={`section-type-card ${sectionForm.is_warehouse ? 'is-selected' : ''}`}>
                                         <input
                                             type="checkbox"
                                             checked={sectionForm.is_warehouse}
                                             onChange={(e) => setSectionForm({ ...sectionForm, is_warehouse: e.target.checked })}
-                                            style={{ marginTop: '2px', width: '18px', height: '18px' }}
                                         />
-                                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                                            <Warehouse size={20} style={{ color: '#2563EB', flexShrink: 0 }} />
-                                            <div>
-                                                <span style={{ display: 'block', fontWeight: 500 }}>Entrepôt / Stockage</span>
-                                                <span style={{ display: 'block', fontSize: '12px', color: '#6b7280' }}>
-                                                    Cette section sert au stockage de marchandises
-                                                </span>
-                                            </div>
+                                        <div className="section-type-card__icon section-type-card__icon--warehouse">
+                                            <Warehouse size={20} />
+                                        </div>
+                                        <div className="section-type-card__content">
+                                            <span className="section-type-card__title">Entrepôt / Stockage</span>
+                                            <span className="section-type-card__desc">
+                                                Cette section sert principalement au stockage de marchandises
+                                            </span>
                                         </div>
                                     </label>
                                 </div>
                             </div>
                         </div>
 
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'flex-end',
-                            gap: '12px',
-                            padding: '24px',
-                            borderTop: '1px solid #e5e7eb'
-                        }}>
-                            <button
-                                onClick={() => setShowSectionModal(false)}
-                                style={{
-                                    padding: '10px 20px',
-                                    border: '1px solid #e5e7eb',
-                                    borderRadius: '8px',
-                                    background: 'white',
-                                    cursor: 'pointer',
-                                    fontSize: '14px',
-                                    fontWeight: 500
-                                }}
-                            >
+                        <div className="section-modal__footer">
+                            <button className="btn-secondary" onClick={() => setShowSectionModal(false)}>
                                 Annuler
                             </button>
                             <button
+                                className="btn-primary"
                                 onClick={handleSaveSection}
                                 disabled={savingSection || !sectionForm.name.trim()}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px',
-                                    padding: '10px 20px',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    background: '#BA90A2',
-                                    color: 'white',
-                                    cursor: 'pointer',
-                                    fontSize: '14px',
-                                    fontWeight: 600,
-                                    opacity: (savingSection || !sectionForm.name.trim()) ? 0.5 : 1
-                                }}
                             >
                                 <Save size={18} />
                                 {savingSection ? 'Enregistrement...' : (editingSection ? 'Mettre à jour' : 'Créer')}
