@@ -1,0 +1,32 @@
+{
+  "name": "Dark Theme",
+  "mode": "dark",
+  "colors": {
+    "background": {
+      "default": "#0F172A",
+      "paper": "#1E293B",
+      "elevated": "#334155"
+    },
+    "text": {
+      "primary": "#F8FAFC",
+      "secondary": "#94A3B8",
+      "disabled": "#475569",
+      "inverse": "#0F172A"
+    },
+    "border": {
+      "default": "#334155",
+      "focus": "#60A5FA"
+    },
+    "action": {
+      "hover": "#334155",
+      "selected": "rgba(59, 130, 246, 0.2)",
+      "disabled": "#1E293B"
+    }
+  },
+  "components": {
+    "card_bg": "#1E293B",
+    "input_bg": "#334155",
+    "sidebar_bg": "#020617",
+    "modal_backdrop": "rgba(0, 0, 0, 0.7)"
+  }
+}

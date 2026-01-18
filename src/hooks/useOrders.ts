@@ -19,7 +19,7 @@ export function useOrders() {
                 table_number: tableNumber,
                 customer_id: customerId,
                 customer_name: customerName,
-                status: 'completed', // For POS, usually completed immediately on payment
+                status: 'new', // Start as 'new' for KDS workflow (new → preparing → ready → served)
                 payment_status: 'paid',
                 subtotal: subtotal,
                 discount_type: discountType === 'percent' ? 'percentage' : (discountType === 'amount' ? 'fixed' : null),
@@ -40,7 +40,10 @@ export function useOrders() {
                 .select()
                 .single()
 
-            if (orderError) throw orderError
+            if (orderError) {
+                console.error('Supabase Order Error:', orderError)
+                throw orderError
+            }
 
             // 2. Create Order Items
             const itemsData = items.map(item => ({
@@ -62,7 +65,10 @@ export function useOrders() {
                 .from('order_items')
                 .insert(itemsData as any)
 
-            if (itemsError) throw itemsError
+            if (itemsError) {
+                console.error('Supabase Items Error:', itemsError)
+                throw itemsError
+            }
 
             return order
         },

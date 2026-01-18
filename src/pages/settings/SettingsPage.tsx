@@ -1,11 +1,62 @@
-import { useState } from 'react';
-import { Store, Printer, Bell, Shield, Save, Plus, Settings, RefreshCw } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+    Store, Printer, Bell, Shield, Save, Plus, Settings, RefreshCw, Layers,
+    Edit2, Trash2, X, ShoppingCart, Factory, Warehouse, ChefHat, Coffee, Monitor
+} from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 import './SettingsPage.css';
 
-type SettingsTab = 'general' | 'printers' | 'notifications' | 'security';
+type SettingsTab = 'general' | 'printers' | 'notifications' | 'security' | 'sections' | 'kds';
+
+interface Section {
+    id: string;
+    name: string;
+    slug: string;
+    is_sales_point: boolean;
+    is_production_point: boolean;
+    is_warehouse: boolean;
+    created_at: string;
+}
+
+interface Category {
+    id: string;
+    name: string;
+    icon: string;
+    dispatch_station: 'barista' | 'kitchen' | 'display' | 'none' | null;
+    is_active: boolean;
+}
+
+const DISPATCH_STATIONS = [
+    { value: 'kitchen', label: 'Hot Kitchen', icon: <ChefHat size={16} />, color: '#EF4444' },
+    { value: 'barista', label: 'Barista', icon: <Coffee size={16} />, color: '#8B5CF6' },
+    { value: 'display', label: 'Display', icon: <Monitor size={16} />, color: '#10B981' },
+    { value: 'none', label: 'No Station', icon: <X size={16} />, color: '#6B7280' }
+];
 
 const SettingsPage = () => {
+    useTranslation();
     const [activeTab, setActiveTab] = useState<SettingsTab>('general');
+    const [sections, setSections] = useState<Section[]>([]);
+    const [loadingSections, setLoadingSections] = useState(false);
+
+    // KDS Categories state
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [loadingCategories, setLoadingCategories] = useState(false);
+    const [savingCategory, setSavingCategory] = useState<string | null>(null);
+
+    // Section modal state
+    const [showSectionModal, setShowSectionModal] = useState(false);
+    const [editingSection, setEditingSection] = useState<Section | null>(null);
+    const [sectionForm, setSectionForm] = useState({
+        name: '',
+        slug: '',
+        is_sales_point: false,
+        is_production_point: false,
+        is_warehouse: false
+    });
+    const [savingSection, setSavingSection] = useState(false);
+
     const [settings, setSettings] = useState({
         storeName: 'The Breakery',
         storeAddress: 'Jl. Selong, Kuta Utara, Lombok',
@@ -18,6 +69,173 @@ const SettingsPage = () => {
         soundNotifications: true,
         emailReports: false,
     });
+
+    useEffect(() => {
+        if (activeTab === 'sections') {
+            fetchSections();
+        }
+        if (activeTab === 'kds') {
+            fetchCategories();
+        }
+    }, [activeTab]);
+
+    const fetchSections = async () => {
+        setLoadingSections(true);
+        try {
+            const { data, error } = await supabase
+                .from('sections')
+                .select('*')
+                .order('name');
+            if (error) throw error;
+            if (data) setSections(data);
+        } catch (error) {
+            console.error('Error fetching sections:', error);
+        } finally {
+            setLoadingSections(false);
+        }
+    };
+
+    const fetchCategories = async () => {
+        setLoadingCategories(true);
+        try {
+            const { data, error } = await supabase
+                .from('categories')
+                .select('id, name, icon, dispatch_station, is_active')
+                .eq('is_active', true)
+                .order('name');
+            if (error) throw error;
+            if (data) setCategories(data);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        } finally {
+            setLoadingCategories(false);
+        }
+    };
+
+    const updateCategoryStation = async (categoryId: string, newStation: string) => {
+        setSavingCategory(categoryId);
+        try {
+            const { error } = await (supabase as any)
+                .from('categories')
+                .update({ dispatch_station: newStation })
+                .eq('id', categoryId);
+
+            if (error) throw error;
+
+            // Update local state
+            setCategories(prev => prev.map(cat =>
+                cat.id === categoryId
+                    ? { ...cat, dispatch_station: newStation as Category['dispatch_station'] }
+                    : cat
+            ));
+        } catch (error) {
+            console.error('Error updating category station:', error);
+            alert('Erreur lors de la mise a jour');
+        } finally {
+            setSavingCategory(null);
+        }
+    };
+
+    const generateSlug = (name: string) => {
+        return name
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '') // Remove accents
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, '');
+    };
+
+    const openCreateModal = () => {
+        setEditingSection(null);
+        setSectionForm({
+            name: '',
+            slug: '',
+            is_sales_point: false,
+            is_production_point: false,
+            is_warehouse: false
+        });
+        setShowSectionModal(true);
+    };
+
+    const openEditModal = (section: Section) => {
+        setEditingSection(section);
+        setSectionForm({
+            name: section.name,
+            slug: section.slug,
+            is_sales_point: section.is_sales_point,
+            is_production_point: section.is_production_point,
+            is_warehouse: section.is_warehouse
+        });
+        setShowSectionModal(true);
+    };
+
+    const handleSectionNameChange = (name: string) => {
+        setSectionForm(prev => ({
+            ...prev,
+            name,
+            slug: editingSection ? prev.slug : generateSlug(name)
+        }));
+    };
+
+    const handleSaveSection = async () => {
+        if (!sectionForm.name.trim()) {
+            alert('Le nom de la section est requis');
+            return;
+        }
+
+        setSavingSection(true);
+        try {
+            const sectionData = {
+                name: sectionForm.name,
+                slug: sectionForm.slug || generateSlug(sectionForm.name),
+                is_sales_point: sectionForm.is_sales_point,
+                is_production_point: sectionForm.is_production_point,
+                is_warehouse: sectionForm.is_warehouse
+            };
+
+            if (editingSection) {
+                const { error } = await supabase
+                    .from('sections')
+                    .update(sectionData)
+                    .eq('id', editingSection.id);
+
+                if (error) throw error;
+            } else {
+                const { error } = await supabase
+                    .from('sections')
+                    .insert(sectionData);
+
+                if (error) throw error;
+            }
+
+            setShowSectionModal(false);
+            fetchSections();
+        } catch (error: any) {
+            console.error('Error saving section:', error);
+            alert('Erreur lors de la sauvegarde: ' + error.message);
+        } finally {
+            setSavingSection(false);
+        }
+    };
+
+    const handleDeleteSection = async (section: Section) => {
+        if (!confirm(`Êtes-vous sûr de vouloir supprimer la section "${section.name}" ?\n\nCette action est irréversible et peut affecter les produits liés à cette section.`)) {
+            return;
+        }
+
+        try {
+            const { error } = await supabase
+                .from('sections')
+                .delete()
+                .eq('id', section.id);
+
+            if (error) throw error;
+            fetchSections();
+        } catch (error: any) {
+            console.error('Error deleting section:', error);
+            alert('Erreur lors de la suppression: ' + error.message);
+        }
+    };
 
     const toggleSetting = (key: keyof typeof settings) => {
         setSettings(prev => ({
@@ -34,6 +252,8 @@ const SettingsPage = () => {
 
     const tabs = [
         { id: 'general' as const, label: 'Général', icon: <Store size={18} /> },
+        { id: 'sections' as const, label: 'Sections', icon: <Layers size={18} /> },
+        { id: 'kds' as const, label: 'Stations KDS', icon: <ChefHat size={18} /> },
         { id: 'printers' as const, label: 'Imprimantes', icon: <Printer size={18} /> },
         { id: 'notifications' as const, label: 'Notifications', icon: <Bell size={18} /> },
         { id: 'security' as const, label: 'Sécurité', icon: <Shield size={18} /> },
@@ -125,6 +345,174 @@ const SettingsPage = () => {
                                         Enregistrer
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'sections' && (
+                        <div className="settings-section">
+                            <div className="settings-section__header">
+                                <div className="settings-section__header-content">
+                                    <div>
+                                        <h2 className="settings-section__title">Sections de l'Établissement</h2>
+                                        <p className="settings-section__description">
+                                            Gérez les différentes sections de votre établissement (cuisine, bar, entrepôt, etc.)
+                                        </p>
+                                    </div>
+                                    <button className="btn-primary" onClick={openCreateModal}>
+                                        <Plus size={18} />
+                                        Nouvelle Section
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="settings-section__body">
+                                {loadingSections ? (
+                                    <div className="sections-loading">
+                                        <RefreshCw size={24} className="spinning" />
+                                        <span>Chargement...</span>
+                                    </div>
+                                ) : sections.length === 0 ? (
+                                    <div className="sections-empty">
+                                        <Layers size={48} />
+                                        <h3>Aucune section configurée</h3>
+                                        <p>Créez des sections pour organiser vos stocks et la production.</p>
+                                        <button className="btn-primary" onClick={openCreateModal}>
+                                            <Plus size={18} />
+                                            Créer une section
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="sections-list">
+                                        {sections.map(section => (
+                                            <div key={section.id} className="section-item">
+                                                <div className="section-item__info">
+                                                    <h3 className="section-item__name">{section.name}</h3>
+                                                    <div className="section-item__badges">
+                                                        {section.is_sales_point && (
+                                                            <span className="section-badge section-badge--sales">
+                                                                <ShoppingCart size={12} />
+                                                                Point de Vente
+                                                            </span>
+                                                        )}
+                                                        {section.is_production_point && (
+                                                            <span className="section-badge section-badge--production">
+                                                                <Factory size={12} />
+                                                                Production
+                                                            </span>
+                                                        )}
+                                                        {section.is_warehouse && (
+                                                            <span className="section-badge section-badge--warehouse">
+                                                                <Warehouse size={12} />
+                                                                Entrepôt
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="section-item__slug">
+                                                    {section.slug}
+                                                </div>
+                                                <div className="section-item__actions">
+                                                    <button
+                                                        className="btn-icon"
+                                                        onClick={() => openEditModal(section)}
+                                                        title="Modifier"
+                                                    >
+                                                        <Edit2 size={16} />
+                                                    </button>
+                                                    <button
+                                                        className="btn-icon btn-icon--danger"
+                                                        onClick={() => handleDeleteSection(section)}
+                                                        title="Supprimer"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'kds' && (
+                        <div className="settings-section">
+                            <div className="settings-section__header">
+                                <div className="settings-section__header-content">
+                                    <div>
+                                        <h2 className="settings-section__title">Configuration des Stations KDS</h2>
+                                        <p className="settings-section__description">
+                                            Assignez chaque categorie de produit a une station KDS specifique
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="settings-section__body">
+                                {/* Station Legend */}
+                                <div className="kds-stations-legend">
+                                    {DISPATCH_STATIONS.map(station => (
+                                        <div key={station.value} className="kds-station-legend-item">
+                                            <span
+                                                className="kds-station-dot"
+                                                style={{ backgroundColor: station.color }}
+                                            />
+                                            <span className="kds-station-icon" style={{ color: station.color }}>
+                                                {station.icon}
+                                            </span>
+                                            <span>{station.label}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {loadingCategories ? (
+                                    <div className="sections-loading">
+                                        <RefreshCw size={24} className="spinning" />
+                                        <span>Chargement des categories...</span>
+                                    </div>
+                                ) : categories.length === 0 ? (
+                                    <div className="sections-empty">
+                                        <ChefHat size={48} />
+                                        <h3>Aucune categorie trouvee</h3>
+                                        <p>Les categories de produits apparaitront ici.</p>
+                                    </div>
+                                ) : (
+                                    <div className="kds-categories-list">
+                                        {categories.map(category => {
+                                            const currentStation = DISPATCH_STATIONS.find(
+                                                s => s.value === (category.dispatch_station || 'none')
+                                            );
+                                            return (
+                                                <div key={category.id} className="kds-category-item">
+                                                    <div className="kds-category-item__info">
+                                                        <span className="kds-category-item__icon">{category.icon}</span>
+                                                        <span className="kds-category-item__name">{category.name}</span>
+                                                    </div>
+                                                    <div className="kds-category-item__station">
+                                                        <select
+                                                            className="kds-station-select"
+                                                            value={category.dispatch_station || 'none'}
+                                                            onChange={(e) => updateCategoryStation(category.id, e.target.value)}
+                                                            disabled={savingCategory === category.id}
+                                                            style={{
+                                                                borderColor: currentStation?.color,
+                                                                backgroundColor: `${currentStation?.color}15`
+                                                            }}
+                                                        >
+                                                            {DISPATCH_STATIONS.map(station => (
+                                                                <option key={station.value} value={station.value}>
+                                                                    {station.label}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                        {savingCategory === category.id && (
+                                                            <RefreshCw size={16} className="spinning kds-saving-icon" />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
@@ -282,6 +670,132 @@ const SettingsPage = () => {
                     )}
                 </div>
             </div>
+
+            {/* Section Modal */}
+            {showSectionModal && (
+                <div className="section-modal-overlay" onClick={() => setShowSectionModal(false)}>
+                    <div className="section-modal" onClick={e => e.stopPropagation()}>
+                        <div className="section-modal__header">
+                            <div className="section-modal__header-icon">
+                                <Layers size={24} />
+                            </div>
+                            <div>
+                                <h2 className="section-modal__title">
+                                    {editingSection ? 'Modifier la Section' : 'Nouvelle Section'}
+                                </h2>
+                                <p className="section-modal__subtitle">
+                                    {editingSection ? 'Modifiez les informations de la section' : 'Créez une nouvelle section pour organiser vos stocks'}
+                                </p>
+                            </div>
+                            <button className="section-modal__close" onClick={() => setShowSectionModal(false)}>
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        <div className="section-modal__content">
+                            <div className="section-form__group">
+                                <label className="section-form__label">
+                                    Nom de la section *
+                                </label>
+                                <input
+                                    type="text"
+                                    className="section-form__input"
+                                    value={sectionForm.name}
+                                    onChange={(e) => handleSectionNameChange(e.target.value)}
+                                    placeholder="Ex: Cuisine, Bar, Entrepôt..."
+                                    autoFocus
+                                />
+                            </div>
+
+                            <div className="section-form__group">
+                                <label className="section-form__label">
+                                    Identifiant (slug)
+                                </label>
+                                <input
+                                    type="text"
+                                    className="section-form__input section-form__input--mono"
+                                    value={sectionForm.slug}
+                                    onChange={(e) => setSectionForm({ ...sectionForm, slug: e.target.value })}
+                                    placeholder="cuisine"
+                                />
+                                <p className="section-form__hint">
+                                    Identifiant unique utilisé en interne. Auto-généré à partir du nom.
+                                </p>
+                            </div>
+
+                            <div className="section-form__group">
+                                <label className="section-form__label">Type de section</label>
+                                <div className="section-form__types">
+                                    <label className={`section-type-card ${sectionForm.is_sales_point ? 'is-selected' : ''}`}>
+                                        <input
+                                            type="checkbox"
+                                            checked={sectionForm.is_sales_point}
+                                            onChange={(e) => setSectionForm({ ...sectionForm, is_sales_point: e.target.checked })}
+                                        />
+                                        <div className="section-type-card__icon section-type-card__icon--sales">
+                                            <ShoppingCart size={20} />
+                                        </div>
+                                        <div className="section-type-card__content">
+                                            <span className="section-type-card__title">Point de Vente</span>
+                                            <span className="section-type-card__desc">
+                                                Cette section peut vendre des produits directement aux clients
+                                            </span>
+                                        </div>
+                                    </label>
+
+                                    <label className={`section-type-card ${sectionForm.is_production_point ? 'is-selected' : ''}`}>
+                                        <input
+                                            type="checkbox"
+                                            checked={sectionForm.is_production_point}
+                                            onChange={(e) => setSectionForm({ ...sectionForm, is_production_point: e.target.checked })}
+                                        />
+                                        <div className="section-type-card__icon section-type-card__icon--production">
+                                            <Factory size={20} />
+                                        </div>
+                                        <div className="section-type-card__content">
+                                            <span className="section-type-card__title">Point de Production</span>
+                                            <span className="section-type-card__desc">
+                                                Cette section fabrique ou prépare des produits
+                                            </span>
+                                        </div>
+                                    </label>
+
+                                    <label className={`section-type-card ${sectionForm.is_warehouse ? 'is-selected' : ''}`}>
+                                        <input
+                                            type="checkbox"
+                                            checked={sectionForm.is_warehouse}
+                                            onChange={(e) => setSectionForm({ ...sectionForm, is_warehouse: e.target.checked })}
+                                        />
+                                        <div className="section-type-card__icon section-type-card__icon--warehouse">
+                                            <Warehouse size={20} />
+                                        </div>
+                                        <div className="section-type-card__content">
+                                            <span className="section-type-card__title">Entrepôt / Stockage</span>
+                                            <span className="section-type-card__desc">
+                                                Cette section sert principalement au stockage de marchandises
+                                            </span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="section-modal__footer">
+                            <button className="btn-secondary" onClick={() => setShowSectionModal(false)}>
+                                Annuler
+                            </button>
+                            <button
+                                className="btn-primary"
+                                onClick={handleSaveSection}
+                                disabled={savingSection || !sectionForm.name.trim()}
+                            >
+                                <Save size={18} />
+                                {savingSection ? 'Enregistrement...' : (editingSection ? 'Mettre à jour' : 'Créer')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

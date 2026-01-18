@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { X, Check } from 'lucide-react'
 import type { Product } from '../../types/database'
-import { useStockAdjustment } from '../../hooks/useInventory'
+import { useStockAdjustment, useSuppliers } from '../../hooks/useInventory'
 // Removed unused import: formatPrice
 import './StockAdjustmentModal.css'
 
@@ -14,11 +14,13 @@ type AdjustmentType = 'purchase' | 'waste' | 'adjustment_in' | 'adjustment_out'
 
 export default function StockAdjustmentModal({ product, onClose }: StockAdjustmentModalProps) {
     const { mutate: adjustStock, isPending } = useStockAdjustment()
+    const { data: suppliers } = useSuppliers()
 
     const [type, setType] = useState<AdjustmentType>('purchase')
     const [quantity, setQuantity] = useState('')
     const [reason, setReason] = useState('')
     const [notes, setNotes] = useState('')
+    const [supplierId, setSupplierId] = useState('') // New state
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -28,7 +30,8 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
             type,
             quantity: Number(quantity),
             reason,
-            notes
+            notes,
+            supplierId: supplierId || undefined // Pass supplierId
         }, {
             onSuccess: () => {
                 onClose()
@@ -102,6 +105,26 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                             </button>
                         </div>
                     </div>
+
+                    {/* Supplier - only for Purchase */}
+                    {type === 'purchase' && (
+                        <div className="form-group">
+                            <label className="form-label">Fournisseur</label>
+                            <select
+                                className="form-select"
+                                value={supplierId}
+                                onChange={(e) => setSupplierId(e.target.value)}
+                                aria-label="Sélectionner fournisseur"
+                            >
+                                <option value="">Sélectionner un fournisseur...</option>
+                                {suppliers?.map((supplier) => (
+                                    <option key={supplier.id} value={supplier.id}>
+                                        {supplier.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
 
                     {/* Quantity */}
                     <div className="form-group">

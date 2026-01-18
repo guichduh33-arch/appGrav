@@ -7,13 +7,16 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:claude": "ts-node --esm scripts/test-claude.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
     "@supabase/supabase-js": "^2.39.0",
     "@tanstack/react-query": "^5.17.0",
     "csv-parse": "^6.1.0",
     "date-fns": "^3.2.0",
+    "dotenv": "^17.2.3",
     "i18next": "^25.7.4",
     "i18next-browser-languagedetector": "^8.2.0",
     "lucide-react": "^0.303.0",
@@ -37,6 +40,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "jsdom": "^27.4.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
     "vitest": "^4.0.17"

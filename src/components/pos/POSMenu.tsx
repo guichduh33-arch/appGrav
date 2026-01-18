@@ -2,8 +2,8 @@ import { useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
-    Settings, LogOut, User, FileText, History,
-    BarChart2, LayoutGrid, Monitor, ShieldCheck, X
+    Settings, LogOut, FileText, History, Receipt,
+    LayoutGrid, Monitor, Clock, Lock, X
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/authStore'
 import './POSMenu.css'
@@ -12,9 +12,21 @@ interface POSMenuProps {
     isOpen: boolean
     onClose: () => void
     onShowHeldOrders: () => void
+    onShowTransactionHistory: () => void
+    hasOpenShift: boolean
+    onOpenShift: () => void
+    onCloseShift: () => void
 }
 
-export default function POSMenu({ isOpen, onClose, onShowHeldOrders }: POSMenuProps) {
+export default function POSMenu({
+    isOpen,
+    onClose,
+    onShowHeldOrders,
+    onShowTransactionHistory,
+    hasOpenShift,
+    onOpenShift,
+    onCloseShift
+}: POSMenuProps) {
     const { t } = useTranslation()
     const navigate = useNavigate()
     const { user, logout } = useAuthStore()
@@ -71,15 +83,40 @@ export default function POSMenu({ isOpen, onClose, onShowHeldOrders }: POSMenuPr
                         <span>{t('pos.menu.held_orders')}</span>
                     </button>
 
-                    <button className="pos-menu__item">
+                    {/* Transaction history - Manager/Admin only */}
+                    {(user?.role === 'manager' || user?.role === 'admin') && (
+                        <button
+                            className="pos-menu__item"
+                            onClick={() => { onClose(); onShowTransactionHistory(); }}
+                            disabled={!hasOpenShift}
+                        >
+                            <Receipt size={20} />
+                            <span>{t('pos.menu.transactions', 'Historique Transactions')}</span>
+                        </button>
+                    )}
+
+                    <button className="pos-menu__item" onClick={() => navigate('/reports')}>
                         <FileText size={20} />
                         <span>{t('pos.menu.reports')}</span>
                     </button>
 
-                    <button className="pos-menu__item">
-                        <ShieldCheck size={20} />
-                        <span>{t('pos.menu.shift')}</span>
-                    </button>
+                    {hasOpenShift ? (
+                        <button
+                            className="pos-menu__item is-warning"
+                            onClick={() => { onClose(); onCloseShift(); }}
+                        >
+                            <Lock size={20} />
+                            <span>{t('shift.close_title', 'Fermer le Shift')}</span>
+                        </button>
+                    ) : (
+                        <button
+                            className="pos-menu__item is-success"
+                            onClick={() => { onClose(); onOpenShift(); }}
+                        >
+                            <Clock size={20} />
+                            <span>{t('shift.open_title', 'Ouvrir un Shift')}</span>
+                        </button>
+                    )}
 
                     <button className="pos-menu__item" onClick={() => window.open('/kds', '_blank')}>
                         <Monitor size={20} />

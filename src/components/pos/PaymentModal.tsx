@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { X, Check, CreditCard } from 'lucide-react'
+import { X, Check, CreditCard, Banknote, QrCode, Printer, RotateCcw } from 'lucide-react'
 import { useCartStore } from '../../stores/cartStore'
 import { formatPrice } from '../../utils/helpers'
 import { useOrders } from '../../hooks/useOrders'
@@ -25,8 +25,15 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
     const [showSuccess, setShowSuccess] = useState(false)
     const { createOrder, isCreating } = useOrders()
 
-    const change = amountReceived - total
-    const canComplete = paymentMethod !== 'cash' || amountReceived >= total
+    const totalRounded = Math.round(total)
+    const change = amountReceived - totalRounded
+
+    // Improved validation: ensure we compare with a small epsilon if needed, 
+    // although amounts are usually integers in IDR, it's good practice.
+    const canComplete = paymentMethod !== 'cash' || (amountReceived >= totalRounded - 0.01)
+
+    // Debug validation
+    console.log('Validation:', { paymentMethod, amountReceived, total: totalRounded, canComplete, isCreating })
 
     // Handle numpad input
     const handleNumpadKey = (key: string) => {
@@ -64,9 +71,14 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
 
             setShowSuccess(true)
 
-        } catch (error) {
-            console.error('Payment error:', error)
-            toast.error(t('payment.toast_error'))
+        } catch (error: any) {
+            console.error('Payment error detail:', {
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+                code: error.code
+            })
+            toast.error(`${t('payment.toast_error')}: ${error.message || 'Unknown error'}`)
             setIsProcessing(false)
         }
     }
@@ -84,7 +96,9 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
             <div className="modal-backdrop is-active" onClick={(e) => e.target === e.currentTarget && handleNewOrder()}>
                 <div className="modal modal-sm is-active success-modal">
                     <div className="modal__body success-content">
-                        <div className="success-icon">✅</div>
+                        <div className="success-icon">
+                            <Check size={64} className="text-success" />
+                        </div>
                         <h2>{t('payment.success_title')}</h2>
                         <p className="success-subtitle">{t('payment.success_subtitle')}</p>
 
@@ -97,9 +111,11 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
 
                         <div className="success-actions">
                             <button className="btn btn-secondary" onClick={() => toast(t('payment.print_toast'))}>
-                                🖨️ {t('payment.print')}
+                                <Printer size={18} className="mr-2" />
+                                {t('payment.print')}
                             </button>
                             <button className="btn btn-primary" onClick={handleNewOrder}>
+                                <RotateCcw size={18} className="mr-2" />
                                 {t('payment.new_order')}
                             </button>
                         </div>
@@ -126,8 +142,54 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                 </div>
 
                 <div className="modal__body payment-body">
-                    <div className={`payment-grid ${paymentMethod === 'cash' ? 'has-numpad' : 'full-width'}`}>
-                        {/* Left: Amount & Methods */}
+                    {/* Top: Payment Methods */}
+                    <div className="payment-methods-container">
+                        <label className="section-label">{t('payment.method_title')}</label>
+                        <div className="payment-methods">
+                            <div className="payment-method">
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    id="payCash"
+                                    checked={paymentMethod === 'cash'}
+                                    onChange={() => setPaymentMethod('cash')}
+                                />
+                                <label htmlFor="payCash" className="payment-method__label">
+                                    <Banknote size={24} className="payment-method__icon" />
+                                    <span className="payment-method__name">{t('payment.cash')}</span>
+                                </label>
+                            </div>
+                            <div className="payment-method">
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    id="payCard"
+                                    checked={paymentMethod === 'card'}
+                                    onChange={() => setPaymentMethod('card')}
+                                />
+                                <label htmlFor="payCard" className="payment-method__label">
+                                    <CreditCard size={24} className="payment-method__icon" />
+                                    <span className="payment-method__name">{t('payment.card')}</span>
+                                </label>
+                            </div>
+                            <div className="payment-method">
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    id="payQris"
+                                    checked={paymentMethod === 'qris'}
+                                    onChange={() => setPaymentMethod('qris')}
+                                />
+                                <label htmlFor="payQris" className="payment-method__label">
+                                    <QrCode size={24} className="payment-method__icon" />
+                                    <span className="payment-method__name">{t('payment.qris')}</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className={`payment-grid ${paymentMethod !== 'cash' ? 'payment-grid--single' : ''}`}>
+                        {/* Left: Money Info & Quick Amounts */}
                         <div className="payment-left">
                             {/* Amount Display */}
                             <div className="payment-amount-display">
@@ -135,70 +197,28 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                                 <p className="payment-amount-display__value">{formatPrice(total)}</p>
                             </div>
 
-                            {/* Payment Methods */}
-                            <h4 className="payment-section-title">{t('payment.method_title')}</h4>
-                            <div className="payment-methods">
-                                <div className="payment-method">
-                                    <input
-                                        type="radio"
-                                        name="paymentMethod"
-                                        id="payCash"
-                                        checked={paymentMethod === 'cash'}
-                                        onChange={() => setPaymentMethod('cash')}
-                                    />
-                                    <label htmlFor="payCash" className="payment-method__label">
-                                        <span className="payment-method__icon">💵</span>
-                                        <span className="payment-method__name">{t('payment.cash')}</span>
-                                    </label>
-                                </div>
-                                <div className="payment-method">
-                                    <input
-                                        type="radio"
-                                        name="paymentMethod"
-                                        id="payCard"
-                                        checked={paymentMethod === 'card'}
-                                        onChange={() => setPaymentMethod('card')}
-                                    />
-                                    <label htmlFor="payCard" className="payment-method__label">
-                                        <span className="payment-method__icon">💳</span>
-                                        <span className="payment-method__name">{t('payment.card')}</span>
-                                    </label>
-                                </div>
-                                <div className="payment-method">
-                                    <input
-                                        type="radio"
-                                        name="paymentMethod"
-                                        id="payQris"
-                                        checked={paymentMethod === 'qris'}
-                                        onChange={() => setPaymentMethod('qris')}
-                                    />
-                                    <label htmlFor="payQris" className="payment-method__label">
-                                        <span className="payment-method__icon">📱</span>
-                                        <span className="payment-method__name">{t('payment.qris')}</span>
-                                    </label>
-                                </div>
-                            </div>
-
                             {/* Quick Amounts (Cash only) */}
                             {paymentMethod === 'cash' && (
                                 <>
-                                    <h4 className="payment-section-title">{t('payment.amount_received')}</h4>
-                                    <div className="quick-amounts">
-                                        <button
-                                            className="quick-amount-btn is-exact"
-                                            onClick={() => handleQuickAmount('exact')}
-                                        >
-                                            {t('payment.exact_amount')}
-                                        </button>
-                                        {QUICK_AMOUNTS.map(amount => (
+                                    <div className="quick-amounts-section">
+                                        <p className="section-label">{t('payment.amount_received')}</p>
+                                        <div className="quick-amounts">
                                             <button
-                                                key={amount}
-                                                className="quick-amount-btn"
-                                                onClick={() => handleQuickAmount(amount)}
+                                                className="quick-amount-btn is-exact"
+                                                onClick={() => handleQuickAmount('exact')}
                                             >
-                                                {formatPrice(amount)}
+                                                {t('payment.exact_amount')}
                                             </button>
-                                        ))}
+                                            {QUICK_AMOUNTS.map(amount => (
+                                                <button
+                                                    key={amount}
+                                                    className="quick-amount-btn"
+                                                    onClick={() => handleQuickAmount(amount)}
+                                                >
+                                                    {formatPrice(amount)}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
 
                                     {/* Change Display */}
@@ -215,15 +235,18 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                         {/* Right: Numpad */}
                         {paymentMethod === 'cash' && (
                             <div className="payment-right">
-                                <h4 className="payment-section-title">{t('payment.manual_input')}</h4>
-                                <div className="amount-input">
-                                    <input
-                                        type="text"
-                                        value={formatPrice(amountReceived)}
-                                        readOnly
-                                        aria-label={t('payment.amount_received')}
-                                        title={t('payment.amount_received')}
-                                    />
+                                <div className="amount-input-container">
+                                    <label className="section-label">{t('payment.manual_input')}</label>
+                                    <div className="amount-input">
+                                        <span className="currency-prefix">Rp</span>
+                                        <input
+                                            type="text"
+                                            value={amountReceived.toLocaleString('id-ID')}
+                                            readOnly
+                                            aria-label={t('payment.amount_received')}
+                                            title={t('payment.amount_received')}
+                                        />
+                                    </div>
                                 </div>
                                 <div className="numpad">
                                     {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'clear', '0', 'backspace'].map(key => (

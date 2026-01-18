@@ -1,47 +1,137 @@
 {
-  "project_name": "AppGrav - The Breakery ERP",
-  "last_updated": "2026-01-16T18:52:23.468490",
+  "project_name": "The Breakery Lombok - ERP/POS System",
+  "description": "Système ERP/POS complet pour une boulangerie française à Lombok, Indonésie",
+  "last_updated": "2026-01-18T05:45:10.498530",
+  "location": "C:\\disk\\AppGrav\\",
   "tech_stack": {
-    "frontend": "React",
-    "backend": "FastAPI (Python)",
-    "database": "Supabase (PostgreSQL)",
-    "state_management": "React Hooks",
-    "styling": "Tailwind CSS"
+    "frontend": "React 18.2 + TypeScript 5.2 + Vite 5.x",
+    "backend": "Supabase Edge Functions (Deno/TypeScript)",
+    "database": "Supabase PostgreSQL",
+    "state_management": "React Hooks + Context API",
+    "styling": "Tailwind CSS + Lucide React",
+    "i18n": "i18next (French, English, Indonesian)",
+    "routing": "React Router DOM 6.x",
+    "authentication": "@supabase/supabase-js",
+    "forms": "react-hook-form",
+    "date": "date-fns",
+    "charts": "recharts"
   },
   "coding_standards": {
-    "python": {
-      "style": "PEP 8",
-      "max_line_length": 100,
-      "type_hints": "required",
-      "docstrings": "Google style",
-      "naming": "snake_case"
-    },
-    "javascript": {
+    "typescript": {
       "style": "ESLint + Prettier",
       "components": "PascalCase",
       "functions": "camelCase",
+      "interfaces": "PascalCase with 'I' prefix",
+      "types": "PascalCase with 'T' prefix",
       "max_file_lines": 300,
-      "prefer": "functional components"
+      "prefer": "functional components with hooks"
     },
     "database": {
       "naming": "snake_case",
       "primary_keys": "id (uuid)",
       "timestamps": "created_at, updated_at",
-      "soft_delete": false
+      "soft_delete": false,
+      "foreign_keys": "table_name_id"
+    },
+    "edge_functions": {
+      "language": "TypeScript (Deno)",
+      "naming": "kebab-case",
+      "error_handling": "try-catch with proper HTTP status codes"
     }
   },
   "patterns": {
     "component_naming": "PascalCase",
     "function_naming": "camelCase",
     "api_naming": "snake_case",
-    "file_organization": "by_feature"
+    "file_organization": "by_feature",
+    "component_structure": "functional with hooks"
   },
   "architecture": {
-    "frontend_path": "",
-    "backend_path": "",
-    "database_path": "",
+    "frontend_path": "src/",
+    "backend_path": "supabase/functions/",
+    "database_path": "supabase/",
     "components_pattern": "src/components/",
-    "api_pattern": "api/"
+    "pages_pattern": "src/pages/",
+    "api_pattern": "supabase/functions/",
+    "scripts_path": "scripts/",
+    "deploy_path": "deploy/",
+    "artifacts_path": "artifacts/",
+    "css_path": "css/",
+    "public_path": "public/"
   },
-  "business_rules": {}
+  "business_rules": {
+    "currency": "IDR (Indonesian Rupiah)",
+    "tax_rate": "10%",
+    "languages": [
+      "French",
+      "English",
+      "Indonesian"
+    ],
+    "default_language": "French",
+    "business_hours": "Daily operations",
+    "target_transactions": "~200 transactions/day",
+    "business_type": "French bakery"
+  },
+  "features": {
+    "pos": {
+      "description": "Point of Sale interface",
+      "path": "src/pages/pos/",
+      "status": "active"
+    },
+    "inventory": {
+      "description": "Stock management and movements",
+      "functions": [
+        "intersection_stock_movements"
+      ],
+      "status": "active"
+    },
+    "invoicing": {
+      "description": "Invoice generation and management",
+      "functions": [
+        "generate-invoice"
+      ],
+      "status": "active"
+    },
+    "reporting": {
+      "description": "Daily reports and analytics",
+      "functions": [
+        "calculate-daily-report"
+      ],
+      "status": "active"
+    },
+    "orders": {
+      "description": "Purchase order management",
+      "functions": [
+        "purchase-order-module"
+      ],
+      "status": "active"
+    },
+    "customer_loyalty": {
+      "description": "Customer loyalty program",
+      "status": "planned"
+    }
+  },
+  "supabase_functions": [
+    "calculate-daily-report",
+    "generate-invoice",
+    "intersection_stock_movements",
+    "purchase-order-module"
+  ],
+  "deployment": {
+    "scripts": [
+      "build_frontend.ps1",
+      "deploy_all.ps1",
+      "deploy_backend.ps1"
+    ],
+    "platform": "Supabase",
+    "environment": "production"
+  },
+  "development": {
+    "server_port": 3000,
+    "server_host": "localhost",
+    "hot_reload": true,
+    "testing": "Vitest + Jest DOM",
+    "linting": "ESLint",
+    "formatting": "Prettier"
+  }
 }

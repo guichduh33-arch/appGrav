@@ -16,18 +16,24 @@ class BackendAgent:
         self.functions_path = self.project_path / "supabase" / "functions"
         self.functions_path.mkdir(parents=True, exist_ok=True)
     
-    def create_edge_function(self, name: str) -> str:
+    def create_edge_function(self, name: str, context: dict = None) -> str:
         """
         Crée une nouvelle Edge Function Deno
         """
         print(f"⚡ Création Edge Function '{name}'...")
+        
+        recs = ""
+        if context and "recommendations" in context:
+            recs = "\n// Design Recommendations:\n"
+            for rec in context["recommendations"]:
+                recs += f"// - {rec}\n"
         
         func_dir = self.functions_path / name
         func_dir.mkdir(parents=True, exist_ok=True)
         
         file_path = func_dir / "index.ts"
         
-        content = '''import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+        content = recs + '''import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
 const corsHeaders = {

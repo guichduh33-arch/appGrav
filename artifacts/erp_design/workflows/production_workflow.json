@@ -1,0 +1,112 @@
+{
+  "module": "production_workflow",
+  "description": "Workflow de production boulangerie",
+  "states": {
+    "planned": {
+      "label": "Planifié",
+      "color": "blue",
+      "next_states": [
+        "in_progress",
+        "cancelled"
+      ]
+    },
+    "in_progress": {
+      "label": "En cours",
+      "color": "yellow",
+      "next_states": [
+        "completed",
+        "on_hold"
+      ]
+    },
+    "on_hold": {
+      "label": "En pause",
+      "color": "orange",
+      "next_states": [
+        "in_progress",
+        "cancelled"
+      ]
+    },
+    "completed": {
+      "label": "Terminé",
+      "color": "green",
+      "next_states": [],
+      "final": true
+    },
+    "cancelled": {
+      "label": "Annulé",
+      "color": "red",
+      "next_states": [],
+      "final": true
+    }
+  },
+  "daily_process": [
+    {
+      "step": 1,
+      "time": "04:00",
+      "action": "Vérifier planification du jour",
+      "agent": "Responsable production"
+    },
+    {
+      "step": 2,
+      "time": "04:15",
+      "action": "Sortir ingrédients (picking)",
+      "agent": "Boulanger"
+    },
+    {
+      "step": 3,
+      "time": "04:30",
+      "action": "Démarrer production (pétrissage)",
+      "agent": "Boulanger"
+    },
+    {
+      "step": 4,
+      "time": "Variable",
+      "action": "Cuisson",
+      "agent": "Boulanger"
+    },
+    {
+      "step": 5,
+      "time": "06:00",
+      "action": "Enregistrer production terminée",
+      "agent": "Responsable production"
+    },
+    {
+      "step": 6,
+      "time": "06:30",
+      "action": "Mise en rayon / stock boutique",
+      "agent": "Vendeur"
+    }
+  ],
+  "automations": [
+    {
+      "trigger": "Production terminée",
+      "action": "Ajouter produits finis au stock",
+      "type": "automatic"
+    },
+    {
+      "trigger": "Stock bas détecté",
+      "action": "Suggérer ordre de production",
+      "type": "notification"
+    },
+    {
+      "trigger": "Début production",
+      "action": "Réserver ingrédients",
+      "type": "automatic"
+    }
+  ],
+  "kds_integration": {
+    "display_info": [
+      "Nom du produit",
+      "Quantité à produire",
+      "Recette (étapes)",
+      "Temps estimé",
+      "Priorité"
+    ],
+    "actions": [
+      "Démarrer",
+      "Pause",
+      "Terminer",
+      "Problème"
+    ]
+  }
+}

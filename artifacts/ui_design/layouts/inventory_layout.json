@@ -1,0 +1,35 @@
+{
+  "name": "Inventory Layout",
+  "type": "master_detail",
+  "regions": {
+    "sidebar": {
+      "width": "280px",
+      "components": [
+        "category_tree",
+        "filters"
+      ]
+    },
+    "main": {
+      "components": [
+        "toolbar",
+        "product_table"
+      ],
+      "toolbar": {
+        "components": [
+          "search",
+          "filters",
+          "view_toggle",
+          "add_button"
+        ]
+      }
+    },
+    "detail_panel": {
+      "width": "400px",
+      "trigger": "row_click",
+      "components": [
+        "product_detail",
+        "stock_history"
+      ]
+    }
+  }
+}

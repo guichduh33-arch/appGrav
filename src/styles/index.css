@@ -133,6 +133,30 @@
     --z-modal-backdrop: 300;
     --z-modal: 400;
     --z-toast: 500;
+
+    /* ----------------------------------------
+       LEGACY TOKENS (The Breakery Classic)
+       Restored for compatibility with legacy components
+       ---------------------------------------- */
+    --color-rose-poudre: #BA90A2;
+    --color-gris-chaud: #8B7355;
+    --color-brun-chocolat: #4A3728;
+    --color-beige-sable: #D2B48C;
+    --color-blanc-creme: #FDF8F3;
+    --color-blanc-creme-dark: #F2E8DF;
+    --color-urgent: #EF4444;
+    --color-urgent-bg: #FEF2F2;
+    --color-warning-bg: #FFFBEB;
+    --color-warning-text: #B45309;
+    --gradient-subtle: linear-gradient(to bottom, #FDF8F3, #F2E8DF);
+    --shadow-3: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --space-2xl: 2rem;
+    --space-xl: 1.5rem;
+    --space-lg: 1.25rem;
+    --space-md: 1rem;
+    --space-sm: 0.75rem;
+    --space-xs: 0.5rem;
+    --radius-2xl: 1.5rem;
 }
 
 /* ============================================

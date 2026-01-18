@@ -5,51 +5,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
 import { ArrowRightLeft, Box, LayoutGrid } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { Section, Product } from '../types/database';
 
-// --- Types ---
-interface Section {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  current_stock: number;
-  unit: string;
-}
-
-interface SectionItem {
-  id: string;
-  section_id: string;
+interface ProductStockView {
   product_id: string;
+  product_name: string;
   quantity: number;
-  products: { name: string; unit: string };
-}
-
-// --- API Helpers ---
-const FUNCTION_URL = import.meta.env.VITE_SUPABASE_URL + '/functions/v1/intersection_stock_movements';
-
-async function fetchAPI(resource: string, params: string = '') {
-  const { data: { session } } = await supabase.auth.getSession();
-  const headers = { Authorization: `Bearer ${session?.access_token}` };
-  const res = await fetch(`${FUNCTION_URL}?resource=${resource}${params}`, { headers });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-async function postTransfer(data: any) {
-  const { data: { session } } = await supabase.auth.getSession();
-  const headers = {
-    Authorization: `Bearer ${session?.access_token}`,
-    'Content-Type': 'application/json'
-  };
-  const res = await fetch(`${FUNCTION_URL}?resource=transfer`, {
-    method: 'POST', body: JSON.stringify(data), headers
-  });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  unit: string;
 }
 
 export const InterSection_Stock_Movements: React.FC = () => {
@@ -58,42 +20,86 @@ export const InterSection_Stock_Movements: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'transfer'>('overview');
 
   // Transfer State
-  const [fromSection, setFromSection] = useState('warehouse'); // 'warehouse' or UUID
-  const [toSection, setToSection] = useState(''); // 'warehouse' or UUID
-  const [selectedProduct, setSelectedProduct] = useState('');
-  const [transferQty, setTransferQty] = useState(0);
+  const [fromSection, setFromSection] = useState<string>('');
+  const [toSection, setToSection] = useState<string>('');
+  const [selectedProduct, setSelectedProduct] = useState<string>('');
+  const [transferQty, setTransferQty] = useState<number>(0);
 
   // --- Queries ---
   const { data: sections = [] } = useQuery({
     queryKey: ['sections'],
-    queryFn: () => fetchAPI('sections')
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('sections')
+        .select('*')
+        .order('name');
+      if (error) throw error;
+      return data as Section[];
+    }
   });
 
   const { data: products = [] } = useQuery({
     queryKey: ['products'],
-    queryFn: () => fetchAPI('products')
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('id, name, current_stock, unit')
+        .eq('is_active', true)
+        .order('name');
+      if (error) throw error;
+      return data as Partial<Product>[];
+    }
   });
 
-  // Fetch stock for all sections (could be optimized, simplified for now)
-  // We'll just fetch items for the 'overview' dashboard
-  // Ideally we loop or fetch all. Let's fetch all items for now if API supported 'all', 
-  // but our API expects section_id. Let's fetch for the first few sections or just fetch on demand.
-  // IMPROVEMENT: Let's assume we view one section at a time or the dashboard iterates queries.
-  // For simplicity: Dashboard listing sections. Clicking one shows stock.
+  // View State
   const [viewSectionId, setViewSectionId] = useState<string | null>(null);
 
   const { data: sectionStock = [], isLoading: loadingStock } = useQuery({
-    queryKey: ['stock', viewSectionId],
-    queryFn: () => fetchAPI('stock', `&section_id=${viewSectionId}`),
+    queryKey: ['section_stock', viewSectionId],
+    queryFn: async () => {
+      if (!viewSectionId) return [];
+
+      // Join product_stocks with products to get names
+      const { data, error } = await supabase
+        .from('product_stocks')
+        .select(`
+                    quantity,
+                    product:products (
+                        id,
+                        name,
+                        unit
+                    )
+                `)
+        .eq('section_id', viewSectionId)
+        .order('quantity', { ascending: false }); // Show highest stock first? Or alphabetical by product name logic (needs client sort or complex query)
+
+      if (error) throw error;
+
+      // Transform to flatter structure
+      return data.map((item: any) => ({
+        product_id: item.product.id,
+        product_name: item.product.name,
+        unit: item.product.unit,
+        quantity: item.quantity
+      })) as ProductStockView[];
+    },
     enabled: !!viewSectionId
   });
 
   // --- Mutations ---
   const transferMutation = useMutation({
-    mutationFn: postTransfer,
+    mutationFn: async (data: { product_id: string, from_section_id: string, to_section_id: string, quantity: number }) => {
+      const { error } = await (supabase.rpc as any)('transfer_stock', {
+        p_product_id: data.product_id,
+        p_from_section_id: data.from_section_id,
+        p_to_section_id: data.to_section_id,
+        p_quantity: data.quantity
+      });
+      if (error) throw error;
+      return true;
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] }); // Update warehouse stock
-      queryClient.invalidateQueries({ queryKey: ['stock'] });    // Update section stock
+      queryClient.invalidateQueries({ queryKey: ['section_stock'] });
       toast.success('Stock transfer successful');
       setTransferQty(0);
       setSelectedProduct('');
@@ -129,8 +135,8 @@ export const InterSection_Stock_Movements: React.FC = () => {
         <div className="grid grid-cols-12 gap-6">
           {/* Sections List */}
           <div className="col-span-4 space-y-3">
-            <h3 className="font-semibold text-gray-700">Storage Sections</h3>
-            {sections.map((s: Section) => (
+            <h3 className="font-semibold text-gray-700">Kitchen Sections</h3>
+            {sections.map((s) => (
               <button
                 key={s.id}
                 onClick={() => setViewSectionId(s.id)}
@@ -138,7 +144,11 @@ export const InterSection_Stock_Movements: React.FC = () => {
                   }`}
               >
                 <div className="font-bold">{s.name}</div>
-                <div className="text-xs text-gray-500 uppercase tracking-wide">{s.slug}</div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide flex gap-2">
+                  {s.slug}
+                  {s.is_warehouse && <span className="bg-blue-100 text-blue-800 px-1 rounded">Warehouse</span>}
+                  {s.is_sales_point && <span className="bg-green-100 text-green-800 px-1 rounded">Sales</span>}
+                </div>
               </button>
             ))}
           </div>
@@ -153,7 +163,7 @@ export const InterSection_Stock_Movements: React.FC = () => {
             ) : (
               <div>
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                  Stock Level: {sections.find((s: any) => s.id === viewSectionId)?.name}
+                  Stock Level: {sections.find(s => s.id === viewSectionId)?.name}
                 </h3>
                 {loadingStock ? <p>Loading...</p> : (
                   sectionStock.length === 0 ? <p className="text-gray-500">No stock items in this section.</p> :
@@ -165,11 +175,11 @@ export const InterSection_Stock_Movements: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y">
-                        {sectionStock.map((item: SectionItem) => (
-                          <tr key={item.id}>
-                            <td className="py-3">{item.products?.name}</td>
+                        {sectionStock.map((item) => (
+                          <tr key={item.product_id}>
+                            <td className="py-3">{item.product_name}</td>
                             <td className="py-3 text-right font-medium">
-                              {item.quantity} {item.products?.unit}
+                              {item.quantity} {item.unit}
                             </td>
                           </tr>
                         ))}
@@ -196,8 +206,8 @@ export const InterSection_Stock_Movements: React.FC = () => {
                 value={fromSection}
                 onChange={(e) => setFromSection(e.target.value)}
               >
-                <option value="warehouse">Main Warehouse (Master)</option>
-                {sections.map((s: Section) => (
+                <option value="">-- Select --</option>
+                {sections.map((s) => (
                   <option key={s.id} value={s.id}>{s.name}</option>
                 ))}
               </select>
@@ -211,8 +221,7 @@ export const InterSection_Stock_Movements: React.FC = () => {
                 onChange={(e) => setToSection(e.target.value)}
               >
                 <option value="">-- Select --</option>
-                <option value="warehouse">Main Warehouse (Master)</option>
-                {sections.map((s: Section) => (
+                {sections.map((s) => (
                   <option key={s.id} value={s.id}>{s.name}</option>
                 ))}
               </select>
@@ -228,15 +237,12 @@ export const InterSection_Stock_Movements: React.FC = () => {
               onChange={(e) => setSelectedProduct(e.target.value)}
             >
               <option value="">-- Choose Product --</option>
-              {products.map((p: Product) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} (Whse: {p.current_stock} {p.unit})
+              {products.map((p) => (
+                <option key={p.id} value={p.id!}>
+                  {p.name}
                 </option>
               ))}
             </select>
-            <p className="text-xs text-gray-500 mt-1">
-              * Showing Main Warehouse stock levels
-            </p>
           </div>
 
           <div>
@@ -251,7 +257,7 @@ export const InterSection_Stock_Movements: React.FC = () => {
           </div>
 
           <button
-            disabled={!toSection || !selectedProduct || transferQty <= 0 || fromSection === toSection || transferMutation.isPending}
+            disabled={!toSection || !fromSection || !selectedProduct || transferQty <= 0 || fromSection === toSection || transferMutation.isPending}
             onClick={() => transferMutation.mutate({
               product_id: selectedProduct,
               from_section_id: fromSection,
@@ -262,6 +268,10 @@ export const InterSection_Stock_Movements: React.FC = () => {
           >
             {transferMutation.isPending ? 'Processing...' : 'Confirm Transfer'}
           </button>
+
+          {fromSection === toSection && fromSection !== '' && (
+            <p className="text-red-500 text-sm text-center">Source and destination must be different.</p>
+          )}
         </div>
       )}
     </div>

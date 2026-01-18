@@ -1,0 +1,71 @@
+{
+  "module": "production",
+  "description": "Gestion de la production et des recettes",
+  "tables": {
+    "recipes": {
+      "description": "Recettes de fabrication",
+      "columns": {
+        "id": "UUID PRIMARY KEY DEFAULT gen_random_uuid()",
+        "product_id": "UUID REFERENCES products(id) NOT NULL",
+        "name": "VARCHAR(255) NOT NULL",
+        "yield_quantity": "DECIMAL(10,3) NOT NULL",
+        "yield_unit_id": "UUID REFERENCES units(id)",
+        "preparation_time": "INTEGER",
+        "cooking_time": "INTEGER",
+        "instructions": "TEXT",
+        "is_active": "BOOLEAN DEFAULT true",
+        "version": "INTEGER DEFAULT 1",
+        "created_at": "TIMESTAMPTZ DEFAULT NOW()",
+        "updated_at": "TIMESTAMPTZ DEFAULT NOW()"
+      },
+      "rls": true
+    },
+    "recipe_ingredients": {
+      "description": "Ingrédients des recettes",
+      "columns": {
+        "id": "UUID PRIMARY KEY DEFAULT gen_random_uuid()",
+        "recipe_id": "UUID REFERENCES recipes(id) ON DELETE CASCADE NOT NULL",
+        "ingredient_id": "UUID REFERENCES products(id) NOT NULL",
+        "quantity": "DECIMAL(15,4) NOT NULL",
+        "unit_id": "UUID REFERENCES units(id)",
+        "notes": "TEXT",
+        "sort_order": "INTEGER DEFAULT 0"
+      },
+      "rls": true
+    },
+    "production_orders": {
+      "description": "Ordres de fabrication",
+      "columns": {
+        "id": "UUID PRIMARY KEY DEFAULT gen_random_uuid()",
+        "order_number": "VARCHAR(50) UNIQUE NOT NULL",
+        "recipe_id": "UUID REFERENCES recipes(id) NOT NULL",
+        "planned_quantity": "DECIMAL(10,3) NOT NULL",
+        "actual_quantity": "DECIMAL(10,3)",
+        "status": "VARCHAR(20) DEFAULT 'planned'",
+        "planned_date": "DATE NOT NULL",
+        "started_at": "TIMESTAMPTZ",
+        "completed_at": "TIMESTAMPTZ",
+        "assigned_to": "UUID REFERENCES auth.users(id)",
+        "notes": "TEXT",
+        "created_at": "TIMESTAMPTZ DEFAULT NOW()"
+      },
+      "indexes": [
+        "CREATE INDEX idx_prod_orders_date ON production_orders(planned_date)",
+        "CREATE INDEX idx_prod_orders_status ON production_orders(status)"
+      ],
+      "rls": true
+    }
+  },
+  "functions": [
+    {
+      "name": "calculate_recipe_cost",
+      "description": "Calcule le coût de revient d'une recette",
+      "returns": "DECIMAL(15,2)"
+    },
+    {
+      "name": "consume_ingredients",
+      "description": "Consomme les ingrédients lors d'une production",
+      "returns": "BOOLEAN"
+    }
+  ]
+}

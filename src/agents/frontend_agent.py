@@ -23,11 +23,18 @@ class FrontendAgent:
         for p in [self.components_path, self.pages_path, self.hooks_path]:
             p.mkdir(parents=True, exist_ok=True)
 
-    def create_component(self, name: str, props: dict = {}, is_page: bool = False) -> str:
+    def create_component(self, name: str, props: dict = {}, is_page: bool = False, context: dict = None) -> str:
         """
         Crée un composant React (Functional Component)
         """
         print(f"⚛️ Création composant '{name}'...")
+        
+        recs = ""
+        if context and "recommendations" in context:
+            recs = "\n/**\n * Design Recommendations:\n"
+            for rec in context["recommendations"]:
+                recs += f" * - {rec}\n"
+            recs += " */\n"
         
         # PascalCase
         name = name[0].upper() + name[1:]
@@ -41,6 +48,7 @@ class FrontendAgent:
         props_interface += "}"
         
         content = f'''import React from 'react';
+{recs}
 import {{ useTranslation }} from 'react-i18next';
 
 {props_interface if props else ''}

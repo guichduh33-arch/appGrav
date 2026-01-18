@@ -65,9 +65,20 @@ git commit -m "Initial commit"
    ```
 
 ### Étape C : Récupérer sur le second poste
-```bash
-git clone https://github.com/VOTRE_USER/AppGrav.git
-cd AppGrav
-npm install
-npm run dev
-```
+1. Ouvrez un terminal sur le nouveau PC.
+2. Clonez le projet :
+   ```bash
+   git clone https://github.com/guichduh33-arch/appGrav.git
+   cd appGrav
+   ```
+3. Installez les dépendances :
+   ```bash
+   npm install
+   ```
+4. **IMPORTANT** : Créez un fichier `.env` à la racine (au même niveau que `package.json`) et copiez-y le contenu du fichier `.env` de votre PC principal.
+   > *Note : Ce fichier contient vos clés de sécurité Supabase et n'est jamais envoyé sur GitHub pour des raisons de sécurité.*
+
+5. Lancez l'application :
+   ```bash
+   npm run dev
+   ```

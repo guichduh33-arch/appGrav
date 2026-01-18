@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
-import { Search, PauseCircle, CheckCircle, AlertCircle } from 'lucide-react'
-import { useAuthStore } from '../../stores/authStore'
-import { useCartStore } from '../../stores/cartStore'
+
+import { Search, PauseCircle, CheckCircle, AlertCircle, Clock, Users, Lock } from 'lucide-react'
+
+import { useCartStore, CartItem } from '../../stores/cartStore'
 import { useOrderStore } from '../../stores/orderStore'
 import { useProducts, useCategories } from '../../hooks/useProducts'
+import { useShift, ShiftUser } from '../../hooks/useShift'
 import CategoryNav from '../../components/pos/CategoryNav'
 import ProductGrid from '../../components/pos/ProductGrid'
 import Cart from '../../components/pos/Cart'
@@ -14,21 +15,45 @@ import ModifierModal from '../../components/pos/ModifierModal'
 import PaymentModal from '../../components/pos/PaymentModal'
 import VariantModal from '../../components/pos/VariantModal'
 import HeldOrdersModal from '../../components/pos/HeldOrdersModal'
+import OpenShiftModal from '../../components/pos/OpenShiftModal'
+import CloseShiftModal from '../../components/pos/CloseShiftModal'
+import ShiftReconciliationModal from '../../components/pos/ShiftReconciliationModal'
+import PinVerificationModal from '../../components/pos/PinVerificationModal'
+import TransactionHistoryModal from '../../components/pos/TransactionHistoryModal'
 import type { Product } from '../../types/database'
 import './POSMainPage.css'
 
 export default function POSMainPage() {
     const { t } = useTranslation()
-    const navigate = useNavigate()
-    const { user } = useAuthStore()
+
     const {
         items, itemCount, clearCart,
-        activeOrderId, activeOrderNumber, restoreCartState, lockedItemIds
+        activeOrderId, activeOrderNumber, restoreCartState, lockedItemIds,
+        subtotal, discountAmount, total, orderType, tableNumber, customerId, customerName
     } = useCartStore()
     const { holdOrder, restoreHeldOrder } = useOrderStore()
 
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
     const [searchQuery, setSearchQuery] = useState('')
+
+    // Shift management
+    const {
+        hasOpenShift,
+        currentSession,
+        terminalSessions,
+        sessionStats: shiftStats,
+        openShift,
+        closeShift,
+        switchToShift,
+        reconciliationData,
+        clearReconciliation,
+        isOpeningShift,
+        isClosingShift,
+        activeShiftUserId
+    } = useShift()
+
+    // Verified user for shift operations
+    const [verifiedUser, setVerifiedUser] = useState<ShiftUser | null>(null)
 
     // Modal states
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
@@ -39,6 +64,12 @@ export default function POSMainPage() {
     const [showVariantModal, setShowVariantModal] = useState(false)
     const [showHeldOrdersModal, setShowHeldOrdersModal] = useState(false)
     const [showMenu, setShowMenu] = useState(false)
+    const [showOpenShiftModal, setShowOpenShiftModal] = useState(false)
+    const [showCloseShiftModal, setShowCloseShiftModal] = useState(false)
+    const [showPinModal, setShowPinModal] = useState(false)
+    const [pinModalAction, setPinModalAction] = useState<'open' | 'close'>('open')
+    const [showShiftSelector, setShowShiftSelector] = useState(false)
+    const [showTransactionHistory, setShowTransactionHistory] = useState(false)
 
     // Toast state
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
@@ -47,12 +78,6 @@ export default function POSMainPage() {
     const { data: categories = [], isLoading: categoriesLoading } = useCategories()
     const { data: products = [], isLoading: productsLoading } = useProducts(selectedCategory)
 
-    // Update time every minute
-    useEffect(() => {
-        const timer = setInterval(() => setCurrentTime(new Date()), 60000)
-        return () => clearInterval(timer)
-    }, [])
-
     // Filter products by search
     const filteredProducts = products.filter(product =>
         searchQuery === '' ||
@@ -60,8 +85,12 @@ export default function POSMainPage() {
         product.sku.toLowerCase().includes(searchQuery.toLowerCase())
     )
 
-    // Handle product click
+    // Handle product click - block if no shift open
     const handleProductClick = (product: Product, variants?: Product[]) => {
+        if (!hasOpenShift) {
+            showToast(t('shift.must_open_shift', 'Vous devez ouvrir un shift pour ajouter des produits'), 'error')
+            return
+        }
         setEditItem(undefined) // Reset edit item when adding new
         setSelectedProduct(product)
         if (variants && variants.length > 1) {
@@ -99,6 +128,10 @@ export default function POSMainPage() {
 
     // Handle send to kitchen - creates or updates a held order and clears the cart
     const handleSendToKitchen = () => {
+        if (!hasOpenShift) {
+            showToast(t('shift.must_open_shift', 'Vous devez ouvrir un shift'), 'error')
+            return
+        }
         if (itemCount === 0) {
             showToast(t('pos.toasts.no_items_send'), 'error')
             return
@@ -135,6 +168,10 @@ export default function POSMainPage() {
 
     // Handle hold order
     const handleHoldOrder = () => {
+        if (!hasOpenShift) {
+            showToast(t('shift.must_open_shift', 'Vous devez ouvrir un shift'), 'error')
+            return
+        }
         if (itemCount > 0) {
             const heldOrder = holdOrder(
                 items,
@@ -173,15 +210,88 @@ export default function POSMainPage() {
         }
     }
 
-    // Handle checkout
+    // Handle checkout - block if no shift open
     const handleCheckout = () => {
+        if (!hasOpenShift) {
+            showToast(t('shift.must_open_shift', 'Vous devez ouvrir un shift pour effectuer une transaction'), 'error')
+            return
+        }
         if (itemCount > 0) {
             setShowPaymentModal(true)
         }
     }
 
+    // Handle open shift request - show PIN verification first
+    const handleOpenShiftRequest = () => {
+        setPinModalAction('open')
+        setShowPinModal(true)
+    }
+
+    // Handle close shift request - show PIN verification first
+    const handleCloseShiftRequest = () => {
+        setPinModalAction('close')
+        setShowPinModal(true)
+    }
+
+    // Handle PIN verification result
+    const handlePinVerified = (verified: boolean, user?: { id: string; name: string; role: string }) => {
+        if (verified && user) {
+            setShowPinModal(false) // Close PIN modal first
+            setVerifiedUser(user)
+            if (pinModalAction === 'open') {
+                setShowOpenShiftModal(true)
+            } else {
+                setShowCloseShiftModal(true)
+            }
+        }
+    }
+
+    // Handle open shift with verified user
+    const handleOpenShift = async (openingCash: number, _terminalId?: string, notes?: string) => {
+        if (!verifiedUser) return
+        try {
+            await openShift(openingCash, verifiedUser.id, verifiedUser.name, notes)
+            setShowOpenShiftModal(false)
+            setVerifiedUser(null)
+        } catch (error) {
+            console.error('Error opening shift:', error)
+        }
+    }
+
+    // Handle close shift with verified user
+    const handleCloseShift = async (actualCash: number, actualQris: number, actualEdc: number, notes?: string) => {
+        if (!verifiedUser) return
+        try {
+            await closeShift(actualCash, actualQris, actualEdc, verifiedUser.id, notes)
+            setShowCloseShiftModal(false)
+            setVerifiedUser(null)
+        } catch (error) {
+            console.error('Error closing shift:', error)
+        }
+    }
+
+    // Handle shift switch
+    const handleSwitchShift = (userId: string) => {
+        switchToShift(userId)
+        setShowShiftSelector(false)
+    }
+
     return (
         <div className="pos-app">
+            {/* Multi-Shift Indicator */}
+            {terminalSessions.length > 1 && (
+                <div className="pos-multi-shift-bar">
+                    <Users size={16} />
+                    <span>{terminalSessions.length} shifts actifs sur ce terminal</span>
+                    <button
+                        className="pos-multi-shift-bar__btn"
+                        onClick={() => setShowShiftSelector(true)}
+                    >
+                        Changer de caisse
+                    </button>
+                </div>
+            )}
+
             {/* Main Content (3 Zones) */}
             <main className="pos-main">
                 {/* Zone 1: Categories Sidebar */}
@@ -194,7 +304,7 @@ export default function POSMainPage() {
                 />
 
                 {/* Zone 2: Products Grid */}
-                <section className="pos-products">
+                <section className={`pos-products ${!hasOpenShift ? 'pos-products--disabled' : ''}`}>
                     <div className="pos-products__header">
                         <h2 className="pos-products__title">
                             {selectedCategory
@@ -209,6 +319,7 @@ export default function POSMainPage() {
                                 placeholder={t('pos.products.search_placeholder')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
+                                disabled={!hasOpenShift}
                             />
                         </div>
                     </div>
@@ -220,6 +331,14 @@ export default function POSMainPage() {
                             isLoading={productsLoading}
                         />
                     </div>
+
+                    {/* Overlay when no shift */}
+                    {!hasOpenShift && (
+                        <div className="pos-products__overlay">
+                            <Lock size={48} />
+                            <p>{t('shift.products_locked', 'Ouvrez un shift pour accéder aux produits')}</p>
+                        </div>
+                    )}
                 </section>
 
                 {/* Zone 3: Cart Sidebar with integrated Menu Button */}
@@ -236,6 +355,10 @@ export default function POSMainPage() {
                 isOpen={showMenu}
                 onClose={() => setShowMenu(false)}
                 onShowHeldOrders={() => setShowHeldOrdersModal(true)}
+                onShowTransactionHistory={() => setShowTransactionHistory(true)}
+                hasOpenShift={hasOpenShift}
+                onOpenShift={handleOpenShiftRequest}
+                onCloseShift={handleCloseShiftRequest}
             />
 
             {/* Toast Notifications */}
@@ -281,7 +404,126 @@ export default function POSMainPage() {
                     onRestore={handleRestoreHeldOrder}
                 />
             )}
+
+            {/* PIN Verification Modal */}
+            {showPinModal && (
+                <PinVerificationModal
+                    title={pinModalAction === 'open'
+                        ? t('shift.pin_open_title', 'Ouvrir un Shift')
+                        : t('shift.pin_close_title', 'Fermer le Shift')
+                    }
+                    message={pinModalAction === 'open'
+                        ? t('shift.pin_open_message', 'Entrez votre code PIN pour ouvrir votre shift')
+                        : t('shift.pin_close_message', 'Entrez votre code PIN pour fermer le shift')
+                    }
+                    allowedRoles={['cashier', 'manager', 'admin', 'barista']}
+                    onVerify={handlePinVerified}
+                    onClose={() => {
+                        setShowPinModal(false)
+                        setVerifiedUser(null)
+                    }}
+                />
+            )}
+
+            {/* Shift Modals */}
+            {showOpenShiftModal && verifiedUser && (
+                <OpenShiftModal
+                    onOpen={handleOpenShift}
+                    onClose={() => {
+                        setShowOpenShiftModal(false)
+                        setVerifiedUser(null)
+                    }}
+                    isLoading={isOpeningShift}
+                />
+            )}
+
+            {showCloseShiftModal && currentSession && verifiedUser && (
+                <CloseShiftModal
+                    sessionStats={shiftStats}
+                    openingCash={currentSession.opening_cash}
+                    onClose={() => {
+                        setShowCloseShiftModal(false)
+                        setVerifiedUser(null)
+                    }}
+                    onConfirm={handleCloseShift}
+                    isLoading={isClosingShift}
+                />
+            )}
+
+            {reconciliationData && (
+                <ShiftReconciliationModal
+                    reconciliation={reconciliationData}
+                    totalSales={shiftStats.totalSales}
+                    transactionCount={shiftStats.transactionCount}
+                    onClose={clearReconciliation}
+                />
+            )}
+
+            {/* Transaction History Modal */}
+            {showTransactionHistory && currentSession && (
+                <TransactionHistoryModal
+                    sessionId={currentSession.id}
+                    sessionOpenedAt={currentSession.opened_at}
+                    onClose={() => setShowTransactionHistory(false)}
+                />
+            )}
+
+            {/* Shift Selector Modal */}
+            {showShiftSelector && (
+                <div className="shift-selector-overlay" onClick={() => setShowShiftSelector(false)}>
+                    <div className="shift-selector" onClick={e => e.stopPropagation()}>
+                        <h3 className="shift-selector__title">
+                            <Users size={20} />
+                            Sélectionner une caisse
+                        </h3>
+                        <div className="shift-selector__list">
+                            {terminalSessions.map(session => (
+                                <button
+                                    key={session.id}
+                                    className={`shift-selector__item ${session.user_id === activeShiftUserId ? 'is-active' : ''}`}
+                                    onClick={() => handleSwitchShift(session.user_id)}
+                                >
+                                    <div className="shift-selector__user">
+                                        <span className="shift-selector__name">
+                                            {session.user_name || `Caissier ${session.session_number}`}
+                                        </span>
+                                        <span className="shift-selector__session">
+                                            #{session.session_number}
+                                        </span>
+                                    </div>
+                                    {session.user_id === activeShiftUserId && (
+                                        <CheckCircle size={18} className="shift-selector__check" />
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                        <button
+                            className="shift-selector__add"
+                            onClick={() => {
+                                setShowShiftSelector(false)
+                                handleOpenShiftRequest()
+                            }}
+                        >
+                            <Clock size={18} />
+                            Ouvrir un nouveau shift
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Shift Required Banner */}
+            {!hasOpenShift && (
+                <div className="pos-shift-banner">
+                    <Clock size={20} />
+                    <span>{t('shift.no_shift_open', 'Aucun shift ouvert. Identifiez-vous pour commencer.')}</span>
+                    <button
+                        className="pos-shift-banner__btn"
+                        onClick={handleOpenShiftRequest}
+                    >
+                        {t('shift.open_title', 'Ouvrir un Shift')}
+                    </button>
+                </div>
+            )}
         </div>
     )
 }
-

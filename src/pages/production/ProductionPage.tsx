@@ -1,272 +1,703 @@
-import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Search, Plus, Minus, Trash2, Save, Factory, TrendingUp, Calendar, AlertCircle } from 'lucide-react';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Badge } from '../../components/ui/Badge';
-
-// Mock products for production
-const AVAILABLE_PRODUCTS = [
-    { id: 1, name: 'Croissant', category: 'Viennoiseries', icon: '🥐' },
-    { id: 2, name: 'Pain au Chocolat', category: 'Viennoiseries', icon: '🍫' },
-    { id: 3, name: 'Baguette Tradition', category: 'Pains', icon: '🥖' },
-    { id: 4, name: 'Pain de Campagne', category: 'Pains', icon: '🍞' },
-    { id: 5, name: 'Tarte aux Fruits', category: 'Pâtisseries', icon: '🥧' },
-    { id: 6, name: 'Éclair Chocolat', category: 'Pâtisseries', icon: '🍫' },
-    { id: 7, name: 'Bagel Nature', category: 'Bagels', icon: '🥯' },
-];
+import { useState, useEffect } from 'react'
+import {
+    Factory, Calendar, ChevronLeft, ChevronRight, Search, Plus, Minus,
+    Trash2, Save, Clock, Package, AlertTriangle, Lock, Edit3, Eye, Layers
+} from 'lucide-react'
+import { supabase } from '../../lib/supabase'
+import { useAuthStore } from '../../stores/authStore'
+import { Product, Section, ProductionRecord } from '../../types/database'
+import toast from 'react-hot-toast'
 
 interface ProductionItem {
-    productId: number;
-    name: string;
-    category: string;
-    icon: string;
-    quantity: number;
-    wasted: number;
-    wasteReason: string;
+    productId: string
+    name: string
+    category: string
+    icon: string
+    unit: string
+    quantity: number
+    wasted: number
+    wasteReason: string
+}
+
+interface ProductUOM {
+    id: string
+    unit_name: string
+    conversion_factor: number
+    is_consumption_unit: boolean
+}
+
+interface ProductWithSection extends Product {
+    category?: { name: string; icon: string }
+    product_uoms?: ProductUOM[]
 }
 
 const ProductionPage = () => {
-    const [selectedDate, setSelectedDate] = useState(new Date());
-    const [searchQuery, setSearchQuery] = useState('');
-    const [productionItems, setProductionItems] = useState<ProductionItem[]>([
-        { productId: 1, name: 'Croissant', category: 'Viennoiseries', icon: '🥐', quantity: 24, wasted: 0, wasteReason: '' },
-        { productId: 2, name: 'Pain au Chocolat', category: 'Viennoiseries', icon: '🍫', quantity: 18, wasted: 2, wasteReason: 'Trop cuit' },
-        { productId: 3, name: 'Baguette Tradition', category: 'Pains', icon: '🥖', quantity: 12, wasted: 0, wasteReason: '' },
-    ]);
+    const { user } = useAuthStore()
+    const isAdmin = user?.role === 'admin' || user?.role === 'manager'
+
+    // State
+    const [selectedDate, setSelectedDate] = useState(new Date())
+    const [sections, setSections] = useState<Section[]>([])
+    const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null)
+    const [sectionProducts, setSectionProducts] = useState<ProductWithSection[]>([])
+    const [productionItems, setProductionItems] = useState<ProductionItem[]>([])
+    const [todayHistory, setTodayHistory] = useState<(ProductionRecord & { product?: Product })[]>([])
+    const [searchQuery, setSearchQuery] = useState('')
+    const [isLoading, setIsLoading] = useState(true)
+    const [isSaving, setIsSaving] = useState(false)
+    const [editingRecordId, setEditingRecordId] = useState<string | null>(null)
+
+    // Fetch sections on mount
+    useEffect(() => {
+        fetchSections()
+    }, [])
+
+    // Fetch products when section changes
+    useEffect(() => {
+        if (selectedSectionId) {
+            fetchSectionProducts()
+            fetchTodayHistory()
+        }
+    }, [selectedSectionId, selectedDate])
+
+    const fetchSections = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('sections')
+                .select('*')
+                .eq('is_production_point', true)
+                .order('name')
+
+            if (error) throw error
+            setSections(data || [])
+
+            // Auto-select first section
+            if (data && data.length > 0 && !selectedSectionId) {
+                setSelectedSectionId(data[0].id)
+            }
+        } catch (error) {
+            console.error('Error fetching sections:', error)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const fetchSectionProducts = async () => {
+        if (!selectedSectionId) return
+
+        try {
+            // Get products linked to this section via product_sections
+            const { data, error } = await supabase
+                .from('product_sections')
+                .select(`
+                    product:products(
+                        *,
+                        category:categories(name, icon),
+                        product_uoms(id, unit_name, conversion_factor, is_consumption_unit)
+                    )
+                `)
+                .eq('section_id', selectedSectionId)
+
+            if (error) throw error
+
+            const products = data
+                ?.map((ps: any) => ps.product)
+                .filter(Boolean)
+                .filter((p: any) => p.product_type === 'finished' || p.product_type === 'semi_finished')
+
+            setSectionProducts(products || [])
+        } catch (error) {
+            console.error('Error fetching section products:', error)
+        }
+    }
+
+    const fetchTodayHistory = async () => {
+        if (!selectedSectionId) return
+
+        try {
+            const dateStr = selectedDate.toISOString().split('T')[0]
+
+            const { data, error } = await supabase
+                .from('production_records')
+                .select(`
+                    *,
+                    product:products(
+                        name,
+                        sku,
+                        unit,
+                        product_uoms(id, unit_name, is_consumption_unit)
+                    )
+                `)
+                .eq('section_id', selectedSectionId)
+                .eq('production_date', dateStr)
+                .order('created_at', { ascending: false })
+
+            if (error) throw error
+            setTodayHistory(data || [])
+        } catch (error) {
+            console.error('Error fetching history:', error)
+        }
+    }
 
     const formatDate = (date: Date) => {
-        return date.toLocaleDateString('fr-FR', {
+        return date.toLocaleDateString('en-US', {
             weekday: 'long',
             day: 'numeric',
             month: 'long',
             year: 'numeric'
-        });
-    };
+        })
+    }
 
     const navigateDate = (direction: number) => {
-        const newDate = new Date(selectedDate);
-        newDate.setDate(newDate.getDate() + direction);
-        setSelectedDate(newDate);
-    };
+        const newDate = new Date(selectedDate)
+        newDate.setDate(newDate.getDate() + direction)
+        setSelectedDate(newDate)
+    }
 
-    const addProduct = (product: typeof AVAILABLE_PRODUCTS[0]) => {
-        const existing = productionItems.find(item => item.productId === product.id);
-        if (existing) {
-            updateValues(product.id, 'quantity', 1);
-        } else {
-            setProductionItems([...productionItems, {
-                productId: product.id,
-                name: product.name,
-                category: product.category,
-                icon: product.icon,
-                quantity: 1,
-                wasted: 0,
-                wasteReason: ''
-            }]);
-        }
-        setSearchQuery('');
-    };
+    const isToday = selectedDate.toDateString() === new Date().toDateString()
 
-    const updateValues = (productId: number, field: 'quantity' | 'wasted', delta: number) => {
+    // Filter products by search
+    const filteredProducts = sectionProducts.filter(p =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !productionItems.find(item => item.productId === p.id)
+    )
+
+    // Get the appropriate unit for production (consumption unit if available)
+    const getProductionUnit = (product: ProductWithSection): string => {
+        const consumptionUom = product.product_uoms?.find(u => u.is_consumption_unit)
+        return consumptionUom?.unit_name || product.unit || 'pcs'
+    }
+
+    // Get unit from history record
+    const getRecordUnit = (record: any): string => {
+        const product = record.product
+        if (!product) return 'pcs'
+        const consumptionUom = product.product_uoms?.find((u: any) => u.is_consumption_unit)
+        return consumptionUom?.unit_name || product.unit || 'pcs'
+    }
+
+    const addProduct = (product: ProductWithSection) => {
+        setProductionItems([...productionItems, {
+            productId: product.id,
+            name: product.name,
+            category: product.category?.name || 'General',
+            icon: product.category?.icon || '📦',
+            unit: getProductionUnit(product),
+            quantity: 1,
+            wasted: 0,
+            wasteReason: ''
+        }])
+        setSearchQuery('')
+    }
+
+    const updateQuantity = (productId: string, field: 'quantity' | 'wasted', delta: number) => {
         setProductionItems(items =>
             items.map(item =>
                 item.productId === productId
                     ? { ...item, [field]: Math.max(0, item[field] + delta) }
                     : item
             )
-        );
-    };
+        )
+    }
 
-    const updateReason = (productId: number, reason: string) => {
+    const updateReason = (productId: string, reason: string) => {
         setProductionItems(items =>
             items.map(item =>
                 item.productId === productId
                     ? { ...item, wasteReason: reason }
                     : item
             )
-        );
-    };
-
-    const removeItem = (productId: number) => {
-        setProductionItems(items => items.filter(item => item.productId !== productId));
-    };
-
-    const filteredProducts = searchQuery
-        ? AVAILABLE_PRODUCTS.filter(p =>
-            p.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-            !productionItems.find(item => item.productId === p.id)
         )
-        : [];
+    }
 
-    const totalItems = productionItems.reduce((sum, item) => sum + item.quantity, 0);
-    const totalWaste = productionItems.reduce((sum, item) => sum + item.wasted, 0);
+    const removeItem = (productId: string) => {
+        setProductionItems(items => items.filter(item => item.productId !== productId))
+    }
 
-    // Mock history data
-    const todayHistory = [
-        { product: 'Croissant', qty: '+24', time: '06:30' },
-        { product: 'Pain au Chocolat', qty: '+18', time: '06:35' },
-        { product: 'Baguette', qty: '+12', time: '07:00' },
-    ];
+    const handleSave = async () => {
+        if (productionItems.length === 0 || !selectedSectionId) return
+        setIsSaving(true)
+
+        try {
+            const dateStr = selectedDate.toISOString().split('T')[0]
+
+            for (const item of productionItems) {
+                // 1. Insert production record
+                const { data: prodRecord, error: prodError } = await supabase
+                    .from('production_records')
+                    .insert({
+                        product_id: item.productId,
+                        section_id: selectedSectionId,
+                        quantity_produced: item.quantity,
+                        quantity_waste: item.wasted,
+                        production_date: dateStr,
+                        created_by: user?.id,
+                        notes: item.wasteReason ? `Waste: ${item.wasteReason}` : null,
+                        stock_updated: true
+                    })
+                    .select()
+                    .single()
+
+                if (prodError) throw prodError
+
+                // 2. Get current stock of produced item
+                const { data: productData } = await supabase
+                    .from('products')
+                    .select('current_stock')
+                    .eq('id', item.productId)
+                    .single()
+
+                const currentStock = productData?.current_stock || 0
+                const netChange = item.quantity - item.wasted
+
+                // 3. Create stock movement for production_in (positive)
+                if (item.quantity > 0) {
+                    const { error: stockError } = await supabase
+                        .from('stock_movements')
+                        .insert({
+                            product_id: item.productId,
+                            movement_type: 'production_in',
+                            quantity: item.quantity,
+                            reason: `Production ${selectedSection?.name || ''} - ${dateStr}`,
+                            reference_id: prodRecord.id,
+                            staff_id: user?.id
+                        })
+
+                    if (stockError) throw stockError
+                }
+
+                // 4. Create stock movement for waste (negative)
+                if (item.wasted > 0) {
+                    const { error: wasteError } = await supabase
+                        .from('stock_movements')
+                        .insert({
+                            product_id: item.productId,
+                            movement_type: 'waste',
+                            quantity: -item.wasted,
+                            reason: item.wasteReason || `Production waste ${dateStr}`,
+                            reference_id: prodRecord.id,
+                            staff_id: user?.id
+                        })
+
+                    if (wasteError) throw wasteError
+                }
+
+                // 5. Update product current_stock
+                const { error: updateError } = await supabase
+                    .from('products')
+                    .update({ current_stock: currentStock + netChange })
+                    .eq('id', item.productId)
+
+                if (updateError) throw updateError
+
+                // 6. Deduct recipe ingredients from stock
+                const { data: recipeItems } = await supabase
+                    .from('recipes')
+                    .select(`
+                        id,
+                        material_id,
+                        quantity,
+                        unit,
+                        material:products!material_id(id, name, current_stock, cost_price, unit)
+                    `)
+                    .eq('product_id', item.productId)
+                    .eq('is_active', true)
+
+                if (recipeItems && recipeItems.length > 0) {
+                    for (const recipe of recipeItems) {
+                        const material = recipe.material as any
+                        if (!material) continue
+
+                        // Calculate quantity to deduct (recipe qty per unit × production qty)
+                        const qtyToDeduct = recipe.quantity * item.quantity
+                        const materialCurrentStock = material.current_stock || 0
+
+                        // Create stock movement for production_out (negative)
+                        await supabase
+                            .from('stock_movements')
+                            .insert({
+                                product_id: recipe.material_id,
+                                movement_type: 'production_out',
+                                quantity: -qtyToDeduct,
+                                reason: `Used for: ${item.name} (×${item.quantity}) - ${dateStr}`,
+                                reference_id: prodRecord.id,
+                                staff_id: user?.id
+                            })
+
+                        // Update ingredient current_stock
+                        await supabase
+                            .from('products')
+                            .update({ current_stock: materialCurrentStock - qtyToDeduct })
+                            .eq('id', recipe.material_id)
+                    }
+                }
+            }
+
+            toast.success('Production saved')
+            setProductionItems([])
+            fetchTodayHistory()
+        } catch (error: any) {
+            console.error('Error saving:', error)
+            toast.error('Error: ' + error.message)
+        } finally {
+            setIsSaving(false)
+        }
+    }
+
+    const handleDeleteRecord = async (recordId: string) => {
+        if (!isAdmin) return
+        if (!confirm('Delete this entry and its stock movements?')) return
+
+        try {
+            // 1. Get the production record to know quantities
+            const { data: record } = await supabase
+                .from('production_records')
+                .select('product_id, quantity_produced, quantity_waste')
+                .eq('id', recordId)
+                .single()
+
+            if (record) {
+                // 2. Get current stock
+                const { data: productData } = await supabase
+                    .from('products')
+                    .select('current_stock')
+                    .eq('id', record.product_id)
+                    .single()
+
+                const currentStock = productData?.current_stock || 0
+                const netChange = record.quantity_produced - (record.quantity_waste || 0)
+
+                // 3. Reverse the stock change
+                await supabase
+                    .from('products')
+                    .update({ current_stock: currentStock - netChange })
+                    .eq('id', record.product_id)
+            }
+
+            // 4. Delete associated stock movements
+            await supabase
+                .from('stock_movements')
+                .delete()
+                .eq('reference_id', recordId)
+
+            // 5. Delete production record
+            const { error } = await supabase
+                .from('production_records')
+                .delete()
+                .eq('id', recordId)
+
+            if (error) throw error
+            toast.success('Entry and movements deleted')
+            fetchTodayHistory()
+        } catch (error: any) {
+            toast.error('Error: ' + error.message)
+        }
+    }
+
+    const selectedSection = sections.find(s => s.id === selectedSectionId)
+    const totalProduced = todayHistory.reduce((sum, r) => sum + r.quantity_produced, 0)
+    const totalWaste = todayHistory.reduce((sum, r) => sum + (r.quantity_waste || 0), 0)
 
     return (
-        <div className="p-8 max-w-[1600px] mx-auto space-y-8 min-h-screen">
-            {/* Header with Date Navigation */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight flex items-center gap-3">
-                        <Factory className="text-blue-600" size={32} />
-                        Production
-                    </h1>
-                    <p className="text-gray-500 mt-1">Planifiez et enregistrez la production du jour.</p>
-                </div>
-
-                <div className="flex items-center gap-4 bg-white p-1.5 rounded-xl border border-gray-200 shadow-sm">
-                    <Button variant="ghost" size="sm" onClick={() => navigateDate(-1)}>
-                        <ChevronLeft size={20} />
-                    </Button>
-                    <div className="flex items-center gap-2 px-4 min-w-[240px] justify-center font-medium text-gray-700">
-                        <Calendar size={18} className="text-gray-400" />
-                        <span className="capitalize">{formatDate(selectedDate)}</span>
+        <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+            {/* Header */}
+            <div style={{ marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+                    <div style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '12px',
+                        background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}>
+                        <Factory size={24} color="white" />
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => navigateDate(1)}>
-                        <ChevronRight size={20} />
-                    </Button>
+                    <div>
+                        <h1 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 700, color: '#4A3728' }}>
+                            Production
+                        </h1>
+                        <p style={{ margin: 0, color: '#8B7355', fontSize: '0.875rem' }}>
+                            Production entry by section
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Main Content - Product Entry */}
-                <div className="lg:col-span-8 space-y-6">
-                    <Card className="p-6">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-lg font-semibold text-gray-900">Saisie de production</h2>
-                            <div className="relative w-72">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                <input
-                                    type="text"
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
-                                    placeholder="Rechercher un produit..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                                {/* Search Results Dropdown */}
-                                {filteredProducts.length > 0 && (
-                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden">
-                                        {filteredProducts.map(product => (
-                                            <button
-                                                key={product.id}
-                                                className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 text-left transition-colors"
-                                                onClick={() => addProduct(product)}
-                                            >
-                                                <span className="text-2xl">{product.icon}</span>
-                                                <div>
-                                                    <div className="font-medium text-gray-900">{product.name}</div>
-                                                    <div className="text-xs text-gray-500">{product.category}</div>
-                                                </div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+            {/* Section & Date Selectors */}
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '1rem',
+                marginBottom: '1.5rem'
+            }}>
+                {/* Section Selector */}
+                <div style={{
+                    background: 'white',
+                    borderRadius: '1rem',
+                    padding: '1.25rem',
+                    border: '1px solid #E5E7EB',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                        <Layers size={18} style={{ color: '#F59E0B' }} />
+                        <span style={{ fontWeight: 600, color: '#4A3728', fontSize: '0.875rem' }}>Section</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {sections.map(section => (
+                            <button
+                                key={section.id}
+                                onClick={() => setSelectedSectionId(section.id)}
+                                style={{
+                                    padding: '0.625rem 1rem',
+                                    borderRadius: '0.5rem',
+                                    border: selectedSectionId === section.id ? '2px solid #F59E0B' : '1px solid #E5E7EB',
+                                    background: selectedSectionId === section.id ? '#FFFBEB' : 'white',
+                                    color: selectedSectionId === section.id ? '#B45309' : '#6B7280',
+                                    fontWeight: selectedSectionId === section.id ? 600 : 500,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.15s ease'
+                                }}
+                            >
+                                {section.name}
+                            </button>
+                        ))}
+                        {sections.length === 0 && (
+                            <p style={{ color: '#9CA3AF', fontSize: '0.875rem', fontStyle: 'italic' }}>
+                                No production section configured
+                            </p>
+                        )}
+                    </div>
+                </div>
+
+                {/* Date Selector */}
+                <div style={{
+                    background: 'white',
+                    borderRadius: '1rem',
+                    padding: '1.25rem',
+                    border: '1px solid #E5E7EB',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                        <Calendar size={18} style={{ color: '#3B82F6' }} />
+                        <span style={{ fontWeight: 600, color: '#4A3728', fontSize: '0.875rem' }}>Date</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <button
+                            onClick={() => navigateDate(-1)}
+                            style={{
+                                padding: '0.5rem',
+                                borderRadius: '0.5rem',
+                                border: '1px solid #E5E7EB',
+                                background: 'white',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            <ChevronLeft size={20} />
+                        </button>
+                        <div style={{
+                            flex: 1,
+                            textAlign: 'center',
+                            padding: '0.625rem 1rem',
+                            background: isToday ? '#DBEAFE' : '#F3F4F6',
+                            borderRadius: '0.5rem',
+                            fontWeight: 600,
+                            color: isToday ? '#1D4ED8' : '#4B5563',
+                            textTransform: 'capitalize'
+                        }}>
+                            {isToday ? "Today" : formatDate(selectedDate)}
+                        </div>
+                        <button
+                            onClick={() => navigateDate(1)}
+                            style={{
+                                padding: '0.5rem',
+                                borderRadius: '0.5rem',
+                                border: '1px solid #E5E7EB',
+                                background: 'white',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            <ChevronRight size={20} />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Content */}
+            {!selectedSectionId ? (
+                <div style={{
+                    textAlign: 'center',
+                    padding: '4rem',
+                    background: '#F9FAFB',
+                    borderRadius: '1rem',
+                    border: '2px dashed #E5E7EB'
+                }}>
+                    <Layers size={48} style={{ color: '#D1D5DB', margin: '0 auto 1rem' }} />
+                    <h3 style={{ margin: 0, color: '#4B5563' }}>Select a section</h3>
+                    <p style={{ color: '#9CA3AF', marginTop: '0.5rem' }}>
+                        Choose a production section to get started
+                    </p>
+                </div>
+            ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem' }}>
+                    {/* Left - Production Entry */}
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '1rem',
+                        padding: '1.5rem',
+                        border: '1px solid #E5E7EB'
+                    }}>
+                        <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.125rem', fontWeight: 600, color: '#4A3728' }}>
+                            Production Entry - {selectedSection?.name}
+                        </h2>
+
+                        {/* Product Search */}
+                        <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
+                            <Search size={20} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+                            <input
+                                type="text"
+                                placeholder="Search for a product..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.875rem 1rem 0.875rem 3rem',
+                                    border: '2px solid #E5E7EB',
+                                    borderRadius: '0.75rem',
+                                    fontSize: '1rem'
+                                }}
+                            />
+
+                            {/* Search Results */}
+                            {searchQuery && filteredProducts.length > 0 && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    left: 0,
+                                    right: 0,
+                                    background: 'white',
+                                    border: '1px solid #E5E7EB',
+                                    borderRadius: '0.75rem',
+                                    marginTop: '0.5rem',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                    zIndex: 10,
+                                    maxHeight: '300px',
+                                    overflow: 'auto'
+                                }}>
+                                    {filteredProducts.map(product => (
+                                        <button
+                                            key={product.id}
+                                            onClick={() => addProduct(product)}
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.75rem 1rem',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.75rem',
+                                                border: 'none',
+                                                background: 'transparent',
+                                                cursor: 'pointer',
+                                                textAlign: 'left',
+                                                borderBottom: '1px solid #F3F4F6'
+                                            }}
+                                        >
+                                            <span style={{ fontSize: '1.25rem' }}>{product.category?.icon || '📦'}</span>
+                                            <div>
+                                                <div style={{ fontWeight: 600, color: '#1F2937' }}>{product.name}</div>
+                                                <div style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>{product.category?.name}</div>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
+                            {searchQuery && filteredProducts.length === 0 && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    left: 0,
+                                    right: 0,
+                                    background: 'white',
+                                    border: '1px solid #E5E7EB',
+                                    borderRadius: '0.75rem',
+                                    marginTop: '0.5rem',
+                                    padding: '1rem',
+                                    textAlign: 'center',
+                                    color: '#9CA3AF',
+                                    zIndex: 10
+                                }}>
+                                    No product found in this section
+                                </div>
+                            )}
                         </div>
 
+                        {/* Production Items Table */}
                         {productionItems.length > 0 ? (
-                            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-                                <table className="w-full">
-                                    <thead className="bg-gray-50 border-b border-gray-200">
-                                        <tr>
-                                            <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-[35%]">Produit</th>
-                                            <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-[20%]">Production</th>
-                                            <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-[20%]">Pertes</th>
-                                            <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-[20%]">Raison</th>
-                                            <th className="w-[5%]"></th>
+                            <div style={{ borderRadius: '0.75rem', border: '1px solid #E5E7EB', overflow: 'hidden' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                    <thead>
+                                        <tr style={{ background: '#F9FAFB' }}>
+                                            <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#6B7280', textTransform: 'uppercase' }}>Product</th>
+                                            <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontSize: '0.75rem', fontWeight: 600, color: '#6B7280', textTransform: 'uppercase' }}>Quantity</th>
+                                            <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontSize: '0.75rem', fontWeight: 600, color: '#6B7280', textTransform: 'uppercase' }}>Waste</th>
+                                            <th style={{ padding: '0.75rem 1rem', textAlign: 'left', fontSize: '0.75rem', fontWeight: 600, color: '#6B7280', textTransform: 'uppercase' }}>Note</th>
+                                            <th style={{ width: '50px' }}></th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100">
+                                    <tbody>
                                         {productionItems.map(item => (
-                                            <tr key={item.productId} className="group hover:bg-gray-50/50 transition-colors">
-                                                {/* Product Info */}
-                                                <td className="py-4 px-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-lg text-lg">
-                                                            {item.icon}
-                                                        </div>
+                                            <tr key={item.productId} style={{ borderTop: '1px solid #F3F4F6' }}>
+                                                <td style={{ padding: '1rem' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                                        <span style={{ fontSize: '1.25rem' }}>{item.icon}</span>
                                                         <div>
-                                                            <div className="font-medium text-gray-900">{item.name}</div>
-                                                            <div className="text-xs text-gray-500">{item.category}</div>
+                                                            <div style={{ fontWeight: 600, color: '#1F2937' }}>{item.name}</div>
+                                                            <div style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>{item.category}</div>
                                                         </div>
                                                     </div>
                                                 </td>
-
-                                                {/* Production Quantity */}
-                                                <td className="py-4 px-4">
-                                                    <div className="flex items-center justify-center gap-2">
-                                                        <button
-                                                            aria-label="Decrease production quantity"
-                                                            onClick={() => updateValues(item.productId, 'quantity', -1)}
-                                                            className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                                                        >
+                                                <td style={{ padding: '1rem' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                                        <button onClick={() => updateQuantity(item.productId, 'quantity', -1)} style={{ padding: '0.25rem', border: 'none', background: '#F3F4F6', borderRadius: '0.25rem', cursor: 'pointer' }}>
                                                             <Minus size={16} />
                                                         </button>
-                                                        <div className="w-12 text-center font-bold text-gray-900 text-lg tabular-nums">
-                                                            {item.quantity}
+                                                        <div style={{ textAlign: 'center' }}>
+                                                            <span style={{ fontWeight: 700, fontSize: '1.125rem' }}>{item.quantity}</span>
+                                                            <span style={{ marginLeft: '0.25rem', fontSize: '0.75rem', color: '#6B7280', fontWeight: 500 }}>{item.unit}</span>
                                                         </div>
-                                                        <button
-                                                            aria-label="Increase production quantity"
-                                                            onClick={() => updateValues(item.productId, 'quantity', 1)}
-                                                            className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                                                        >
+                                                        <button onClick={() => updateQuantity(item.productId, 'quantity', 1)} style={{ padding: '0.25rem', border: 'none', background: '#F3F4F6', borderRadius: '0.25rem', cursor: 'pointer' }}>
                                                             <Plus size={16} />
                                                         </button>
                                                     </div>
                                                 </td>
-
-                                                {/* Waste Quantity */}
-                                                <td className="py-4 px-4">
-                                                    <div className="flex items-center justify-center gap-2">
-                                                        <button
-                                                            aria-label="Decrease waste quantity"
-                                                            onClick={() => updateValues(item.productId, 'wasted', -1)}
-                                                            className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                                                        >
+                                                <td style={{ padding: '1rem' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                                        <button onClick={() => updateQuantity(item.productId, 'wasted', -1)} style={{ padding: '0.25rem', border: 'none', background: '#FEE2E2', borderRadius: '0.25rem', cursor: 'pointer', color: '#DC2626' }}>
                                                             <Minus size={16} />
                                                         </button>
-                                                        <div className={`w-12 text-center font-bold text-lg tabular-nums ${item.wasted > 0 ? 'text-red-600' : 'text-gray-300'}`}>
-                                                            {item.wasted}
+                                                        <div style={{ textAlign: 'center' }}>
+                                                            <span style={{ fontWeight: 700, fontSize: '1.125rem', color: item.wasted > 0 ? '#DC2626' : '#D1D5DB' }}>{item.wasted}</span>
+                                                            {item.wasted > 0 && <span style={{ marginLeft: '0.25rem', fontSize: '0.75rem', color: '#DC2626', fontWeight: 500 }}>{item.unit}</span>}
                                                         </div>
-                                                        <button
-                                                            aria-label="Increase waste quantity"
-                                                            onClick={() => updateValues(item.productId, 'wasted', 1)}
-                                                            className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                                                        >
+                                                        <button onClick={() => updateQuantity(item.productId, 'wasted', 1)} style={{ padding: '0.25rem', border: 'none', background: '#FEE2E2', borderRadius: '0.25rem', cursor: 'pointer', color: '#DC2626' }}>
                                                             <Plus size={16} />
                                                         </button>
                                                     </div>
                                                 </td>
-
-                                                {/* Waste Reason */}
-                                                <td className="py-4 px-4">
-                                                    {item.wasted > 0 ? (
+                                                <td style={{ padding: '1rem' }}>
+                                                    {item.wasted > 0 && (
                                                         <input
                                                             type="text"
-                                                            placeholder="Note..."
+                                                            placeholder="Reason..."
                                                             value={item.wasteReason}
                                                             onChange={(e) => updateReason(item.productId, e.target.value)}
-                                                            className="w-full text-sm px-3 py-1.5 bg-white border border-red-200 rounded-md text-gray-700 placeholder-gray-400 focus:outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 transition-all"
-                                                            autoFocus
+                                                            style={{ width: '100%', padding: '0.5rem', border: '1px solid #FCA5A5', borderRadius: '0.375rem', fontSize: '0.875rem' }}
                                                         />
-                                                    ) : (
-                                                        <div className="h-8"></div>
                                                     )}
                                                 </td>
-
-                                                {/* Actions */}
-                                                <td className="py-4 px-4 text-right">
-                                                    <button
-                                                        onClick={() => removeItem(item.productId)}
-                                                        className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                                                        title="Supprimer"
-                                                    >
+                                                <td style={{ padding: '1rem' }}>
+                                                    <button onClick={() => removeItem(item.productId)} style={{ padding: '0.5rem', border: 'none', background: 'transparent', cursor: 'pointer', color: '#EF4444' }}>
                                                         <Trash2 size={18} />
                                                     </button>
                                                 </td>
@@ -276,82 +707,202 @@ const ProductionPage = () => {
                                 </table>
                             </div>
                         ) : (
-                            <div className="text-center py-20 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-200">
-                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
-                                    <Search size={32} />
-                                </div>
-                                <h3 className="text-lg font-medium text-gray-900">Aucun produit sélectionné</h3>
-                                <p className="text-gray-500 mt-1 max-w-sm mx-auto">
-                                    Utilisez la barre de recherche ci-dessus pour ajouter des produits à la liste de production.
+                            <div style={{
+                                textAlign: 'center',
+                                padding: '3rem',
+                                background: '#F9FAFB',
+                                borderRadius: '0.75rem',
+                                border: '2px dashed #E5E7EB'
+                            }}>
+                                <Package size={40} style={{ color: '#D1D5DB', margin: '0 auto 0.75rem' }} />
+                                <p style={{ color: '#6B7280', margin: 0 }}>No product added</p>
+                                <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                                    Search for a product to add to production
                                 </p>
                             </div>
                         )}
 
+                        {/* Save Button */}
                         {productionItems.length > 0 && (
-                            <div className="mt-8 flex justify-end gap-3 pt-6 border-t border-gray-100">
-                                <Button variant="ghost" className="text-gray-500">Annuler</Button>
-                                <Button className="pl-4 pr-6">
-                                    <Save size={18} className="mr-2" />
-                                    Enregistrer la production
-                                </Button>
+                            <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                                <button
+                                    onClick={() => setProductionItems([])}
+                                    disabled={isSaving}
+                                    style={{
+                                        padding: '0.75rem 1.5rem',
+                                        border: '1px solid #E5E7EB',
+                                        borderRadius: '0.5rem',
+                                        background: 'white',
+                                        fontWeight: 500,
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleSave}
+                                    disabled={isSaving}
+                                    style={{
+                                        padding: '0.75rem 1.5rem',
+                                        border: 'none',
+                                        borderRadius: '0.5rem',
+                                        background: 'linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%)',
+                                        color: 'white',
+                                        fontWeight: 600,
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        opacity: isSaving ? 0.7 : 1
+                                    }}
+                                >
+                                    <Save size={18} />
+                                    {isSaving ? 'Saving...' : 'Save'}
+                                </button>
                             </div>
                         )}
-                    </Card>
-                </div>
+                    </div>
 
-                {/* Sidebar - Summary & History */}
-                <div className="lg:col-span-4 space-y-6">
-                    <Card className="p-6">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                            <TrendingUp size={20} className="text-blue-600" />
-                            Résumé du Jour
-                        </h2>
-
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span className="text-gray-600 text-sm">Produits différents</span>
-                                <span className="font-bold text-gray-900">{productionItems.length}</span>
-                            </div>
-                            <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg border border-blue-100">
-                                <span className="text-blue-700 text-sm font-medium">Total produits</span>
-                                <span className="font-bold text-blue-700 text-xl">{totalItems}</span>
-                            </div>
-                            <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg border border-red-100">
-                                <span className="text-red-700 text-sm font-medium">Pertes déclarées</span>
-                                <span className="font-bold text-red-700 text-xl">{totalWaste}</span>
-                            </div>
-                        </div>
-                    </Card>
-
-                    <Card className="p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Historique récent</h3>
-                            <button className="text-xs text-blue-600 font-medium hover:underline">Voir tout</button>
-                        </div>
-
-                        <div className="space-y-4">
-                            {todayHistory.map((item, index) => (
-                                <div key={index} className="flex items-center justify-between group">
-                                    <div>
-                                        <div className="font-medium text-gray-900 text-sm">{item.product}</div>
-                                        <div className="text-xs text-gray-400">{item.time}</div>
-                                    </div>
-                                    <Badge variant="success" className="font-mono">{item.qty}</Badge>
+                    {/* Right - Summary & History */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {/* Summary Card */}
+                        <div style={{
+                            background: 'white',
+                            borderRadius: '1rem',
+                            padding: '1.25rem',
+                            border: '1px solid #E5E7EB'
+                        }}>
+                            <h3 style={{ margin: '0 0 1rem 0', fontSize: '0.875rem', fontWeight: 600, color: '#6B7280', textTransform: 'uppercase' }}>
+                                Daily Summary
+                            </h3>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                                <div style={{ padding: '1rem', background: '#ECFDF5', borderRadius: '0.75rem', textAlign: 'center' }}>
+                                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#059669' }}>{totalProduced}</div>
+                                    <div style={{ fontSize: '0.75rem', color: '#047857', fontWeight: 500 }}>Produced</div>
                                 </div>
-                            ))}
+                                <div style={{ padding: '1rem', background: '#FEF2F2', borderRadius: '0.75rem', textAlign: 'center' }}>
+                                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#DC2626' }}>{totalWaste}</div>
+                                    <div style={{ fontSize: '0.75rem', color: '#B91C1C', fontWeight: 500 }}>Waste</div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="mt-6 pt-4 border-t border-gray-100 text-center">
-                            <p className="text-xs text-gray-400 flex items-center justify-center gap-1">
-                                <AlertCircle size={12} />
-                                Synchronisé automatiquement
-                            </p>
+                        {/* History Card */}
+                        <div style={{
+                            background: 'white',
+                            borderRadius: '1rem',
+                            padding: '1.25rem',
+                            border: '1px solid #E5E7EB',
+                            flex: 1
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                <h3 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600, color: '#6B7280', textTransform: 'uppercase' }}>
+                                    Today's Production ({todayHistory.length})
+                                </h3>
+                                {!isAdmin && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: '#9CA3AF', fontSize: '0.75rem' }}>
+                                        <Eye size={14} />
+                                        Read only
+                                    </div>
+                                )}
+                            </div>
+
+                            <div style={{ maxHeight: '400px', overflow: 'auto' }}>
+                                {todayHistory.length > 0 ? (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                        {todayHistory.map(record => (
+                                            <div
+                                                key={record.id}
+                                                style={{
+                                                    padding: '0.75rem',
+                                                    background: '#F9FAFB',
+                                                    borderRadius: '0.5rem',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'space-between'
+                                                }}
+                                            >
+                                                <div>
+                                                    <div style={{ fontWeight: 600, color: '#1F2937', fontSize: '0.875rem' }}>
+                                                        {(record as any).product?.name}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.75rem', color: '#9CA3AF', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                        <Clock size={12} />
+                                                        {new Date(record.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                                    </div>
+                                                </div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                    <span style={{
+                                                        padding: '0.25rem 0.5rem',
+                                                        background: '#D1FAE5',
+                                                        color: '#059669',
+                                                        borderRadius: '0.25rem',
+                                                        fontSize: '0.75rem',
+                                                        fontWeight: 600
+                                                    }}>
+                                                        +{record.quantity_produced} {getRecordUnit(record)}
+                                                    </span>
+                                                    {record.quantity_waste > 0 && (
+                                                        <span style={{
+                                                            padding: '0.25rem 0.5rem',
+                                                            background: '#FEE2E2',
+                                                            color: '#DC2626',
+                                                            borderRadius: '0.25rem',
+                                                            fontSize: '0.75rem',
+                                                            fontWeight: 600
+                                                        }}>
+                                                            -{record.quantity_waste} {getRecordUnit(record)}
+                                                        </span>
+                                                    )}
+                                                    {isAdmin && (
+                                                        <button
+                                                            onClick={() => handleDeleteRecord(record.id)}
+                                                            style={{
+                                                                padding: '0.25rem',
+                                                                border: 'none',
+                                                                background: 'transparent',
+                                                                cursor: 'pointer',
+                                                                color: '#EF4444'
+                                                            }}
+                                                            title="Delete"
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div style={{ textAlign: 'center', padding: '2rem', color: '#9CA3AF' }}>
+                                        <Clock size={32} style={{ margin: '0 auto 0.5rem', opacity: 0.5 }} />
+                                        <p style={{ margin: 0, fontSize: '0.875rem' }}>No production recorded</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {!isAdmin && todayHistory.length > 0 && (
+                                <div style={{
+                                    marginTop: '1rem',
+                                    padding: '0.75rem',
+                                    background: '#FEF3C7',
+                                    borderRadius: '0.5rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem'
+                                }}>
+                                    <Lock size={16} style={{ color: '#D97706' }} />
+                                    <span style={{ fontSize: '0.75rem', color: '#92400E' }}>
+                                        Only an administrator can modify entries
+                                    </span>
+                                </div>
+                            )}
                         </div>
-                    </Card>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
-    );
-};
+    )
+}
 
-export default ProductionPage;
+export default ProductionPage

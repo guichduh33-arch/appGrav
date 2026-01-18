@@ -124,6 +124,21 @@ export const useCartStore = create<CartState>((set, get) => ({
         })
     },
 
+    updateItem: (itemId, modifiers, notes) => {
+        set(state => {
+            const newItems = state.items.map(item => {
+                if (item.id === itemId) {
+                    const modifiersTotal = modifiers.reduce((sum, m) => sum + m.priceAdjustment, 0)
+                    const totalPrice = (item.unitPrice + modifiersTotal) * item.quantity
+                    return { ...item, modifiers, modifiersTotal, notes, totalPrice }
+                }
+                return item
+            })
+            const totals = calculateTotals(newItems, state.discountType, state.discountValue)
+            return { items: newItems, ...totals }
+        })
+    },
+
     updateItemQuantity: (itemId, quantity) => {
         const state = get()
         const isLocked = state.lockedItemIds.includes(itemId)

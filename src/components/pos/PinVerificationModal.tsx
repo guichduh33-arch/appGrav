@@ -3,20 +3,26 @@ import { X, Lock, AlertCircle } from 'lucide-react'
 import type { UserProfile } from '../../types/database'
 import './PinVerificationModal.css'
 
+interface VerifiedUser {
+    id: string
+    name: string
+    role: string
+}
+
 interface PinVerificationModalProps {
     title?: string
     message?: string
-    onVerify: (verified: boolean) => void
+    onVerify: (verified: boolean, user?: VerifiedUser) => void
     onClose: () => void
     allowedRoles?: string[]
 }
 
 // Demo users for PIN verification (same as login)
 const DEMO_USERS: Partial<UserProfile>[] = [
-    { id: 'demo-1', name: 'Apni', role: 'cashier', pin_code: '1234' },
-    { id: 'demo-2', name: 'Dani', role: 'manager', pin_code: '0000' },
-    { id: 'demo-3', name: 'Bayu', role: 'barista', pin_code: '2222' },
-    { id: 'demo-4', name: 'Admin', role: 'admin', pin_code: '9999' },
+    { id: 'a1110000-0000-0000-0000-000000000001', name: 'Apni', role: 'cashier', pin_code: '1234' },
+    { id: 'a1110000-0000-0000-0000-000000000002', name: 'Dani', role: 'manager', pin_code: '0000' },
+    { id: 'a1110000-0000-0000-0000-000000000004', name: 'Bayu', role: 'barista', pin_code: '2222' },
+    { id: 'a1110000-0000-0000-0000-000000000005', name: 'Admin', role: 'admin', pin_code: '9999' },
 ]
 
 export default function PinVerificationModal({
@@ -55,8 +61,12 @@ export default function PinVerificationModal({
         )
 
         if (matchingUser) {
-            onVerify(true)
-            onClose()
+            onVerify(true, {
+                id: matchingUser.id!,
+                name: matchingUser.name!,
+                role: matchingUser.role!
+            })
+            // Don't call onClose here - let parent handle modal closure
         } else {
             setError('Code PIN invalide ou rôle non autorisé')
             setIsShaking(true)

@@ -21,7 +21,6 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder, onItemC
         items,
         orderType,
         setOrderType,
-        tableNumber,
         subtotal,
         discountAmount,
         total,

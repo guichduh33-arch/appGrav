@@ -18,10 +18,10 @@ export default function LoginPage() {
 
     // Demo users fallback (used when RLS blocks anonymous access)
     const DEMO_USERS: UserProfile[] = [
-        { id: 'demo-1', name: 'Apni', role: 'cashier', pin_code: '1234', is_active: true } as UserProfile,
-        { id: 'demo-2', name: 'Dani', role: 'manager', pin_code: '0000', is_active: true } as UserProfile,
-        { id: 'demo-3', name: 'Bayu', role: 'barista', pin_code: '2222', is_active: true } as UserProfile,
-        { id: 'demo-4', name: 'Admin', role: 'admin', pin_code: '9999', is_active: true } as UserProfile,
+        { id: 'a1110000-0000-0000-0000-000000000001', name: 'Apni', role: 'cashier', pin_code: '1234', is_active: true } as UserProfile,
+        { id: 'a1110000-0000-0000-0000-000000000002', name: 'Dani', role: 'manager', pin_code: '0000', is_active: true } as UserProfile,
+        { id: 'a1110000-0000-0000-0000-000000000004', name: 'Bayu', role: 'barista', pin_code: '2222', is_active: true } as UserProfile,
+        { id: 'a1110000-0000-0000-0000-000000000005', name: 'Admin', role: 'admin', pin_code: '9999', is_active: true } as UserProfile,
     ]
 
     // Load real users from Supabase (with demo fallback)

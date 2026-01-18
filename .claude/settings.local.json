@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npm run dev:*)",
+      "Bash(timeout:*)",
+      "Bash(python:*)",
+      "Bash(supabase db push:*)",
+      "Bash(npx supabase:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run lint)",
+      "Bash(start http://localhost:3004/)",
+      "Bash(npx tsc:*)",
+      "Bash(curl:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(npx ts-node:*)"
+    ]
+  }
+}
