@@ -7,7 +7,7 @@ import {
     Layers, Clock, Settings, Scale, AlertTriangle
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import type { Product, Recipe, StockMovement, ProductUOM, Category } from '../../types/database'
+import type { Product, Recipe, StockMovement, ProductUOM, Category, Section, ProductSection } from '../../types/database'
 import { MOCK_PRODUCTS, MOCK_CATEGORIES } from '../../hooks/useProducts'
 import './ProductDetailPage.css'
 
@@ -32,7 +32,9 @@ export default function ProductDetailPage() {
     // Data states
     const [product, setProduct] = useState<Product | null>(null)
     const [categories, setCategories] = useState<Category[]>([])
-    const [sections, setSections] = useState<any[]>([])
+    const [sections, setSections] = useState<Section[]>([])
+    const [productSections, setProductSections] = useState<string[]>([]) // Selected section IDs
+    const [primarySectionId, setPrimarySectionId] = useState<string | null>(null)
     const [recipeItems, setRecipeItems] = useState<(Recipe & { material: Product })[]>([])
     const [stockHistory, setStockHistory] = useState<StockMovement[]>([])
     const [priceHistory, setPriceHistory] = useState<any[]>([])
@@ -113,6 +115,17 @@ export default function ProductDetailPage() {
             const { data: sects } = await supabase.from('sections').select('*').order('name')
             if (sects) setSections(sects)
 
+            // 3b. Fetch Product Sections (many-to-many)
+            const { data: prodSects } = await supabase
+                .from('product_sections')
+                .select('*')
+                .eq('product_id', id)
+            if (prodSects) {
+                setProductSections(prodSects.map(ps => ps.section_id))
+                const primary = prodSects.find(ps => ps.is_primary)
+                setPrimarySectionId(primary?.section_id || (prodSects[0]?.section_id || null))
+            }
+
             // 4. Fetch Recipe
             const { data: recipes, error: rError } = await (supabase
                 .from('recipes') as any)
@@ -165,6 +178,7 @@ export default function ProductDetailPage() {
         if (!product) return
         setSaving(true)
         try {
+            // 1. Update product
             const { error } = await (supabase
                 .from('products') as any)
                 .update({
@@ -178,11 +192,32 @@ export default function ProductDetailPage() {
                     pos_visible: product.pos_visible,
                     is_active: product.is_active,
                     unit: product.unit,
-                    default_producing_section_id: product.default_producing_section_id
+                    default_producing_section_id: primarySectionId // Keep backward compatibility
                 })
                 .eq('id', product.id)
 
             if (error) throw error
+
+            // 2. Save product sections (delete existing, insert new)
+            await supabase
+                .from('product_sections')
+                .delete()
+                .eq('product_id', product.id)
+
+            if (productSections.length > 0) {
+                const sectionsToInsert = productSections.map(sectionId => ({
+                    product_id: product.id,
+                    section_id: sectionId,
+                    is_primary: sectionId === primarySectionId
+                }))
+
+                const { error: sectError } = await supabase
+                    .from('product_sections')
+                    .insert(sectionsToInsert)
+
+                if (sectError) throw sectError
+            }
+
             alert(t('product_detail.messages.product_updated'))
         } catch (error: any) {
             alert(t('product_detail.messages.save_error') + ' ' + error.message)
@@ -354,7 +389,16 @@ export default function ProductDetailPage() {
             {/* Content */}
             <div className="detail-content">
                 {activeTab === 'general' && (
-                    <GeneralTab product={product} categories={categories} sections={sections} onChange={setProduct} />
+                    <GeneralTab
+                        product={product}
+                        categories={categories}
+                        sections={sections}
+                        selectedSections={productSections}
+                        primarySectionId={primarySectionId}
+                        onSectionsChange={setProductSections}
+                        onPrimarySectionChange={setPrimarySectionId}
+                        onChange={setProduct}
+                    />
                 )}
                 {activeTab === 'units' && (
                     <UnitsTab product={product} uoms={uoms} onProductChange={setProduct} onAddUOM={addUOM} onDeleteUOM={deleteUOM} />

@@ -46,6 +46,7 @@ export interface Database {
                     available_for_sale: boolean
                     image_url: string | null
                     is_active: boolean
+                    default_producing_section_id: string | null
                     created_at: string
                     updated_at: string
                 }
@@ -73,6 +74,41 @@ export interface Database {
                 Insert: Partial<Database['public']['Tables']['product_modifiers']['Row']> & { group_name: string, option_id: string, option_label: string }
                 Update: Partial<Database['public']['Tables']['product_modifiers']['Row']>
             }
+            suppliers: {
+                Row: {
+                    id: string
+                    name: string
+                    contact_person: string | null
+                    email: string | null
+                    phone: string | null
+                    address: string | null
+                    is_active: boolean
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    name: string
+                    contact_person?: string | null
+                    email?: string | null
+                    phone?: string | null
+                    address?: string | null
+                    is_active?: boolean
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    name?: string
+                    contact_person?: string | null
+                    email?: string | null
+                    phone?: string | null
+                    address?: string | null
+                    is_active?: boolean
+                    created_at?: string
+                    updated_at?: string
+                }
+            },
             customers: {
                 Row: {
                     id: string
@@ -222,11 +258,82 @@ export interface Database {
                     notes: string | null
                     staff_id: string | null
                     reference_id: string | null
+                    from_section_id: string | null
+                    to_section_id: string | null
+                    supplier_id?: string | null
                     created_at: string
                 }
-                Insert: Partial<Database['public']['Tables']['stock_movements']['Row']> & { product_id: string, movement_type: 'purchase' | 'waste' | 'adjustment_in' | 'adjustment_out' | 'sale' | 'production', quantity: number }
+                Insert: Partial<Database['public']['Tables']['stock_movements']['Row']> & { product_id: string, movement_type: 'purchase' | 'waste' | 'adjustment_in' | 'adjustment_out' | 'sale' | 'production', quantity: number, supplier_id?: string | null }
                 Update: Partial<Database['public']['Tables']['stock_movements']['Row']>
-            }
+            },
+            sections: {
+                Row: {
+                    id: string
+                    name: string
+                    slug: string
+                    is_sales_point: boolean
+                    is_production_point: boolean
+                    is_warehouse: boolean
+                    created_at: string
+                }
+                Insert: Partial<Database['public']['Tables']['sections']['Row']> & { name: string, slug: string }
+                Update: Partial<Database['public']['Tables']['sections']['Row']>
+            },
+            product_stocks: {
+                Row: {
+                    id: string
+                    section_id: string
+                    product_id: string
+                    quantity: number
+                    updated_at: string
+                }
+                Insert: Partial<Database['public']['Tables']['product_stocks']['Row']> & { section_id: string, product_id: string }
+                Update: Partial<Database['public']['Tables']['product_stocks']['Row']>
+            },
+            product_sections: {
+                Row: {
+                    id: string
+                    product_id: string
+                    section_id: string
+                    is_primary: boolean
+                    created_at: string
+                }
+                Insert: Partial<Database['public']['Tables']['product_sections']['Row']> & { product_id: string, section_id: string }
+                Update: Partial<Database['public']['Tables']['product_sections']['Row']>
+            },
+            production_records: {
+                Row: {
+                    id: string
+                    production_id: string
+                    product_id: string
+                    quantity_produced: number
+                    quantity_waste: number
+                    production_date: string
+                    staff_id: string | null
+                    staff_name: string | null
+                    stock_updated: boolean
+                    materials_consumed: boolean
+                    notes: string | null
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    production_id?: string // Generated by trigger
+                    product_id: string
+                    quantity_produced: number
+                    quantity_waste?: number
+                    production_date?: string
+                    staff_id?: string | null
+                    staff_name?: string | null
+                    stock_updated?: boolean
+                    materials_consumed?: boolean
+                    notes?: string | null
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: Partial<Database['public']['Tables']['production_records']['Row']>
+            },
             recipes: {
                 Row: {
                     id: string
@@ -403,6 +510,21 @@ export interface Database {
                     end_date: string
                 }
                 Returns: Json
+            },
+            process_production: {
+                Args: {
+                    production_uuid: string
+                }
+                Returns: boolean
+            },
+            transfer_stock: {
+                Args: {
+                    p_product_id: string
+                    p_from_section_id: string
+                    p_to_section_id: string
+                    p_quantity: number
+                }
+                Returns: boolean
             }
         }
         Enums: {
@@ -425,10 +547,24 @@ export type Recipe = Database['public']['Tables']['recipes']['Row']
 export type ProductUOM = Database['public']['Tables']['product_uoms']['Row']
 export type InventoryCount = Database['public']['Tables']['inventory_counts']['Row']
 export type InventoryCountItem = Database['public']['Tables']['inventory_count_items']['Row']
+export type Supplier = Database['public']['Tables']['suppliers']['Row']
+
+export type ProductionRecord = Database['public']['Tables']['production_records']['Row']
+export type Section = Database['public']['Tables']['sections']['Row']
+export type ProductStock = Database['public']['Tables']['product_stocks']['Row']
+export type ProductSection = Database['public']['Tables']['product_sections']['Row']
 
 // Extended types with relations
 export interface ProductWithCategory extends Product {
     category: Category | null
+}
+
+export interface ProductSectionWithDetails extends ProductSection {
+    section: Section
+}
+
+export interface ProductWithSections extends Product {
+    sections: ProductSectionWithDetails[]
 }
 
 export interface OrderWithItems extends Order {
