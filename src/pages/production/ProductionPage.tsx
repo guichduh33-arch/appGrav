@@ -240,13 +240,23 @@ const ProductionPage = () => {
 
                 if (prodError) throw prodError
 
-                // 2. Create stock movement for production (positive)
+                // 2. Get current stock of produced item
+                const { data: productData } = await supabase
+                    .from('products')
+                    .select('current_stock')
+                    .eq('id', item.productId)
+                    .single()
+
+                const currentStock = productData?.current_stock || 0
+                const netChange = item.quantity - item.wasted
+
+                // 3. Create stock movement for production_in (positive)
                 if (item.quantity > 0) {
                     const { error: stockError } = await supabase
                         .from('stock_movements')
                         .insert({
                             product_id: item.productId,
-                            movement_type: 'production',
+                            movement_type: 'production_in',
                             quantity: item.quantity,
                             reason: `Production ${selectedSection?.name || ''} - ${dateStr}`,
                             reference_id: prodRecord.id,
@@ -256,7 +266,7 @@ const ProductionPage = () => {
                     if (stockError) throw stockError
                 }
 
-                // 3. Create stock movement for waste (negative)
+                // 4. Create stock movement for waste (negative)
                 if (item.wasted > 0) {
                     const { error: wasteError } = await supabase
                         .from('stock_movements')
@@ -270,6 +280,56 @@ const ProductionPage = () => {
                         })
 
                     if (wasteError) throw wasteError
+                }
+
+                // 5. Update product current_stock
+                const { error: updateError } = await supabase
+                    .from('products')
+                    .update({ current_stock: currentStock + netChange })
+                    .eq('id', item.productId)
+
+                if (updateError) throw updateError
+
+                // 6. Deduct recipe ingredients from stock
+                const { data: recipeItems } = await supabase
+                    .from('recipes')
+                    .select(`
+                        id,
+                        material_id,
+                        quantity,
+                        unit,
+                        material:products!material_id(id, name, current_stock, cost_price, unit)
+                    `)
+                    .eq('product_id', item.productId)
+                    .eq('is_active', true)
+
+                if (recipeItems && recipeItems.length > 0) {
+                    for (const recipe of recipeItems) {
+                        const material = recipe.material as any
+                        if (!material) continue
+
+                        // Calculate quantity to deduct (recipe qty per unit × production qty)
+                        const qtyToDeduct = recipe.quantity * item.quantity
+                        const materialCurrentStock = material.current_stock || 0
+
+                        // Create stock movement for production_out (negative)
+                        await supabase
+                            .from('stock_movements')
+                            .insert({
+                                product_id: recipe.material_id,
+                                movement_type: 'production_out',
+                                quantity: -qtyToDeduct,
+                                reason: `Used for: ${item.name} (×${item.quantity}) - ${dateStr}`,
+                                reference_id: prodRecord.id,
+                                staff_id: user?.id
+                            })
+
+                        // Update ingredient current_stock
+                        await supabase
+                            .from('products')
+                            .update({ current_stock: materialCurrentStock - qtyToDeduct })
+                            .eq('id', recipe.material_id)
+                    }
                 }
             }
 
@@ -289,13 +349,38 @@ const ProductionPage = () => {
         if (!confirm('Delete this entry and its stock movements?')) return
 
         try {
-            // 1. Delete associated stock movements
+            // 1. Get the production record to know quantities
+            const { data: record } = await supabase
+                .from('production_records')
+                .select('product_id, quantity_produced, quantity_waste')
+                .eq('id', recordId)
+                .single()
+
+            if (record) {
+                // 2. Get current stock
+                const { data: productData } = await supabase
+                    .from('products')
+                    .select('current_stock')
+                    .eq('id', record.product_id)
+                    .single()
+
+                const currentStock = productData?.current_stock || 0
+                const netChange = record.quantity_produced - (record.quantity_waste || 0)
+
+                // 3. Reverse the stock change
+                await supabase
+                    .from('products')
+                    .update({ current_stock: currentStock - netChange })
+                    .eq('id', record.product_id)
+            }
+
+            // 4. Delete associated stock movements
             await supabase
                 .from('stock_movements')
                 .delete()
                 .eq('reference_id', recordId)
 
-            // 2. Delete production record
+            // 5. Delete production record
             const { error } = await supabase
                 .from('production_records')
                 .delete()

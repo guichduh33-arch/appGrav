@@ -10,38 +10,7 @@ interface ProductGridProps {
 }
 
 // Extract base name (without variant info in parentheses)
-function getBaseName(name: string): string {
-    return name.replace(/\s*\([^)]*\)\s*$/, '').trim()
-}
 
-// Group products by base name
-function groupProducts(products: Product[]): Map<string, Product[]> {
-    const groups = new Map<string, Product[]>()
-
-    products.forEach(product => {
-        const baseName = getBaseName(product.name)
-        if (!groups.has(baseName)) {
-            groups.set(baseName, [])
-        }
-        groups.get(baseName)!.push(product)
-    })
-
-    return groups
-}
-
-// Get the representative product for a group (first one with an image, or just first)
-function getRepresentativeProduct(variants: Product[]): Product {
-    return variants.find(p => p.image_url) || variants[0]
-}
-
-// Get price range for variants
-function getPriceRange(variants: Product[]): { min: number; max: number } {
-    const prices = variants.map(v => v.retail_price || 0)
-    return {
-        min: Math.min(...prices),
-        max: Math.max(...prices)
-    }
-}
 
 export default function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) {
     const { t } = useTranslation()

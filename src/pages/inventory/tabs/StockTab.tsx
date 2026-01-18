@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
     Factory, ShoppingCart, Package, Trash2, ArrowUpCircle, ArrowDownCircle,
-    Filter, TrendingUp, TrendingDown, Clock, AlertTriangle, Truck
+    Filter, TrendingUp, TrendingDown, Clock, AlertTriangle, Truck, ArrowRight
 } from 'lucide-react'
 import { Product, StockMovement } from '../../../types/database'
 
@@ -11,7 +11,7 @@ interface StockTabProps {
     stockHistory: StockMovement[]
 }
 
-type MovementType = 'all' | 'production' | 'sale' | 'purchase' | 'waste' | 'adjustment_in' | 'adjustment_out'
+type MovementType = 'all' | 'production_in' | 'production_out' | 'stock_in' | 'sale_pos' | 'sale_b2b' | 'waste' | 'opname'
 
 const MOVEMENT_CONFIG: Record<string, {
     label: string
@@ -21,29 +21,45 @@ const MOVEMENT_CONFIG: Record<string, {
     borderColor: string
     description: string
 }> = {
-    production: {
-        label: 'Production',
+    production_in: {
+        label: 'Production In',
         icon: <Factory size={16} />,
         bgColor: '#FEF3C7',
         textColor: '#B45309',
         borderColor: '#FCD34D',
-        description: 'Manufactured product'
+        description: 'Finished/semi-finished produced'
     },
-    sale: {
-        label: 'Sale',
+    production_out: {
+        label: 'Production Out',
+        icon: <Package size={16} />,
+        bgColor: '#FDF2F8',
+        textColor: '#BE185D',
+        borderColor: '#F9A8D4',
+        description: 'Ingredients used in production'
+    },
+    stock_in: {
+        label: 'Stock In',
+        icon: <Truck size={16} />,
+        bgColor: '#D1FAE5',
+        textColor: '#047857',
+        borderColor: '#6EE7B7',
+        description: 'Purchase / Supplier receipt'
+    },
+    sale_pos: {
+        label: 'Sale POS',
         icon: <ShoppingCart size={16} />,
         bgColor: '#DBEAFE',
         textColor: '#1D4ED8',
         borderColor: '#93C5FD',
         description: 'Sold at POS'
     },
-    purchase: {
-        label: 'Purchase',
-        icon: <Truck size={16} />,
-        bgColor: '#D1FAE5',
-        textColor: '#047857',
-        borderColor: '#6EE7B7',
-        description: 'Supplier receipt'
+    sale_b2b: {
+        label: 'Sale B2B',
+        icon: <ShoppingCart size={16} />,
+        bgColor: '#E0E7FF',
+        textColor: '#4338CA',
+        borderColor: '#A5B4FC',
+        description: 'B2B wholesale sale'
     },
     waste: {
         label: 'Waste',
@@ -53,41 +69,71 @@ const MOVEMENT_CONFIG: Record<string, {
         borderColor: '#FCA5A5',
         description: 'Loss / Breakage'
     },
-    adjustment_in: {
-        label: 'Adj. In',
+    opname: {
+        label: 'Opname',
         icon: <ArrowUpCircle size={16} />,
-        bgColor: '#ECFDF5',
-        textColor: '#059669',
-        borderColor: '#A7F3D0',
-        description: 'Stock adjustment in'
-    },
-    adjustment_out: {
-        label: 'Adj. Out',
-        icon: <ArrowDownCircle size={16} />,
-        bgColor: '#FFF7ED',
-        textColor: '#EA580C',
-        borderColor: '#FDBA74',
-        description: 'Stock adjustment out'
+        bgColor: '#F3F4F6',
+        textColor: '#4B5563',
+        borderColor: '#D1D5DB',
+        description: 'Weekly stock control'
     }
+}
+
+interface MovementWithBalance extends StockMovement {
+    stockBefore: number
+    stockAfter: number
 }
 
 export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => {
     const { t } = useTranslation()
     const [filterType, setFilterType] = useState<MovementType>('all')
 
+    // Calculate running balance for each movement (oldest to newest, then reverse for display)
+    const movementsWithBalance = useMemo(() => {
+        // Sort by date ascending (oldest first) to calculate running balance
+        const sorted = [...stockHistory].sort((a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        )
+
+        // Start from current stock and work backwards to find initial stock
+        const totalMovement = sorted.reduce((sum, m) => sum + m.quantity, 0)
+        let runningStock = (product.current_stock || 0) - totalMovement
+
+        // Calculate stock before and after for each movement
+        const withBalance: MovementWithBalance[] = sorted.map(movement => {
+            const stockBefore = runningStock
+            runningStock += movement.quantity
+            return {
+                ...movement,
+                stockBefore,
+                stockAfter: runningStock
+            }
+        })
+
+        // Reverse to show newest first
+        return withBalance.reverse()
+    }, [stockHistory, product.current_stock])
+
     // Filter movements
     const filteredHistory = filterType === 'all'
-        ? stockHistory
-        : stockHistory.filter(m => m.movement_type === filterType)
+        ? movementsWithBalance
+        : movementsWithBalance.filter(m => m.movement_type === filterType)
 
     // Calculate stats
+    const costPrice = product.cost_price || 0
     const stats = {
         totalIn: stockHistory.filter(m => m.quantity > 0).reduce((sum, m) => sum + m.quantity, 0),
         totalOut: stockHistory.filter(m => m.quantity < 0).reduce((sum, m) => sum + Math.abs(m.quantity), 0),
-        production: stockHistory.filter(m => m.movement_type === 'production').reduce((sum, m) => sum + m.quantity, 0),
-        sales: stockHistory.filter(m => m.movement_type === 'sale').reduce((sum, m) => sum + Math.abs(m.quantity), 0),
-        purchases: stockHistory.filter(m => m.movement_type === 'purchase').reduce((sum, m) => sum + m.quantity, 0),
-        waste: stockHistory.filter(m => m.movement_type === 'waste').reduce((sum, m) => sum + Math.abs(m.quantity), 0)
+        productionIn: stockHistory.filter(m => m.movement_type === 'production_in').reduce((sum, m) => sum + m.quantity, 0),
+        productionOut: stockHistory.filter(m => m.movement_type === 'production_out').reduce((sum, m) => sum + Math.abs(m.quantity), 0),
+        stockIn: stockHistory.filter(m => m.movement_type === 'stock_in').reduce((sum, m) => sum + m.quantity, 0),
+        sales: stockHistory.filter(m => m.movement_type === 'sale_pos' || m.movement_type === 'sale_b2b').reduce((sum, m) => sum + Math.abs(m.quantity), 0),
+        waste: stockHistory.filter(m => m.movement_type === 'waste').reduce((sum, m) => sum + Math.abs(m.quantity), 0),
+        opname: stockHistory.filter(m => m.movement_type === 'opname').reduce((sum, m) => sum + m.quantity, 0),
+        // Values in IDR
+        totalInValue: stockHistory.filter(m => m.quantity > 0).reduce((sum, m) => sum + (m.quantity * costPrice), 0),
+        totalOutValue: stockHistory.filter(m => m.quantity < 0).reduce((sum, m) => sum + (Math.abs(m.quantity) * costPrice), 0),
+        currentStockValue: (product.current_stock || 0) * costPrice
     }
 
     const getMovementConfig = (type: string) => {
@@ -109,6 +155,21 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
         }
     }
 
+    const formatIDR = (amount: number) => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(Math.abs(amount))
+    }
+
+    // Calculate movement value based on cost price
+    const getMovementValue = (quantity: number): number => {
+        const costPrice = product.cost_price || 0
+        return quantity * costPrice
+    }
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {/* Stats Cards */}
@@ -121,8 +182,8 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                     color: 'white'
                 }}>
                     <div style={{ fontSize: '0.75rem', opacity: 0.9, marginBottom: '0.25rem' }}>Current Stock</div>
-                    <div style={{ fontSize: '1.75rem', fontWeight: 700 }}>{product.current_stock}</div>
-                    <div style={{ fontSize: '0.875rem', opacity: 0.8 }}>{product.unit}</div>
+                    <div style={{ fontSize: '1.75rem', fontWeight: 700 }}>{product.current_stock} {product.unit}</div>
+                    <div style={{ fontSize: '0.75rem', opacity: 0.9, marginTop: '0.25rem' }}>{formatIDR(stats.currentStockValue)}</div>
                 </div>
 
                 {/* Total In */}
@@ -137,6 +198,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                         <span style={{ fontSize: '0.75rem', color: '#6B7280' }}>Total In</span>
                     </div>
                     <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#10B981' }}>+{stats.totalIn}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 500 }}>+{formatIDR(stats.totalInValue)}</div>
                 </div>
 
                 {/* Total Out */}
@@ -151,9 +213,10 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                         <span style={{ fontSize: '0.75rem', color: '#6B7280' }}>Total Out</span>
                     </div>
                     <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#EF4444' }}>-{stats.totalOut}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#DC2626', fontWeight: 500 }}>-{formatIDR(stats.totalOutValue)}</div>
                 </div>
 
-                {/* Productions */}
+                {/* Production In */}
                 <div style={{
                     background: 'white',
                     borderRadius: '1rem',
@@ -162,12 +225,13 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                         <Factory size={18} style={{ color: '#F59E0B' }} />
-                        <span style={{ fontSize: '0.75rem', color: '#6B7280' }}>Production</span>
+                        <span style={{ fontSize: '0.75rem', color: '#6B7280' }}>Production In</span>
                     </div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#B45309' }}>+{stats.production}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#B45309' }}>+{stats.productionIn}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#92400E', fontWeight: 500 }}>+{formatIDR(stats.productionIn * costPrice)}</div>
                 </div>
 
-                {/* Waste */}
+                {/* Production Out */}
                 <div style={{
                     background: 'white',
                     borderRadius: '1rem',
@@ -175,10 +239,11 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                     border: '1px solid #E5E7EB'
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                        <Trash2 size={18} style={{ color: '#DC2626' }} />
-                        <span style={{ fontSize: '0.75rem', color: '#6B7280' }}>Waste</span>
+                        <Package size={18} style={{ color: '#BE185D' }} />
+                        <span style={{ fontSize: '0.75rem', color: '#6B7280' }}>Production Out</span>
                     </div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#DC2626' }}>-{stats.waste}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#BE185D' }}>-{stats.productionOut}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#9D174D', fontWeight: 500 }}>-{formatIDR(stats.productionOut * costPrice)}</div>
                 </div>
             </div>
 
@@ -323,31 +388,49 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                                                 {movement.reason}
                                             </div>
                                         )}
-                                        {movement.reference_id && (
-                                            <div style={{
-                                                fontSize: '0.75rem',
-                                                color: '#9CA3AF',
-                                                marginTop: '0.25rem'
-                                            }}>
-                                                Ref: {movement.reference_id.substring(0, 8)}...
-                                            </div>
-                                        )}
                                     </div>
 
-                                    {/* Quantity */}
+                                    {/* Stock Before → After */}
                                     <div style={{
-                                        textAlign: 'right',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        padding: '0.5rem 0.75rem',
+                                        background: '#F3F4F6',
+                                        borderRadius: '0.5rem',
                                         flexShrink: 0
+                                    }}>
+                                        <div style={{ textAlign: 'center' }}>
+                                            <div style={{ fontSize: '0.625rem', color: '#9CA3AF', textTransform: 'uppercase' }}>Before</div>
+                                            <div style={{ fontSize: '1rem', fontWeight: 600, color: '#4B5563' }}>{movement.stockBefore}</div>
+                                        </div>
+                                        <ArrowRight size={16} style={{ color: '#9CA3AF' }} />
+                                        <div style={{ textAlign: 'center' }}>
+                                            <div style={{ fontSize: '0.625rem', color: '#9CA3AF', textTransform: 'uppercase' }}>After</div>
+                                            <div style={{ fontSize: '1rem', fontWeight: 700, color: isPositive ? '#10B981' : '#EF4444' }}>{movement.stockAfter}</div>
+                                        </div>
+                                    </div>
+
+                                    {/* Quantity & Value */}
+                                    <div style={{
+                                        textAlign: 'center',
+                                        flexShrink: 0,
+                                        minWidth: '100px'
                                     }}>
                                         <div style={{
                                             fontSize: '1.25rem',
                                             fontWeight: 700,
                                             color: isPositive ? '#10B981' : '#EF4444'
                                         }}>
-                                            {isPositive ? '+' : ''}{movement.quantity}
+                                            {isPositive ? '+' : ''}{movement.quantity} {product.unit}
                                         </div>
-                                        <div style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>
-                                            {product.unit}
+                                        <div style={{
+                                            fontSize: '0.75rem',
+                                            fontWeight: 600,
+                                            color: isPositive ? '#059669' : '#DC2626',
+                                            marginTop: '0.125rem'
+                                        }}>
+                                            {isPositive ? '+' : '-'}{formatIDR(getMovementValue(movement.quantity))}
                                         </div>
                                     </div>
 

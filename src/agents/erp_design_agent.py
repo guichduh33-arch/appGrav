@@ -56,7 +56,8 @@ class ERPDesignAgent:
             "hr": {"name": "RH & Planning", "status": "planned", "priority": 3},
             "accounting": {"name": "Comptabilité", "status": "planned", "priority": 3},
             "b2b": {"name": "Ventes B2B", "status": "planned", "priority": 2},
-            "kds": {"name": "Kitchen Display System", "status": "planned", "priority": 2}
+            "kds": {"name": "Kitchen Display System", "status": "planned", "priority": 2},
+            "auth": {"name": "Authentification (Local PIN)", "status": "active", "priority": 1}
         }
         
         # Design patterns recommandés
@@ -611,9 +612,62 @@ class ERPDesignAgent:
                         }
                     ]
                 },
+                "login_screen": {
+                    "route": "/login",
+                    "description": "Écran d'authentification par PIN local",
+                    "components": [
+                        {
+                            "name": "AppLogo",
+                            "type": "image",
+                            "asset": "croissant_logo.png",
+                            "style": "centered, large"
+                        },
+                        {
+                            "name": "AppTitle",
+                            "type": "heading",
+                            "text": "The Breakery",
+                            "style": "dark_blue, bold, large"
+                        },
+                        {
+                            "name": "AppSubtitle",
+                            "type": "text",
+                            "text": "Point de Vente",
+                            "style": "gray, medium"
+                        },
+                        {
+                            "name": "ProfileSelector",
+                            "type": "dropdown",
+                            "label": "Sélectionnez votre profil",
+                            "options": ["Admin (admin)", "Vendeur (vendeur)", "Boulanger (boulanger)"]
+                        },
+                        {
+                            "name": "PINDisplay",
+                            "type": "pin_indicator",
+                            "length": 6,
+                            "style": "dots, reflective"
+                        },
+                        {
+                            "name": "NumericKeypad",
+                            "type": "keypad",
+                            "style": "cream_buttons, dark_icons",
+                            "special_keys": ["Clear (C)", "Backspace (Icon)"]
+                        },
+                        {
+                            "name": "LoginButton",
+                            "type": "button",
+                            "text": "Se connecter",
+                            "style": "full_width, primary_blue"
+                        }
+                    ]
+                },
                 "payment_modal": {
-                    "route": null,
-                    "description": "Modal de finalisation paiement",
+                    "route": None,
+                    "description": "Modal de finalisation paiement (Adaptive Layout: 2 columns for Cash, 1 centered column for others)",
+                    "specs": {
+                        "width": "800px",
+                        "layout": "Adaptive Grid",
+                        "equitable_spacing": True
+                    },
                     "components": [
                         {
                             "name": "CashPayment",
@@ -669,6 +723,83 @@ class ERPDesignAgent:
             json.dump(design, f, indent=2, ensure_ascii=False)
         
         print(f"✅ Spécifications POS sauvegardées: {output_path}")
+        return design
+
+    def design_auth_interface(self) -> Dict[str, Any]:
+        """
+        Conçoit l'interface d'authentification (Login / PIN).
+        Inspiré par le design épuré avec clavier crème.
+        """
+        print("🔐 Conception interface Authentification PIN...")
+        
+        design = {
+            "module": "auth_interface",
+            "description": "Spécifications de l'écran de connexion par PIN",
+            "visual_identity": {
+                "font_family": "Inter, sans-serif",
+                "primary_color": "#3B82F6",  # Blue
+                "text_primary": "#0F172A",    # Slate-900 (High-contrast)
+                "text_secondary": "#475569",  # Slate-600
+                "keypad_bg": "#F1F5F9",       # Light slate container
+                "button_bg": "#FEF3C7",       # Warm cream/yellow
+                "button_border": "#F59E0B",   # Amber-500 (Strong border)
+                "keypad_text": "#0F172A"      # Slate-900 for numbers
+            },
+            "elements": [
+                {
+                    "id": "header",
+                    "type": "vertical_stack",
+                    "items": ["Logo (Croissant)", "Title (The Breakery)", "Subtitle (Point de Vente)"],
+                    "spacing": "small"
+                },
+                {
+                    "id": "profile_selection",
+                    "type": "select_field",
+                    "label": "Sélectionnez votre profil",
+                    "style": "minimalist"
+                },
+                {
+                    "id": "pin_entry",
+                    "type": "pin_grid",
+                    "slots": 6,
+                    "behavior": "Masked dots"
+                },
+                {
+                    "id": "numpad",
+                    "type": "grid",
+                    "layout": "3x4",
+                    "keys": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "C", "0", "DeleteIcon"],
+                    "style": {
+                        "button_bg": "#FEF3C7",
+                        "button_radius": "12px",
+                        "button_border": "2px solid #F59E0B",
+                        "button_shadow": "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)",
+                        "font_weight": "800",
+                        "text_color": "#0F172A",
+                        "hover_bg": "#FDE68A"
+                    }
+                },
+                {
+                    "id": "submit_action",
+                    "type": "action_button",
+                    "label": "Se connecter",
+                    "color": "blue",
+                    "width": "full"
+                }
+            ],
+            "messages": {
+                "demo_hint": "💡 Demo: PIN pour tous les utilisateurs = leur code affiché"
+            }
+        }
+
+        # Sauvegarder
+        output_path = self.artifacts_path / "interfaces" / "auth_interface_spec.json"
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        with open(output_path, 'w', encoding='utf-8') as f:
+            json.dump(design, f, indent=2, ensure_ascii=False)
+        
+        print(f"✅ Spécifications Auth sauvegardées: {output_path}")
         return design
 
     # =========================================================================
@@ -788,6 +919,45 @@ class ERPDesignAgent:
         
         print(f"✅ Workflow production sauvegardé: {output_path}")
         return workflow
+
+    def design_production_interface(self) -> Dict[str, Any]:
+        """
+        Conçoit l'interface de saisie de production.
+        """
+        print("🏭 Conception interface production...")
+
+        design = {
+            "module": "production_interface",
+            "description": "Interface de saisie de production journalière",
+            "components": [
+                {
+                    "name": "ProductSearch",
+                    "type": "autocomplete",
+                    "specs": {
+                        "width": "large (w-96+)",
+                        "behavior": "Instant search with keyboard navigation",
+                        "display": "Rich result (Icon + Name + Category + Stock)",
+                        "shortcuts": ["ArrowDown", "ArrowUp", "Enter"]
+                    }
+                },
+                {
+                    "name": "ProductionTable",
+                    "type": "data_grid",
+                    "columns": ["Product", "Produced Qty", "Waste Qty", "Waste Reason", "Actions"],
+                    "features": ["Inline editing", "Tab navigation"]
+                }
+            ]
+        }
+        
+        # Sauvegarder
+        output_path = self.artifacts_path / "interfaces" / "production_interface_spec.json"
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        with open(output_path, 'w', encoding='utf-8') as f:
+            json.dump(design, f, indent=2, ensure_ascii=False)
+            
+        print(f"✅ Spécifications interface production sauvegardées: {output_path}")
+        return design
 
     # =========================================================================
     # 4. DESIGN DASHBOARD & KPIs
@@ -1023,6 +1193,19 @@ CREATE POLICY "Enable all for authenticated users" ON {table_name}
 
 ---
 
+## 🔐 Authentification (PIN Local)
+
+### Composants de l'écran
+- **Logo**: Croissant
+- **Titre**: The Breakery
+- **Profils**: Dropdown (Admin, Vendeur, Boulanger)
+- **PIN**: Indicateur 6 points
+- **Clavier**: Pavé numérique Haute-Visibilité (Boutons: #FEF3C7, Bordure: #F59E0B, Texte: #0F172A)
+- **Design**: Coins arrondis (12px), ombre prononcée et bordure de 2px pour une visibilité garantie sur tout écran.
+- **Bouton**: Se connecter (Bleu, Pleine largeur)
+
+---
+
 ## 🏭 Workflow Production
 
 ### États des ordres de fabrication
@@ -1160,10 +1343,11 @@ def main():
         print("4. 📊 Design dashboard")
         print("5. 📝 Générer migration SQL")
         print("6. 📋 Générer rapport complet")
-        print("7. 💡 Suggérer implémentation")
-        print("8. 🚪 Quitter")
+        print("7. 🔐 Design interface Authentification")
+        print("8. 💡 Suggérer implémentation")
+        print("9. 🚪 Quitter")
         
-        choice = input("\nChoix (1-8): ").strip()
+        choice = input("\nChoix (1-9): ").strip()
         
         if choice == "1":
             module = input("Module (pos/inventory/production/customers/purchasing/reporting): ").strip()
@@ -1180,10 +1364,12 @@ def main():
         elif choice == "6":
             agent.generate_design_report()
         elif choice == "7":
+            agent.design_auth_interface()
+        elif choice == "8":
             task = input("Description de la tâche: ").strip()
             result = agent.suggest_implementation(task)
             print(json.dumps(result, indent=2, ensure_ascii=False))
-        elif choice == "8":
+        elif choice == "9":
             print("👋 Au revoir!")
             break
 

@@ -1,0 +1,120 @@
+{
+  "name": "LoginScreen",
+  "description": "Écran de connexion par PIN",
+  "layout": "centered_card",
+  "background": {
+    "color": "#F8FAFC",
+    "gradient": "linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%)"
+  },
+  "card": {
+    "max_width": "400px",
+    "padding": "2rem",
+    "border_radius": "1rem",
+    "shadow": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+    "background": "#FFFFFF"
+  },
+  "components": {
+    "logo": {
+      "type": "image",
+      "src": "/logo-croissant.png",
+      "size": "80px",
+      "margin_bottom": "1rem"
+    },
+    "title": {
+      "text": "The Breakery",
+      "font_size": "1.875rem",
+      "font_weight": "700",
+      "color": "#0F172A"
+    },
+    "subtitle": {
+      "text": "Point de Vente",
+      "font_size": "1rem",
+      "color": "#64748B"
+    },
+    "profile_select": {
+      "type": "select",
+      "label": "Sélectionnez votre profil",
+      "margin_top": "1.5rem",
+      "options_source": "user_profiles"
+    },
+    "pin_display": {
+      "type": "pin_dots",
+      "length": 6,
+      "dot_size": "16px",
+      "dot_spacing": "12px",
+      "active_color": "#3B82F6",
+      "inactive_color": "#CBD5E1",
+      "margin_top": "1.5rem"
+    },
+    "numeric_keypad": {
+      "type": "grid",
+      "columns": 3,
+      "gap": "0.75rem",
+      "margin_top": "1.5rem",
+      "container": {
+        "background": "#F1F5F9",
+        "padding": "1rem",
+        "border_radius": "0.75rem"
+      },
+      "button": {
+        "width": "64px",
+        "height": "64px",
+        "background": "#FEF3C7",
+        "border": "2px solid #F59E0B",
+        "border_radius": "0.75rem",
+        "font_size": "1.5rem",
+        "font_weight": "800",
+        "color": "#0F172A",
+        "shadow": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        "hover": {
+          "background": "#FDE68A",
+          "shadow": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)"
+        },
+        "active": {
+          "background": "#FCD34D",
+          "transform": "scale(0.98)"
+        }
+      },
+      "keys": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "C",
+        "0",
+        "⌫"
+      ]
+    },
+    "login_button": {
+      "type": "button",
+      "variant": "primary",
+      "text": "Se connecter",
+      "full_width": true,
+      "margin_top": "1.5rem"
+    },
+    "demo_hint": {
+      "type": "text",
+      "text": "💡 Demo: Le PIN est affiché pour chaque profil",
+      "font_size": "0.875rem",
+      "color": "#64748B",
+      "margin_top": "1rem",
+      "text_align": "center"
+    }
+  },
+  "accessibility": {
+    "focus_order": [
+      "profile_select",
+      "keypad_keys",
+      "login_button"
+    ],
+    "aria_labels": {
+      "keypad": "Clavier numérique pour saisie du PIN",
+      "pin_display": "Affichage du PIN saisi"
+    }
+  }
+}

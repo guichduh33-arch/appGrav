@@ -53,6 +53,29 @@ export interface DashboardSummary {
     active_sessions: number;
 }
 
+export interface DailySalesStat {
+    date: string;
+    total_sales: number; // mapped from total_revenue
+    total_orders: number;
+    avg_basket: number; // mapped from avg_basket_value
+    net_revenue: number;
+}
+
+export interface ProductPerformanceStat {
+    product_id: string;
+    product_name: string;
+    quantity_sold: number;
+    total_revenue: number;
+    avg_price: number;
+}
+
+export interface CategorySalesStat {
+    category_id: string;
+    category_name: string;
+    total_revenue: number;
+    transaction_count: number;
+}
+
 export interface AuditLogEntry {
     id: string;
     action_type: string;

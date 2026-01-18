@@ -76,27 +76,32 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: var(--text-xl);
-    font-weight: 600;
-    background: var(--color-blanc-creme);
-    border: 1px solid var(--color-border);
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    background: #1E293B;
+    color: #FFFFFF !important;
+    border: 1px solid #334155;
     border-radius: var(--radius-md);
     cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: all var(--duration-fast) var(--ease-standard);
 }
 
 .numpad__key:hover {
-    background: var(--color-blanc-creme-dark);
+    background: #334155;
+    border-color: #3B82F6;
 }
 
 .numpad__key:active {
     transform: scale(0.95);
+    background: #3B82F6;
 }
 
 .numpad__key--action {
-    background: var(--color-blanc-creme-dark);
+    background: rgba(239, 68, 68, 0.1);
     font-size: var(--text-lg);
-    color: var(--color-gris-chaud);
+    color: #F87171 !important;
+    border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 /* Shake Animation */

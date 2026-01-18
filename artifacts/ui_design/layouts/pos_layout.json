@@ -1,0 +1,52 @@
+{
+  "name": "POS Layout",
+  "type": "split_screen",
+  "fullscreen": true,
+  "grid": {
+    "desktop": {
+      "columns": "1fr 400px",
+      "template": "'products cart'"
+    },
+    "tablet": {
+      "columns": "1fr 350px",
+      "template": "'products cart'"
+    },
+    "mobile": {
+      "columns": "1fr",
+      "template": "'products' 'cart'",
+      "cart_mode": "slide_up_panel"
+    }
+  },
+  "regions": {
+    "header": {
+      "height": "64px",
+      "components": [
+        "menu_button",
+        "search_bar",
+        "user_info"
+      ],
+      "sticky": true
+    },
+    "products": {
+      "components": [
+        "category_tabs",
+        "product_grid"
+      ],
+      "overflow": "auto"
+    },
+    "cart": {
+      "components": [
+        "cart_header",
+        "cart_items",
+        "cart_summary",
+        "action_buttons"
+      ],
+      "sticky": true,
+      "border_left": true
+    }
+  },
+  "spacing": {
+    "gap": "1rem",
+    "padding": "1rem"
+  }
+}

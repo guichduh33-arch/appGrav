@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
-import type { Product } from '../types/database'
+import type { Product, Supplier } from '../types/database'
 import { useAuthStore } from '../stores/authStore'
 import { MOCK_PRODUCTS } from './useProducts'
 
@@ -54,6 +54,25 @@ export function useInventoryItems() {
     })
 }
 
+export function useSuppliers() {
+    return useQuery({
+        queryKey: ['suppliers'],
+        queryFn: async (): Promise<Supplier[]> => {
+            const { data, error } = await supabase
+                .from('suppliers')
+                .select('*')
+                .eq('is_active', true)
+                .order('name');
+
+            if (error) {
+                console.error('Suppliers Fetch Error:', error);
+                return [];
+            }
+            return data || [];
+        }
+    });
+}
+
 export function useStockAdjustment() {
     const queryClient = useQueryClient()
     const { user } = useAuthStore()
@@ -64,13 +83,15 @@ export function useStockAdjustment() {
             type,
             quantity,
             reason,
-            notes
+            notes,
+            supplierId
         }: {
             productId: string
             type: 'purchase' | 'waste' | 'adjustment_in' | 'adjustment_out'
             quantity: number
             reason: string
             notes?: string
+            supplierId?: string
         }) => {
             if (!user) {
                 // Allow non-logged in users to "simulate" for demo
@@ -86,7 +107,8 @@ export function useStockAdjustment() {
                     quantity: quantity,
                     reason: reason,
                     notes: notes || null,
-                    staff_id: user.id
+                    staff_id: user.id,
+                    supplier_id: supplierId || null
                 } as any)
                 .select()
                 .single()
@@ -97,6 +119,7 @@ export function useStockAdjustment() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['inventory'] })
             queryClient.invalidateQueries({ queryKey: ['products'] })
+            queryClient.invalidateQueries({ queryKey: ['suppliers'] })
         }
     })
 }

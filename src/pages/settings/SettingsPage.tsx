@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     Store, Printer, Bell, Shield, Save, Plus, Settings, RefreshCw, Layers,
-    Edit2, Trash2, X, ShoppingCart, Factory, Warehouse
+    Edit2, Trash2, X, ShoppingCart, Factory, Warehouse, ChefHat, Coffee, Monitor
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import './SettingsPage.css';
 
-type SettingsTab = 'general' | 'printers' | 'notifications' | 'security' | 'sections';
+type SettingsTab = 'general' | 'printers' | 'notifications' | 'security' | 'sections' | 'kds';
 
 interface Section {
     id: string;
@@ -19,11 +19,31 @@ interface Section {
     created_at: string;
 }
 
+interface Category {
+    id: string;
+    name: string;
+    icon: string;
+    dispatch_station: 'barista' | 'kitchen' | 'display' | 'none' | null;
+    is_active: boolean;
+}
+
+const DISPATCH_STATIONS = [
+    { value: 'kitchen', label: 'Hot Kitchen', icon: <ChefHat size={16} />, color: '#EF4444' },
+    { value: 'barista', label: 'Barista', icon: <Coffee size={16} />, color: '#8B5CF6' },
+    { value: 'display', label: 'Display', icon: <Monitor size={16} />, color: '#10B981' },
+    { value: 'none', label: 'No Station', icon: <X size={16} />, color: '#6B7280' }
+];
+
 const SettingsPage = () => {
-    const { t } = useTranslation();
+    useTranslation();
     const [activeTab, setActiveTab] = useState<SettingsTab>('general');
     const [sections, setSections] = useState<Section[]>([]);
     const [loadingSections, setLoadingSections] = useState(false);
+
+    // KDS Categories state
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [loadingCategories, setLoadingCategories] = useState(false);
+    const [savingCategory, setSavingCategory] = useState<string | null>(null);
 
     // Section modal state
     const [showSectionModal, setShowSectionModal] = useState(false);
@@ -54,6 +74,9 @@ const SettingsPage = () => {
         if (activeTab === 'sections') {
             fetchSections();
         }
+        if (activeTab === 'kds') {
+            fetchCategories();
+        }
     }, [activeTab]);
 
     const fetchSections = async () => {
@@ -69,6 +92,47 @@ const SettingsPage = () => {
             console.error('Error fetching sections:', error);
         } finally {
             setLoadingSections(false);
+        }
+    };
+
+    const fetchCategories = async () => {
+        setLoadingCategories(true);
+        try {
+            const { data, error } = await supabase
+                .from('categories')
+                .select('id, name, icon, dispatch_station, is_active')
+                .eq('is_active', true)
+                .order('name');
+            if (error) throw error;
+            if (data) setCategories(data);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        } finally {
+            setLoadingCategories(false);
+        }
+    };
+
+    const updateCategoryStation = async (categoryId: string, newStation: string) => {
+        setSavingCategory(categoryId);
+        try {
+            const { error } = await (supabase as any)
+                .from('categories')
+                .update({ dispatch_station: newStation })
+                .eq('id', categoryId);
+
+            if (error) throw error;
+
+            // Update local state
+            setCategories(prev => prev.map(cat =>
+                cat.id === categoryId
+                    ? { ...cat, dispatch_station: newStation as Category['dispatch_station'] }
+                    : cat
+            ));
+        } catch (error) {
+            console.error('Error updating category station:', error);
+            alert('Erreur lors de la mise a jour');
+        } finally {
+            setSavingCategory(null);
         }
     };
 
@@ -189,6 +253,7 @@ const SettingsPage = () => {
     const tabs = [
         { id: 'general' as const, label: 'Général', icon: <Store size={18} /> },
         { id: 'sections' as const, label: 'Sections', icon: <Layers size={18} /> },
+        { id: 'kds' as const, label: 'Stations KDS', icon: <ChefHat size={18} /> },
         { id: 'printers' as const, label: 'Imprimantes', icon: <Printer size={18} /> },
         { id: 'notifications' as const, label: 'Notifications', icon: <Bell size={18} /> },
         { id: 'security' as const, label: 'Sécurité', icon: <Shield size={18} /> },
@@ -364,6 +429,88 @@ const SettingsPage = () => {
                                                 </div>
                                             </div>
                                         ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'kds' && (
+                        <div className="settings-section">
+                            <div className="settings-section__header">
+                                <div className="settings-section__header-content">
+                                    <div>
+                                        <h2 className="settings-section__title">Configuration des Stations KDS</h2>
+                                        <p className="settings-section__description">
+                                            Assignez chaque categorie de produit a une station KDS specifique
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="settings-section__body">
+                                {/* Station Legend */}
+                                <div className="kds-stations-legend">
+                                    {DISPATCH_STATIONS.map(station => (
+                                        <div key={station.value} className="kds-station-legend-item">
+                                            <span
+                                                className="kds-station-dot"
+                                                style={{ backgroundColor: station.color }}
+                                            />
+                                            <span className="kds-station-icon" style={{ color: station.color }}>
+                                                {station.icon}
+                                            </span>
+                                            <span>{station.label}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {loadingCategories ? (
+                                    <div className="sections-loading">
+                                        <RefreshCw size={24} className="spinning" />
+                                        <span>Chargement des categories...</span>
+                                    </div>
+                                ) : categories.length === 0 ? (
+                                    <div className="sections-empty">
+                                        <ChefHat size={48} />
+                                        <h3>Aucune categorie trouvee</h3>
+                                        <p>Les categories de produits apparaitront ici.</p>
+                                    </div>
+                                ) : (
+                                    <div className="kds-categories-list">
+                                        {categories.map(category => {
+                                            const currentStation = DISPATCH_STATIONS.find(
+                                                s => s.value === (category.dispatch_station || 'none')
+                                            );
+                                            return (
+                                                <div key={category.id} className="kds-category-item">
+                                                    <div className="kds-category-item__info">
+                                                        <span className="kds-category-item__icon">{category.icon}</span>
+                                                        <span className="kds-category-item__name">{category.name}</span>
+                                                    </div>
+                                                    <div className="kds-category-item__station">
+                                                        <select
+                                                            className="kds-station-select"
+                                                            value={category.dispatch_station || 'none'}
+                                                            onChange={(e) => updateCategoryStation(category.id, e.target.value)}
+                                                            disabled={savingCategory === category.id}
+                                                            style={{
+                                                                borderColor: currentStation?.color,
+                                                                backgroundColor: `${currentStation?.color}15`
+                                                            }}
+                                                        >
+                                                            {DISPATCH_STATIONS.map(station => (
+                                                                <option key={station.value} value={station.value}>
+                                                                    {station.label}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                        {savingCategory === category.id && (
+                                                            <RefreshCw size={16} className="spinning kds-saving-icon" />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>

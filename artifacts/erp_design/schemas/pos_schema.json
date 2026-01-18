@@ -1,0 +1,81 @@
+{
+  "module": "pos",
+  "description": "Gestion des ventes et transactions",
+  "tables": {
+    "sales": {
+      "description": "Transactions de vente",
+      "columns": {
+        "id": "UUID PRIMARY KEY DEFAULT gen_random_uuid()",
+        "sale_number": "VARCHAR(50) UNIQUE NOT NULL",
+        "customer_id": "UUID REFERENCES customers(id)",
+        "user_id": "UUID REFERENCES auth.users(id) NOT NULL",
+        "subtotal": "DECIMAL(15,2) NOT NULL DEFAULT 0",
+        "tax_amount": "DECIMAL(15,2) NOT NULL DEFAULT 0",
+        "discount_amount": "DECIMAL(15,2) DEFAULT 0",
+        "total_amount": "DECIMAL(15,2) NOT NULL",
+        "payment_method": "VARCHAR(20) NOT NULL CHECK (payment_method IN ('cash', 'card', 'transfer', 'qris'))",
+        "payment_status": "VARCHAR(20) DEFAULT 'completed'",
+        "notes": "TEXT",
+        "created_at": "TIMESTAMPTZ DEFAULT NOW()",
+        "updated_at": "TIMESTAMPTZ DEFAULT NOW()"
+      },
+      "indexes": [
+        "CREATE INDEX idx_sales_date ON sales(created_at DESC)",
+        "CREATE INDEX idx_sales_customer ON sales(customer_id)",
+        "CREATE INDEX idx_sales_number ON sales(sale_number)"
+      ],
+      "rls": true
+    },
+    "sale_items": {
+      "description": "Lignes de vente (produits vendus)",
+      "columns": {
+        "id": "UUID PRIMARY KEY DEFAULT gen_random_uuid()",
+        "sale_id": "UUID REFERENCES sales(id) ON DELETE CASCADE NOT NULL",
+        "product_id": "UUID REFERENCES products(id) NOT NULL",
+        "product_name": "VARCHAR(255) NOT NULL",
+        "quantity": "DECIMAL(10,3) NOT NULL",
+        "unit_price": "DECIMAL(15,2) NOT NULL",
+        "discount_percent": "DECIMAL(5,2) DEFAULT 0",
+        "line_total": "DECIMAL(15,2) NOT NULL",
+        "created_at": "TIMESTAMPTZ DEFAULT NOW()"
+      },
+      "indexes": [
+        "CREATE INDEX idx_sale_items_sale ON sale_items(sale_id)",
+        "CREATE INDEX idx_sale_items_product ON sale_items(product_id)"
+      ],
+      "rls": true
+    },
+    "payment_methods": {
+      "description": "Méthodes de paiement configurées",
+      "columns": {
+        "id": "UUID PRIMARY KEY DEFAULT gen_random_uuid()",
+        "code": "VARCHAR(20) UNIQUE NOT NULL",
+        "name": "VARCHAR(100) NOT NULL",
+        "is_active": "BOOLEAN DEFAULT true",
+        "requires_reference": "BOOLEAN DEFAULT false",
+        "icon": "VARCHAR(50)",
+        "sort_order": "INTEGER DEFAULT 0"
+      },
+      "rls": true
+    }
+  },
+  "functions": [
+    {
+      "name": "generate_sale_number",
+      "description": "Génère un numéro de vente unique (SALE-YYYYMMDD-XXX)",
+      "returns": "VARCHAR(50)"
+    },
+    {
+      "name": "process_sale",
+      "description": "Traite une vente complète (atomique)",
+      "returns": "UUID"
+    }
+  ],
+  "triggers": [
+    {
+      "name": "trg_sale_update_stock",
+      "description": "Déduction automatique du stock après vente",
+      "event": "AFTER INSERT ON sale_items"
+    }
+  ]
+}

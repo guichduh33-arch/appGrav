@@ -19,8 +19,8 @@ class TranslationAgent:
         self.src_path = self.project_path / "src"
     
     def generate_translation_files(self) -> dict:
-        """Génère JSONs"""
-        print("📝 Fichiers de traduction...")
+        """Generates JSON files"""
+        print("📝 Translation files...")
         langs = ["fr", "en", "id"]
         files = {}
         
@@ -38,7 +38,7 @@ class TranslationAgent:
         return files
 
     def setup_i18n_frontend(self) -> str:
-        """Configuraton i18n.ts"""
+        """i18n.ts configuration"""
         print("⚛️ Config src/i18n.ts...")
         
         content = '''import i18n from 'i18next';

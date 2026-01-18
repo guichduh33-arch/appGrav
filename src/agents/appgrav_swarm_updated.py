@@ -60,28 +60,112 @@ class AppGravSwarm:
         self.reports_path = self.project_path / "artifacts" / "reports"
         self.reports_path.mkdir(parents=True, exist_ok=True)
         
-        # Initialiser tous les agents
-        print("🤖 Initialisation du Swarm AppGrav...\n")
+        # Initialiser le cache des agents
+        print("🤖 Initialisation de l'orchestrateur AppGrav (Lazy Loading actif)...\n")
         
-        self.audit_agent = AuditAgent(str(project_path))
-        self.context_agent = ContextAgent(str(project_path))
-        self.database_agent = DatabaseAgent(str(project_path))
-        self.backend_agent = BackendAgent(str(project_path))
-        self.frontend_agent = FrontendAgent(str(project_path))
-        self.integration_agent = IntegrationAgent(str(project_path))
-        self.testing_agent = TestingAgent(str(project_path))
-        self.refactoring_agent = RefactoringAgent(str(project_path))
-        self.documentation_agent = DocumentationAgent(str(project_path))
-        self.deployment_agent = DeploymentAgent(str(project_path))
-        self.translation_agent = TranslationAgent(str(project_path))
+        self._audit_agent = None
+        self._context_agent = None
+        self._database_agent = None
+        self._backend_agent = None
+        self._frontend_agent = None
+        self._integration_agent = None
+        self._testing_agent = None
+        self._refactoring_agent = None
+        self._documentation_agent = None
+        self._deployment_agent = None
+        self._translation_agent = None
+        self._erp_design_agent = None
         
-        # NEW: Agent ERP/POS Design
-        self.erp_design_agent = ERPDesignAgent(str(project_path))
-        
-        print("✅ Swarm initialisé avec 12 agents\n")
+        print("✅ Orchestrateur prêt\n")
         
         self.execution_log = []
-    
+        
+
+    # Properties pour le Lazy Loading
+    @property
+    def audit_agent(self):
+        if self._audit_agent is None:
+            print("🚀 Loading AuditAgent...")
+            self._audit_agent = AuditAgent(str(self.project_path))
+        return self._audit_agent
+
+    @property
+    def context_agent(self):
+        if self._context_agent is None:
+            print("🚀 Loading ContextAgent...")
+            self._context_agent = ContextAgent(str(self.project_path))
+        return self._context_agent
+
+    @property
+    def database_agent(self):
+        if self._database_agent is None:
+            print("🚀 Loading DatabaseAgent...")
+            self._database_agent = DatabaseAgent(str(self.project_path))
+        return self._database_agent
+
+    @property
+    def backend_agent(self):
+        if self._backend_agent is None:
+            print("🚀 Loading BackendAgent...")
+            self._backend_agent = BackendAgent(str(self.project_path))
+        return self._backend_agent
+
+    @property
+    def frontend_agent(self):
+        if self._frontend_agent is None:
+            print("🚀 Loading FrontendAgent...")
+            self._frontend_agent = FrontendAgent(str(self.project_path))
+        return self._frontend_agent
+
+    @property
+    def integration_agent(self):
+        if self._integration_agent is None:
+            print("🚀 Loading IntegrationAgent...")
+            self._integration_agent = IntegrationAgent(str(self.project_path))
+        return self._integration_agent
+
+    @property
+    def testing_agent(self):
+        if self._testing_agent is None:
+            print("🚀 Loading TestingAgent...")
+            self._testing_agent = TestingAgent(str(self.project_path))
+        return self._testing_agent
+
+    @property
+    def refactoring_agent(self):
+        if self._refactoring_agent is None:
+            print("🚀 Loading RefactoringAgent...")
+            self._refactoring_agent = RefactoringAgent(str(self.project_path))
+        return self._refactoring_agent
+
+    @property
+    def documentation_agent(self):
+        if self._documentation_agent is None:
+            print("🚀 Loading DocumentationAgent...")
+            self._documentation_agent = DocumentationAgent(str(self.project_path))
+        return self._documentation_agent
+
+    @property
+    def deployment_agent(self):
+        if self._deployment_agent is None:
+            print("🚀 Loading DeploymentAgent...")
+            self._deployment_agent = DeploymentAgent(str(self.project_path))
+        return self._deployment_agent
+
+    @property
+    def translation_agent(self):
+        if self._translation_agent is None:
+            print("🚀 Loading TranslationAgent...")
+            self._translation_agent = TranslationAgent(str(self.project_path))
+        return self._translation_agent
+
+    @property
+    def erp_design_agent(self):
+        if self._erp_design_agent is None:
+            print("🚀 Loading ERPDesignAgent...")
+            self._erp_design_agent = ERPDesignAgent(str(self.project_path))
+        return self._erp_design_agent
+
     def list_agents(self) -> Dict[str, str]:
         """Liste tous les agents disponibles avec leur rôle"""
         return {
@@ -169,56 +253,94 @@ class AppGravSwarm:
         
         return plan
     
-    def build_feature(self, feature_description: str) -> dict:
+    def build_feature(self, feature_description: str, technical_name: str = None) -> dict:
         """
         Construit une fonctionnalité complète
         """
         print("="*70)
         print(f"🏗️ CONSTRUCTION DE FONCTIONNALITÉ")
         print("="*70)
-        print(f"\n📝 Description : {feature_description}\n")
+        print(f"\n📝 Description : {feature_description}")
+        print(f"🆔 Nom technique : {technical_name}\n")
         
         execution = {
             "feature": feature_description,
+            "technical_name": technical_name,
             "started_at": datetime.now().isoformat(),
             "steps": []
         }
         
-        # Context
-        print("1️⃣ Analyse du besoin...")
-        suggestion = self.context_agent.suggest_consistent_approach("component", feature_description)
-        feature_name = feature_description.split(" ")[0] if " " in feature_description else feature_description
-        
-        # ERP Design consultation (NEW)
-        print("\n2️⃣ Consultation ERPDesignAgent...")
-        erp_suggestion = self.erp_design_agent.suggest_implementation(feature_description)
-        execution["steps"].append({
-            "agent": "ERPDesignAgent",
-            "action": "suggest_implementation",
-            "result": erp_suggestion
-        })
-        
-        # Backend
-        print("\n3️⃣ Backend API...")
-        self.backend_agent.create_edge_function(feature_name.lower())
-        
-        # Frontend
-        print("\n4️⃣ Frontend Interface...")
-        self.frontend_agent.create_component(feature_name, is_page=True)
-        
-        # Testing
-        print("\n5️⃣ Tests...")
-        self.testing_agent.generate_edge_function_test(feature_name.lower())
-        self.testing_agent.generate_frontend_test(feature_name)
-        
-        execution["completed_at"] = datetime.now().isoformat()
-        execution["status"] = "completed"
+        try:
+            # Context
+            print("1️⃣ Analyse du besoin...")
+            suggestion = self.context_agent.suggest_consistent_approach("component", feature_description)
+            
+            # Use technical_name if provided, otherwise fallback to description splitting
+            if technical_name:
+                feature_name = technical_name
+            else:
+                feature_name = feature_description.split(" ")[0] if " " in feature_description else feature_description
+            
+            # Ensure feature_name is safe for filenames
+            feature_name = "".join(c for c in feature_name if c.isalnum() or c in ('-', '_'))
+            
+            # ERP Design consultation (NEW)
+            print("\n2️⃣ Consultation ERPDesignAgent...")
+            erp_suggestion = self.erp_design_agent.suggest_implementation(feature_description)
+            execution["steps"].append({
+                "agent": "ERPDesignAgent",
+                "action": "suggest_implementation",
+                "result": "success"
+            })
+            
+            # Backend
+            print("\n3️⃣ Backend API...")
+            try:
+                self.backend_agent.create_edge_function(feature_name.lower(), context=erp_suggestion)
+                execution["steps"].append({"agent": "BackendAgent", "status": "success"})
+            except Exception as b_err:
+                print(f"❌ Erreur Backend: {b_err}")
+                execution["steps"].append({"agent": "BackendAgent", "status": "failed", "error": str(b_err)})
+                execution["status"] = "failed"
+                raise b_err
+
+            # Frontend
+            print("\n4️⃣ Frontend Interface...")
+            try:
+                self.frontend_agent.create_component(feature_name, is_page=True, context=erp_suggestion)
+                execution["steps"].append({"agent": "FrontendAgent", "status": "success"})
+            except Exception as f_err:
+                print(f"❌ Erreur Frontend: {f_err}")
+                execution["steps"].append({"agent": "FrontendAgent", "status": "failed", "error": str(f_err)})
+                execution["status"] = "failed"
+                raise f_err
+
+            # Testing
+            print("\n5️⃣ Tests...")
+            try:
+                self.testing_agent.generate_edge_function_test(feature_name.lower())
+                self.testing_agent.generate_frontend_test(feature_name)
+                execution["steps"].append({"agent": "TestingAgent", "status": "success"})
+            except Exception as t_err:
+                print(f"⚠️ Erreur Tests (non critique): {t_err}")
+                execution["steps"].append({"agent": "TestingAgent", "status": "warning", "error": str(t_err)})
+
+            execution["completed_at"] = datetime.now().isoformat()
+            execution["status"] = "completed"
+            print(f"\n✅ Fonctionnalité construite avec succès")
+
+        except Exception as global_err:
+            execution["completed_at"] = datetime.now().isoformat()
+            if execution["status"] != "failed":
+                execution["status"] = "failed"
+                execution["error"] = str(global_err)
+            print(f"\n❌ ÉCHEC de la construction: {global_err}")
         
         report_path = self.reports_path / f"feature_build_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(report_path, 'w', encoding='utf-8') as f:
             json.dump(execution, f, indent=2)
             
-        print(f"\n✅ Fonctionnalité construite : {report_path}")
+        print(f"📄 Rapport : {report_path}")
         self.execution_log.append(execution)
         return execution
     
@@ -397,7 +519,8 @@ def main():
             swarm.analyze_and_plan()
         elif choice == "2":
             f = input("Description de la fonctionnalité: ")
-            swarm.build_feature(f)
+            n = input("Nom technique (Slug, ex: user-profile): ").strip()
+            swarm.build_feature(f, technical_name=n)
         elif choice == "3":
             swarm.refactor_project()
         elif choice == "4":

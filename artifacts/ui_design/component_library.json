@@ -1,0 +1,544 @@
+{
+  "meta": {
+    "name": "The Breakery Design System",
+    "version": "1.0.0",
+    "generated_at": "2026-01-18T06:33:02.597483",
+    "framework": "React + Tailwind CSS"
+  },
+  "components": {
+    "buttons": {
+      "Button": {
+        "name": "Button",
+        "description": "Bouton principal de l'application",
+        "variants": {
+          "primary": {
+            "bg": "#2563EB",
+            "text": "#FFFFFF",
+            "hover": "#1D4ED8",
+            "active": "#1E40AF",
+            "border": "none"
+          },
+          "secondary": {
+            "bg": "#FEF3C7",
+            "text": "#0F172A",
+            "hover": "#FDE68A",
+            "active": "#FCD34D",
+            "border": "2px solid #F59E0B"
+          },
+          "ghost": {
+            "bg": "transparent",
+            "text": "#334155",
+            "hover": "#F1F5F9",
+            "active": "#E2E8F0",
+            "border": "none"
+          },
+          "danger": {
+            "bg": "#DC2626",
+            "text": "#FFFFFF",
+            "hover": "#B91C1C",
+            "active": "#991B1B",
+            "border": "none"
+          },
+          "success": {
+            "bg": "#047857",
+            "text": "#FFFFFF",
+            "hover": "#059669",
+            "active": "#047857",
+            "border": "none"
+          }
+        },
+        "sizes": {
+          "sm": {
+            "padding": "0.5rem 1rem",
+            "font_size": "0.875rem",
+            "height": "32px"
+          },
+          "md": {
+            "padding": "0.75rem 1.5rem",
+            "font_size": "1rem",
+            "height": "40px"
+          },
+          "lg": {
+            "padding": "1rem 2rem",
+            "font_size": "1.125rem",
+            "height": "48px"
+          }
+        },
+        "props": {
+          "variant": "primary | secondary | ghost | danger | success",
+          "size": "sm | md | lg",
+          "disabled": "boolean",
+          "fullWidth": "boolean",
+          "loading": "boolean",
+          "leftIcon": "ReactNode",
+          "rightIcon": "ReactNode"
+        },
+        "accessibility": {
+          "aria_required": [
+            "aria-label (si icon only)",
+            "aria-disabled (si disabled)"
+          ],
+          "keyboard": "Enter, Space pour activer",
+          "focus_visible": true,
+          "focus_ring": "2px solid #3B82F6"
+        },
+        "example_react": "\nimport { Button } from '@/components/ui/Button';\n\n// Variantes\n<Button variant=\"primary\">Confirmer</Button>\n<Button variant=\"secondary\">Annuler</Button>\n<Button variant=\"danger\">Supprimer</Button>\n\n// Tailles\n<Button size=\"sm\">Petit</Button>\n<Button size=\"lg\">Grand</Button>\n\n// Avec icônes\n<Button leftIcon={<PlusIcon />}>Ajouter</Button>\n\n// États\n<Button loading>Chargement...</Button>\n<Button disabled>Désactivé</Button>\n<Button fullWidth>Pleine largeur</Button>\n",
+        "example_tailwind": "\n<!-- Primary Button -->\n<button class=\"bg-blue-600 hover:bg-blue-700 active:bg-blue-800\n               text-white font-medium px-6 py-3 rounded-lg\n               transition-colors duration-200\n               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2\n               disabled:opacity-50 disabled:cursor-not-allowed\">\n  Confirmer\n</button>\n\n<!-- Secondary Button (Cream) -->\n<button class=\"bg-amber-100 hover:bg-amber-200 active:bg-amber-300\n               text-slate-900 font-semibold px-6 py-3 rounded-xl\n               border-2 border-amber-500\n               shadow-md hover:shadow-lg transition-all duration-200\">\n  Annuler\n</button>\n"
+      },
+      "IconButton": {
+        "name": "IconButton",
+        "description": "Bouton avec icône uniquement",
+        "variants": {
+          "default": {
+            "bg": "transparent",
+            "hover": "#F1F5F9"
+          },
+          "filled": {
+            "bg": "#F1F5F9",
+            "hover": "#E2E8F0"
+          }
+        },
+        "sizes": {
+          "sm": {
+            "size": "32px",
+            "icon_size": "16px"
+          },
+          "md": {
+            "size": "40px",
+            "icon_size": "20px"
+          },
+          "lg": {
+            "size": "48px",
+            "icon_size": "24px"
+          }
+        },
+        "accessibility": {
+          "aria_required": [
+            "aria-label (obligatoire)"
+          ],
+          "keyboard": "Enter, Space",
+          "focus_visible": true
+        }
+      }
+    },
+    "inputs": {
+      "Input": {
+        "name": "Input",
+        "description": "Champ de saisie texte",
+        "variants": {
+          "default": {
+            "bg": "#FFFFFF",
+            "border": "#CBD5E1",
+            "focus_border": "#3B82F6",
+            "text": "#0F172A",
+            "placeholder": "#94A3B8"
+          },
+          "error": {
+            "border": "#EF4444",
+            "focus_border": "#EF4444"
+          },
+          "success": {
+            "border": "#10B981"
+          }
+        },
+        "sizes": {
+          "sm": {
+            "height": "32px",
+            "padding": "0.5rem 0.75rem"
+          },
+          "md": {
+            "height": "40px",
+            "padding": "0.75rem 1rem"
+          },
+          "lg": {
+            "height": "48px",
+            "padding": "1rem 1.25rem"
+          }
+        },
+        "props": {
+          "type": "text | email | password | number | tel | search",
+          "size": "sm | md | lg",
+          "error": "boolean",
+          "disabled": "boolean",
+          "leftIcon": "ReactNode",
+          "rightIcon": "ReactNode",
+          "helperText": "string",
+          "errorMessage": "string"
+        },
+        "accessibility": {
+          "aria_required": [
+            "aria-label ou label associé",
+            "aria-invalid si erreur",
+            "aria-describedby pour helper"
+          ],
+          "keyboard": "Tab pour navigation",
+          "focus_visible": true
+        },
+        "example_tailwind": "\n<input type=\"text\"\n       class=\"w-full h-10 px-4 py-2\n              border border-slate-300 rounded-lg\n              text-slate-900 placeholder-slate-400\n              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500\n              disabled:bg-slate-50 disabled:cursor-not-allowed\n              transition-colors duration-200\"\n       placeholder=\"Entrez votre texte...\" />\n"
+      },
+      "Select": {
+        "name": "Select",
+        "description": "Liste déroulante",
+        "props": {
+          "options": "Array<{value: string, label: string}>",
+          "placeholder": "string",
+          "multiple": "boolean",
+          "searchable": "boolean"
+        }
+      },
+      "Checkbox": {
+        "name": "Checkbox",
+        "description": "Case à cocher",
+        "accessibility": {
+          "keyboard": "Space pour toggle",
+          "aria_required": [
+            "aria-checked"
+          ]
+        }
+      },
+      "NumericKeypad": {
+        "name": "NumericKeypad",
+        "description": "Pavé numérique pour PIN et montants",
+        "style": {
+          "button_bg": "#FEF3C7",
+          "button_border": "2px solid #F59E0B",
+          "button_radius": "0.75rem",
+          "button_shadow": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+          "text_color": "#0F172A",
+          "font_weight": "800",
+          "hover_bg": "#FDE68A"
+        },
+        "layout": "3x4 grid",
+        "keys": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "C",
+          "0",
+          "⌫"
+        ],
+        "accessibility": {
+          "keyboard": "Navigation par Tab et flèches",
+          "aria_required": [
+            "role='group'",
+            "aria-label='Clavier numérique'"
+          ]
+        },
+        "example_tailwind": "\n<div class=\"grid grid-cols-3 gap-3 p-4 bg-slate-100 rounded-2xl\">\n  <!-- Bouton numérique -->\n  <button class=\"w-16 h-16\n                 bg-amber-100 hover:bg-amber-200 active:bg-amber-300\n                 border-2 border-amber-500 rounded-xl\n                 text-slate-900 text-2xl font-extrabold\n                 shadow-md hover:shadow-lg\n                 transition-all duration-150\n                 focus:outline-none focus:ring-2 focus:ring-amber-500\">\n    1\n  </button>\n</div>\n"
+      }
+    },
+    "cards": {
+      "Card": {
+        "name": "Card",
+        "description": "Conteneur carte pour regrouper du contenu",
+        "variants": {
+          "elevated": {
+            "bg": "#FFFFFF",
+            "shadow": "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+            "border": "none"
+          },
+          "outlined": {
+            "bg": "#FFFFFF",
+            "shadow": "none",
+            "border": "1px solid #E2E8F0"
+          },
+          "filled": {
+            "bg": "#F8FAFC",
+            "shadow": "none",
+            "border": "none"
+          }
+        },
+        "props": {
+          "variant": "elevated | outlined | filled",
+          "padding": "none | sm | md | lg",
+          "hoverable": "boolean",
+          "clickable": "boolean"
+        },
+        "example_tailwind": "\n<div class=\"bg-white rounded-xl shadow-md p-6\n            hover:shadow-lg transition-shadow duration-200\">\n  <h3 class=\"text-lg font-semibold text-slate-900\">Titre</h3>\n  <p class=\"mt-2 text-slate-600\">Contenu de la carte</p>\n</div>\n"
+      },
+      "ProductCard": {
+        "name": "ProductCard",
+        "description": "Carte produit pour la grille POS",
+        "specs": {
+          "image_ratio": "1:1",
+          "image_size": "80px",
+          "min_width": "120px",
+          "max_width": "160px"
+        },
+        "states": {
+          "default": {
+            "bg": "#FFFFFF"
+          },
+          "hover": {
+            "shadow": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)"
+          },
+          "selected": {
+            "border": "2px solid #3B82F6"
+          },
+          "out_of_stock": {
+            "opacity": "0.5"
+          }
+        }
+      },
+      "StatCard": {
+        "name": "StatCard",
+        "description": "Carte pour afficher une statistique KPI",
+        "layout": {
+          "icon": "top-left ou left",
+          "value": "large, bold",
+          "label": "small, muted",
+          "trend": "optional, bottom"
+        }
+      }
+    },
+    "badges": {
+      "Badge": {
+        "name": "Badge",
+        "description": "Badge de statut ou étiquette",
+        "variants": {
+          "default": {
+            "bg": "#F1F5F9",
+            "text": "#334155"
+          },
+          "primary": {
+            "bg": "#DBEAFE",
+            "text": "#1D4ED8"
+          },
+          "success": {
+            "bg": "#D1FAE5",
+            "text": "#047857"
+          },
+          "warning": {
+            "bg": "#FEF3C7",
+            "text": "#B45309"
+          },
+          "danger": {
+            "bg": "#FEE2E2",
+            "text": "#B91C1C"
+          }
+        },
+        "sizes": {
+          "sm": {
+            "padding": "0.125rem 0.5rem",
+            "font_size": "0.75rem"
+          },
+          "md": {
+            "padding": "0.25rem 0.75rem",
+            "font_size": "0.875rem"
+          }
+        },
+        "example_tailwind": "\n<span class=\"inline-flex items-center px-2.5 py-0.5\n             rounded-full text-xs font-medium\n             bg-green-100 text-green-800\">\n  En stock\n</span>\n"
+      },
+      "OrderStatusBadge": {
+        "name": "OrderStatusBadge",
+        "description": "Badge spécifique pour les statuts de commande",
+        "statuses": {
+          "pending": {
+            "color": "warning",
+            "label": "En attente"
+          },
+          "preparing": {
+            "color": "primary",
+            "label": "En préparation"
+          },
+          "ready": {
+            "color": "success",
+            "label": "Prêt"
+          },
+          "completed": {
+            "color": "default",
+            "label": "Terminé"
+          },
+          "cancelled": {
+            "color": "danger",
+            "label": "Annulé"
+          }
+        }
+      }
+    },
+    "modals": {
+      "Modal": {
+        "name": "Modal",
+        "description": "Fenêtre modale",
+        "sizes": {
+          "sm": {
+            "max_width": "400px"
+          },
+          "md": {
+            "max_width": "600px"
+          },
+          "lg": {
+            "max_width": "800px"
+          },
+          "xl": {
+            "max_width": "1000px"
+          },
+          "full": {
+            "max_width": "calc(100vw - 2rem)"
+          }
+        },
+        "structure": {
+          "backdrop": {
+            "bg": "rgba(0, 0, 0, 0.5)",
+            "z_index": "1040"
+          },
+          "container": {
+            "bg": "#FFFFFF",
+            "border_radius": "0.75rem",
+            "shadow": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+            "z_index": "1050"
+          }
+        },
+        "accessibility": {
+          "aria_required": [
+            "role='dialog'",
+            "aria-modal='true'",
+            "aria-labelledby"
+          ],
+          "keyboard": "Escape pour fermer, Tab trap",
+          "focus": "Focus initial sur premier élément interactif"
+        }
+      },
+      "PaymentModal": {
+        "name": "PaymentModal",
+        "description": "Modal de paiement POS",
+        "specs": {
+          "width": "800px",
+          "layout": "Adaptive (2 colonnes pour Cash, 1 centrée pour autres)"
+        },
+        "sections": [
+          "amount_display",
+          "payment_method_selector",
+          "input_area",
+          "action_buttons"
+        ]
+      }
+    },
+    "tables": {
+      "Table": {
+        "name": "Table",
+        "description": "Tableau de données",
+        "style": {
+          "header_bg": "#F8FAFC",
+          "header_text": "#475569",
+          "row_hover": "#F8FAFC",
+          "border": "#E2E8F0"
+        },
+        "features": [
+          "sorting",
+          "pagination",
+          "row_selection",
+          "column_resizing"
+        ]
+      },
+      "CartTable": {
+        "name": "CartTable",
+        "description": "Tableau du panier POS",
+        "columns": [
+          "product_name",
+          "quantity_controls",
+          "unit_price",
+          "line_total",
+          "actions"
+        ],
+        "row_states": {
+          "locked": {
+            "indicator": "lock_icon",
+            "color": "warning"
+          }
+        }
+      }
+    },
+    "navigation": {
+      "Tabs": {
+        "name": "Tabs",
+        "description": "Onglets de navigation",
+        "variants": {
+          "underline": {
+            "active_indicator": "border-bottom 2px",
+            "active_color": "#3B82F6"
+          },
+          "pills": {
+            "active_bg": "#3B82F6",
+            "active_text": "#FFFFFF"
+          },
+          "contained": {
+            "container_bg": "#F1F5F9",
+            "active_bg": "#FFFFFF"
+          }
+        }
+      },
+      "CategoryTabs": {
+        "name": "CategoryTabs",
+        "description": "Onglets de catégories pour le POS",
+        "behavior": "Scroll horizontal sur mobile",
+        "features": [
+          "all_category_tab",
+          "category_icons",
+          "active_highlight"
+        ]
+      },
+      "Sidebar": {
+        "name": "Sidebar",
+        "description": "Barre latérale de navigation",
+        "width": {
+          "collapsed": "64px",
+          "expanded": "240px"
+        }
+      }
+    },
+    "feedback": {
+      "Toast": {
+        "name": "Toast",
+        "description": "Notification toast",
+        "variants": {
+          "success": {
+            "icon": "check",
+            "bg": "#ECFDF5"
+          },
+          "error": {
+            "icon": "x",
+            "bg": "#FEF2F2"
+          },
+          "warning": {
+            "icon": "alert",
+            "bg": "#FFFBEB"
+          },
+          "info": {
+            "icon": "info",
+            "bg": "#EFF6FF"
+          }
+        },
+        "position": "top-right",
+        "duration": "5000ms",
+        "accessibility": {
+          "aria_required": [
+            "role='alert'",
+            "aria-live='polite'"
+          ]
+        }
+      },
+      "Spinner": {
+        "name": "Spinner",
+        "description": "Indicateur de chargement",
+        "sizes": {
+          "sm": "16px",
+          "md": "24px",
+          "lg": "32px",
+          "xl": "48px"
+        }
+      },
+      "Skeleton": {
+        "name": "Skeleton",
+        "description": "Placeholder de chargement",
+        "animation": "pulse"
+      }
+    }
+  }
+}

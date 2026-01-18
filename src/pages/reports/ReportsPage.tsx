@@ -4,8 +4,15 @@ import { ChevronRight, ArrowLeft, Download } from 'lucide-react';
 import { OverviewTab } from './components/OverviewTab';
 import { SalesTab } from './components/SalesTab';
 import { InventoryTab } from './components/InventoryTab';
+import { StockMovementTab } from './components/StockMovementTab';
+import { SalesByCategoryTab } from './components/SalesByCategoryTab';
+import { PaymentMethodTab } from './components/PaymentMethodTab';
+import { PurchaseDetailsTab } from './components/PurchaseDetailsTab';
+import { PurchaseBySupplierTab } from './components/PurchaseBySupplierTab';
 import { AuditTab } from './components/AuditTab';
-import { REPORT_CATEGORIES, ReportCategory, ReportDefinition } from './ReportsConfig';
+import { DailySalesTab } from './components/DailySalesTab';
+import { ProductPerformanceTab } from './components/ProductPerformanceTab';
+import { REPORT_CATEGORIES } from './ReportsConfig';
 import './ReportsPage.css';
 
 const ReportsPage = () => {
@@ -23,6 +30,20 @@ const ReportsPage = () => {
                 return <OverviewTab />;
             case 'sales_dashboard':
                 return <SalesTab />;
+            case 'daily_sales':
+                return <DailySalesTab />;
+            case 'product_performance':
+                return <ProductPerformanceTab />;
+            case 'sales_by_category':
+                return <SalesByCategoryTab />;
+            case 'stock_movement':
+                return <StockMovementTab />;
+            case 'payment_by_method':
+                return <PaymentMethodTab />;
+            case 'purchase_details':
+                return <PurchaseDetailsTab />;
+            case 'purchase_by_supplier':
+                return <PurchaseBySupplierTab />;
             case 'inventory_dashboard':
                 return <InventoryTab />;
             case 'audit_log':

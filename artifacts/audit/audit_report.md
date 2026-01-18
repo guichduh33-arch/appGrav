@@ -1,7 +1,7 @@
 # 🔍 Audit Report - The Breakery POS
 
-**Generated:** 2026-01-16 19:45:35  
-**Project:** C:\disk\AppGrav
+**Generated:** 2026-01-18 05:45:10  
+**Project:** .
 
 ---
 
@@ -9,32 +9,32 @@
 
 | Category | Score |
 |----------|-------|
-| **Overall** | **7.0/10** |
-| Code Quality | 9.0/10 |
+| **Overall** | **6.9/10** |
+| Code Quality | 8.8/10 |
 | Security | 1/10 |
-| Feature Completeness | 8.2/10 |
-| Database | 10/10 |
+| Feature Completeness | 8.9/10 |
+| Database | 9.0/10 |
 
 ---
 
 ## 📁 Project Structure
 
 ### Overview
-- **Total Files:** 211
-- **Total Directories:** 64
+- **Total Files:** 291
+- **Total Directories:** 83
 
 ### Files by Extension
 | Extension | Count |
 |-----------|-------|
-| .tsx | 42 |
-| .css | 31 |
-| .ts | 26 |
+| .tsx | 59 |
+| .md | 39 |
+| .ts | 36 |
+| .css | 32 |
+| .sql | 31 |
+| .json | 30 |
 | .js | 21 |
-| .sql | 19 |
-| .md | 18 |
-| .py | 17 |
-| .json | 15 |
-| (none) | 4 |
+| .py | 18 |
+| (none) | 5 |
 | .html | 4 |
 
 ### Detected Frameworks
@@ -68,49 +68,50 @@
 - ✅ TypeScript for type safety
 - ✅ Internationalization support implemented
 - ✅ Row-Level Security policies in place
-- ✅ Good feature coverage (82.1%)
-- ✅ No critical security vulnerabilities found
+- ✅ Good feature coverage (89.3%)
 
 ---
 
 ## ⚠️ Issues by Priority
 
 ### 🔴 Critical Issues
-- None found ✅
+- **Hardcoded API key** in `supabase\migrations\20250118_implement_rls_policies.sql` (line 2342)
 
 ### 🟠 High Priority
-- **Direct innerHTML assignment - XSS risk** in `costing.html` (line 168)
-- **Direct innerHTML assignment - XSS risk** in `kds.html` (line 233)
-- **Direct innerHTML assignment - XSS risk** in `kds.html` (line 250)
-- **Direct innerHTML assignment - XSS risk** in `kds.html` (line 277)
-- **Direct innerHTML assignment - XSS risk** in `js\app.js` (line 127)
-- **Direct innerHTML assignment - XSS risk** in `js\app.js` (line 162)
-- **Direct innerHTML assignment - XSS risk** in `js\app.js` (line 287)
-- **Direct innerHTML assignment - XSS risk** in `js\app.js` (line 298)
-- **Direct innerHTML assignment - XSS risk** in `js\stock.js` (line 84)
-- **Direct innerHTML assignment - XSS risk** in `js\stock.js` (line 150)
+- **Use of eval() - potential code injection** in `src\agents\audit_agent.py` (line 623)
+- **dangerouslySetInnerHTML usage - XSS risk** in `src\agents\audit_agent.py` (line 625)
+- **dangerouslySetInnerHTML usage - XSS risk** in `src\agents\audit_agent.py` (line 625)
+- **Use of eval() - potential code injection** in `src\artifacts\audit\audit_report.md` (line 59)
+- **dangerouslySetInnerHTML usage - XSS risk** in `src\artifacts\audit\audit_report.md` (line 60)
+- **dangerouslySetInnerHTML usage - XSS risk** in `src\artifacts\audit\audit_report.md` (line 61)
+- **Direct innerHTML assignment - XSS risk** in `_legacy\costing.html` (line 168)
+- **Direct innerHTML assignment - XSS risk** in `_legacy\kds.html` (line 233)
+- **Direct innerHTML assignment - XSS risk** in `_legacy\kds.html` (line 250)
+- **Direct innerHTML assignment - XSS risk** in `_legacy\kds.html` (line 277)
 
 ### 🟡 Medium Priority
 - Non-HTTPS URL (except localhost) in `README.md`
 - Non-HTTPS URL (except localhost) in `README.md`
 - Non-HTTPS URL (except localhost) in `README.md`
-- Non-HTTPS URL (except localhost) in `css\components.css`
-- Non-HTTPS URL (except localhost) in `docs\api\sales.md`
+- Non-HTTPS URL (except localhost) in `.antigravity\tasks\fix-categories-error.md`
+- Non-HTTPS URL (except localhost) in `artifacts\remote_access.md`
 
 ### 🔵 Low Priority
-- 124 console/debug statements found
+- 292 console/debug statements found
 
 ---
 
 ## 📦 Dependencies Analysis
 
-**Total Dependencies:** 24
+**Total Dependencies:** 31
 
-### Production Dependencies (14)
+### Production Dependencies (16)
+- `@anthropic-ai/sdk`: ^0.71.2
 - `@supabase/supabase-js`: ^2.39.0
 - `@tanstack/react-query`: ^5.17.0
 - `csv-parse`: ^6.1.0
 - `date-fns`: ^3.2.0
+- `dotenv`: ^17.2.3
 - `i18next`: ^25.7.4
 - `i18next-browser-languagedetector`: ^8.2.0
 - `lucide-react`: ^0.303.0
@@ -120,9 +121,9 @@
 - `react-i18next`: ^16.5.3
 - `react-router-dom`: ^6.21.1
 - `recharts`: ^3.6.0
-- `zustand`: ^4.4.7
 
 ### ⚠️ Version Warnings
+- @anthropic-ai/sdk@^0.71.2 - Pre-1.0 version, may be unstable
 - lucide-react@^0.303.0 - Pre-1.0 version, may be unstable
 - eslint-plugin-react-refresh@^0.4.5 - Pre-1.0 version, may be unstable
 
@@ -130,7 +131,7 @@
 
 ## 🗄️ Database Analysis
 
-### Tables (25)
+### Tables (28)
 - `app_settings`
 - `audit_log`
 - `b2b_order_items`
@@ -139,20 +140,20 @@
 - `customers`
 - `inventory_count_items`
 - `inventory_counts`
+- `loyalty_points`
 - `order_items`
 - `orders`
 - `po_items`
 - `pos_sessions`
 - `product_modifiers`
+- `product_stocks`
 - `product_uoms`
 - `production_records`
 - `products`
 - `purchase_orders`
 - `recipes`
-- `reporting_stock_snapshots`
-- `section_items`
 
-### Functions (37)
+### Functions (42)
 - `calculate_loyalty_points()`
 - `calculate_order_totals()`
 - `can_access_backoffice()`
@@ -162,63 +163,67 @@
 - `check_reporting_access()`
 - `check_stock_alert()`
 - `deduct_stock_from_order()`
-- `finalize_inventory_count()`
+- `deduct_stock_on_sale()`
 
-### RLS Policies (82)
+### RLS Policies (100)
 - `Admin`
+- `Admins`
 - `Allow`
+- `Anyone`
+- `Authenticated`
 - `Backoffice`
 - `Enable`
 - `Public`
 - `Staff`
-- `admin_manage_profiles`
-- `admins_read_system_logs`
-- `anon_read_active_profiles`
-- `cancel_orders_manager`
+- `Users`
+
+### ⚠️ Database Issues
+- Tables without RLS: sections, product_stocks
 
 ---
 
 ## 🎯 Feature Coverage
 
-**Coverage:** 82.1%
+**Coverage:** 89.3%
 
 ### ✅ Existing Features
 - **POS/Sales**: Point of sale functionality
 - **Inventory Management**: Product and stock management
 - **Order Management**: Order processing and tracking
 - **Kitchen Display System**: Kitchen order display
+- **Reporting/Analytics**: Business intelligence and reporting
 - **Settings/Configuration**: System configuration
 - **Production/Manufacturing**: Production management
+- **Purchasing**: Purchase order management
 - **Customer Display**: Customer-facing display
 - **Internationalization**: Multi-language support
 - **Printing**: Receipt and ticket printing
 
 ### 🔶 Partial Implementation
 - **Authentication**: User authentication and authorization
-- **Reporting/Analytics**: Business intelligence and reporting
 - **User Management**: User and role management
-- **Purchasing**: Purchase order management
 - **B2B/Wholesale**: Business-to-business sales
 
 ---
 
 ## 🛡️ Security Audit
 
-**Files Scanned:** 193  
-**Total Issues:** 166
+**Files Scanned:** 270  
+**Total Issues:** 350
 
 | Severity | Count |
 |----------|-------|
-| Critical | 0 |
-| High | 14 |
-| Medium | 28 |
-| Low | 124 |
+| Critical | 1 |
+| High | 17 |
+| Medium | 40 |
+| Low | 292 |
 
 ---
 
 ## 📋 Recommendations
 
 ### Immediate Actions (This Week)
+1. 🔴 **URGENT**: Fix all critical security issues immediately
 1. 🟠 Address high-priority security vulnerabilities
 1. 📦 Review and update dependencies with version warnings
 
@@ -247,43 +252,44 @@
 ## 📊 Code Quality Details
 
 ### File Scores Distribution
-- **Excellent (8-10):** 98 files
-- **Good (6-7.9):** 6 files
+- **Excellent (8-10):** 119 files
+- **Good (6-7.9):** 13 files
 - **Needs Improvement (4-5.9):** 2 files
 - **Poor (<4):** 0 files
 
-**Average Score:** 9.0/10
+**Average Score:** 8.8/10
 
 ### Files Needing Attention
-- `src\pages\inventory\ProductDetailPage.tsx`: 5.0/10
-  - File too long (777 lines)
-  - 42 lines exceed 120 characters
+- `src\pages\production\ProductionPage.tsx`: 5.0/10
+  - File too long (578 lines)
+  - 44 lines exceed 120 characters
 - `src\agents\audit_agent.py`: 5.5/10
   - File too long (1169 lines)
   - 15 TODO/FIXME markers found
-- `src\pages\production\ProductionPage.tsx`: 6.0/10
-  - File somewhat long (358 lines)
-  - 29 lines exceed 120 characters
+- `src\agents\erp_design_agent.py`: 6.0/10
+  - File too long (1379 lines)
+  - 32 debug statements found
+- `src\pages\inventory\SuppliersPage.tsx`: 6.0/10
+  - File somewhat long (311 lines)
+  - 17 lines exceed 120 characters
 - `src\agents\documentation_agent.py`: 6.5/10
   - File too long (923 lines)
   - 7 TODO/FIXME markers found
-- `src\components\pos\ModifierModal.tsx`: 7.0/10
-  - File somewhat long (318 lines)
-  - Insufficient comments
+- `src\agents\appgrav_swarm_updated.py`: 7.0/10
+  - File too long (560 lines)
+  - 82 debug statements found
 - `src\pages\Purchase_Order_Module.tsx`: 7.0/10
   - File somewhat long (424 lines)
   - Insufficient comments
-- `src\pages\orders\OrdersPage.tsx`: 7.0/10
-  - File somewhat long (301 lines)
+- `src\pages\inventory\ProductDetailPage.tsx`: 7.0/10
+  - File somewhat long (385 lines)
+  - 11 lines exceed 120 characters
+- `src\pages\inventory\StockOpnameForm.tsx`: 7.0/10
+  - File somewhat long (307 lines)
   - Insufficient comments
-- `supabase\types\database.ts`: 7.0/10
-  - File too long (652 lines)
+- `src\pages\inventory\tabs\CostingTab.tsx`: 7.0/10
+  - 13 lines exceed 120 characters
   - Insufficient comments
-- `js\app.js`: 8.0/10
-  - File too long (754 lines)
-- `print-server\src\test-print.js`: 8.0/10
-  - Insufficient comments
-  - 19 debug statements found
 
 ---
 

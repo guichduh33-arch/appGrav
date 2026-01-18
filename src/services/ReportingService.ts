@@ -1,7 +1,11 @@
 import { supabase } from '../lib/supabase';
+import { StockMovement } from '../types/database';
 import {
     SalesComparison,
     PaymentMethodStat,
+    DailySalesStat,
+    ProductPerformanceStat,
+    CategorySalesStat,
     StockWaste,
     SessionDiscrepancy,
     InventoryValuation,
@@ -60,6 +64,122 @@ export const ReportingService = {
     },
 
     /**
+     * Get Daily Sales Statistics
+     */
+    async getDailySales(startDate: Date, endDate: Date): Promise<DailySalesStat[]> {
+        const { data, error } = await supabase
+            .from('view_daily_kpis')
+            .select('*')
+            .gte('date', startDate.toISOString())
+            .lte('date', endDate.toISOString())
+            .order('date', { ascending: true });
+
+        if (error) throw error;
+
+        return (data || []).map((row: any) => ({
+            date: row.date,
+            total_sales: row.total_revenue,
+            total_orders: row.total_orders,
+            avg_basket: row.avg_basket_value,
+            net_revenue: row.net_revenue
+        }));
+    },
+
+    /**
+     * Get Product Performance
+     */
+    async getProductPerformance(startDate: Date, endDate: Date): Promise<ProductPerformanceStat[]> {
+        const { data, error } = await supabase
+            .from('order_items')
+            .select('product_id, product_name, quantity, total_price')
+            .gte('created_at', startDate.toISOString())
+            .lte('created_at', endDate.toISOString())
+            .eq('item_status', 'served');
+
+        if (error) throw error;
+
+        const map = new Map<string, ProductPerformanceStat>();
+
+        data?.forEach((item: any) => {
+            const key = item.product_id || item.product_name;
+            if (!map.has(key)) {
+                map.set(key, {
+                    product_id: item.product_id,
+                    product_name: item.product_name,
+                    quantity_sold: 0,
+                    total_revenue: 0,
+                    avg_price: 0
+                });
+            }
+            const stat = map.get(key)!;
+            stat.quantity_sold += item.quantity;
+            stat.total_revenue += item.total_price;
+        });
+
+        const result = Array.from(map.values()).map(stat => ({
+            ...stat,
+            avg_price: stat.quantity_sold > 0 ? stat.total_revenue / stat.quantity_sold : 0
+        }));
+
+        return result.sort((a, b) => b.total_revenue - a.total_revenue);
+    },
+
+    async getStockMovements(startDate: Date, endDate: Date): Promise<StockMovement[]> {
+        const { data, error } = await supabase
+            .from('stock_movements')
+            .select(`
+                *,
+                product:products(name, sku, unit)
+            `)
+            .gte('created_at', startDate.toISOString())
+            .lte('created_at', endDate.toISOString())
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data || [];
+    },
+
+    /**
+     * Get Sales By Category
+     */
+    async getSalesByCategory(startDate: Date, endDate: Date): Promise<CategorySalesStat[]> {
+        const { data, error } = await supabase
+            .from('order_items')
+            .select(`
+                quantity, 
+                total_price, 
+                product:products(category:categories(id, name))
+            `)
+            .gte('created_at', startDate.toISOString())
+            .lte('created_at', endDate.toISOString())
+            .eq('item_status', 'served');
+
+        if (error) throw error;
+
+        const map = new Map<string, CategorySalesStat>();
+
+        data?.forEach((item: any) => {
+            const category = item.product?.category;
+            const key = category?.id || 'uncategorized';
+            const name = category?.name || 'Uncategorized';
+
+            if (!map.has(key)) {
+                map.set(key, {
+                    category_id: key,
+                    category_name: name,
+                    total_revenue: 0,
+                    transaction_count: 0
+                });
+            }
+            const stat = map.get(key)!;
+            stat.transaction_count += item.quantity;
+            stat.total_revenue += item.total_price;
+        });
+
+        return Array.from(map.values()).sort((a, b) => b.total_revenue - a.total_revenue);
+    },
+
+    /**
      * Get Stock Waste Report
      */
     async getStockWasteReport(): Promise<StockWaste[]> {
@@ -110,5 +230,67 @@ export const ReportingService = {
 
         if (error) throw error;
         return data || [];
+    },
+
+    /**
+     * Get Purchase Details
+     */
+    async getPurchaseDetails(startDate: Date, endDate: Date): Promise<any[]> {
+        const { data, error } = await supabase
+            .from('stock_movements')
+            .select(`
+                *,
+                product:products(name, sku, unit, cost_price),
+                staff:user_profiles(name),
+                supplier:suppliers(name)
+            `)
+            .eq('movement_type', 'purchase')
+            .gte('created_at', startDate.toISOString())
+            .lte('created_at', endDate.toISOString())
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data || [];
+    },
+
+    /**
+     * Get Purchase By Supplier
+     */
+    async getPurchaseBySupplier(startDate: Date, endDate: Date): Promise<any[]> {
+        const { data, error } = await supabase
+            .from('stock_movements')
+            .select(`
+                *,
+                product:products(name, sku, unit, cost_price),
+                supplier:suppliers(name)
+            `)
+            .eq('movement_type', 'purchase')
+            .gte('created_at', startDate.toISOString())
+            .lte('created_at', endDate.toISOString());
+
+        if (error) throw error;
+
+        // Aggregate by supplier
+        const map = new Map<string, { supplier_name: string, total_quantity: number, total_value: number, transaction_count: number }>();
+
+        data?.forEach((item: any) => {
+            const supplierName = item.supplier?.name || 'Unknown Supplier';
+            const key = supplierName;
+
+            if (!map.has(key)) {
+                map.set(key, {
+                    supplier_name: supplierName,
+                    total_quantity: 0,
+                    total_value: 0,
+                    transaction_count: 0
+                });
+            }
+            const stat = map.get(key)!;
+            stat.transaction_count += 1;
+            stat.total_quantity += item.quantity;
+            stat.total_value += (item.product?.cost_price || 0) * item.quantity;
+        });
+
+        return Array.from(map.values()).sort((a, b) => b.total_value - a.total_value);
     }
 };

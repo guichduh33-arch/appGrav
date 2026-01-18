@@ -784,3 +784,146 @@
     color: #64748B;
     line-height: 1.4;
 }
+
+/* ============================================
+   KDS STATIONS CONFIGURATION
+   ============================================ */
+
+.kds-stations-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+    background: #F8FAFC;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.kds-station-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #475569;
+}
+
+.kds-station-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.kds-station-icon {
+    display: flex;
+    align-items: center;
+}
+
+/* Categories List */
+.kds-categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.kds-category-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1rem;
+    background: #F8FAFC;
+    border-radius: 0.75rem;
+    transition: all 0.15s ease;
+}
+
+.kds-category-item:hover {
+    background: #F1F5F9;
+}
+
+.kds-category-item__info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.kds-category-item__icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.kds-category-item__name {
+    font-weight: 600;
+    color: #1E293B;
+    font-size: 0.9375rem;
+}
+
+.kds-category-item__station {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.kds-station-select {
+    padding: 0.5rem 2rem 0.5rem 0.875rem;
+    border: 2px solid #E2E8F0;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #334155;
+    background-color: white;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 16px;
+    cursor: pointer;
+    appearance: none;
+    transition: all 0.15s ease;
+    min-width: 140px;
+}
+
+.kds-station-select:hover {
+    background-color: #FAFAFA;
+}
+
+.kds-station-select:focus {
+    outline: none;
+    border-color: var(--color-rose-poudre, #BA90A2);
+    box-shadow: 0 0 0 3px rgba(186, 144, 162, 0.15);
+}
+
+.kds-station-select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.kds-saving-icon {
+    color: var(--color-rose-poudre, #BA90A2);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .kds-category-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .kds-category-item__station {
+        width: 100%;
+    }
+
+    .kds-station-select {
+        width: 100%;
+    }
+
+    .kds-stations-legend {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
