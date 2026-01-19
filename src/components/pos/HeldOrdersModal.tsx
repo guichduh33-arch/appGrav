@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { X, Clock, RotateCcw, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useOrderStore } from '../../stores/orderStore'
 import { formatPrice } from '../../utils/helpers'
+import PinVerificationModal from './PinVerificationModal'
 import './HeldOrdersModal.css'
 
 interface HeldOrdersModalProps {
@@ -12,10 +14,25 @@ interface HeldOrdersModalProps {
 export default function HeldOrdersModal({ onClose, onRestore }: HeldOrdersModalProps) {
     const { t, i18n } = useTranslation()
     const { heldOrders, removeHeldOrder } = useOrderStore()
+    const [showPinModal, setShowPinModal] = useState(false)
+    const [pendingDeleteOrderId, setPendingDeleteOrderId] = useState<string | null>(null)
 
     const formatHeldTime = (date: Date) => {
         const d = new Date(date)
         return d.toLocaleTimeString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit' })
+    }
+
+    const handleDeleteClick = (orderId: string) => {
+        setPendingDeleteOrderId(orderId)
+        setShowPinModal(true)
+    }
+
+    const handlePinVerify = (verified: boolean) => {
+        if (verified && pendingDeleteOrderId) {
+            removeHeldOrder(pendingDeleteOrderId)
+        }
+        setShowPinModal(false)
+        setPendingDeleteOrderId(null)
     }
 
     return (
@@ -79,7 +96,7 @@ export default function HeldOrdersModal({ onClose, onRestore }: HeldOrdersModalP
                                         <div className="held-order-card__actions">
                                             <button
                                                 className="btn btn-danger btn-sm"
-                                                onClick={() => removeHeldOrder(order.id)}
+                                                onClick={() => handleDeleteClick(order.id)}
                                                 title={t('common.delete')}
                                             >
                                                 <Trash2 size={16} />
@@ -99,6 +116,19 @@ export default function HeldOrdersModal({ onClose, onRestore }: HeldOrdersModalP
                     )}
                 </div>
             </div>
+
+            {showPinModal && (
+                <PinVerificationModal
+                    title="Suppression de commande"
+                    message="Code PIN administrateur requis pour supprimer cette commande"
+                    allowedRoles={['admin']}
+                    onVerify={handlePinVerify}
+                    onClose={() => {
+                        setShowPinModal(false)
+                        setPendingDeleteOrderId(null)
+                    }}
+                />
+            )}
         </div>
     )
 }

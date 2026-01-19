@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Trash2, User, Tag, CreditCard, Plus, Minus, SendHorizontal, Clock, Lock } from 'lucide-react'
+import { Trash2, Tag, CreditCard, Plus, Minus, SendHorizontal, Lock, List } from 'lucide-react'
 import { useCartStore } from '../../stores/cartStore'
 import { formatPrice } from '../../utils/helpers'
 import PinVerificationModal from './PinVerificationModal'
+import TableSelectionModal from './TableSelectionModal'
+import DiscountModal from './DiscountModal'
 import './Cart.css'
 
 import type { CartItem } from '../../stores/cartStore'
@@ -11,22 +13,25 @@ import type { CartItem } from '../../stores/cartStore'
 interface CartProps {
     onCheckout: () => void
     onSendToKitchen?: () => void
-    onHoldOrder?: () => void
+    onShowPendingOrders?: () => void
     onItemClick?: (item: CartItem) => void
 }
 
-export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder, onItemClick }: CartProps) {
+export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }: CartProps) {
     const { t } = useTranslation()
     const {
         items,
         orderType,
         setOrderType,
+        tableNumber,
+        setTableNumber,
         subtotal,
         discountAmount,
         total,
         updateItemQuantity,
         removeItem,
         clearCart,
+        setDiscount,
         // Locked items state
         lockedItemIds,
         activeOrderNumber,
@@ -34,8 +39,11 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder, onItemC
         removeLockedItem,
     } = useCartStore()
 
-    // PIN verification state
+    // Modal states
     const [showPinModal, setShowPinModal] = useState(false)
+    const [showTableModal, setShowTableModal] = useState(false)
+    const [showDiscountModal, setShowDiscountModal] = useState(false)
+    const [selectedItemForDiscount, setSelectedItemForDiscount] = useState<CartItem | null>(null)
     const [pendingDeleteItemId, setPendingDeleteItemId] = useState<string | null>(null)
 
     // Use active order number if available, otherwise generate temp number
@@ -44,6 +52,30 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder, onItemC
     // Check if there are any locked items (sent to kitchen)
     const hasLockedItems = lockedItemIds.length > 0
     const hasUnlockedItems = items.some(item => !lockedItemIds.includes(item.id))
+
+    // Handle order type change - show table modal if dine_in selected
+    const handleOrderTypeChange = (type: 'dine_in' | 'takeaway' | 'delivery') => {
+        if (type === 'dine_in') {
+            // For dine_in, ALWAYS show table modal to force selection
+            setShowTableModal(true)
+            setOrderType(type)
+        } else {
+            // For takeaway/delivery, no table needed
+            setTableNumber(null)
+            setOrderType(type)
+        }
+    }
+
+    // Handle table selection
+    const handleTableSelect = (table: string) => {
+        setTableNumber(table)
+        setShowTableModal(false)
+    }
+
+    // Handle discount apply
+    const handleApplyDiscount = (_amount: number, type: 'percentage' | 'fixed', value: number) => {
+        setDiscount(type === 'percentage' ? 'percent' : 'amount', value, null)
+    }
 
     // Handle delete click - check if item is locked
     const handleDeleteClick = (itemId: string) => {
@@ -78,14 +110,44 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder, onItemC
 
     return (
         <aside className="pos-cart">
+            {/* Pending Orders Button - Above Cart */}
+            <div className="pos-cart__pending-button">
+                <button
+                    type="button"
+                    className="btn btn-pending-orders"
+                    onClick={onShowPendingOrders}
+                >
+                    <List size={18} />
+                    Pending Orders
+                </button>
+            </div>
+
             {/* Header */}
             <div className="pos-cart__header">
-                <div className="pos-cart__header-top">
+                <div className="pos-cart__header-row">
+                    {/* Order Type Selector */}
+                    <div className="pos-cart__types">
+                        {(['dine_in', 'takeaway'] as const).map((type) => (
+                            <button
+                                key={type}
+                                type="button"
+                                className={`order-type-btn ${orderType === type ? 'is-active' : ''}`}
+                                onClick={() => handleOrderTypeChange(type)}
+                            >
+                                {t(`pos.header.${type}`)}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Order Number */}
                     <span className="pos-cart__order-number">
                         {displayOrderNumber}
                         {hasLockedItems && <Lock size={14} className="order-lock-icon" />}
                     </span>
+
+                    {/* Clear Cart Button */}
                     <button
+                        type="button"
                         className="btn-icon btn-icon-sm"
                         title={t('cart.clear_title')}
                         onClick={clearCart}
@@ -95,18 +157,19 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder, onItemC
                     </button>
                 </div>
 
-                {/* Order Type Selector */}
-                <div className="pos-cart__types">
-                    {(['dine_in', 'takeaway', 'delivery'] as const).map((type) => (
+                {/* Show table number if dine_in and table selected */}
+                {orderType === 'dine_in' && tableNumber && (
+                    <div className="pos-cart__table-info">
+                        <span>Table: {tableNumber}</span>
                         <button
-                            key={type}
-                            className={`order-type-btn ${orderType === type ? 'is-active' : ''}`}
-                            onClick={() => setOrderType(type)}
+                            type="button"
+                            className="btn-change-table"
+                            onClick={() => setShowTableModal(true)}
                         >
-                            {t(`pos.header.${type}`)}
+                            Changer
                         </button>
-                    ))}
-                </div>
+                    </div>
+                )}
             </div>
 
             {/* Cart Items */}
@@ -146,8 +209,12 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder, onItemC
                                 <div className="cart-item__controls">
                                     <div className="cart-item__quantity">
                                         <button
+                                            type="button"
                                             className="qty-btn"
-                                            onClick={() => handleQuantityChange(item.id, item.quantity - 1, item.quantity)}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                handleQuantityChange(item.id, item.quantity - 1, item.quantity)
+                                            }}
                                             disabled={isLocked}
                                             title={isLocked ? t('cart.qty_pin_required') : t('cart.qty_decrease')}
                                             aria-label={t('cart.qty_decrease')}
@@ -156,8 +223,12 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder, onItemC
                                         </button>
                                         <span>{item.quantity}</span>
                                         <button
+                                            type="button"
                                             className="qty-btn"
-                                            onClick={() => handleQuantityChange(item.id, item.quantity + 1, item.quantity)}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                handleQuantityChange(item.id, item.quantity + 1, item.quantity)
+                                            }}
                                             title={t('cart.qty_increase')}
                                             aria-label={t('cart.qty_increase')}
                                         >
@@ -165,17 +236,36 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder, onItemC
                                         </button>
                                     </div>
 
-                                    <div className="cart-item__price">
-                                        {formatPrice(item.totalPrice)}
-                                    </div>
+                                    <div className="cart-item__actions">
+                                        <button
+                                            type="button"
+                                            className="cart-item__discount-btn"
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                setSelectedItemForDiscount(item)
+                                                setShowDiscountModal(true)
+                                            }}
+                                            title="Ajouter une remise"
+                                        >
+                                            <Tag size={14} />
+                                        </button>
 
-                                    <button
-                                        className={`cart-item__remove ${isLocked ? 'requires-pin' : ''}`}
-                                        onClick={() => handleDeleteClick(item.id)}
-                                        title={isLocked ? t('cart.remove_pin_required') : t('cart.remove')}
-                                    >
-                                        {isLocked ? <Lock size={16} /> : <Trash2 size={16} />}
-                                    </button>
+                                        <div className="cart-item__price">
+                                            {formatPrice(item.totalPrice)}
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            className={`cart-item__remove ${isLocked ? 'requires-pin' : ''}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                handleDeleteClick(item.id)
+                                            }}
+                                            title={isLocked ? t('cart.remove_pin_required') : t('cart.remove')}
+                                        >
+                                            {isLocked ? <Lock size={16} /> : <Trash2 size={16} />}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )
@@ -190,12 +280,19 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder, onItemC
                         <span className="cart-total-row__label">{t('cart.subtotal')}</span>
                         <span className="cart-total-row__value">{formatPrice(subtotal)}</span>
                     </div>
-                    {discountAmount > 0 && (
-                        <div className="cart-total-row">
-                            <span className="cart-total-row__label">{t('cart.discount')}</span>
-                            <span className="cart-total-row__value text-urgent">-{formatPrice(discountAmount)}</span>
-                        </div>
-                    )}
+                    <div className="cart-total-row">
+                        <button
+                            type="button"
+                            className="btn-discount-link"
+                            onClick={() => setShowDiscountModal(true)}
+                        >
+                            <Tag size={14} />
+                            {t('cart.discount')}
+                        </button>
+                        <span className="cart-total-row__value text-urgent">
+                            {discountAmount > 0 ? `-${formatPrice(discountAmount)}` : formatPrice(0)}
+                        </span>
+                    </div>
                     <div className="cart-total-row is-grand-total">
                         <span className="cart-total-row__label">{t('cart.total')}</span>
                         <span className="cart-total-row__value">{formatPrice(total)}</span>
@@ -203,54 +300,30 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder, onItemC
                 </div>
             )}
 
-            {/* Action Buttons */}
+            {/* Action Buttons - Simplified */}
             <div className="pos-cart__buttons">
-                <div className="pos-cart__secondary-actions">
-                    <button className="btn btn-secondary">
-                        <User size={18} />
-                        {t('cart.client')}
-                    </button>
-                    <button className="btn btn-secondary">
-                        <Tag size={18} />
-                        {t('pos.footer.on_hold')}
-                    </button>
-                </div>
-
-                {/* Kitchen & Hold Buttons */}
-                <div className="pos-cart__workflow-actions">
-                    <button
-                        className={`btn ${hasLockedItems ? 'btn-kitchen-add' : 'btn-kitchen'}`}
-                        onClick={onSendToKitchen}
-                        disabled={!hasUnlockedItems && !items.length}
-                    >
-                        <SendHorizontal size={18} />
-                        {hasLockedItems ? t('cart.add_to_order') : t('cart.send_to_kitchen')}
-                    </button>
-                    <button
-                        className="btn btn-hold"
-                        onClick={onHoldOrder}
-                        disabled={items.length === 0 || hasLockedItems}
-                        title={hasLockedItems ? t('cart.hold_error_locked') : undefined}
-                    >
-                        <Clock size={18} />
-                        {t('cart.hold')}
-                    </button>
-                </div>
+                <button
+                    type="button"
+                    className={`btn ${hasLockedItems ? 'btn-kitchen-add' : 'btn-kitchen'}`}
+                    onClick={onSendToKitchen}
+                    disabled={!hasUnlockedItems && !items.length}
+                >
+                    <SendHorizontal size={18} />
+                    {hasLockedItems ? t('cart.add_to_order') : t('cart.send_to_kitchen')}
+                </button>
 
                 <button
+                    type="button"
                     className="btn-checkout"
                     onClick={onCheckout}
                     disabled={items.length === 0}
                 >
-                    <span className="btn-checkout__label">
-                        <CreditCard size={18} />
-                        {t('cart.checkout')}
-                    </span>
-                    <span className="btn-checkout__amount">{formatPrice(total)}</span>
+                    <CreditCard size={18} />
+                    {t('cart.checkout')}
                 </button>
             </div>
 
-            {/* PIN Verification Modal */}
+            {/* Modals */}
             {showPinModal && (
                 <PinVerificationModal
                     title={t('cart.pin_modal_title')}
@@ -262,7 +335,26 @@ export default function Cart({ onCheckout, onSendToKitchen, onHoldOrder, onItemC
                     }}
                 />
             )}
+
+            {showTableModal && (
+                <TableSelectionModal
+                    onSelectTable={handleTableSelect}
+                    onClose={() => setShowTableModal(false)}
+                />
+            )}
+
+            {showDiscountModal && (
+                <DiscountModal
+                    itemName={selectedItemForDiscount?.product.name}
+                    itemPrice={selectedItemForDiscount?.totalPrice}
+                    totalPrice={selectedItemForDiscount ? selectedItemForDiscount.totalPrice : total}
+                    onApplyDiscount={handleApplyDiscount}
+                    onClose={() => {
+                        setShowDiscountModal(false)
+                        setSelectedItemForDiscount(null)
+                    }}
+                />
+            )}
         </aside>
     )
 }
-

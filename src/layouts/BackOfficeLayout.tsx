@@ -5,7 +5,7 @@ import { useAuthStore } from '../stores/authStore';
 import {
     Package, FileText, Factory, Building2,
     ShoppingCart, BarChart3, Users, Settings, Store, Utensils,
-    ChevronLeft, ChevronRight, LogOut
+    ChevronLeft, ChevronRight, LogOut, Truck
 } from 'lucide-react';
 import './BackOfficeLayout.css';
 
@@ -75,9 +75,13 @@ const BackOfficeLayout: React.FC = () => {
                             <Building2 size={22} strokeWidth={2} />
                             {!isCollapsed && <span className="fade-in">{t('nav.b2b_wholesale')}</span>}
                         </NavLink>
-                        <NavLink to="/purchases" className="nav-item" title={isCollapsed ? t('nav.purchases') : ""}>
+                        <NavLink to="/purchasing/purchase-orders" className="nav-item" title={isCollapsed ? t('nav.purchases') : ""}>
                             <ShoppingCart size={22} strokeWidth={2} />
                             {!isCollapsed && <span className="fade-in">{t('nav.purchases')}</span>}
+                        </NavLink>
+                        <NavLink to="/purchasing/suppliers" className="nav-item" title={isCollapsed ? "Fournisseurs" : ""}>
+                            <Truck size={22} strokeWidth={2} />
+                            {!isCollapsed && <span className="fade-in">Fournisseurs</span>}
                         </NavLink>
                     </div>
 

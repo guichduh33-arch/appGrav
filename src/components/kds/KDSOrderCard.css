@@ -71,11 +71,12 @@
 }
 
 .kds-order-card__type {
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 4px 10px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 8px 16px;
     border-radius: 20px;
     color: white;
+    white-space: nowrap;
 }
 
 .kds-order-card__timer {

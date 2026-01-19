@@ -16,7 +16,9 @@
       "Bash(npx tsc:*)",
       "Bash(curl:*)",
       "mcp__ide__getDiagnostics",
-      "Bash(npx ts-node:*)"
+      "Bash(npx ts-node:*)",
+      "Bash(git checkout:*)",
+      "Bash(where supabase:*)"
     ]
   }
 }

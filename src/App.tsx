@@ -28,6 +28,10 @@ import SettingsPage from './pages/settings/SettingsPage'
 import B2BPage from './pages/b2b/B2BPage'
 import Purchase_Order_Module from './pages/Purchase_Order_Module'
 import InterSection_Stock_Movements from './pages/InterSection_Stock_Movements'
+import PurchasingSuppliersPage from './pages/purchasing/SuppliersPage'
+import PurchaseOrdersPage from './pages/purchasing/PurchaseOrdersPage'
+import PurchaseOrderFormPage from './pages/purchasing/PurchaseOrderFormPage'
+import PurchaseOrderDetailPage from './pages/purchasing/PurchaseOrderDetailPage'
 
 function App() {
     const { isAuthenticated, user, logout } = useAuthStore()
@@ -94,6 +98,13 @@ function App() {
                     <Route path="/b2b" element={<B2BPage />} />
                     <Route path="/purchases" element={<Purchase_Order_Module />} />
                     <Route path="/internal-moves" element={<InterSection_Stock_Movements />} />
+
+                    {/* Purchase Order Module Routes */}
+                    <Route path="/purchasing/suppliers" element={<PurchasingSuppliersPage />} />
+                    <Route path="/purchasing/purchase-orders" element={<PurchaseOrdersPage />} />
+                    <Route path="/purchasing/purchase-orders/new" element={<PurchaseOrderFormPage />} />
+                    <Route path="/purchasing/purchase-orders/:id" element={<PurchaseOrderDetailPage />} />
+                    <Route path="/purchasing/purchase-orders/:id/edit" element={<PurchaseOrderFormPage />} />
 
                     <Route path="/reports" element={<ReportsPage />} />
                     <Route path="/reports/sales" element={<SalesReportsPage />} />

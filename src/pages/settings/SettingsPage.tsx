@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     Store, Printer, Bell, Shield, Save, Plus, Settings, RefreshCw, Layers,
-    Edit2, Trash2, X, ShoppingCart, Factory, Warehouse, ChefHat, Coffee, Monitor
+    Edit2, Trash2, X, ShoppingCart, Factory, Warehouse, ChefHat, Coffee, Monitor, Grid
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import FloorPlanEditor from '../../components/settings/FloorPlanEditor';
 import './SettingsPage.css';
 
-type SettingsTab = 'general' | 'printers' | 'notifications' | 'security' | 'sections' | 'kds';
+type SettingsTab = 'general' | 'printers' | 'notifications' | 'security' | 'sections' | 'kds' | 'floorplan';
 
 interface Section {
     id: string;
@@ -253,6 +254,7 @@ const SettingsPage = () => {
     const tabs = [
         { id: 'general' as const, label: 'Général', icon: <Store size={18} /> },
         { id: 'sections' as const, label: 'Sections', icon: <Layers size={18} /> },
+        { id: 'floorplan' as const, label: 'Plan de Salle', icon: <Grid size={18} /> },
         { id: 'kds' as const, label: 'Stations KDS', icon: <ChefHat size={18} /> },
         { id: 'printers' as const, label: 'Imprimantes', icon: <Printer size={18} /> },
         { id: 'notifications' as const, label: 'Notifications', icon: <Bell size={18} /> },
@@ -623,6 +625,20 @@ const SettingsPage = () => {
                                         onClick={() => toggleSetting('emailReports')}
                                     />
                                 </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'floorplan' && (
+                        <div className="settings-section">
+                            <div className="settings-section__header">
+                                <h2 className="settings-section__title">Plan de Salle</h2>
+                                <p className="settings-section__description">
+                                    Configurez le plan de salle pour les commandes Dine In
+                                </p>
+                            </div>
+                            <div className="settings-section__body">
+                                <FloorPlanEditor />
                             </div>
                         </div>
                     )}

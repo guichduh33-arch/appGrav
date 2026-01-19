@@ -345,7 +345,7 @@ export default function POSMainPage() {
                 <Cart
                     onCheckout={handleCheckout}
                     onSendToKitchen={handleSendToKitchen}
-                    onHoldOrder={handleHoldOrder}
+                    onShowPendingOrders={() => setShowHeldOrdersModal(true)}
                     onItemClick={handleCartItemClick}
                 />
             </main>

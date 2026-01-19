@@ -1,0 +1,304 @@
+/* Purchase Orders Page */
+.purchase-orders-page {
+    padding: var(--space-xl);
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Header */
+.purchase-orders-page__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-xl);
+}
+
+.purchase-orders-page__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--color-white);
+    margin: 0 0 var(--space-sm) 0;
+}
+
+.purchase-orders-page__subtitle {
+    font-size: var(--text-base);
+    color: var(--color-gray-400);
+    margin: 0;
+}
+
+/* Stats */
+.purchase-orders-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.purchase-orders-stat {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background: var(--color-gray-800);
+    border: 1px solid var(--color-gray-700);
+    border-radius: var(--radius-lg);
+}
+
+.purchase-orders-stat__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-lg);
+}
+
+.purchase-orders-stat__icon--primary {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--color-primary);
+}
+
+.purchase-orders-stat__icon--success {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-success);
+}
+
+.purchase-orders-stat__icon--warning {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.purchase-orders-stat__icon--info {
+    background: rgba(139, 92, 246, 0.15);
+    color: #8b5cf6;
+}
+
+.purchase-orders-stat__content {
+    flex: 1;
+}
+
+.purchase-orders-stat__value {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--color-white);
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.purchase-orders-stat__label {
+    font-size: var(--text-sm);
+    color: var(--color-gray-400);
+}
+
+/* Filters */
+.purchase-orders-filters {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.purchase-orders-search {
+    position: relative;
+    flex: 1;
+}
+
+.purchase-orders-search input {
+    width: 100%;
+    padding: 12px 16px 12px 48px;
+    background: var(--color-gray-800);
+    border: 1px solid var(--color-gray-700);
+    border-radius: var(--radius-lg);
+    color: var(--color-white);
+    font-size: var(--text-base);
+}
+
+.purchase-orders-search input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.purchase-orders-search svg {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-gray-400);
+}
+
+.purchase-orders-filter {
+    padding: 12px 16px;
+    background: var(--color-gray-800);
+    border: 1px solid var(--color-gray-700);
+    border-radius: var(--radius-lg);
+    color: var(--color-white);
+    font-size: var(--text-base);
+    min-width: 200px;
+}
+
+.purchase-orders-filter:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* Table */
+.purchase-orders-table {
+    background: var(--color-gray-800);
+    border: 1px solid var(--color-gray-700);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.purchase-orders-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.purchase-orders-table thead {
+    background: var(--color-gray-750);
+    border-bottom: 1px solid var(--color-gray-700);
+}
+
+.purchase-orders-table th {
+    padding: var(--space-md);
+    text-align: left;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.purchase-orders-table td {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--color-gray-700);
+    font-size: var(--text-sm);
+    color: var(--color-gray-300);
+}
+
+.purchase-orders-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.purchase-orders-table tbody tr:hover {
+    background: var(--color-gray-750);
+}
+
+.purchase-orders-table__actions {
+    display: flex;
+    gap: 4px;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-badge--gray {
+    background: rgba(107, 114, 128, 0.15);
+    color: var(--color-gray-400);
+}
+
+.status-badge--blue {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--color-primary);
+}
+
+.status-badge--yellow {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.status-badge--orange {
+    background: rgba(251, 146, 60, 0.15);
+    color: #fb923c;
+}
+
+.status-badge--success {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--color-success);
+}
+
+.status-badge--danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--color-danger);
+}
+
+.status-badge--purple {
+    background: rgba(139, 92, 246, 0.15);
+    color: #8b5cf6;
+}
+
+/* Loading & Empty States */
+.purchase-orders-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3xl);
+    font-size: var(--text-lg);
+    color: var(--color-gray-400);
+}
+
+.purchase-orders-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3xl);
+    background: var(--color-gray-800);
+    border: 2px dashed var(--color-gray-700);
+    border-radius: var(--radius-xl);
+    text-align: center;
+}
+
+.purchase-orders-empty svg {
+    color: var(--color-gray-600);
+    margin-bottom: var(--space-md);
+}
+
+.purchase-orders-empty h3 {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-white);
+    margin: 0 0 var(--space-sm) 0;
+}
+
+.purchase-orders-empty p {
+    font-size: var(--text-base);
+    color: var(--color-gray-400);
+    margin: 0 0 var(--space-lg) 0;
+}
+
+/* Button Icon */
+.btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--color-gray-400);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: var(--color-gray-700);
+    color: var(--color-primary-light);
+}
+
+.btn-icon--danger:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--color-danger);
+}
