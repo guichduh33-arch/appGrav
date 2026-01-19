@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Plus, Save, Trash2, Grid, Users, Circle, Square, Minus } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Plus, Save, Trash2, Grid, Users, Circle, Square, Minus, Home, Sun, Star } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import './FloorPlanEditor.css'
 
@@ -31,9 +31,16 @@ const DECORATION_TYPES = [
     { value: 'entrance' as const, label: '🚪 Entrée', emoji: '🚪' }
 ]
 
+const FLOOR_SECTIONS = [
+    { value: 'Main', label: 'Intérieur', icon: <Home size={18} /> },
+    { value: 'Terrace', label: 'Terrasse', icon: <Sun size={18} /> },
+    { value: 'VIP', label: 'VIP', icon: <Star size={18} /> }
+]
+
 export default function FloorPlanEditor() {
     const [items, setItems] = useState<FloorPlanItem[]>([])
-    const [sections, setSections] = useState<string[]>(['Main', 'Terrace', 'VIP'])
+    const [sections] = useState<string[]>(['Main', 'Terrace', 'VIP'])
+    const [activeSection, setActiveSection] = useState<string>('Main')
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [selectedItem, setSelectedItem] = useState<FloorPlanItem | null>(null)
@@ -41,14 +48,22 @@ export default function FloorPlanEditor() {
     const [addMode, setAddMode] = useState<'table' | 'decoration' | null>(null)
     const [isDragging, setIsDragging] = useState(false)
     const [draggedItem, setDraggedItem] = useState<FloorPlanItem | null>(null)
+    const [isResizing, setIsResizing] = useState(false)
+    const [resizeDirection, setResizeDirection] = useState<string | null>(null)
+    const canvasRef = useRef<HTMLDivElement>(null)
 
-    // Form state for new table
+    // Form state for new table - uses active section by default
     const [tableForm, setTableForm] = useState({
         number: '',
         capacity: 2,
-        section: 'Main',
+        section: activeSection,
         shape: 'square' as const
     })
+
+    // Update table form section when active section changes
+    useEffect(() => {
+        setTableForm(prev => ({ ...prev, section: activeSection }))
+    }, [activeSection])
 
     // Form state for new decoration
     const [decorationForm, setDecorationForm] = useState({
@@ -192,9 +207,43 @@ export default function FloorPlanEditor() {
     }
 
     const handleCanvasMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!canvasRef.current) return
+        const rect = canvasRef.current.getBoundingClientRect()
+
+        if (isResizing && selectedItem && resizeDirection) {
+            const mouseX = e.clientX - rect.left
+            const mouseY = e.clientY - rect.top
+
+            const itemX = (selectedItem.x / 100) * rect.width
+            const itemY = (selectedItem.y / 100) * rect.height
+
+            let newWidth = selectedItem.width || 80
+            let newHeight = selectedItem.height || 80
+
+            if (resizeDirection.includes('e')) {
+                newWidth = Math.max(40, Math.min(200, mouseX - itemX + (selectedItem.width || 80) / 2))
+            }
+            if (resizeDirection.includes('w')) {
+                newWidth = Math.max(40, Math.min(200, itemX - mouseX + (selectedItem.width || 80) / 2))
+            }
+            if (resizeDirection.includes('s')) {
+                newHeight = Math.max(40, Math.min(200, mouseY - itemY + (selectedItem.height || 80) / 2))
+            }
+            if (resizeDirection.includes('n')) {
+                newHeight = Math.max(40, Math.min(200, itemY - mouseY + (selectedItem.height || 80) / 2))
+            }
+
+            setItems(items.map(i =>
+                i.id === selectedItem.id
+                    ? { ...i, width: Math.round(newWidth), height: Math.round(newHeight) }
+                    : i
+            ))
+            setSelectedItem({ ...selectedItem, width: Math.round(newWidth), height: Math.round(newHeight) })
+            return
+        }
+
         if (!isDragging || !draggedItem) return
 
-        const rect = e.currentTarget.getBoundingClientRect()
         const x = ((e.clientX - rect.left) / rect.width) * 100
         const y = ((e.clientY - rect.top) / rect.height) * 100
 
@@ -208,7 +257,30 @@ export default function FloorPlanEditor() {
     const handleCanvasMouseUp = () => {
         setIsDragging(false)
         setDraggedItem(null)
+        setIsResizing(false)
+        setResizeDirection(null)
     }
+
+    const handleResizeStart = (e: React.MouseEvent, direction: string) => {
+        e.stopPropagation()
+        e.preventDefault()
+        setIsResizing(true)
+        setResizeDirection(direction)
+    }
+
+    const handleEditItemSize = (itemId: string, width: number, height: number) => {
+        setItems(items.map(i =>
+            i.id === itemId ? { ...i, width, height } : i
+        ))
+        if (selectedItem && selectedItem.id === itemId) {
+            setSelectedItem({ ...selectedItem, width, height })
+        }
+    }
+
+    // Filter items by active section (tables only, decorations show on all)
+    const filteredItems = items.filter(item =>
+        item.type === 'decoration' || item.section === activeSection
+    )
 
     const handleEditItemCapacity = (itemId: string, newCapacity: number) => {
         setItems(items.map(i =>
@@ -402,9 +474,32 @@ export default function FloorPlanEditor() {
                 </div>
             )}
 
+            {/* Section Tabs */}
+            <div className="floor-plan-sections">
+                {FLOOR_SECTIONS.map(section => {
+                    const sectionTables = items.filter(i => i.type === 'table' && i.section === section.value)
+                    const sectionCovers = sectionTables.reduce((sum, t) => sum + (t.capacity || 0), 0)
+                    return (
+                        <button
+                            key={section.value}
+                            className={`floor-plan-section-tab ${activeSection === section.value ? 'is-active' : ''}`}
+                            onClick={() => {
+                                setActiveSection(section.value)
+                                setSelectedItem(null)
+                            }}
+                        >
+                            {section.icon}
+                            <span className="floor-plan-section-tab__label">{section.label}</span>
+                            <span className="floor-plan-section-tab__count">{sectionTables.length} tables · {sectionCovers} couverts</span>
+                        </button>
+                    )
+                })}
+            </div>
+
             {/* Canvas */}
             <div className="floor-plan-editor__content">
                 <div
+                    ref={canvasRef}
                     className="floor-plan-canvas"
                     onMouseMove={handleCanvasMouseMove}
                     onMouseUp={handleCanvasMouseUp}
@@ -414,16 +509,16 @@ export default function FloorPlanEditor() {
                         <div className="floor-plan-loading">
                             Chargement du plan de salle...
                         </div>
-                    ) : items.length === 0 ? (
+                    ) : filteredItems.length === 0 ? (
                         <div className="floor-plan-empty">
                             <Grid size={48} opacity={0.3} />
-                            <h3>Aucun élément configuré</h3>
+                            <h3>Aucun élément dans "{FLOOR_SECTIONS.find(s => s.value === activeSection)?.label}"</h3>
                             <p>Cliquez sur "Ajouter un Élément" pour commencer</p>
                         </div>
                     ) : (
                         <>
                             {/* Decorations (rendered first, behind tables) */}
-                            {decorations.map(item => {
+                            {filteredItems.filter(i => i.type === 'decoration').map(item => {
                                 const decorationType = DECORATION_TYPES.find(d => d.value === item.decoration_type)
                                 return (
                                     <div
@@ -442,12 +537,20 @@ export default function FloorPlanEditor() {
                                         <span className="floor-plan-decoration__emoji">
                                             {decorationType?.emoji || '🎨'}
                                         </span>
+                                        {/* Resize handles */}
+                                        {selectedItem?.id === item.id && (
+                                            <>
+                                                <div className="resize-handle resize-handle--e" onMouseDown={(e) => handleResizeStart(e, 'e')} />
+                                                <div className="resize-handle resize-handle--s" onMouseDown={(e) => handleResizeStart(e, 's')} />
+                                                <div className="resize-handle resize-handle--se" onMouseDown={(e) => handleResizeStart(e, 'se')} />
+                                            </>
+                                        )}
                                     </div>
                                 )
                             })}
 
                             {/* Tables */}
-                            {tables.map(item => (
+                            {filteredItems.filter(i => i.type === 'table').map(item => (
                                 <div
                                     key={item.id}
                                     className={`floor-plan-table floor-plan-table--${item.shape} ${selectedItem?.id === item.id ? 'is-selected' : ''} ${isDragging && draggedItem?.id === item.id ? 'is-dragging' : ''}`}
@@ -465,7 +568,14 @@ export default function FloorPlanEditor() {
                                     <div className="floor-plan-table__capacity">
                                         <Users size={12} /> {item.capacity}
                                     </div>
-                                    <div className="floor-plan-table__section">{item.section}</div>
+                                    {/* Resize handles */}
+                                    {selectedItem?.id === item.id && (
+                                        <>
+                                            <div className="resize-handle resize-handle--e" onMouseDown={(e) => handleResizeStart(e, 'e')} />
+                                            <div className="resize-handle resize-handle--s" onMouseDown={(e) => handleResizeStart(e, 's')} />
+                                            <div className="resize-handle resize-handle--se" onMouseDown={(e) => handleResizeStart(e, 'se')} />
+                                        </>
+                                    )}
                                 </div>
                             ))}
                         </>
@@ -522,9 +632,36 @@ export default function FloorPlanEditor() {
                                 <label>Position</label>
                                 <span>X: {selectedItem.x.toFixed(0)}%, Y: {selectedItem.y.toFixed(0)}%</span>
                             </div>
+                            <div className="floor-plan-details__field floor-plan-details__field--size">
+                                <label>Taille</label>
+                                <div className="size-inputs">
+                                    <div className="size-input">
+                                        <span>L:</span>
+                                        <input
+                                            type="number"
+                                            min="40"
+                                            max="200"
+                                            value={selectedItem.width || 80}
+                                            onChange={(e) => handleEditItemSize(selectedItem.id, parseInt(e.target.value) || 80, selectedItem.height || 80)}
+                                        />
+                                        <span>px</span>
+                                    </div>
+                                    <div className="size-input">
+                                        <span>H:</span>
+                                        <input
+                                            type="number"
+                                            min="40"
+                                            max="200"
+                                            value={selectedItem.height || 80}
+                                            onChange={(e) => handleEditItemSize(selectedItem.id, selectedItem.width || 80, parseInt(e.target.value) || 80)}
+                                        />
+                                        <span>px</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div className="floor-plan-details__hint">
-                            💡 Cliquez et maintenez pour déplacer l'élément
+                            💡 Glissez les coins pour redimensionner, ou déplacez l'élément
                         </div>
                     </div>
                 )}

@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import {
-    Package, FileText, Factory, Building2,
+    FileText, Factory, Building2,
     ShoppingCart, BarChart3, Users, Settings, Store, Utensils,
-    ChevronLeft, ChevronRight, LogOut, Truck
+    ChevronLeft, ChevronRight, LogOut, Truck, UserCircle, Coffee, Boxes
 } from 'lucide-react';
 import './BackOfficeLayout.css';
 
@@ -59,8 +59,12 @@ const BackOfficeLayout: React.FC = () => {
 
                     <div className="nav-section">
                         {!isCollapsed && <h3 className="section-title fade-in">{t('nav.management')}</h3>}
+                        <NavLink to="/products" className="nav-item" title={isCollapsed ? "Produits" : ""}>
+                            <Coffee size={22} strokeWidth={2} />
+                            {!isCollapsed && <span className="fade-in">Produits</span>}
+                        </NavLink>
                         <NavLink to="/inventory" className="nav-item" title={isCollapsed ? t('nav.stock_inventory') : ""}>
-                            <Package size={22} strokeWidth={2} />
+                            <Boxes size={22} strokeWidth={2} />
                             {!isCollapsed && <span className="fade-in">{t('nav.stock_inventory')}</span>}
                         </NavLink>
                         <NavLink to="/orders" className="nav-item" title={isCollapsed ? t('nav.order_history') : ""}>
@@ -82,6 +86,10 @@ const BackOfficeLayout: React.FC = () => {
                         <NavLink to="/purchasing/suppliers" className="nav-item" title={isCollapsed ? "Fournisseurs" : ""}>
                             <Truck size={22} strokeWidth={2} />
                             {!isCollapsed && <span className="fade-in">Fournisseurs</span>}
+                        </NavLink>
+                        <NavLink to="/customers" className="nav-item" title={isCollapsed ? "Clients" : ""}>
+                            <UserCircle size={22} strokeWidth={2} />
+                            {!isCollapsed && <span className="fade-in">Clients</span>}
                         </NavLink>
                     </div>
 

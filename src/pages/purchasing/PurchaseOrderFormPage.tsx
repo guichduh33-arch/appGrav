@@ -12,7 +12,7 @@ interface Supplier {
 interface Product {
     id: string
     name: string
-    price: number
+    cost_price: number | null
 }
 
 interface POItem {
@@ -88,7 +88,7 @@ export default function PurchaseOrderFormPage() {
             // First, try to load products with product_type filter
             let { data, error } = await supabase
                 .from('products')
-                .select('id, name, price, product_type')
+                .select('id, name, cost_price, product_type')
                 .eq('is_active', true)
                 .order('name')
 
@@ -178,7 +178,7 @@ export default function PurchaseOrderFormPage() {
             const product = products.find(p => p.id === value)
             if (product) {
                 newItems[index].product_name = product.name
-                newItems[index].unit_price = product.price
+                newItems[index].unit_price = product.cost_price || 0
             }
         }
 
@@ -342,9 +342,9 @@ export default function PurchaseOrderFormPage() {
             }
 
             navigate('/purchasing/purchase-orders')
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error saving purchase order:', error)
-            alert('Erreur lors de l\'enregistrement du bon de commande')
+            alert(`Erreur lors de l'enregistrement du bon de commande:\n${error?.message || JSON.stringify(error)}`)
         } finally {
             setLoading(false)
         }

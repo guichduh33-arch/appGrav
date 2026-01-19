@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, Users } from 'lucide-react'
+import { Users } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import './TableSelectionModal.css'
 
@@ -18,11 +18,11 @@ interface TableSelectionModalProps {
     onClose: () => void
 }
 
-export default function TableSelectionModal({ onSelectTable, onClose }: TableSelectionModalProps) {
+export default function TableSelectionModal({ onSelectTable, onClose: _onClose }: TableSelectionModalProps) {
     const [selectedSection, setSelectedSection] = useState<string>('all')
     const [selectedTable, setSelectedTable] = useState<string | null>(null)
     const [tables, setTables] = useState<Table[]>([])
-    const [loading, setLoading] = useState(true)
+    const [_loading, setLoading] = useState(true)
 
     useEffect(() => {
         fetchTables()

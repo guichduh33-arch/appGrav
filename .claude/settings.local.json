@@ -17,8 +17,9 @@
       "Bash(curl:*)",
       "mcp__ide__getDiagnostics",
       "Bash(npx ts-node:*)",
-      "Bash(git checkout:*)",
-      "Bash(where supabase:*)"
+      "Bash(git pull:*)",
+      "Bash(git stash:*)",
+      "Bash(start cmd /k \"claude\")"
     ]
   }
 }

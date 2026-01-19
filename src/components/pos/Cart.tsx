@@ -1,14 +1,28 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Trash2, Tag, CreditCard, Plus, Minus, SendHorizontal, Lock, List } from 'lucide-react'
+import { Trash2, Tag, CreditCard, Plus, Minus, SendHorizontal, Lock, List, User, QrCode, Star, Crown } from 'lucide-react'
 import { useCartStore } from '../../stores/cartStore'
 import { formatPrice } from '../../utils/helpers'
 import PinVerificationModal from './PinVerificationModal'
 import TableSelectionModal from './TableSelectionModal'
 import DiscountModal from './DiscountModal'
+import CustomerSearchModal from './CustomerSearchModal'
 import './Cart.css'
 
 import type { CartItem } from '../../stores/cartStore'
+
+interface SelectedCustomer {
+    id: string
+    name: string
+    company_name: string | null
+    loyalty_points: number
+    loyalty_tier: string
+    category?: {
+        name: string
+        color: string
+        discount_percentage: number | null
+    }
+}
 
 interface CartProps {
     onCheckout: () => void
@@ -37,14 +51,20 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
         activeOrderNumber,
         isItemLocked,
         removeLockedItem,
+        // Customer state
+        customerId,
+        customerName,
+        setCustomer,
     } = useCartStore()
 
     // Modal states
     const [showPinModal, setShowPinModal] = useState(false)
     const [showTableModal, setShowTableModal] = useState(false)
     const [showDiscountModal, setShowDiscountModal] = useState(false)
+    const [showCustomerModal, setShowCustomerModal] = useState(false)
     const [selectedItemForDiscount, setSelectedItemForDiscount] = useState<CartItem | null>(null)
     const [pendingDeleteItemId, setPendingDeleteItemId] = useState<string | null>(null)
+    const [selectedCustomer, setSelectedCustomer] = useState<SelectedCustomer | null>(null)
 
     // Use active order number if available, otherwise generate temp number
     const displayOrderNumber = activeOrderNumber || `#${String(Date.now()).slice(-4)}`
@@ -106,6 +126,28 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
             return
         }
         updateItemQuantity(itemId, newQuantity)
+    }
+
+    // Handle customer selection
+    const handleSelectCustomer = (customer: SelectedCustomer | null) => {
+        if (customer) {
+            setSelectedCustomer(customer)
+            setCustomer(customer.id, customer.company_name || customer.name)
+        } else {
+            setSelectedCustomer(null)
+            setCustomer(null, null)
+        }
+    }
+
+    // Get tier color
+    const getTierColor = (tier: string) => {
+        const colors: Record<string, string> = {
+            bronze: '#cd7f32',
+            silver: '#c0c0c0',
+            gold: '#ffd700',
+            platinum: '#e5e4e2'
+        }
+        return colors[tier] || '#6366f1'
     }
 
     return (
@@ -170,6 +212,56 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                         </button>
                     </div>
                 )}
+
+                {/* Customer Selection */}
+                <div className="pos-cart__customer">
+                    {selectedCustomer || customerId ? (
+                        <button
+                            type="button"
+                            className="customer-badge"
+                            onClick={() => setShowCustomerModal(true)}
+                            style={{
+                                borderColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze')
+                            }}
+                        >
+                            <div
+                                className="customer-badge__avatar"
+                                style={{
+                                    backgroundColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze')
+                                }}
+                            >
+                                {(selectedCustomer?.company_name || selectedCustomer?.name || customerName || '?')[0].toUpperCase()}
+                            </div>
+                            <div className="customer-badge__info">
+                                <span className="customer-badge__name">
+                                    {selectedCustomer?.company_name || selectedCustomer?.name || customerName}
+                                </span>
+                                <span className="customer-badge__points">
+                                    <Star size={10} />
+                                    {selectedCustomer?.loyalty_points?.toLocaleString() || 0} pts
+                                    {selectedCustomer?.loyalty_tier && selectedCustomer.loyalty_tier !== 'bronze' && (
+                                        <Crown size={10} style={{ color: getTierColor(selectedCustomer.loyalty_tier) }} />
+                                    )}
+                                </span>
+                            </div>
+                            {selectedCustomer?.category?.discount_percentage && selectedCustomer.category.discount_percentage > 0 && (
+                                <span className="customer-badge__discount">
+                                    -{selectedCustomer.category.discount_percentage}%
+                                </span>
+                            )}
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            className="btn-add-customer"
+                            onClick={() => setShowCustomerModal(true)}
+                        >
+                            <QrCode size={16} />
+                            <User size={16} />
+                            <span>Client</span>
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Cart Items */}
@@ -353,6 +445,14 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                         setShowDiscountModal(false)
                         setSelectedItemForDiscount(null)
                     }}
+                />
+            )}
+
+            {showCustomerModal && (
+                <CustomerSearchModal
+                    selectedCustomerId={customerId}
+                    onSelectCustomer={handleSelectCustomer}
+                    onClose={() => setShowCustomerModal(false)}
                 />
             )}
         </aside>

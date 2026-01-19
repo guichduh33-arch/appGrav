@@ -7,7 +7,7 @@ import {
     Layers, Clock, Settings, Scale, AlertTriangle
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import type { Product, Recipe, StockMovement, ProductUOM, Category, Section, ProductSection } from '../../types/database'
+import type { Product, Recipe, StockMovement, ProductUOM, Category, Section } from '../../types/database'
 import { MOCK_PRODUCTS, MOCK_CATEGORIES } from '../../hooks/useProducts'
 import './ProductDetailPage.css'
 
@@ -121,9 +121,10 @@ export default function ProductDetailPage() {
                 .select('*')
                 .eq('product_id', id)
             if (prodSects) {
-                setProductSections(prodSects.map(ps => ps.section_id))
-                const primary = prodSects.find(ps => ps.is_primary)
-                setPrimarySectionId(primary?.section_id || (prodSects[0]?.section_id || null))
+                const typedSects = prodSects as { section_id: string; is_primary?: boolean }[]
+                setProductSections(typedSects.map(ps => ps.section_id))
+                const primary = typedSects.find(ps => ps.is_primary)
+                setPrimarySectionId(primary?.section_id || (typedSects[0]?.section_id || null))
             }
 
             // 4. Fetch Recipe

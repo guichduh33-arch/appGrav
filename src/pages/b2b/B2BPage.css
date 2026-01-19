@@ -419,3 +419,194 @@
 .tab-icon {
     margin-right: 8px;
 }
+
+/* Page Subtitle */
+.b2b-page__subtitle {
+    color: var(--color-gris-chaud);
+    font-size: var(--text-sm);
+    margin-top: var(--space-xs);
+}
+
+/* Quick Actions */
+.b2b-quick-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+@media (max-width: 900px) {
+    .b2b-quick-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
+.b2b-quick-action {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
+    padding: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.b2b-quick-action:hover {
+    box-shadow: var(--shadow-2);
+    transform: translateY(-2px);
+}
+
+.b2b-quick-action__icon {
+    width: 48px;
+    height: 48px;
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.b2b-quick-action__content {
+    flex: 1;
+}
+
+.b2b-quick-action__content h3 {
+    font-size: var(--text-md);
+    font-weight: 600;
+    color: var(--color-brun-chocolat);
+    margin: 0 0 var(--space-xs);
+}
+
+.b2b-quick-action__content p {
+    font-size: var(--text-sm);
+    color: var(--color-gris-chaud);
+    margin: 0;
+}
+
+.b2b-quick-action > svg {
+    color: var(--color-gris-chaud);
+}
+
+/* Clickable stat cards */
+.b2b-stat-card[style*="cursor: pointer"]:hover,
+.b2b-stat-card.clickable:hover {
+    box-shadow: var(--shadow-2);
+    transform: translateY(-2px);
+}
+
+/* Orders Section Header */
+.b2b-orders-section {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
+    overflow: hidden;
+}
+
+.b2b-orders-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.b2b-orders-header h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-brun-chocolat);
+    margin: 0;
+}
+
+.btn-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background: transparent;
+    border: none;
+    color: var(--color-rose-poudre);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--duration-fast);
+}
+
+.btn-link:hover {
+    color: var(--color-rose-hover);
+}
+
+/* Loading & Empty States */
+.b2b-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2xl);
+    color: var(--color-gris-chaud);
+}
+
+.b2b-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2xl);
+    text-align: center;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
+}
+
+.b2b-empty svg {
+    color: var(--color-gris-chaud);
+    opacity: 0.3;
+    margin-bottom: var(--space-md);
+}
+
+.b2b-empty h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-brun-chocolat);
+    margin: 0 0 var(--space-xs);
+}
+
+.b2b-empty p {
+    color: var(--color-gris-chaud);
+    font-size: var(--text-sm);
+    margin: 0 0 var(--space-lg);
+}
+
+/* Clickable table rows */
+.b2b-orders-table tbody tr[style*="cursor: pointer"]:hover td,
+.b2b-orders-table tbody tr.clickable:hover td {
+    background: rgba(186, 144, 162, 0.08);
+}
+
+/* Additional status badges */
+.order-status-badge.draft {
+    background: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+}
+
+.order-status-badge.processing {
+    background: rgba(234, 192, 134, 0.2);
+    color: #b38600;
+}
+
+.order-status-badge.ready {
+    background: rgba(138, 118, 171, 0.15);
+    color: #7c5cbf;
+}
+
+.order-status-badge.partially_delivered {
+    background: rgba(255, 153, 0, 0.15);
+    color: #cc7a00;
+}
+
+/* Payment badge partial */
+.payment-badge.partial {
+    color: var(--color-warning);
+}
