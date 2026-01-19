@@ -45,14 +45,14 @@ src/
 ├── components/       # React components by feature (pos/, inventory/, ui/)
 ├── pages/           # Route-based page components
 │   ├── customers/   # Customer management module
-│   ├── products/    # Products management module
+│   ├── products/    # Products management module (includes Combos & Promotions)
 │   ├── inventory/   # Stock & inventory module
 │   ├── b2b/         # B2B wholesale module
 │   ├── purchasing/  # Purchase orders module
 │   └── ...
 ├── stores/          # Zustand stores (cartStore, authStore, orderStore)
 ├── hooks/           # Custom React hooks (useInventory, useOrders, useProducts, useStock)
-├── services/        # External API integrations (Claude AI, Anthropic)
+├── services/        # External API integrations (Claude AI, Anthropic, promotionService)
 ├── types/           # TypeScript types (database.ts contains full schema)
 ├── lib/             # Utilities (supabase.ts client init)
 ├── locales/         # i18n translation files
@@ -87,6 +87,8 @@ Core tables in Supabase PostgreSQL:
 - `b2b_orders` / `b2b_order_items` / `b2b_payments` (B2B module)
 - `purchase_orders` / `po_items` / `suppliers` (purchasing module)
 - `floor_plan_items` (table layout for POS)
+- `product_combos` / `product_combo_groups` / `product_combo_group_items` (combo deals with choice groups and price adjustments)
+- `promotions` / `promotion_products` / `promotion_free_products` / `promotion_usage` (promotion system)
 
 Key views: `view_daily_kpis`, `view_inventory_valuation`, `view_payment_method_stats`
 
@@ -94,7 +96,9 @@ Key views: `view_daily_kpis`, `view_inventory_valuation`, `view_payment_method_s
 
 - `/pos` - Main POS interface (fullscreen, touch-optimized)
 - `/kds/:station` - Kitchen Display System by station
-- `/products` - Products management (dedicated module)
+- `/products` - Products management (dedicated module with tabs)
+- `/products/combos` - Combo deals management
+- `/products/promotions` - Promotions management (time-based, flexible rules)
 - `/products/:id/pricing` - Product pricing by customer category
 - `/inventory` - Stock & inventory management
 - `/inventory/stock-opname` - Physical inventory counts
@@ -175,3 +179,5 @@ Migrations are in `supabase/migrations/` numbered 001-029. Apply via Supabase da
 - 027: B2B sales module
 - 028: Customer loyalty system (customer_categories, loyalty_tiers, loyalty_transactions)
 - 029: Product category prices (product_category_prices, get_customer_product_price function)
+- 030: Combos and Promotions (product_combos, promotions with time-based rules, buy X get Y, free products)
+- 031: Combo Choice Groups (product_combo_groups, product_combo_group_items with price adjustments - allows customer to choose options within combo)

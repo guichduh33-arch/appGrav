@@ -433,6 +433,187 @@ export interface Database {
                 }
                 Update: Partial<Database['public']['Tables']['inventory_count_items']['Row']>
             }
+            product_combos: {
+                Row: {
+                    id: string
+                    name: string
+                    description: string | null
+                    combo_price: number
+                    is_active: boolean
+                    available_at_pos: boolean
+                    image_url: string | null
+                    sort_order: number
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    name: string
+                    description?: string | null
+                    combo_price: number
+                    is_active?: boolean
+                    available_at_pos?: boolean
+                    image_url?: string | null
+                    sort_order?: number
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: Partial<Database['public']['Tables']['product_combos']['Row']>
+            }
+            product_combo_groups: {
+                Row: {
+                    id: string
+                    combo_id: string
+                    group_name: string
+                    group_type: 'single' | 'multiple'
+                    is_required: boolean
+                    min_selections: number
+                    max_selections: number
+                    sort_order: number
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    combo_id: string
+                    group_name: string
+                    group_type?: 'single' | 'multiple'
+                    is_required?: boolean
+                    min_selections?: number
+                    max_selections?: number
+                    sort_order?: number
+                    created_at?: string
+                }
+                Update: Partial<Database['public']['Tables']['product_combo_groups']['Row']>
+            }
+            product_combo_group_items: {
+                Row: {
+                    id: string
+                    group_id: string
+                    product_id: string
+                    price_adjustment: number
+                    is_default: boolean
+                    sort_order: number
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    group_id: string
+                    product_id: string
+                    price_adjustment?: number
+                    is_default?: boolean
+                    sort_order?: number
+                    created_at?: string
+                }
+                Update: Partial<Database['public']['Tables']['product_combo_group_items']['Row']>
+            }
+            promotions: {
+                Row: {
+                    id: string
+                    code: string
+                    name: string
+                    description: string | null
+                    promotion_type: 'percentage' | 'fixed_amount' | 'buy_x_get_y' | 'free_product'
+                    is_active: boolean
+                    start_date: string | null
+                    end_date: string | null
+                    days_of_week: number[] | null
+                    time_start: string | null
+                    time_end: string | null
+                    discount_percentage: number | null
+                    discount_amount: number | null
+                    buy_quantity: number | null
+                    get_quantity: number | null
+                    min_purchase_amount: number | null
+                    min_quantity: number | null
+                    max_uses_total: number | null
+                    max_uses_per_customer: number | null
+                    current_uses: number
+                    priority: number
+                    is_stackable: boolean
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    code: string
+                    name: string
+                    description?: string | null
+                    promotion_type: 'percentage' | 'fixed_amount' | 'buy_x_get_y' | 'free_product'
+                    is_active?: boolean
+                    start_date?: string | null
+                    end_date?: string | null
+                    days_of_week?: number[] | null
+                    time_start?: string | null
+                    time_end?: string | null
+                    discount_percentage?: number | null
+                    discount_amount?: number | null
+                    buy_quantity?: number | null
+                    get_quantity?: number | null
+                    min_purchase_amount?: number | null
+                    min_quantity?: number | null
+                    max_uses_total?: number | null
+                    max_uses_per_customer?: number | null
+                    current_uses?: number
+                    priority?: number
+                    is_stackable?: boolean
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: Partial<Database['public']['Tables']['promotions']['Row']>
+            }
+            promotion_products: {
+                Row: {
+                    id: string
+                    promotion_id: string
+                    product_id: string | null
+                    category_id: string | null
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    promotion_id: string
+                    product_id?: string | null
+                    category_id?: string | null
+                    created_at?: string
+                }
+                Update: Partial<Database['public']['Tables']['promotion_products']['Row']>
+            }
+            promotion_free_products: {
+                Row: {
+                    id: string
+                    promotion_id: string
+                    free_product_id: string
+                    quantity: number
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    promotion_id: string
+                    free_product_id: string
+                    quantity?: number
+                    created_at?: string
+                }
+                Update: Partial<Database['public']['Tables']['promotion_free_products']['Row']>
+            }
+            promotion_usage: {
+                Row: {
+                    id: string
+                    promotion_id: string
+                    customer_id: string | null
+                    order_id: string | null
+                    discount_amount: number
+                    used_at: string
+                }
+                Insert: {
+                    id?: string
+                    promotion_id: string
+                    customer_id?: string | null
+                    order_id?: string | null
+                    discount_amount: number
+                    used_at?: string
+                }
+                Update: Partial<Database['public']['Tables']['promotion_usage']['Row']>
+            }
         }
         Views: {
             view_daily_kpis: {
@@ -560,6 +741,18 @@ export type Section = Database['public']['Tables']['sections']['Row']
 export type ProductStock = Database['public']['Tables']['product_stocks']['Row']
 export type ProductSection = Database['public']['Tables']['product_sections']['Row']
 
+// Combos and Promotions types
+export type ProductCombo = Database['public']['Tables']['product_combos']['Row']
+export type ProductComboGroup = Database['public']['Tables']['product_combo_groups']['Row']
+export type ProductComboGroupItem = Database['public']['Tables']['product_combo_group_items']['Row']
+export type Promotion = Database['public']['Tables']['promotions']['Row']
+export type PromotionProduct = Database['public']['Tables']['promotion_products']['Row']
+export type PromotionFreeProduct = Database['public']['Tables']['promotion_free_products']['Row']
+export type PromotionUsage = Database['public']['Tables']['promotion_usage']['Row']
+
+// Promotion types
+export type PromotionType = 'percentage' | 'fixed_amount' | 'buy_x_get_y' | 'free_product'
+
 // Extended types with relations
 export interface ProductWithCategory extends Product {
     category: Category | null
@@ -579,4 +772,23 @@ export interface OrderWithItems extends Order {
 
 export interface OrderItemWithProduct extends OrderItem {
     product: Product
+}
+
+// Combo with groups
+export interface ProductComboWithGroups extends ProductCombo {
+    groups: ProductComboGroupWithItems[]
+}
+
+export interface ProductComboGroupWithItems extends ProductComboGroup {
+    items: ProductComboGroupItemWithProduct[]
+}
+
+export interface ProductComboGroupItemWithProduct extends ProductComboGroupItem {
+    product: Product
+}
+
+// Promotion with products
+export interface PromotionWithProducts extends Promotion {
+    promotion_products: PromotionProduct[]
+    promotion_free_products: PromotionFreeProduct[]
 }

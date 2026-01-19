@@ -19,7 +19,9 @@
       "Bash(npx ts-node:*)",
       "Bash(git pull:*)",
       "Bash(git stash:*)",
-      "Bash(start cmd /k \"claude\")"
+      "Bash(start cmd /k \"claude\")",
+      "Bash(ls -la \"c:\\\\Users\\\\guich\\\\appGrav\\\\supabase\\\\migrations\"\" | grep -E \"02[678]_ \")",
+      "Bash(grep:*)"
     ]
   }
 }

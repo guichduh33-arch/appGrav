@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Product } from '../types/database'
+import type { Product, ProductCombo } from '../types/database'
 
 export interface CartModifier {
     groupName: string
@@ -8,13 +8,25 @@ export interface CartModifier {
     priceAdjustment: number
 }
 
+export interface ComboSelectedItem {
+    group_id: string
+    group_name: string
+    item_id: string
+    product_id: string
+    product_name: string
+    price_adjustment: number
+}
+
 export interface CartItem {
     id: string // Unique ID for this cart item
-    product: Product
+    type: 'product' | 'combo'
+    product?: Product // For regular products
+    combo?: ProductCombo // For combos
     quantity: number
     unitPrice: number // Base price
-    modifiers: CartModifier[]
-    modifiersTotal: number // Sum of modifier prices
+    modifiers: CartModifier[] // For regular products
+    comboSelections?: ComboSelectedItem[] // For combos
+    modifiersTotal: number // Sum of modifier/adjustment prices
     notes: string
     totalPrice: number // (unitPrice + modifiersTotal) * quantity
 }
@@ -42,6 +54,7 @@ interface CartState {
 
     // Actions
     addItem: (product: Product, quantity: number, modifiers: CartModifier[], notes: string) => void
+    addCombo: (combo: ProductCombo, quantity: number, comboSelections: ComboSelectedItem[], totalPrice: number, notes: string) => void
     updateItem: (itemId: string, modifiers: CartModifier[], notes: string) => void
     updateItemQuantity: (itemId: string, quantity: number) => void
     removeItem: (itemId: string) => void
@@ -107,7 +120,8 @@ export const useCartStore = create<CartState>((set, get) => ({
         const totalPrice = (unitPrice + modifiersTotal) * quantity
 
         const newItem: CartItem = {
-            id: `${product.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            id: `${product.id}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+            type: 'product',
             product,
             quantity,
             unitPrice,
@@ -115,6 +129,31 @@ export const useCartStore = create<CartState>((set, get) => ({
             modifiersTotal,
             notes,
             totalPrice,
+        }
+
+        set(state => {
+            const newItems = [...state.items, newItem]
+            const totals = calculateTotals(newItems, state.discountType, state.discountValue)
+            return { items: newItems, ...totals }
+        })
+    },
+
+    addCombo: (combo, quantity, comboSelections, totalPrice, notes) => {
+        // Calculate adjustments total from selections
+        const modifiersTotal = comboSelections.reduce((sum, sel) => sum + sel.price_adjustment, 0)
+        const unitPrice = totalPrice / quantity // Unit price already includes selections
+
+        const newItem: CartItem = {
+            id: `combo-${combo.id}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+            type: 'combo',
+            combo,
+            quantity,
+            unitPrice,
+            modifiers: [], // Combos use comboSelections instead
+            comboSelections,
+            modifiersTotal,
+            notes,
+            totalPrice: totalPrice * quantity,
         }
 
         set(state => {

@@ -40,8 +40,17 @@ import CustomersPage from './pages/customers/CustomersPage'
 import CustomerFormPage from './pages/customers/CustomerFormPage'
 import CustomerDetailPage from './pages/customers/CustomerDetailPage'
 import CustomerCategoriesPage from './pages/customers/CustomerCategoriesPage'
+import ProductsLayout from './pages/products/ProductsLayout'
 import ProductsPage from './pages/products/ProductsPage'
 import ProductCategoryPricingPage from './pages/products/ProductCategoryPricingPage'
+import CombosPage from './pages/products/CombosPage'
+import ComboFormPage from './pages/products/ComboFormPage'
+import PromotionsPage from './pages/products/PromotionsPage'
+import StockMovementsPage from './pages/inventory/StockMovementsPage'
+import InternalTransfersPage from './pages/inventory/InternalTransfersPage'
+import TransferFormPage from './pages/inventory/TransferFormPage'
+import TransferDetailPage from './pages/inventory/TransferDetailPage'
+import StockByLocationPage from './pages/inventory/StockByLocationPage'
 
 function App() {
     const { isAuthenticated, user, logout } = useAuthStore()
@@ -102,6 +111,15 @@ function App() {
                     <Route path="/inventory/suppliers" element={<SuppliersPage />} />
                     <Route path="/inventory/stock-opname" element={<StockOpnameList />} />
                     <Route path="/inventory/stock-opname/:id" element={<StockOpnameForm />} />
+
+                    {/* Stock Movement & Transfers Module Routes */}
+                    <Route path="/inventory/movements" element={<StockMovementsPage />} />
+                    <Route path="/inventory/transfers" element={<InternalTransfersPage />} />
+                    <Route path="/inventory/transfers/new" element={<TransferFormPage />} />
+                    <Route path="/inventory/transfers/:id" element={<TransferDetailPage />} />
+                    <Route path="/inventory/transfers/:id/edit" element={<TransferFormPage />} />
+                    <Route path="/inventory/stock-by-location" element={<StockByLocationPage />} />
+
                     <Route path="/stock" element={<Navigate to="/inventory" replace />} />
                     <Route path="/orders" element={<OrdersPage />} />
                     <Route path="/production" element={<ProductionPage />} />
@@ -131,8 +149,21 @@ function App() {
                     <Route path="/customers/:id" element={<CustomerDetailPage />} />
                     <Route path="/customers/:id/edit" element={<CustomerFormPage />} />
 
-                    {/* Products Module Routes */}
-                    <Route path="/products" element={<ProductsPage />} />
+                    {/* Products Module Routes with Layout */}
+                    <Route path="/products" element={<ProductsLayout />}>
+                        <Route index element={<ProductsPage />} />
+                        <Route path="combos" element={<CombosPage />} />
+                        <Route path="promotions" element={<PromotionsPage />} />
+                    </Route>
+                    {/* Combo Routes (outside layout for full page forms) */}
+                    <Route path="/products/combos/new" element={<ComboFormPage />} />
+                    <Route path="/products/combos/:id" element={<ComboFormPage />} />
+                    <Route path="/products/combos/:id/edit" element={<ComboFormPage />} />
+                    {/* Promotion Routes (outside layout for full page forms) */}
+                    <Route path="/products/promotions/new" element={<PromotionsPage />} />
+                    <Route path="/products/promotions/:id" element={<PromotionsPage />} />
+                    <Route path="/products/promotions/:id/edit" element={<PromotionsPage />} />
+                    {/* Product Detail Routes */}
                     <Route path="/products/:id" element={<ProductDetailPage />} />
                     <Route path="/products/:id/edit" element={<ProductDetailPage />} />
                     <Route path="/products/:id/pricing" element={<ProductCategoryPricingPage />} />
