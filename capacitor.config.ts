@@ -19,6 +19,14 @@ const config: CapacitorConfig = {
     webContentsDebuggingEnabled: true, // Enable debugging in dev
   },
 
+  // iOS specific configuration
+  ios: {
+    contentInset: 'automatic', // Handle safe areas automatically
+    allowsLinkPreview: false, // Disable link previews for POS
+    scrollEnabled: true,
+    webContentsDebuggingEnabled: true, // Enable Safari debugging in dev
+  },
+
   // Plugin configurations
   plugins: {
     SplashScreen: {
@@ -27,6 +35,7 @@ const config: CapacitorConfig = {
       backgroundColor: '#1a1a2e', // Dark theme background
       androidSplashResourceName: 'splash',
       androidScaleType: 'CENTER_CROP',
+      iosSpinnerStyle: 'large',
       showSpinner: true,
       spinnerColor: '#BA90A2', // Brand color
     },
