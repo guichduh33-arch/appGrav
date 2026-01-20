@@ -3,6 +3,8 @@
         "loading": "Chargement...",
         "no_data": "Aucune donnée.",
         "save": "Enregistrer",
+        "saving": "Enregistrement...",
+        "saved": "Enregistré",
         "cancel": "Annuler",
         "delete": "Supprimer",
         "edit": "Modifier",
@@ -14,7 +16,18 @@
         "settings": "Paramètres",
         "date": "Date",
         "export_pdf": "Exporter PDF",
-        "actions": "Actions"
+        "actions": "Actions",
+        "allRoles": "Tous les rôles",
+        "allStatus": "Tous les statuts",
+        "filterByRole": "Filtrer par rôle",
+        "filterByStatus": "Filtrer par statut",
+        "noResults": "Aucun résultat",
+        "error": "Erreur",
+        "you": "Vous",
+        "welcome": "Bienvenue",
+        "choose": "Choisir",
+        "online": "En ligne",
+        "requiredFields": "Champs requis manquants"
     },
     "pos": {
         "header": {
@@ -300,6 +313,12 @@
         "reports": "Rapports",
         "team": "Équipe",
         "settings": "Paramètres",
+        "roles": "Rôles",
+        "audit": "Audit",
+        "users": "Utilisateurs",
+        "suppliers": "Fournisseurs",
+        "customers": "Clients",
+        "products": "Produits",
         "expand_menu": "Agrandir le menu",
         "collapse_menu": "Réduire le menu"
     },
@@ -528,7 +547,15 @@
             "active": "Actif",
             "inactive": "Inactif",
             "lastLogin": "Dernière Connexion",
-            "neverLoggedIn": "Jamais connecté"
+            "neverLoggedIn": "Jamais connecté",
+            "totalMembers": "Total Membres",
+            "adminsManagers": "Admins / Managers",
+            "recentlyActive": "Actifs (24h)",
+            "showInactive": "Afficher inactifs",
+            "activated": "Utilisateur activé",
+            "deactivated": "Utilisateur désactivé",
+            "deleted": "Utilisateur supprimé",
+            "created": "Utilisateur créé"
         },
         "rolesManagement": {
             "title": "Gestion des Rôles",

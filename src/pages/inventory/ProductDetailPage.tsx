@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import type { Product, Recipe, StockMovement, ProductUOM, Category, Section } from '../../types/database'
-import { MOCK_PRODUCTS, MOCK_CATEGORIES } from '../../hooks/useProducts'
+import { MOCK_PRODUCTS, MOCK_CATEGORIES } from '../../hooks/products'
 import './ProductDetailPage.css'
 
 // Tabs

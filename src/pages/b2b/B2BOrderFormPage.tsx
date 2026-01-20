@@ -91,11 +91,13 @@ export default function B2BOrderFormPage() {
 
     const fetchCustomers = async () => {
         try {
+            // Fetch all active customers for B2B orders
+            // This includes wholesale and retail customers who may need formal orders/invoices
             const { data, error } = await supabase
                 .from('customers')
                 .select('*')
                 .eq('is_active', true)
-                .eq('customer_type', 'wholesale')
+                .order('company_name', { ascending: true, nullsFirst: false })
                 .order('name')
 
             if (error) throw error

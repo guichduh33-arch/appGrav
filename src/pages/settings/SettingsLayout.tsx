@@ -21,8 +21,7 @@ import {
   Grid,
   Wallet,
 } from 'lucide-react';
-import { useSettingsCategories } from '../../hooks/useSettings';
-import { useInitializeSettings } from '../../hooks/useSettings';
+import { useSettingsCategories, useInitializeSettings } from '../../hooks/settings';
 import './SettingsPage.css';
 
 // Icon mapping for settings categories

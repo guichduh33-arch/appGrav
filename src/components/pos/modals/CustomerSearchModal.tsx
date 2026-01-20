@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, Search, QrCode, User, Crown, Star, Building2, UserCheck, Check } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
+import { supabase } from '../../../lib/supabase'
 import './CustomerSearchModal.css'
 
 interface Customer {

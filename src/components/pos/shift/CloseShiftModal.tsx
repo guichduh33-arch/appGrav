@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Banknote, QrCode, CreditCard, Clock, AlertTriangle, Lock } from 'lucide-react'
-import { formatPrice } from '../../utils/helpers'
+import { formatPrice } from '../../../utils/helpers'
 import './ShiftModals.css'
 
 interface CloseShiftModalProps {

@@ -3,10 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { Trash2, Tag, CreditCard, Plus, Minus, SendHorizontal, Lock, List, User, QrCode, Star, Crown } from 'lucide-react'
 import { useCartStore } from '../../stores/cartStore'
 import { formatPrice } from '../../utils/helpers'
-import PinVerificationModal from './PinVerificationModal'
-import TableSelectionModal from './TableSelectionModal'
-import DiscountModal from './DiscountModal'
-import CustomerSearchModal from './CustomerSearchModal'
+import {
+    PinVerificationModal,
+    TableSelectionModal,
+    DiscountModal,
+    CustomerSearchModal,
+} from './modals'
 import './Cart.css'
 
 import type { CartItem } from '../../stores/cartStore'

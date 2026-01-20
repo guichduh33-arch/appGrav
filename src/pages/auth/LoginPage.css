@@ -102,14 +102,18 @@
 }
 
 .pin-dot {
-    font-size: var(--text-2xl);
-    color: #334155;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(51, 65, 85, 0.6);
+    border: 2px solid #475569;
     transition: all var(--duration-fast) var(--ease-standard);
 }
 
 .pin-dot.filled {
-    color: #3B82F6;
-    text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+    background: #3B82F6;
+    border-color: #60A5FA;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
 }
 
 /* Login Numpad */

@@ -18,7 +18,7 @@ import InventoryPage from './pages/inventory/InventoryPage'
 import ProductDetailPage from './pages/inventory/ProductDetailPage'
 import StockOpnameList from './pages/inventory/StockOpnameList'
 import StockOpnameForm from './pages/inventory/StockOpnameForm'
-import SuppliersPage from './pages/inventory/SuppliersPage'
+// SuppliersPage moved to purchasing module
 import OrdersPage from './pages/orders/OrdersPage'
 import ProductionPage from './pages/production/ProductionPage'
 import ReportsPage from './pages/reports/ReportsPage'
@@ -39,9 +39,8 @@ import B2BOrdersPage from './pages/b2b/B2BOrdersPage'
 import B2BOrderFormPage from './pages/b2b/B2BOrderFormPage'
 import B2BOrderDetailPage from './pages/b2b/B2BOrderDetailPage'
 import B2BPaymentsPage from './pages/b2b/B2BPaymentsPage'
-import Purchase_Order_Module from './pages/Purchase_Order_Module'
-import InterSection_Stock_Movements from './pages/InterSection_Stock_Movements'
-import PurchasingSuppliersPage from './pages/purchasing/SuppliersPage'
+// Removed duplicate Purchase_Order_Module and InterSection_Stock_Movements
+import SuppliersPage from './pages/purchasing/SuppliersPage'
 import PurchaseOrdersPage from './pages/purchasing/PurchaseOrdersPage'
 import PurchaseOrderFormPage from './pages/purchasing/PurchaseOrderFormPage'
 import PurchaseOrderDetailPage from './pages/purchasing/PurchaseOrderDetailPage'
@@ -117,7 +116,8 @@ function App() {
                 >
                     <Route path="/inventory" element={<InventoryPage />} />
                     <Route path="/inventory/product/:id" element={<ProductDetailPage />} />
-                    <Route path="/inventory/suppliers" element={<SuppliersPage />} />
+                    {/* Suppliers redirected to purchasing module */}
+                    <Route path="/inventory/suppliers" element={<Navigate to="/purchasing/suppliers" replace />} />
                     <Route path="/inventory/stock-opname" element={<StockOpnameList />} />
                     <Route path="/inventory/stock-opname/:id" element={<StockOpnameForm />} />
 
@@ -141,11 +141,12 @@ function App() {
                     <Route path="/b2b/orders/:id/edit" element={<B2BOrderFormPage />} />
                     <Route path="/b2b/payments" element={<B2BPaymentsPage />} />
 
-                    <Route path="/purchases" element={<Purchase_Order_Module />} />
-                    <Route path="/internal-moves" element={<InterSection_Stock_Movements />} />
+                    {/* Legacy routes - redirect to new locations */}
+                    <Route path="/purchases" element={<Navigate to="/purchasing/purchase-orders" replace />} />
+                    <Route path="/internal-moves" element={<Navigate to="/inventory/transfers" replace />} />
 
                     {/* Purchase Order Module Routes */}
-                    <Route path="/purchasing/suppliers" element={<PurchasingSuppliersPage />} />
+                    <Route path="/purchasing/suppliers" element={<SuppliersPage />} />
                     <Route path="/purchasing/purchase-orders" element={<PurchaseOrdersPage />} />
                     <Route path="/purchasing/purchase-orders/new" element={<PurchaseOrderFormPage />} />
                     <Route path="/purchasing/purchase-orders/:id" element={<PurchaseOrderDetailPage />} />

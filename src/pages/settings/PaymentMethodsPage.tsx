@@ -19,7 +19,7 @@ import {
   useCreatePaymentMethod,
   useUpdatePaymentMethod,
   useDeletePaymentMethod,
-} from '../../hooks/useSettings';
+} from '../../hooks/settings';
 import type { PaymentMethod, PaymentType } from '../../types/settings';
 import toast from 'react-hot-toast';
 

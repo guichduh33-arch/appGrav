@@ -3,6 +3,8 @@
         "loading": "Loading...",
         "no_data": "No data available.",
         "save": "Save",
+        "saving": "Saving...",
+        "saved": "Saved",
         "cancel": "Cancel",
         "delete": "Delete",
         "edit": "Edit",
@@ -14,7 +16,18 @@
         "settings": "Settings",
         "date": "Date",
         "export_pdf": "Export PDF",
-        "actions": "Actions"
+        "actions": "Actions",
+        "allRoles": "All roles",
+        "allStatus": "All statuses",
+        "filterByRole": "Filter by role",
+        "filterByStatus": "Filter by status",
+        "noResults": "No results",
+        "error": "Error",
+        "you": "You",
+        "welcome": "Welcome",
+        "choose": "Choose",
+        "online": "Online",
+        "requiredFields": "Required fields missing"
     },
     "pos": {
         "header": {
@@ -299,6 +312,12 @@
         "reports": "Reports",
         "team": "Team",
         "settings": "Settings",
+        "roles": "Roles",
+        "audit": "Audit",
+        "users": "Users",
+        "suppliers": "Suppliers",
+        "customers": "Customers",
+        "products": "Products",
         "expand_menu": "Expand menu",
         "collapse_menu": "Collapse menu"
     },
@@ -527,7 +546,15 @@
             "active": "Active",
             "inactive": "Inactive",
             "lastLogin": "Last Login",
-            "neverLoggedIn": "Never logged in"
+            "neverLoggedIn": "Never logged in",
+            "totalMembers": "Total Members",
+            "adminsManagers": "Admins / Managers",
+            "recentlyActive": "Active (24h)",
+            "showInactive": "Show inactive",
+            "activated": "User activated",
+            "deactivated": "User deactivated",
+            "deleted": "User deleted",
+            "created": "User created"
         },
         "rolesManagement": {
             "title": "Role Management",

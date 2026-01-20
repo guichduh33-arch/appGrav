@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { X, Clock, RotateCcw, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { useOrderStore } from '../../stores/orderStore'
-import { formatPrice } from '../../utils/helpers'
+import { useOrderStore } from '../../../stores/orderStore'
+import { formatPrice } from '../../../utils/helpers'
 import PinVerificationModal from './PinVerificationModal'
 import './HeldOrdersModal.css'
 

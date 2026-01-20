@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import type { Product, Supplier } from '../types/database'
 import { useAuthStore } from '../stores/authStore'
-import { MOCK_PRODUCTS } from './useProducts'
+import { MOCK_PRODUCTS } from './products'
 
 // Type that matches what InventoryTable expects (with optional is_raw_material for mock data compatibility)
 type InventoryItem = Product & { category: { name: string } | null; is_raw_material?: boolean }

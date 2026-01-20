@@ -5,21 +5,27 @@ import { Search, PauseCircle, CheckCircle, AlertCircle, Clock, Users, Lock } fro
 
 import { useCartStore, CartItem } from '../../stores/cartStore'
 import { useOrderStore } from '../../stores/orderStore'
-import { useProducts, useCategories } from '../../hooks/useProducts'
+import { useProducts, useCategories } from '../../hooks/products'
 import { useShift, ShiftUser } from '../../hooks/useShift'
 import CategoryNav from '../../components/pos/CategoryNav'
 import ProductGrid from '../../components/pos/ProductGrid'
 import Cart from '../../components/pos/Cart'
 import POSMenu from '../../components/pos/POSMenu'
-import ModifierModal from '../../components/pos/ModifierModal'
-import PaymentModal from '../../components/pos/PaymentModal'
-import VariantModal from '../../components/pos/VariantModal'
-import HeldOrdersModal from '../../components/pos/HeldOrdersModal'
-import OpenShiftModal from '../../components/pos/OpenShiftModal'
-import CloseShiftModal from '../../components/pos/CloseShiftModal'
-import ShiftReconciliationModal from '../../components/pos/ShiftReconciliationModal'
-import PinVerificationModal from '../../components/pos/PinVerificationModal'
-import TransactionHistoryModal from '../../components/pos/TransactionHistoryModal'
+// Modals
+import {
+    ModifierModal,
+    PaymentModal,
+    VariantModal,
+    HeldOrdersModal,
+    PinVerificationModal,
+    TransactionHistoryModal,
+} from '../../components/pos/modals'
+// Shift modals
+import {
+    OpenShiftModal,
+    CloseShiftModal,
+    ShiftReconciliationModal,
+} from '../../components/pos/shift'
 import type { Product } from '../../types/database'
 import './POSMainPage.css'
 

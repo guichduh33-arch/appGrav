@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Save, RotateCcw, AlertCircle, CheckCircle } from 'lucide-react';
-import { useSettingsByCategory, useUpdateSetting, useResetSetting } from '../../hooks/useSettings';
+import { useSettingsByCategory, useUpdateSetting, useResetSetting } from '../../hooks/settings';
 import { useSettingsStore } from '../../stores/settingsStore';
 import SettingField from '../../components/settings/SettingField';
 import type { Setting } from '../../types/settings';

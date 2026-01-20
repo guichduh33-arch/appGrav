@@ -107,13 +107,8 @@ export default function LoginPage() {
       if (result.error === 'account_locked') {
         setLockedUntil(result.error);
         setError(t('auth.errors.accountLocked', { minutes: 15 }) || 'Compte verrouill. Ressayez dans 15 minutes.');
-      } else if (result.error === 'invalid_pin') {
-        setError(t('auth.errors.invalidPin') || 'Code PIN incorrect');
-        // Try to get attempts remaining from the error response
-      } else if (result.error === 'user_not_found') {
-        setError(t('auth.errors.userNotFound') || 'Utilisateur non trouv');
       } else {
-        // Fallback to legacy login for demo mode
+        // Fallback to legacy login for all other errors (demo mode)
         await handleLegacyLogin();
       }
     } catch (err) {
@@ -127,7 +122,19 @@ export default function LoginPage() {
 
   // Legacy login for demo mode or when Edge Functions are unavailable
   const handleLegacyLogin = async () => {
-    const user = users.find(u => u.id === selectedUser);
+    // First check if we have PIN in current users list
+    let user = users.find(u => u.id === selectedUser);
+
+    // If user doesn't have pin_code, try to find in DEMO_USERS
+    if (!user?.pin_code) {
+      const demoUser = DEMO_USERS.find(u =>
+        u.name.toLowerCase() === user?.name?.toLowerCase() ||
+        u.id === selectedUser
+      );
+      if (demoUser) {
+        user = { ...user, ...demoUser } as UserProfile;
+      }
+    }
 
     if (!user) {
       setError(t('auth.errors.userNotFound') || 'Utilisateur non trouv');
@@ -241,9 +248,7 @@ export default function LoginPage() {
             </label>
             <div className="pin-display">
               {[...Array(6)].map((_, i) => (
-                <span key={i} className={`pin-dot ${i < pin.length ? 'filled' : ''}`}>
-                  {i < pin.length ? '' : ''}
-                </span>
+                <span key={i} className={`pin-dot ${i < pin.length ? 'filled' : ''}`} />
               ))}
             </div>
 

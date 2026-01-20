@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Save, Clock, AlertCircle } from 'lucide-react';
-import { useBusinessHours, useUpdateBusinessHours } from '../../hooks/useSettings';
+import { useBusinessHours, useUpdateBusinessHours } from '../../hooks/settings';
 import type { BusinessHours } from '../../types/settings';
 import toast from 'react-hot-toast';
 

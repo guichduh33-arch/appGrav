@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import { X, Check } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
-import { formatCurrency } from '../../utils/helpers'
+import { supabase } from '../../../lib/supabase'
+import { formatCurrency } from '../../../utils/helpers'
 import {
     ProductCombo,
     ProductComboGroup,
     ProductComboGroupItem,
     Product
-} from '../../types/database'
+} from '../../../types/database'
 import './ComboSelectorModal.css'
 
 interface GroupItemWithProduct extends ProductComboGroupItem {

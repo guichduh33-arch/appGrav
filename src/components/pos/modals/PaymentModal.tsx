@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Check, CreditCard, Banknote, QrCode, Printer, RotateCcw } from 'lucide-react'
-import { useCartStore } from '../../stores/cartStore'
-import { formatPrice } from '../../utils/helpers'
-import { useOrders } from '../../hooks/useOrders'
+import { useCartStore } from '../../../stores/cartStore'
+import { formatPrice } from '../../../utils/helpers'
+import { useOrders } from '../../../hooks/useOrders'
 import toast from 'react-hot-toast'
 import './PaymentModal.css'
 

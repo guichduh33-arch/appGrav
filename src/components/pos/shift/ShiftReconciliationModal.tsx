@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { X, CheckCircle, AlertTriangle, TrendingUp, TrendingDown, Minus, Banknote, QrCode, CreditCard } from 'lucide-react'
-import { formatPrice } from '../../utils/helpers'
-import { ReconciliationData } from '../../hooks/useShift'
+import { formatPrice } from '../../../utils/helpers'
+import { ReconciliationData } from '../../../hooks/useShift'
 import './ShiftModals.css'
 
 interface ShiftReconciliationModalProps {

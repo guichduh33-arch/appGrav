@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { X, Check } from 'lucide-react'
-import type { Product } from '../../types/database'
-import { useCartStore } from '../../stores/cartStore'
-import { formatPrice } from '../../utils/helpers'
+import type { Product } from '../../../types/database'
+import { useCartStore } from '../../../stores/cartStore'
+import { formatPrice } from '../../../utils/helpers'
 import './VariantModal.css'
 
 interface VariantModalProps {

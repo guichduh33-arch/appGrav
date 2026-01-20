@@ -5,8 +5,8 @@ import {
     X, Receipt, Clock, CreditCard, Banknote, QrCode,
     ChevronDown, ChevronUp, ShoppingBag, User, Hash
 } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
-import { formatPrice } from '../../utils/helpers'
+import { supabase } from '../../../lib/supabase'
+import { formatPrice } from '../../../utils/helpers'
 import './TransactionHistoryModal.css'
 
 interface TransactionHistoryModalProps {

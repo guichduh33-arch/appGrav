@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X, Percent, DollarSign, Tag } from 'lucide-react'
-import { formatPrice } from '../../utils/helpers'
+import { formatPrice } from '../../../utils/helpers'
 import PinVerificationModal from './PinVerificationModal'
 import './DiscountModal.css'
 

@@ -31,7 +31,7 @@ interface CustomerFormData {
     is_active: boolean
     // B2B specific
     tax_id: string
-    payment_terms: number
+    payment_terms: string  // 'cod' | 'net15' | 'net30' | 'net60'
     credit_limit: number
 }
 
@@ -58,7 +58,7 @@ export default function CustomerFormPage() {
         notes: '',
         is_active: true,
         tax_id: '',
-        payment_terms: 30,
+        payment_terms: 'cod',
         credit_limit: 0
     })
 
@@ -113,7 +113,7 @@ export default function CustomerFormPage() {
                     notes: (customer.notes as string) || '',
                     is_active: (customer.is_active as boolean) ?? true,
                     tax_id: (customer.tax_id as string) || '',
-                    payment_terms: (customer.payment_terms as number) || 30,
+                    payment_terms: (customer.payment_terms as string) || 'cod',
                     credit_limit: (customer.credit_limit as number) || 0
                 })
                 setCustomerQR(customer.loyalty_qr_code as string | null)
@@ -155,36 +155,63 @@ export default function CustomerFormPage() {
 
         setSaving(true)
         try {
-            const customerData = {
+            // Build customer data - only include category_id if it's a valid UUID
+            const customerData: Record<string, unknown> = {
                 name: formData.name.trim(),
                 company_name: formData.company_name.trim() || null,
                 phone: formData.phone.trim() || null,
                 email: formData.email.trim() || null,
                 address: formData.address.trim() || null,
                 customer_type: formData.customer_type,
-                category_id: formData.category_id || null,
                 date_of_birth: formData.date_of_birth || null,
                 notes: formData.notes.trim() || null,
                 is_active: formData.is_active,
                 tax_id: formData.tax_id.trim() || null,
-                payment_terms: formData.payment_terms,
-                credit_limit: formData.credit_limit
+                payment_terms: formData.payment_terms || 'cod',  // ENUM: 'cod', 'net15', 'net30', 'net60'
+                credit_limit: formData.credit_limit || 0
             }
 
-            if (isEditing) {
-                const { error } = await supabase
-                    .from('customers')
-                    .update(customerData as never)
-                    .eq('id', id as string)
+            // Only include category_id if it's a valid UUID
+            if (formData.category_id && formData.category_id.length === 36) {
+                customerData.category_id = formData.category_id
+            } else {
+                customerData.category_id = null
+            }
 
-                if (error) throw error
+            console.log('Saving customer:', customerData)
+
+            if (isEditing) {
+                const { data, error } = await supabase
+                    .from('customers')
+                    .update(customerData)
+                    .eq('id', id as string)
+                    .select()
+
+                if (error) {
+                    console.error('Supabase update error:', error)
+                    throw new Error(error.message || 'Erreur lors de la mise à jour')
+                }
+                console.log('Customer updated:', data)
                 toast.success('Client mis à jour avec succès')
             } else {
-                const { error } = await supabase
+                const { data, error } = await supabase
                     .from('customers')
-                    .insert(customerData as never)
+                    .insert(customerData)
+                    .select()
 
-                if (error) throw error
+                if (error) {
+                    console.error('Supabase insert error:', error)
+                    // Handle specific errors
+                    if (error.code === '42501') {
+                        throw new Error('Permission refusée. Veuillez vérifier les politiques RLS.')
+                    } else if (error.code === '23503') {
+                        throw new Error('Catégorie invalide. Veuillez sélectionner une catégorie valide.')
+                    } else if (error.code === '23505') {
+                        throw new Error('Un client avec ce numéro de téléphone ou email existe déjà.')
+                    }
+                    throw new Error(error.message || 'Erreur lors de la création')
+                }
+                console.log('Customer created:', data)
                 toast.success('Client créé avec succès')
             }
 
@@ -488,16 +515,18 @@ export default function CustomerFormPage() {
 
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label htmlFor="payment_terms">Délai de paiement (jours)</label>
-                                    <input
-                                        type="number"
+                                    <label htmlFor="payment_terms">Délai de paiement</label>
+                                    <select
                                         id="payment_terms"
                                         name="payment_terms"
                                         value={formData.payment_terms}
                                         onChange={handleChange}
-                                        min="0"
-                                        max="180"
-                                    />
+                                    >
+                                        <option value="cod">Comptant (COD)</option>
+                                        <option value="net15">15 jours</option>
+                                        <option value="net30">30 jours</option>
+                                        <option value="net60">60 jours</option>
+                                    </select>
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="credit_limit">Limite de crédit (IDR)</label>

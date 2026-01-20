@@ -14,6 +14,7 @@ import {
   Key,
   XCircle,
   RefreshCw,
+  Clock,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
@@ -22,9 +23,10 @@ import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
 import { usePermissions } from '../../hooks/usePermissions';
 import { PermissionGuard } from '../../components/auth/PermissionGuard';
-import { authService } from '../../services/authService';
+import { authService } from '../../services/AuthService';
 import toast from 'react-hot-toast';
 import type { Role } from '../../types/auth';
+import './UsersPage.css';
 
 interface UserWithRoles {
   id: string;
@@ -283,14 +285,14 @@ const UsersPage = () => {
   };
 
   return (
-    <div className="p-8 max-w-[1600px] mx-auto space-y-8">
+    <div className="users-page">
       {/* Header */}
-      <header className="flex items-center justify-between">
+      <header className="users-page__header">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+          <h1 className="users-page__title">
             {t('auth.users.title') || 'Gestion des Utilisateurs'}
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="users-page__subtitle">
             {t('auth.users.subtitle') || 'Gérez les utilisateurs et leurs accès'}
           </p>
         </div>
@@ -302,67 +304,68 @@ const UsersPage = () => {
       </header>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="users-stats-grid">
         <StatCard
           label={t('auth.users.totalMembers') || 'Total Membres'}
           value={stats.total}
-          icon={<Users className="w-5 h-5 text-blue-600" />}
+          icon={<Users size={24} />}
+          variant="blue"
         />
         <StatCard
           label={t('auth.users.active') || 'Actifs'}
           value={stats.active}
-          icon={<CheckCircle2 className="w-5 h-5 text-green-600" />}
+          icon={<CheckCircle2 size={24} />}
+          variant="green"
         />
         <StatCard
           label={t('auth.users.adminsManagers') || 'Admins/Managers'}
           value={stats.admins}
-          icon={<Shield className="w-5 h-5 text-orange-600" />}
+          icon={<Shield size={24} />}
+          variant="orange"
         />
         <StatCard
           label={t('auth.users.recentlyActive') || 'Actifs 24h'}
           value={stats.recentlyActive}
-          icon={<RefreshCw className="w-5 h-5 text-purple-600" />}
+          icon={<Clock size={24} />}
+          variant="purple"
         />
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="users-filters">
         {/* Search */}
-        <div className="relative flex-1 min-w-[200px] max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <div className="users-filters__search">
+          <Search className="users-filters__search-icon" size={16} />
           <input
             type="text"
             placeholder={t('common.search') || 'Rechercher...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="users-filters__search-input"
           />
         </div>
 
         {/* Role filter */}
-        <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-gray-400" />
-          <select
-            value={filterRole}
-            onChange={(e) => setFilterRole(e.target.value)}
-            className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
-            title={t('common.filterByRole') || 'Filtrer par rôle'}
-            aria-label={t('common.filterByRole') || 'Filtrer par rôle'}
-          >
-            <option value="all">{t('common.allRoles') || 'Tous les rôles'}</option>
-            {roles.map(role => (
-              <option key={role.id} value={role.code}>
-                {getRoleName(role)}
-              </option>
-            ))}
-          </select>
-        </div>
+        <select
+          value={filterRole}
+          onChange={(e) => setFilterRole(e.target.value)}
+          className="users-filters__select"
+          title={t('common.filterByRole') || 'Filtrer par rôle'}
+          aria-label={t('common.filterByRole') || 'Filtrer par rôle'}
+        >
+          <option value="all">{t('common.allRoles') || 'Tous les rôles'}</option>
+          {roles.map(role => (
+            <option key={role.id} value={role.code}>
+              {getRoleName(role)}
+            </option>
+          ))}
+        </select>
 
         {/* Status filter */}
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+          className="users-filters__select"
           title={t('common.filterByStatus') || 'Filtrer par statut'}
           aria-label={t('common.filterByStatus') || 'Filtrer par statut'}
         >
@@ -372,184 +375,167 @@ const UsersPage = () => {
         </select>
 
         {/* Show inactive toggle */}
-        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+        <label className="users-filters__checkbox">
           <input
             type="checkbox"
             checked={showInactive}
             onChange={(e) => setShowInactive(e.target.checked)}
-            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
           {t('auth.users.showInactive') || 'Afficher inactifs'}
         </label>
 
         {/* Refresh */}
-        <Button variant="ghost" size="sm" onClick={loadData} disabled={isLoading}>
-          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-        </Button>
+        <button
+          type="button"
+          className="users-filters__refresh"
+          onClick={loadData}
+          disabled={isLoading}
+          title="Refresh"
+        >
+          <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
+        </button>
       </div>
 
       {/* Users Table */}
-      <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-100 bg-gray-50/50">
-                <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  {t('table.user') || 'Utilisateur'}
-                </th>
-                <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  {t('auth.users.employeeCode') || 'Code'}
-                </th>
-                <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  {t('auth.users.primaryRole') || 'Rôle'}
-                </th>
-                <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  {t('auth.users.status') || 'Statut'}
-                </th>
-                <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  {t('auth.users.lastLogin') || 'Dernière connexion'}
-                </th>
-                <th className="text-right py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  {t('common.actions') || 'Actions'}
-                </th>
+      <div className="users-table-wrapper">
+        <table className="users-table">
+          <thead>
+            <tr>
+              <th>{t('table.user') || 'Utilisateur'}</th>
+              <th>{t('auth.users.employeeCode') || 'Code'}</th>
+              <th>{t('auth.users.primaryRole') || 'Rôle'}</th>
+              <th>{t('auth.users.status') || 'Statut'}</th>
+              <th>{t('auth.users.lastLogin') || 'Dernière connexion'}</th>
+              <th>{t('common.actions') || 'Actions'}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading ? (
+              <tr>
+                <td colSpan={6} className="users-empty">
+                  <RefreshCw className="users-empty__icon animate-spin" />
+                  {t('common.loading') || 'Chargement...'}
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-gray-500">
-                    <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
-                    {t('common.loading') || 'Chargement...'}
-                  </td>
-                </tr>
-              ) : filteredUsers.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-gray-500">
-                    <Users className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                    {t('common.noResults') || 'Aucun résultat'}
-                  </td>
-                </tr>
-              ) : (
-                filteredUsers.map(user => {
-                  const primaryRole = getPrimaryRole(user);
-                  const isSelf = user.id === currentUser?.id;
+            ) : filteredUsers.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="users-empty">
+                  <Users className="users-empty__icon" />
+                  {t('common.noResults') || 'Aucun résultat'}
+                </td>
+              </tr>
+            ) : (
+              filteredUsers.map(user => {
+                const primaryRole = getPrimaryRole(user);
+                const isSelf = user.id === currentUser?.id;
 
-                  return (
-                    <tr
-                      key={user.id}
-                      className={`hover:bg-gray-50/50 transition-colors ${!user.is_active ? 'opacity-60' : ''}`}
-                    >
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-4">
-                          {user.avatar_url ? (
-                            <img
-                              src={user.avatar_url}
-                              alt={user.name}
-                              className="w-10 h-10 rounded-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-sm">
-                              {getInitials(user)}
-                            </div>
-                          )}
-                          <div>
-                            <div className="font-medium text-gray-900 flex items-center gap-2">
-                              {user.display_name || user.name}
-                              {isSelf && (
-                                <span className="text-xs text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
-                                  {t('common.you') || 'Vous'}
-                                </span>
-                              )}
-                            </div>
-                            {user.phone && (
-                              <div className="text-sm text-gray-500">{user.phone}</div>
+                return (
+                  <tr key={user.id} className={!user.is_active ? 'row-inactive' : ''}>
+                    <td>
+                      <div className="user-cell">
+                        {user.avatar_url ? (
+                          <img
+                            src={user.avatar_url}
+                            alt={user.name}
+                            className="user-cell__avatar"
+                          />
+                        ) : (
+                          <div className="user-cell__avatar-placeholder">
+                            {getInitials(user)}
+                          </div>
+                        )}
+                        <div className="user-cell__info">
+                          <div className="user-cell__name">
+                            {user.display_name || user.name}
+                            {isSelf && (
+                              <span className="user-cell__badge">
+                                {t('common.you') || 'Vous'}
+                              </span>
                             )}
                           </div>
+                          {user.phone && (
+                            <div className="user-cell__phone">{user.phone}</div>
+                          )}
                         </div>
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className="font-mono text-sm text-gray-600">
-                          {user.employee_code || '-'}
+                      </div>
+                    </td>
+                    <td>
+                      <span className="employee-code">
+                        {user.employee_code || '-'}
+                      </span>
+                    </td>
+                    <td>
+                      <Badge variant={getRoleBadgeVariant(primaryRole?.code)}>
+                        {getRoleName(primaryRole)}
+                      </Badge>
+                      {user.user_roles && user.user_roles.length > 1 && (
+                        <span className="extra-roles">
+                          +{user.user_roles.length - 1}
                         </span>
-                      </td>
-                      <td className="py-4 px-6">
-                        <Badge variant={getRoleBadgeVariant(primaryRole?.code)}>
-                          {getRoleName(primaryRole)}
-                        </Badge>
-                        {user.user_roles && user.user_roles.length > 1 && (
-                          <span className="ml-2 text-xs text-gray-400">
-                            +{user.user_roles.length - 1}
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`w-2 h-2 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-gray-300'}`}
-                          />
-                          <span className="text-sm text-gray-700">
-                            {user.is_active
-                              ? (t('auth.users.active') || 'Actif')
-                              : (t('auth.users.inactive') || 'Inactif')}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-sm text-gray-500">
-                        {formatLastActive(user.last_login_at)}
-                      </td>
-                      <td className="py-4 px-6 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <PermissionGuard permission="users.update">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              onClick={() => handleEdit(user)}
-                              title={t('common.edit') || 'Modifier'}
-                            >
-                              <Edit2 size={16} />
-                            </Button>
-                          </PermissionGuard>
+                      )}
+                    </td>
+                    <td>
+                      <div className="status-cell">
+                        <span className={`status-cell__dot ${user.is_active ? 'status-cell__dot--active' : 'status-cell__dot--inactive'}`} />
+                        <span className="status-cell__text">
+                          {user.is_active
+                            ? (t('auth.users.active') || 'Actif')
+                            : (t('auth.users.inactive') || 'Inactif')}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="last-login">
+                      {formatLastActive(user.last_login_at)}
+                    </td>
+                    <td>
+                      <div className="actions-cell">
+                        <PermissionGuard permission="users.update">
+                          <button
+                            type="button"
+                            className="action-btn"
+                            onClick={() => handleEdit(user)}
+                            title={t('common.edit') || 'Modifier'}
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                        </PermissionGuard>
 
-                          <PermissionGuard permission="users.update">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              onClick={() => handleToggleActive(user.id, user.is_active)}
-                              disabled={isSelf}
-                              title={user.is_active ? 'Désactiver' : 'Activer'}
-                            >
-                              {user.is_active ? (
-                                <XCircle size={16} className="text-orange-500" />
-                              ) : (
-                                <Power size={16} className="text-green-500" />
-                              )}
-                            </Button>
-                          </PermissionGuard>
+                        <PermissionGuard permission="users.update">
+                          <button
+                            type="button"
+                            className={`action-btn ${user.is_active ? 'action-btn--deactivate' : 'action-btn--activate'}`}
+                            onClick={() => handleToggleActive(user.id, user.is_active)}
+                            disabled={isSelf}
+                            title={user.is_active ? 'Désactiver' : 'Activer'}
+                          >
+                            {user.is_active ? (
+                              <XCircle size={16} />
+                            ) : (
+                              <Power size={16} />
+                            )}
+                          </button>
+                        </PermissionGuard>
 
-                          <PermissionGuard permission="users.delete">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                              onClick={() => setShowDeleteConfirm(user.id)}
-                              disabled={isSelf || primaryRole?.code === 'SUPER_ADMIN'}
-                              title={t('common.delete') || 'Supprimer'}
-                            >
-                              <Trash2 size={16} />
-                            </Button>
-                          </PermissionGuard>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+                        <PermissionGuard permission="users.delete">
+                          <button
+                            type="button"
+                            className="action-btn action-btn--danger"
+                            onClick={() => setShowDeleteConfirm(user.id)}
+                            disabled={isSelf || primaryRole?.code === 'SUPER_ADMIN'}
+                            title={t('common.delete') || 'Supprimer'}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </PermissionGuard>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
@@ -597,14 +583,24 @@ const UsersPage = () => {
 };
 
 // Stats Card Component
-function StatCard({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
+function StatCard({
+  label,
+  value,
+  icon,
+  variant = 'blue'
+}: {
+  label: string;
+  value: number;
+  icon: React.ReactNode;
+  variant?: 'blue' | 'green' | 'orange' | 'purple';
+}) {
   return (
-    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
-      <div>
-        <p className="text-sm font-medium text-gray-500">{label}</p>
-        <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+    <div className="stat-card">
+      <div className="stat-card__content">
+        <p className="stat-card__label">{label}</p>
+        <p className="stat-card__value">{value}</p>
       </div>
-      <div className="p-3 bg-gray-50 rounded-lg">{icon}</div>
+      <div className={`stat-card__icon stat-card__icon--${variant}`}>{icon}</div>
     </div>
   );
 }

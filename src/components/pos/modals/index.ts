@@ -1,0 +1,11 @@
+// POS Modals - centralized exports
+export { default as ComboSelectorModal } from './ComboSelectorModal'
+export { default as CustomerSearchModal } from './CustomerSearchModal'
+export { default as DiscountModal } from './DiscountModal'
+export { default as HeldOrdersModal } from './HeldOrdersModal'
+export { default as ModifierModal } from './ModifierModal'
+export { default as PaymentModal } from './PaymentModal'
+export { default as PinVerificationModal } from './PinVerificationModal'
+export { default as TableSelectionModal } from './TableSelectionModal'
+export { default as TransactionHistoryModal } from './TransactionHistoryModal'
+export { default as VariantModal } from './VariantModal'

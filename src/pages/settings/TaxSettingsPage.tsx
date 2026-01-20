@@ -17,7 +17,7 @@ import {
   useDeleteTaxRate,
   useSettingsByCategory,
   useUpdateSetting,
-} from '../../hooks/useSettings';
+} from '../../hooks/settings';
 import SettingField from '../../components/settings/SettingField';
 import type { TaxRate } from '../../types/settings';
 import toast from 'react-hot-toast';

@@ -22,7 +22,26 @@
       "Bash(start cmd /k \"claude\")",
       "Bash(ls -la \"c:\\\\Users\\\\guich\\\\appGrav\\\\supabase\\\\migrations\"\" | grep -E \"02[678]_ \")",
       "Bash(grep:*)",
-      "Bash(dir /b c:UsersguichappGravsupabasemigrations*.sql)"
+      "Bash(dir /b c:UsersguichappGravsupabasemigrations*.sql)",
+      "Bash(__NEW_LINE_41e9b22a1c184c6b__ echo \"\")",
+      "Bash(__NEW_LINE_c9ef07e7baf652f5__ echo \"\")",
+      "Bash(__NEW_LINE_9c115878904591e3__ echo \"=== POTENTIAL ISSUES - FILES IN SRC ROOT ===\")",
+      "Bash(__NEW_LINE_9c115878904591e3__ echo \"\")",
+      "Bash(__NEW_LINE_2119cdbfae398a76__ echo \"\")",
+      "Bash(__NEW_LINE_caa279affbe1a72e__ echo \"\")",
+      "Bash(__NEW_LINE_5285b08a8aa83918__ echo \"\")",
+      "Bash(__NEW_LINE_9d711f222d20a248__ echo \"=== INVENTORY-RELATED FILES ===\")",
+      "Bash(__NEW_LINE_9d711f222d20a248__ echo \"\")",
+      "Bash(__NEW_LINE_5d3ae65a85bdbc18__ echo \"\")",
+      "Bash(__NEW_LINE_d4231330c189b0f9__ echo \"\")",
+      "Bash(__NEW_LINE_9bd3a49c2bb164ac__ echo \"\")",
+      "Bash(__NEW_LINE_3316c692188b518b__ echo \"=== UNUSUAL DIRECTORIES ===\")",
+      "Bash(__NEW_LINE_3316c692188b518b__ echo \"\")",
+      "Bash(__NEW_LINE_e6a7a0f77e331e36__ echo \"=== COMPONENTS POS MODALS ===\")",
+      "Bash(__NEW_LINE_e6a7a0f77e331e36__ echo \"\")",
+      "Bash(find:*)",
+      "Bash(while read:*)",
+      "Bash(done)"
     ]
   }
 }

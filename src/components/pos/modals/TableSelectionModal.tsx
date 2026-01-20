@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Users } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
+import { supabase } from '../../../lib/supabase'
 import './TableSelectionModal.css'
 
 interface Table {

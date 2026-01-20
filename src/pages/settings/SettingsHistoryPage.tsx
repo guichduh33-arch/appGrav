@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { History, User, Clock, ArrowRight, Search, Filter } from 'lucide-react';
-import { useSettingsHistory } from '../../hooks/useSettings';
+import { useSettingsHistory } from '../../hooks/settings';
 import { formatDistanceToNow } from 'date-fns';
 import { fr, enUS, id } from 'date-fns/locale';
 

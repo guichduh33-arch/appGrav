@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Check, Plus, Minus } from 'lucide-react'
-import type { Product } from '../../types/database'
-import { useCartStore, type CartModifier, type CartItem } from '../../stores/cartStore'
-import { formatPrice } from '../../utils/helpers'
+import type { Product } from '../../../types/database'
+import { useCartStore, type CartModifier, type CartItem } from '../../../stores/cartStore'
+import { formatPrice } from '../../../utils/helpers'
 import './ModifierModal.css'
 
 interface ModifierModalProps {
