@@ -1,0 +1,237 @@
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Save, Clock, AlertCircle } from 'lucide-react';
+import { useBusinessHours, useUpdateBusinessHours } from '../../hooks/useSettings';
+import type { BusinessHours } from '../../types/settings';
+import toast from 'react-hot-toast';
+
+const DAY_NAMES: Record<string, string[]> = {
+  fr: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+  en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  id: ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'],
+};
+
+const BusinessHoursPage = () => {
+  const { t, i18n } = useTranslation();
+  const { data: businessHours, isLoading } = useBusinessHours();
+  const updateHours = useUpdateBusinessHours();
+
+  const [localHours, setLocalHours] = useState<BusinessHours[]>([]);
+  const [pendingChanges, setPendingChanges] = useState<Set<number>>(new Set());
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Language
+  const lang = i18n.language?.substring(0, 2) || 'fr';
+  const dayNames = DAY_NAMES[lang] || DAY_NAMES.fr;
+
+  // Initialize local state
+  useEffect(() => {
+    if (businessHours) {
+      setLocalHours([...businessHours].sort((a, b) => a.day_of_week - b.day_of_week));
+      setPendingChanges(new Set());
+    }
+  }, [businessHours]);
+
+  // Handle change
+  const handleChange = (dayOfWeek: number, field: keyof BusinessHours, value: unknown) => {
+    setLocalHours((prev) =>
+      prev.map((h) =>
+        h.day_of_week === dayOfWeek ? { ...h, [field]: value } : h
+      )
+    );
+    setPendingChanges((prev) => new Set(prev).add(dayOfWeek));
+  };
+
+  // Handle toggle closed
+  const handleToggleClosed = (dayOfWeek: number) => {
+    const hours = localHours.find((h) => h.day_of_week === dayOfWeek);
+    if (hours) {
+      handleChange(dayOfWeek, 'is_closed', !hours.is_closed);
+    }
+  };
+
+  // Save all changes
+  const handleSaveAll = async () => {
+    if (pendingChanges.size === 0) return;
+
+    setIsSaving(true);
+    const errors: number[] = [];
+
+    try {
+      for (const dayOfWeek of pendingChanges) {
+        const hours = localHours.find((h) => h.day_of_week === dayOfWeek);
+        if (!hours) continue;
+
+        try {
+          await updateHours.mutateAsync({
+            dayOfWeek,
+            updates: {
+              open_time: hours.open_time,
+              close_time: hours.close_time,
+              is_closed: hours.is_closed,
+              break_start: hours.break_start,
+              break_end: hours.break_end,
+            },
+          });
+        } catch (error) {
+          errors.push(dayOfWeek);
+        }
+      }
+
+      if (errors.length === 0) {
+        toast.success('Horaires enregistrés');
+        setPendingChanges(new Set());
+      } else {
+        toast.error(`Erreur sur ${errors.length} jour(s)`);
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Apply to all days
+  const applyToAll = (sourceDay: BusinessHours) => {
+    setLocalHours((prev) =>
+      prev.map((h) => ({
+        ...h,
+        open_time: sourceDay.open_time,
+        close_time: sourceDay.close_time,
+        is_closed: sourceDay.is_closed,
+        break_start: sourceDay.break_start,
+        break_end: sourceDay.break_end,
+      }))
+    );
+    setPendingChanges(new Set([0, 1, 2, 3, 4, 5, 6]));
+  };
+
+  if (isLoading) {
+    return (
+      <div className="settings-section">
+        <div className="settings-section__body settings-section__loading">
+          <div className="spinner" />
+          <span>Chargement...</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="settings-section">
+      <div className="settings-section__header">
+        <div className="settings-section__header-content">
+          <div>
+            <h2 className="settings-section__title">Horaires d'Ouverture</h2>
+            <p className="settings-section__description">
+              Configurez les heures d'ouverture de votre établissement
+            </p>
+          </div>
+          {pendingChanges.size > 0 && (
+            <button
+              className="btn-primary"
+              onClick={handleSaveAll}
+              disabled={isSaving}
+            >
+              <Save size={16} />
+              {isSaving ? 'Enregistrement...' : `Enregistrer (${pendingChanges.size})`}
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="settings-section__body">
+        <div className="business-hours-list">
+          {localHours.map((hours) => (
+            <div
+              key={hours.day_of_week}
+              className={`business-hours-item ${hours.is_closed ? 'is-closed' : ''} ${
+                pendingChanges.has(hours.day_of_week) ? 'has-changes' : ''
+              }`}
+            >
+              <div className="business-hours-item__day">
+                <span className="business-hours-item__day-name">
+                  {dayNames[hours.day_of_week]}
+                </span>
+                <button
+                  className={`toggle-mini ${!hours.is_closed ? 'is-on' : ''}`}
+                  onClick={() => handleToggleClosed(hours.day_of_week)}
+                  title={hours.is_closed ? 'Ouvrir' : 'Fermer'}
+                />
+              </div>
+
+              {!hours.is_closed ? (
+                <div className="business-hours-item__times">
+                  <div className="business-hours-item__time-group">
+                    <label>Ouverture</label>
+                    <input
+                      type="time"
+                      className="business-hours-input"
+                      value={hours.open_time || ''}
+                      onChange={(e) => handleChange(hours.day_of_week, 'open_time', e.target.value || null)}
+                    />
+                  </div>
+                  <span className="business-hours-item__separator">-</span>
+                  <div className="business-hours-item__time-group">
+                    <label>Fermeture</label>
+                    <input
+                      type="time"
+                      className="business-hours-input"
+                      value={hours.close_time || ''}
+                      onChange={(e) => handleChange(hours.day_of_week, 'close_time', e.target.value || null)}
+                    />
+                  </div>
+
+                  <div className="business-hours-item__break">
+                    <span className="business-hours-item__break-label">Pause:</span>
+                    <input
+                      type="time"
+                      className="business-hours-input business-hours-input--small"
+                      value={hours.break_start || ''}
+                      onChange={(e) => handleChange(hours.day_of_week, 'break_start', e.target.value || null)}
+                      placeholder="Début"
+                    />
+                    <span>-</span>
+                    <input
+                      type="time"
+                      className="business-hours-input business-hours-input--small"
+                      value={hours.break_end || ''}
+                      onChange={(e) => handleChange(hours.day_of_week, 'break_end', e.target.value || null)}
+                      placeholder="Fin"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="business-hours-item__closed">
+                  <Clock size={16} />
+                  Fermé
+                </div>
+              )}
+
+              <div className="business-hours-item__actions">
+                <button
+                  className="btn-ghost btn-ghost--small"
+                  onClick={() => applyToAll(hours)}
+                  title="Appliquer à tous les jours"
+                >
+                  Appliquer à tous
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {pendingChanges.size > 0 && (
+        <div className="settings-section__footer">
+          <div className="settings-unsaved-notice">
+            <AlertCircle size={16} />
+            <span>
+              {pendingChanges.size} modification{pendingChanges.size > 1 ? 's' : ''} non enregistrée{pendingChanges.size > 1 ? 's' : ''}
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default BusinessHoursPage;

@@ -25,6 +25,15 @@ import ReportsPage from './pages/reports/ReportsPage'
 import SalesReportsPage from './pages/reports/SalesReportsPage'
 import UsersPage from './pages/users/UsersPage'
 import SettingsPage from './pages/settings/SettingsPage'
+import SettingsLayout from './pages/settings/SettingsLayout'
+import CategorySettingsPage from './pages/settings/CategorySettingsPage'
+import TaxSettingsPage from './pages/settings/TaxSettingsPage'
+import PaymentMethodsPage from './pages/settings/PaymentMethodsPage'
+import BusinessHoursPage from './pages/settings/BusinessHoursPage'
+import SettingsHistoryPage from './pages/settings/SettingsHistoryPage'
+import RolesPage from './pages/settings/RolesPage'
+import AuditPage from './pages/settings/AuditPage'
+import ProfilePage from './pages/profile/ProfilePage'
 import B2BPage from './pages/b2b/B2BPage'
 import B2BOrdersPage from './pages/b2b/B2BOrdersPage'
 import B2BOrderFormPage from './pages/b2b/B2BOrderFormPage'
@@ -171,7 +180,37 @@ function App() {
                     <Route path="/reports" element={<ReportsPage />} />
                     <Route path="/reports/sales" element={<SalesReportsPage />} />
                     <Route path="/users" element={<UsersPage />} />
-                    <Route path="/settings" element={<SettingsPage />} />
+
+                    {/* Settings Module Routes with Layout */}
+                    <Route path="/settings" element={<SettingsLayout />}>
+                        <Route index element={<CategorySettingsPage />} />
+                        {/* Dynamic category pages */}
+                        <Route path="company" element={<CategorySettingsPage />} />
+                        <Route path="pos" element={<CategorySettingsPage />} />
+                        <Route path="tax" element={<TaxSettingsPage />} />
+                        <Route path="inventory" element={<CategorySettingsPage />} />
+                        <Route path="printing" element={<CategorySettingsPage />} />
+                        <Route path="notifications" element={<CategorySettingsPage />} />
+                        <Route path="localization" element={<CategorySettingsPage />} />
+                        <Route path="security" element={<CategorySettingsPage />} />
+                        <Route path="integrations" element={<CategorySettingsPage />} />
+                        <Route path="backup" element={<CategorySettingsPage />} />
+                        <Route path="appearance" element={<CategorySettingsPage />} />
+                        <Route path="advanced" element={<CategorySettingsPage />} />
+                        {/* Specialized pages */}
+                        <Route path="payments" element={<PaymentMethodsPage />} />
+                        <Route path="hours" element={<BusinessHoursPage />} />
+                        <Route path="history" element={<SettingsHistoryPage />} />
+                        {/* Legacy pages from old settings (still accessible) */}
+                        <Route path="sections" element={<SettingsPage />} />
+                        <Route path="floorplan" element={<SettingsPage />} />
+                        <Route path="kds" element={<SettingsPage />} />
+                    </Route>
+                    {/* Settings sub-pages outside layout */}
+                    <Route path="/settings/roles" element={<RolesPage />} />
+                    <Route path="/settings/audit" element={<AuditPage />} />
+
+                    <Route path="/profile" element={<ProfilePage />} />
                 </Route>
 
                 {/* Default redirect */}

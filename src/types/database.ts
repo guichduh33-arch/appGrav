@@ -242,11 +242,136 @@ export interface Database {
                     can_access_reports: boolean
                     avatar_url: string | null
                     is_active: boolean
+                    // New fields from migration 040
+                    employee_code: string | null
+                    first_name: string | null
+                    last_name: string | null
+                    display_name: string | null
+                    phone: string | null
+                    preferred_language: 'fr' | 'en' | 'id'
+                    timezone: string
+                    pin_hash: string | null
+                    last_login_at: string | null
+                    failed_login_attempts: number
+                    locked_until: string | null
+                    password_changed_at: string | null
+                    must_change_password: boolean
+                    created_by: string | null
+                    updated_by: string | null
                     created_at: string
                     updated_at: string
                 }
                 Insert: Partial<Database['public']['Tables']['user_profiles']['Row']> & { name: string, role: 'admin' | 'manager' | 'cashier' | 'server' | 'barista' | 'kitchen' | 'backoffice' }
                 Update: Partial<Database['public']['Tables']['user_profiles']['Row']>
+            }
+            roles: {
+                Row: {
+                    id: string
+                    code: string
+                    name_fr: string
+                    name_en: string
+                    name_id: string
+                    description: string | null
+                    is_system: boolean
+                    is_active: boolean
+                    hierarchy_level: number
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: Partial<Database['public']['Tables']['roles']['Row']> & { code: string, name_fr: string, name_en: string, name_id: string }
+                Update: Partial<Database['public']['Tables']['roles']['Row']>
+            }
+            permissions: {
+                Row: {
+                    id: string
+                    code: string
+                    module: string
+                    action: string
+                    name_fr: string
+                    name_en: string
+                    name_id: string
+                    description: string | null
+                    is_sensitive: boolean
+                    created_at: string
+                }
+                Insert: Partial<Database['public']['Tables']['permissions']['Row']> & { code: string, module: string, action: string, name_fr: string, name_en: string, name_id: string }
+                Update: Partial<Database['public']['Tables']['permissions']['Row']>
+            }
+            role_permissions: {
+                Row: {
+                    id: string
+                    role_id: string
+                    permission_id: string
+                    granted_at: string
+                    granted_by: string | null
+                }
+                Insert: Partial<Database['public']['Tables']['role_permissions']['Row']> & { role_id: string, permission_id: string }
+                Update: Partial<Database['public']['Tables']['role_permissions']['Row']>
+            }
+            user_roles: {
+                Row: {
+                    id: string
+                    user_id: string
+                    role_id: string
+                    is_primary: boolean
+                    valid_from: string | null
+                    valid_until: string | null
+                    assigned_at: string
+                    assigned_by: string | null
+                }
+                Insert: Partial<Database['public']['Tables']['user_roles']['Row']> & { user_id: string, role_id: string }
+                Update: Partial<Database['public']['Tables']['user_roles']['Row']>
+            }
+            user_permissions: {
+                Row: {
+                    id: string
+                    user_id: string
+                    permission_id: string
+                    is_granted: boolean
+                    valid_from: string | null
+                    valid_until: string | null
+                    reason: string | null
+                    granted_at: string
+                    granted_by: string | null
+                }
+                Insert: Partial<Database['public']['Tables']['user_permissions']['Row']> & { user_id: string, permission_id: string }
+                Update: Partial<Database['public']['Tables']['user_permissions']['Row']>
+            }
+            user_sessions: {
+                Row: {
+                    id: string
+                    user_id: string
+                    session_token: string
+                    device_type: 'desktop' | 'tablet' | 'pos' | null
+                    device_name: string | null
+                    ip_address: string | null
+                    user_agent: string | null
+                    started_at: string
+                    last_activity_at: string
+                    ended_at: string | null
+                    end_reason: 'logout' | 'timeout' | 'forced' | null
+                }
+                Insert: Partial<Database['public']['Tables']['user_sessions']['Row']> & { user_id: string, session_token: string }
+                Update: Partial<Database['public']['Tables']['user_sessions']['Row']>
+            }
+            audit_logs: {
+                Row: {
+                    id: string
+                    user_id: string | null
+                    action: string
+                    module: string
+                    entity_type: string | null
+                    entity_id: string | null
+                    old_values: Record<string, unknown> | null
+                    new_values: Record<string, unknown> | null
+                    ip_address: string | null
+                    user_agent: string | null
+                    session_id: string | null
+                    severity: 'info' | 'warning' | 'critical'
+                    created_at: string
+                }
+                Insert: Partial<Database['public']['Tables']['audit_logs']['Row']> & { action: string, module: string }
+                Update: Partial<Database['public']['Tables']['audit_logs']['Row']>
             }
             stock_movements: {
                 Row: {
@@ -712,6 +837,52 @@ export interface Database {
                     p_quantity: number
                 }
                 Returns: boolean
+            },
+            // Users & Permissions functions (from migration 040)
+            user_has_permission: {
+                Args: {
+                    p_user_id: string
+                    p_permission_code: string
+                }
+                Returns: boolean
+            },
+            get_user_permissions: {
+                Args: {
+                    p_user_id: string
+                }
+                Returns: {
+                    permission_code: string
+                    permission_module: string
+                    permission_action: string
+                    is_granted: boolean
+                    source: 'direct' | 'role'
+                    is_sensitive: boolean
+                }[]
+            },
+            is_admin: {
+                Args: {
+                    p_user_id: string
+                }
+                Returns: boolean
+            },
+            is_super_admin: {
+                Args: {
+                    p_user_id: string
+                }
+                Returns: boolean
+            },
+            verify_user_pin: {
+                Args: {
+                    p_user_id: string
+                    p_pin: string
+                }
+                Returns: boolean
+            },
+            hash_pin: {
+                Args: {
+                    p_pin: string
+                }
+                Returns: string
             }
         }
         Enums: {
@@ -749,6 +920,15 @@ export type Promotion = Database['public']['Tables']['promotions']['Row']
 export type PromotionProduct = Database['public']['Tables']['promotion_products']['Row']
 export type PromotionFreeProduct = Database['public']['Tables']['promotion_free_products']['Row']
 export type PromotionUsage = Database['public']['Tables']['promotion_usage']['Row']
+
+// Users & Permissions types (from migration 040)
+export type Role = Database['public']['Tables']['roles']['Row']
+export type Permission = Database['public']['Tables']['permissions']['Row']
+export type RolePermission = Database['public']['Tables']['role_permissions']['Row']
+export type UserRole = Database['public']['Tables']['user_roles']['Row']
+export type UserPermissionRow = Database['public']['Tables']['user_permissions']['Row']
+export type UserSession = Database['public']['Tables']['user_sessions']['Row']
+export type AuditLog = Database['public']['Tables']['audit_logs']['Row']
 
 // Promotion types
 export type PromotionType = 'percentage' | 'fixed_amount' | 'buy_x_get_y' | 'free_product'

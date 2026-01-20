@@ -1,0 +1,560 @@
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  FileText, Search, RefreshCw, Calendar, User,
+  ChevronLeft, ChevronRight, Eye, X, Download
+} from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+import { fr, enUS, id } from 'date-fns/locale';
+import type { AuditLog } from '../../types/auth';
+
+interface AuditLogWithUser extends AuditLog {
+  user_profiles?: {
+    name: string;
+    display_name?: string;
+    avatar_url?: string;
+  };
+}
+
+const ACTION_COLORS: Record<string, string> = {
+  login: 'bg-green-100 text-green-700',
+  logout: 'bg-gray-100 text-gray-700',
+  create: 'bg-blue-100 text-blue-700',
+  update: 'bg-amber-100 text-amber-700',
+  delete: 'bg-red-100 text-red-700',
+  view: 'bg-purple-100 text-purple-700',
+  export: 'bg-cyan-100 text-cyan-700',
+  default: 'bg-gray-100 text-gray-700',
+};
+
+const TABLE_LABELS: Record<string, string> = {
+  user_profiles: 'Utilisateurs',
+  roles: 'Rôles',
+  permissions: 'Permissions',
+  user_roles: 'Rôles utilisateur',
+  user_permissions: 'Permissions utilisateur',
+  user_sessions: 'Sessions',
+  products: 'Produits',
+  orders: 'Commandes',
+  customers: 'Clients',
+  stock_movements: 'Mouvements stock',
+  pos_sessions: 'Sessions caisse',
+};
+
+export default function AuditPage() {
+  const { t, i18n } = useTranslation();
+  const [logs, setLogs] = useState<AuditLogWithUser[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedLog, setSelectedLog] = useState<AuditLogWithUser | null>(null);
+
+  // Filters
+  const [filterAction, setFilterAction] = useState('');
+  const [filterTable] = useState('');
+  const [filterUser, setFilterUser] = useState('');
+  const [dateRange, setDateRange] = useState<'today' | '7days' | '30days' | 'custom'>('7days');
+  const [customStart, setCustomStart] = useState('');
+  const [customEnd, setCustomEnd] = useState('');
+
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const perPage = 50;
+
+  // Users for filter
+  const [users, setUsers] = useState<{ id: string; name: string }[]>([]);
+
+  // Get locale for date formatting
+  const getLocale = () => {
+    switch (i18n.language) {
+      case 'fr': return fr;
+      case 'id': return id;
+      default: return enUS;
+    }
+  };
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  useEffect(() => {
+    loadLogs();
+  }, [page, filterAction, filterTable, filterUser, dateRange, customStart, customEnd]);
+
+  const loadUsers = async () => {
+    const { data } = await supabase
+      .from('user_profiles')
+      .select('id, name, display_name')
+      .order('name');
+
+    if (data) {
+      setUsers((data as any[]).map((u: any) => ({ id: u.id, name: u.display_name || u.name })));
+    }
+  };
+
+  const loadLogs = async () => {
+    setIsLoading(true);
+    try {
+      // Calculate date range
+      let startDate: Date;
+      let endDate = endOfDay(new Date());
+
+      switch (dateRange) {
+        case 'today':
+          startDate = startOfDay(new Date());
+          break;
+        case '7days':
+          startDate = startOfDay(subDays(new Date(), 7));
+          break;
+        case '30days':
+          startDate = startOfDay(subDays(new Date(), 30));
+          break;
+        case 'custom':
+          startDate = customStart ? startOfDay(new Date(customStart)) : startOfDay(subDays(new Date(), 7));
+          endDate = customEnd ? endOfDay(new Date(customEnd)) : endOfDay(new Date());
+          break;
+        default:
+          startDate = startOfDay(subDays(new Date(), 7));
+      }
+
+      // Build query
+      let query = (supabase as any)
+        .from('audit_logs')
+        .select(`
+          *,
+          user_profiles!audit_logs_user_id_fkey(name, display_name, avatar_url)
+        `, { count: 'exact' })
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString())
+        .order('created_at', { ascending: false })
+        .range((page - 1) * perPage, page * perPage - 1);
+
+      if (filterAction) {
+        query = query.eq('action', filterAction);
+      }
+      if (filterTable) {
+        query = query.eq('table_name', filterTable);
+      }
+      if (filterUser) {
+        query = query.eq('user_id', filterUser);
+      }
+
+      const { data, error, count } = await query;
+
+      if (error) throw error;
+
+      setLogs((data || []) as AuditLogWithUser[]);
+      setTotalCount(count || 0);
+    } catch (error) {
+      console.error('Error loading audit logs:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const exportToCSV = () => {
+    const headers = ['Date', 'Utilisateur', 'Action', 'Table', 'Record ID', 'IP'];
+    const rows = logs.map(log => [
+      format(new Date(log.created_at), 'yyyy-MM-dd HH:mm:ss'),
+      log.user_profiles?.display_name || log.user_profiles?.name || '-',
+      log.action,
+      log.table_name || '-',
+      log.record_id || '-',
+      log.ip_address || '-',
+    ]);
+
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `audit-logs-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const getActionColor = (action: string) => {
+    return ACTION_COLORS[action] || ACTION_COLORS.default;
+  };
+
+  const getTableLabel = (table: string) => {
+    return TABLE_LABELS[table] || table;
+  };
+
+  const totalPages = Math.ceil(totalCount / perPage);
+
+  const filteredLogs = searchQuery
+    ? logs.filter(log =>
+        (log.user_profiles?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (log.action || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (log.table_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (log.record_id || '').toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : logs;
+
+  return (
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <FileText className="w-7 h-7 text-blue-600" />
+            {t('auth.audit.title') || 'Journal d\'Audit'}
+          </h1>
+          <p className="text-gray-500 mt-1">
+            {t('auth.audit.description') || 'Historique des actions utilisateurs'}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={exportToCSV}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+        >
+          <Download className="w-5 h-5" />
+          {t('common.export') || 'Exporter'}
+        </button>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Search */}
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('common.search') || 'Rechercher...'}
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Date Range */}
+          <div className="flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-gray-400" />
+            <select
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value as any)}
+              className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+              title={t('auth.audit.dateRange') || 'Période'}
+              aria-label={t('auth.audit.dateRange') || 'Période'}
+            >
+              <option value="today">{t('auth.audit.today') || 'Aujourd\'hui'}</option>
+              <option value="7days">{t('auth.audit.last7Days') || '7 derniers jours'}</option>
+              <option value="30days">{t('auth.audit.last30Days') || '30 derniers jours'}</option>
+              <option value="custom">{t('auth.audit.custom') || 'Personnalisé'}</option>
+            </select>
+          </div>
+
+          {dateRange === 'custom' && (
+            <>
+              <input
+                type="date"
+                value={customStart}
+                onChange={(e) => setCustomStart(e.target.value)}
+                className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                title={t('auth.audit.startDate') || 'Date de début'}
+              />
+              <span className="text-gray-400">→</span>
+              <input
+                type="date"
+                value={customEnd}
+                onChange={(e) => setCustomEnd(e.target.value)}
+                className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                title={t('auth.audit.endDate') || 'Date de fin'}
+              />
+            </>
+          )}
+
+          {/* Action Filter */}
+          <select
+            value={filterAction}
+            onChange={(e) => { setFilterAction(e.target.value); setPage(1); }}
+            className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+            title={t('auth.audit.filterAction') || 'Filtrer par action'}
+            aria-label={t('auth.audit.filterAction') || 'Filtrer par action'}
+          >
+            <option value="">{t('auth.audit.allActions') || 'Toutes les actions'}</option>
+            <option value="login">Login</option>
+            <option value="logout">Logout</option>
+            <option value="create">Création</option>
+            <option value="update">Modification</option>
+            <option value="delete">Suppression</option>
+            <option value="view">Consultation</option>
+          </select>
+
+          {/* User Filter */}
+          <div className="flex items-center gap-2">
+            <User className="w-5 h-5 text-gray-400" />
+            <select
+              value={filterUser}
+              onChange={(e) => { setFilterUser(e.target.value); setPage(1); }}
+              className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+              title={t('auth.audit.filterUser') || 'Filtrer par utilisateur'}
+              aria-label={t('auth.audit.filterUser') || 'Filtrer par utilisateur'}
+            >
+              <option value="">{t('auth.audit.allUsers') || 'Tous les utilisateurs'}</option>
+              {users.map(user => (
+                <option key={user.id} value={user.id}>{user.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Refresh */}
+          <button
+            type="button"
+            onClick={loadLogs}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title={t('common.refresh') || 'Actualiser'}
+          >
+            <RefreshCw className={`w-5 h-5 text-gray-600 ${isLoading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-sm text-gray-500">{t('auth.audit.totalLogs') || 'Total'}</p>
+          <p className="text-2xl font-bold text-gray-900">{totalCount}</p>
+        </div>
+        <div className="bg-green-50 rounded-xl border border-green-200 p-4">
+          <p className="text-sm text-green-600">{t('auth.audit.logins') || 'Connexions'}</p>
+          <p className="text-2xl font-bold text-green-700">
+            {logs.filter(l => l.action === 'login').length}
+          </p>
+        </div>
+        <div className="bg-blue-50 rounded-xl border border-blue-200 p-4">
+          <p className="text-sm text-blue-600">{t('auth.audit.creates') || 'Créations'}</p>
+          <p className="text-2xl font-bold text-blue-700">
+            {logs.filter(l => l.action === 'create').length}
+          </p>
+        </div>
+        <div className="bg-amber-50 rounded-xl border border-amber-200 p-4">
+          <p className="text-sm text-amber-600">{t('auth.audit.updates') || 'Modifications'}</p>
+          <p className="text-2xl font-bold text-amber-700">
+            {logs.filter(l => l.action === 'update').length}
+          </p>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  {t('auth.audit.date') || 'Date'}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  {t('auth.audit.user') || 'Utilisateur'}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  {t('auth.audit.action') || 'Action'}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  {t('auth.audit.table') || 'Table'}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  {t('auth.audit.recordId') || 'ID Enregistrement'}
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  {t('auth.audit.ip') || 'IP'}
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                  {t('common.actions') || 'Actions'}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {isLoading ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                    <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
+                    {t('common.loading') || 'Chargement...'}
+                  </td>
+                </tr>
+              ) : filteredLogs.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                    {t('auth.audit.noLogs') || 'Aucun log trouvé'}
+                  </td>
+                </tr>
+              ) : (
+                filteredLogs.map(log => (
+                  <tr key={log.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {format(new Date(log.created_at), 'dd/MM/yyyy HH:mm:ss', { locale: getLocale() })}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        {log.user_profiles?.avatar_url ? (
+                          <img
+                            src={log.user_profiles.avatar_url}
+                            alt=""
+                            className="w-6 h-6 rounded-full"
+                          />
+                        ) : (
+                          <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs">
+                            {(log.user_profiles?.name || '?').charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <span className="text-sm text-gray-900">
+                          {log.user_profiles?.display_name || log.user_profiles?.name || '-'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getActionColor(log.action)}`}>
+                        {log.action}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {log.table_name ? getTableLabel(log.table_name) : '-'}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-500 font-mono">
+                      {log.record_id ? log.record_id.slice(0, 8) + '...' : '-'}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-500 font-mono">
+                      {log.ip_address || '-'}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedLog(log)}
+                        className="p-1 hover:bg-gray-100 rounded transition-colors"
+                        title={t('common.details') || 'Détails'}
+                      >
+                        <Eye className="w-4 h-4 text-gray-600" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="px-4 py-3 border-t border-gray-200 flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              {t('common.showing') || 'Affichage'} {(page - 1) * perPage + 1}-{Math.min(page * perPage, totalCount)} {t('common.of') || 'sur'} {totalCount}
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="p-2 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <span className="text-sm text-gray-700">
+                {page} / {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="p-2 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Detail Modal */}
+      {selectedLog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-xl">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-gray-900">
+                {t('auth.audit.logDetails') || 'Détails du log'}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setSelectedLog(null)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[60vh]">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm text-gray-500">{t('auth.audit.date') || 'Date'}</label>
+                    <p className="font-medium">
+                      {format(new Date(selectedLog.created_at), 'PPpp', { locale: getLocale() })}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm text-gray-500">{t('auth.audit.user') || 'Utilisateur'}</label>
+                    <p className="font-medium">
+                      {selectedLog.user_profiles?.display_name || selectedLog.user_profiles?.name || '-'}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm text-gray-500">{t('auth.audit.action') || 'Action'}</label>
+                    <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getActionColor(selectedLog.action)}`}>
+                      {selectedLog.action}
+                    </span>
+                  </div>
+                  <div>
+                    <label className="text-sm text-gray-500">{t('auth.audit.table') || 'Table'}</label>
+                    <p className="font-medium">{selectedLog.table_name || '-'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm text-gray-500">{t('auth.audit.recordId') || 'ID Enregistrement'}</label>
+                    <p className="font-mono text-sm">{selectedLog.record_id || '-'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm text-gray-500">{t('auth.audit.ip') || 'Adresse IP'}</label>
+                    <p className="font-mono text-sm">{selectedLog.ip_address || '-'}</p>
+                  </div>
+                </div>
+
+                {selectedLog.user_agent && (
+                  <div>
+                    <label className="text-sm text-gray-500">User Agent</label>
+                    <p className="text-sm text-gray-600 break-all">{selectedLog.user_agent}</p>
+                  </div>
+                )}
+
+                {selectedLog.old_values && Object.keys(selectedLog.old_values).length > 0 && (
+                  <div>
+                    <label className="text-sm text-gray-500 mb-2 block">
+                      {t('auth.audit.oldValues') || 'Anciennes valeurs'}
+                    </label>
+                    <pre className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm overflow-x-auto">
+                      {JSON.stringify(selectedLog.old_values, null, 2)}
+                    </pre>
+                  </div>
+                )}
+
+                {selectedLog.new_values && Object.keys(selectedLog.new_values).length > 0 && (
+                  <div>
+                    <label className="text-sm text-gray-500 mb-2 block">
+                      {t('auth.audit.newValues') || 'Nouvelles valeurs'}
+                    </label>
+                    <pre className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm overflow-x-auto">
+                      {JSON.stringify(selectedLog.new_values, null, 2)}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

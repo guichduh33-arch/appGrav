@@ -1,0 +1,241 @@
+/* ============================================
+   SETTING FIELD COMPONENT STYLES
+   ============================================ */
+
+.setting-field {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.setting-field:last-child {
+  border-bottom: none;
+}
+
+.setting-field--toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+.setting-field--toggle .setting-field__header {
+  flex: 1;
+}
+
+.setting-field--toggle .setting-field__control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.setting-field__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-sm);
+}
+
+.setting-field--toggle .setting-field__header {
+  margin-bottom: 0;
+}
+
+.setting-field__label-group {
+  flex: 1;
+}
+
+.setting-field__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-brun-chocolat);
+}
+
+.setting-field__restart-badge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  background: var(--color-orange);
+  color: white;
+  border-radius: var(--radius-sm);
+}
+
+.setting-field__description {
+  font-size: var(--text-xs);
+  color: var(--color-gris-chaud);
+  margin-top: 2px;
+}
+
+.setting-field__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.setting-field__reset {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--color-gris-chaud);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.setting-field__reset:hover {
+  background: var(--color-blanc-creme);
+  color: var(--color-orange);
+}
+
+.setting-field__reset--inline {
+  margin-left: var(--space-sm);
+}
+
+/* Input Styles */
+.setting-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 var(--space-md);
+  background: var(--color-blanc-creme);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  color: var(--color-brun-chocolat);
+  transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.setting-input:focus {
+  outline: none;
+  border-color: var(--color-rose-poudre);
+  box-shadow: 0 0 0 3px rgba(var(--color-rose-poudre-rgb), 0.2);
+}
+
+.setting-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.setting-input--number {
+  max-width: 150px;
+}
+
+.setting-input--select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+.setting-input--textarea {
+  height: auto;
+  min-height: 100px;
+  padding: var(--space-md);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: var(--text-xs);
+  resize: vertical;
+}
+
+.setting-input--password {
+  padding-right: 44px;
+}
+
+/* Input Wrapper (for password toggle) */
+.setting-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.setting-input-wrapper .setting-input {
+  flex: 1;
+}
+
+.setting-input__toggle {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--color-gris-chaud);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.setting-input__toggle:hover {
+  color: var(--color-brun-chocolat);
+}
+
+/* Toggle Switch */
+.setting-toggle {
+  width: 48px;
+  height: 28px;
+  border-radius: 14px;
+  background: var(--color-gris-chaud);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-standard);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.setting-toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.setting-toggle.is-on {
+  background: var(--color-vert-menthe);
+}
+
+.setting-toggle.is-on::after {
+  left: 23px;
+}
+
+.setting-toggle.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.setting-toggle:focus-visible {
+  outline: 2px solid var(--color-rose-poudre);
+  outline-offset: 2px;
+}
+
+/* File Input */
+.setting-file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.setting-file__input {
+  flex: 1;
+}
+
+.setting-file__name {
+  font-size: var(--text-sm);
+  color: var(--color-gris-chaud);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

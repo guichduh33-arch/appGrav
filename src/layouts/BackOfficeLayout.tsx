@@ -5,7 +5,8 @@ import { useAuthStore } from '../stores/authStore';
 import {
     FileText, Factory, Building2,
     ShoppingCart, BarChart3, Users, Settings, Store, Utensils,
-    ChevronLeft, ChevronRight, LogOut, Truck, UserCircle, Coffee, Boxes
+    ChevronLeft, ChevronRight, LogOut, Truck, UserCircle, Coffee, Boxes,
+    Shield, ScrollText
 } from 'lucide-react';
 import './BackOfficeLayout.css';
 
@@ -107,6 +108,14 @@ const BackOfficeLayout: React.FC = () => {
                             <Settings size={22} strokeWidth={2} />
                             {!isCollapsed && <span className="fade-in">{t('nav.settings')}</span>}
                         </NavLink>
+                        <NavLink to="/settings/roles" className="nav-item" title={isCollapsed ? t('nav.roles') : ""}>
+                            <Shield size={22} strokeWidth={2} />
+                            {!isCollapsed && <span className="fade-in">{t('nav.roles') || 'Rôles'}</span>}
+                        </NavLink>
+                        <NavLink to="/settings/audit" className="nav-item" title={isCollapsed ? t('nav.audit') : ""}>
+                            <ScrollText size={22} strokeWidth={2} />
+                            {!isCollapsed && <span className="fade-in">{t('nav.audit') || 'Audit'}</span>}
+                        </NavLink>
                     </div>
                 </nav>
 
@@ -123,13 +132,13 @@ const BackOfficeLayout: React.FC = () => {
                     <div className="user-section">
                         {!isCollapsed ? (
                             <div className="user-info fade-in">
-                                <div className="user-avatar-sm">
+                                <NavLink to="/profile" className="user-avatar-sm" title={t('nav.profile') || 'Mon profil'}>
                                     {user?.name?.charAt(0) || 'U'}
-                                </div>
-                                <div className="user-details">
-                                    <span className="user-name">{user?.name}</span>
+                                </NavLink>
+                                <NavLink to="/profile" className="user-details" title={t('nav.profile') || 'Mon profil'}>
+                                    <span className="user-name">{user?.display_name || user?.name}</span>
                                     <span className="user-role">{user?.role}</span>
-                                </div>
+                                </NavLink>
                                 <button onClick={handleLogout} className="logout-btn-mini" title={t('common.logout')}>
                                     <LogOut size={16} />
                                 </button>
