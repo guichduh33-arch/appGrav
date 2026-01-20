@@ -62,7 +62,7 @@ export function PermissionGuard({
   showAccessDenied = false,
   children,
 }: PermissionGuardProps) {
-  const { hasAnyPermission, hasAllPermissions, hasAnyRole } = usePermissions();
+  const { hasAnyPermission, hasAllPermissions, hasAnyRole, permissions: userPermissions, user } = usePermissions();
 
   // Build list of all permissions to check
   const allPerms = permission ? [permission, ...permissions] : permissions;
@@ -83,6 +83,18 @@ export function PermissionGuard({
   // If no permissions or roles specified, grant access
   if (allPerms.length === 0 && allRoles.length === 0) {
     hasAccess = true;
+  }
+
+  // Fallback: If no permissions loaded but user has legacy admin/manager role, grant access for users.* permissions
+  if (!hasAccess && userPermissions.length === 0 && user?.role) {
+    const legacyRole = (user.role as string).toLowerCase();
+    if (['admin', 'manager', 'super_admin'].includes(legacyRole)) {
+      // Admin/manager gets access to user management permissions
+      const userManagementPerms = ['users.create', 'users.update', 'users.delete', 'users.view', 'users.roles', 'users.permissions'];
+      if (allPerms.some(p => userManagementPerms.includes(p))) {
+        hasAccess = true;
+      }
+    }
   }
 
   if (hasAccess) {

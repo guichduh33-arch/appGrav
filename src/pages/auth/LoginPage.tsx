@@ -41,7 +41,7 @@ export default function LoginPage() {
       try {
         const { data, error } = await supabase
           .from('user_profiles')
-          .select('id, name, display_name, role, is_active, avatar_url, employee_code')
+          .select('id, name, display_name, role, is_active, avatar_url, employee_code, pin_code')
           .eq('is_active', true)
           .order('name');
 
@@ -125,34 +125,97 @@ export default function LoginPage() {
     // First check if we have PIN in current users list
     let user = users.find(u => u.id === selectedUser);
 
-    // If user doesn't have pin_code, try to find in DEMO_USERS
-    if (!user?.pin_code) {
-      const demoUser = DEMO_USERS.find(u =>
-        u.name.toLowerCase() === user?.name?.toLowerCase() ||
-        u.id === selectedUser
-      );
-      if (demoUser) {
-        user = { ...user, ...demoUser } as UserProfile;
-      }
-    }
-
     if (!user) {
-      setError(t('auth.errors.userNotFound') || 'Utilisateur non trouv');
+      setError(t('auth.errors.userNotFound') || 'Utilisateur non trouvé');
       return;
     }
 
+    // If user doesn't have pin_code locally, fetch it from database
+    if (!user.pin_code) {
+      const { data: userData } = await supabase
+        .from('user_profiles')
+        .select('pin_code')
+        .eq('id', selectedUser)
+        .single();
+
+      if (userData?.pin_code) {
+        user = { ...user, pin_code: userData.pin_code } as UserProfile;
+      } else {
+        // Try demo users as last resort
+        const demoUser = DEMO_USERS.find(u =>
+          u.name.toLowerCase() === user?.name?.toLowerCase() ||
+          u.id === selectedUser
+        );
+        if (demoUser?.pin_code) {
+          user = { ...user, pin_code: demoUser.pin_code } as UserProfile;
+        }
+      }
+    }
+
     // Check PIN against pin_code field (legacy)
+    if (!user.pin_code) {
+      setError(t('auth.errors.noPinSet') || 'Aucun code PIN défini pour cet utilisateur');
+      return;
+    }
+
     if (user.pin_code !== pin) {
       setError(t('auth.errors.invalidPin') || 'Code PIN incorrect');
       return;
     }
 
-    // Success - use legacy login
-    const { login } = useAuthStore.getState();
-    login(user);
+    // Load roles and permissions from database for legacy login
+    try {
+      // Get user roles
+      const { data: userRoles } = await supabase
+        .from('user_roles')
+        .select(`
+          id,
+          is_primary,
+          role:roles (id, code, name_fr, name_en, name_id, hierarchy_level)
+        `)
+        .eq('user_id', user.id);
 
-    toast.success(`${t('common.welcome') || 'Bienvenue'}, ${user.display_name || user.name}!`);
-    navigate('/pos');
+      const roles = userRoles?.map(ur => ur.role).filter(Boolean) || [];
+
+      // Get permissions from role_permissions
+      const roleIds = roles.map((r: { id: string }) => r.id);
+      let permissions: { permission_code: string; permission_module: string; is_granted: boolean; is_sensitive: boolean }[] = [];
+
+      if (roleIds.length > 0) {
+        const { data: rolePerms } = await supabase
+          .from('role_permissions')
+          .select(`
+            permission:permissions (code, module, action, is_sensitive)
+          `)
+          .in('role_id', roleIds);
+
+        permissions = rolePerms?.map(rp => ({
+          permission_code: rp.permission?.code,
+          permission_module: rp.permission?.module,
+          is_granted: true,
+          is_sensitive: rp.permission?.is_sensitive || false,
+        })).filter(p => p.permission_code) || [];
+      }
+
+      // Update auth store with roles and permissions
+      useAuthStore.setState({
+        user,
+        roles,
+        permissions,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+
+      toast.success(`${t('common.welcome') || 'Bienvenue'}, ${user.display_name || user.name}!`);
+      navigate('/pos');
+    } catch (err) {
+      console.error('Error loading permissions:', err);
+      // Fallback to basic login without permissions
+      const { login } = useAuthStore.getState();
+      login(user);
+      toast.success(`${t('common.welcome') || 'Bienvenue'}, ${user.display_name || user.name}!`);
+      navigate('/pos');
+    }
   };
 
   const selectedUserData = users.find(u => u.id === selectedUser);

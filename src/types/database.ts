@@ -82,6 +82,12 @@ export interface Database {
                     email: string | null
                     phone: string | null
                     address: string | null
+                    city: string | null
+                    postal_code: string | null
+                    country: string | null
+                    tax_id: string | null
+                    payment_terms: string | null
+                    notes: string | null
                     is_active: boolean
                     created_at: string
                     updated_at: string
@@ -93,21 +99,17 @@ export interface Database {
                     email?: string | null
                     phone?: string | null
                     address?: string | null
+                    city?: string | null
+                    postal_code?: string | null
+                    country?: string | null
+                    tax_id?: string | null
+                    payment_terms?: string | null
+                    notes?: string | null
                     is_active?: boolean
                     created_at?: string
                     updated_at?: string
                 }
-                Update: {
-                    id?: string
-                    name?: string
-                    contact_person?: string | null
-                    email?: string | null
-                    phone?: string | null
-                    address?: string | null
-                    is_active?: boolean
-                    created_at?: string
-                    updated_at?: string
-                }
+                Update: Partial<Database['public']['Tables']['suppliers']['Row']>
             },
             customers: {
                 Row: {
@@ -738,6 +740,105 @@ export interface Database {
                     used_at?: string
                 }
                 Update: Partial<Database['public']['Tables']['promotion_usage']['Row']>
+            }
+            floor_plan_items: {
+                Row: {
+                    id: string
+                    type: 'table' | 'decoration'
+                    number: string | null
+                    capacity: number | null
+                    section: string | null
+                    status: 'available' | 'occupied' | 'reserved' | null
+                    shape: 'square' | 'round' | 'rectangle'
+                    decoration_type: 'plant' | 'wall' | 'bar' | 'entrance' | null
+                    x: number
+                    y: number
+                    width: number | null
+                    height: number | null
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    type: 'table' | 'decoration'
+                    number?: string | null
+                    capacity?: number | null
+                    section?: string | null
+                    status?: 'available' | 'occupied' | 'reserved' | null
+                    shape?: 'square' | 'round' | 'rectangle'
+                    decoration_type?: 'plant' | 'wall' | 'bar' | 'entrance' | null
+                    x: number
+                    y: number
+                    width?: number | null
+                    height?: number | null
+                    created_at?: string
+                }
+                Update: Partial<Database['public']['Tables']['floor_plan_items']['Row']>
+            }
+            purchase_orders: {
+                Row: {
+                    id: string
+                    po_number: string
+                    supplier_id: string
+                    expected_delivery_date: string | null
+                    subtotal: number
+                    discount_amount: number
+                    discount_percentage: number | null
+                    tax_amount: number
+                    total_amount: number
+                    notes: string | null
+                    status: 'draft' | 'sent' | 'received' | 'cancelled'
+                    created_by: string | null
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    po_number?: string
+                    supplier_id: string
+                    expected_delivery_date?: string | null
+                    subtotal?: number
+                    discount_amount?: number
+                    discount_percentage?: number | null
+                    tax_amount?: number
+                    total_amount?: number
+                    notes?: string | null
+                    status?: 'draft' | 'sent' | 'received' | 'cancelled'
+                    created_by?: string | null
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: Partial<Database['public']['Tables']['purchase_orders']['Row']>
+            }
+            purchase_order_items: {
+                Row: {
+                    id: string
+                    purchase_order_id: string
+                    product_id: string | null
+                    product_name: string
+                    description: string | null
+                    quantity: number
+                    unit_price: number
+                    discount_amount: number
+                    discount_percentage: number | null
+                    tax_rate: number
+                    line_total: number
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    purchase_order_id: string
+                    product_id?: string | null
+                    product_name: string
+                    description?: string | null
+                    quantity: number
+                    unit_price: number
+                    discount_amount?: number
+                    discount_percentage?: number | null
+                    tax_rate?: number
+                    line_total?: number
+                    created_at?: string
+                }
+                Update: Partial<Database['public']['Tables']['purchase_order_items']['Row']>
             }
         }
         Views: {

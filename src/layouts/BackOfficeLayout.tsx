@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import {
-    FileText, Factory, Building2,
+    FileText, Building2,
     ShoppingCart, BarChart3, Users, Settings, Store, Utensils,
     ChevronLeft, ChevronRight, LogOut, Truck, UserCircle, Coffee, Boxes,
     Shield, ScrollText
@@ -71,10 +71,6 @@ const BackOfficeLayout: React.FC = () => {
                         <NavLink to="/orders" className="nav-item" title={isCollapsed ? t('nav.order_history') : ""}>
                             <FileText size={22} strokeWidth={2} />
                             {!isCollapsed && <span className="fade-in">{t('nav.order_history')}</span>}
-                        </NavLink>
-                        <NavLink to="/production" className="nav-item" title={isCollapsed ? t('nav.production') : ""}>
-                            <Factory size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">{t('nav.production')}</span>}
                         </NavLink>
                         <NavLink to="/b2b" className="nav-item" title={isCollapsed ? t('nav.b2b_wholesale') : ""}>
                             <Building2 size={22} strokeWidth={2} />

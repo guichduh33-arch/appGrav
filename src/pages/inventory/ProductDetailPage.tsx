@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
     ArrowLeft, Save, DollarSign,
-    Layers, Clock, Settings, Scale, AlertTriangle
+    Layers, Settings, Scale, AlertTriangle
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import type { Product, Recipe, StockMovement, ProductUOM, Category, Section } from '../../types/database'
+import type { Product, Recipe, ProductUOM, Category, Section } from '../../types/database'
 import { MOCK_PRODUCTS, MOCK_CATEGORIES } from '../../hooks/products'
 import './ProductDetailPage.css'
 
@@ -16,10 +16,9 @@ import { GeneralTab } from './tabs/GeneralTab'
 import { UnitsTab } from './tabs/UnitsTab'
 import { RecipeTab } from './tabs/RecipeTab'
 import { CostingTab } from './tabs/CostingTab'
-import { StockTab } from './tabs/StockTab'
 import { PricesTab } from './tabs/PricesTab'
 
-type Tab = 'general' | 'units' | 'recipe' | 'stock' | 'costing' | 'prices'
+type Tab = 'general' | 'units' | 'recipe' | 'costing' | 'prices'
 
 export default function ProductDetailPage() {
     const { t } = useTranslation()
@@ -36,7 +35,6 @@ export default function ProductDetailPage() {
     const [productSections, setProductSections] = useState<string[]>([]) // Selected section IDs
     const [primarySectionId, setPrimarySectionId] = useState<string | null>(null)
     const [recipeItems, setRecipeItems] = useState<(Recipe & { material: Product })[]>([])
-    const [stockHistory, setStockHistory] = useState<StockMovement[]>([])
     const [priceHistory, setPriceHistory] = useState<any[]>([])
     const [uoms, setUoms] = useState<ProductUOM[]>([])
 
@@ -83,7 +81,6 @@ export default function ProductDetailPage() {
                     setCategories(MOCK_CATEGORIES)
                     setSections([])
                     setRecipeItems([])
-                    setStockHistory([])
                     setUoms([])
                     setAllIngredients(MOCK_PRODUCTS.filter((_, i) => i % 3 === 0).map((p) => ({
                         ...p,
@@ -135,16 +132,7 @@ export default function ProductDetailPage() {
             if (rError) throw rError
             setRecipeItems(recipes || [])
 
-            // 5. Fetch Stock History (Limit 50)
-            const { data: history } = await supabase
-                .from('stock_movements')
-                .select('*')
-                .eq('product_id', id)
-                .order('created_at', { ascending: false })
-                .limit(50)
-            if (history) setStockHistory(history)
-
-            // 6. Fetch UOMs
+            // 5. Fetch UOMs
             const { data: uomData } = await supabase
                 .from('product_uoms')
                 .select('*')
@@ -379,9 +367,6 @@ export default function ProductDetailPage() {
                 <button className={`tab-btn ${activeTab === 'costing' ? 'active' : ''}`} onClick={() => setActiveTab('costing')}>
                     <DollarSign size={16} /> {t('product_detail.tabs.costing')}
                 </button>
-                <button className={`tab-btn ${activeTab === 'stock' ? 'active' : ''}`} onClick={() => setActiveTab('stock')}>
-                    <Clock size={16} /> {t('product_detail.tabs.stock')}
-                </button>
                 <button className={`tab-btn ${activeTab === 'prices' ? 'active' : ''}`} onClick={() => setActiveTab('prices')}>
                     <DollarSign size={16} /> {t('product_detail.tabs.prices')}
                 </button>
@@ -418,9 +403,6 @@ export default function ProductDetailPage() {
                 )}
                 {activeTab === 'costing' && (
                     <CostingTab product={product} recipeItems={recipeItems} />
-                )}
-                {activeTab === 'stock' && (
-                    <StockTab product={product} stockHistory={stockHistory} />
                 )}
                 {activeTab === 'prices' && (
                     <PricesTab product={product} priceHistory={priceHistory} />

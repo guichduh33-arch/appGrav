@@ -55,6 +55,8 @@
     transition: all var(--duration-fast) ease;
     height: 80px;
     /* Reduced height */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .payment-method input:checked+.payment-method__label {
@@ -159,6 +161,8 @@
     padding: var(--space-sm);
     background: rgba(255, 255, 255, 0.1);
     /* Visible glass background */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--radius-md);
     font-weight: 600;
@@ -269,6 +273,8 @@
     color: #ffffff;
     /* FORCE WHITE */
     cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
     transition: all 0.1s;
     min-height: 70px;
     display: flex;

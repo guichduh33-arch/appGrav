@@ -234,7 +234,12 @@ const UsersPage = () => {
     if (!currentUser?.id) return;
 
     try {
-      const result = await authService.toggleUserActive(userId, !currentStatus, currentUser.id);
+      let result = await authService.toggleUserActive(userId, !currentStatus, currentUser.id);
+
+      // Fallback to direct method if Edge Function fails
+      if (!result.success && result.error?.includes('Network')) {
+        result = await authService.toggleUserActiveDirect(userId, !currentStatus);
+      }
 
       if (result.success) {
         toast.success(
@@ -257,7 +262,12 @@ const UsersPage = () => {
     if (!currentUser?.id) return;
 
     try {
-      const result = await authService.deleteUser(userId, currentUser.id);
+      let result = await authService.deleteUser(userId, currentUser.id);
+
+      // Fallback to direct method if Edge Function fails
+      if (!result.success && result.error?.includes('Network')) {
+        result = await authService.deleteUserDirect(userId);
+      }
 
       if (result.success) {
         toast.success(t('auth.users.deleted') || 'Utilisateur supprimé');
@@ -648,8 +658,8 @@ function UserFormModal({
 
     try {
       if (user) {
-        // Update existing user
-        const result = await authService.updateUser(
+        // Update existing user - try Edge Function first, fallback to direct
+        let result = await authService.updateUser(
           user.id,
           {
             first_name: formData.first_name,
@@ -662,6 +672,22 @@ function UserFormModal({
           },
           currentUser.id
         );
+
+        // Fallback to direct method if Edge Function fails
+        if (!result.success && result.error?.includes('Network')) {
+          result = await authService.updateUserDirect(
+            user.id,
+            {
+              first_name: formData.first_name,
+              last_name: formData.last_name,
+              display_name: formData.display_name || undefined,
+              employee_code: formData.employee_code || undefined,
+              phone: formData.phone || undefined,
+              role_ids: formData.role_ids,
+              primary_role_id: formData.primary_role_id,
+            }
+          );
+        }
 
         if (result.success) {
           toast.success(t('common.saved') || 'Enregistré');
@@ -677,7 +703,8 @@ function UserFormModal({
           return;
         }
 
-        const result = await authService.createUser(
+        // Try Edge Function first
+        let result = await authService.createUser(
           {
             first_name: formData.first_name,
             last_name: formData.last_name,
@@ -691,6 +718,21 @@ function UserFormModal({
           },
           currentUser.id
         );
+
+        // Fallback to direct method if Edge Function fails
+        if (!result.success && result.error?.includes('Network')) {
+          result = await authService.createUserDirect({
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            display_name: formData.display_name || undefined,
+            employee_code: formData.employee_code || undefined,
+            phone: formData.phone || undefined,
+            preferred_language: formData.preferred_language,
+            pin: formData.pin || undefined,
+            role_ids: formData.role_ids.length > 0 ? formData.role_ids : [formData.primary_role_id],
+            primary_role_id: formData.primary_role_id,
+          });
+        }
 
         if (result.success) {
           toast.success(t('auth.users.created') || 'Utilisateur créé');

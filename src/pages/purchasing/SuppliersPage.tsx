@@ -223,6 +223,7 @@ export default function SuppliersPage() {
                     placeholder="Rechercher un fournisseur..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    aria-label="Rechercher"
                 />
             </div>
 
@@ -253,18 +254,21 @@ export default function SuppliersPage() {
                                         className="btn-icon"
                                         onClick={() => handleToggleActive(supplier)}
                                         title={supplier.is_active ? 'Désactiver' : 'Activer'}
+                                        aria-label={supplier.is_active ? 'Désactiver' : 'Activer'}
                                     >
                                         {supplier.is_active ? <CheckCircle size={18} /> : <XCircle size={18} />}
                                     </button>
                                     <button
                                         className="btn-icon"
                                         onClick={() => handleOpenModal(supplier)}
+                                        aria-label="Modifier"
                                     >
                                         <Edit2 size={18} />
                                     </button>
                                     <button
                                         className="btn-icon btn-icon--danger"
                                         onClick={() => handleDelete(supplier.id)}
+                                        aria-label="Supprimer"
                                     >
                                         <Trash2 size={18} />
                                     </button>
@@ -330,6 +334,7 @@ export default function SuppliersPage() {
                                                     required
                                                     value={formData.name}
                                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                                    aria-label="Nom du fournisseur"
                                                 />
                                             </div>
                                             <div className="form-group">
@@ -338,6 +343,7 @@ export default function SuppliersPage() {
                                                     type="text"
                                                     value={formData.contact_person || ''}
                                                     onChange={e => setFormData({ ...formData, contact_person: e.target.value })}
+                                                    aria-label="Personne de contact"
                                                 />
                                             </div>
                                             <div className="form-group">
@@ -346,6 +352,7 @@ export default function SuppliersPage() {
                                                     type="email"
                                                     value={formData.email || ''}
                                                     onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                                    aria-label="Email"
                                                 />
                                             </div>
                                             <div className="form-group">
@@ -354,6 +361,7 @@ export default function SuppliersPage() {
                                                     type="tel"
                                                     value={formData.phone || ''}
                                                     onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                                    aria-label="Téléphone"
                                                 />
                                             </div>
                                         </div>
@@ -369,6 +377,7 @@ export default function SuppliersPage() {
                                                     type="text"
                                                     value={formData.address || ''}
                                                     onChange={e => setFormData({ ...formData, address: e.target.value })}
+                                                    aria-label="Adresse"
                                                 />
                                             </div>
                                             <div className="form-group">
@@ -377,6 +386,7 @@ export default function SuppliersPage() {
                                                     type="text"
                                                     value={formData.city || ''}
                                                     onChange={e => setFormData({ ...formData, city: e.target.value })}
+                                                    aria-label="Ville"
                                                 />
                                             </div>
                                             <div className="form-group">
@@ -385,6 +395,7 @@ export default function SuppliersPage() {
                                                     type="text"
                                                     value={formData.postal_code || ''}
                                                     onChange={e => setFormData({ ...formData, postal_code: e.target.value })}
+                                                    aria-label="Code Postal"
                                                 />
                                             </div>
                                             <div className="form-group">
@@ -393,6 +404,7 @@ export default function SuppliersPage() {
                                                     type="text"
                                                     value={formData.country || ''}
                                                     onChange={e => setFormData({ ...formData, country: e.target.value })}
+                                                    aria-label="Pays"
                                                 />
                                             </div>
                                         </div>
@@ -408,6 +420,7 @@ export default function SuppliersPage() {
                                                     type="text"
                                                     value={formData.tax_id || ''}
                                                     onChange={e => setFormData({ ...formData, tax_id: e.target.value })}
+                                                    aria-label="Numéro de TVA"
                                                 />
                                             </div>
                                             <div className="form-group">
@@ -415,6 +428,7 @@ export default function SuppliersPage() {
                                                 <select
                                                     value={formData.payment_terms || ''}
                                                     onChange={e => setFormData({ ...formData, payment_terms: e.target.value })}
+                                                    aria-label="Conditions de paiement"
                                                 >
                                                     <option value="Net 15">Net 15</option>
                                                     <option value="Net 30">Net 30</option>
@@ -429,6 +443,7 @@ export default function SuppliersPage() {
                                                     rows={3}
                                                     value={formData.notes || ''}
                                                     onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                                                    aria-label="Notes"
                                                 />
                                             </div>
                                             <div className="form-group form-group--full">

@@ -196,6 +196,7 @@ export default function ProductsPage() {
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
                     className="products-filter"
+                    aria-label="Filtrer par catégorie"
                 >
                     <option value="all">Toutes catégories</option>
                     {categories.map(cat => (
@@ -207,6 +208,7 @@ export default function ProductsPage() {
                         className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
                         onClick={() => setViewMode('grid')}
                         title="Vue grille"
+                        aria-label="Vue grille"
                     >
                         <LayoutGrid size={18} />
                     </button>
@@ -214,6 +216,7 @@ export default function ProductsPage() {
                         className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
                         onClick={() => setViewMode('list')}
                         title="Vue liste"
+                        aria-label="Vue liste"
                     >
                         <List size={18} />
                     </button>
@@ -298,6 +301,7 @@ export default function ProductsPage() {
                                         navigate(`/products/${product.id}`)
                                     }}
                                     title="Voir détails"
+                                    aria-label="Voir détails"
                                 >
                                     <Eye size={16} />
                                 </button>
@@ -308,6 +312,7 @@ export default function ProductsPage() {
                                         navigate(`/products/${product.id}/edit`)
                                     }}
                                     title="Modifier"
+                                    aria-label="Modifier"
                                 >
                                     <Edit size={16} />
                                 </button>
@@ -318,6 +323,7 @@ export default function ProductsPage() {
                                         navigate(`/products/${product.id}/pricing`)
                                     }}
                                     title="Prix par catégorie"
+                                    aria-label="Prix par catégorie"
                                 >
                                     <DollarSign size={16} />
                                 </button>
@@ -386,6 +392,7 @@ export default function ProductsPage() {
                                                 navigate(`/products/${product.id}`)
                                             }}
                                             title="Voir"
+                                            aria-label="Voir"
                                         >
                                             <Eye size={16} />
                                         </button>
@@ -396,6 +403,7 @@ export default function ProductsPage() {
                                                 navigate(`/products/${product.id}/pricing`)
                                             }}
                                             title="Prix"
+                                            aria-label="Prix"
                                         >
                                             <DollarSign size={16} />
                                         </button>

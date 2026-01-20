@@ -14,13 +14,17 @@ import toast from 'react-hot-toast'
 import KDSMainPage from './pages/kds/KDSMainPage'
 import KDSStationSelector from './pages/kds/KDSStationSelector'
 import CustomerDisplayPage from './pages/display/CustomerDisplayPage'
-import InventoryPage from './pages/inventory/InventoryPage'
-import ProductDetailPage from './pages/inventory/ProductDetailPage'
+import InventoryLayout from './pages/inventory/InventoryLayout'
+import StockPage from './pages/inventory/StockPage'
+import IncomingStockPage from './pages/inventory/IncomingStockPage'
+import WastedPage from './pages/inventory/WastedPage'
+import StockProductionPage from './pages/inventory/StockProductionPage'
 import StockOpnameList from './pages/inventory/StockOpnameList'
 import StockOpnameForm from './pages/inventory/StockOpnameForm'
+import ProductDetailPage from './pages/inventory/ProductDetailPage'
 // SuppliersPage moved to purchasing module
 import OrdersPage from './pages/orders/OrdersPage'
-import ProductionPage from './pages/production/ProductionPage'
+// ProductionPage moved to inventory module as StockProductionPage
 import ReportsPage from './pages/reports/ReportsPage'
 import SalesReportsPage from './pages/reports/SalesReportsPage'
 import UsersPage from './pages/users/UsersPage'
@@ -114,24 +118,29 @@ function App() {
                         isAuthenticated ? <BackOfficeLayout /> : <Navigate to="/login" replace />
                     }
                 >
-                    <Route path="/inventory" element={<InventoryPage />} />
+                    {/* Inventory Module with Tabs */}
+                    <Route path="/inventory" element={<InventoryLayout />}>
+                        <Route index element={<StockPage />} />
+                        <Route path="incoming" element={<IncomingStockPage />} />
+                        <Route path="wasted" element={<WastedPage />} />
+                        <Route path="production" element={<StockProductionPage />} />
+                        <Route path="opname" element={<StockOpnameList />} />
+                        <Route path="movements" element={<StockMovementsPage />} />
+                    </Route>
+                    {/* Inventory sub-pages outside layout */}
                     <Route path="/inventory/product/:id" element={<ProductDetailPage />} />
-                    {/* Suppliers redirected to purchasing module */}
-                    <Route path="/inventory/suppliers" element={<Navigate to="/purchasing/suppliers" replace />} />
-                    <Route path="/inventory/stock-opname" element={<StockOpnameList />} />
                     <Route path="/inventory/stock-opname/:id" element={<StockOpnameForm />} />
-
-                    {/* Stock Movement & Transfers Module Routes */}
-                    <Route path="/inventory/movements" element={<StockMovementsPage />} />
                     <Route path="/inventory/transfers" element={<InternalTransfersPage />} />
                     <Route path="/inventory/transfers/new" element={<TransferFormPage />} />
                     <Route path="/inventory/transfers/:id" element={<TransferDetailPage />} />
                     <Route path="/inventory/transfers/:id/edit" element={<TransferFormPage />} />
                     <Route path="/inventory/stock-by-location" element={<StockByLocationPage />} />
+                    {/* Suppliers redirected to purchasing module */}
+                    <Route path="/inventory/suppliers" element={<Navigate to="/purchasing/suppliers" replace />} />
 
                     <Route path="/stock" element={<Navigate to="/inventory" replace />} />
                     <Route path="/orders" element={<OrdersPage />} />
-                    <Route path="/production" element={<ProductionPage />} />
+                    <Route path="/production" element={<Navigate to="/inventory/production" replace />} />
 
                     {/* B2B Module Routes */}
                     <Route path="/b2b" element={<B2BPage />} />

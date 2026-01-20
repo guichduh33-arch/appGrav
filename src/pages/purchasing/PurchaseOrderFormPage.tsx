@@ -389,6 +389,7 @@ export default function PurchaseOrderFormPage() {
                                     required
                                     value={formData.supplier_id}
                                     onChange={e => setFormData({ ...formData, supplier_id: e.target.value })}
+                                    aria-label="Fournisseur"
                                 >
                                     <option value="">Sélectionner un fournisseur</option>
                                     {suppliers.map(supplier => (
@@ -404,6 +405,7 @@ export default function PurchaseOrderFormPage() {
                                     type="date"
                                     value={formData.expected_delivery_date}
                                     onChange={e => setFormData({ ...formData, expected_delivery_date: e.target.value })}
+                                    aria-label="Date de livraison prévue"
                                 />
                             </div>
                             <div className="form-group form-group--full">
@@ -449,6 +451,7 @@ export default function PurchaseOrderFormPage() {
                                                 <select
                                                     value={item.product_id || ''}
                                                     onChange={e => handleItemChange(index, 'product_id', e.target.value || null)}
+                                                    aria-label="Sélectionner un produit"
                                                 >
                                                     <option value="">Produit personnalisé</option>
                                                     {products.map(product => (
@@ -473,6 +476,7 @@ export default function PurchaseOrderFormPage() {
                                                     placeholder="Description"
                                                     value={item.description}
                                                     onChange={e => handleItemChange(index, 'description', e.target.value)}
+                                                    aria-label="Description"
                                                 />
                                             </td>
                                             <td>
@@ -482,6 +486,7 @@ export default function PurchaseOrderFormPage() {
                                                     step="0.01"
                                                     value={item.quantity}
                                                     onChange={e => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
+                                                    aria-label="Quantité"
                                                 />
                                             </td>
                                             <td>
@@ -491,6 +496,7 @@ export default function PurchaseOrderFormPage() {
                                                     step="0.01"
                                                     value={item.unit_price}
                                                     onChange={e => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                                                    aria-label="Prix Unitaire"
                                                 />
                                             </td>
                                             <td>
@@ -500,6 +506,7 @@ export default function PurchaseOrderFormPage() {
                                                     step="0.01"
                                                     value={item.discount_amount}
                                                     onChange={e => handleItemChange(index, 'discount_amount', parseFloat(e.target.value) || 0)}
+                                                    aria-label="Montant de la remise"
                                                 />
                                             </td>
                                             <td>
@@ -510,6 +517,7 @@ export default function PurchaseOrderFormPage() {
                                                     step="0.01"
                                                     value={item.tax_rate}
                                                     onChange={e => handleItemChange(index, 'tax_rate', parseFloat(e.target.value) || 0)}
+                                                    aria-label="Taux de TVA"
                                                 />
                                             </td>
                                             <td>
@@ -520,6 +528,8 @@ export default function PurchaseOrderFormPage() {
                                                     className="btn-icon btn-icon--danger"
                                                     onClick={() => handleRemoveItem(index)}
                                                     disabled={items.length === 1}
+                                                    aria-label="Supprimer la ligne"
+                                                    title="Supprimer la ligne"
                                                 >
                                                     <Trash2 size={16} />
                                                 </button>
@@ -611,6 +621,7 @@ export default function PurchaseOrderFormPage() {
                                         discount_amount: parseFloat(e.target.value) || 0,
                                         discount_percentage: null
                                     })}
+                                    aria-label="Montant fixe de remise"
                                 />
                             </div>
                             <div className="form-group">
@@ -626,6 +637,7 @@ export default function PurchaseOrderFormPage() {
                                         discount_percentage: parseFloat(e.target.value) || null,
                                         discount_amount: 0
                                     })}
+                                    aria-label="Pourcentage de remise"
                                 />
                             </div>
                         </div>

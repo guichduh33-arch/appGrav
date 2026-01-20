@@ -268,6 +268,8 @@ export default function CustomerFormPage() {
                     <button
                         type="button"
                         className="btn btn-ghost"
+                        title="Retour"
+                        aria-label="Retour"
                         onClick={() => navigate('/customers')}
                     >
                         <ArrowLeft size={20} />

@@ -66,11 +66,6 @@ export default function InventoryTable({ items, onAdjustStock, onViewDetails, is
                                 <tr key={item.id} className={isLowStock ? 'is-low-stock' : ''}>
                                     <td className="cell-product">
                                         <div className="product-cell">
-                                            {item.image_url ? (
-                                                <img src={item.image_url} alt={item.name} className="product-thumb" />
-                                            ) : (
-                                                <div className="product-thumb-placeholder">📦</div>
-                                            )}
                                             <div>
                                                 <div
                                                     className="product-name clickable"

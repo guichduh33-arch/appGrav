@@ -169,6 +169,16 @@
         "placeholder_hint": "Cette page affichera les commandes en temps réel pour la station sélectionnée."
     },
     "inventory": {
+        "title": "Stock & Inventaire",
+        "subtitle": "Gerez les stocks, suivez les mouvements et controlez l'inventaire",
+        "tabs": {
+            "stock": "Stock",
+            "incoming": "Entrees",
+            "wasted": "Pertes",
+            "production": "Production",
+            "opname": "Inventaire",
+            "movements": "Mouvements"
+        },
         "wastage": "Pertes",
         "restock": "Approvisionnement",
         "procurement": "Approvisionnement",

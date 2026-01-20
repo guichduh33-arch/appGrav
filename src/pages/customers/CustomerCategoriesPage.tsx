@@ -200,7 +200,7 @@ export default function CustomerCategoriesPage() {
             {/* Header */}
             <header className="categories-header">
                 <div className="categories-header__left">
-                    <button className="btn btn-ghost" onClick={() => navigate('/customers')}>
+                    <button className="btn btn-ghost" onClick={() => navigate('/customers')} title="Retour" aria-label="Retour">
                         <ArrowLeft size={20} />
                     </button>
                     <div>
@@ -302,7 +302,7 @@ export default function CustomerCategoriesPage() {
                             <h2>
                                 {editingCategory ? 'Modifier la Catégorie' : 'Nouvelle Catégorie'}
                             </h2>
-                            <button className="btn-icon" onClick={() => setShowModal(false)}>
+                            <button className="btn-icon" onClick={() => setShowModal(false)} title="Fermer" aria-label="Fermer">
                                 <X size={20} />
                             </button>
                         </div>
@@ -348,6 +348,8 @@ export default function CustomerCategoriesPage() {
                                             type="button"
                                             className={`color-option ${formData.color === color ? 'selected' : ''}`}
                                             style={{ backgroundColor: color }}
+                                            title={`Couleur ${color}`}
+                                            aria-label={`Sélectionner la couleur ${color}`}
                                             onClick={() => setFormData({ ...formData, color })}
                                         />
                                     ))}
@@ -379,6 +381,7 @@ export default function CustomerCategoriesPage() {
                                     <div className="input-with-suffix">
                                         <input
                                             type="number"
+                                            aria-label="Pourcentage de réduction"
                                             value={formData.discount_percentage}
                                             onChange={(e) => setFormData({ ...formData, discount_percentage: Number(e.target.value) })}
                                             min="0"

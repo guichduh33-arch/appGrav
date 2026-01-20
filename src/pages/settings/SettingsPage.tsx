@@ -418,6 +418,7 @@ const SettingsPage = () => {
                                                         className="btn-icon"
                                                         onClick={() => openEditModal(section)}
                                                         title="Modifier"
+                                                        aria-label="Modifier"
                                                     >
                                                         <Edit2 size={16} />
                                                     </button>
@@ -425,6 +426,7 @@ const SettingsPage = () => {
                                                         className="btn-icon btn-icon--danger"
                                                         onClick={() => handleDeleteSection(section)}
                                                         title="Supprimer"
+                                                        aria-label="Supprimer"
                                                     >
                                                         <Trash2 size={16} />
                                                     </button>
@@ -494,6 +496,7 @@ const SettingsPage = () => {
                                                             className="kds-station-select"
                                                             value={category.dispatch_station || 'none'}
                                                             onChange={(e) => updateCategoryStation(category.id, e.target.value)}
+                                                            aria-label={`Station pour ${category.name}`}
                                                             disabled={savingCategory === category.id}
                                                             style={{
                                                                 borderColor: currentStation?.color,
@@ -703,7 +706,7 @@ const SettingsPage = () => {
                                     {editingSection ? 'Modifiez les informations de la section' : 'Créez une nouvelle section pour organiser vos stocks'}
                                 </p>
                             </div>
-                            <button className="section-modal__close" onClick={() => setShowSectionModal(false)}>
+                            <button className="section-modal__close" onClick={() => setShowSectionModal(false)} aria-label="Fermer">
                                 <X size={24} />
                             </button>
                         </div>
@@ -720,6 +723,7 @@ const SettingsPage = () => {
                                     onChange={(e) => handleSectionNameChange(e.target.value)}
                                     placeholder="Ex: Cuisine, Bar, Entrepôt..."
                                     autoFocus
+                                    aria-label="Nom de la section"
                                 />
                             </div>
 
@@ -733,6 +737,7 @@ const SettingsPage = () => {
                                     value={sectionForm.slug}
                                     onChange={(e) => setSectionForm({ ...sectionForm, slug: e.target.value })}
                                     placeholder="cuisine"
+                                    aria-label="Identifiant slug"
                                 />
                                 <p className="section-form__hint">
                                     Identifiant unique utilisé en interne. Auto-généré à partir du nom.

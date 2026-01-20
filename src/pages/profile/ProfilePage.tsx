@@ -357,8 +357,8 @@ export default function ProfilePage() {
                       <label className="text-sm text-gray-500">{t('auth.profile.language') || 'Langue'}</label>
                       <p className="font-medium">
                         {user.preferred_language === 'fr' ? 'Français' :
-                         user.preferred_language === 'en' ? 'English' :
-                         user.preferred_language === 'id' ? 'Bahasa Indonesia' : '-'}
+                          user.preferred_language === 'en' ? 'English' :
+                            user.preferred_language === 'id' ? 'Bahasa Indonesia' : '-'}
                       </p>
                     </div>
                   </div>
@@ -556,6 +556,8 @@ export default function ProfilePage() {
                 type="button"
                 onClick={() => setShowPinModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                title={t('common.close', 'Fermer')}
+                aria-label={t('common.close', 'Fermer')}
               >
                 <X className="w-5 h-5" />
               </button>

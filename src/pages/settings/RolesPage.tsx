@@ -356,7 +356,7 @@ export default function RolesPage() {
     <div className="settings-page">
       {/* Header */}
       <header className="settings-page__header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div className="flex items-center gap-4">
           <Link
             to="/settings/security"
             className="btn-icon"
@@ -366,7 +366,7 @@ export default function RolesPage() {
           </Link>
           <div>
             <h1 className="settings-page__title">Gestion des Rôles</h1>
-            <p style={{ color: 'var(--color-gris-chaud)', fontSize: 'var(--text-sm)', marginTop: '0.25rem' }}>
+            <p className="text-[var(--color-gris-chaud)] text-sm mt-1">
               Configurez les rôles et leurs permissions d'accès
             </p>
           </div>
@@ -391,11 +391,7 @@ export default function RolesPage() {
         </div>
 
         <div className="settings-section__body">
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-            gap: 'var(--space-md)'
-          }}>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6">
             {roles.map(role => {
               const permCount = role.permissions?.length || 0;
               const hierarchy = getHierarchyLabel(role.hierarchy_level || 0);
@@ -403,42 +399,19 @@ export default function RolesPage() {
               return (
                 <div
                   key={role.id}
-                  className="section-item"
-                  style={{
-                    flexDirection: 'column',
-                    alignItems: 'stretch',
-                    padding: 'var(--space-lg)'
-                  }}
+                  className="section-item flex-col items-stretch p-6"
                 >
                   {/* Header */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 'var(--space-md)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
-                      <div style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 'var(--radius-md)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: 'var(--color-rose-poudre)',
-                        color: 'white'
-                      }}>
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[var(--color-rose-poudre)] text-white">
                         <Shield size={20} />
                       </div>
                       <div>
-                        <h3 style={{
-                          fontWeight: 600,
-                          color: 'var(--color-brun-chocolat)',
-                          margin: 0,
-                          fontSize: 'var(--text-base)'
-                        }}>
+                        <h3 className="font-semibold text-[var(--color-brun-chocolat)] m-0 text-base">
                           {getRoleName(role)}
                         </h3>
-                        <span style={{
-                          fontFamily: 'monospace',
-                          fontSize: 'var(--text-xs)',
-                          color: 'var(--color-gris-chaud)'
-                        }}>
+                        <span className="font-mono text-xs text-[var(--color-gris-chaud)]">
                           {role.code}
                         </span>
                       </div>
@@ -451,40 +424,29 @@ export default function RolesPage() {
                   </div>
 
                   {/* Description */}
-                  <p style={{
-                    fontSize: 'var(--text-sm)',
-                    color: 'var(--color-gris-chaud)',
-                    margin: '0 0 var(--space-md) 0',
-                    lineHeight: 1.5
-                  }}>
+                  <p className="text-sm text-[var(--color-gris-chaud)] mb-4 leading-normal">
                     {role.description || 'Aucune description'}
                   </p>
 
                   {/* Stats */}
-                  <div style={{
-                    display: 'flex',
-                    gap: 'var(--space-lg)',
-                    marginBottom: 'var(--space-md)',
-                    paddingBottom: 'var(--space-md)',
-                    borderBottom: '1px solid var(--color-border)'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)', color: 'var(--color-gris-chaud)', fontSize: 'var(--text-sm)' }}>
+                  <div className="flex gap-6 mb-4 pb-4 border-b border-[var(--color-border)]">
+                    <div className="flex items-center gap-2 text-[var(--color-gris-chaud)] text-sm">
                       <Users size={16} />
                       <span>{role.user_count || 0} utilisateur{(role.user_count || 0) > 1 ? 's' : ''}</span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)', color: 'var(--color-gris-chaud)', fontSize: 'var(--text-sm)' }}>
+                    <div className="flex items-center gap-2 text-[var(--color-gris-chaud)] text-sm">
                       <Key size={16} />
                       <span>{permCount} permission{permCount > 1 ? 's' : ''}</span>
                     </div>
                   </div>
 
                   {/* Hierarchy Badge + Actions */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div className="flex items-center justify-between">
                     <span className={`section-badge ${hierarchy.color}`}>
                       Niveau {role.hierarchy_level} - {hierarchy.label}
                     </span>
 
-                    <div style={{ display: 'flex', gap: 'var(--space-xs)' }}>
+                    <div className="flex gap-2">
                       <button
                         className="btn-icon"
                         onClick={() => openEditModal(role)}
@@ -514,8 +476,7 @@ export default function RolesPage() {
       {showModal && (
         <div className="settings-modal-overlay" onClick={() => setShowModal(false)}>
           <div
-            className="settings-modal"
-            style={{ maxWidth: 800 }}
+            className="settings-modal max-w-[800px]"
             onClick={e => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -534,33 +495,18 @@ export default function RolesPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="settings-modal__body" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+            <div className="settings-modal__body max-h-[60vh] overflow-y-auto">
               {selectedRole?.is_system && (
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--space-sm)',
-                  padding: 'var(--space-md)',
-                  background: 'rgba(245, 158, 11, 0.1)',
-                  borderRadius: 'var(--radius-md)',
-                  marginBottom: 'var(--space-lg)',
-                  color: '#D97706',
-                  fontSize: 'var(--text-sm)'
-                }}>
+                <div className="flex items-center gap-3 p-4 bg-amber-500/10 rounded-lg mb-6 text-amber-600 text-sm">
                   <AlertTriangle size={18} />
                   <span>Rôle système - modification limitée</span>
                 </div>
               )}
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-lg)' }}>
+              <div className="grid grid-cols-2 gap-8">
                 {/* Left: Role Info */}
                 <div>
-                  <h3 style={{
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 600,
-                    color: 'var(--color-brun-chocolat)',
-                    marginBottom: 'var(--space-md)'
-                  }}>
+                  <h3 className="text-sm font-semibold text-[var(--color-brun-chocolat)] mb-4">
                     Informations du rôle
                   </h3>
 
@@ -623,21 +569,20 @@ export default function RolesPage() {
 
                   <div className="form-group">
                     <label className="form-label">Niveau hiérarchique</label>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+                    <div className="flex items-center gap-4">
                       <input
                         type="range"
                         min="0"
                         max="100"
                         value={formData.hierarchy_level}
                         onChange={(e) => setFormData({ ...formData, hierarchy_level: parseInt(e.target.value) })}
-                        style={{ flex: 1 }}
+                        className="flex-1"
                         disabled={selectedRole?.is_system}
                         title="Niveau hiérarchique"
                         aria-label="Niveau hiérarchique"
                       />
                       <span
-                        className={`section-badge ${getHierarchyLabel(formData.hierarchy_level).color}`}
-                        style={{ minWidth: 50, textAlign: 'center' }}
+                        className={`section-badge ${getHierarchyLabel(formData.hierarchy_level).color} min-w-[50px] text-center`}
                       >
                         {formData.hierarchy_level}
                       </span>
@@ -650,21 +595,11 @@ export default function RolesPage() {
 
                 {/* Right: Permissions */}
                 <div>
-                  <h3 style={{
-                    fontSize: 'var(--text-sm)',
-                    fontWeight: 600,
-                    color: 'var(--color-brun-chocolat)',
-                    marginBottom: 'var(--space-md)'
-                  }}>
+                  <h3 className="text-sm font-semibold text-[var(--color-brun-chocolat)] mb-4">
                     Permissions ({formData.selectedPermissions.length})
                   </h3>
 
-                  <div style={{
-                    border: '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-md)',
-                    maxHeight: 350,
-                    overflowY: 'auto'
-                  }}>
+                  <div className="border border-[var(--color-border)] rounded-lg max-h-[350px] overflow-y-auto">
                     {permissionGroups.map(group => {
                       const isExpanded = expandedModules.has(group.module);
                       const selectedCount = group.permissions.filter(p =>
@@ -673,34 +608,24 @@ export default function RolesPage() {
                       const allSelected = selectedCount === group.permissions.length;
 
                       return (
-                        <div key={group.module} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                        <div key={group.module} className="border-b border-[var(--color-border)] last:border-0">
                           <button
                             type="button"
                             onClick={() => toggleModule(group.module)}
-                            style={{
-                              width: '100%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              padding: 'var(--space-sm) var(--space-md)',
-                              background: 'transparent',
-                              border: 'none',
-                              cursor: 'pointer',
-                              textAlign: 'left'
-                            }}
+                            className="w-full flex items-center justify-between px-4 py-2 bg-transparent border-0 cursor-pointer text-left hover:bg-gray-50 transition-colors"
                           >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
+                            <div className="flex items-center gap-2">
                               {isExpanded ? (
                                 <ChevronDown size={16} color="var(--color-gris-chaud)" />
                               ) : (
                                 <ChevronRight size={16} color="var(--color-gris-chaud)" />
                               )}
-                              <span style={{ fontWeight: 500, color: 'var(--color-brun-chocolat)' }}>
+                              <span className="font-medium text-[var(--color-brun-chocolat)]">
                                 {getModuleName(group.module)}
                               </span>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
-                              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-gris-chaud)' }}>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-[var(--color-gris-chaud)]">
                                 {selectedCount}/{group.permissions.length}
                               </span>
                               <button
@@ -709,8 +634,7 @@ export default function RolesPage() {
                                   e.stopPropagation();
                                   toggleModulePermissions(group.module);
                                 }}
-                                className={`section-badge ${allSelected ? 'section-badge--sales' : ''}`}
-                                style={{ cursor: 'pointer', border: 'none' }}
+                                className={`section-badge cursor-pointer border-0 ${allSelected ? 'section-badge--sales' : ''}`}
                               >
                                 {allSelected ? 'Tout désél.' : 'Tout sél.'}
                               </button>
@@ -718,38 +642,24 @@ export default function RolesPage() {
                           </button>
 
                           {isExpanded && (
-                            <div style={{ background: 'var(--color-blanc-creme)', padding: 'var(--space-sm) var(--space-md)' }}>
+                            <div className="bg-[var(--color-blanc-creme)] px-4 py-2 space-y-1">
                               {group.permissions.map(perm => (
                                 <label
                                   key={perm.id}
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 'var(--space-sm)',
-                                    padding: 'var(--space-xs) var(--space-sm)',
-                                    cursor: 'pointer',
-                                    borderRadius: 'var(--radius-sm)'
-                                  }}
+                                  className="flex items-center gap-2 px-2 py-1 cursor-pointer rounded hover:bg-black/5 transition-colors"
                                 >
                                   <input
                                     type="checkbox"
                                     checked={formData.selectedPermissions.includes(perm.id)}
                                     onChange={() => togglePermission(perm.id)}
-                                    style={{ accentColor: 'var(--color-rose-poudre)' }}
+                                    className="accent-[var(--color-rose-poudre)]"
                                   />
-                                  <div style={{ flex: 1 }}>
-                                    <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-brun-chocolat)' }}>
+                                  <div className="flex-1">
+                                    <span className="text-sm text-[var(--color-brun-chocolat)]">
                                       {getPermissionName(perm)}
                                     </span>
                                     {perm.is_sensitive && (
-                                      <span style={{
-                                        marginLeft: 'var(--space-xs)',
-                                        fontSize: '10px',
-                                        padding: '1px 6px',
-                                        background: 'rgba(239, 68, 68, 0.1)',
-                                        color: '#DC2626',
-                                        borderRadius: 'var(--radius-sm)'
-                                      }}>
+                                      <span className="ml-2 text-[10px] px-1.5 py-0.5 bg-red-500/10 text-red-600 rounded">
                                         Sensible
                                       </span>
                                     )}

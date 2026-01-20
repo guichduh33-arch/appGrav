@@ -186,11 +186,11 @@ export default function AuditPage() {
 
   const filteredLogs = searchQuery
     ? logs.filter(log =>
-        (log.user_profiles?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (log.action || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (log.table_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (log.record_id || '').toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      (log.user_profiles?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (log.action || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (log.table_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (log.record_id || '').toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : logs;
 
   return (
@@ -229,6 +229,7 @@ export default function AuditPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('common.search') || 'Rechercher...'}
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+              aria-label={t('common.search') || 'Rechercher'}
             />
           </div>
 
@@ -257,6 +258,7 @@ export default function AuditPage() {
                 onChange={(e) => setCustomStart(e.target.value)}
                 className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 title={t('auth.audit.startDate') || 'Date de début'}
+                aria-label={t('auth.audit.startDate') || 'Date de début'}
               />
               <span className="text-gray-400">→</span>
               <input
@@ -265,6 +267,7 @@ export default function AuditPage() {
                 onChange={(e) => setCustomEnd(e.target.value)}
                 className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 title={t('auth.audit.endDate') || 'Date de fin'}
+                aria-label={t('auth.audit.endDate') || 'Date de fin'}
               />
             </>
           )}
@@ -309,6 +312,7 @@ export default function AuditPage() {
             onClick={loadLogs}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             title={t('common.refresh') || 'Actualiser'}
+            aria-label={t('common.refresh') || 'Actualiser'}
           >
             <RefreshCw className={`w-5 h-5 text-gray-600 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
@@ -428,6 +432,7 @@ export default function AuditPage() {
                         onClick={() => setSelectedLog(log)}
                         className="p-1 hover:bg-gray-100 rounded transition-colors"
                         title={t('common.details') || 'Détails'}
+                        aria-label={t('common.details') || 'Détails'}
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
                       </button>
@@ -451,6 +456,7 @@ export default function AuditPage() {
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
                 className="p-2 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                title="Page précédente"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -462,6 +468,7 @@ export default function AuditPage() {
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
                 className="p-2 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                title="Page suivante"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
@@ -482,6 +489,7 @@ export default function AuditPage() {
                 type="button"
                 onClick={() => setSelectedLog(null)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                aria-label={t('common.close', 'Fermer')}
               >
                 <X className="w-5 h-5" />
               </button>

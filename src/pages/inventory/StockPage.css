@@ -1,0 +1,174 @@
+/* =====================================================
+   Stock Page - Main inventory view
+   ===================================================== */
+
+.stock-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Filters */
+.stock-filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-gray-600, #4b5563);
+    background: white;
+    border: 1px solid var(--color-gray-200, #e5e7eb);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+    border-color: var(--color-primary, #3b82f6);
+    color: var(--color-primary, #3b82f6);
+}
+
+.filter-btn.is-active {
+    background: var(--color-primary, #3b82f6);
+    border-color: var(--color-primary, #3b82f6);
+    color: white;
+}
+
+.filter-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding: 0 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--color-red-500, #ef4444);
+    color: white;
+    border-radius: 9999px;
+}
+
+.filter-btn.is-active .filter-badge {
+    background: white;
+    color: var(--color-primary, #3b82f6);
+}
+
+/* Stats Grid */
+.stock-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.stat-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: white;
+    border: 1px solid var(--color-gray-200, #e5e7eb);
+    border-radius: 0.75rem;
+}
+
+.stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 0.75rem;
+}
+
+.stat-icon.total {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--color-primary, #3b82f6);
+}
+
+.stat-icon.raw {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--color-amber-500, #f59e0b);
+}
+
+.stat-icon.finished {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-emerald-500, #10b981);
+}
+
+.stat-icon.alert {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--color-red-500, #ef4444);
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-gray-500, #6b7280);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-gray-900, #111827);
+    line-height: 1.2;
+}
+
+.stat-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    margin-top: 0.25rem;
+}
+
+.stat-trend.up {
+    color: var(--color-emerald-600, #059669);
+}
+
+.stat-trend.down {
+    color: var(--color-red-600, #dc2626);
+}
+
+/* Table Section */
+.stock-table-section {
+    background: white;
+    border: 1px solid var(--color-gray-200, #e5e7eb);
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .stock-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .stock-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stock-filters {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 0.5rem;
+    }
+
+    .filter-btn {
+        flex-shrink: 0;
+    }
+}

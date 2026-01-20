@@ -53,11 +53,16 @@ export default function FloorPlanEditor() {
     const canvasRef = useRef<HTMLDivElement>(null)
 
     // Form state for new table - uses active section by default
-    const [tableForm, setTableForm] = useState({
+    const [tableForm, setTableForm] = useState<{
+        number: string
+        capacity: number
+        section: string
+        shape: 'square' | 'round' | 'rectangle'
+    }>({
         number: '',
         capacity: 2,
         section: activeSection,
-        shape: 'square' as const
+        shape: 'square'
     })
 
     // Update table form section when active section changes
@@ -66,9 +71,12 @@ export default function FloorPlanEditor() {
     }, [activeSection])
 
     // Form state for new decoration
-    const [decorationForm, setDecorationForm] = useState({
-        decoration_type: 'plant' as const,
-        shape: 'square' as const
+    const [decorationForm, setDecorationForm] = useState<{
+        decoration_type: 'plant' | 'wall' | 'bar' | 'entrance'
+        shape: 'square' | 'round' | 'rectangle'
+    }>({
+        decoration_type: 'plant',
+        shape: 'square'
     })
 
     useEffect(() => {
@@ -343,7 +351,7 @@ export default function FloorPlanEditor() {
                                         setShowAddMenu(false)
                                     }}
                                 >
-                                    <span style={{ fontSize: '18px' }}>🌿</span>
+                                    <span className="text-lg">🌿</span>
                                     <div>
                                         <div className="add-menu__item-title">Décoration</div>
                                         <div className="add-menu__item-desc">Plante, mur, bar, etc.</div>
@@ -363,7 +371,7 @@ export default function FloorPlanEditor() {
                             <span>{totalCovers} couverts</span>
                         </div>
                         <div className="floor-plan-stat">
-                            <span style={{ fontSize: '16px' }}>🌿</span>
+                            <span className="text-base">🌿</span>
                             <span>{decorations.length} décorations</span>
                         </div>
                     </div>
@@ -391,6 +399,7 @@ export default function FloorPlanEditor() {
                             <label>Numéro de Table</label>
                             <input
                                 type="text"
+                                aria-label="Numéro de Table"
                                 value={tableForm.number}
                                 onChange={(e) => setTableForm({ ...tableForm, number: e.target.value })}
                                 placeholder="Ex: 1, A1, T5..."
@@ -401,6 +410,7 @@ export default function FloorPlanEditor() {
                             <label>Capacité</label>
                             <input
                                 type="number"
+                                aria-label="Capacité"
                                 min="1"
                                 max="20"
                                 value={tableForm.capacity}
@@ -410,6 +420,7 @@ export default function FloorPlanEditor() {
                         <div className="floor-plan-form__group">
                             <label>Section</label>
                             <select
+                                aria-label="Section"
                                 value={tableForm.section}
                                 onChange={(e) => setTableForm({ ...tableForm, section: e.target.value })}
                             >
@@ -615,6 +626,7 @@ export default function FloorPlanEditor() {
                                         <label>Capacité</label>
                                         <input
                                             type="number"
+                                            aria-label="Capacité"
                                             min="1"
                                             max="20"
                                             value={selectedItem.capacity || 2}
@@ -639,6 +651,7 @@ export default function FloorPlanEditor() {
                                         <span>L:</span>
                                         <input
                                             type="number"
+                                            aria-label="Largeur"
                                             min="40"
                                             max="200"
                                             value={selectedItem.width || 80}
@@ -650,6 +663,7 @@ export default function FloorPlanEditor() {
                                         <span>H:</span>
                                         <input
                                             type="number"
+                                            aria-label="Hauteur"
                                             min="40"
                                             max="200"
                                             value={selectedItem.height || 80}

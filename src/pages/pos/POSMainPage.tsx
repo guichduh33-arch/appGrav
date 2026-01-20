@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Search, PauseCircle, CheckCircle, AlertCircle, Clock, Users, Lock } from 'lucide-react'
+import { Search, PauseCircle, CheckCircle, AlertCircle, Clock, Users } from 'lucide-react'
 
 import { useCartStore, CartItem } from '../../stores/cartStore'
 import { useOrderStore } from '../../stores/orderStore'
@@ -76,6 +76,7 @@ export default function POSMainPage() {
     const [pinModalAction, setPinModalAction] = useState<'open' | 'close'>('open')
     const [showShiftSelector, setShowShiftSelector] = useState(false)
     const [showTransactionHistory, setShowTransactionHistory] = useState(false)
+    const [showNoShiftModal, setShowNoShiftModal] = useState(false)
 
     // Toast state
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
@@ -91,12 +92,8 @@ export default function POSMainPage() {
         product.sku.toLowerCase().includes(searchQuery.toLowerCase())
     )
 
-    // Handle product click - block if no shift open
+    // Handle product click - allow even without shift (block at checkout/send)
     const handleProductClick = (product: Product, variants?: Product[]) => {
-        if (!hasOpenShift) {
-            showToast(t('shift.must_open_shift', 'Vous devez ouvrir un shift pour ajouter des produits'), 'error')
-            return
-        }
         setEditItem(undefined) // Reset edit item when adding new
         setSelectedProduct(product)
         if (variants && variants.length > 1) {
@@ -135,7 +132,7 @@ export default function POSMainPage() {
     // Handle send to kitchen - creates or updates a held order and clears the cart
     const handleSendToKitchen = () => {
         if (!hasOpenShift) {
-            showToast(t('shift.must_open_shift', 'Vous devez ouvrir un shift'), 'error')
+            setShowNoShiftModal(true)
             return
         }
         if (itemCount === 0) {
@@ -175,7 +172,7 @@ export default function POSMainPage() {
     // Handle hold order
     const handleHoldOrder = () => {
         if (!hasOpenShift) {
-            showToast(t('shift.must_open_shift', 'Vous devez ouvrir un shift'), 'error')
+            setShowNoShiftModal(true)
             return
         }
         if (itemCount > 0) {
@@ -219,7 +216,7 @@ export default function POSMainPage() {
     // Handle checkout - block if no shift open
     const handleCheckout = () => {
         if (!hasOpenShift) {
-            showToast(t('shift.must_open_shift', 'Vous devez ouvrir un shift pour effectuer une transaction'), 'error')
+            setShowNoShiftModal(true)
             return
         }
         if (itemCount > 0) {
@@ -310,7 +307,7 @@ export default function POSMainPage() {
                 />
 
                 {/* Zone 2: Products Grid */}
-                <section className={`pos-products ${!hasOpenShift ? 'pos-products--disabled' : ''}`}>
+                <section className="pos-products">
                     <div className="pos-products__header">
                         <h2 className="pos-products__title">
                             {selectedCategory
@@ -325,7 +322,6 @@ export default function POSMainPage() {
                                 placeholder={t('pos.products.search_placeholder')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                disabled={!hasOpenShift}
                             />
                         </div>
                     </div>
@@ -337,14 +333,6 @@ export default function POSMainPage() {
                             isLoading={productsLoading}
                         />
                     </div>
-
-                    {/* Overlay when no shift */}
-                    {!hasOpenShift && (
-                        <div className="pos-products__overlay">
-                            <Lock size={48} />
-                            <p>{t('shift.products_locked', 'Ouvrez un shift pour accéder aux produits')}</p>
-                        </div>
-                    )}
                 </section>
 
                 {/* Zone 3: Cart Sidebar with integrated Menu Button */}
@@ -517,17 +505,39 @@ export default function POSMainPage() {
                 </div>
             )}
 
-            {/* Shift Required Banner */}
-            {!hasOpenShift && (
-                <div className="pos-shift-banner">
-                    <Clock size={20} />
-                    <span>{t('shift.no_shift_open', 'Aucun shift ouvert. Identifiez-vous pour commencer.')}</span>
-                    <button
-                        className="pos-shift-banner__btn"
-                        onClick={handleOpenShiftRequest}
-                    >
-                        {t('shift.open_title', 'Ouvrir un Shift')}
-                    </button>
+            {/* No Shift Modal - shown when trying to checkout/send without shift */}
+            {showNoShiftModal && (
+                <div className="pos-no-shift-modal-overlay">
+                    <div className="pos-no-shift-modal">
+                        <div className="pos-no-shift-modal__icon">
+                            <Clock size={48} />
+                        </div>
+                        <h3 className="pos-no-shift-modal__title">
+                            {t('shift.no_shift_open', 'Aucun shift ouvert')}
+                        </h3>
+                        <p className="pos-no-shift-modal__message">
+                            {t('shift.must_open_shift_message', 'Vous devez ouvrir un shift pour effectuer cette action.')}
+                        </p>
+                        <div className="pos-no-shift-modal__actions">
+                            <button
+                                type="button"
+                                className="pos-no-shift-modal__btn pos-no-shift-modal__btn--secondary"
+                                onClick={() => setShowNoShiftModal(false)}
+                            >
+                                {t('common.cancel', 'Annuler')}
+                            </button>
+                            <button
+                                type="button"
+                                className="pos-no-shift-modal__btn pos-no-shift-modal__btn--primary"
+                                onClick={() => {
+                                    setShowNoShiftModal(false)
+                                    handleOpenShiftRequest()
+                                }}
+                            >
+                                {t('shift.open_title', 'Ouvrir un Shift')}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

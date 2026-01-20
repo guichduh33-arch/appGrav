@@ -1,77 +1,131 @@
-import { useState, useEffect } from 'react'
-import { Calendar, Package, TrendingDown, TrendingUp, Filter, Search, Download } from 'lucide-react'
+import { useState, useEffect, useMemo } from 'react'
+import {
+    Factory, ShoppingCart, Package, Trash2, ArrowUpCircle,
+    Filter, TrendingUp, TrendingDown, Clock, Truck, ArrowRight,
+    Search, Calendar
+} from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import toast from 'react-hot-toast'
+import { formatCurrency } from '../../utils/helpers'
 import './StockMovementsPage.css'
-
-interface StockLocation {
-    id: string
-    name: string
-    code: string
-    location_type: string
-}
-
-interface Product {
-    id: string
-    name: string
-    sku: string
-}
 
 interface StockMovement {
     id: string
     product_id: string
     product_name: string
     product_sku: string
-    from_location_id: string | null
-    from_location_name: string | null
-    to_location_id: string | null
-    to_location_name: string | null
+    product_unit: string
+    product_cost: number
     movement_type: string
     quantity: number
-    unit: string
-    unit_cost: number | null
-    total_cost: number | null
-    reference_type: string | null
-    reference_number: string | null
-    notes: string | null
-    created_by_name: string | null
+    reason: string | null
+    reference_id: string | null
     created_at: string
+    staff_name: string | null
 }
 
-const MOVEMENT_TYPES = [
-    { value: 'transfer', label: 'Transfert', color: '#3b82f6' },
-    { value: 'adjustment', label: 'Ajustement', color: '#8b5cf6' },
-    { value: 'production_input', label: 'Entrée Production', color: '#10b981' },
-    { value: 'production_output', label: 'Sortie Production', color: '#f59e0b' },
-    { value: 'waste', label: 'Perte/Gaspillage', color: '#ef4444' },
-    { value: 'receipt', label: 'Réception', color: '#06b6d4' },
-    { value: 'sale', label: 'Vente', color: '#ec4899' },
-    { value: 'return', label: 'Retour', color: '#84cc16' }
-]
+type MovementType = 'all' | 'production_in' | 'production_out' | 'stock_in' | 'sale' | 'waste' | 'adjustment' | 'transfer'
+
+const MOVEMENT_CONFIG: Record<string, {
+    label: string
+    icon: React.ReactNode
+    bgColor: string
+    textColor: string
+    borderColor: string
+    description: string
+}> = {
+    production_in: {
+        label: 'Production In',
+        icon: <Factory size={16} />,
+        bgColor: '#FEF3C7',
+        textColor: '#B45309',
+        borderColor: '#FCD34D',
+        description: 'Produits finis/semi-finis produits'
+    },
+    production_out: {
+        label: 'Production Out',
+        icon: <Package size={16} />,
+        bgColor: '#FDF2F8',
+        textColor: '#BE185D',
+        borderColor: '#F9A8D4',
+        description: 'Ingredients utilises en production'
+    },
+    stock_in: {
+        label: 'Entree Stock',
+        icon: <Truck size={16} />,
+        bgColor: '#D1FAE5',
+        textColor: '#047857',
+        borderColor: '#6EE7B7',
+        description: 'Achat / Reception fournisseur'
+    },
+    purchase: {
+        label: 'Achat',
+        icon: <Truck size={16} />,
+        bgColor: '#D1FAE5',
+        textColor: '#047857',
+        borderColor: '#6EE7B7',
+        description: 'Commande fournisseur recue'
+    },
+    sale: {
+        label: 'Vente',
+        icon: <ShoppingCart size={16} />,
+        bgColor: '#DBEAFE',
+        textColor: '#1D4ED8',
+        borderColor: '#93C5FD',
+        description: 'Vendu au POS'
+    },
+    waste: {
+        label: 'Perte',
+        icon: <Trash2 size={16} />,
+        bgColor: '#FEE2E2',
+        textColor: '#DC2626',
+        borderColor: '#FCA5A5',
+        description: 'Perte / Casse'
+    },
+    adjustment: {
+        label: 'Ajustement',
+        icon: <ArrowUpCircle size={16} />,
+        bgColor: '#F3F4F6',
+        textColor: '#4B5563',
+        borderColor: '#D1D5DB',
+        description: 'Ajustement de stock'
+    },
+    adjustment_in: {
+        label: 'Ajustement +',
+        icon: <ArrowUpCircle size={16} />,
+        bgColor: '#D1FAE5',
+        textColor: '#047857',
+        borderColor: '#6EE7B7',
+        description: 'Ajustement positif'
+    },
+    adjustment_out: {
+        label: 'Ajustement -',
+        icon: <ArrowUpCircle size={16} />,
+        bgColor: '#FEE2E2',
+        textColor: '#DC2626',
+        borderColor: '#FCA5A5',
+        description: 'Ajustement negatif'
+    },
+    transfer: {
+        label: 'Transfert',
+        icon: <ArrowRight size={16} />,
+        bgColor: '#E0E7FF',
+        textColor: '#4338CA',
+        borderColor: '#A5B4FC',
+        description: 'Transfert entre emplacements'
+    }
+}
 
 export default function StockMovementsPage() {
     const [movements, setMovements] = useState<StockMovement[]>([])
-    const [locations, setLocations] = useState<StockLocation[]>([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
-    const [filterType, setFilterType] = useState<string>('all')
-    const [filterLocation, setFilterLocation] = useState<string>('all')
+    const [filterType, setFilterType] = useState<MovementType>('all')
     const [dateFrom, setDateFrom] = useState('')
     const [dateTo, setDateTo] = useState('')
 
     useEffect(() => {
-        fetchLocations()
         fetchMovements()
     }, [])
-
-    const fetchLocations = async () => {
-        const { data } = await supabase
-            .from('stock_locations')
-            .select('*')
-            .eq('is_active', true)
-            .order('name')
-        if (data) setLocations(data)
-    }
 
     const fetchMovements = async () => {
         setLoading(true)
@@ -80,9 +134,8 @@ export default function StockMovementsPage() {
                 .from('stock_movements')
                 .select(`
                     *,
-                    product:products(name, sku),
-                    from_location:stock_locations!stock_movements_from_location_id_fkey(name),
-                    to_location:stock_locations!stock_movements_to_location_id_fkey(name)
+                    product:products(name, sku, unit, cost_price),
+                    staff:user_profiles!stock_movements_staff_id_fkey(display_name)
                 `)
                 .order('created_at', { ascending: false })
                 .limit(500)
@@ -92,230 +145,317 @@ export default function StockMovementsPage() {
             const formattedData: StockMovement[] = (data || []).map((m: any) => ({
                 id: m.id,
                 product_id: m.product_id,
-                product_name: m.product?.name || 'Unknown',
+                product_name: m.product?.name || 'Inconnu',
                 product_sku: m.product?.sku || '',
-                from_location_id: m.from_location_id,
-                from_location_name: m.from_location?.name || null,
-                to_location_id: m.to_location_id,
-                to_location_name: m.to_location?.name || null,
+                product_unit: m.product?.unit || 'pcs',
+                product_cost: m.product?.cost_price || 0,
                 movement_type: m.movement_type,
                 quantity: m.quantity,
-                unit: m.unit,
-                unit_cost: m.unit_cost,
-                total_cost: m.total_cost,
-                reference_type: m.reference_type,
-                reference_number: m.reference_number,
-                notes: m.notes,
-                created_by_name: m.created_by_name,
-                created_at: m.created_at
+                reason: m.reason,
+                reference_id: m.reference_id,
+                created_at: m.created_at,
+                staff_name: m.staff?.display_name || null
             }))
 
             setMovements(formattedData)
         } catch (error) {
             console.error('Error fetching movements:', error)
-            toast.error('Erreur lors du chargement')
         } finally {
             setLoading(false)
         }
     }
 
-    const getMovementTypeLabel = (type: string) => {
-        const found = MOVEMENT_TYPES.find(t => t.value === type)
-        return found ? found.label : type
+    // Filter movements
+    const filteredMovements = useMemo(() => {
+        return movements.filter(m => {
+            // Search filter
+            if (searchTerm) {
+                const search = searchTerm.toLowerCase()
+                const matchesProduct = m.product_name.toLowerCase().includes(search)
+                const matchesSku = m.product_sku.toLowerCase().includes(search)
+                const matchesReason = m.reason?.toLowerCase().includes(search)
+                if (!matchesProduct && !matchesSku && !matchesReason) return false
+            }
+
+            // Type filter
+            if (filterType !== 'all' && m.movement_type !== filterType) return false
+
+            // Date filters
+            if (dateFrom && new Date(m.created_at) < new Date(dateFrom)) return false
+            if (dateTo && new Date(m.created_at) > new Date(dateTo + 'T23:59:59')) return false
+
+            return true
+        })
+    }, [movements, searchTerm, filterType, dateFrom, dateTo])
+
+    // Calculate stats
+    const stats = useMemo(() => {
+        const totalIn = filteredMovements.filter(m => m.quantity > 0).reduce((sum, m) => sum + m.quantity, 0)
+        const totalOut = filteredMovements.filter(m => m.quantity < 0).reduce((sum, m) => sum + Math.abs(m.quantity), 0)
+        const productionIn = filteredMovements.filter(m => m.movement_type === 'production_in').reduce((sum, m) => sum + m.quantity, 0)
+        const productionOut = filteredMovements.filter(m => m.movement_type === 'production_out').reduce((sum, m) => sum + Math.abs(m.quantity), 0)
+        const totalInValue = filteredMovements.filter(m => m.quantity > 0).reduce((sum, m) => sum + (m.quantity * m.product_cost), 0)
+        const totalOutValue = filteredMovements.filter(m => m.quantity < 0).reduce((sum, m) => sum + (Math.abs(m.quantity) * m.product_cost), 0)
+
+        return { totalIn, totalOut, productionIn, productionOut, totalInValue, totalOutValue }
+    }, [filteredMovements])
+
+    // Get movement type counts for filter buttons
+    const typeCounts = useMemo(() => {
+        const counts: Record<string, number> = {}
+        movements.forEach(m => {
+            counts[m.movement_type] = (counts[m.movement_type] || 0) + 1
+        })
+        return counts
+    }, [movements])
+
+    const getMovementConfig = (type: string) => {
+        return MOVEMENT_CONFIG[type] || {
+            label: type,
+            icon: <Package size={16} />,
+            bgColor: '#F3F4F6',
+            textColor: '#6B7280',
+            borderColor: '#E5E7EB',
+            description: 'Mouvement'
+        }
     }
 
-    const getMovementTypeColor = (type: string) => {
-        const found = MOVEMENT_TYPES.find(t => t.value === type)
-        return found ? found.color : '#6b7280'
+    const formatDate = (dateStr: string) => {
+        const date = new Date(dateStr)
+        return {
+            date: date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }),
+            time: date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+        }
     }
 
-    const filteredMovements = movements.filter(m => {
-        const matchesSearch = searchTerm === '' ||
-            m.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            m.product_sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            m.reference_number?.toLowerCase().includes(searchTerm.toLowerCase())
-
-        const matchesType = filterType === 'all' || m.movement_type === filterType
-
-        const matchesLocation = filterLocation === 'all' ||
-            m.from_location_id === filterLocation ||
-            m.to_location_id === filterLocation
-
-        const matchesDateFrom = dateFrom === '' || new Date(m.created_at) >= new Date(dateFrom)
-        const matchesDateTo = dateTo === '' || new Date(m.created_at) <= new Date(dateTo + 'T23:59:59')
-
-        return matchesSearch && matchesType && matchesLocation && matchesDateFrom && matchesDateTo
-    })
-
-    const totalMovements = filteredMovements.length
-    const totalValue = filteredMovements.reduce((sum, m) => sum + (m.total_cost || 0), 0)
+    if (loading) {
+        return (
+            <div className="movements-loading">
+                <div className="spinner" />
+                <p>Chargement des mouvements...</p>
+            </div>
+        )
+    }
 
     return (
-        <div className="stock-movements-page">
-            {/* Header */}
-            <header className="stock-movements-header">
-                <div>
-                    <h1 className="stock-movements-title">
-                        <Package size={28} />
-                        Mouvements de Stock
-                    </h1>
-                    <p className="stock-movements-subtitle">
-                        Historique complet des mouvements de stock
-                    </p>
+        <div className="stock-movements-page-new">
+            {/* Stats Cards */}
+            <div className="movements-stats">
+                {/* Total Movements */}
+                <div className="stat-card stat-primary">
+                    <div className="stat-label">Total Mouvements</div>
+                    <div className="stat-value">{filteredMovements.length}</div>
+                    <div className="stat-sub">enregistrements</div>
                 </div>
-                <button className="btn btn-secondary">
-                    <Download size={18} />
-                    Exporter
-                </button>
-            </header>
 
-            {/* Stats */}
-            <div className="stock-movements-stats">
-                <div className="stock-movement-stat">
-                    <div className="stock-movement-stat__icon" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6' }}>
-                        <Package size={24} />
+                {/* Total In */}
+                <div className="stat-card">
+                    <div className="stat-icon stat-icon-green">
+                        <TrendingUp size={18} />
                     </div>
-                    <div className="stock-movement-stat__content">
-                        <div className="stock-movement-stat__value">{totalMovements}</div>
-                        <div className="stock-movement-stat__label">Mouvements</div>
-                    </div>
-                </div>
-                <div className="stock-movement-stat">
-                    <div className="stock-movement-stat__icon" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
-                        <TrendingUp size={24} />
-                    </div>
-                    <div className="stock-movement-stat__content">
-                        <div className="stock-movement-stat__value">
-                            {filteredMovements.filter(m => m.to_location_id !== null).length}
-                        </div>
-                        <div className="stock-movement-stat__label">Entrées</div>
+                    <div className="stat-content">
+                        <div className="stat-label">Total Entrees</div>
+                        <div className="stat-value text-green">+{stats.totalIn}</div>
+                        <div className="stat-sub text-green">+{formatCurrency(stats.totalInValue)}</div>
                     </div>
                 </div>
-                <div className="stock-movement-stat">
-                    <div className="stock-movement-stat__icon" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>
-                        <TrendingDown size={24} />
+
+                {/* Total Out */}
+                <div className="stat-card">
+                    <div className="stat-icon stat-icon-red">
+                        <TrendingDown size={18} />
                     </div>
-                    <div className="stock-movement-stat__content">
-                        <div className="stock-movement-stat__value">
-                            {filteredMovements.filter(m => m.from_location_id !== null).length}
-                        </div>
-                        <div className="stock-movement-stat__label">Sorties</div>
+                    <div className="stat-content">
+                        <div className="stat-label">Total Sorties</div>
+                        <div className="stat-value text-red">-{stats.totalOut}</div>
+                        <div className="stat-sub text-red">-{formatCurrency(stats.totalOutValue)}</div>
                     </div>
                 </div>
-                <div className="stock-movement-stat">
-                    <div className="stock-movement-stat__icon" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}>
-                        <Calendar size={24} />
+
+                {/* Production In */}
+                <div className="stat-card">
+                    <div className="stat-icon stat-icon-amber">
+                        <Factory size={18} />
                     </div>
-                    <div className="stock-movement-stat__content">
-                        <div className="stock-movement-stat__value">€{totalValue.toFixed(2)}</div>
-                        <div className="stock-movement-stat__label">Valeur Totale</div>
+                    <div className="stat-content">
+                        <div className="stat-label">Production In</div>
+                        <div className="stat-value text-amber">+{stats.productionIn}</div>
+                    </div>
+                </div>
+
+                {/* Production Out */}
+                <div className="stat-card">
+                    <div className="stat-icon stat-icon-pink">
+                        <Package size={18} />
+                    </div>
+                    <div className="stat-content">
+                        <div className="stat-label">Production Out</div>
+                        <div className="stat-value text-pink">-{stats.productionOut}</div>
                     </div>
                 </div>
             </div>
 
-            {/* Filters */}
-            <div className="stock-movements-filters">
-                <div className="stock-movements-search">
-                    <Search size={20} />
+            {/* Search & Date Filters */}
+            <div className="movements-search-bar">
+                <div className="search-input-wrapper">
+                    <Search size={18} />
                     <input
                         type="text"
-                        placeholder="Rechercher par produit, SKU, référence..."
+                        placeholder="Rechercher par produit, SKU, raison..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-
-                <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className="filter-select">
-                    <option value="all">Tous les types</option>
-                    {MOVEMENT_TYPES.map(type => (
-                        <option key={type.value} value={type.value}>{type.label}</option>
-                    ))}
-                </select>
-
-                <select value={filterLocation} onChange={(e) => setFilterLocation(e.target.value)} className="filter-select">
-                    <option value="all">Tous les emplacements</option>
-                    {locations.map(loc => (
-                        <option key={loc.id} value={loc.id}>{loc.name}</option>
-                    ))}
-                </select>
-
-                <input
-                    type="date"
-                    value={dateFrom}
-                    onChange={(e) => setDateFrom(e.target.value)}
-                    className="filter-date"
-                    placeholder="Date début"
-                />
-
-                <input
-                    type="date"
-                    value={dateTo}
-                    onChange={(e) => setDateTo(e.target.value)}
-                    className="filter-date"
-                    placeholder="Date fin"
-                />
+                <div className="date-filters">
+                    <div className="date-input-wrapper">
+                        <Calendar size={16} />
+                        <input
+                            type="date"
+                            value={dateFrom}
+                            onChange={(e) => setDateFrom(e.target.value)}
+                            placeholder="Date debut"
+                        />
+                    </div>
+                    <span className="date-separator">a</span>
+                    <div className="date-input-wrapper">
+                        <Calendar size={16} />
+                        <input
+                            type="date"
+                            value={dateTo}
+                            onChange={(e) => setDateTo(e.target.value)}
+                            placeholder="Date fin"
+                        />
+                    </div>
+                </div>
             </div>
 
-            {/* Movements Table */}
-            {loading ? (
-                <div className="stock-movements-loading">Chargement...</div>
-            ) : filteredMovements.length === 0 ? (
-                <div className="stock-movements-empty">
-                    <Package size={64} />
-                    <h3>Aucun mouvement</h3>
-                    <p>Aucun mouvement de stock trouvé</p>
+            {/* Type Filters */}
+            <div className="movements-filters">
+                <div className="filter-label">
+                    <Filter size={18} />
+                    <span>Filtrer:</span>
                 </div>
-            ) : (
-                <div className="stock-movements-table-container">
-                    <table className="stock-movements-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Type</th>
-                                <th>Produit</th>
-                                <th>De</th>
-                                <th>Vers</th>
-                                <th>Quantité</th>
-                                <th>Coût</th>
-                                <th>Référence</th>
-                                <th>Créé par</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredMovements.map(movement => (
-                                <tr key={movement.id}>
-                                    <td>{new Date(movement.created_at).toLocaleDateString('fr-FR')}</td>
-                                    <td>
-                                        <span
-                                            className="movement-type-badge"
-                                            style={{
-                                                background: `${getMovementTypeColor(movement.movement_type)}20`,
-                                                color: getMovementTypeColor(movement.movement_type)
-                                            }}
-                                        >
-                                            {getMovementTypeLabel(movement.movement_type)}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div className="product-info">
+
+                <button
+                    onClick={() => setFilterType('all')}
+                    className={`filter-btn ${filterType === 'all' ? 'active' : ''}`}
+                >
+                    Tous ({movements.length})
+                </button>
+
+                {Object.entries(MOVEMENT_CONFIG).map(([type, config]) => {
+                    const count = typeCounts[type] || 0
+                    if (count === 0) return null
+                    return (
+                        <button
+                            key={type}
+                            onClick={() => setFilterType(type as MovementType)}
+                            className={`filter-btn ${filterType === type ? 'active' : ''}`}
+                            style={{
+                                '--btn-bg': filterType === type ? config.bgColor : 'white',
+                                '--btn-color': filterType === type ? config.textColor : '#6B7280',
+                                '--btn-border': filterType === type ? config.borderColor : '#E5E7EB'
+                            } as React.CSSProperties}
+                        >
+                            {config.icon}
+                            {config.label} ({count})
+                        </button>
+                    )
+                })}
+            </div>
+
+            {/* Movements List */}
+            <div className="movements-list-card">
+                <div className="movements-list-header">
+                    <h3>Historique des Mouvements ({filteredMovements.length})</h3>
+                </div>
+
+                {filteredMovements.length > 0 ? (
+                    <div className="movements-list">
+                        {filteredMovements.map((movement) => {
+                            const config = getMovementConfig(movement.movement_type)
+                            const { date, time } = formatDate(movement.created_at)
+                            const isPositive = movement.quantity > 0
+                            const value = Math.abs(movement.quantity * movement.product_cost)
+
+                            return (
+                                <div key={movement.id} className="movement-item">
+                                    {/* Type Icon */}
+                                    <div
+                                        className="movement-icon"
+                                        style={{
+                                            background: config.bgColor,
+                                            borderColor: config.borderColor,
+                                            color: config.textColor
+                                        }}
+                                    >
+                                        {config.icon}
+                                    </div>
+
+                                    {/* Product & Details */}
+                                    <div className="movement-details">
+                                        <div className="movement-product">
                                             <span className="product-name">{movement.product_name}</span>
                                             {movement.product_sku && (
                                                 <span className="product-sku">{movement.product_sku}</span>
                                             )}
                                         </div>
-                                    </td>
-                                    <td>{movement.from_location_name || '-'}</td>
-                                    <td>{movement.to_location_name || '-'}</td>
-                                    <td className="quantity-cell">{movement.quantity} {movement.unit}</td>
-                                    <td>{movement.total_cost ? `€${movement.total_cost.toFixed(2)}` : '-'}</td>
-                                    <td>{movement.reference_number || '-'}</td>
-                                    <td>{movement.created_by_name || '-'}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+                                        <div className="movement-meta">
+                                            <span
+                                                className="movement-type-badge"
+                                                style={{
+                                                    background: config.bgColor,
+                                                    color: config.textColor
+                                                }}
+                                            >
+                                                {config.label}
+                                            </span>
+                                            <span className="movement-desc">{config.description}</span>
+                                        </div>
+                                        {movement.reason && (
+                                            <div className="movement-reason" title={movement.reason}>
+                                                {movement.reason}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quantity & Value */}
+                                    <div className="movement-quantity">
+                                        <div className={`qty-value ${isPositive ? 'positive' : 'negative'}`}>
+                                            {isPositive ? '+' : ''}{movement.quantity} {movement.product_unit}
+                                        </div>
+                                        <div className={`qty-cost ${isPositive ? 'positive' : 'negative'}`}>
+                                            {isPositive ? '+' : '-'}{formatCurrency(value)}
+                                        </div>
+                                    </div>
+
+                                    {/* Date & Staff */}
+                                    <div className="movement-date">
+                                        <div className="date-value">{date}</div>
+                                        <div className="time-value">
+                                            <Clock size={12} />
+                                            {time}
+                                        </div>
+                                        {movement.staff_name && (
+                                            <div className="staff-name">{movement.staff_name}</div>
+                                        )}
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                ) : (
+                    <div className="movements-empty">
+                        <Package size={48} />
+                        <p className="empty-title">Aucun mouvement</p>
+                        <p className="empty-desc">
+                            {filterType !== 'all'
+                                ? 'Aucun mouvement de ce type trouve'
+                                : 'Les mouvements de stock apparaitront ici'}
+                        </p>
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

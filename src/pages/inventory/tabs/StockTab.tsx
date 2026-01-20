@@ -171,107 +171,71 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
     }
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div className="flex flex-col gap-6">
             {/* Stats Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem' }}>
+            <div className="grid grid-cols-5 gap-4">
                 {/* Current Stock */}
-                <div style={{
-                    background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
-                    borderRadius: '1rem',
-                    padding: '1.25rem',
-                    color: 'white'
-                }}>
-                    <div style={{ fontSize: '0.75rem', opacity: 0.9, marginBottom: '0.25rem' }}>Current Stock</div>
-                    <div style={{ fontSize: '1.75rem', fontWeight: 700 }}>{product.current_stock} {product.unit}</div>
-                    <div style={{ fontSize: '0.75rem', opacity: 0.9, marginTop: '0.25rem' }}>{formatIDR(stats.currentStockValue)}</div>
+                <div className="rounded-2xl p-5 text-white bg-gradient-to-br from-blue-500 to-blue-700">
+                    <div className="text-xs opacity-90 mb-1">Current Stock</div>
+                    <div className="text-2xl font-bold">{product.current_stock} {product.unit}</div>
+                    <div className="text-xs opacity-90 mt-1">{formatIDR(stats.currentStockValue)}</div>
                 </div>
 
                 {/* Total In */}
-                <div style={{
-                    background: 'white',
-                    borderRadius: '1rem',
-                    padding: '1.25rem',
-                    border: '1px solid #E5E7EB'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                        <TrendingUp size={18} style={{ color: '#10B981' }} />
-                        <span style={{ fontSize: '0.75rem', color: '#6B7280' }}>Total In</span>
+                <div className="bg-white rounded-2xl p-5 border border-gray-200">
+                    <div className="flex items-center gap-2 mb-2">
+                        <TrendingUp size={18} className="text-emerald-500" />
+                        <span className="text-xs text-gray-500">Total In</span>
                     </div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#10B981' }}>+{stats.totalIn}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 500 }}>+{formatIDR(stats.totalInValue)}</div>
+                    <div className="text-2xl font-bold text-emerald-500">+{stats.totalIn}</div>
+                    <div className="text-xs text-emerald-600 font-medium">+{formatIDR(stats.totalInValue)}</div>
                 </div>
 
                 {/* Total Out */}
-                <div style={{
-                    background: 'white',
-                    borderRadius: '1rem',
-                    padding: '1.25rem',
-                    border: '1px solid #E5E7EB'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                        <TrendingDown size={18} style={{ color: '#EF4444' }} />
-                        <span style={{ fontSize: '0.75rem', color: '#6B7280' }}>Total Out</span>
+                <div className="bg-white rounded-2xl p-5 border border-gray-200">
+                    <div className="flex items-center gap-2 mb-2">
+                        <TrendingDown size={18} className="text-red-500" />
+                        <span className="text-xs text-gray-500">Total Out</span>
                     </div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#EF4444' }}>-{stats.totalOut}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#DC2626', fontWeight: 500 }}>-{formatIDR(stats.totalOutValue)}</div>
+                    <div className="text-2xl font-bold text-red-500">-{stats.totalOut}</div>
+                    <div className="text-xs text-red-600 font-medium">-{formatIDR(stats.totalOutValue)}</div>
                 </div>
 
                 {/* Production In */}
-                <div style={{
-                    background: 'white',
-                    borderRadius: '1rem',
-                    padding: '1.25rem',
-                    border: '1px solid #E5E7EB'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                        <Factory size={18} style={{ color: '#F59E0B' }} />
-                        <span style={{ fontSize: '0.75rem', color: '#6B7280' }}>Production In</span>
+                <div className="bg-white rounded-2xl p-5 border border-gray-200">
+                    <div className="flex items-center gap-2 mb-2">
+                        <Factory size={18} className="text-amber-500" />
+                        <span className="text-xs text-gray-500">Production In</span>
                     </div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#B45309' }}>+{stats.productionIn}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#92400E', fontWeight: 500 }}>+{formatIDR(stats.productionIn * costPrice)}</div>
+                    <div className="text-2xl font-bold text-amber-700">+{stats.productionIn}</div>
+                    <div className="text-xs text-amber-800 font-medium">+{formatIDR(stats.productionIn * costPrice)}</div>
                 </div>
 
                 {/* Production Out */}
-                <div style={{
-                    background: 'white',
-                    borderRadius: '1rem',
-                    padding: '1.25rem',
-                    border: '1px solid #E5E7EB'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                        <Package size={18} style={{ color: '#BE185D' }} />
-                        <span style={{ fontSize: '0.75rem', color: '#6B7280' }}>Production Out</span>
+                <div className="bg-white rounded-2xl p-5 border border-gray-200">
+                    <div className="flex items-center gap-2 mb-2">
+                        <Package size={18} className="text-pink-600" />
+                        <span className="text-xs text-gray-500">Production Out</span>
                     </div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#BE185D' }}>-{stats.productionOut}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#9D174D', fontWeight: 500 }}>-{formatIDR(stats.productionOut * costPrice)}</div>
+                    <div className="text-2xl font-bold text-pink-600">-{stats.productionOut}</div>
+                    <div className="text-xs text-pink-800 font-medium">-{formatIDR(stats.productionOut * costPrice)}</div>
                 </div>
             </div>
 
             {/* Filters */}
-            <div style={{
-                background: 'white',
-                borderRadius: '1rem',
-                padding: '1rem',
-                border: '1px solid #E5E7EB'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#6B7280' }}>
+            <div className="bg-white rounded-2xl p-4 border border-gray-200">
+                <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-2 text-gray-500">
                         <Filter size={18} />
-                        <span style={{ fontWeight: 500, fontSize: '0.875rem' }}>Filter:</span>
+                        <span className="font-medium text-sm">Filter:</span>
                     </div>
 
                     <button
                         onClick={() => setFilterType('all')}
-                        style={{
-                            padding: '0.5rem 1rem',
-                            borderRadius: '0.5rem',
-                            border: filterType === 'all' ? '2px solid #3B82F6' : '1px solid #E5E7EB',
-                            background: filterType === 'all' ? '#DBEAFE' : 'white',
-                            color: filterType === 'all' ? '#1D4ED8' : '#6B7280',
-                            fontWeight: filterType === 'all' ? 600 : 500,
-                            cursor: 'pointer',
-                            fontSize: '0.875rem'
-                        }}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filterType === 'all'
+                                ? 'bg-blue-100 text-blue-700 border-2 border-blue-500 font-semibold'
+                                : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+                            }`}
                     >
                         All ({stockHistory.length})
                     </button>
@@ -279,23 +243,18 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                     {Object.entries(MOVEMENT_CONFIG).map(([type, config]) => {
                         const count = stockHistory.filter(m => m.movement_type === type).length
                         if (count === 0) return null
+                        const isActive = filterType === type
                         return (
                             <button
                                 key={type}
                                 onClick={() => setFilterType(type as MovementType)}
-                                style={{
-                                    padding: '0.5rem 1rem',
-                                    borderRadius: '0.5rem',
-                                    border: filterType === type ? `2px solid ${config.borderColor}` : '1px solid #E5E7EB',
-                                    background: filterType === type ? config.bgColor : 'white',
-                                    color: filterType === type ? config.textColor : '#6B7280',
-                                    fontWeight: filterType === type ? 600 : 500,
-                                    cursor: 'pointer',
-                                    fontSize: '0.875rem',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.375rem'
-                                }}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-colors ${isActive ? 'border-2 font-semibold' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+                                    }`}
+                                style={isActive ? {
+                                    backgroundColor: config.bgColor,
+                                    color: config.textColor,
+                                    borderColor: config.borderColor
+                                } : {}}
                             >
                                 {config.icon}
                                 {config.label} ({count})
@@ -306,24 +265,15 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
             </div>
 
             {/* Movements List */}
-            <div style={{
-                background: 'white',
-                borderRadius: '1rem',
-                border: '1px solid #E5E7EB',
-                overflow: 'hidden'
-            }}>
-                <div style={{
-                    padding: '1rem 1.25rem',
-                    borderBottom: '1px solid #E5E7EB',
-                    background: '#F9FAFB'
-                }}>
-                    <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: '#4A3728' }}>
+            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                <div className="px-5 py-4 border-b border-gray-200 bg-gray-50">
+                    <h3 className="m-0 text-base font-semibold text-gray-800">
                         Movement History ({filteredHistory.length})
                     </h3>
                 </div>
 
                 {filteredHistory.length > 0 ? (
-                    <div style={{ maxHeight: '500px', overflow: 'auto' }}>
+                    <div className="max-h-[500px] overflow-y-auto">
                         {filteredHistory.map((movement, index) => {
                             const config = getMovementConfig(movement.movement_type)
                             const { date, time } = formatDate(movement.created_at)
@@ -332,125 +282,78 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                             return (
                                 <div
                                     key={movement.id}
-                                    style={{
-                                        padding: '1rem 1.25rem',
-                                        borderBottom: index < filteredHistory.length - 1 ? '1px solid #F3F4F6' : 'none',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '1rem',
-                                        transition: 'background 0.15s ease'
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.background = '#FAFAFA'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                                    className={`px-5 py-4 flex items-center gap-4 transition-colors hover:bg-gray-50 ${index < filteredHistory.length - 1 ? 'border-b border-gray-100' : ''
+                                        }`}
                                 >
                                     {/* Type Icon */}
-                                    <div style={{
-                                        width: '44px',
-                                        height: '44px',
-                                        borderRadius: '0.75rem',
-                                        background: config.bgColor,
-                                        border: `1px solid ${config.borderColor}`,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: config.textColor,
-                                        flexShrink: 0
-                                    }}>
+                                    <div
+                                        className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border"
+                                        style={{
+                                            backgroundColor: config.bgColor,
+                                            borderColor: config.borderColor,
+                                            color: config.textColor
+                                        }}
+                                    >
                                         {config.icon}
                                     </div>
 
                                     {/* Details */}
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                                            <span style={{
-                                                padding: '0.25rem 0.5rem',
-                                                borderRadius: '0.375rem',
-                                                background: config.bgColor,
-                                                color: config.textColor,
-                                                fontSize: '0.75rem',
-                                                fontWeight: 600,
-                                                textTransform: 'uppercase'
-                                            }}>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span
+                                                className="px-2 py-1 rounded-md text-xs font-semibold uppercase"
+                                                style={{
+                                                    backgroundColor: config.bgColor,
+                                                    color: config.textColor
+                                                }}
+                                            >
                                                 {config.label}
                                             </span>
-                                            <span style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>
+                                            <span className="text-xs text-gray-400">
                                                 {config.description}
                                             </span>
                                         </div>
                                         {movement.reason && (
-                                            <div style={{
-                                                fontSize: '0.875rem',
-                                                color: '#6B7280',
-                                                whiteSpace: 'nowrap',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis'
-                                            }} title={movement.reason}>
+                                            <div
+                                                className="text-sm text-gray-500 truncate"
+                                                title={movement.reason}
+                                            >
                                                 {movement.reason}
                                             </div>
                                         )}
                                     </div>
 
                                     {/* Stock Before → After */}
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem',
-                                        padding: '0.5rem 0.75rem',
-                                        background: '#F3F4F6',
-                                        borderRadius: '0.5rem',
-                                        flexShrink: 0
-                                    }}>
-                                        <div style={{ textAlign: 'center' }}>
-                                            <div style={{ fontSize: '0.625rem', color: '#9CA3AF', textTransform: 'uppercase' }}>Before</div>
-                                            <div style={{ fontSize: '1rem', fontWeight: 600, color: '#4B5563' }}>{movement.stockBefore}</div>
+                                    <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg shrink-0">
+                                        <div className="text-center">
+                                            <div className="text-xs text-gray-400 uppercase">Before</div>
+                                            <div className="text-base font-semibold text-gray-600">{movement.stockBefore}</div>
                                         </div>
-                                        <ArrowRight size={16} style={{ color: '#9CA3AF' }} />
-                                        <div style={{ textAlign: 'center' }}>
-                                            <div style={{ fontSize: '0.625rem', color: '#9CA3AF', textTransform: 'uppercase' }}>After</div>
-                                            <div style={{ fontSize: '1rem', fontWeight: 700, color: isPositive ? '#10B981' : '#EF4444' }}>{movement.stockAfter}</div>
+                                        <ArrowRight size={16} className="text-gray-400" />
+                                        <div className="text-center">
+                                            <div className="text-xs text-gray-400 uppercase">After</div>
+                                            <div className={`text-base font-bold ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
+                                                {movement.stockAfter}
+                                            </div>
                                         </div>
                                     </div>
 
                                     {/* Quantity & Value */}
-                                    <div style={{
-                                        textAlign: 'center',
-                                        flexShrink: 0,
-                                        minWidth: '100px'
-                                    }}>
-                                        <div style={{
-                                            fontSize: '1.25rem',
-                                            fontWeight: 700,
-                                            color: isPositive ? '#10B981' : '#EF4444'
-                                        }}>
+                                    <div className="text-center shrink-0 min-w-[100px]">
+                                        <div className={`text-xl font-bold ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
                                             {isPositive ? '+' : ''}{movement.quantity} {product.unit}
                                         </div>
-                                        <div style={{
-                                            fontSize: '0.75rem',
-                                            fontWeight: 600,
-                                            color: isPositive ? '#059669' : '#DC2626',
-                                            marginTop: '0.125rem'
-                                        }}>
+                                        <div className={`text-xs font-semibold mt-0.5 ${isPositive ? 'text-emerald-600' : 'text-red-600'}`}>
                                             {isPositive ? '+' : '-'}{formatIDR(getMovementValue(movement.quantity))}
                                         </div>
                                     </div>
 
                                     {/* Date */}
-                                    <div style={{
-                                        textAlign: 'right',
-                                        flexShrink: 0,
-                                        minWidth: '90px'
-                                    }}>
-                                        <div style={{ fontSize: '0.875rem', color: '#4B5563', fontWeight: 500 }}>
+                                    <div className="text-right shrink-0 min-w-[90px]">
+                                        <div className="text-sm font-medium text-gray-600">
                                             {date}
                                         </div>
-                                        <div style={{
-                                            fontSize: '0.75rem',
-                                            color: '#9CA3AF',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'flex-end',
-                                            gap: '0.25rem'
-                                        }}>
+                                        <div className="text-xs text-gray-400 flex items-center justify-end gap-1">
                                             <Clock size={12} />
                                             {time}
                                         </div>
@@ -460,14 +363,10 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                         })}
                     </div>
                 ) : (
-                    <div style={{
-                        padding: '4rem 2rem',
-                        textAlign: 'center',
-                        color: '#9CA3AF'
-                    }}>
-                        <Package size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-                        <p style={{ margin: 0, fontWeight: 500 }}>No stock movements</p>
-                        <p style={{ margin: '0.5rem 0 0', fontSize: '0.875rem' }}>
+                    <div className="py-16 px-8 text-center text-gray-400">
+                        <Package size={48} className="mx-auto mb-4 opacity-50" />
+                        <p className="m-0 font-medium">No stock movements</p>
+                        <p className="mt-2 text-sm">
                             {filterType !== 'all'
                                 ? 'No movements of this type found'
                                 : 'Stock movements will appear here'}
@@ -478,19 +377,11 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
 
             {/* Low Stock Warning */}
             {product.current_stock <= (product.min_stock_level || 0) && (
-                <div style={{
-                    background: '#FEF3C7',
-                    borderRadius: '1rem',
-                    padding: '1rem 1.25rem',
-                    border: '1px solid #FCD34D',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem'
-                }}>
-                    <AlertTriangle size={20} style={{ color: '#D97706' }} />
+                <div className="bg-amber-100 rounded-2xl p-5 border border-amber-300 flex items-center gap-3">
+                    <AlertTriangle size={20} className="text-amber-600" />
                     <div>
-                        <div style={{ fontWeight: 600, color: '#92400E' }}>Low Stock</div>
-                        <div style={{ fontSize: '0.875rem', color: '#B45309' }}>
+                        <div className="font-semibold text-amber-800">Low Stock</div>
+                        <div className="text-sm text-amber-700">
                             Current stock ({product.current_stock} {product.unit}) is below minimum threshold ({product.min_stock_level} {product.unit})
                         </div>
                     </div>
