@@ -32,9 +32,6 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
     // although amounts are usually integers in IDR, it's good practice.
     const canComplete = paymentMethod !== 'cash' || (amountReceived >= totalRounded - 0.01)
 
-    // Debug validation
-    console.log('Validation:', { paymentMethod, amountReceived, total: totalRounded, canComplete, isCreating })
-
     // Handle numpad input
     const handleNumpadKey = (key: string) => {
         if (key === 'clear') {
