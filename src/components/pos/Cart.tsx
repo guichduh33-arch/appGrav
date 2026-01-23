@@ -288,7 +288,7 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                                     <div className="cart-item__name">
                                         {isLocked && <Lock size={12} className="cart-item__lock-icon" />}
                                         <span className="cart-item__qty">{item.quantity}{t('cart.qty_prefix')}</span>
-                                        {item.product.name}
+                                        {item.type === 'combo' ? item.combo?.name : item.product?.name}
                                     </div>
                                     {item.modifiers.length > 0 && (
                                         <div className="cart-item__mods">
@@ -439,7 +439,7 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
 
             {showDiscountModal && (
                 <DiscountModal
-                    itemName={selectedItemForDiscount?.product.name}
+                    itemName={selectedItemForDiscount?.type === 'combo' ? selectedItemForDiscount?.combo?.name : selectedItemForDiscount?.product?.name}
                     itemPrice={selectedItemForDiscount?.totalPrice}
                     totalPrice={selectedItemForDiscount ? selectedItemForDiscount.totalPrice : total}
                     onApplyDiscount={handleApplyDiscount}

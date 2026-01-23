@@ -3,6 +3,29 @@
 -- Functions & Triggers Migration
 -- Version: 2.0.0
 -- =====================================================
+
+-- =====================================================
+-- DROP EXISTING FUNCTIONS (to allow return type changes)
+-- =====================================================
+DROP FUNCTION IF EXISTS update_updated_at() CASCADE;
+DROP FUNCTION IF EXISTS generate_order_number() CASCADE;
+DROP FUNCTION IF EXISTS generate_session_number() CASCADE;
+DROP FUNCTION IF EXISTS generate_movement_id() CASCADE;
+DROP FUNCTION IF EXISTS generate_po_number() CASCADE;
+DROP FUNCTION IF EXISTS generate_b2b_order_number() CASCADE;
+DROP FUNCTION IF EXISTS generate_production_id() CASCADE;
+DROP FUNCTION IF EXISTS record_stock_before_after() CASCADE;
+DROP FUNCTION IF EXISTS update_product_stock() CASCADE;
+DROP FUNCTION IF EXISTS check_stock_alert() CASCADE;
+DROP FUNCTION IF EXISTS deduct_stock_from_order() CASCADE;
+DROP FUNCTION IF EXISTS calculate_loyalty_points(DECIMAL) CASCADE;
+DROP FUNCTION IF EXISTS update_customer_loyalty() CASCADE;
+DROP FUNCTION IF EXISTS log_order_changes() CASCADE;
+DROP FUNCTION IF EXISTS log_price_changes() CASCADE;
+DROP FUNCTION IF EXISTS process_production(UUID) CASCADE;
+DROP FUNCTION IF EXISTS update_session_totals() CASCADE;
+DROP FUNCTION IF EXISTS calculate_order_totals() CASCADE;
+
 -- =====================================================
 -- UTILITY FUNCTIONS
 -- =====================================================
@@ -410,8 +433,6 @@ UPDATE ON products FOR EACH ROW EXECUTE FUNCTION log_price_changes();
 -- PRODUCTION FUNCTION
 -- =====================================================
 -- Process production record
--- Drop existing function first to allow parameter renaming
-DROP FUNCTION IF EXISTS process_production(UUID);
 CREATE OR REPLACE FUNCTION process_production(production_uuid UUID) RETURNS BOOLEAN AS $$
 DECLARE prod_record RECORD;
 recipe_record RECORD;

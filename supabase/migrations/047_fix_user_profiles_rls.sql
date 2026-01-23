@@ -18,22 +18,26 @@ DROP POLICY IF EXISTS "admin_manage_profiles" ON public.user_profiles;
 -- =====================================================
 
 -- Allow anyone to read user profiles (needed for login screen)
+DROP POLICY IF EXISTS "allow_read_user_profiles" ON public.user_profiles;
 CREATE POLICY "allow_read_user_profiles" ON public.user_profiles
     FOR SELECT
     USING (true);
 
 -- Allow insert for creating new users
+DROP POLICY IF EXISTS "allow_insert_user_profiles" ON public.user_profiles;
 CREATE POLICY "allow_insert_user_profiles" ON public.user_profiles
     FOR INSERT
     WITH CHECK (true);
 
 -- Allow update for modifying users
+DROP POLICY IF EXISTS "allow_update_user_profiles" ON public.user_profiles;
 CREATE POLICY "allow_update_user_profiles" ON public.user_profiles
     FOR UPDATE
     USING (true)
     WITH CHECK (true);
 
 -- Allow delete (soft delete via is_active)
+DROP POLICY IF EXISTS "allow_delete_user_profiles" ON public.user_profiles;
 CREATE POLICY "allow_delete_user_profiles" ON public.user_profiles
     FOR DELETE
     USING (true);
@@ -46,22 +50,26 @@ DROP POLICY IF EXISTS "Users can view own roles" ON public.user_roles;
 DROP POLICY IF EXISTS "Admins can manage user_roles" ON public.user_roles;
 
 -- Allow read on user_roles
+DROP POLICY IF EXISTS "allow_read_user_roles" ON public.user_roles;
 CREATE POLICY "allow_read_user_roles" ON public.user_roles
     FOR SELECT
     USING (true);
 
 -- Allow insert on user_roles
+DROP POLICY IF EXISTS "allow_insert_user_roles" ON public.user_roles;
 CREATE POLICY "allow_insert_user_roles" ON public.user_roles
     FOR INSERT
     WITH CHECK (true);
 
 -- Allow update on user_roles
+DROP POLICY IF EXISTS "allow_update_user_roles" ON public.user_roles;
 CREATE POLICY "allow_update_user_roles" ON public.user_roles
     FOR UPDATE
     USING (true)
     WITH CHECK (true);
 
 -- Allow delete on user_roles
+DROP POLICY IF EXISTS "allow_delete_user_roles" ON public.user_roles;
 CREATE POLICY "allow_delete_user_roles" ON public.user_roles
     FOR DELETE
     USING (true);

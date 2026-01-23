@@ -196,7 +196,7 @@ CREATE TYPE modifier_group_type AS ENUM (
 -- TABLE: categories
 -- =====================================================
 CREATE TABLE categories (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     icon VARCHAR(10),                              -- Emoji
     color VARCHAR(7),                              -- Hex color
@@ -215,7 +215,7 @@ CREATE INDEX idx_categories_active ON categories(is_active) WHERE is_active = TR
 -- TABLE: products
 -- =====================================================
 CREATE TABLE products (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     sku VARCHAR(50) UNIQUE NOT NULL,
     name VARCHAR(200) NOT NULL,
     description TEXT,
@@ -258,7 +258,7 @@ CREATE INDEX idx_products_name ON products(name);
 -- TABLE: product_modifiers
 -- =====================================================
 CREATE TABLE product_modifiers (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     
     -- Link to product OR category (one only)
     product_id UUID REFERENCES products(id) ON DELETE CASCADE,
@@ -296,7 +296,7 @@ CREATE INDEX idx_modifiers_group ON product_modifiers(group_name, group_sort_ord
 -- TABLE: customers
 -- =====================================================
 CREATE TABLE customers (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     
     -- Basic info
     name VARCHAR(200) NOT NULL,
@@ -335,7 +335,7 @@ CREATE INDEX idx_customers_company ON customers(company_name) WHERE company_name
 -- TABLE: user_profiles
 -- =====================================================
 CREATE TABLE user_profiles (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     auth_user_id UUID UNIQUE,                      -- Reference to auth.users
     
     name VARCHAR(200) NOT NULL,
@@ -362,7 +362,7 @@ CREATE INDEX idx_user_profiles_auth ON user_profiles(auth_user_id) WHERE auth_us
 -- TABLE: pos_sessions
 -- =====================================================
 CREATE TABLE pos_sessions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     session_number VARCHAR(30) NOT NULL UNIQUE,
     
     -- Opening
@@ -411,7 +411,7 @@ CREATE INDEX idx_sessions_date ON pos_sessions(opened_at);
 -- TABLE: orders
 -- =====================================================
 CREATE TABLE orders (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_number VARCHAR(30) NOT NULL UNIQUE,
     
     -- Type and context
@@ -482,7 +482,7 @@ CREATE INDEX idx_orders_status_session ON orders (status, session_id);
 -- TABLE: order_items
 -- =====================================================
 CREATE TABLE order_items (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     product_id UUID REFERENCES products(id) ON DELETE SET NULL,
     
@@ -527,7 +527,7 @@ CREATE INDEX idx_order_items_station_status ON order_items (dispatch_station, it
 -- TABLE: stock_movements
 -- =====================================================
 CREATE TABLE stock_movements (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     movement_id VARCHAR(30) NOT NULL UNIQUE,
     
     product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
@@ -562,7 +562,7 @@ CREATE INDEX idx_stock_movements_product_date ON stock_movements (product_id, cr
 -- TABLE: recipes
 -- =====================================================
 CREATE TABLE recipes (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     material_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     
@@ -583,7 +583,7 @@ CREATE INDEX idx_recipes_material ON recipes(material_id);
 -- TABLE: production_records
 -- =====================================================
 CREATE TABLE production_records (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     production_id VARCHAR(30) NOT NULL UNIQUE,
     
     product_id UUID NOT NULL REFERENCES products(id),
@@ -612,7 +612,7 @@ CREATE INDEX idx_production_date ON production_records(production_date);
 -- TABLE: suppliers
 -- =====================================================
 CREATE TABLE suppliers (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(200) NOT NULL,
     phone VARCHAR(30),
     email VARCHAR(255),
@@ -636,7 +636,7 @@ CREATE INDEX idx_suppliers_name ON suppliers(name);
 -- TABLE: purchase_orders
 -- =====================================================
 CREATE TABLE purchase_orders (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     po_number VARCHAR(30) NOT NULL UNIQUE,
     
     supplier_id UUID NOT NULL REFERENCES suppliers(id),
@@ -674,7 +674,7 @@ CREATE INDEX idx_po_date ON purchase_orders(order_date);
 -- TABLE: po_items
 -- =====================================================
 CREATE TABLE po_items (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     po_id UUID NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
     product_id UUID NOT NULL REFERENCES products(id),
     
@@ -695,7 +695,7 @@ CREATE INDEX idx_po_items_product ON po_items(product_id);
 -- TABLE: b2b_orders
 -- =====================================================
 CREATE TABLE b2b_orders (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_number VARCHAR(30) NOT NULL UNIQUE,
     
     customer_id UUID NOT NULL REFERENCES customers(id),
@@ -748,7 +748,7 @@ CREATE INDEX idx_b2b_date ON b2b_orders(order_date);
 -- TABLE: b2b_order_items
 -- =====================================================
 CREATE TABLE b2b_order_items (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID NOT NULL REFERENCES b2b_orders(id) ON DELETE CASCADE,
     product_id UUID NOT NULL REFERENCES products(id),
     
@@ -771,7 +771,7 @@ CREATE INDEX idx_b2b_items_product ON b2b_order_items(product_id);
 -- TABLE: audit_log
 -- =====================================================
 CREATE TABLE audit_log (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     
     -- Action
     action_type VARCHAR(100) NOT NULL,
@@ -815,7 +815,7 @@ CREATE INDEX idx_audit_session ON audit_log(session_id);
 -- TABLE: app_settings
 -- =====================================================
 CREATE TABLE app_settings (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     key VARCHAR(100) NOT NULL UNIQUE,
     value JSONB NOT NULL,
     description TEXT,

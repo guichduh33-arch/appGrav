@@ -91,7 +91,7 @@ export default function ProfilePage() {
     if (!user) return;
     setIsSaving(true);
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_profiles')
         .update({
           display_name: formData.display_name,
@@ -157,7 +157,7 @@ export default function ProfilePage() {
     }
 
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_sessions')
         .update({ is_active: false })
         .eq('id', sessionIdToTerminate);
@@ -180,7 +180,9 @@ export default function ProfilePage() {
   const getRoleName = () => {
     if (!primaryRole) return '-';
     const lang = i18n.language || 'fr';
-    return (primaryRole as any)[`name_${lang}`] || primaryRole.name_fr || primaryRole.code;
+    const role = primaryRole as { name_fr?: string; name_en?: string; name_id?: string; code: string };
+    const nameKey = `name_${lang}` as keyof typeof role;
+    return role[nameKey] || role.name_fr || role.code;
   };
 
   const getDeviceIcon = (deviceType: string) => {
@@ -475,14 +477,18 @@ export default function ProfilePage() {
               <div className="mb-4">
                 <p className="text-sm text-gray-500 mb-2">{t('auth.profile.allRoles') || 'Tous les rôles'}</p>
                 <div className="flex flex-wrap gap-2">
-                  {roles.map(role => (
-                    <span
-                      key={role.id}
-                      className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full"
-                    >
-                      {(role as any)[`name_${i18n.language}`] || role.name_fr || role.code}
-                    </span>
-                  ))}
+                  {roles.map(role => {
+                    const r = role as { id: string; name_fr?: string; name_en?: string; name_id?: string; code: string };
+                    const nameKey = `name_${i18n.language}` as keyof typeof r;
+                    return (
+                      <span
+                        key={r.id}
+                        className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full"
+                      >
+                        {r[nameKey] || r.name_fr || r.code}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             )}

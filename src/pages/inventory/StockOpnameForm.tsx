@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Save, CheckCheck, Search, Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import type { InventoryCount, InventoryCountItem, Product } from '../../types/database'
+import type { InventoryCount, InventoryCountItem, Product, Insertable } from '../../types/database'
 import './StockOpname.css'
 
 export default function StockOpnameForm() {
@@ -43,7 +43,6 @@ export default function StockOpnameForm() {
                 .from('inventory_count_items')
                 .select('*, product:products(*)')
                 .eq('inventory_count_id', id)
-                .order('product(name)' as any)
                 .returns<(InventoryCountItem & { product: Product })[]>()
 
             if (iErr) throw iErr
@@ -52,7 +51,7 @@ export default function StockOpnameForm() {
             if (sess.status === 'draft' && (!existingItems || existingItems.length === 0)) {
                 await initializeItems(id)
             } else {
-                setItems(existingItems as any || [])
+                setItems(existingItems || [])
             }
         } catch (error) {
             console.error('Error loading session:', error)
@@ -71,7 +70,7 @@ export default function StockOpnameForm() {
 
         if (!products) return
 
-        const records = products.map(p => ({
+        const records: Insertable<'inventory_count_items'>[] = products.map(p => ({
             inventory_count_id: sessionId,
             product_id: p.id,
             system_stock: p.current_stock, // SNAPSHOT
@@ -80,7 +79,7 @@ export default function StockOpnameForm() {
 
         const { error } = await supabase
             .from('inventory_count_items')
-            .insert(records as any)
+            .insert(records)
             .select('*, product:products(*)')
 
         if (error) {
@@ -92,8 +91,9 @@ export default function StockOpnameForm() {
             .from('inventory_count_items')
             .select('*, product:products(*)')
             .eq('inventory_count_id', sessionId)
+            .returns<(InventoryCountItem & { product: Product })[]>()
 
-        setItems(reloaded as any || [])
+        setItems(reloaded || [])
     }
 
     async function handleUpdateCount(itemId: string, actual: number | null) {
@@ -124,7 +124,7 @@ export default function StockOpnameForm() {
 
             const { error } = await supabase
                 .from('inventory_count_items')
-                .upsert(updates as any)
+                .upsert(updates)
 
             if (error) throw error
 
@@ -146,7 +146,7 @@ export default function StockOpnameForm() {
             const { error } = await supabase.rpc('finalize_inventory_count', {
                 count_uuid: id!,
                 user_uuid: (await supabase.auth.getUser()).data.user?.id || ''
-            } as any)
+            })
 
             if (error) throw error
 

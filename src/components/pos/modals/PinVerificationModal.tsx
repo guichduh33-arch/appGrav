@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { X, Lock, AlertCircle } from 'lucide-react'
 import type { UserProfile } from '../../../types/database'
-import '../PinVerificationModal.css'
+import './PinVerificationModal.css'
 
 interface VerifiedUser {
     id: string

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Edit2, Calendar, DollarSign, Package, FileText, Clock, User, AlertCircle, RotateCcw } from 'lucide-react'
+import { ArrowLeft, Edit2, DollarSign, Clock, RotateCcw } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import './PurchaseOrderDetailPage.css'
 
@@ -107,7 +107,7 @@ export default function PurchaseOrderDetailPage() {
                     *,
                     supplier:suppliers(name, email, phone)
                 `)
-                .eq('id', id)
+                .eq('id', id!)
                 .single()
 
             if (poError) throw poError
@@ -117,7 +117,7 @@ export default function PurchaseOrderDetailPage() {
             const { data: poItems, error: itemsError } = await supabase
                 .from('purchase_order_items')
                 .select('*')
-                .eq('purchase_order_id', id)
+                .eq('purchase_order_id', id!)
 
             if (itemsError) throw itemsError
             if (poItems) setItems(poItems)
@@ -126,7 +126,7 @@ export default function PurchaseOrderDetailPage() {
             const { data: poHistory, error: historyError } = await supabase
                 .from('purchase_order_history')
                 .select('*')
-                .eq('purchase_order_id', id)
+                .eq('purchase_order_id', id!)
                 .order('created_at', { ascending: false })
 
             if (historyError) throw historyError
@@ -139,7 +139,7 @@ export default function PurchaseOrderDetailPage() {
                     *,
                     item:purchase_order_items(product_name)
                 `)
-                .eq('purchase_order_id', id)
+                .eq('purchase_order_id', id!)
                 .order('return_date', { ascending: false })
 
             if (returnsError) throw returnsError
@@ -162,7 +162,7 @@ export default function PurchaseOrderDetailPage() {
                     payment_status: 'paid',
                     payment_date: new Date().toISOString()
                 })
-                .eq('id', id)
+                .eq('id', id!)
 
             if (error) throw error
             await fetchPurchaseOrderDetails()
@@ -194,12 +194,12 @@ export default function PurchaseOrderDetailPage() {
                         status: 'received',
                         actual_delivery_date: new Date().toISOString()
                     })
-                    .eq('id', id)
+                    .eq('id', id!)
             } else {
                 await supabase
                     .from('purchase_orders')
                     .update({ status: 'partially_received' })
-                    .eq('id', id)
+                    .eq('id', id!)
             }
 
             await fetchPurchaseOrderDetails()
@@ -229,7 +229,7 @@ export default function PurchaseOrderDetailPage() {
             const { error } = await supabase
                 .from('purchase_order_returns')
                 .insert([{
-                    purchase_order_id: id,
+                    purchase_order_id: id!,
                     purchase_order_item_id: selectedItem.id,
                     quantity_returned: returnForm.quantity,
                     reason: returnForm.reason,
@@ -527,7 +527,7 @@ export default function PurchaseOrderDetailPage() {
                                 <label>Raison *</label>
                                 <select
                                     value={returnForm.reason}
-                                    onChange={e => setReturnForm({ ...returnForm, reason: e.target.value as any })}
+                                    onChange={e => setReturnForm({ ...returnForm, reason: e.target.value as 'damaged' | 'wrong_item' | 'quality_issue' | 'excess_quantity' | 'other' })}
                                 >
                                     <option value="damaged">Endommagé</option>
                                     <option value="wrong_item">Mauvais article</option>

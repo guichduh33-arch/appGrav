@@ -48,25 +48,36 @@ CREATE TABLE IF NOT EXISTS pos_sessions (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Add user_id column if it doesn't exist (table may already exist from earlier migration)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'pos_sessions' AND column_name = 'user_id') THEN
+        ALTER TABLE pos_sessions ADD COLUMN user_id UUID REFERENCES auth.users(id);
+    END IF;
+END $$;
+
 -- Indexes
-CREATE INDEX idx_pos_sessions_user ON pos_sessions(user_id);
-CREATE INDEX idx_pos_sessions_status ON pos_sessions(status);
-CREATE INDEX idx_pos_sessions_date ON pos_sessions(opened_at DESC);
+CREATE INDEX IF NOT EXISTS idx_pos_sessions_user ON pos_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_pos_sessions_status ON pos_sessions(status);
+CREATE INDEX IF NOT EXISTS idx_pos_sessions_date ON pos_sessions(opened_at DESC);
 
 -- Enable RLS
 ALTER TABLE pos_sessions ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+DROP POLICY IF EXISTS "Users can view their own sessions" ON pos_sessions;
 CREATE POLICY "Users can view their own sessions" ON pos_sessions
     FOR SELECT TO authenticated
     USING (user_id = auth.uid() OR EXISTS (
         SELECT 1 FROM user_profiles WHERE user_id = auth.uid() AND role IN ('admin', 'manager')
     ));
 
+DROP POLICY IF EXISTS "Users can create their own sessions" ON pos_sessions;
 CREATE POLICY "Users can create their own sessions" ON pos_sessions
     FOR INSERT TO authenticated
     WITH CHECK (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Users can update their own open sessions" ON pos_sessions;
 CREATE POLICY "Users can update their own open sessions" ON pos_sessions
     FOR UPDATE TO authenticated
     USING (user_id = auth.uid() OR EXISTS (
@@ -74,6 +85,7 @@ CREATE POLICY "Users can update their own open sessions" ON pos_sessions
     ));
 
 -- Function to generate session number
+DROP FUNCTION IF EXISTS generate_session_number() CASCADE;
 CREATE OR REPLACE FUNCTION generate_session_number()
 RETURNS VARCHAR(50) AS $$
 DECLARE
@@ -234,6 +246,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_pos_sessions_updated_at ON pos_sessions;
 CREATE TRIGGER trg_pos_sessions_updated_at
     BEFORE UPDATE ON pos_sessions
     FOR EACH ROW

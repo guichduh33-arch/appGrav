@@ -7,7 +7,6 @@ import {
   Save,
   X,
   CheckCircle,
-  AlertCircle,
   Percent,
 } from 'lucide-react';
 import {
@@ -45,7 +44,7 @@ const emptyForm: TaxRateFormData = {
 };
 
 const TaxSettingsPage = () => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const { data: taxRates, isLoading: loadingRates } = useTaxRates();
   const { data: settings, isLoading: loadingSettings } = useSettingsByCategory('tax');
   const createTaxRate = useCreateTaxRate();

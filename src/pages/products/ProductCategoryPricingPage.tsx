@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
-    ArrowLeft, Save, DollarSign, Users, Tag, Percent,
+    ArrowLeft, Save, DollarSign, Users, Tag,
     Building2, Crown, UserCheck, Plus, Trash2
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
@@ -55,7 +55,7 @@ export default function ProductCategoryPricingPage() {
                 supabase
                     .from('products')
                     .select('id, name, sku, retail_price, wholesale_price')
-                    .eq('id', id as string)
+                    .eq('id', id!)
                     .single(),
                 supabase
                     .from('customer_categories')
@@ -65,7 +65,7 @@ export default function ProductCategoryPricingPage() {
                 supabase
                     .from('product_category_prices')
                     .select('*')
-                    .eq('product_id', id as string)
+                    .eq('product_id', id!)
             ])
 
             if (productRes.error) throw productRes.error
@@ -196,7 +196,7 @@ export default function ProductCategoryPricingPage() {
                             customer_category_id: cp.customer_category_id,
                             price: cp.price,
                             is_active: true
-                        } as never)
+                        })
                     if (error) throw error
                 } else if (cp.id && cp.isModified) {
                     // Update existing
@@ -205,7 +205,7 @@ export default function ProductCategoryPricingPage() {
                         .update({
                             price: cp.price,
                             is_active: cp.is_active
-                        } as never)
+                        })
                         .eq('id', cp.id)
                     if (error) throw error
                 }

@@ -169,6 +169,19 @@ CREATE TABLE IF NOT EXISTS public.b2b_order_history (
 );
 
 -- =============================================
+-- ADD MISSING COLUMNS (if table already exists with older schema)
+-- =============================================
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'b2b_orders' AND column_name = 'due_date') THEN
+        ALTER TABLE public.b2b_orders ADD COLUMN due_date DATE;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'b2b_orders' AND column_name = 'amount_due') THEN
+        ALTER TABLE public.b2b_orders ADD COLUMN amount_due NUMERIC(12,2) NOT NULL DEFAULT 0;
+    END IF;
+END $$;
+
+-- =============================================
 -- INDEXES
 -- =============================================
 CREATE INDEX IF NOT EXISTS idx_b2b_orders_customer_id ON public.b2b_orders(customer_id);
@@ -204,6 +217,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_b2b_orders_updated_at ON public.b2b_orders;
 CREATE TRIGGER trigger_update_b2b_orders_updated_at
     BEFORE UPDATE ON public.b2b_orders
     FOR EACH ROW
@@ -217,6 +231,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_b2b_order_items_updated_at ON public.b2b_order_items;
 CREATE TRIGGER trigger_update_b2b_order_items_updated_at
     BEFORE UPDATE ON public.b2b_order_items
     FOR EACH ROW
@@ -230,6 +245,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_b2b_payments_updated_at ON public.b2b_payments;
 CREATE TRIGGER trigger_update_b2b_payments_updated_at
     BEFORE UPDATE ON public.b2b_payments
     FOR EACH ROW
@@ -243,6 +259,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_b2b_deliveries_updated_at ON public.b2b_deliveries;
 CREATE TRIGGER trigger_update_b2b_deliveries_updated_at
     BEFORE UPDATE ON public.b2b_deliveries
     FOR EACH ROW
@@ -271,6 +288,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_generate_b2b_order_number ON public.b2b_orders;
 CREATE TRIGGER trigger_generate_b2b_order_number
     BEFORE INSERT ON public.b2b_orders
     FOR EACH ROW
@@ -300,6 +318,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_generate_b2b_payment_number ON public.b2b_payments;
 CREATE TRIGGER trigger_generate_b2b_payment_number
     BEFORE INSERT ON public.b2b_payments
     FOR EACH ROW
@@ -329,6 +348,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_generate_b2b_delivery_number ON public.b2b_deliveries;
 CREATE TRIGGER trigger_generate_b2b_delivery_number
     BEFORE INSERT ON public.b2b_deliveries
     FOR EACH ROW
@@ -390,6 +410,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_b2b_order_totals ON public.b2b_order_items;
 CREATE TRIGGER trigger_update_b2b_order_totals
     AFTER INSERT OR UPDATE OR DELETE ON public.b2b_order_items
     FOR EACH ROW
@@ -453,6 +474,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_b2b_order_payment_status ON public.b2b_payments;
 CREATE TRIGGER trigger_update_b2b_order_payment_status
     AFTER INSERT OR UPDATE OR DELETE ON public.b2b_payments
     FOR EACH ROW
@@ -492,6 +514,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_b2b_delivery_quantities ON public.b2b_delivery_items;
 CREATE TRIGGER trigger_update_b2b_delivery_quantities
     AFTER INSERT OR UPDATE OR DELETE ON public.b2b_delivery_items
     FOR EACH ROW
@@ -520,6 +543,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_log_b2b_order_status_change ON public.b2b_orders;
 CREATE TRIGGER trigger_log_b2b_order_status_change
     AFTER INSERT OR UPDATE ON public.b2b_orders
     FOR EACH ROW
@@ -536,19 +560,31 @@ ALTER TABLE public.b2b_delivery_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.b2b_order_history ENABLE ROW LEVEL SECURITY;
 
 -- Policies for authenticated users
+DROP POLICY IF EXISTS "Allow authenticated to manage b2b_orders" ON public.b2b_orders;
 CREATE POLICY "Allow authenticated to manage b2b_orders" ON public.b2b_orders FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow authenticated to manage b2b_order_items" ON public.b2b_order_items;
 CREATE POLICY "Allow authenticated to manage b2b_order_items" ON public.b2b_order_items FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow authenticated to manage b2b_payments" ON public.b2b_payments;
 CREATE POLICY "Allow authenticated to manage b2b_payments" ON public.b2b_payments FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow authenticated to manage b2b_deliveries" ON public.b2b_deliveries;
 CREATE POLICY "Allow authenticated to manage b2b_deliveries" ON public.b2b_deliveries FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow authenticated to manage b2b_delivery_items" ON public.b2b_delivery_items;
 CREATE POLICY "Allow authenticated to manage b2b_delivery_items" ON public.b2b_delivery_items FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow authenticated to manage b2b_order_history" ON public.b2b_order_history;
 CREATE POLICY "Allow authenticated to manage b2b_order_history" ON public.b2b_order_history FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 -- Policies for anon users (development)
+DROP POLICY IF EXISTS "Allow anon to manage b2b_orders" ON public.b2b_orders;
 CREATE POLICY "Allow anon to manage b2b_orders" ON public.b2b_orders FOR ALL TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow anon to manage b2b_order_items" ON public.b2b_order_items;
 CREATE POLICY "Allow anon to manage b2b_order_items" ON public.b2b_order_items FOR ALL TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow anon to manage b2b_payments" ON public.b2b_payments;
 CREATE POLICY "Allow anon to manage b2b_payments" ON public.b2b_payments FOR ALL TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow anon to manage b2b_deliveries" ON public.b2b_deliveries;
 CREATE POLICY "Allow anon to manage b2b_deliveries" ON public.b2b_deliveries FOR ALL TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow anon to manage b2b_delivery_items" ON public.b2b_delivery_items;
 CREATE POLICY "Allow anon to manage b2b_delivery_items" ON public.b2b_delivery_items FOR ALL TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow anon to manage b2b_order_history" ON public.b2b_order_history;
 CREATE POLICY "Allow anon to manage b2b_order_history" ON public.b2b_order_history FOR ALL TO anon USING (true) WITH CHECK (true);
 
 -- =============================================

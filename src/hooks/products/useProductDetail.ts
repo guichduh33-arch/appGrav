@@ -19,14 +19,12 @@ export function useProductWithModifiers(productId: string) {
                 throw productError || new Error('Product not found')
             }
 
-            const p = product as any
-
             // Get modifiers (by product_id or category_id)
             const { data: modifiers, error: modifiersError } = await supabase
                 .from('product_modifiers')
                 .select('*')
                 .eq('is_active', true)
-                .or(`product_id.eq.${productId},category_id.eq.${p.category_id}`)
+                .or(`product_id.eq.${productId},category_id.eq.${product.category_id}`)
                 .order('group_sort_order')
                 .order('option_sort_order')
 

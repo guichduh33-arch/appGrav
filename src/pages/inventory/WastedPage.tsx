@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../stores/authStore'
-import { formatCurrency, formatDate, formatDateTime } from '../../utils/helpers'
+import { formatCurrency, formatDateTime } from '../../utils/helpers'
 import toast from 'react-hot-toast'
 import './WastedPage.css'
 

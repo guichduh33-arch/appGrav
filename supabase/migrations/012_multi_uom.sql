@@ -6,8 +6,8 @@
 -- =====================================================
 -- 1. UOM SCHEMA
 -- =====================================================
-CREATE TABLE product_uoms (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+CREATE TABLE IF NOT EXISTS product_uoms (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     unit_name VARCHAR(50) NOT NULL,
     conversion_factor DECIMAL(12, 4) NOT NULL,
@@ -21,11 +21,13 @@ CREATE TABLE product_uoms (
     -- Prevent duplicate unit names for the same product
     UNIQUE(product_id, unit_name)
 );
-CREATE INDEX idx_uoms_product ON product_uoms(product_id);
+CREATE INDEX IF NOT EXISTS idx_uoms_product ON product_uoms(product_id);
 -- Enable RLS
 ALTER TABLE product_uoms ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "select_uoms" ON product_uoms;
 CREATE POLICY "select_uoms" ON product_uoms FOR
 SELECT TO authenticated USING (TRUE);
+DROP POLICY IF EXISTS "modify_uoms_admin" ON product_uoms;
 CREATE POLICY "modify_uoms_admin" ON product_uoms FOR ALL TO authenticated USING (
     is_admin_or_manager()
     OR can_access_backoffice()

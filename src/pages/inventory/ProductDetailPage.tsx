@@ -125,8 +125,8 @@ export default function ProductDetailPage() {
             }
 
             // 4. Fetch Recipe
-            const { data: recipes, error: rError } = await (supabase
-                .from('recipes') as any)
+            const { data: recipes, error: rError } = await supabase
+                .from('recipes')
                 .select('*, material:products!material_id(*)')
                 .eq('product_id', id)
             if (rError) throw rError
@@ -168,8 +168,8 @@ export default function ProductDetailPage() {
         setSaving(true)
         try {
             // 1. Update product
-            const { error } = await (supabase
-                .from('products') as any)
+            const { error } = await supabase
+                .from('products')
                 .update({
                     name: product.name,
                     sku: product.sku,
@@ -231,7 +231,7 @@ export default function ProductDetailPage() {
                     unit_name: unitName,
                     conversion_factor: factor,
                     is_consumption_unit: true
-                } as any)
+                })
                 .select()
                 .single()
 
@@ -259,8 +259,8 @@ export default function ProductDetailPage() {
             const material = allIngredients.find(i => i.id === materialId)
             const defaultUnit = material?.unit || 'pcs'
 
-            const { data, error } = await (supabase
-                .from('recipes') as any)
+            const { data, error } = await supabase
+                .from('recipes')
                 .insert({
                     product_id: product.id,
                     material_id: materialId,
@@ -299,8 +299,8 @@ export default function ProductDetailPage() {
         ))
 
         try {
-            await (supabase
-                .from('recipes') as any)
+            await supabase
+                .from('recipes')
                 .update({ quantity, unit })
                 .eq('id', recipeId)
         } catch (error) {

@@ -5,7 +5,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../stores/authStore'
-import { Product, Section, ProductionRecord } from '../../types/database'
+import { Product, Section, ProductionRecord, Insertable } from '../../types/database'
 import toast from 'react-hot-toast'
 import './StockProductionPage.css'
 
@@ -219,18 +219,20 @@ export default function StockProductionPage() {
             const dateStr = selectedDate.toISOString().split('T')[0]
 
             for (const item of productionItems) {
+                const productionData: Insertable<'production_records'> = {
+                    product_id: item.productId,
+                    section_id: selectedSectionId,
+                    quantity_produced: item.quantity,
+                    quantity_waste: item.wasted,
+                    production_date: dateStr,
+                    created_by: user?.id,
+                    notes: item.wasteReason ? `Waste: ${item.wasteReason}` : null,
+                    stock_updated: true
+                }
+
                 const { data: prodRecord, error: prodError } = await supabase
                     .from('production_records')
-                    .insert({
-                        product_id: item.productId,
-                        section_id: selectedSectionId,
-                        quantity_produced: item.quantity,
-                        quantity_waste: item.wasted,
-                        production_date: dateStr,
-                        created_by: user?.id,
-                        notes: item.wasteReason ? `Waste: ${item.wasteReason}` : null,
-                        stock_updated: true
-                    })
+                    .insert(productionData)
                     .select()
                     .single()
 
@@ -246,31 +248,35 @@ export default function StockProductionPage() {
                 const netChange = item.quantity - item.wasted
 
                 if (item.quantity > 0) {
+                    const stockData: Insertable<'stock_movements'> = {
+                        product_id: item.productId,
+                        movement_type: 'production_in',
+                        quantity: item.quantity,
+                        reason: `Production ${selectedSection?.name || ''} - ${dateStr}`,
+                        reference_id: prodRecord.id,
+                        created_by: user?.id
+                    }
+
                     const { error: stockError } = await supabase
                         .from('stock_movements')
-                        .insert({
-                            product_id: item.productId,
-                            movement_type: 'production_in',
-                            quantity: item.quantity,
-                            reason: `Production ${selectedSection?.name || ''} - ${dateStr}`,
-                            reference_id: prodRecord.id,
-                            staff_id: user?.id
-                        })
+                        .insert(stockData)
 
                     if (stockError) throw stockError
                 }
 
                 if (item.wasted > 0) {
+                    const wasteData: Insertable<'stock_movements'> = {
+                        product_id: item.productId,
+                        movement_type: 'waste',
+                        quantity: -item.wasted,
+                        reason: item.wasteReason || `Production waste ${dateStr}`,
+                        reference_id: prodRecord.id,
+                        created_by: user?.id
+                    }
+
                     const { error: wasteError } = await supabase
                         .from('stock_movements')
-                        .insert({
-                            product_id: item.productId,
-                            movement_type: 'waste',
-                            quantity: -item.wasted,
-                            reason: item.wasteReason || `Production waste ${dateStr}`,
-                            reference_id: prodRecord.id,
-                            staff_id: user?.id
-                        })
+                        .insert(wasteData)
 
                     if (wasteError) throw wasteError
                 }
@@ -296,22 +302,24 @@ export default function StockProductionPage() {
 
                 if (recipeItems && recipeItems.length > 0) {
                     for (const recipe of recipeItems) {
-                        const material = recipe.material as any
+                        const material = recipe.material as { id: string; name: string; current_stock: number | null; cost_price: number | null; unit: string | null } | null
                         if (!material) continue
 
                         const qtyToDeduct = recipe.quantity * item.quantity
                         const materialCurrentStock = material.current_stock || 0
 
+                        const movementData: Insertable<'stock_movements'> = {
+                            product_id: recipe.material_id,
+                            movement_type: 'production_out',
+                            quantity: -qtyToDeduct,
+                            reason: `Used for: ${item.name} (x${item.quantity}) - ${dateStr}`,
+                            reference_id: prodRecord.id,
+                            created_by: user?.id
+                        }
+
                         await supabase
                             .from('stock_movements')
-                            .insert({
-                                product_id: recipe.material_id,
-                                movement_type: 'production_out',
-                                quantity: -qtyToDeduct,
-                                reason: `Used for: ${item.name} (x${item.quantity}) - ${dateStr}`,
-                                reference_id: prodRecord.id,
-                                staff_id: user?.id
-                            })
+                            .insert(movementData)
 
                         await supabase
                             .from('products')
@@ -619,7 +627,7 @@ export default function StockProductionPage() {
                                     todayHistory.map(record => (
                                         <div key={record.id} className="history-item">
                                             <div className="history-item-info">
-                                                <div className="history-product">{(record as any).product?.name}</div>
+                                                <div className="history-product">{record.product?.name}</div>
                                                 <div className="history-time">
                                                     <Clock size={12} />
                                                     {new Date(record.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}

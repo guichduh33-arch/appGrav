@@ -77,7 +77,7 @@ export default function TransferFormPage() {
             const { data: transfer, error: transferError } = await supabase
                 .from('internal_transfers')
                 .select('*')
-                .eq('id', id)
+                .eq('id', id!)
                 .single()
 
             if (transferError) throw transferError
@@ -88,7 +88,7 @@ export default function TransferFormPage() {
                     *,
                     product:products(name)
                 `)
-                .eq('transfer_id', id)
+                .eq('transfer_id', id!)
 
             if (itemsError) throw itemsError
 
@@ -192,11 +192,11 @@ export default function TransferFormPage() {
                 const { error } = await supabase
                     .from('internal_transfers')
                     .update(transferData)
-                    .eq('id', id)
+                    .eq('id', id!)
 
                 if (error) throw error
 
-                await supabase.from('transfer_items').delete().eq('transfer_id', id)
+                await supabase.from('transfer_items').delete().eq('transfer_id', id!)
             }
 
             let transferId = id

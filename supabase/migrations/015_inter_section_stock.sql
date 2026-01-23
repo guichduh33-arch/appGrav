@@ -5,7 +5,7 @@
 -- =====================================================
 -- 1. Create Storage Sections Table
 CREATE TABLE IF NOT EXISTS storage_sections (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL UNIQUE,
     slug VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS storage_sections (
 );
 -- 2. Create Section Items Table (Stock per section)
 CREATE TABLE IF NOT EXISTS section_items (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     section_id UUID NOT NULL REFERENCES storage_sections(id) ON DELETE CASCADE,
     product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     quantity DECIMAL(10, 3) NOT NULL DEFAULT 0,
@@ -26,10 +26,13 @@ CREATE TABLE IF NOT EXISTS section_items (
 ALTER TABLE storage_sections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE section_items ENABLE ROW LEVEL SECURITY;
 -- 4. RLS Policies (Allow all authenticated staff for now)
+DROP POLICY IF EXISTS "Enable read access for authenticated users" ON storage_sections;
 CREATE POLICY "Enable read access for authenticated users" ON storage_sections FOR
 SELECT USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Enable read access for authenticated users" ON section_items;
 CREATE POLICY "Enable read access for authenticated users" ON section_items FOR
 SELECT USING (auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Enable write access for authenticated users" ON section_items;
 CREATE POLICY "Enable write access for authenticated users" ON section_items FOR ALL USING (auth.role() = 'authenticated');
 -- 5. Seed Data
 INSERT INTO storage_sections (name, slug, description)
@@ -64,5 +67,5 @@ VALUES (
         'Front of house bar and display'
     ) ON CONFLICT (slug) DO NOTHING;
 -- 6. Indexes
-CREATE INDEX idx_section_items_section ON section_items(section_id);
-CREATE INDEX idx_section_items_product ON section_items(product_id);
+CREATE INDEX IF NOT EXISTS idx_section_items_section ON section_items(section_id);
+CREATE INDEX IF NOT EXISTS idx_section_items_product ON section_items(product_id);

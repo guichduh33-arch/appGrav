@@ -113,7 +113,7 @@ export default function CombosPage() {
         }
     }
 
-    const handleToggleActive = async (combo: ComboWithItems) => {
+    const handleToggleActive = async (combo: ComboWithGroups) => {
         try {
             const { error } = await supabase
                 .from('product_combos')

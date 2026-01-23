@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Search, FileText, Calendar, DollarSign, Package, Trash2, Eye, Edit2, Check, X, Clock } from 'lucide-react'
+import { Plus, Search, FileText, DollarSign, Package, Trash2, Eye, Edit2, Check, Clock } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useNavigate } from 'react-router-dom'
 import './PurchaseOrdersPage.css'

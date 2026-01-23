@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-    Factory, ShoppingCart, Package, Trash2, ArrowUpCircle, ArrowDownCircle,
+    Factory, ShoppingCart, Package, Trash2, ArrowUpCircle,
     Filter, TrendingUp, TrendingDown, Clock, AlertTriangle, Truck, ArrowRight
 } from 'lucide-react'
 import { Product, StockMovement } from '../../../types/database'
@@ -11,7 +11,7 @@ interface StockTabProps {
     stockHistory: StockMovement[]
 }
 
-type MovementType = 'all' | 'production_in' | 'production_out' | 'stock_in' | 'sale_pos' | 'sale_b2b' | 'waste' | 'opname'
+type MovementType = 'all' | 'production_in' | 'production_out' | 'stock_in' | 'sale_pos' | 'sale_b2b' | 'waste' | 'opname' | 'purchase' | 'adjustment_in' | 'adjustment_out' | 'sale' | 'production'
 
 const MOVEMENT_CONFIG: Record<string, {
     label: string
@@ -85,7 +85,7 @@ interface MovementWithBalance extends StockMovement {
 }
 
 export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => {
-    const { t } = useTranslation()
+    useTranslation() // Translation hook for future use
     const [filterType, setFilterType] = useState<MovementType>('all')
 
     // Calculate running balance for each movement (oldest to newest, then reverse for display)
@@ -119,17 +119,18 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
         ? movementsWithBalance
         : movementsWithBalance.filter(m => m.movement_type === filterType)
 
-    // Calculate stats
+    // Calculate stats - cast movement_type to string for flexible comparison
     const costPrice = product.cost_price || 0
+    const getMovementType = (m: StockMovement): string => m.movement_type as string
     const stats = {
         totalIn: stockHistory.filter(m => m.quantity > 0).reduce((sum, m) => sum + m.quantity, 0),
         totalOut: stockHistory.filter(m => m.quantity < 0).reduce((sum, m) => sum + Math.abs(m.quantity), 0),
-        productionIn: stockHistory.filter(m => m.movement_type === 'production_in').reduce((sum, m) => sum + m.quantity, 0),
-        productionOut: stockHistory.filter(m => m.movement_type === 'production_out').reduce((sum, m) => sum + Math.abs(m.quantity), 0),
-        stockIn: stockHistory.filter(m => m.movement_type === 'stock_in').reduce((sum, m) => sum + m.quantity, 0),
-        sales: stockHistory.filter(m => m.movement_type === 'sale_pos' || m.movement_type === 'sale_b2b').reduce((sum, m) => sum + Math.abs(m.quantity), 0),
-        waste: stockHistory.filter(m => m.movement_type === 'waste').reduce((sum, m) => sum + Math.abs(m.quantity), 0),
-        opname: stockHistory.filter(m => m.movement_type === 'opname').reduce((sum, m) => sum + m.quantity, 0),
+        productionIn: stockHistory.filter(m => getMovementType(m) === 'production_in').reduce((sum, m) => sum + m.quantity, 0),
+        productionOut: stockHistory.filter(m => getMovementType(m) === 'production_out').reduce((sum, m) => sum + Math.abs(m.quantity), 0),
+        stockIn: stockHistory.filter(m => getMovementType(m) === 'stock_in').reduce((sum, m) => sum + m.quantity, 0),
+        sales: stockHistory.filter(m => getMovementType(m) === 'sale_pos' || getMovementType(m) === 'sale_b2b').reduce((sum, m) => sum + Math.abs(m.quantity), 0),
+        waste: stockHistory.filter(m => getMovementType(m) === 'waste').reduce((sum, m) => sum + Math.abs(m.quantity), 0),
+        opname: stockHistory.filter(m => getMovementType(m) === 'opname').reduce((sum, m) => sum + m.quantity, 0),
         // Values in IDR
         totalInValue: stockHistory.filter(m => m.quantity > 0).reduce((sum, m) => sum + (m.quantity * costPrice), 0),
         totalOutValue: stockHistory.filter(m => m.quantity < 0).reduce((sum, m) => sum + (Math.abs(m.quantity) * costPrice), 0),

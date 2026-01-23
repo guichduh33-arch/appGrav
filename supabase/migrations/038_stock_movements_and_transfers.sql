@@ -59,6 +59,32 @@ CREATE TABLE IF NOT EXISTS public.stock_movements (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Add missing columns if table already exists
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'stock_movements' AND column_name = 'from_location_id') THEN
+        ALTER TABLE public.stock_movements ADD COLUMN from_location_id UUID REFERENCES public.stock_locations(id) ON DELETE RESTRICT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'stock_movements' AND column_name = 'to_location_id') THEN
+        ALTER TABLE public.stock_movements ADD COLUMN to_location_id UUID REFERENCES public.stock_locations(id) ON DELETE RESTRICT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'stock_movements' AND column_name = 'unit') THEN
+        ALTER TABLE public.stock_movements ADD COLUMN unit TEXT NOT NULL DEFAULT 'unit';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'stock_movements' AND column_name = 'unit_cost') THEN
+        ALTER TABLE public.stock_movements ADD COLUMN unit_cost NUMERIC(12,2);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'stock_movements' AND column_name = 'total_cost') THEN
+        ALTER TABLE public.stock_movements ADD COLUMN total_cost NUMERIC(12,2);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'stock_movements' AND column_name = 'reference_number') THEN
+        ALTER TABLE public.stock_movements ADD COLUMN reference_number TEXT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'stock_movements' AND column_name = 'created_by_name') THEN
+        ALTER TABLE public.stock_movements ADD COLUMN created_by_name TEXT;
+    END IF;
+END $$;
+
 -- =============================================
 -- INTERNAL TRANSFERS TABLE
 -- =============================================
@@ -128,7 +154,7 @@ SELECT
     p.id as product_id,
     p.name as product_name,
     p.sku,
-    p.stock_unit,
+    p.unit as stock_unit,
     sl.id as location_id,
     sl.name as location_name,
     sl.code as location_code,
@@ -155,7 +181,7 @@ CROSS JOIN public.stock_locations sl
 LEFT JOIN public.stock_movements sm ON sm.product_id = p.id
     AND (sm.from_location_id = sl.id OR sm.to_location_id = sl.id)
 WHERE p.is_active = true AND sl.is_active = true
-GROUP BY p.id, p.name, p.sku, p.stock_unit, sl.id, sl.name, sl.code, sl.location_type, p.cost_price;
+GROUP BY p.id, p.name, p.sku, p.unit, sl.id, sl.name, sl.code, sl.location_type, p.cost_price;
 
 -- =============================================
 -- INDEXES
@@ -351,35 +377,49 @@ ALTER TABLE public.internal_transfers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.transfer_items ENABLE ROW LEVEL SECURITY;
 
 -- Public access policies for all tables
+DROP POLICY IF EXISTS "Allow public to select stock_locations" ON public.stock_locations;
 CREATE POLICY "Allow public to select stock_locations"
     ON public.stock_locations FOR SELECT TO public USING (true);
+DROP POLICY IF EXISTS "Allow public to insert stock_locations" ON public.stock_locations;
 CREATE POLICY "Allow public to insert stock_locations"
     ON public.stock_locations FOR INSERT TO public WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow public to update stock_locations" ON public.stock_locations;
 CREATE POLICY "Allow public to update stock_locations"
     ON public.stock_locations FOR UPDATE TO public USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow public to delete stock_locations" ON public.stock_locations;
 CREATE POLICY "Allow public to delete stock_locations"
     ON public.stock_locations FOR DELETE TO public USING (true);
 
+DROP POLICY IF EXISTS "Allow public to select stock_movements" ON public.stock_movements;
 CREATE POLICY "Allow public to select stock_movements"
     ON public.stock_movements FOR SELECT TO public USING (true);
+DROP POLICY IF EXISTS "Allow public to insert stock_movements" ON public.stock_movements;
 CREATE POLICY "Allow public to insert stock_movements"
     ON public.stock_movements FOR INSERT TO public WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Allow public to select internal_transfers" ON public.internal_transfers;
 CREATE POLICY "Allow public to select internal_transfers"
     ON public.internal_transfers FOR SELECT TO public USING (true);
+DROP POLICY IF EXISTS "Allow public to insert internal_transfers" ON public.internal_transfers;
 CREATE POLICY "Allow public to insert internal_transfers"
     ON public.internal_transfers FOR INSERT TO public WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow public to update internal_transfers" ON public.internal_transfers;
 CREATE POLICY "Allow public to update internal_transfers"
     ON public.internal_transfers FOR UPDATE TO public USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow public to delete internal_transfers" ON public.internal_transfers;
 CREATE POLICY "Allow public to delete internal_transfers"
     ON public.internal_transfers FOR DELETE TO public USING (true);
 
+DROP POLICY IF EXISTS "Allow public to select transfer_items" ON public.transfer_items;
 CREATE POLICY "Allow public to select transfer_items"
     ON public.transfer_items FOR SELECT TO public USING (true);
+DROP POLICY IF EXISTS "Allow public to insert transfer_items" ON public.transfer_items;
 CREATE POLICY "Allow public to insert transfer_items"
     ON public.transfer_items FOR INSERT TO public WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow public to update transfer_items" ON public.transfer_items;
 CREATE POLICY "Allow public to update transfer_items"
     ON public.transfer_items FOR UPDATE TO public USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow public to delete transfer_items" ON public.transfer_items;
 CREATE POLICY "Allow public to delete transfer_items"
     ON public.transfer_items FOR DELETE TO public USING (true);
 

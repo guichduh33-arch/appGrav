@@ -6,7 +6,6 @@ import type {
   Role,
   EffectivePermission,
   UserProfileExtended,
-  UserSession,
   PermissionCode,
 } from '@/types/auth';
 
@@ -609,7 +608,7 @@ export const authService = {
       return [];
     }
 
-    return data || [];
+    return (data || []) as UserProfileExtended[];
   },
 
   /**
@@ -632,7 +631,7 @@ export const authService = {
       return [];
     }
 
-    return data || [];
+    return (data || []) as Role[];
   },
 
   /**
@@ -662,7 +661,7 @@ export const authService = {
         permission_action: perm.action,
         is_granted: false,
         source: 'role',
-        is_sensitive: perm.is_sensitive,
+        is_sensitive: perm.is_sensitive ?? false,
       });
     }
 

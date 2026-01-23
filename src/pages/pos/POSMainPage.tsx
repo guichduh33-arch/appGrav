@@ -109,7 +109,7 @@ export default function POSMainPage() {
 
     const handleCartItemClick = (item: CartItem) => {
         setEditItem(item)
-        setSelectedProduct(item.product)
+        setSelectedProduct(item.product || null)
         setShowModifierModal(true)
     }
 
@@ -169,8 +169,9 @@ export default function POSMainPage() {
         clearCart()
     }
 
-    // Handle hold order
-    const handleHoldOrder = () => {
+    // Handle hold order - prefixed with underscore as it's kept for future use
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _handleHoldOrder = () => {
         if (!hasOpenShift) {
             setShowNoShiftModal(true)
             return
@@ -195,6 +196,7 @@ export default function POSMainPage() {
             showToast(t('pos.toasts.order_held', { number: heldOrder.orderNumber }), 'info')
         }
     }
+    void _handleHoldOrder
 
     // Handle restore held order
     const handleRestoreHeldOrder = (heldOrderId: string) => {

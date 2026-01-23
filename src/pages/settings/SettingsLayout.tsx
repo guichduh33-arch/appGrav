@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { Outlet, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Building2,
@@ -61,7 +60,6 @@ const EXTRA_TAB_NAMES: Record<string, { fr: string; en: string; id: string }> = 
 
 const SettingsLayout = () => {
   const { t, i18n } = useTranslation();
-  const location = useLocation();
   const { data: categories, isLoading } = useSettingsCategories();
 
   // Initialize settings store

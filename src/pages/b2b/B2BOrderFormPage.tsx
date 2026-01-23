@@ -133,7 +133,7 @@ export default function B2BOrderFormPage() {
                     *,
                     customer:customers(*)
                 `)
-                .eq('id', id)
+                .eq('id', id!)
                 .single()
 
             if (orderError) throw orderError
@@ -141,7 +141,7 @@ export default function B2BOrderFormPage() {
             const { data: orderItems, error: itemsError } = await supabase
                 .from('b2b_order_items')
                 .select('*')
-                .eq('order_id', id as string)
+                .eq('order_id', id!)
 
             if (itemsError) throw itemsError
 
@@ -153,10 +153,10 @@ export default function B2BOrderFormPage() {
                 delivery_notes: (typedOrder.delivery_notes as string) || '',
                 notes: (typedOrder.notes as string) || '',
                 internal_notes: (typedOrder.internal_notes as string) || '',
-                discount_type: (typedOrder.discount_type as string) || '',
+                discount_type: (typedOrder.discount_type as '' | 'percentage' | 'fixed') || '',
                 discount_value: (typedOrder.discount_value as number) || 0,
                 tax_rate: (typedOrder.tax_rate as number) || 10,
-                payment_terms: (typedOrder.payment_terms as string) || ''
+                payment_terms: (typedOrder.payment_terms as '' | 'cod' | 'net15' | 'net30' | 'net60') || ''
             })
 
             setSelectedCustomer(typedOrder.customer as Customer)
@@ -317,7 +317,7 @@ export default function B2BOrderFormPage() {
                 const { error } = await supabase
                     .from('b2b_orders')
                     .update(orderData)
-                    .eq('id', id)
+                    .eq('id', id!)
 
                 if (error) throw error
 
@@ -325,7 +325,7 @@ export default function B2BOrderFormPage() {
                 await supabase
                     .from('b2b_order_items')
                     .delete()
-                    .eq('order_id', id)
+                    .eq('order_id', id!)
             } else {
                 const { data: newOrder, error } = await supabase
                     .from('b2b_orders')
@@ -463,7 +463,7 @@ export default function B2BOrderFormPage() {
                                 <label>Conditions de paiement</label>
                                 <select
                                     value={formData.payment_terms}
-                                    onChange={(e) => setFormData({ ...formData, payment_terms: e.target.value as any })}
+                                    onChange={(e) => setFormData({ ...formData, payment_terms: e.target.value as '' | 'cod' | 'net15' | 'net30' | 'net60' })}
                                 >
                                     <option value="">Sélectionner...</option>
                                     <option value="cod">Paiement à la livraison</option>

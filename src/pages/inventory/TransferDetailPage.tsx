@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, CheckCircle, Edit, Package } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Edit } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../stores/authStore'
 import toast from 'react-hot-toast'
@@ -49,7 +49,7 @@ export default function TransferDetailPage() {
                     from_location:stock_locations!internal_transfers_from_location_id_fkey(name),
                     to_location:stock_locations!internal_transfers_to_location_id_fkey(name)
                 `)
-                .eq('id', id)
+                .eq('id', id!)
                 .single()
 
             if (tError) throw tError
@@ -60,7 +60,7 @@ export default function TransferDetailPage() {
                     *,
                     product:products(name)
                 `)
-                .eq('transfer_id', id)
+                .eq('transfer_id', id!)
 
             if (iError) throw iError
 

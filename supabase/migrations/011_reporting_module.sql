@@ -8,7 +8,7 @@
 -- =====================================================
 -- System Logs Table
 CREATE TABLE system_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     severity VARCHAR(20) NOT NULL CHECK (
         severity IN ('info', 'warning', 'error', 'critical')
     ),
@@ -132,7 +132,7 @@ GROUP BY EXTRACT(
 -- Table: Daily Stock Snapshots
 -- Intended to be populated daily to track inventory value over time
 CREATE TABLE reporting_stock_snapshots (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     snapshot_date DATE NOT NULL DEFAULT CURRENT_DATE,
     total_items_count INTEGER DEFAULT 0,
     total_value_cost DECIMAL(15, 2) DEFAULT 0,

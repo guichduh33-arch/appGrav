@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Plus, Trash2, Package, Scale, ClipboardList, ShoppingCart, Check, X } from 'lucide-react'
+import { Plus, Trash2, Package, Scale, ClipboardList, ShoppingCart } from 'lucide-react'
 import { Product, ProductUOM } from '../../../types/database'
 import { supabase } from '../../../lib/supabase'
 
@@ -7,13 +7,13 @@ interface UnitsTabProps {
     product: Product
     uoms: ProductUOM[]
     onProductChange: (product: Product) => void
-    onAddUOM: () => void
+    onAddUOM?: () => void
     onDeleteUOM: (id: string) => void
 }
 
 type UOMContext = 'stock_opname' | 'recipe' | 'purchase'
 
-export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChange, onAddUOM, onDeleteUOM }) => {
+export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChange, onDeleteUOM }) => {
     const [showAddModal, setShowAddModal] = useState(false)
     const [newUOM, setNewUOM] = useState({ unit_name: '', conversion_factor: 1 })
     const [saving, setSaving] = useState(false)
@@ -83,11 +83,12 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
         }
     }
 
-    // All available units (base + UOMs)
-    const allUnits = [
+    // All available units (base + UOMs) - kept for future use
+    const _allUnits = [
         { id: 'base', unit_name: product.unit, conversion_factor: 1, isBase: true },
         ...uoms.map(u => ({ ...u, isBase: false }))
     ]
+    void _allUnits // Prevent unused variable warning
 
     const contexts = [
         {

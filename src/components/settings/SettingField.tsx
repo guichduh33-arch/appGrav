@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RotateCcw, Eye, EyeOff, Info } from 'lucide-react';
+import { RotateCcw, Eye, EyeOff } from 'lucide-react';
 import type { Setting, ValidationRules } from '../../types/settings';
 import './SettingField.css';
 
@@ -205,7 +205,7 @@ const SettingField: React.FC<SettingFieldProps> = ({
               disabled={disabled}
               accept="image/*"
             />
-            {parsedValue && (
+            {parsedValue != null && (
               <span className="setting-file__name">{String(parsedValue)}</span>
             )}
           </div>

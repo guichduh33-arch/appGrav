@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, CheckCircle, Clock, XCircle, ArrowRight } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import type { InventoryCount } from '../../types/database'
+import type { InventoryCount, Insertable } from '../../types/database'
 import './StockOpname.css'
 
 export default function StockOpnameList() {
@@ -31,21 +31,22 @@ export default function StockOpnameList() {
     async function createNewSession() {
         try {
             // Create a new draft session
+            const sessionData: Insertable<'inventory_counts'> = {
+                notes: 'Nouvel inventaire',
+                status: 'draft'
+            }
             const { data, error } = await supabase
                 .from('inventory_counts')
-                .insert({
-                    notes: 'Nouvel inventaire',
-                    status: 'draft'
-                } as any)
+                .insert(sessionData)
                 .select()
                 .single()
 
             if (error) throw error
             if (data) {
-                navigate(`/inventory/stock-opname/${(data as any).id}`)
+                navigate(`/inventory/stock-opname/${data.id}`)
             }
-        } catch (error: any) {
-            alert('Erreur: ' + error.message)
+        } catch (error: unknown) {
+            alert('Erreur: ' + (error instanceof Error ? error.message : String(error)))
         }
     }
 

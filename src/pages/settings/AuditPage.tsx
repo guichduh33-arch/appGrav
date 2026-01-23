@@ -89,7 +89,7 @@ export default function AuditPage() {
       .order('name');
 
     if (data) {
-      setUsers((data as any[]).map((u: any) => ({ id: u.id, name: u.display_name || u.name })));
+      setUsers(data.map(u => ({ id: u.id, name: u.display_name || u.name })));
     }
   };
 
@@ -119,7 +119,7 @@ export default function AuditPage() {
       }
 
       // Build query
-      let query = (supabase as any)
+      let query = supabase
         .from('audit_logs')
         .select(`
           *,
@@ -238,7 +238,7 @@ export default function AuditPage() {
             <Calendar className="w-5 h-5 text-gray-400" />
             <select
               value={dateRange}
-              onChange={(e) => setDateRange(e.target.value as any)}
+              onChange={(e) => setDateRange(e.target.value as 'today' | '7days' | '30days' | 'custom')}
               className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
               title={t('auth.audit.dateRange') || 'Période'}
               aria-label={t('auth.audit.dateRange') || 'Période'}

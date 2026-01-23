@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { History, User, Clock, ArrowRight, Search, Filter } from 'lucide-react';
+import { History, User, Clock, ArrowRight, Search } from 'lucide-react';
 import { useSettingsHistory } from '../../hooks/settings';
 import { formatDistanceToNow } from 'date-fns';
 import { fr, enUS, id } from 'date-fns/locale';
@@ -8,7 +8,7 @@ import { fr, enUS, id } from 'date-fns/locale';
 const LOCALES = { fr, en: enUS, id };
 
 const SettingsHistoryPage = () => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const { data: history, isLoading } = useSettingsHistory();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -26,7 +26,7 @@ const SettingsHistoryPage = () => {
   };
 
   // Filter history
-  const filteredHistory = history?.filter((item) => {
+  const filteredHistory = history?.filter((item: any) => {
     if (!searchQuery) return true;
     const search = searchQuery.toLowerCase();
     const setting = item.setting as { key?: string; name_fr?: string; name_en?: string; name_id?: string } | undefined;
@@ -78,7 +78,7 @@ const SettingsHistoryPage = () => {
           </div>
         ) : (
           <div className="settings-history-list">
-            {filteredHistory.map((item) => {
+            {filteredHistory.map((item: any) => {
               const setting = item.setting as { key?: string; name_fr?: string; name_en?: string; name_id?: string } | undefined;
               const user = item.user as { display_name?: string; first_name?: string; last_name?: string } | undefined;
               const userName = user?.display_name ||

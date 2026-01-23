@@ -64,6 +64,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_floor_plan_items_updated_at ON public.floor_plan_items;
 CREATE TRIGGER trigger_update_floor_plan_items_updated_at
     BEFORE UPDATE ON public.floor_plan_items
     FOR EACH ROW
@@ -73,18 +74,21 @@ CREATE TRIGGER trigger_update_floor_plan_items_updated_at
 ALTER TABLE public.floor_plan_items ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+DROP POLICY IF EXISTS "Allow authenticated users to read floor plan items" ON public.floor_plan_items;
 CREATE POLICY "Allow authenticated users to read floor plan items"
     ON public.floor_plan_items
     FOR SELECT
     TO authenticated
     USING (true);
 
+DROP POLICY IF EXISTS "Allow authenticated users to insert floor plan items" ON public.floor_plan_items;
 CREATE POLICY "Allow authenticated users to insert floor plan items"
     ON public.floor_plan_items
     FOR INSERT
     TO authenticated
     WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Allow authenticated users to update floor plan items" ON public.floor_plan_items;
 CREATE POLICY "Allow authenticated users to update floor plan items"
     ON public.floor_plan_items
     FOR UPDATE
@@ -92,39 +96,41 @@ CREATE POLICY "Allow authenticated users to update floor plan items"
     USING (true)
     WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Allow authenticated users to delete floor plan items" ON public.floor_plan_items;
 CREATE POLICY "Allow authenticated users to delete floor plan items"
     ON public.floor_plan_items
     FOR DELETE
     TO authenticated
     USING (true);
 
--- Insert default floor plan with tables and decorations
-INSERT INTO public.floor_plan_items (type, number, capacity, section, status, shape, x, y, width, height) VALUES
-    -- Main Section Tables
-    ('table', '1', 2, 'Main', 'available', 'square', 15, 15, 80, 80),
-    ('table', '2', 2, 'Main', 'available', 'square', 40, 15, 80, 80),
-    ('table', '3', 4, 'Main', 'available', 'round', 65, 15, 80, 80),
-    ('table', '4', 4, 'Main', 'available', 'square', 15, 40, 80, 80),
-    ('table', '5', 6, 'Main', 'available', 'rectangle', 40, 40, 120, 80),
-    ('table', '6', 2, 'Main', 'available', 'round', 65, 40, 80, 80),
+-- Insert default floor plan only if table is empty
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM public.floor_plan_items LIMIT 1) THEN
+        INSERT INTO public.floor_plan_items (type, number, capacity, section, status, shape, x, y, width, height) VALUES
+            -- Main Section Tables
+            ('table', '1', 2, 'Main', 'available', 'square', 15, 15, 80, 80),
+            ('table', '2', 2, 'Main', 'available', 'square', 40, 15, 80, 80),
+            ('table', '3', 4, 'Main', 'available', 'round', 65, 15, 80, 80),
+            ('table', '4', 4, 'Main', 'available', 'square', 15, 40, 80, 80),
+            ('table', '5', 6, 'Main', 'available', 'rectangle', 40, 40, 120, 80),
+            ('table', '6', 2, 'Main', 'available', 'round', 65, 40, 80, 80),
+            -- Terrace Tables
+            ('table', '7', 4, 'Terrace', 'available', 'square', 15, 65, 80, 80),
+            ('table', '8', 4, 'Terrace', 'available', 'round', 40, 65, 80, 80),
+            ('table', '9', 2, 'Terrace', 'available', 'square', 65, 65, 80, 80),
+            -- VIP Section
+            ('table', '10', 8, 'VIP', 'available', 'rectangle', 25, 85, 120, 80),
+            ('table', '11', 8, 'VIP', 'available', 'rectangle', 60, 85, 120, 80);
 
-    -- Terrace Tables
-    ('table', '7', 4, 'Terrace', 'available', 'square', 15, 65, 80, 80),
-    ('table', '8', 4, 'Terrace', 'available', 'round', 40, 65, 80, 80),
-    ('table', '9', 2, 'Terrace', 'available', 'square', 65, 65, 80, 80),
-
-    -- VIP Section
-    ('table', '10', 8, 'VIP', 'available', 'rectangle', 25, 85, 120, 80),
-    ('table', '11', 8, 'VIP', 'available', 'rectangle', 60, 85, 120, 80)
-ON CONFLICT (number) DO NOTHING;
-
--- Insert some decorations
-INSERT INTO public.floor_plan_items (type, decoration_type, shape, x, y, width, height) VALUES
-    ('decoration', 'plant', 'square', 85, 20, 60, 60),
-    ('decoration', 'plant', 'square', 85, 50, 60, 60),
-    ('decoration', 'entrance', 'rectangle', 50, 5, 80, 40),
-    ('decoration', 'bar', 'rectangle', 10, 90, 150, 80)
-ON CONFLICT DO NOTHING;
+        -- Insert some decorations
+        INSERT INTO public.floor_plan_items (type, decoration_type, shape, x, y, width, height) VALUES
+            ('decoration', 'plant', 'square', 85, 20, 60, 60),
+            ('decoration', 'plant', 'square', 85, 50, 60, 60),
+            ('decoration', 'entrance', 'rectangle', 50, 5, 80, 40),
+            ('decoration', 'bar', 'rectangle', 10, 90, 150, 80);
+    END IF;
+END $$;
 
 -- Add comment
 COMMENT ON TABLE public.floor_plan_items IS 'Stores floor plan items including tables with different shapes and decoration elements (plants, walls, bars, etc.)';

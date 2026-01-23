@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-    FileText, Search, Download, ChevronLeft, ChevronRight, Check, Clock,
+    Search, Download, ChevronLeft, ChevronRight, Check, Clock,
     RefreshCw, X, ShoppingBag, User, Hash, CreditCard, Banknote, QrCode,
     Calendar, Filter, Eye
 } from 'lucide-react';
@@ -47,7 +47,7 @@ type PaymentStatus = 'all' | 'paid' | 'unpaid';
 const ITEMS_PER_PAGE = 20;
 
 const OrdersPage = () => {
-    const { t } = useTranslation();
+    useTranslation(); // Translation hook available for future use
     const queryClient = useQueryClient();
 
     const [statusFilter, setStatusFilter] = useState<OrderStatus>('all');

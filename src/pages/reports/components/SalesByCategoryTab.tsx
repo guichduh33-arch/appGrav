@@ -54,7 +54,7 @@ export const SalesByCategoryTab = () => {
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
-                                data={data as any}
+                                data={data}
                                 cx="50%"
                                 cy="50%"
                                 labelLine={false}
@@ -62,7 +62,7 @@ export const SalesByCategoryTab = () => {
                                 fill="#8884d8"
                                 dataKey="total_revenue"
                                 nameKey="category_name"
-                                label={({ name, percent }: any) => `${name ?? ''} ${((percent ?? 0) * 100).toFixed(0)}%`}
+                                label={({ name, percent }: { name?: string; percent?: number }) => `${name ?? ''} ${((percent ?? 0) * 100).toFixed(0)}%`}
                             >
                                 {data.map((_, index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

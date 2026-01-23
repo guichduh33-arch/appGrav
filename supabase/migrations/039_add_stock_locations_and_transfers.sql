@@ -100,7 +100,7 @@ SELECT
     p.id as product_id,
     p.name as product_name,
     p.sku,
-    p.stock_unit,
+    p.unit as stock_unit,
     sl.id as location_id,
     sl.name as location_name,
     sl.code as location_code,
@@ -127,7 +127,7 @@ CROSS JOIN public.stock_locations sl
 LEFT JOIN public.stock_movements sm ON sm.product_id = p.id
     AND (sm.from_location_id = sl.id OR sm.to_location_id = sl.id)
 WHERE p.is_active = true AND sl.is_active = true
-GROUP BY p.id, p.name, p.sku, p.stock_unit, sl.id, sl.name, sl.code, sl.location_type, p.cost_price;
+GROUP BY p.id, p.name, p.sku, p.unit, sl.id, sl.name, sl.code, sl.location_type, p.cost_price;
 
 -- =============================================
 -- INDEXES

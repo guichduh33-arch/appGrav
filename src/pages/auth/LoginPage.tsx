@@ -27,13 +27,15 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, navigate]);
 
-  // Demo users fallback (used when RLS blocks anonymous access or Edge Functions unavailable)
-  const DEMO_USERS: UserProfile[] = [
-    { id: 'a1110000-0000-0000-0000-000000000001', name: 'Apni', role: 'cashier', pin_code: '1234', is_active: true } as UserProfile,
-    { id: 'a1110000-0000-0000-0000-000000000002', name: 'Dani', role: 'manager', pin_code: '0000', is_active: true } as UserProfile,
-    { id: 'a1110000-0000-0000-0000-000000000004', name: 'Bayu', role: 'barista', pin_code: '2222', is_active: true } as UserProfile,
-    { id: 'a1110000-0000-0000-0000-000000000005', name: 'Admin', role: 'admin', pin_code: '9999', is_active: true } as UserProfile,
-  ];
+  // Demo users fallback - ONLY enabled in development mode
+  // In production, this should be empty to prevent credential exposure
+  const isDevelopment = import.meta.env.DEV;
+  const DEMO_USERS: UserProfile[] = isDevelopment ? [
+    { id: 'a1110000-0000-0000-0000-000000000001', name: 'Apni', role: 'cashier', pin_code: import.meta.env.VITE_DEMO_PIN_CASHIER || '', is_active: true } as UserProfile,
+    { id: 'a1110000-0000-0000-0000-000000000002', name: 'Dani', role: 'manager', pin_code: import.meta.env.VITE_DEMO_PIN_MANAGER || '', is_active: true } as UserProfile,
+    { id: 'a1110000-0000-0000-0000-000000000004', name: 'Bayu', role: 'barista', pin_code: import.meta.env.VITE_DEMO_PIN_BARISTA || '', is_active: true } as UserProfile,
+    { id: 'a1110000-0000-0000-0000-000000000005', name: 'Admin', role: 'admin', pin_code: import.meta.env.VITE_DEMO_PIN_ADMIN || '', is_active: true } as UserProfile,
+  ] : [];
 
   // Load real users from Supabase (with demo fallback)
   useEffect(() => {
@@ -136,7 +138,7 @@ export default function LoginPage() {
         .from('user_profiles')
         .select('pin_code')
         .eq('id', selectedUser)
-        .single();
+        .single() as { data: { pin_code: string } | null };
 
       if (userData?.pin_code) {
         user = { ...user, pin_code: userData.pin_code } as UserProfile;
@@ -173,13 +175,13 @@ export default function LoginPage() {
           is_primary,
           role:roles (id, code, name_fr, name_en, name_id, hierarchy_level)
         `)
-        .eq('user_id', user.id);
+        .eq('user_id', user.id) as { data: Array<{ id: string; is_primary: boolean; role: { id: string; code: string; name_fr: string; name_en: string; name_id: string; hierarchy_level: number } | null }> | null };
 
       const roles = userRoles?.map(ur => ur.role).filter(Boolean) || [];
 
       // Get permissions from role_permissions
-      const roleIds = roles.map((r: { id: string }) => r.id);
-      let permissions: { permission_code: string; permission_module: string; is_granted: boolean; is_sensitive: boolean }[] = [];
+      const roleIds = roles.map((r) => (r as { id: string }).id);
+      let permissions: { permission_code: string; permission_module: string; permission_action: string; is_granted: boolean; is_sensitive: boolean; source: 'direct' | 'role' }[] = [];
 
       if (roleIds.length > 0) {
         const { data: rolePerms } = await supabase
@@ -187,13 +189,15 @@ export default function LoginPage() {
           .select(`
             permission:permissions (code, module, action, is_sensitive)
           `)
-          .in('role_id', roleIds);
+          .in('role_id', roleIds) as { data: Array<{ permission: { code: string; module: string; action: string; is_sensitive: boolean } | null }> | null };
 
         permissions = rolePerms?.map(rp => ({
-          permission_code: rp.permission?.code,
-          permission_module: rp.permission?.module,
+          permission_code: rp.permission?.code || '',
+          permission_module: rp.permission?.module || '',
+          permission_action: rp.permission?.action || '',
           is_granted: true,
           is_sensitive: rp.permission?.is_sensitive || false,
+          source: 'role' as const,
         })).filter(p => p.permission_code) || [];
       }
 
@@ -362,10 +366,12 @@ export default function LoginPage() {
             : (t('auth.login.submit') || 'Se connecter')}
         </button>
 
-        {/* Demo hint */}
-        <p className="login-hint">
-          💡 Demo: Admin=9999, Manager=0000, Cashier=1234
-        </p>
+        {/* Demo hint - only shown in development */}
+        {isDevelopment && import.meta.env.VITE_SHOW_DEMO_HINT === 'true' && (
+          <p className="login-hint">
+            💡 {t('auth.login.demoMode') || 'Demo mode - check .env for PINs'}
+          </p>
+        )}
       </div>
     </div>
   );

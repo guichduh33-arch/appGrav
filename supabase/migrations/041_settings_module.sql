@@ -519,13 +519,16 @@ ALTER TABLE public.email_templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.receipt_templates ENABLE ROW LEVEL SECURITY;
 
 -- Settings categories: anyone authenticated can read
+DROP POLICY IF EXISTS "View active settings categories" ON public.settings_categories;
 CREATE POLICY "View active settings categories" ON public.settings_categories
     FOR SELECT USING (is_active = true);
 
 -- Settings: view with permission, update with permission
+DROP POLICY IF EXISTS "View settings" ON public.settings;
 CREATE POLICY "View settings" ON public.settings
     FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Update settings" ON public.settings;
 CREATE POLICY "Update settings" ON public.settings
     FOR UPDATE USING (
         public.user_has_permission(auth.uid(), 'settings.update')
@@ -534,51 +537,65 @@ CREATE POLICY "Update settings" ON public.settings
     );
 
 -- Settings history: admins only
+DROP POLICY IF EXISTS "Admins view settings history" ON public.settings_history;
 CREATE POLICY "Admins view settings history" ON public.settings_history
     FOR SELECT USING (public.is_admin(auth.uid()));
 
+DROP POLICY IF EXISTS "System insert settings history" ON public.settings_history;
 CREATE POLICY "System insert settings history" ON public.settings_history
     FOR INSERT WITH CHECK (true);
 
 -- Printer configurations
+DROP POLICY IF EXISTS "View printers" ON public.printer_configurations;
 CREATE POLICY "View printers" ON public.printer_configurations
     FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Manage printers" ON public.printer_configurations;
 CREATE POLICY "Manage printers" ON public.printer_configurations
     FOR ALL USING (public.user_has_permission(auth.uid(), 'settings.update'));
 
 -- Tax rates
+DROP POLICY IF EXISTS "View tax rates" ON public.tax_rates;
 CREATE POLICY "View tax rates" ON public.tax_rates
     FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Manage tax rates" ON public.tax_rates;
 CREATE POLICY "Manage tax rates" ON public.tax_rates
     FOR ALL USING (public.user_has_permission(auth.uid(), 'settings.update'));
 
 -- Payment methods
+DROP POLICY IF EXISTS "View payment methods" ON public.payment_methods;
 CREATE POLICY "View payment methods" ON public.payment_methods
     FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Manage payment methods" ON public.payment_methods;
 CREATE POLICY "Manage payment methods" ON public.payment_methods
     FOR ALL USING (public.user_has_permission(auth.uid(), 'settings.update'));
 
 -- Business hours
+DROP POLICY IF EXISTS "View business hours" ON public.business_hours;
 CREATE POLICY "View business hours" ON public.business_hours
     FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Manage business hours" ON public.business_hours;
 CREATE POLICY "Manage business hours" ON public.business_hours
     FOR ALL USING (public.user_has_permission(auth.uid(), 'settings.update'));
 
 -- Email templates
+DROP POLICY IF EXISTS "View email templates" ON public.email_templates;
 CREATE POLICY "View email templates" ON public.email_templates
     FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Manage email templates" ON public.email_templates;
 CREATE POLICY "Manage email templates" ON public.email_templates
     FOR ALL USING (public.user_has_permission(auth.uid(), 'settings.update'));
 
 -- Receipt templates
+DROP POLICY IF EXISTS "View receipt templates" ON public.receipt_templates;
 CREATE POLICY "View receipt templates" ON public.receipt_templates
     FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Manage receipt templates" ON public.receipt_templates;
 CREATE POLICY "Manage receipt templates" ON public.receipt_templates
     FOR ALL USING (public.user_has_permission(auth.uid(), 'settings.update'));
 

@@ -298,7 +298,7 @@ export default function ComboFormPage() {
                         image_url: imageUrl || null,
                         sort_order: sortOrder
                     })
-                    .eq('id', id)
+                    .eq('id', id!)
 
                 if (comboError) throw comboError
 
@@ -306,7 +306,7 @@ export default function ComboFormPage() {
                 const { error: deleteError } = await supabase
                     .from('product_combo_groups')
                     .delete()
-                    .eq('combo_id', id)
+                    .eq('combo_id', id!)
 
                 if (deleteError) throw deleteError
 
@@ -671,7 +671,7 @@ export default function ComboFormPage() {
                                                                 >
                                                                     <span className="product-name">{product.name}</span>
                                                                     <span className="product-price">
-                                                                        {new Intl.NumberFormat('id-ID').format(product.retail_price)} IDR
+                                                                        {new Intl.NumberFormat('id-ID').format(product.retail_price || 0)} IDR
                                                                     </span>
                                                                 </div>
                                                             ))}

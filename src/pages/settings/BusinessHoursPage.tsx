@@ -12,7 +12,7 @@ const DAY_NAMES: Record<string, string[]> = {
 };
 
 const BusinessHoursPage = () => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const { data: businessHours, isLoading } = useBusinessHours();
   const updateHours = useUpdateBusinessHours();
 

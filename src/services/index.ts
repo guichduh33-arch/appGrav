@@ -1,5 +1,5 @@
 // Centralized services exports
-export * from './AnthropicService'
+export * from './anthropicService'
 export * from './AuthService'
 export * from './ClaudeService'
 export * from './PromotionService'

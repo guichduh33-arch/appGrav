@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
-import { Database } from '../types/database';
+import { Database, Insertable } from '../types/database';
 
 type Product = Database['public']['Tables']['products']['Row'] & {
     category?: { name: string } | null;
@@ -38,14 +38,16 @@ export const useStock = () => {
         mutationFn: async (input: StockMovementInput) => {
             // Insert movement - DB trigger will handle stock updates
 
+            const movementData: Insertable<'stock_movements'> = {
+                product_id: input.productId,
+                movement_type: input.type,
+                quantity: input.quantity,
+                reason: input.reason || null
+            };
+
             const { data, error } = await supabase
                 .from('stock_movements')
-                .insert({
-                    product_id: input.productId,
-                    movement_type: input.type,
-                    quantity: input.quantity,
-                    reason: input.reason || null
-                } as any)
+                .insert(movementData)
                 .select()
                 .single();
 

@@ -18,12 +18,17 @@ CREATE TABLE IF NOT EXISTS public.product_sections (
 CREATE INDEX IF NOT EXISTS idx_product_sections_product ON public.product_sections(product_id);
 CREATE INDEX IF NOT EXISTS idx_product_sections_section ON public.product_sections(section_id);
 
--- 3. Migrate existing data from default_producing_section_id
-INSERT INTO public.product_sections (product_id, section_id, is_primary)
-SELECT id, default_producing_section_id, true
-FROM public.products
-WHERE default_producing_section_id IS NOT NULL
-ON CONFLICT (product_id, section_id) DO NOTHING;
+-- 3. Migrate existing data from default_producing_section_id (only if column exists)
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'products' AND column_name = 'default_producing_section_id') THEN
+        INSERT INTO public.product_sections (product_id, section_id, is_primary)
+        SELECT id, default_producing_section_id, true
+        FROM public.products
+        WHERE default_producing_section_id IS NOT NULL
+        ON CONFLICT (product_id, section_id) DO NOTHING;
+    END IF;
+END $$;
 
 -- 4. Disable RLS for now (same as sections table)
 ALTER TABLE public.product_sections DISABLE ROW LEVEL SECURITY;
@@ -49,6 +54,7 @@ LEFT JOIN public.sections s ON ps.section_id = s.id
 GROUP BY p.id;
 
 -- 6. Update deduct_stock_on_sale to use primary section from product_sections
+DROP FUNCTION IF EXISTS deduct_stock_on_sale() CASCADE;
 CREATE OR REPLACE FUNCTION deduct_stock_on_sale() RETURNS TRIGGER LANGUAGE plpgsql AS $$
 DECLARE
     v_producing_section_id UUID;
@@ -59,13 +65,6 @@ BEGIN
     WHERE product_id = NEW.product_id
     ORDER BY is_primary DESC, created_at ASC
     LIMIT 1;
-
-    -- Fallback to default_producing_section_id if no product_sections entry
-    IF v_producing_section_id IS NULL THEN
-        SELECT default_producing_section_id INTO v_producing_section_id
-        FROM public.products
-        WHERE id = NEW.product_id;
-    END IF;
 
     -- If there is a producing section, deduct stock/record movement
     IF v_producing_section_id IS NOT NULL THEN

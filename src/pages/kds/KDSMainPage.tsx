@@ -56,7 +56,8 @@ const STATION_CONFIG: Record<string, { name: string; icon: React.ReactNode; colo
 // Notification sound
 const playNotificationSound = () => {
     try {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+        const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+        const audioContext = new AudioContextClass()
         const oscillator = audioContext.createOscillator()
         const gainNode = audioContext.createGain()
 
@@ -226,7 +227,7 @@ export default function KDSMainPage() {
     // Handle item status updates
     const handleStartPreparing = async (orderId: string, itemIds: string[]) => {
         try {
-            await (supabase as any)
+            await supabase
                 .from('order_items')
                 .update({ item_status: 'preparing' })
                 .in('id', itemIds)
@@ -238,7 +239,7 @@ export default function KDSMainPage() {
                     itemIds.includes(item.id) || item.item_status !== 'new'
                 )
                 if (allPreparing) {
-                    await (supabase as any)
+                    await supabase
                         .from('orders')
                         .update({ status: 'preparing' })
                         .eq('id', orderId)
@@ -253,7 +254,7 @@ export default function KDSMainPage() {
 
     const handleMarkReady = async (_orderId: string, itemIds: string[]) => {
         try {
-            await (supabase as any)
+            await supabase
                 .from('order_items')
                 .update({
                     item_status: 'ready',
@@ -269,7 +270,7 @@ export default function KDSMainPage() {
 
     const handleMarkServed = async (orderId: string, itemIds: string[]) => {
         try {
-            await (supabase as any)
+            await supabase
                 .from('order_items')
                 .update({
                     item_status: 'served',
@@ -284,7 +285,7 @@ export default function KDSMainPage() {
                     itemIds.includes(item.id) || item.item_status === 'served'
                 )
                 if (allServed) {
-                    await (supabase as any)
+                    await supabase
                         .from('orders')
                         .update({ status: 'served' })
                         .eq('id', orderId)

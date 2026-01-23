@@ -116,7 +116,7 @@ const SettingsPage = () => {
     const updateCategoryStation = async (categoryId: string, newStation: string) => {
         setSavingCategory(categoryId);
         try {
-            const { error } = await (supabase as any)
+            const { error } = await supabase
                 .from('categories')
                 .update({ dispatch_station: newStation })
                 .eq('id', categoryId);

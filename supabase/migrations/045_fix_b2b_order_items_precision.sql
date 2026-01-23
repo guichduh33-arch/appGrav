@@ -63,9 +63,21 @@ BEGIN
     END IF;
 END $$;
 
--- Re-add the generated column with proper precision
-ALTER TABLE public.b2b_order_items
-ADD COLUMN quantity_remaining NUMERIC(15,2) GENERATED ALWAYS AS (quantity - quantity_delivered) STORED;
+-- Re-add the generated column with proper precision (only if quantity_delivered exists)
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = 'b2b_order_items' AND column_name = 'quantity_delivered'
+    ) AND NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = 'b2b_order_items' AND column_name = 'quantity_remaining'
+    ) THEN
+        ALTER TABLE public.b2b_order_items
+        ADD COLUMN quantity_remaining NUMERIC(15,2) GENERATED ALWAYS AS (quantity - quantity_delivered) STORED;
+        RAISE NOTICE 'Added quantity_remaining generated column';
+    END IF;
+END $$;
 
 -- Also fix b2b_orders columns if needed
 DO $$

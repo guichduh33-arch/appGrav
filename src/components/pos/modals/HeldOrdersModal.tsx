@@ -78,7 +78,7 @@ export default function HeldOrdersModal({ onClose, onRestore }: HeldOrdersModalP
                                             <div key={idx} className="held-order-item">
                                                 <span className="held-order-item__qty">{item.quantity}×</span>
                                                 <span className="held-order-item__name">
-                                                    {item.product.name}
+                                                    {item.type === 'combo' ? item.combo?.name : item.product?.name}
                                                 </span>
                                             </div>
                                         ))}

@@ -2,6 +2,8 @@
 // CRUD operations for users with permission checks
 // POST /auth-user-management { action: 'create' | 'update' | 'delete' | 'toggle_active', ... }
 
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders, handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
@@ -72,9 +74,9 @@ serve(async (req: Request) => {
 
     // Check if requesting user has permission
     const requiredPermission = body.action === 'create' ? 'users.create' :
-                               body.action === 'update' ? 'users.update' :
-                               body.action === 'delete' ? 'users.delete' :
-                               'users.update';
+      body.action === 'update' ? 'users.update' :
+        body.action === 'delete' ? 'users.delete' :
+          'users.update';
 
     const { data: hasPermission } = await supabase.rpc('user_has_permission', {
       p_user_id: requestingUserId,

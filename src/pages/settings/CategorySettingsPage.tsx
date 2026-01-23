@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Save, RotateCcw, AlertCircle, CheckCircle } from 'lucide-react';
+import { Save, RotateCcw, AlertCircle } from 'lucide-react';
 import { useSettingsByCategory, useUpdateSetting, useResetSetting } from '../../hooks/settings';
 import { useSettingsStore } from '../../stores/settingsStore';
 import SettingField from '../../components/settings/SettingField';
-import type { Setting } from '../../types/settings';
 import toast from 'react-hot-toast';
 
 const CategorySettingsPage = () => {
   const location = useLocation();
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
 
   // Extract category from URL path (e.g., /settings/company -> company)
   // Default to 'company' when at /settings root

@@ -229,6 +229,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_customer_categories_updated_at ON public.customer_categories;
 CREATE TRIGGER trigger_update_customer_categories_updated_at
     BEFORE UPDATE ON public.customer_categories
     FOR EACH ROW
@@ -242,6 +243,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_customer_category_prices_updated_at ON public.customer_category_prices;
 CREATE TRIGGER trigger_update_customer_category_prices_updated_at
     BEFORE UPDATE ON public.customer_category_prices
     FOR EACH ROW
@@ -255,6 +257,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_loyalty_tiers_updated_at ON public.loyalty_tiers;
 CREATE TRIGGER trigger_update_loyalty_tiers_updated_at
     BEFORE UPDATE ON public.loyalty_tiers
     FOR EACH ROW
@@ -268,6 +271,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_loyalty_rewards_updated_at ON public.loyalty_rewards;
 CREATE TRIGGER trigger_update_loyalty_rewards_updated_at
     BEFORE UPDATE ON public.loyalty_rewards
     FOR EACH ROW
@@ -301,6 +305,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_generate_customer_qr_code ON public.customers;
 CREATE TRIGGER trigger_generate_customer_qr_code
     BEFORE INSERT ON public.customers
     FOR EACH ROW
@@ -334,6 +339,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_generate_membership_number ON public.customers;
 CREATE TRIGGER trigger_generate_membership_number
     BEFORE INSERT ON public.customers
     FOR EACH ROW
@@ -363,6 +369,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_customer_loyalty_tier ON public.customers;
 CREATE TRIGGER trigger_update_customer_loyalty_tier
     BEFORE UPDATE OF lifetime_points ON public.customers
     FOR EACH ROW
@@ -599,19 +606,31 @@ ALTER TABLE public.loyalty_rewards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.loyalty_redemptions ENABLE ROW LEVEL SECURITY;
 
 -- Policies for authenticated
+DROP POLICY IF EXISTS "Allow authenticated to manage customer_categories" ON public.customer_categories;
 CREATE POLICY "Allow authenticated to manage customer_categories" ON public.customer_categories FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow authenticated to manage customer_category_prices" ON public.customer_category_prices;
 CREATE POLICY "Allow authenticated to manage customer_category_prices" ON public.customer_category_prices FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow authenticated to manage loyalty_transactions" ON public.loyalty_transactions;
 CREATE POLICY "Allow authenticated to manage loyalty_transactions" ON public.loyalty_transactions FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow authenticated to manage loyalty_tiers" ON public.loyalty_tiers;
 CREATE POLICY "Allow authenticated to manage loyalty_tiers" ON public.loyalty_tiers FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow authenticated to manage loyalty_rewards" ON public.loyalty_rewards;
 CREATE POLICY "Allow authenticated to manage loyalty_rewards" ON public.loyalty_rewards FOR ALL TO authenticated USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow authenticated to manage loyalty_redemptions" ON public.loyalty_redemptions;
 CREATE POLICY "Allow authenticated to manage loyalty_redemptions" ON public.loyalty_redemptions FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 -- Policies for anon (development)
+DROP POLICY IF EXISTS "Allow anon to manage customer_categories" ON public.customer_categories;
 CREATE POLICY "Allow anon to manage customer_categories" ON public.customer_categories FOR ALL TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow anon to manage customer_category_prices" ON public.customer_category_prices;
 CREATE POLICY "Allow anon to manage customer_category_prices" ON public.customer_category_prices FOR ALL TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow anon to manage loyalty_transactions" ON public.loyalty_transactions;
 CREATE POLICY "Allow anon to manage loyalty_transactions" ON public.loyalty_transactions FOR ALL TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow anon to manage loyalty_tiers" ON public.loyalty_tiers;
 CREATE POLICY "Allow anon to manage loyalty_tiers" ON public.loyalty_tiers FOR ALL TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow anon to manage loyalty_rewards" ON public.loyalty_rewards;
 CREATE POLICY "Allow anon to manage loyalty_rewards" ON public.loyalty_rewards FOR ALL TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow anon to manage loyalty_redemptions" ON public.loyalty_redemptions;
 CREATE POLICY "Allow anon to manage loyalty_redemptions" ON public.loyalty_redemptions FOR ALL TO anon USING (true) WITH CHECK (true);
 
 -- =============================================

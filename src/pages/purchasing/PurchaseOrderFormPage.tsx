@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Plus, Trash2, Save, Send, Percent, DollarSign } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, Save, Send, Percent } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import './PurchaseOrderFormPage.css'
 
@@ -101,7 +101,7 @@ export default function PurchaseOrderFormPage() {
             if (data && data.length > 0) {
                 // Check if product_type field exists
                 if ('product_type' in data[0]) {
-                    data = data.filter(p => p.product_type === 'raw_material')
+                    data = data.filter((p: any) => p.product_type === 'raw_material')
                     console.log('Raw materials loaded (filtered):', data?.length || 0)
                 } else {
                     console.log('All products loaded (product_type not found):', data?.length || 0)
@@ -121,7 +121,7 @@ export default function PurchaseOrderFormPage() {
             const { data: po, error: poError } = await supabase
                 .from('purchase_orders')
                 .select('*')
-                .eq('id', id)
+                .eq('id', id!)
                 .single()
 
             if (poError) throw poError
@@ -129,7 +129,7 @@ export default function PurchaseOrderFormPage() {
             const { data: poItems, error: itemsError } = await supabase
                 .from('purchase_order_items')
                 .select('*')
-                .eq('purchase_order_id', id)
+                .eq('purchase_order_id', id!)
 
             if (itemsError) throw itemsError
 
@@ -148,12 +148,12 @@ export default function PurchaseOrderFormPage() {
                     product_id: item.product_id,
                     product_name: item.product_name,
                     description: item.description || '',
-                    quantity: parseFloat(item.quantity),
-                    unit_price: parseFloat(item.unit_price),
-                    discount_amount: parseFloat(item.discount_amount),
+                    quantity: parseFloat(String(item.quantity)),
+                    unit_price: parseFloat(String(item.unit_price)),
+                    discount_amount: parseFloat(String(item.discount_amount)),
                     discount_percentage: item.discount_percentage,
-                    tax_rate: parseFloat(item.tax_rate),
-                    line_total: parseFloat(item.line_total)
+                    tax_rate: parseFloat(String(item.tax_rate)),
+                    line_total: parseFloat(String(item.line_total))
                 })))
             }
         } catch (error) {
@@ -269,7 +269,7 @@ export default function PurchaseOrderFormPage() {
                         notes: formData.notes,
                         status
                     })
-                    .eq('id', id)
+                    .eq('id', id!)
 
                 if (poError) throw poError
 
@@ -277,11 +277,11 @@ export default function PurchaseOrderFormPage() {
                 await supabase
                     .from('purchase_order_items')
                     .delete()
-                    .eq('purchase_order_id', id)
+                    .eq('purchase_order_id', id!)
 
                 // Insert new items
                 const itemsToInsert = items.map(item => ({
-                    purchase_order_id: id,
+                    purchase_order_id: id!,
                     product_id: item.product_id,
                     product_name: item.product_name,
                     description: item.description,

@@ -1,9 +1,6 @@
 import { supabase } from '../lib/supabase'
 import {
-    Promotion,
-    PromotionProduct,
-    PromotionFreeProduct,
-    Product
+    Promotion
 } from '../types/database'
 
 export interface CartItem {
@@ -35,8 +32,9 @@ export interface AppliedPromotion {
  */
 export function isPromotionValid(
     promotion: Promotion,
-    customerId?: string | null
+    _customerId?: string | null
 ): { valid: boolean; reason?: string } {
+    void _customerId; // Parameter reserved for future use
     // Check if active
     if (!promotion.is_active) {
         return { valid: false, reason: 'Promotion inactive' }
@@ -152,8 +150,9 @@ export async function getApplicablePromotions(
 export async function calculatePromotionDiscount(
     promotion: Promotion,
     cartItems: CartItem[],
-    subtotal: number
+    _subtotal: number
 ): Promise<PromotionResult | null> {
+    void _subtotal; // Reserved for future use
     try {
         // Get promotion products
         const { data: promotionProducts } = await supabase
@@ -335,10 +334,11 @@ export async function recordPromotionUsage(
  */
 export async function validatePromotionCode(
     code: string,
-    cartItems: CartItem[],
+    _cartItems: CartItem[],
     subtotal: number,
     customerId?: string | null
 ): Promise<{ valid: boolean; promotion?: Promotion; reason?: string }> {
+    void _cartItems; // Reserved for future use
     try {
         const { data: promotion, error } = await supabase
             .from('promotions')

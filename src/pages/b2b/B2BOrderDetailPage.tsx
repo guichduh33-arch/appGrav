@@ -145,7 +145,7 @@ export default function B2BOrderDetailPage() {
                     *,
                     customer:customers(id, name, company_name, phone, email, address)
                 `)
-                .eq('id', id)
+                .eq('id', id!)
                 .single()
 
             if (error) throw error
@@ -162,7 +162,7 @@ export default function B2BOrderDetailPage() {
             const { data, error } = await supabase
                 .from('b2b_order_items')
                 .select('*')
-                .eq('order_id', id)
+                .eq('order_id', id!)
                 .order('created_at')
 
             if (error) throw error
@@ -177,7 +177,7 @@ export default function B2BOrderDetailPage() {
             const { data, error } = await supabase
                 .from('b2b_payments')
                 .select('*')
-                .eq('order_id', id)
+                .eq('order_id', id!)
                 .order('payment_date', { ascending: false })
 
             if (error) throw error
@@ -192,7 +192,7 @@ export default function B2BOrderDetailPage() {
             const { data, error } = await supabase
                 .from('b2b_deliveries')
                 .select('*')
-                .eq('order_id', id)
+                .eq('order_id', id!)
                 .order('scheduled_date', { ascending: false })
 
             if (error) throw error
@@ -207,7 +207,7 @@ export default function B2BOrderDetailPage() {
             const { data, error } = await supabase
                 .from('b2b_order_history')
                 .select('*')
-                .eq('order_id', id)
+                .eq('order_id', id!)
                 .order('created_at', { ascending: false })
 
             if (error) throw error
@@ -247,14 +247,14 @@ export default function B2BOrderDetailPage() {
         try {
             const { error } = await supabase
                 .from('b2b_payments')
-                .insert([{
+                .insert({
                     order_id: order.id,
                     customer_id: order.customer_id,
                     amount: paymentForm.amount,
                     payment_method: paymentForm.payment_method,
                     reference_number: paymentForm.reference_number || null,
                     notes: paymentForm.notes || null
-                }])
+                })
 
             if (error) throw error
 

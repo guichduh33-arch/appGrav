@@ -1,8 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
-    Package, Coffee, Croissant, Search, Plus, Filter,
+    Package, Coffee, Croissant, Search, Plus,
     Eye, Edit, Tag, DollarSign, LayoutGrid, List
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
@@ -34,7 +33,6 @@ type ViewMode = 'grid' | 'list'
 type TabType = 'all' | 'finished' | 'semi_finished' | 'raw_material'
 
 export default function ProductsPage() {
-    const { t } = useTranslation()
     const navigate = useNavigate()
     const [products, setProducts] = useState<Product[]>([])
     const [categories, setCategories] = useState<Category[]>([])

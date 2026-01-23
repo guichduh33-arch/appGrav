@@ -8,16 +8,12 @@ import {
   CheckCircle2,
   Shield,
   Search,
-  Filter,
-  MoreVertical,
   Power,
-  Key,
   XCircle,
   RefreshCw,
   Clock,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
@@ -51,7 +47,8 @@ interface UserWithRoles {
 const UsersPage = () => {
   const { t, i18n } = useTranslation();
   const { user: currentUser } = useAuthStore();
-  const { hasPermission, isAdmin } = usePermissions();
+  const { isAdmin } = usePermissions();
+  void isAdmin; // Suppress unused variable warning
 
   const [users, setUsers] = useState<UserWithRoles[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -562,7 +559,7 @@ const UsersPage = () => {
                 {t('common.cancel') || 'Annuler'}
               </Button>
               <Button
-                variant="danger"
+                variant="primary"
                 onClick={() => handleDelete(showDeleteConfirm)}
               >
                 {t('common.delete') || 'Supprimer'}
