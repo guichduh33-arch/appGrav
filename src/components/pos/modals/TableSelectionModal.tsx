@@ -38,7 +38,7 @@ export default function TableSelectionModal({ onSelectTable, onClose: _onClose }
 
             if (error) throw error
             if (data) {
-                setTables(data)
+                setTables(data as Table[])
             }
         } catch (error) {
             console.error('Error fetching tables:', error)

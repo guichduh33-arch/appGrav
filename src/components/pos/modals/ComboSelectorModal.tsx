@@ -69,11 +69,11 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
 
             if (groupsError) throw groupsError
 
-            const groups = groupsData || []
+            const groups = (groupsData || []) as ProductComboGroup[]
 
             // Fetch items for each group
             const groupsWithItems = await Promise.all(
-                groups.map(async (group) => {
+                groups.map(async (group: ProductComboGroup) => {
                     const { data: itemsData } = await supabase
                         .from('product_combo_group_items')
                         .select(`
@@ -85,13 +85,13 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
 
                     return {
                         ...group,
-                        items: itemsData || []
+                        items: (itemsData || []) as GroupItemWithProduct[]
                     }
                 })
             )
 
             const comboWithGroups: ComboWithGroups = {
-                ...comboData,
+                ...(comboData as ProductCombo),
                 groups: groupsWithItems
             }
 
@@ -99,8 +99,8 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
 
             // Initialize selections with default items
             const initialSelections = new Map<string, Set<string>>()
-            groupsWithItems.forEach(group => {
-                const defaultItem = group.items.find(item => item.is_default)
+            groupsWithItems.forEach((group: ComboGroupWithItems) => {
+                const defaultItem = group.items.find((item: GroupItemWithProduct) => item.is_default)
                 if (defaultItem && group.is_required) {
                     initialSelections.set(group.id, new Set([defaultItem.id]))
                 }
@@ -128,8 +128,8 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                 groupSelections.delete(itemId)
             } else {
                 // Check max selections
-                if (groupSelections.size >= group.max_selections) {
-                    setError(`Maximum ${group.max_selections} sélection(s) pour ${group.group_name}`)
+                if (groupSelections.size >= (group.max_selections ?? 1)) {
+                    setError(`Maximum ${group.max_selections ?? 1} sélection(s) pour ${group.group_name}`)
                     setTimeout(() => setError(''), 3000)
                     return
                 }
@@ -158,7 +158,7 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                 groupSelections.forEach(itemId => {
                     const item = group.items.find(i => i.id === itemId)
                     if (item) {
-                        total += item.price_adjustment
+                        total += item.price_adjustment ?? 0
                     }
                 })
             }
@@ -178,11 +178,11 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
             }
 
             if (group.group_type === 'multiple') {
-                if (groupSelections.size < group.min_selections) {
-                    return `Minimum ${group.min_selections} sélection(s) pour ${group.group_name}`
+                if (groupSelections.size < (group.min_selections ?? 0)) {
+                    return `Minimum ${group.min_selections ?? 0} sélection(s) pour ${group.group_name}`
                 }
-                if (groupSelections.size > group.max_selections) {
-                    return `Maximum ${group.max_selections} sélection(s) pour ${group.group_name}`
+                if (groupSelections.size > (group.max_selections ?? 1)) {
+                    return `Maximum ${group.max_selections ?? 1} sélection(s) pour ${group.group_name}`
                 }
             }
         }
@@ -213,7 +213,7 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                             item_id: item.id,
                             product_id: item.product_id,
                             product_name: item.product.name,
-                            price_adjustment: item.price_adjustment
+                            price_adjustment: item.price_adjustment ?? 0
                         })
                     }
                 })
@@ -285,8 +285,6 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                 {/* Groups */}
                 <div className="combo-modal-body">
                     {combo.groups.map((group) => {
-                        const groupSelections = selections.get(group.id) || new Set()
-
                         return (
                             <div key={group.id} className="combo-group">
                                 <div className="combo-group-header">
@@ -322,10 +320,10 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                                                         <span className="combo-item-name">
                                                             {item.product.name}
                                                         </span>
-                                                        {item.price_adjustment !== 0 && (
-                                                            <span className={`combo-item-price ${item.price_adjustment > 0 ? 'extra' : 'discount'}`}>
-                                                                {item.price_adjustment > 0 ? '+' : ''}
-                                                                {formatCurrency(item.price_adjustment)}
+                                                        {(item.price_adjustment ?? 0) !== 0 && (
+                                                            <span className={`combo-item-price ${(item.price_adjustment ?? 0) > 0 ? 'extra' : 'discount'}`}>
+                                                                {(item.price_adjustment ?? 0) > 0 ? '+' : ''}
+                                                                {formatCurrency(item.price_adjustment ?? 0)}
                                                             </span>
                                                         )}
                                                     </div>

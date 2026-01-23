@@ -228,7 +228,7 @@ export const useSettingsStore = create<SettingsState>()(
           .rpc('get_settings_by_category', { p_category_code: categoryCode });
 
         if (error) throw error;
-        return data || [];
+        return (data || []) as Setting[];
       },
 
       loadTaxRates: async () => {
@@ -287,7 +287,7 @@ export const useSettingsStore = create<SettingsState>()(
 
         return Object.values(get().settings)
           .filter((s) => s.category_id === category.id)
-          .sort((a, b) => a.sort_order - b.sort_order);
+          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
       },
 
       getDefaultTaxRate: () => {
@@ -315,7 +315,7 @@ export const useSettingsStore = create<SettingsState>()(
           const { error } = await supabase.rpc('update_setting', {
             p_key: key,
             p_value: JSON.stringify(value),
-            p_reason: reason || null,
+            p_reason: reason ?? null,
           });
 
           if (error) throw error;
@@ -325,7 +325,7 @@ export const useSettingsStore = create<SettingsState>()(
           if (settings[key]) {
             settings[key] = {
               ...settings[key],
-              value,
+              value: value as Setting['value'],
               updated_at: new Date().toISOString(),
             };
             set({ settings });
@@ -361,7 +361,7 @@ export const useSettingsStore = create<SettingsState>()(
       updateSettings: async (updates: Record<string, unknown>) => {
         try {
           const { data, error } = await supabase.rpc('update_settings_bulk', {
-            p_settings: updates,
+            p_settings: updates as Record<string, string>,
           });
 
           if (error) throw error;

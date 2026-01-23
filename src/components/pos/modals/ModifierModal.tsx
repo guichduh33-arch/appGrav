@@ -7,7 +7,7 @@ import { formatPrice } from '../../../utils/helpers'
 import './ModifierModal.css'
 
 interface ModifierModalProps {
-    product: Product
+    product: Product & { category?: { name: string } | null }
     onClose: () => void
     editItem?: CartItem
 }
@@ -98,7 +98,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
     const { addItem, updateItem } = useCartStore()
 
     // Get modifiers for this product's category
-    const categoryName = (product as any).category?.name || 'default'
+    const categoryName = (product.category as { name?: string } | null)?.name || 'default'
     const modifierGroups = MODIFIER_CONFIG[categoryName] || []
 
     // Initialize selections

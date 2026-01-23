@@ -146,7 +146,7 @@ export function useShift() {
                 return []
             }
 
-            return data as PosSession[]
+            return data as unknown as PosSession[]
         }
     })
 
@@ -195,10 +195,10 @@ export function useShift() {
                     console.error('Error fetching transactions:', fallbackError)
                     return []
                 }
-                return fallbackData as ShiftTransaction[]
+                return fallbackData as unknown as ShiftTransaction[]
             }
 
-            return data as ShiftTransaction[]
+            return data as unknown as ShiftTransaction[]
         },
         enabled: !!currentSession?.id
     })
@@ -233,11 +233,11 @@ export function useShift() {
                 throw new Error(`${userName} a déjà un shift ouvert`)
             }
 
-            const { data, error } = await (supabase.rpc as any)('open_shift', {
+            const { data, error } = await supabase.rpc('open_shift', {
                 p_user_id: userId,
                 p_opening_cash: openingCash,
                 p_terminal_id: terminalId,
-                p_notes: notes || null
+                p_notes: notes ?? undefined
             })
 
             if (error) throw error
@@ -245,7 +245,7 @@ export function useShift() {
             // Set the active shift user
             setActiveShiftUserId(userId)
 
-            return { ...data, userName }
+            return { ...(data as object), userName }
         },
         onSuccess: (data) => {
             toast.success(`Shift ouvert pour ${data.userName}`)
@@ -267,17 +267,17 @@ export function useShift() {
             closedBy: string
             notes?: string
         }) => {
-            const { data, error } = await (supabase.rpc as any)('close_shift', {
+            const { data, error } = await supabase.rpc('close_shift', {
                 p_session_id: sessionId,
                 p_actual_cash: actualCash,
                 p_actual_qris: actualQris,
                 p_actual_edc: actualEdc,
                 p_closed_by: closedBy,
-                p_notes: notes || null
+                p_notes: notes ?? undefined
             })
 
             if (error) throw error
-            return data as CloseShiftResult
+            return data as unknown as CloseShiftResult
         },
         onSuccess: (data) => {
             toast.success('Shift fermé avec succès')
@@ -312,7 +312,7 @@ export function useShift() {
                 return []
             }
 
-            return data as PosSession[]
+            return data as unknown as PosSession[]
         }
     })
 

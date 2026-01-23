@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/authStore'
 import { useCartStore } from '../stores/cartStore'
+import type { Insertable } from '../types/database'
 
 export function useOrders() {
     const queryClient = useQueryClient()
@@ -36,7 +37,7 @@ export function useOrders() {
 
             const { data: order, error: orderError } = await supabase
                 .from('orders')
-                .insert(orderData as any)
+                .insert(orderData as Insertable<'orders'>)
                 .select()
                 .single()
 
@@ -47,23 +48,23 @@ export function useOrders() {
 
             // 2. Create Order Items
             const itemsData = items.map(item => ({
-                order_id: (order as any).id,
-                product_id: item.product.id,
-                product_name: item.product.name,
-                product_sku: item.product.sku,
+                order_id: order.id,
+                product_id: item.product?.id || item.combo?.id,
+                product_name: item.product?.name || item.combo?.name || 'Unknown',
+                product_sku: item.product?.sku || `COMBO-${item.combo?.id?.slice(0, 8) || 'UNKNOWN'}`,
                 quantity: item.quantity,
                 unit_price: item.unitPrice,
                 total_price: item.totalPrice,
-                modifiers: item.modifiers as any,
+                modifiers: item.modifiers,
                 modifiers_total: item.modifiersTotal,
                 notes: item.notes,
-                dispatch_station: (item.product as any).category?.dispatch_station || 'none',
-                item_status: 'new'
-            }))
+                dispatch_station: (item.product as { category?: { dispatch_station?: string } })?.category?.dispatch_station || 'none',
+                item_status: 'new' as const
+            })) as unknown as Insertable<'order_items'>[]
 
             const { error: itemsError } = await supabase
                 .from('order_items')
-                .insert(itemsData as any)
+                .insert(itemsData)
 
             if (itemsError) {
                 console.error('Supabase Items Error:', itemsError)

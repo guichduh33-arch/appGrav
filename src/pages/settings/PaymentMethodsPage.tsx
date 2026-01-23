@@ -73,7 +73,7 @@ const getPaymentIcon = (iconName: string) => {
 };
 
 const PaymentMethodsPage = () => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const { data: methods, isLoading } = usePaymentMethods();
   const createMethod = useCreatePaymentMethod();
   const updateMethod = useUpdatePaymentMethod();
@@ -105,12 +105,12 @@ const PaymentMethodsPage = () => {
       name_fr: method.name_fr,
       name_en: method.name_en,
       name_id: method.name_id,
-      payment_type: method.payment_type,
-      icon: method.icon,
-      is_active: method.is_active,
-      is_default: method.is_default,
-      requires_reference: method.requires_reference,
-      sort_order: method.sort_order,
+      payment_type: method.payment_type as PaymentType,
+      icon: method.icon ?? '',
+      is_active: method.is_active ?? true,
+      is_default: method.is_default ?? false,
+      requires_reference: method.requires_reference ?? false,
+      sort_order: method.sort_order ?? 0,
     });
     setShowModal(true);
   };
@@ -130,7 +130,7 @@ const PaymentMethodsPage = () => {
         });
         toast.success('Mode de paiement mis à jour');
       } else {
-        await createMethod.mutateAsync(formData as Omit<PaymentMethod, 'id' | 'created_at' | 'updated_at' | 'settings'>);
+        await createMethod.mutateAsync(formData);
         toast.success('Mode de paiement créé');
       }
       setShowModal(false);
@@ -194,12 +194,12 @@ const PaymentMethodsPage = () => {
   };
 
   // Group methods by type
-  const groupedMethods = methods?.reduce((acc, method) => {
+  const groupedMethods = methods?.reduce((acc: Record<string, PaymentMethod[]>, method: PaymentMethod) => {
     const type = method.payment_type;
     if (!acc[type]) acc[type] = [];
     acc[type].push(method);
     return acc;
-  }, {} as Record<PaymentType, PaymentMethod[]>) || {};
+  }, {} as Record<string, PaymentMethod[]>) || {};
 
   return (
     <>
@@ -238,7 +238,7 @@ const PaymentMethodsPage = () => {
           ) : (
             <div className="payment-methods-grid">
               {PAYMENT_TYPES.map((type) => {
-                const typeMethods = groupedMethods[type.value] || [];
+                const typeMethods = groupedMethods?.[type.value] || [];
                 if (typeMethods.length === 0) return null;
 
                 return (
@@ -248,7 +248,7 @@ const PaymentMethodsPage = () => {
                       {type.label}
                     </h3>
                     <div className="payment-methods-list">
-                      {typeMethods.map((method) => (
+                      {typeMethods.map((method: PaymentMethod) => (
                         <div
                           key={method.id}
                           className={`payment-method-item ${!method.is_active ? 'is-inactive' : ''}`}
@@ -257,7 +257,7 @@ const PaymentMethodsPage = () => {
                             <GripVertical size={16} />
                           </div>
                           <div className="payment-method-item__icon">
-                            {getPaymentIcon(method.icon)}
+                            {getPaymentIcon(method.icon ?? '')}
                           </div>
                           <div className="payment-method-item__info">
                             <div className="payment-method-item__name">
@@ -296,7 +296,7 @@ const PaymentMethodsPage = () => {
                               className="btn-icon btn-icon--danger"
                               onClick={() => handleDelete(method)}
                               title="Supprimer"
-                              disabled={method.is_default}
+                              disabled={method.is_default ?? false}
                             >
                               <Trash2 size={14} />
                             </button>

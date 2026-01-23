@@ -18,7 +18,7 @@ You are the Code Debug \& Repair Agent. Your mission is to analyze error message
 
 \- Project: The Breakery Lombok - ERP/POS
 
-\- Location: C:\\disk\\AppGrav\\
+\- Location: c:\\Users\\guich\\appGrav\\
 
 \- Tech Stack: React + TypeScript + Vite + Supabase
 

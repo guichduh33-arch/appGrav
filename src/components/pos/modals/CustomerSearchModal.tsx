@@ -96,7 +96,7 @@ export default function CustomerSearchModal({
                 .order('last_visit_at', { ascending: false, nullsFirst: false })
                 .limit(10)
 
-            if (data) setCustomers(data)
+            if (data) setCustomers(data as unknown as Customer[])
         } catch (error) {
             console.error('Error fetching customers:', error)
         } finally {
@@ -117,7 +117,7 @@ export default function CustomerSearchModal({
                 .or(`name.ilike.%${term}%,phone.ilike.%${term}%,email.ilike.%${term}%,company_name.ilike.%${term}%,membership_number.ilike.%${term}%`)
                 .limit(20)
 
-            if (data) setCustomers(data)
+            if (data) setCustomers(data as unknown as Customer[])
         } catch (error) {
             console.error('Error searching customers:', error)
         } finally {
@@ -149,7 +149,7 @@ export default function CustomerSearchModal({
             }
 
             // Found - select immediately
-            onSelectCustomer(data)
+            onSelectCustomer(data as unknown as Customer)
             onClose()
         } catch (error) {
             console.error('Error scanning QR:', error)

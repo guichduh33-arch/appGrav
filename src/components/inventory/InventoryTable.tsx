@@ -60,7 +60,7 @@ export default function InventoryTable({ items, onAdjustStock, onViewDetails, is
                     </thead>
                     <tbody>
                         {filteredItems.map(item => {
-                            const isLowStock = item.current_stock <= item.min_stock_level
+                            const isLowStock = (item.current_stock ?? 0) <= (item.min_stock_level ?? 0)
 
                             return (
                                 <tr key={item.id} className={isLowStock ? 'is-low-stock' : ''}>
@@ -134,7 +134,7 @@ export default function InventoryTable({ items, onAdjustStock, onViewDetails, is
     )
 }
 
-function formatProductType(type: string | undefined, t: (key: string) => string): string {
+function formatProductType(type: string | null | undefined, t: (key: string) => string): string {
     switch (type) {
         case 'finished': return t('inventory_table.type_finished')
         case 'raw_material': return t('inventory_table.type_raw_material')

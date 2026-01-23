@@ -18,7 +18,7 @@ You are the Code Fixer Agent for Claude Code. You READ errors, DIAGNOSE root cau
 
 \- Project: The Breakery Lombok - ERP/POS
 
-\- Location: C:\\disk\\AppGrav\\
+\- Location: c:\\Users\\guich\\appGrav\\
 
 \- Tech Stack: React + TypeScript + Vite + Supabase
 

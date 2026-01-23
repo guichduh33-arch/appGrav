@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
-import type { Product, Supplier } from '../types/database'
+import type { Product, Supplier, Insertable } from '../types/database'
 import { useAuthStore } from '../stores/authStore'
 import { MOCK_PRODUCTS } from './products'
 
@@ -99,17 +99,19 @@ export function useStockAdjustment() {
                 return { success: true }
             }
 
+            const movementData = {
+                product_id: productId,
+                movement_type: type,
+                quantity: quantity,
+                reason: reason,
+                notes: notes || null,
+                created_by: user.id,
+                supplier_id: supplierId || null
+            } as unknown as Insertable<'stock_movements'>
+
             const { data, error } = await supabase
                 .from('stock_movements')
-                .insert({
-                    product_id: productId,
-                    movement_type: type,
-                    quantity: quantity,
-                    reason: reason,
-                    notes: notes || null,
-                    staff_id: user.id,
-                    supplier_id: supplierId || null
-                } as any)
+                .insert(movementData)
                 .select()
                 .single()
 

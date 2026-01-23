@@ -18,7 +18,7 @@ You are the System Repair Agent. Your mission is to READ the audit report and IM
 
 \- Project: The Breakery Lombok - ERP/POS
 
-\- Location: C:\\disk\\AppGrav\\
+\- Location: c:\\Users\\guich\\appGrav\\
 
 \- Audit Report: artifacts/audit/audit-report-\*.md
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Plus, Save, Trash2, Grid, Users, Circle, Square, Minus, Home, Sun, Star } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import type { Insertable } from '../../types/database'
 import './FloorPlanEditor.css'
 
 export interface FloorPlanItem {
@@ -93,7 +94,7 @@ export default function FloorPlanEditor() {
 
             if (error) throw error
             if (data) {
-                setItems(data)
+                setItems(data as FloorPlanItem[])
             }
         } catch (error) {
             console.error('Error fetching floor plan items:', error)
@@ -140,21 +141,22 @@ export default function FloorPlanEditor() {
         }
 
         try {
+            const tableData: Insertable<'floor_plan_items'> = newTable
             const { data, error } = await supabase
                 .from('floor_plan_items')
-                .insert(newTable)
+                .insert(tableData)
                 .select()
                 .single()
 
             if (error) throw error
             if (data) {
-                setItems([...items, data])
+                setItems([...items, data as FloorPlanItem])
                 setAddMode(null)
                 setTableForm({ number: '', capacity: 2, section: 'Main', shape: 'square' })
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error adding table:', error)
-            alert('Erreur lors de l\'ajout: ' + error.message)
+            alert('Erreur lors de l\'ajout: ' + (error instanceof Error ? error.message : String(error)))
         }
     }
 
@@ -170,21 +172,22 @@ export default function FloorPlanEditor() {
         }
 
         try {
+            const decorationData: Insertable<'floor_plan_items'> = newDecoration
             const { data, error } = await supabase
                 .from('floor_plan_items')
-                .insert(newDecoration)
+                .insert(decorationData)
                 .select()
                 .single()
 
             if (error) throw error
             if (data) {
-                setItems([...items, data])
+                setItems([...items, data as FloorPlanItem])
                 setAddMode(null)
                 setDecorationForm({ decoration_type: 'plant', shape: 'square' })
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error adding decoration:', error)
-            alert('Erreur lors de l\'ajout: ' + error.message)
+            alert('Erreur lors de l\'ajout: ' + (error instanceof Error ? error.message : String(error)))
         }
     }
 

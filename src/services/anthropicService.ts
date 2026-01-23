@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-const apiKey = typeof process !== 'undefined' && process.env ? process.env.VITE_ANTHROPIC_API_KEY : (import.meta as any).env.VITE_ANTHROPIC_API_KEY;
+const apiKey = typeof process !== 'undefined' && process.env ? process.env.VITE_ANTHROPIC_API_KEY : import.meta.env.VITE_ANTHROPIC_API_KEY;
 
 const anthropic = new Anthropic({
   apiKey: apiKey,

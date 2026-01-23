@@ -28,10 +28,10 @@ export const ReportingService = {
             current_end: currentEnd.toISOString(),
             previous_start: previousStart.toISOString(),
             previous_end: previousEnd.toISOString(),
-        } as any);
+        });
 
         if (error) throw error;
-        return data || [];
+        return (data || []) as SalesComparison[];
     },
 
     /**
@@ -44,10 +44,10 @@ export const ReportingService = {
         const { data, error } = await supabase.rpc('get_reporting_dashboard_summary', {
             start_date: startDate.toISOString(),
             end_date: endDate.toISOString(),
-        } as any);
+        });
 
         if (error) throw error;
-        return data;
+        return data as unknown as DashboardSummary;
     },
 
     /**
@@ -60,7 +60,7 @@ export const ReportingService = {
             .order('total_revenue', { ascending: false });
 
         if (error) throw error;
-        return data || [];
+        return (data || []) as PaymentMethodStat[];
     },
 
     /**
@@ -189,7 +189,7 @@ export const ReportingService = {
             .order('waste_date', { ascending: false });
 
         if (error) throw error;
-        return data || [];
+        return (data || []) as StockWaste[];
     },
 
     /**
@@ -202,7 +202,7 @@ export const ReportingService = {
             .order('closed_at', { ascending: false });
 
         if (error) throw error;
-        return data || [];
+        return (data || []) as SessionDiscrepancy[];
     },
 
     /**
@@ -215,7 +215,7 @@ export const ReportingService = {
             .single();
 
         if (error) throw error;
-        return data;
+        return data as InventoryValuation;
     },
 
     /**
@@ -223,13 +223,13 @@ export const ReportingService = {
      */
     async getAuditLogs(limit = 50): Promise<AuditLogEntry[]> {
         const { data, error } = await supabase
-            .from('audit_log')
+            .from('audit_logs')
             .select('*')
             .order('created_at', { ascending: false })
             .limit(limit);
 
         if (error) throw error;
-        return data || [];
+        return (data || []) as unknown as AuditLogEntry[];
     },
 
     /**

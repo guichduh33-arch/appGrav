@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import type { Category, Product, ProductWithCategory } from '../types/database'
 
 // --- MOCK DATA FOR DEMO MODE (Matches CSV Files exactly) ---
-export const MOCK_CATEGORIES: Category[] = [
+export const MOCK_CATEGORIES = [
     {
         "id": "cat-1",
         "name": "Speciale Latte",
@@ -158,7 +158,7 @@ export const MOCK_CATEGORIES: Category[] = [
     }
 ] as Category[];
 
-export const MOCK_PRODUCTS: ProductWithCategory[] = [
+export const MOCK_PRODUCTS = [
     {
         "id": "p-0",
         "sku": "SKU-0",
@@ -2847,7 +2847,7 @@ export const MOCK_PRODUCTS: ProductWithCategory[] = [
             "is_active": true
         }
     }
-] as any[];
+];
 
 // Fetch all categories
 export function useCategories() {
@@ -2901,15 +2901,15 @@ export function useProducts(categoryId: string | null = null) {
                 console.warn('No products from Supabase, using mock')
                 // Filter mock by category if provided
                 if (categoryId) {
-                    return MOCK_PRODUCTS.filter(p => p.category_id === categoryId)
+                    return MOCK_PRODUCTS.filter(p => p.category_id === categoryId) as ProductWithCategory[]
                 }
-                return MOCK_PRODUCTS
+                return MOCK_PRODUCTS as ProductWithCategory[]
             } catch (err) {
                 console.error('Error loading products:', err)
                 if (categoryId) {
-                    return MOCK_PRODUCTS.filter(p => p.category_id === categoryId)
+                    return MOCK_PRODUCTS.filter(p => p.category_id === categoryId) as ProductWithCategory[]
                 }
-                return MOCK_PRODUCTS
+                return MOCK_PRODUCTS as ProductWithCategory[]
             }
         },
     })
@@ -2929,14 +2929,12 @@ export function useProductWithModifiers(productId: string) {
 
             if (productError || !product) throw productError || new Error('Product not found')
 
-            const p = product as any
-
             // Get modifiers (by product_id or category_id)
             const { data: modifiers, error: modifiersError } = await supabase
                 .from('product_modifiers')
                 .select('*')
                 .eq('is_active', true)
-                .or(`product_id.eq.${productId},category_id.eq.${p.category_id}`)
+                .or(`product_id.eq.${productId},category_id.eq.${product.category_id}`)
                 .order('group_sort_order')
                 .order('option_sort_order')
 
