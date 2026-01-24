@@ -122,6 +122,31 @@ export default function LoginPage() {
     }
   };
 
+  // Demo login fallback - only for when bcrypt RPC is unavailable
+  const handleDemoLogin = async (user: UserProfile) => {
+    // Try to get plaintext PIN from demo users
+    const demoUser = DEMO_USERS.find(u =>
+      u.name.toLowerCase() === user?.name?.toLowerCase() ||
+      u.id === user.id
+    );
+
+    if (!demoUser?.pin_code) {
+      setError(t('auth.errors.noPinSet') || 'Aucun code PIN défini (mode demo)');
+      return;
+    }
+
+    if (demoUser.pin_code !== pin) {
+      setError(t('auth.errors.invalidPin') || 'Code PIN incorrect');
+      return;
+    }
+
+    // Demo login successful - load basic permissions
+    const { login } = useAuthStore.getState();
+    login(user);
+    toast.success(`${t('common.welcome') || 'Bienvenue'}, ${user.display_name || user.name}! (Demo)`);
+    navigate('/pos');
+  };
+
   // Legacy login for demo mode or when Edge Functions are unavailable
   const handleLegacyLogin = async () => {
     // First check if we have PIN in current users list
@@ -132,36 +157,27 @@ export default function LoginPage() {
       return;
     }
 
-    // If user doesn't have pin_code locally, fetch it from database
-    if (!user.pin_code) {
-      const { data: userData } = await supabase
-        .from('user_profiles')
-        .select('pin_code')
-        .eq('id', selectedUser)
-        .single() as { data: { pin_code: string } | null };
+    // Use secure bcrypt verification via RPC (preferred method)
+    try {
+      const { data: isValid, error: verifyError } = await supabase.rpc('verify_user_pin', {
+        p_user_id: selectedUser,
+        p_pin: pin
+      });
 
-      if (userData?.pin_code) {
-        user = { ...user, pin_code: userData.pin_code } as UserProfile;
-      } else {
-        // Try demo users as last resort
-        const demoUser = DEMO_USERS.find(u =>
-          u.name.toLowerCase() === user?.name?.toLowerCase() ||
-          u.id === selectedUser
-        );
-        if (demoUser?.pin_code) {
-          user = { ...user, pin_code: demoUser.pin_code } as UserProfile;
-        }
+      if (verifyError) {
+        console.error('PIN verification error:', verifyError);
+        // Fall back to plaintext check for demo mode
+        await handleDemoLogin(user);
+        return;
       }
-    }
 
-    // Check PIN against pin_code field (legacy)
-    if (!user.pin_code) {
-      setError(t('auth.errors.noPinSet') || 'Aucun code PIN défini pour cet utilisateur');
-      return;
-    }
-
-    if (user.pin_code !== pin) {
-      setError(t('auth.errors.invalidPin') || 'Code PIN incorrect');
+      if (!isValid) {
+        setError(t('auth.errors.invalidPin') || 'Code PIN incorrect');
+        return;
+      }
+    } catch (rpcError) {
+      console.error('RPC error, falling back to demo:', rpcError);
+      await handleDemoLogin(user);
       return;
     }
 

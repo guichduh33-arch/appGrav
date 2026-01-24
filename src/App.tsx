@@ -58,6 +58,7 @@ import ProductCategoryPricingPage from './pages/products/ProductCategoryPricingP
 import CombosPage from './pages/products/CombosPage'
 import ComboFormPage from './pages/products/ComboFormPage'
 import PromotionsPage from './pages/products/PromotionsPage'
+import PromotionFormPage from './pages/products/PromotionFormPage'
 import StockMovementsPage from './pages/inventory/StockMovementsPage'
 import InternalTransfersPage from './pages/inventory/InternalTransfersPage'
 import TransferFormPage from './pages/inventory/TransferFormPage'
@@ -179,9 +180,9 @@ function App() {
                     <Route path="/products/combos/:id" element={<ComboFormPage />} />
                     <Route path="/products/combos/:id/edit" element={<ComboFormPage />} />
                     {/* Promotion Routes (outside layout for full page forms) */}
-                    <Route path="/products/promotions/new" element={<PromotionsPage />} />
-                    <Route path="/products/promotions/:id" element={<PromotionsPage />} />
-                    <Route path="/products/promotions/:id/edit" element={<PromotionsPage />} />
+                    <Route path="/products/promotions/new" element={<PromotionFormPage />} />
+                    <Route path="/products/promotions/:id" element={<PromotionFormPage />} />
+                    <Route path="/products/promotions/:id/edit" element={<PromotionFormPage />} />
                     {/* Product Detail Routes */}
                     <Route path="/products/:id" element={<ProductDetailPage />} />
                     <Route path="/products/:id/edit" element={<ProductDetailPage />} />
