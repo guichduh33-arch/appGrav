@@ -9,7 +9,7 @@ AppGrav is a full-stack ERP/POS system for "The Breakery," a French bakery in Lo
 ## Development Commands
 
 ```bash
-# Start development server (port 3000)
+# Start development server
 npm run dev
 
 # Build for production (TypeScript check + Vite build)
@@ -18,12 +18,20 @@ npm run build
 # Lint codebase
 npm run lint
 
-# Preview production build
-npm run preview
+# Run all tests
+npx vitest run
+
+# Run a single test file
+npx vitest run src/path/to/test.test.ts
+
+# Run tests in watch mode
+npx vitest
 
 # Test Claude API integration
 npm run test:claude
 ```
+
+**Path Alias**: Use `@/` to import from `src/` (configured in `vite.config.ts` and `tsconfig.json`)
 
 ## Tech Stack
 
@@ -51,23 +59,26 @@ src/
 │   ├── purchasing/  # Purchase orders module
 │   └── ...
 ├── stores/          # Zustand stores (cartStore, authStore, orderStore)
-├── hooks/           # Custom React hooks (useInventory, useOrders, useProducts, useStock)
+├── hooks/           # Custom React hooks (useInventory, useOrders, useProducts, useStock, usePermissions, useSettings, useShift)
 ├── services/        # External API integrations (Claude AI, Anthropic, promotionService)
 ├── types/           # TypeScript types (database.ts contains full schema)
 ├── lib/             # Utilities (supabase.ts client init)
 ├── locales/         # i18n translation files
 └── styles/          # CSS files
 supabase/
-├── migrations/      # SQL migrations (001-029)
+├── migrations/      # SQL migrations (001-047)
 └── functions/       # Edge Functions (Deno/TypeScript)
 ```
 
 ### State Management Pattern
 
-Three Zustand stores manage application state:
-- **cartStore**: Shopping cart with modifiers, locked items (sent to kitchen requiring PIN to modify), discounts, customer selection
+Four Zustand stores manage application state:
+- **cartStore**: Shopping cart with modifiers, locked items (sent to kitchen requiring PIN to modify), discounts, customer selection, combo selections
 - **authStore**: User authentication and session
 - **orderStore**: Order lifecycle management
+- **settingsStore**: Application settings and preferences
+
+Cart items can be of type `'product'` (regular products with modifiers) or `'combo'` (combo deals with `comboSelections`). Locked items cannot be modified or removed without PIN verification.
 
 ### Database Schema
 
@@ -91,6 +102,33 @@ Core tables in Supabase PostgreSQL:
 - `promotions` / `promotion_products` / `promotion_free_products` / `promotion_usage` (promotion system)
 
 Key views: `view_daily_kpis`, `view_inventory_valuation`, `view_payment_method_stats`
+
+### Database Utility Functions
+
+```sql
+-- Permission checking
+user_has_permission(p_user_id UUID, p_permission_code VARCHAR) → BOOLEAN
+is_admin(p_user_id UUID) → BOOLEAN
+
+-- Customer pricing
+get_customer_product_price(p_product_id UUID, p_customer_category_slug VARCHAR) → DECIMAL
+
+-- Loyalty management
+add_loyalty_points(p_customer_id UUID, p_points INTEGER, p_order_id UUID) → VOID
+redeem_loyalty_points(p_customer_id UUID, p_points INTEGER) → BOOLEAN
+```
+
+### RLS Pattern (Always enable for new tables)
+
+```sql
+ALTER TABLE public.{table_name} ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Authenticated read" ON public.{table_name}
+    FOR SELECT USING (auth.uid() IS NOT NULL);
+
+CREATE POLICY "Permission-based write" ON public.{table_name}
+    FOR INSERT WITH CHECK (public.user_has_permission(auth.uid(), '{module}.create'));
+```
 
 ### Key Routes
 
@@ -125,16 +163,20 @@ Key views: `view_daily_kpis`, `view_inventory_valuation`, `view_payment_method_s
 
 ## Business Rules
 
-- Currency: IDR (Indonesian Rupiah)
-- Tax rate: 10% (automatic calculation)
+- Currency: IDR (Indonesian Rupiah), rounded to nearest 100 IDR
+- Tax rate: 10% **included** in prices (tax = total × 10/110)
 - Loyalty: 1 point = 1,000 IDR spent
-- Loyalty tiers: Bronze (0pts), Silver (500pts), Gold (2000pts), Platinum (5000pts)
+- Loyalty tiers with discounts:
+  - Bronze: 0pts (0% discount)
+  - Silver: 500pts (5% discount)
+  - Gold: 2,000pts (8% discount)
+  - Platinum: 5,000pts (10% discount)
 - Customer categories with pricing:
   - `retail`: Standard retail price
   - `wholesale`: Uses wholesale_price from products
   - `discount_percentage`: Applies X% discount on retail price
   - `custom`: Uses product_category_prices table for specific pricing
-- Low stock alert threshold: <10 units
+- Stock alerts: <10 units (warning), <5 units (critical)
 - Order types: dine_in, takeaway, delivery, b2b
 
 ## Customer & Loyalty System
@@ -156,6 +198,16 @@ Key views: `view_daily_kpis`, `view_inventory_valuation`, `view_payment_method_s
 - Points redemption via `redeem_loyalty_points()` function
 - Automatic tier upgrades based on lifetime_points
 
+## Permission Codes
+
+Key permissions used in `usePermissions` hook and `PermissionGuard` component:
+- **Sales**: `sales.view`, `sales.create`, `sales.void`, `sales.discount`, `sales.refund`
+- **Inventory**: `inventory.view`, `inventory.create`, `inventory.update`, `inventory.delete`, `inventory.adjust`
+- **Products**: `products.view`, `products.create`, `products.update`, `products.pricing`
+- **Customers**: `customers.view`, `customers.create`, `customers.update`, `customers.loyalty`
+- **Reports**: `reports.sales`, `reports.inventory`, `reports.financial`
+- **Admin**: `users.view`, `users.create`, `users.roles`, `settings.view`, `settings.update`
+
 ## Environment Variables
 
 Required in `.env`:
@@ -167,17 +219,56 @@ ANTHROPIC_API_KEY=your-claude-api-key
 
 ## Database Migrations
 
-Migrations are in `supabase/migrations/` numbered 001-029. Apply via Supabase dashboard or CLI. Key migrations:
-- 001: Initial schema
-- 003: Stock triggers (auto-update on movements)
-- 004: RLS policies
-- 011: Reporting module with views
-- 012: Multi-UOM support
-- 015: Inter-section stock movements
-- 023-024: Floor plan / table layout
-- 025-026: Purchase orders module
-- 027: B2B sales module
-- 028: Customer loyalty system (customer_categories, loyalty_tiers, loyalty_transactions)
-- 029: Product category prices (product_category_prices, get_customer_product_price function)
-- 030: Combos and Promotions (product_combos, promotions with time-based rules, buy X get Y, free products)
-- 031: Combo Choice Groups (product_combo_groups, product_combo_group_items with price adjustments - allows customer to choose options within combo)
+Migrations are in `supabase/migrations/`. Apply via Supabase dashboard or CLI. Notable migrations:
+- Stock triggers (auto-update on movements)
+- RLS policies (required on all tables)
+- Floor plan / table layout
+- Purchase orders & B2B sales modules
+- Customer loyalty system (customer_categories, loyalty_tiers, loyalty_transactions)
+- Product category prices (get_customer_product_price function)
+- Combos and Promotions (product_combos, promotions with time-based rules)
+- Combo Choice Groups (product_combo_groups with price adjustments)
+- Stock movements and transfers
+- Users & permissions module
+- Settings module
+
+## Mobile (Capacitor)
+
+The project includes Capacitor for iOS/Android builds. Key commands:
+```bash
+# Sync web assets to native projects
+npx cap sync
+
+# Open iOS project in Xcode
+npx cap open ios
+
+# Open Android project in Android Studio
+npx cap open android
+```
+
+## Common Pitfalls
+
+- **Async data**: Always use optional chaining (`data?.map(...)`) for data that may be undefined
+- **RLS forgotten**: Every new table MUST have RLS enabled + policies
+- **Types out of sync**: After SQL schema changes, update `src/types/database.ts`
+- **Missing translations**: Add to ALL 3 locale files (`fr.json`, `en.json`, `id.json`)
+- **Locked cart items**: Items sent to kitchen are locked and require PIN to modify (see `cartStore.ts`)
+
+## New Feature Workflow
+
+1. **Database**: Create migration in `supabase/migrations/` with table + RLS policies
+2. **Types**: Add TypeScript types to `src/types/database.ts`
+3. **Hook**: Create `src/hooks/useFeatureName.ts` with react-query
+4. **Components**: Add to `src/components/feature/` and `src/pages/feature/`
+5. **Translations**: Add keys to all 3 locale files (`fr.json`, `en.json`, `id.json`)
+6. **Route**: Register in router configuration
+
+## Additional Documentation
+
+- `DEVELOPMENT_INSTRUCTIONS.md` - Detailed development guide (French) with code patterns, feature workflow, and common pitfalls
+- `docs/COMBOS_AND_PROMOTIONS.md` - Combos & promotions module spec
+- `docs/COMBO_CHOICE_GROUPS.md` - Combo choice groups with price adjustments
+- `docs/COMBO_POS_INTEGRATION.md` - POS integration for combos
+- `docs/STOCK_MOVEMENTS_MODULE.md` - Stock movements module spec
+- `docs/prompt-module-settings-erp.md` - Settings module spec
+- `docs/prompt-module-utilisateur-erp.md` - Users module spec
