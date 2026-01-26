@@ -178,8 +178,6 @@ export default function CustomerFormPage() {
                 customerData.category_id = null
             }
 
-            console.log('Saving customer:', customerData)
-
             if (isEditing) {
                 const { data, error } = await supabase
                     .from('customers')
@@ -191,7 +189,6 @@ export default function CustomerFormPage() {
                     console.error('Supabase update error:', error)
                     throw new Error(error.message || 'Erreur lors de la mise à jour')
                 }
-                console.log('Customer updated:', data)
                 toast.success('Client mis à jour avec succès')
             } else {
                 const { data, error } = await supabase
@@ -211,7 +208,6 @@ export default function CustomerFormPage() {
                     }
                     throw new Error(error.message || 'Erreur lors de la création')
                 }
-                console.log('Customer created:', data)
                 toast.success('Client créé avec succès')
             }
 

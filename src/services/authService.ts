@@ -416,7 +416,7 @@ export const authService = {
       const name = `${userData.first_name} ${userData.last_name}`.trim();
       const displayName = userData.display_name || name;
 
-      // Create user profile
+      // Create user profile (SECURITY: Don't store plaintext PIN here)
       const { data: newUser, error: userError } = await supabase
         .from('user_profiles')
         .insert({
@@ -427,7 +427,6 @@ export const authService = {
           employee_code: userData.employee_code || null,
           phone: userData.phone || null,
           preferred_language: userData.preferred_language || 'id',
-          pin_code: userData.pin || null,
           role: 'cashier', // Default legacy role
           is_active: true,
         })
@@ -437,6 +436,19 @@ export const authService = {
       if (userError) {
         console.error('Create user error:', userError);
         return { success: false, error: userError.message };
+      }
+
+      // SECURITY: Set PIN securely via RPC (uses bcrypt hashing)
+      if (userData.pin) {
+        const { error: pinError } = await supabase.rpc('set_user_pin', {
+          p_user_id: newUser.id,
+          p_pin: userData.pin,
+        });
+
+        if (pinError) {
+          console.error('Set PIN error:', pinError);
+          // User created but PIN failed - not critical, can be set later
+        }
       }
 
       // Assign roles

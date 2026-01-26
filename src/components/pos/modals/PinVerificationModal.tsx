@@ -1,11 +1,18 @@
-import { useState } from 'react'
-import { X, Lock, AlertCircle } from 'lucide-react'
-import type { UserProfile } from '../../../types/database'
+import { useState, useEffect } from 'react'
+import { X, Lock, AlertCircle, Loader2 } from 'lucide-react'
+import { supabase } from '../../../lib/supabase'
 import './PinVerificationModal.css'
 
 interface VerifiedUser {
     id: string
     name: string
+    role: string
+}
+
+interface UserForVerification {
+    id: string
+    name: string
+    display_name: string | null
     role: string
 }
 
@@ -17,14 +24,6 @@ interface PinVerificationModalProps {
     allowedRoles?: string[]
 }
 
-// Demo users for PIN verification (same as login)
-const DEMO_USERS: Partial<UserProfile>[] = [
-    { id: 'a1110000-0000-0000-0000-000000000001', name: 'Apni', role: 'cashier', pin_code: '1234' },
-    { id: 'a1110000-0000-0000-0000-000000000002', name: 'Dani', role: 'manager', pin_code: '0000' },
-    { id: 'a1110000-0000-0000-0000-000000000004', name: 'Bayu', role: 'barista', pin_code: '2222' },
-    { id: 'a1110000-0000-0000-0000-000000000005', name: 'Admin', role: 'admin', pin_code: '9999' },
-]
-
 export default function PinVerificationModal({
     title = 'Vérification requise',
     message = 'Entrez un code PIN manager pour continuer',
@@ -35,8 +34,96 @@ export default function PinVerificationModal({
     const [pin, setPin] = useState('')
     const [error, setError] = useState('')
     const [isShaking, setIsShaking] = useState(false)
+    const [isVerifying, setIsVerifying] = useState(false)
+    const [users, setUsers] = useState<UserForVerification[]>([])
+    const [isLoadingUsers, setIsLoadingUsers] = useState(true)
+
+    // Fetch users with allowed roles on mount
+    useEffect(() => {
+        async function fetchUsers() {
+            setIsLoadingUsers(true)
+            try {
+                // Get all active users
+                const { data: users, error: usersError } = await supabase
+                    .from('user_profiles')
+                    .select('id, name, display_name, role')
+                    .eq('is_active', true)
+
+                if (usersError) {
+                    console.error('Error fetching users:', usersError)
+                    setError('Erreur de chargement des utilisateurs')
+                    return
+                }
+
+                // Get user_roles with role codes
+                const { data: userRoles, error: rolesError } = await supabase
+                    .from('user_roles')
+                    .select('user_id, roles(code)')
+
+                if (rolesError) {
+                    console.error('Error fetching user roles:', rolesError)
+                    // Continue with legacy roles only
+                }
+
+                // Build a map of user_id -> role codes
+                const userRoleMap = new Map<string, string[]>()
+                if (userRoles) {
+                    for (const ur of userRoles) {
+                        const roleCode = (ur.roles as { code: string } | null)?.code
+                        if (roleCode) {
+                            const existing = userRoleMap.get(ur.user_id) || []
+                            existing.push(roleCode)
+                            userRoleMap.set(ur.user_id, existing)
+                        }
+                    }
+                }
+
+                // Filter users that have at least one allowed role
+                const filteredUsers = (users || []).filter(user => {
+                    // Check legacy role field
+                    if (user.role && allowedRoles.includes(user.role)) {
+                        return true
+                    }
+                    // Check user_roles map
+                    const roles = userRoleMap.get(user.id)
+                    if (roles && roles.length > 0) {
+                        return roles.some(r => allowedRoles.includes(r))
+                    }
+                    return false
+                }).map(user => {
+                    // Determine the primary role
+                    let primaryRole: string = user.role || 'unknown'
+                    const roles = userRoleMap.get(user.id)
+                    if (roles && roles.length > 0) {
+                        // Use the first role that matches allowed roles
+                        const matchedRole = roles.find(r => allowedRoles.includes(r))
+                        if (matchedRole) {
+                            primaryRole = matchedRole
+                        }
+                    }
+                    return {
+                        id: user.id,
+                        name: user.name,
+                        display_name: user.display_name,
+                        role: primaryRole
+                    }
+                })
+
+                setUsers(filteredUsers)
+            } catch (err) {
+                console.error('Error:', err)
+                setError('Erreur de connexion')
+            } finally {
+                setIsLoadingUsers(false)
+            }
+        }
+
+        fetchUsers()
+    }, [allowedRoles])
 
     const handleKeyPress = (key: string) => {
+        if (isVerifying) return
+
         if (key === 'clear') {
             setPin('')
             setError('')
@@ -49,29 +136,54 @@ export default function PinVerificationModal({
         }
     }
 
-    const handleVerify = () => {
+    const handleVerify = async () => {
         if (pin.length < 4) {
             setError('Code PIN trop court')
             return
         }
 
-        // Check if PIN matches any allowed user
-        const matchingUser = DEMO_USERS.find(
-            user => user.pin_code === pin && allowedRoles.includes(user.role || '')
-        )
+        if (users.length === 0) {
+            setError('Aucun utilisateur autorisé trouvé')
+            return
+        }
 
-        if (matchingUser) {
-            onVerify(true, {
-                id: matchingUser.id!,
-                name: matchingUser.name!,
-                role: matchingUser.role!
-            })
-            // Don't call onClose here - let parent handle modal closure
-        } else {
+        setIsVerifying(true)
+        setError('')
+
+        try {
+            // Try to verify PIN against each allowed user
+            for (const user of users) {
+                const { data: isValid, error: verifyError } = await supabase.rpc('verify_user_pin', {
+                    p_user_id: user.id,
+                    p_pin: pin
+                })
+
+                if (verifyError) {
+                    console.error('PIN verification error for user', user.id, verifyError)
+                    continue
+                }
+
+                if (isValid) {
+                    // Found matching user
+                    onVerify(true, {
+                        id: user.id,
+                        name: user.display_name || user.name,
+                        role: user.role
+                    })
+                    return
+                }
+            }
+
+            // No matching user found
             setError('Code PIN invalide ou rôle non autorisé')
             setIsShaking(true)
             setTimeout(() => setIsShaking(false), 500)
             setPin('')
+        } catch (err) {
+            console.error('Verification error:', err)
+            setError('Erreur de vérification')
+        } finally {
+            setIsVerifying(false)
         }
     }
 
@@ -94,48 +206,65 @@ export default function PinVerificationModal({
                 </div>
 
                 <div className="modal__body">
-                    {/* PIN Display */}
-                    <div className="pin-entry">
-                        <div className="pin-display">
-                            {[...Array(6)].map((_, i) => (
-                                <span key={i} className={`pin-dot ${i < pin.length ? 'filled' : ''}`}>
-                                    {i < pin.length ? '●' : '○'}
-                                </span>
-                            ))}
+                    {isLoadingUsers ? (
+                        <div className="pin-loading">
+                            <Loader2 size={32} className="spin" />
+                            <p>Chargement...</p>
                         </div>
+                    ) : (
+                        <>
+                            {/* PIN Display */}
+                            <div className="pin-entry">
+                                <div className="pin-display">
+                                    {[...Array(6)].map((_, i) => (
+                                        <span key={i} className={`pin-dot ${i < pin.length ? 'filled' : ''}`}>
+                                            {i < pin.length ? '●' : '○'}
+                                        </span>
+                                    ))}
+                                </div>
 
-                        {error && (
-                            <div className="pin-error">
-                                <AlertCircle size={16} />
-                                {error}
+                                {error && (
+                                    <div className="pin-error">
+                                        <AlertCircle size={16} />
+                                        {error}
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </div>
 
-                    {/* Numpad */}
-                    <div className="numpad">
-                        {numpadKeys.map((key) => (
-                            <button
-                                key={key}
-                                className={`numpad__key ${key === 'clear' || key === 'back' ? 'numpad__key--action' : ''}`}
-                                onClick={() => handleKeyPress(key)}
-                            >
-                                {key === 'clear' ? 'C' : key === 'back' ? '←' : key}
-                            </button>
-                        ))}
-                    </div>
+                            {/* Numpad */}
+                            <div className="numpad">
+                                {numpadKeys.map((key) => (
+                                    <button
+                                        key={key}
+                                        className={`numpad__key ${key === 'clear' || key === 'back' ? 'numpad__key--action' : ''}`}
+                                        onClick={() => handleKeyPress(key)}
+                                        disabled={isVerifying}
+                                    >
+                                        {key === 'clear' ? 'C' : key === 'back' ? '←' : key}
+                                    </button>
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 <div className="modal__footer">
-                    <button className="btn btn-secondary" onClick={onClose}>
+                    <button className="btn btn-secondary" onClick={onClose} disabled={isVerifying}>
                         Annuler
                     </button>
                     <button
                         className="btn btn-primary"
                         onClick={handleVerify}
-                        disabled={pin.length < 4}
+                        disabled={pin.length < 4 || isVerifying || isLoadingUsers}
                     >
-                        Vérifier
+                        {isVerifying ? (
+                            <>
+                                <Loader2 size={16} className="spin" />
+                                Vérification...
+                            </>
+                        ) : (
+                            'Vérifier'
+                        )}
                     </button>
                 </div>
             </div>

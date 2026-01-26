@@ -1,4 +1,5 @@
 // POS Modals - centralized exports
+export { default as CashierAnalyticsModal } from './CashierAnalyticsModal'
 export { default as ComboSelectorModal } from './ComboSelectorModal'
 export { default as CustomerSearchModal } from './CustomerSearchModal'
 export { default as DiscountModal } from './DiscountModal'

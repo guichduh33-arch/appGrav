@@ -5,6 +5,7 @@ import { Search, PauseCircle, CheckCircle, AlertCircle, Clock, Users } from 'luc
 
 import { useCartStore, CartItem } from '../../stores/cartStore'
 import { useOrderStore } from '../../stores/orderStore'
+import { useAuthStore } from '../../stores/authStore'
 import { useProducts, useCategories } from '../../hooks/products'
 import { useShift, ShiftUser } from '../../hooks/useShift'
 import CategoryNav from '../../components/pos/CategoryNav'
@@ -19,12 +20,15 @@ import {
     HeldOrdersModal,
     PinVerificationModal,
     TransactionHistoryModal,
+    CashierAnalyticsModal,
 } from '../../components/pos/modals'
 // Shift modals
 import {
     OpenShiftModal,
     CloseShiftModal,
     ShiftReconciliationModal,
+    ShiftHistoryModal,
+    ShiftStatsModal,
 } from '../../components/pos/shift'
 import type { Product } from '../../types/database'
 import './POSMainPage.css'
@@ -38,6 +42,7 @@ export default function POSMainPage() {
         subtotal, discountAmount, total, orderType, tableNumber, customerId, customerName
     } = useCartStore()
     const { holdOrder, restoreHeldOrder } = useOrderStore()
+    const { user } = useAuthStore()
 
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
     const [searchQuery, setSearchQuery] = useState('')
@@ -48,9 +53,11 @@ export default function POSMainPage() {
         currentSession,
         terminalSessions,
         sessionStats: shiftStats,
+        sessionTransactions,
         openShift,
         closeShift,
         switchToShift,
+        recoverShift,
         reconciliationData,
         clearReconciliation,
         isOpeningShift,
@@ -76,7 +83,11 @@ export default function POSMainPage() {
     const [pinModalAction, setPinModalAction] = useState<'open' | 'close'>('open')
     const [showShiftSelector, setShowShiftSelector] = useState(false)
     const [showTransactionHistory, setShowTransactionHistory] = useState(false)
+    const [showAnalytics, setShowAnalytics] = useState(false)
+    const [showShiftHistory, setShowShiftHistory] = useState(false)
+    const [showShiftStats, setShowShiftStats] = useState(false)
     const [showNoShiftModal, setShowNoShiftModal] = useState(false)
+    const [isRecoveringShift, setIsRecoveringShift] = useState(false)
 
     // Toast state
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
@@ -352,6 +363,9 @@ export default function POSMainPage() {
                 onClose={() => setShowMenu(false)}
                 onShowHeldOrders={() => setShowHeldOrdersModal(true)}
                 onShowTransactionHistory={() => setShowTransactionHistory(true)}
+                onShowAnalytics={() => setShowAnalytics(true)}
+                onShowShiftHistory={() => setShowShiftHistory(true)}
+                onShowShiftStats={() => setShowShiftStats(true)}
                 hasOpenShift={hasOpenShift}
                 onOpenShift={handleOpenShiftRequest}
                 onCloseShift={handleCloseShiftRequest}
@@ -464,6 +478,31 @@ export default function POSMainPage() {
                 />
             )}
 
+            {/* Cashier Analytics Modal */}
+            {showAnalytics && (
+                <CashierAnalyticsModal
+                    onClose={() => setShowAnalytics(false)}
+                    sessionId={currentSession?.id}
+                />
+            )}
+
+            {/* Shift History Modal */}
+            {showShiftHistory && (
+                <ShiftHistoryModal
+                    onClose={() => setShowShiftHistory(false)}
+                />
+            )}
+
+            {/* Shift Stats Modal */}
+            {showShiftStats && currentSession && (
+                <ShiftStatsModal
+                    session={currentSession}
+                    transactions={sessionTransactions}
+                    stats={shiftStats}
+                    onClose={() => setShowShiftStats(false)}
+                />
+            )}
+
             {/* Shift Selector Modal */}
             {showShiftSelector && (
                 <div className="shift-selector-overlay" onClick={() => setShowShiftSelector(false)}>
@@ -528,6 +567,23 @@ export default function POSMainPage() {
                             >
                                 {t('common.cancel', 'Annuler')}
                             </button>
+                            {user?.id && (
+                                <button
+                                    type="button"
+                                    className="pos-no-shift-modal__btn pos-no-shift-modal__btn--secondary"
+                                    disabled={isRecoveringShift}
+                                    onClick={async () => {
+                                        setIsRecoveringShift(true)
+                                        const recovered = await recoverShift(user.id)
+                                        setIsRecoveringShift(false)
+                                        if (recovered) {
+                                            setShowNoShiftModal(false)
+                                        }
+                                    }}
+                                >
+                                    {isRecoveringShift ? 'Recherche...' : 'Récupérer mon shift'}
+                                </button>
+                            )}
                             <button
                                 type="button"
                                 className="pos-no-shift-modal__btn pos-no-shift-modal__btn--primary"

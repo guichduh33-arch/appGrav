@@ -28,12 +28,9 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
     const totalRounded = Math.round(total)
     const change = amountReceived - totalRounded
 
-    // Improved validation: ensure we compare with a small epsilon if needed, 
+    // Improved validation: ensure we compare with a small epsilon if needed,
     // although amounts are usually integers in IDR, it's good practice.
     const canComplete = paymentMethod !== 'cash' || (amountReceived >= totalRounded - 0.01)
-
-    // Debug validation
-    console.log('Validation:', { paymentMethod, amountReceived, total: totalRounded, canComplete, isCreating })
 
     // Handle numpad input
     const handleNumpadKey = (key: string) => {

@@ -1,35 +1,52 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { supabase } from '../lib/supabase'
 
-const apiKey = typeof process !== 'undefined' && process.env ? process.env.VITE_ANTHROPIC_API_KEY : import.meta.env.VITE_ANTHROPIC_API_KEY;
-
-const anthropic = new Anthropic({
-    apiKey: apiKey,
-    dangerouslyAllowBrowser: true, // Required if using this in a client-side Vite app
-});
+interface ClaudeProxyResponse {
+    text: string
+    model: string
+    usage: {
+        input_tokens: number
+        output_tokens: number
+    }
+}
 
 export const claudeService = {
     /**
-     * Sends a message to Claude and returns the response.
+     * Sends a message to Claude via secure Edge Function proxy.
      * @param content The user message to send.
      * @param system Optional system prompt.
      * @returns The text response from Claude.
      */
-    async sendMessage(content: string, system?: string) {
-        try {
-            const response = await anthropic.messages.create({
-                model: 'claude-3-haiku-20240307',
-                max_tokens: 1024,
-                system: system,
-                messages: [{ role: 'user', content }],
-            });
+    async sendMessage(content: string, system?: string): Promise<string> {
+        const { data: sessionData } = await supabase.auth.getSession()
+        const accessToken = sessionData?.session?.access_token
 
-            if (response.content[0].type === 'text') {
-                return response.content[0].text;
-            }
-            return 'Response format not recognized.';
-        } catch (error) {
-            console.error('Error calling Claude API:', error);
-            throw error;
+        if (!accessToken) {
+            throw new Error('Authentication required to use Claude')
         }
+
+        const response = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                    'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+                },
+                body: JSON.stringify({
+                    messages: [{ role: 'user', content }],
+                    system,
+                    max_tokens: 1024,
+                }),
+            }
+        )
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+            throw new Error(errorData.error || `API Error: ${response.status}`)
+        }
+
+        const data: ClaudeProxyResponse = await response.json()
+        return data.text
     },
-};
+}

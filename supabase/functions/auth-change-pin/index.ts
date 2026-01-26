@@ -102,12 +102,12 @@ serve(async (req: Request) => {
       return errorResponse('Failed to process PIN', 500);
     }
 
-    // Update the PIN
+    // Update the PIN (SECURITY: Only store hashed PIN, never plaintext)
     const { error: updateError } = await supabase
       .from('user_profiles')
       .update({
         pin_hash: hashedPin,
-        pin_code: new_pin, // Keep legacy field updated
+        pin_code: null, // SECURITY: Clear any legacy plaintext PIN
         password_changed_at: new Date().toISOString(),
         must_change_password: false,
         failed_login_attempts: 0,

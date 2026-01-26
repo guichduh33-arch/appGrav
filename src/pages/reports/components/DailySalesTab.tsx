@@ -41,7 +41,7 @@ export const DailySalesTab = () => {
     };
 
     const handleDownload = () => {
-        console.log("Download CSV");
+        // TODO: Implement CSV export
     };
 
     if (loading) return <div className="p-8 text-center text-gray-500">{t('common.loading', 'Loading data...')}</div>;

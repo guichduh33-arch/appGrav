@@ -1,7 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
-import { X, Search, QrCode, User, Crown, Star, Building2, UserCheck, Check } from 'lucide-react'
+import { X, Search, QrCode, User, Crown, Star, Building2, UserCheck, Check, UserPlus, Phone, Mail, Save } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
 import './CustomerSearchModal.css'
+
+interface CustomerCategory {
+    id: string
+    name: string
+    slug: string
+    color: string | null
+    price_modifier_type: string
+    discount_percentage: number | null
+}
 
 interface Customer {
     id: string
@@ -46,17 +55,39 @@ export default function CustomerSearchModal({
     const [searchTerm, setSearchTerm] = useState('')
     const [customers, setCustomers] = useState<Customer[]>([])
     const [loading, setLoading] = useState(false)
-    const [scanMode, setScanMode] = useState(false)
+    const [mode, setMode] = useState<'search' | 'scan' | 'create'>('search')
     const [qrInput, setQrInput] = useState('')
     const qrInputRef = useRef<HTMLInputElement>(null)
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+    // New customer form state
+    const [newCustomerName, setNewCustomerName] = useState('')
+    const [newCustomerPhone, setNewCustomerPhone] = useState('')
+    const [newCustomerEmail, setNewCustomerEmail] = useState('')
+    const [newCustomerCategoryId, setNewCustomerCategoryId] = useState<string | null>(null)
+    const [categories, setCategories] = useState<CustomerCategory[]>([])
+    const [saving, setSaving] = useState(false)
+    const [formError, setFormError] = useState('')
+
     useEffect(() => {
         // Focus QR input when in scan mode
-        if (scanMode && qrInputRef.current) {
+        if (mode === 'scan' && qrInputRef.current) {
             qrInputRef.current.focus()
         }
-    }, [scanMode])
+    }, [mode])
+
+    useEffect(() => {
+        // Load customer categories for the new customer form
+        const fetchCategories = async () => {
+            const { data } = await supabase
+                .from('customer_categories')
+                .select('*')
+                .eq('is_active', true)
+                .order('name')
+            if (data) setCategories(data)
+        }
+        fetchCategories()
+    }, [])
 
     useEffect(() => {
         // Search debounce
@@ -176,6 +207,62 @@ export default function CustomerSearchModal({
         onClose()
     }
 
+    const handleCreateCustomer = async () => {
+        // Validate
+        if (!newCustomerName.trim()) {
+            setFormError('Le nom est obligatoire')
+            return
+        }
+
+        setSaving(true)
+        setFormError('')
+
+        try {
+            const { data, error } = await supabase
+                .from('customers')
+                .insert({
+                    name: newCustomerName.trim(),
+                    phone: newCustomerPhone.trim() || null,
+                    email: newCustomerEmail.trim() || null,
+                    category_id: newCustomerCategoryId,
+                    customer_type: 'retail',
+                    is_active: true,
+                    loyalty_points: 0,
+                    loyalty_tier: 'bronze',
+                    total_spent: 0,
+                    visit_count: 0
+                })
+                .select(`
+                    *,
+                    category:customer_categories(name, slug, color, price_modifier_type, discount_percentage)
+                `)
+                .single()
+
+            if (error) throw error
+
+            // Select the newly created customer and close
+            onSelectCustomer(data as unknown as Customer)
+            onClose()
+        } catch (error: unknown) {
+            console.error('Error creating customer:', error)
+            if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
+                setFormError('Un client avec ce téléphone ou email existe déjà')
+            } else {
+                setFormError('Erreur lors de la création du client')
+            }
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    const resetCreateForm = () => {
+        setNewCustomerName('')
+        setNewCustomerPhone('')
+        setNewCustomerEmail('')
+        setNewCustomerCategoryId(null)
+        setFormError('')
+    }
+
     const getCategoryIcon = (code?: string) => {
         switch (code) {
             case 'wholesale': return <Building2 size={12} />
@@ -191,8 +278,12 @@ export default function CustomerSearchModal({
                 {/* Header */}
                 <div className="customer-search-modal__header">
                     <h2>
-                        <User size={22} />
-                        {scanMode ? 'Scanner Code QR Client' : 'Sélectionner un Client'}
+                        {mode === 'search' && <User size={22} />}
+                        {mode === 'scan' && <QrCode size={22} />}
+                        {mode === 'create' && <UserPlus size={22} />}
+                        {mode === 'search' && 'Sélectionner un Client'}
+                        {mode === 'scan' && 'Scanner Code QR Client'}
+                        {mode === 'create' && 'Nouveau Client'}
                     </h2>
                     <button className="btn-close" onClick={onClose}>
                         <X size={20} />
@@ -202,24 +293,126 @@ export default function CustomerSearchModal({
                 {/* Mode Toggle */}
                 <div className="customer-search-modal__modes">
                     <button
-                        className={`mode-btn ${!scanMode ? 'active' : ''}`}
-                        onClick={() => setScanMode(false)}
+                        className={`mode-btn ${mode === 'search' ? 'active' : ''}`}
+                        onClick={() => setMode('search')}
                     >
                         <Search size={16} />
                         Rechercher
                     </button>
                     <button
-                        className={`mode-btn ${scanMode ? 'active' : ''}`}
-                        onClick={() => setScanMode(true)}
+                        className={`mode-btn ${mode === 'scan' ? 'active' : ''}`}
+                        onClick={() => setMode('scan')}
                     >
                         <QrCode size={16} />
                         Scanner QR
+                    </button>
+                    <button
+                        className={`mode-btn mode-btn--create ${mode === 'create' ? 'active' : ''}`}
+                        onClick={() => { setMode('create'); resetCreateForm() }}
+                    >
+                        <UserPlus size={16} />
+                        Nouveau
                     </button>
                 </div>
 
                 {/* Content */}
                 <div className="customer-search-modal__content">
-                    {scanMode ? (
+                    {mode === 'create' ? (
+                        <div className="create-customer-form">
+                            {formError && (
+                                <div className="form-error">
+                                    <X size={16} />
+                                    {formError}
+                                </div>
+                            )}
+
+                            <div className="form-group">
+                                <label>
+                                    <User size={16} />
+                                    Nom *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={newCustomerName}
+                                    onChange={(e) => setNewCustomerName(e.target.value)}
+                                    placeholder="Nom du client"
+                                    autoFocus
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>
+                                    <Phone size={16} />
+                                    Téléphone
+                                </label>
+                                <input
+                                    type="tel"
+                                    value={newCustomerPhone}
+                                    onChange={(e) => setNewCustomerPhone(e.target.value)}
+                                    placeholder="+62 812 345 6789"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>
+                                    <Mail size={16} />
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    value={newCustomerEmail}
+                                    onChange={(e) => setNewCustomerEmail(e.target.value)}
+                                    placeholder="email@exemple.com"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>
+                                    <Crown size={16} />
+                                    Catégorie
+                                </label>
+                                <div className="category-selector">
+                                    <button
+                                        type="button"
+                                        className={`category-option ${!newCustomerCategoryId ? 'active' : ''}`}
+                                        onClick={() => setNewCustomerCategoryId(null)}
+                                    >
+                                        <User size={14} />
+                                        Standard
+                                    </button>
+                                    {categories.map(cat => (
+                                        <button
+                                            key={cat.id}
+                                            type="button"
+                                            className={`category-option ${newCustomerCategoryId === cat.id ? 'active' : ''}`}
+                                            style={{
+                                                '--category-color': cat.color
+                                            } as React.CSSProperties}
+                                            onClick={() => setNewCustomerCategoryId(cat.id)}
+                                        >
+                                            {cat.slug === 'wholesale' && <Building2 size={14} />}
+                                            {cat.slug === 'vip' && <Crown size={14} />}
+                                            {cat.slug === 'staff' && <UserCheck size={14} />}
+                                            {!['wholesale', 'vip', 'staff'].includes(cat.slug) && <User size={14} />}
+                                            {cat.name}
+                                            {cat.discount_percentage && cat.discount_percentage > 0 && (
+                                                <span className="discount">-{cat.discount_percentage}%</span>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <button
+                                className="btn btn-primary btn-create-customer"
+                                onClick={handleCreateCustomer}
+                                disabled={saving || !newCustomerName.trim()}
+                            >
+                                <Save size={18} />
+                                {saving ? 'Enregistrement...' : 'Enregistrer et Sélectionner'}
+                            </button>
+                        </div>
+                    ) : mode === 'scan' ? (
                         <div className="qr-scan-area">
                             <div className="qr-scan-icon">
                                 <QrCode size={80} />

@@ -34,7 +34,7 @@ export interface PosSession {
 export interface ShiftTransaction {
     id: string
     order_number: string
-    total_amount: number
+    total: number
     payment_method: string
     status: string
     created_at: string
@@ -98,7 +98,7 @@ export function useShift() {
 
     const terminalId = getTerminalId()
 
-    // Fetch current user's open session
+    // Fetch current user's open session using RPC (bypasses RLS)
     const {
         data: currentSession,
         isLoading: isLoadingSession,
@@ -109,24 +109,24 @@ export function useShift() {
             const userId = activeShiftUserId || user?.id
             if (!userId) return null
 
-            const { data, error } = await supabase
-                .from('pos_sessions')
-                .select('*')
-                .eq('user_id', userId)
-                .eq('status', 'open')
-                .single()
+            // Use RPC to bypass RLS
+            const { data, error } = await supabase.rpc('get_user_open_shift', {
+                p_user_id: userId
+            })
 
-            if (error && error.code !== 'PGRST116') {
+            if (error) {
                 console.error('Error fetching session:', error)
                 return null
             }
 
-            return data as PosSession | null
+            // RPC returns an array, get first element
+            const session = Array.isArray(data) ? data[0] : data
+            return session as PosSession | null
         },
         enabled: !!(activeShiftUserId || user?.id)
     })
 
-    // Fetch ALL open sessions on this terminal (multi-user support)
+    // Fetch ALL open sessions on this terminal (multi-user support) using RPC
     const {
         data: terminalSessions = [],
         isLoading: isLoadingTerminalSessions,
@@ -134,36 +134,53 @@ export function useShift() {
     } = useQuery({
         queryKey: ['terminal-shifts', terminalId],
         queryFn: async () => {
-            const { data, error } = await supabase
-                .from('pos_sessions')
-                .select('*')
-                .eq('terminal_id', terminalId)
-                .eq('status', 'open')
-                .order('opened_at', { ascending: false })
+            // Use RPC to bypass RLS
+            const { data, error } = await supabase.rpc('get_terminal_open_shifts', {
+                p_terminal_id: terminalId
+            })
 
             if (error) {
                 console.error('Error fetching terminal sessions:', error)
                 return []
             }
 
-            return data as unknown as PosSession[]
+            return (data || []) as unknown as PosSession[]
         }
     })
 
-    // Auto-recover shift: if no active shift but there are open sessions on terminal, select the first one
+    // Auto-recover shift: check for open sessions on terminal OR for the logged-in user
     useEffect(() => {
-        if (!isLoadingTerminalSessions && terminalSessions.length > 0) {
+        async function autoRecoverShift() {
             const storedUserId = getStoredActiveShiftUserId()
 
-            // Check if stored user has an open shift
-            const storedUserHasShift = storedUserId && terminalSessions.some(s => s.user_id === storedUserId)
+            // If we have terminal sessions, check those first
+            if (!isLoadingTerminalSessions && terminalSessions.length > 0) {
+                const storedUserHasShift = storedUserId && terminalSessions.some(s => s.user_id === storedUserId)
+                if (!storedUserHasShift) {
+                    // Auto-select the first open shift on this terminal
+                    setActiveShiftUserId(terminalSessions[0].user_id)
+                    return
+                }
+            }
 
-            if (!storedUserHasShift) {
-                // Auto-select the first open shift on this terminal
-                setActiveShiftUserId(terminalSessions[0].user_id)
+            // If no terminal sessions but we have a logged-in user, check for their shifts using RPC
+            if (user?.id && !storedUserId) {
+                const { data, error } = await supabase.rpc('get_user_open_shift', {
+                    p_user_id: user.id
+                })
+
+                if (!error && data) {
+                    const userShift = Array.isArray(data) ? data[0] : data
+                    if (userShift) {
+                        console.log('Auto-recovered shift for logged-in user:', userShift.id)
+                        setActiveShiftUserId(user.id)
+                    }
+                }
             }
         }
-    }, [terminalSessions, isLoadingTerminalSessions])
+
+        autoRecoverShift()
+    }, [terminalSessions, isLoadingTerminalSessions, user?.id])
 
     // Fetch transactions for current session
     const {
@@ -177,7 +194,7 @@ export function useShift() {
 
             const { data, error } = await supabase
                 .from('orders')
-                .select('id, order_number, total_amount, payment_method, status, created_at, cashier_id')
+                .select('id, order_number, total, payment_method, status, created_at, cashier_id')
                 .eq('pos_session_id', currentSession.id)
                 .eq('status', 'completed')
                 .order('created_at', { ascending: false })
@@ -186,7 +203,7 @@ export function useShift() {
                 // Fallback: query by time range if pos_session_id doesn't exist yet
                 const { data: fallbackData, error: fallbackError } = await supabase
                     .from('orders')
-                    .select('id, order_number, total_amount, payment_method, status, created_at')
+                    .select('id, order_number, total, payment_method, status, created_at')
                     .gte('created_at', currentSession.opened_at)
                     .eq('status', 'completed')
                     .order('created_at', { ascending: false })
@@ -205,11 +222,11 @@ export function useShift() {
 
     // Calculate session statistics
     const sessionStats = {
-        totalSales: sessionTransactions.reduce((sum, t) => sum + t.total_amount, 0),
+        totalSales: sessionTransactions.reduce((sum, t) => sum + t.total, 0),
         transactionCount: sessionTransactions.length,
-        cashTotal: sessionTransactions.filter(t => t.payment_method === 'cash').reduce((sum, t) => sum + t.total_amount, 0),
-        qrisTotal: sessionTransactions.filter(t => t.payment_method === 'qris').reduce((sum, t) => sum + t.total_amount, 0),
-        edcTotal: sessionTransactions.filter(t => ['card', 'edc'].includes(t.payment_method)).reduce((sum, t) => sum + t.total_amount, 0),
+        cashTotal: sessionTransactions.filter(t => t.payment_method === 'cash').reduce((sum, t) => sum + t.total, 0),
+        qrisTotal: sessionTransactions.filter(t => t.payment_method === 'qris').reduce((sum, t) => sum + t.total, 0),
+        edcTotal: sessionTransactions.filter(t => ['card', 'edc'].includes(t.payment_method)).reduce((sum, t) => sum + t.total, 0),
         duration: currentSession ? Math.floor((Date.now() - new Date(currentSession.opened_at).getTime()) / 1000 / 60) : 0
     }
 
@@ -221,18 +238,21 @@ export function useShift() {
             userName: string
             notes?: string
         }) => {
-            // Check if this user already has an open shift
-            const { data: existingShift } = await supabase
-                .from('pos_sessions')
-                .select('id')
-                .eq('user_id', userId)
-                .eq('status', 'open')
-                .single()
+            // FIRST: Check if this user already has an open shift using RPC (bypasses RLS)
+            const { data: existingData, error: checkError } = await supabase.rpc('get_user_open_shift', {
+                p_user_id: userId
+            })
 
-            if (existingShift) {
-                throw new Error(`${userName} a déjà un shift ouvert`)
+            const existingShift = Array.isArray(existingData) ? existingData[0] : existingData
+
+            if (!checkError && existingShift) {
+                // User already has an open shift - recover it
+                console.log('Found existing shift for user, recovering:', existingShift.id)
+                setActiveShiftUserId(userId)
+                return { recovered: true, userName, session: existingShift }
             }
 
+            // No existing shift found, try to open a new one
             const { data, error } = await supabase.rpc('open_shift', {
                 p_user_id: userId,
                 p_opening_cash: openingCash,
@@ -240,15 +260,34 @@ export function useShift() {
                 p_notes: notes ?? undefined
             })
 
-            if (error) throw error
+            if (error) {
+                console.error('Error opening shift:', error.message)
+                // If RPC fails for any reason, try one more time to find existing shift using RPC
+                const { data: retryData } = await supabase.rpc('get_user_open_shift', {
+                    p_user_id: userId
+                })
+
+                const retryShift = Array.isArray(retryData) ? retryData[0] : retryData
+
+                if (retryShift) {
+                    console.log('Found existing shift on retry:', retryShift.id)
+                    setActiveShiftUserId(userId)
+                    return { recovered: true, userName, session: retryShift }
+                }
+                throw error
+            }
 
             // Set the active shift user
             setActiveShiftUserId(userId)
 
-            return { ...(data as object), userName }
+            return { ...(data as unknown as Record<string, unknown>), userName, recovered: false }
         },
         onSuccess: (data) => {
-            toast.success(`Shift ouvert pour ${data.userName}`)
+            if (data.recovered) {
+                toast.success(`Shift récupéré pour ${data.userName}`)
+            } else {
+                toast.success(`Shift ouvert pour ${data.userName}`)
+            }
             queryClient.invalidateQueries({ queryKey: ['current-shift'] })
             queryClient.invalidateQueries({ queryKey: ['terminal-shifts'] })
         },
@@ -339,6 +378,42 @@ export function useShift() {
         setActiveShiftUserId(userId)
     }, [])
 
+    // Manual recovery: find and activate any open shift for a user using RPC (bypasses RLS)
+    const recoverShift = useCallback(async (userId: string) => {
+        console.log('Attempting to recover shift for user:', userId)
+
+        const { data, error } = await supabase.rpc('get_user_open_shift', {
+            p_user_id: userId
+        })
+
+        console.log('Recovery RPC result:', { data, error })
+
+        if (error) {
+            console.error('Error recovering shift:', error)
+            // Show more specific error message
+            if (error.message?.includes('function') || error.code === '42883') {
+                toast.error('Fonction RPC manquante - appliquez la migration SQL')
+            } else {
+                toast.error(`Erreur: ${error.message || 'Récupération impossible'}`)
+            }
+            return null
+        }
+
+        const existingShift = Array.isArray(data) ? data[0] : data
+
+        if (existingShift) {
+            setActiveShiftUserId(userId)
+            queryClient.invalidateQueries({ queryKey: ['current-shift'] })
+            queryClient.invalidateQueries({ queryKey: ['terminal-shifts'] })
+            toast.success('Shift récupéré')
+            return existingShift
+        }
+
+        // No shift found - show info message
+        toast.error('Aucun shift ouvert trouvé pour cet utilisateur')
+        return null
+    }, [queryClient])
+
     const clearReconciliation = useCallback(() => {
         setReconciliationData(null)
     }, [])
@@ -363,6 +438,7 @@ export function useShift() {
         openShift,
         closeShift,
         switchToShift,
+        recoverShift,
         clearReconciliation,
         refetchSession,
         refetchTransactions,

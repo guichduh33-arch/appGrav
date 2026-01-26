@@ -1,15 +1,58 @@
-import Anthropic from '@anthropic-ai/sdk';
-
-const apiKey = typeof process !== 'undefined' && process.env ? process.env.VITE_ANTHROPIC_API_KEY : import.meta.env.VITE_ANTHROPIC_API_KEY;
-
-const anthropic = new Anthropic({
-  apiKey: apiKey,
-  dangerouslyAllowBrowser: true,
-});
+import { supabase } from '../lib/supabase'
 
 export interface ClaudeMessage {
-  role: 'user' | 'assistant';
-  content: string;
+  role: 'user' | 'assistant'
+  content: string
+}
+
+interface ClaudeProxyResponse {
+  text: string
+  model: string
+  usage: {
+    input_tokens: number
+    output_tokens: number
+  }
+}
+
+/**
+ * Appelle l'Edge Function claude-proxy pour communiquer avec Claude
+ */
+async function callClaudeProxy(
+  messages: ClaudeMessage[],
+  systemPrompt?: string,
+  maxTokens?: number
+): Promise<string> {
+  const { data: sessionData } = await supabase.auth.getSession()
+  const accessToken = sessionData?.session?.access_token
+
+  if (!accessToken) {
+    throw new Error('Authentification requise pour utiliser Claude')
+  }
+
+  const response = await fetch(
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+        'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+      },
+      body: JSON.stringify({
+        messages,
+        system: systemPrompt,
+        max_tokens: maxTokens,
+      }),
+    }
+  )
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+    throw new Error(errorData.error || `Erreur API: ${response.status}`)
+  }
+
+  const data: ClaudeProxyResponse = await response.json()
+  return data.text
 }
 
 /**
@@ -19,28 +62,11 @@ export async function askClaude(
   prompt: string,
   systemPrompt?: string
 ): Promise<string> {
-  try {
-    const message = await anthropic.messages.create({
-      model: 'claude-3-haiku-20240307',
-      max_tokens: 2000,
-      system: systemPrompt,
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-    });
-
-    const content = message.content[0];
-    if (content.type === 'text') {
-      return content.text;
-    }
-    throw new Error('Réponse inattendue de Claude');
-  } catch (error) {
-    console.error('Erreur API Anthropic:', error);
-    throw error;
-  }
+  return callClaudeProxy(
+    [{ role: 'user', content: prompt }],
+    systemPrompt,
+    2000
+  )
 }
 
 /**
@@ -50,24 +76,5 @@ export async function chatWithClaude(
   messages: ClaudeMessage[],
   systemPrompt?: string
 ): Promise<string> {
-  try {
-    const response = await anthropic.messages.create({
-      model: 'claude-3-haiku-20240307',
-      max_tokens: 2000,
-      system: systemPrompt,
-      messages: messages.map(msg => ({
-        role: msg.role,
-        content: msg.content,
-      })),
-    });
-
-    const content = response.content[0];
-    if (content.type === 'text') {
-      return content.text;
-    }
-    throw new Error('Réponse inattendue de Claude');
-  } catch (error) {
-    console.error('Erreur API Anthropic:', error);
-    throw error;
-  }
+  return callClaudeProxy(messages, systemPrompt, 2000)
 }

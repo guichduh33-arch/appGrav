@@ -160,3 +160,72 @@
     padding: var(--space-md);
     border-top: 1px solid var(--color-gray-700);
 }
+
+/* Collapsible Submenu Section */
+.pos-menu__divider--clickable {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: var(--radius-md);
+    margin: 8px 0 4px 0;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.pos-menu__divider--clickable:hover {
+    background: var(--color-gray-700);
+    color: var(--color-gray-300);
+}
+
+.pos-menu__divider--clickable svg {
+    opacity: 0.6;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pos-menu__submenu {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+.pos-menu__submenu.is-expanded {
+    grid-template-rows: 1fr;
+}
+
+.pos-menu__submenu > * {
+    min-height: 0;
+}
+
+.pos-menu__subitem {
+    padding-left: 24px !important;
+    font-size: var(--text-sm);
+    position: relative;
+}
+
+.pos-menu__subitem::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-gray-600);
+    transition: background 0.2s ease;
+}
+
+.pos-menu__subitem:hover::before {
+    background: var(--color-gray-400);
+}
+
+.pos-menu__subitem.is-success::before {
+    background: #10B981;
+}
+
+.pos-menu__subitem.is-warning::before {
+    background: #F59E0B;
+}

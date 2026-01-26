@@ -102,13 +102,9 @@ export default function PurchaseOrderFormPage() {
                 // Check if product_type field exists
                 if ('product_type' in data[0]) {
                     data = data.filter((p: any) => p.product_type === 'raw_material')
-                    console.log('Raw materials loaded (filtered):', data?.length || 0)
-                } else {
-                    console.log('All products loaded (product_type not found):', data?.length || 0)
                 }
             }
 
-            console.log('Products loaded:', data?.length || 0, data)
             if (data) setProducts(data)
         } catch (error: any) {
             console.error('Error fetching products:', error)
