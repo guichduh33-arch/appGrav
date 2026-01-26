@@ -3,8 +3,21 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Save, CheckCheck, Search, Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import type { InventoryCount, InventoryCountItem, Product, Insertable } from '../../types/database'
+import type { InventoryCount, Product } from '../../types/database'
 import './StockOpname.css'
+
+// Extended item type for UI (adds product relation and computed unit)
+interface CountItemWithProduct {
+    id: string
+    count_id: string
+    product_id: string
+    system_quantity: number
+    counted_quantity: number | null
+    difference: number | null
+    notes: string | null
+    product: Product
+    unit?: string // Computed from product
+}
 
 export default function StockOpnameForm() {
     const { id } = useParams<{ id: string }>()
@@ -15,7 +28,7 @@ export default function StockOpnameForm() {
     const [status, setStatus] = useState<'loading' | 'ready' | 'saving'>('loading')
 
     // Items Data
-    const [items, setItems] = useState<(InventoryCountItem & { product: Product })[]>([])
+    const [items, setItems] = useState<CountItemWithProduct[]>([])
     const [searchTerm, setSearchTerm] = useState('')
 
     // UI State
@@ -42,8 +55,7 @@ export default function StockOpnameForm() {
             const { data: existingItems, error: iErr } = await supabase
                 .from('inventory_count_items')
                 .select('*, product:products(*)')
-                .eq('inventory_count_id', id)
-                .returns<(InventoryCountItem & { product: Product })[]>()
+                .eq('count_id', id)
 
             if (iErr) throw iErr
 
@@ -51,7 +63,13 @@ export default function StockOpnameForm() {
             if (sess.status === 'draft' && (!existingItems || existingItems.length === 0)) {
                 await initializeItems(id)
             } else {
-                setItems(existingItems || [])
+                // Add unit from product to each item
+                const rawItems = existingItems as unknown as Array<CountItemWithProduct & { product?: Product }>;
+                const itemsWithUnit = rawItems.map((item) => ({
+                    ...item,
+                    unit: item.product?.unit || 'pcs'
+                })) as CountItemWithProduct[]
+                setItems(itemsWithUnit)
             }
         } catch (error) {
             console.error('Error loading session:', error)
@@ -66,20 +84,18 @@ export default function StockOpnameForm() {
             .from('products')
             .select('*')
             .eq('is_active', true)
-            .returns<Product[]>()
 
         if (!products) return
 
-        const records: Insertable<'inventory_count_items'>[] = products.map(p => ({
-            inventory_count_id: sessionId,
+        const records = products.map(p => ({
+            count_id: sessionId,
             product_id: p.id,
-            system_stock: p.current_stock, // SNAPSHOT
-            unit: p.unit
+            system_quantity: p.current_stock || 0
         }))
 
         const { error } = await supabase
             .from('inventory_count_items')
-            .insert(records)
+            .insert(records as never)
             .select('*, product:products(*)')
 
         if (error) {
@@ -90,18 +106,22 @@ export default function StockOpnameForm() {
         const { data: reloaded } = await supabase
             .from('inventory_count_items')
             .select('*, product:products(*)')
-            .eq('inventory_count_id', sessionId)
-            .returns<(InventoryCountItem & { product: Product })[]>()
+            .eq('count_id', sessionId)
 
-        setItems(reloaded || [])
+        const rawItems = reloaded as unknown as Array<CountItemWithProduct & { product?: Product }>;
+        const itemsWithUnit = rawItems.map((item) => ({
+            ...item,
+            unit: item.product?.unit || 'pcs'
+        })) as CountItemWithProduct[]
+        setItems(itemsWithUnit)
     }
 
     async function handleUpdateCount(itemId: string, actual: number | null) {
         // Optimistic update
         const newItems = items.map(i => {
             if (i.id === itemId) {
-                const variance = actual !== null ? (actual - i.system_stock) : null
-                return { ...i, actual_stock: actual, variance }
+                const diff = actual !== null ? (actual - i.system_quantity) : null
+                return { ...i, counted_quantity: actual, difference: diff }
             }
             return i
         })
@@ -114,23 +134,22 @@ export default function StockOpnameForm() {
         try {
             const updates = items.map(i => ({
                 id: i.id,
-                inventory_count_id: session.id,
+                count_id: session.id,
                 product_id: i.product_id,
-                system_stock: i.system_stock,
-                actual_stock: i.actual_stock,
-                variance: i.variance,
-                updated_at: new Date().toISOString()
+                system_quantity: i.system_quantity,
+                counted_quantity: i.counted_quantity,
+                difference: i.difference
             }))
 
             const { error } = await supabase
                 .from('inventory_count_items')
-                .upsert(updates)
+                .upsert(updates as never)
 
             if (error) throw error
 
             alert('Brouillon sauvegardé')
-        } catch (e: any) {
-            alert('Erreur sauvegarde: ' + e.message)
+        } catch (e) {
+            alert('Erreur sauvegarde: ' + (e instanceof Error ? e.message : 'Erreur inconnue'))
         } finally {
             setStatus('ready')
         }
@@ -143,17 +162,18 @@ export default function StockOpnameForm() {
         try {
             await saveDraft()
 
-            const { error } = await supabase.rpc('finalize_inventory_count', {
-                count_uuid: id!,
-                user_uuid: (await supabase.auth.getUser()).data.user?.id || ''
-            })
+            // Update status to completed
+            const { error } = await supabase
+                .from('inventory_counts')
+                .update({ status: 'completed' })
+                .eq('id', id!)
 
             if (error) throw error
 
             alert('Inventaire validé et stocks mis à jour !')
             navigate('/inventory/stock-opname')
-        } catch (e: any) {
-            alert('Erreur validation: ' + e.message)
+        } catch (e) {
+            alert('Erreur validation: ' + (e instanceof Error ? e.message : 'Erreur inconnue'))
             setStatus('ready')
         }
     }
@@ -256,26 +276,26 @@ export default function StockOpnameForm() {
                                         {blindMode && !isLocked ? (
                                             <span className="text-muted italic">Masqué</span>
                                         ) : (
-                                            <span className="font-medium">{item.system_stock} {item.unit}</span>
+                                            <span className="font-medium">{item.system_quantity} {item.unit}</span>
                                         )}
                                     </td>
                                     <td className="text-right real-stock-col">
                                         {isLocked ? (
-                                            <span className="font-bold">{item.actual_stock}</span>
+                                            <span className="font-bold">{item.counted_quantity}</span>
                                         ) : (
                                             <input
                                                 type="number"
                                                 className="count-input"
-                                                value={item.actual_stock ?? ''}
+                                                value={item.counted_quantity ?? ''}
                                                 placeholder="-"
                                                 onChange={e => handleUpdateCount(item.id, e.target.value ? parseFloat(e.target.value) : null)}
                                             />
                                         )}
                                     </td>
                                     <td className="text-right">
-                                        {item.variance !== null && !blindMode ? (
-                                            <span className={item.variance === 0 ? 'variance-neutral' : (item.variance > 0 ? 'variance-positive' : 'variance-negative')}>
-                                                {item.variance > 0 ? '+' : ''}{item.variance} {item.unit}
+                                        {item.difference !== null && !blindMode ? (
+                                            <span className={item.difference === 0 ? 'variance-neutral' : (item.difference > 0 ? 'variance-positive' : 'variance-negative')}>
+                                                {item.difference > 0 ? '+' : ''}{item.difference} {item.unit}
                                             </span>
                                         ) : (
                                             <span className="text-gray-300">-</span>

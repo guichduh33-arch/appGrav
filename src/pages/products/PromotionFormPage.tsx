@@ -122,8 +122,9 @@ export default function PromotionFormPage() {
 
             if (error) throw error
             if (data) {
+                const d = data as any
                 setForm({
-                    code: data.code,
+                    code: d.code || '',
                     name: data.name,
                     description: data.description || '',
                     promotion_type: data.promotion_type as PromotionType,
@@ -132,15 +133,15 @@ export default function PromotionFormPage() {
                     buy_quantity: data.buy_quantity || 2,
                     get_quantity: data.get_quantity || 1,
                     min_purchase_amount: data.min_purchase_amount || 0,
-                    max_uses_total: data.max_uses_total,
-                    max_uses_per_customer: data.max_uses_per_customer,
+                    max_uses_total: d.max_uses_total || null,
+                    max_uses_per_customer: d.max_uses_per_customer || null,
                     start_date: data.start_date || '',
                     end_date: data.end_date || '',
                     days_of_week: data.days_of_week || [],
-                    time_start: data.time_start || '',
-                    time_end: data.time_end || '',
+                    time_start: d.time_start || '',
+                    time_end: d.time_end || '',
                     priority: data.priority || 0,
-                    is_stackable: data.is_stackable ?? false,
+                    is_stackable: d.is_stackable ?? false,
                     is_active: data.is_active ?? true
                 })
 
@@ -151,7 +152,9 @@ export default function PromotionFormPage() {
                     .eq('promotion_id', id)
 
                 if (promoProducts) {
-                    setSelectedProducts(promoProducts.map((pp: any) => pp.product).filter(Boolean))
+                    type PromoProductRow = { product: Product | null };
+                    const rawData = promoProducts as unknown as PromoProductRow[];
+                    setSelectedProducts(rawData.map((pp) => pp.product).filter((p): p is Product => p !== null))
                 }
 
                 const { data: promoFreeProducts } = await supabase
@@ -160,7 +163,9 @@ export default function PromotionFormPage() {
                     .eq('promotion_id', id)
 
                 if (promoFreeProducts) {
-                    setFreeProducts(promoFreeProducts.map((pp: any) => pp.product).filter(Boolean))
+                    type PromoFreeProductRow = { product: Product | null };
+                    const rawFreeData = promoFreeProducts as unknown as PromoFreeProductRow[];
+                    setFreeProducts(rawFreeData.map((pp) => pp.product).filter((p): p is Product => p !== null))
                 }
             }
         } catch (error) {
@@ -247,7 +252,6 @@ export default function PromotionFormPage() {
         setSaving(true)
         try {
             const promotionData = {
-                code: form.code.toUpperCase(),
                 name: form.name,
                 description: form.description || null,
                 promotion_type: form.promotion_type,
@@ -256,15 +260,10 @@ export default function PromotionFormPage() {
                 buy_quantity: form.promotion_type === 'buy_x_get_y' ? form.buy_quantity : null,
                 get_quantity: form.promotion_type === 'buy_x_get_y' ? form.get_quantity : null,
                 min_purchase_amount: form.min_purchase_amount || null,
-                max_uses_total: form.max_uses_total || null,
-                max_uses_per_customer: form.max_uses_per_customer || null,
                 start_date: form.start_date || null,
                 end_date: form.end_date || null,
                 days_of_week: form.days_of_week.length > 0 ? form.days_of_week : null,
-                time_start: form.time_start || null,
-                time_end: form.time_end || null,
                 priority: form.priority,
-                is_stackable: form.is_stackable,
                 is_active: form.is_active
             }
 
@@ -273,7 +272,7 @@ export default function PromotionFormPage() {
             if (isEditing) {
                 const { error } = await supabase
                     .from('promotions')
-                    .update(promotionData)
+                    .update(promotionData as never)
                     .eq('id', id!)
 
                 if (error) throw error
@@ -285,7 +284,7 @@ export default function PromotionFormPage() {
             } else {
                 const { data, error } = await supabase
                     .from('promotions')
-                    .insert(promotionData)
+                    .insert(promotionData as never)
                     .select()
                     .single()
 
@@ -315,8 +314,8 @@ export default function PromotionFormPage() {
 
             toast.success(isEditing ? 'Promotion mise à jour' : 'Promotion créée')
             navigate('/products/promotions')
-        } catch (error: any) {
-            toast.error(error.message || 'Erreur sauvegarde')
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Erreur sauvegarde')
         } finally {
             setSaving(false)
         }

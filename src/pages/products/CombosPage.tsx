@@ -19,10 +19,13 @@ interface GroupItemWithProduct extends ProductComboGroupItem {
 
 interface ComboGroupWithItems extends ProductComboGroup {
     items: GroupItemWithProduct[]
+    group_name: string
 }
 
 interface ComboWithGroups extends ProductCombo {
     groups: ComboGroupWithItems[]
+    combo_price: number
+    available_at_pos: boolean
 }
 
 export default function CombosPage() {
@@ -76,13 +79,26 @@ export default function CombosPage() {
                             })
                         )
 
+                        // Map combo fields to match interface
+                        type RawGroup = ProductComboGroup & { items?: Array<ProductComboGroupItem & { product?: Product }> };
+                        const rawGroups = groupsWithItems as unknown as RawGroup[];
+                        const mappedGroups = rawGroups.map((g) => ({
+                            ...g,
+                            group_name: g.name,
+                            items: (g.items || []).map((item) => ({
+                                ...item,
+                                product: item.product
+                            }))
+                        }))
                         return {
                             ...combo,
-                            groups: groupsWithItems
+                            combo_price: combo.base_price,
+                            available_at_pos: combo.pos_visible,
+                            groups: mappedGroups
                         }
                     })
                 )
-                setCombos(combosWithGroups as ComboWithGroups[])
+                setCombos(combosWithGroups as unknown as ComboWithGroups[])
             }
         } catch (error) {
             console.error('Error fetching combos:', error)

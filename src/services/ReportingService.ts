@@ -23,7 +23,7 @@ export const ReportingService = {
         previousStart: Date,
         previousEnd: Date
     ): Promise<SalesComparison[]> {
-        const { data, error } = await supabase.rpc('get_sales_comparison', {
+        const { data, error } = await supabase.rpc('get_sales_comparison' as any, {
             current_start: currentStart.toISOString(),
             current_end: currentEnd.toISOString(),
             previous_start: previousStart.toISOString(),
@@ -31,7 +31,7 @@ export const ReportingService = {
         });
 
         if (error) throw error;
-        return (data || []) as SalesComparison[];
+        return (data || []) as unknown as SalesComparison[];
     },
 
     /**
@@ -41,7 +41,7 @@ export const ReportingService = {
         startDate: Date,
         endDate: Date
     ): Promise<DashboardSummary> {
-        const { data, error } = await supabase.rpc('get_reporting_dashboard_summary', {
+        const { data, error } = await supabase.rpc('get_reporting_dashboard_summary' as any, {
             start_date: startDate.toISOString(),
             end_date: endDate.toISOString(),
         });
@@ -57,10 +57,10 @@ export const ReportingService = {
         const { data, error } = await supabase
             .from('view_payment_method_stats')
             .select('*')
-            .order('total_revenue', { ascending: false });
+            .order('total_revenue' as any, { ascending: false });
 
         if (error) throw error;
-        return (data || []) as PaymentMethodStat[];
+        return (data || []) as unknown as PaymentMethodStat[];
     },
 
     /**
@@ -76,12 +76,20 @@ export const ReportingService = {
 
         if (error) throw error;
 
-        return (data || []).map((row: any) => ({
-            date: row.date,
-            total_sales: row.total_revenue,
-            total_orders: row.total_orders,
-            avg_basket: row.avg_basket_value,
-            net_revenue: row.net_revenue
+        type KpiRow = {
+            date: string | null;
+            total_revenue: number | null;
+            total_orders: number | null;
+            avg_order_value: number | null;
+            total_tax: number | null;
+        };
+        const rawData = data as unknown as KpiRow[];
+        return (rawData || []).map((row) => ({
+            date: row.date || '',
+            total_sales: row.total_revenue || 0,
+            total_orders: row.total_orders || 0,
+            avg_basket: row.avg_order_value || 0,
+            net_revenue: (row.total_revenue || 0) - (row.total_tax || 0)
         }));
     },
 
@@ -100,11 +108,18 @@ export const ReportingService = {
 
         const map = new Map<string, ProductPerformanceStat>();
 
-        data?.forEach((item: any) => {
-            const key = item.product_id || item.product_name;
+        type OrderItemRow = {
+            product_id: string | null;
+            product_name: string;
+            quantity: number;
+            total_price: number;
+        };
+        const rawData = data as unknown as OrderItemRow[];
+        rawData?.forEach((item) => {
+            const key = item.product_id ?? item.product_name;
             if (!map.has(key)) {
                 map.set(key, {
-                    product_id: item.product_id,
+                    product_id: item.product_id ?? '',
                     product_name: item.product_name,
                     quantity_sold: 0,
                     total_revenue: 0,
@@ -158,7 +173,13 @@ export const ReportingService = {
 
         const map = new Map<string, CategorySalesStat>();
 
-        data?.forEach((item: any) => {
+        type CategoryItemRow = {
+            quantity: number;
+            total_price: number;
+            product?: { category?: { id: string; name: string } };
+        };
+        const rawData = data as unknown as CategoryItemRow[];
+        rawData?.forEach((item) => {
             const category = item.product?.category;
             const key = category?.id || 'uncategorized';
             const name = category?.name || 'Uncategorized';
@@ -183,7 +204,7 @@ export const ReportingService = {
      * Get Stock Waste Report
      */
     async getStockWasteReport(): Promise<StockWaste[]> {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('view_stock_waste')
             .select('*')
             .order('waste_date', { ascending: false });
@@ -196,7 +217,7 @@ export const ReportingService = {
      * Get Session Discrepancies (Cashier Performance)
      */
     async getSessionDiscrepancies(): Promise<SessionDiscrepancy[]> {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
             .from('view_session_discrepancies')
             .select('*')
             .order('closed_at', { ascending: false });
@@ -211,11 +232,18 @@ export const ReportingService = {
     async getInventoryValuation(): Promise<InventoryValuation> {
         const { data, error } = await supabase
             .from('view_inventory_valuation')
-            .select('*')
-            .single();
+            .select('*');
 
         if (error) throw error;
-        return data as InventoryValuation;
+
+        // Aggregate the results from the view
+        const items = data || [];
+        return {
+            total_skus: items.length,
+            total_items_in_stock: items.reduce((sum, i) => sum + (i.current_stock || 0), 0),
+            total_valuation_cost: items.reduce((sum, i) => sum + (i.stock_value_cost || 0), 0),
+            total_valuation_retail: items.reduce((sum, i) => sum + (i.stock_value_retail || 0), 0),
+        };
     },
 
     /**
@@ -273,7 +301,13 @@ export const ReportingService = {
         // Aggregate by supplier
         const map = new Map<string, { supplier_name: string, total_quantity: number, total_value: number, transaction_count: number }>();
 
-        data?.forEach((item: any) => {
+        type SupplierMovementRow = {
+            quantity: number;
+            supplier?: { name?: string };
+            product?: { cost_price?: number };
+        };
+        const rawData = data as unknown as SupplierMovementRow[];
+        rawData?.forEach((item) => {
             const supplierName = item.supplier?.name || 'Unknown Supplier';
             const key = supplierName;
 

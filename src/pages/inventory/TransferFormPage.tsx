@@ -60,16 +60,16 @@ export default function TransferFormPage() {
             .select('*')
             .eq('is_active', true)
             .order('name')
-        if (data) setLocations(data)
+        if (data) setLocations(data as unknown as Location[])
     }
 
     const fetchProducts = async () => {
         const { data } = await supabase
             .from('products')
-            .select('id, name, sku, cost_price, stock_unit')
+            .select('id, name, sku, cost_price, unit')
             .eq('is_active', true)
             .order('name')
-        if (data) setProducts(data)
+        if (data) setProducts(data as unknown as Product[])
     }
 
     const fetchTransfer = async () => {
@@ -92,18 +92,28 @@ export default function TransferFormPage() {
 
             if (itemsError) throw itemsError
 
+            const t = transfer as any
             setFromLocationId(transfer.from_location_id)
             setToLocationId(transfer.to_location_id)
-            setResponsiblePerson(transfer.responsible_person)
-            setTransferDate(transfer.transfer_date)
+            setResponsiblePerson(t.responsible_person || transfer.requested_by || '')
+            setTransferDate(t.transfer_date || transfer.created_at?.split('T')[0] || '')
             setNotes(transfer.notes || '')
 
-            setItems(transferItems.map((item: any) => ({
+            const rawItems = transferItems as unknown as Array<{
+                id: string;
+                product_id: string;
+                product: { name: string };
+                quantity_requested: number;
+                unit?: string;
+                unit_cost?: number;
+                line_total?: number;
+            }>;
+            setItems(rawItems.map((item) => ({
                 id: item.id,
                 product_id: item.product_id,
                 product_name: item.product.name,
                 quantity_requested: item.quantity_requested,
-                unit: item.unit,
+                unit: item.unit || 'pcs',
                 unit_cost: item.unit_cost || 0,
                 line_total: item.line_total || 0
             })))
@@ -125,7 +135,7 @@ export default function TransferFormPage() {
         }])
     }
 
-    const updateItem = (index: number, field: keyof TransferItem, value: any) => {
+    const updateItem = (index: number, field: keyof TransferItem, value: string | number | null) => {
         const newItems = [...items]
         newItems[index] = { ...newItems[index], [field]: value }
 
@@ -176,22 +186,20 @@ export default function TransferFormPage() {
 
         setLoading(true)
         try {
+            const transferNumber = `TR-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`
             const transferData = {
+                transfer_number: transferNumber,
                 from_location_id: fromLocationId,
                 to_location_id: toLocationId,
-                responsible_person: responsiblePerson.trim(),
-                transfer_date: transferDate,
                 status: sendDirectly ? 'pending' : 'draft',
                 notes: notes.trim() || null,
-                requested_by: user?.id,
-                requested_by_name: user?.name,
-                requested_at: new Date().toISOString()
+                requested_by: user?.id
             }
 
             if (isEditing) {
                 const { error } = await supabase
                     .from('internal_transfers')
-                    .update(transferData)
+                    .update(transferData as never)
                     .eq('id', id!)
 
                 if (error) throw error
@@ -204,7 +212,7 @@ export default function TransferFormPage() {
             if (!isEditing) {
                 const { data: newTransfer, error } = await supabase
                     .from('internal_transfers')
-                    .insert(transferData)
+                    .insert(transferData as never)
                     .select()
                     .single()
 
@@ -216,23 +224,20 @@ export default function TransferFormPage() {
                 transfer_id: transferId,
                 product_id: item.product_id,
                 quantity_requested: item.quantity_requested,
-                quantity_shipped: sendDirectly ? item.quantity_requested : 0,
-                unit: item.unit,
-                unit_cost: item.unit_cost,
-                line_total: item.line_total
+                quantity_received: sendDirectly ? item.quantity_requested : 0
             }))
 
             const { error: itemsError } = await supabase
                 .from('transfer_items')
-                .insert(itemsToInsert)
+                .insert(itemsToInsert as never)
 
             if (itemsError) throw itemsError
 
             toast.success(isEditing ? 'Transfert mis à jour' : 'Transfert créé')
             navigate('/inventory/transfers')
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error saving transfer:', error)
-            toast.error(error.message || 'Erreur lors de l\'enregistrement')
+            toast.error(error instanceof Error ? error.message : 'Erreur lors de l\'enregistrement')
         } finally {
             setLoading(false)
         }

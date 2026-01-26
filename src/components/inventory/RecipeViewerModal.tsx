@@ -56,9 +56,9 @@ export default function RecipeViewerModal({ product, onClose }: RecipeViewerModa
                                 <span>Quantité</span>
                                 <span>Stock Actuel</span>
                             </div>
-                            {recipe.map((item: any, index: number) => {
+                            {(recipe as unknown as Array<{ material?: Product & { current_stock?: number }; quantity: number; unit?: string }>).map((item, index) => {
                                 const material = item.material
-                                const isLowStock = material && material.current_stock < item.quantity
+                                const isLowStock = material && (material.current_stock ?? 0) < item.quantity
 
                                 return (
                                     <div key={index} className={`recipe-item ${isLowStock ? 'is-low' : ''}`}>

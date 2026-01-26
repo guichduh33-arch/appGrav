@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { usePermissions } from '../../hooks/usePermissions';
-import { authService } from '../../services/AuthService';
+import { authService } from '../../services/authService';
 import { supabase } from '../../lib/supabase';
 import { format } from 'date-fns';
 import { fr, enUS, id } from 'date-fns/locale';
@@ -58,10 +58,11 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (user) {
+      const userAny = user as any;
       setFormData({
         display_name: user.display_name || '',
         phone: user.phone || '',
-        preferred_language: user.preferred_language || 'fr',
+        preferred_language: userAny.preferred_language || user.language || 'fr',
       });
       loadSessions();
     }
@@ -75,11 +76,29 @@ export default function ProfilePage() {
         .from('user_sessions')
         .select('*')
         .eq('user_id', user.id)
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
+        .is('ended_at', null)
+        .order('started_at', { ascending: false });
 
       if (error) throw error;
-      setSessions(data || []);
+      // Map the database fields to our interface
+      type SessionRow = {
+        id: string;
+        device_info?: { type?: string; name?: string } | null;
+        ip_address?: string | null;
+        started_at: string;
+        ended_at?: string | null;
+      };
+      const rawData = data as unknown as SessionRow[];
+      const mapped = rawData.map((s) => ({
+        id: s.id,
+        device_type: (s.device_info as { type?: string })?.type || 'unknown',
+        device_name: (s.device_info as { name?: string })?.name || 'Unknown Device',
+        ip_address: s.ip_address || '',
+        created_at: s.started_at,
+        expires_at: s.ended_at || '',
+        is_active: !s.ended_at,
+      }));
+      setSessions(mapped);
     } catch (error) {
       console.error('Error loading sessions:', error);
     } finally {
@@ -96,8 +115,8 @@ export default function ProfilePage() {
         .update({
           display_name: formData.display_name,
           phone: formData.phone,
-          preferred_language: formData.preferred_language,
-        })
+          language: formData.preferred_language,
+        } as never)
         .eq('id', user.id);
 
       if (error) throw error;
@@ -109,9 +128,9 @@ export default function ProfilePage() {
 
       toast.success(t('auth.profile.updated') || 'Profil mis à jour');
       setIsEditing(false);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error(error.message || t('common.error'));
+      toast.error(error instanceof Error ? error.message : t('common.error'));
     } finally {
       setIsSaving(false);
     }
@@ -141,9 +160,9 @@ export default function ProfilePage() {
       } else {
         toast.error(result.error || t('common.error'));
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error changing PIN:', error);
-      toast.error(error.message || t('common.error'));
+      toast.error(error instanceof Error ? error.message : t('common.error'));
     } finally {
       setChangingPin(false);
     }
@@ -159,16 +178,16 @@ export default function ProfilePage() {
     try {
       const { error } = await supabase
         .from('user_sessions')
-        .update({ is_active: false })
+        .update({ ended_at: new Date().toISOString() } as never)
         .eq('id', sessionIdToTerminate);
 
       if (error) throw error;
 
       toast.success(t('auth.profile.sessionTerminated') || 'Session terminée');
       loadSessions();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error terminating session:', error);
-      toast.error(error.message || t('common.error'));
+      toast.error(error instanceof Error ? error.message : t('common.error'));
     }
   };
 
@@ -249,12 +268,12 @@ export default function ProfilePage() {
                   {user.avatar_url ? (
                     <img
                       src={user.avatar_url}
-                      alt={user.name}
+                      alt={user.display_name || 'User'}
                       className="w-20 h-20 rounded-full object-cover border-4 border-white shadow"
                     />
                   ) : (
                     <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-3xl font-bold text-white shadow">
-                      {(user.display_name || user.name).charAt(0).toUpperCase()}
+                      {(user.display_name || user.first_name || 'U').charAt(0).toUpperCase()}
                     </div>
                   )}
                   <button
@@ -267,9 +286,9 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900">
-                    {user.display_name || user.name}
+                    {user.display_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User'}
                   </h3>
-                  <p className="text-gray-500">{user.employee_code || '-'}</p>
+                  <p className="text-gray-500">{(user as any).employee_code || '-'}</p>
                 </div>
               </div>
 
@@ -284,7 +303,7 @@ export default function ProfilePage() {
                       value={formData.display_name}
                       onChange={(e) => setFormData({ ...formData, display_name: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      placeholder={user.name}
+                      placeholder={user.display_name || `${user.first_name || ''} ${user.last_name || ''}`.trim()}
                     />
                   </div>
 
@@ -345,7 +364,7 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm text-gray-500">{t('auth.profile.name') || 'Nom'}</label>
-                      <p className="font-medium">{user.name}</p>
+                      <p className="font-medium">{`${user.first_name || ''} ${user.last_name || ''}`.trim() || '-'}</p>
                     </div>
                     <div>
                       <label className="text-sm text-gray-500">{t('auth.profile.displayName') || 'Nom affiché'}</label>
@@ -358,9 +377,9 @@ export default function ProfilePage() {
                     <div>
                       <label className="text-sm text-gray-500">{t('auth.profile.language') || 'Langue'}</label>
                       <p className="font-medium">
-                        {user.preferred_language === 'fr' ? 'Français' :
-                          user.preferred_language === 'en' ? 'English' :
-                            user.preferred_language === 'id' ? 'Bahasa Indonesia' : '-'}
+                        {user.language === 'fr' ? 'Français' :
+                          user.language === 'en' ? 'English' :
+                            user.language === 'id' ? 'Bahasa Indonesia' : '-'}
                       </p>
                     </div>
                   </div>
@@ -523,7 +542,7 @@ export default function ProfilePage() {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">{t('auth.profile.employeeCode') || 'Code employé'}</span>
-                <span className="font-mono">{user.employee_code || '-'}</span>
+                <span className="font-mono">{(user as any).employee_code || '-'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">{t('auth.profile.createdAt') || 'Créé le'}</span>

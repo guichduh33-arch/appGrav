@@ -23,10 +23,9 @@ interface WasteRecord {
     quantity: number
     reason: string
     notes: string | null
-    recorded_by: string
-    user: { name: string } | null
+    performed_by: string | null
     created_at: string
-    cost_value: number
+    unit_cost: number | null
 }
 
 interface Product {
@@ -80,12 +79,10 @@ export default function WastedPage() {
                     product_id,
                     product:products(id, name, sku, unit),
                     quantity,
-                    reason,
                     notes,
-                    recorded_by,
-                    user:user_profiles!recorded_by(name),
+                    performed_by,
                     created_at,
-                    cost_value
+                    unit_cost
                 `)
                 .eq('movement_type', 'waste')
                 .order('created_at', { ascending: false })
@@ -106,7 +103,29 @@ export default function WastedPage() {
             const { data: wasteData, error: wasteError } = await query
 
             if (wasteError) throw wasteError
-            setWasteRecords(wasteData || [])
+            // Map data to WasteRecord format - extract reason from notes if present
+            const rawData = wasteData as unknown as Array<{
+                id: string;
+                product_id: string;
+                product: { id: string; name: string; sku: string; unit: string } | null;
+                quantity: number;
+                notes?: string | null;
+                performed_by?: string | null;
+                created_at: string;
+                unit_cost?: number | null;
+            }>;
+            const mappedData: WasteRecord[] = rawData.map((r) => ({
+                id: r.id,
+                product_id: r.product_id,
+                product: r.product,
+                quantity: r.quantity,
+                reason: r.notes?.split(':')[0] || 'other',
+                notes: r.notes ?? null,
+                performed_by: r.performed_by ?? null,
+                created_at: r.created_at,
+                unit_cost: r.unit_cost ?? null
+            }))
+            setWasteRecords(mappedData)
 
             // Load products for the form
             const { data: productsData, error: productsError } = await supabase
@@ -129,7 +148,7 @@ export default function WastedPage() {
     const stats = {
         totalRecords: wasteRecords.length,
         totalQuantity: wasteRecords.reduce((sum, r) => sum + Math.abs(r.quantity), 0),
-        totalCost: wasteRecords.reduce((sum, r) => sum + (r.cost_value || 0), 0),
+        totalCost: wasteRecords.reduce((sum, r) => sum + (Math.abs(r.quantity) * (r.unit_cost || 0)), 0),
         byReason: WASTE_REASONS.map(r => ({
             reason: r.value,
             count: wasteRecords.filter(wr => wr.reason === r.value).length
@@ -169,21 +188,20 @@ export default function WastedPage() {
 
         setIsSaving(true)
         try {
-            const costValue = qty * (selectedProduct.cost_price || 0)
+            const movementId = `MV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
+            const combinedNotes = `${reason}${notes ? ': ' + notes : ''}`
 
             const { error } = await supabase
                 .from('stock_movements')
                 .insert({
+                    movement_id: movementId,
                     product_id: selectedProduct.id,
                     movement_type: 'waste',
                     quantity: -qty, // Negative for waste
-                    reason,
-                    notes: notes || null,
-                    recorded_by: user?.id,
-                    cost_value: costValue,
-                    reference_type: 'waste',
-                    reference_id: null
-                })
+                    notes: combinedNotes,
+                    performed_by: user?.id,
+                    unit_cost: selectedProduct.cost_price || 0
+                } as never)
 
             if (error) throw error
 
@@ -346,10 +364,10 @@ export default function WastedPage() {
                                         </span>
                                     </td>
                                     <td className="cell-cost">
-                                        {formatCurrency(record.cost_value || 0)}
+                                        {formatCurrency(Math.abs(record.quantity) * (record.unit_cost || 0))}
                                     </td>
                                     <td className="cell-user">
-                                        {record.user?.name || '-'}
+                                        {record.performed_by || '-'}
                                     </td>
                                     <td className="cell-notes">
                                         {record.notes || '-'}

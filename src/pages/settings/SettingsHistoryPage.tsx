@@ -25,11 +25,22 @@ const SettingsHistoryPage = () => {
     return String(value);
   };
 
+  // Define type for history items
+  type HistoryItem = {
+    id: string;
+    old_value: unknown;
+    new_value: unknown;
+    change_reason?: string;
+    changed_at: string;
+    setting?: { key?: string; name_fr?: string; name_en?: string; name_id?: string };
+    user?: { display_name?: string; first_name?: string; last_name?: string };
+  };
+
   // Filter history
-  const filteredHistory = history?.filter((item: any) => {
+  const filteredHistory = history?.filter((item: HistoryItem) => {
     if (!searchQuery) return true;
     const search = searchQuery.toLowerCase();
-    const setting = item.setting as { key?: string; name_fr?: string; name_en?: string; name_id?: string } | undefined;
+    const setting = item.setting;
     return (
       setting?.key?.toLowerCase().includes(search) ||
       setting?.name_fr?.toLowerCase().includes(search) ||
@@ -78,9 +89,9 @@ const SettingsHistoryPage = () => {
           </div>
         ) : (
           <div className="settings-history-list">
-            {filteredHistory.map((item: any) => {
-              const setting = item.setting as { key?: string; name_fr?: string; name_en?: string; name_id?: string } | undefined;
-              const user = item.user as { display_name?: string; first_name?: string; last_name?: string } | undefined;
+            {filteredHistory.map((item: HistoryItem) => {
+              const setting = item.setting;
+              const user = item.user;
               const userName = user?.display_name ||
                 (user?.first_name && user?.last_name
                   ? `${user.first_name} ${user.last_name}`

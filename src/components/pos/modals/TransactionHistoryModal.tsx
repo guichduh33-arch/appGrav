@@ -38,7 +38,7 @@ interface OrderWithItems {
         quantity: number
         unit_price: number
         total_price: number
-        modifiers: any
+        modifiers: Array<{ name: string; price?: number }> | null
         modifiers_total: number
     }[]
 }
@@ -99,7 +99,12 @@ export default function TransactionHistoryModal({
             }
 
             // Map total to total_amount for consistency
-            return (data || []).map((order: any) => ({
+            type RawOrder = Omit<OrderWithItems, 'total_amount' | 'items'> & {
+                total: number;
+                order_items?: OrderWithItems['items'];
+            };
+            const rawOrders = data as unknown as RawOrder[];
+            return (rawOrders || []).map((order) => ({
                 ...order,
                 total_amount: order.total,
                 items: order.order_items || []

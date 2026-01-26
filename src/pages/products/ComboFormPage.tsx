@@ -90,9 +90,9 @@ export default function ComboFormPage() {
             if (comboData) {
                 setName(comboData.name)
                 setDescription(comboData.description || '')
-                setComboPrice(comboData.combo_price)
+                setComboPrice(comboData.base_price)
                 setIsActive(comboData.is_active)
-                setAvailableAtPos(comboData.available_at_pos)
+                setAvailableAtPos(comboData.pos_visible)
                 setImageUrl(comboData.image_url || '')
                 setSortOrder(comboData.sort_order)
 
@@ -110,18 +110,32 @@ export default function ComboFormPage() {
                         groupsData.map(async (group) => {
                             const { data: itemsData } = await supabase
                                 .from('product_combo_group_items')
-                                .select(`
-                                    *,
-                                    product:products(*)
-                                `)
+                                .select('*')
                                 .eq('group_id', group.id)
                                 .order('sort_order')
 
+                            // Fetch product details for each item
+                            type RawGroupItem = { id: string; product_id: string; price_adjustment?: number; is_default?: boolean; sort_order?: number };
+                            const itemsWithProducts = await Promise.all((itemsData || []).map(async (item: RawGroupItem) => {
+                                const { data: product } = await supabase
+                                    .from('products')
+                                    .select('*')
+                                    .eq('id', item.product_id)
+                                    .single()
+                                return { ...item, product }
+                            }))
+
                             return {
-                                ...group,
-                                items: itemsData || [],
+                                id: group.id,
+                                group_name: group.name,
+                                group_type: group.max_selections === 1 ? 'single' : 'multiple',
+                                is_required: group.is_required,
+                                min_selections: group.min_selections,
+                                max_selections: group.max_selections,
+                                sort_order: group.sort_order,
+                                items: itemsWithProducts,
                                 expanded: true
-                            }
+                            } as ComboGroup
                         })
                     )
                     setGroups(groupsWithItems)
@@ -292,9 +306,9 @@ export default function ComboFormPage() {
                     .update({
                         name,
                         description: description || null,
-                        combo_price: comboPrice,
+                        base_price: comboPrice,
                         is_active: isActive,
-                        available_at_pos: availableAtPos,
+                        pos_visible: availableAtPos,
                         image_url: imageUrl || null,
                         sort_order: sortOrder
                     })
@@ -321,9 +335,9 @@ export default function ComboFormPage() {
                     .insert({
                         name,
                         description: description || null,
-                        combo_price: comboPrice,
+                        base_price: comboPrice,
                         is_active: isActive,
-                        available_at_pos: availableAtPos,
+                        pos_visible: availableAtPos,
                         image_url: imageUrl || null,
                         sort_order: sortOrder
                     })
@@ -353,8 +367,7 @@ export default function ComboFormPage() {
                 .from('product_combo_groups')
                 .insert({
                     combo_id: comboId,
-                    group_name: group.group_name,
-                    group_type: group.group_type,
+                    name: group.group_name,
                     is_required: group.is_required,
                     min_selections: group.min_selections,
                     max_selections: group.max_selections,

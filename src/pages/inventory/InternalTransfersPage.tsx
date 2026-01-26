@@ -50,14 +50,27 @@ export default function InternalTransfersPage() {
 
             if (error) throw error
 
-            const formattedData: Transfer[] = (data || []).map((t: any) => ({
+            const rawData = data as unknown as Array<{
+                id: string;
+                transfer_number: string;
+                from_location?: { name: string };
+                to_location?: { name: string };
+                status: string;
+                responsible_person?: string;
+                requested_by?: string;
+                transfer_date?: string;
+                created_at: string;
+                total_items?: number;
+                total_value?: number;
+            }>;
+            const formattedData: Transfer[] = rawData.map((t) => ({
                 id: t.id,
                 transfer_number: t.transfer_number,
                 from_location_name: t.from_location?.name || 'Unknown',
                 to_location_name: t.to_location?.name || 'Unknown',
                 status: t.status,
-                responsible_person: t.responsible_person,
-                transfer_date: t.transfer_date,
+                responsible_person: t.responsible_person || t.requested_by || '',
+                transfer_date: t.transfer_date || t.created_at.split('T')[0],
                 total_items: t.total_items || 0,
                 total_value: t.total_value || 0,
                 created_at: t.created_at
