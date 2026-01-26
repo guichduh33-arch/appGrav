@@ -117,17 +117,33 @@ export default function RolesPage() {
 
       if (permsError) throw permsError;
 
+      // Define inline types for Supabase results
+      type RoleRow = Role & { user_roles?: { count: number }[] };
+      type RolePermRow = { role_id: string; permission_id: string };
+      type PermissionRow = Partial<Permission> & { id: string; code: string; module: string };
+
+      // Cast through unknown to handle Supabase type mismatches
+      const rawRoles = rolesData as unknown as RoleRow[];
+      const rawRolePerms = rolePermsData as unknown as RolePermRow[];
+      const rawPerms = permsData as unknown as PermissionRow[];
+
       // Map permissions to roles
-      const rolesWithPerms = (rolesData || []).map((role: any) => ({
+      const rolesWithPerms = (rawRoles || []).map((role) => ({
         ...role,
-        permissions: (rolePermsData || [])
-          .filter((rp: any) => rp.role_id === role.id)
-          .map((rp: any) => rp.permission_id),
+        permissions: (rawRolePerms || [])
+          .filter((rp) => rp.role_id === role.id)
+          .map((rp) => rp.permission_id),
         user_count: role.user_roles?.[0]?.count || 0,
       }));
 
       setRoles(rolesWithPerms as RoleWithPermissions[]);
-      setPermissions((permsData || []) as Permission[]);
+      // Map permissions to include missing fields
+      const mappedPerms = (rawPerms || []).map((p) => ({
+        ...p,
+        action: p.action || p.code.split('.').pop() || '',
+        is_sensitive: p.is_sensitive ?? false,
+      }));
+      setPermissions(mappedPerms as Permission[]);
     } catch (error) {
       console.error('Error loading roles:', error);
       toast.error('Erreur de chargement');
@@ -250,9 +266,9 @@ export default function RolesPage() {
       toast.success(selectedRole ? 'Rôle mis à jour' : 'Rôle créé');
       setShowModal(false);
       loadData();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error saving role:', error);
-      toast.error(error.message || 'Erreur lors de la sauvegarde');
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de la sauvegarde');
     } finally {
       setIsSaving(false);
     }
@@ -288,9 +304,9 @@ export default function RolesPage() {
 
       toast.success('Rôle supprimé');
       loadData();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error deleting role:', error);
-      toast.error(error.message || 'Erreur lors de la suppression');
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de la suppression');
     }
   };
 

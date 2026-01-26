@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, CheckCircle, Edit } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import { useAuthStore } from '../../stores/authStore'
 import toast from 'react-hot-toast'
 import './TransferDetailPage.css'
 
@@ -31,7 +30,6 @@ interface Transfer {
 export default function TransferDetailPage() {
     const navigate = useNavigate()
     const { id } = useParams()
-    const { user } = useAuthStore()
     const [transfer, setTransfer] = useState<Transfer | null>(null)
     const [loading, setLoading] = useState(true)
     const [receiving, setReceiving] = useState(false)
@@ -64,25 +62,48 @@ export default function TransferDetailPage() {
 
             if (iError) throw iError
 
+            const tTyped = t as unknown as {
+                id: string;
+                transfer_number: string;
+                status: string;
+                notes: string | null;
+                created_at: string;
+                requested_by: string | null;
+                from_location?: { name: string };
+                to_location?: { name: string };
+                responsible_person?: string;
+                transfer_date?: string;
+                total_items?: number;
+                total_value?: number;
+            };
+            const rawItems = items as unknown as Array<{
+                id: string;
+                product?: { name: string };
+                quantity_requested: number;
+                quantity_received: number | null;
+                unit?: string;
+                unit_cost?: number;
+                line_total?: number;
+            }>;
             setTransfer({
-                id: t.id,
-                transfer_number: t.transfer_number,
-                from_location_name: t.from_location?.name,
-                to_location_name: t.to_location?.name,
-                status: t.status,
-                responsible_person: t.responsible_person,
-                transfer_date: t.transfer_date,
-                total_items: t.total_items,
-                total_value: t.total_value,
-                notes: t.notes,
-                items: items.map((i: any) => ({
+                id: tTyped.id,
+                transfer_number: tTyped.transfer_number,
+                from_location_name: tTyped.from_location?.name || 'N/A',
+                to_location_name: tTyped.to_location?.name || 'N/A',
+                status: tTyped.status,
+                responsible_person: tTyped.responsible_person || tTyped.requested_by || '',
+                transfer_date: tTyped.transfer_date || tTyped.created_at,
+                total_items: tTyped.total_items || 0,
+                total_value: tTyped.total_value || 0,
+                notes: tTyped.notes,
+                items: rawItems.map((i) => ({
                     id: i.id,
-                    product_name: i.product.name,
+                    product_name: i.product?.name || 'Unknown',
                     quantity_requested: i.quantity_requested,
-                    quantity_received: i.quantity_received,
-                    unit: i.unit,
-                    unit_cost: i.unit_cost,
-                    line_total: i.line_total
+                    quantity_received: i.quantity_received ?? 0,
+                    unit: i.unit || 'pcs',
+                    unit_cost: i.unit_cost || 0,
+                    line_total: i.line_total || 0
                 }))
             })
         } catch (error) {
@@ -111,11 +132,8 @@ export default function TransferDetailPage() {
             await supabase
                 .from('internal_transfers')
                 .update({
-                    status: 'received',
-                    received_by: user?.id,
-                    received_by_name: user?.name,
-                    received_at: new Date().toISOString()
-                })
+                    status: 'received'
+                } as never)
                 .eq('id', transfer.id)
 
             toast.success('Transfert reçu avec succès')

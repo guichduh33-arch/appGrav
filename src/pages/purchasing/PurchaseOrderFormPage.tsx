@@ -100,19 +100,16 @@ export default function PurchaseOrderFormPage() {
             // Filter raw materials in JavaScript if product_type exists
             if (data && data.length > 0) {
                 // Check if product_type field exists
+                type ProductRow = { product_type?: string };
                 if ('product_type' in data[0]) {
-                    data = data.filter((p: any) => p.product_type === 'raw_material')
-                    console.log('Raw materials loaded (filtered):', data?.length || 0)
-                } else {
-                    console.log('All products loaded (product_type not found):', data?.length || 0)
+                    data = data.filter((p: ProductRow) => p.product_type === 'raw_material')
                 }
             }
 
-            console.log('Products loaded:', data?.length || 0, data)
             if (data) setProducts(data)
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error fetching products:', error)
-            alert(`Erreur lors du chargement des produits:\n${error?.message || 'Erreur inconnue'}`)
+            alert(`Erreur lors du chargement des produits:\n${error instanceof Error ? error.message : 'Erreur inconnue'}`)
         }
     }
 
@@ -133,27 +130,44 @@ export default function PurchaseOrderFormPage() {
 
             if (itemsError) throw itemsError
 
+            const poAny = po as any
             setFormData({
                 supplier_id: po.supplier_id,
-                expected_delivery_date: po.expected_delivery_date ? po.expected_delivery_date.split('T')[0] : '',
+                expected_delivery_date: (poAny.expected_delivery_date || po.expected_date || '').split('T')[0],
                 notes: po.notes || '',
-                discount_amount: parseFloat(po.discount_amount),
-                discount_percentage: po.discount_percentage,
-                status: po.status
+                discount_amount: parseFloat(poAny.discount_amount || '0'),
+                discount_percentage: poAny.discount_percentage || null,
+                status: po.status as 'draft'
             })
 
             if (poItems && poItems.length > 0) {
-                setItems(poItems.map(item => ({
+                type RawPOItem = {
+                    id: string;
+                    product_id: string;
+                    product_name?: string;
+                    description?: string;
+                    notes?: string | null;
+                    quantity?: number;
+                    quantity_ordered?: number;
+                    unit_price?: number;
+                    discount_amount?: number;
+                    discount_percentage?: number | null;
+                    tax_rate?: number;
+                    line_total?: number;
+                    total_price?: number;
+                };
+                const rawItems = poItems as unknown as RawPOItem[];
+                setItems(rawItems.map((item) => ({
                     id: item.id,
                     product_id: item.product_id,
-                    product_name: item.product_name,
-                    description: item.description || '',
-                    quantity: parseFloat(String(item.quantity)),
-                    unit_price: parseFloat(String(item.unit_price)),
-                    discount_amount: parseFloat(String(item.discount_amount)),
-                    discount_percentage: item.discount_percentage,
-                    tax_rate: parseFloat(String(item.tax_rate)),
-                    line_total: parseFloat(String(item.line_total))
+                    product_name: item.product_name || '',
+                    description: item.description || item.notes || '',
+                    quantity: parseFloat(String(item.quantity || item.quantity_ordered || 0)),
+                    unit_price: parseFloat(String(item.unit_price || 0)),
+                    discount_amount: parseFloat(String(item.discount_amount || 0)),
+                    discount_percentage: item.discount_percentage || null,
+                    tax_rate: parseFloat(String(item.tax_rate || 0)),
+                    line_total: parseFloat(String(item.line_total || item.total_price || 0))
                 })))
             }
         } catch (error) {
@@ -169,7 +183,7 @@ export default function PurchaseOrderFormPage() {
         return subtotal - discountAmount
     }
 
-    const handleItemChange = (index: number, field: keyof POItem, value: any) => {
+    const handleItemChange = (index: number, field: keyof POItem, value: string | number | null) => {
         const newItems = [...items]
         newItems[index] = { ...newItems[index], [field]: value }
 
@@ -277,25 +291,21 @@ export default function PurchaseOrderFormPage() {
                 await supabase
                     .from('purchase_order_items')
                     .delete()
-                    .eq('purchase_order_id', id!)
+                    .eq('po_id', id!)
 
                 // Insert new items
                 const itemsToInsert = items.map(item => ({
-                    purchase_order_id: id!,
+                    po_id: id!,
                     product_id: item.product_id,
-                    product_name: item.product_name,
-                    description: item.description,
-                    quantity: item.quantity,
+                    quantity_ordered: item.quantity,
                     unit_price: item.unit_price,
-                    discount_amount: item.discount_amount,
-                    discount_percentage: item.discount_percentage,
-                    tax_rate: item.tax_rate,
-                    line_total: item.line_total
+                    total_price: item.line_total,
+                    notes: item.description
                 }))
 
                 const { error: itemsError } = await supabase
                     .from('purchase_order_items')
-                    .insert(itemsToInsert)
+                    .insert(itemsToInsert as never)
 
                 if (itemsError) throw itemsError
             } else {
@@ -304,47 +314,41 @@ export default function PurchaseOrderFormPage() {
 
                 const { data: newPO, error: poError } = await supabase
                     .from('purchase_orders')
-                    .insert([{
+                    .insert({
                         po_number: poNumber,
                         supplier_id: formData.supplier_id,
-                        expected_delivery_date: formData.expected_delivery_date || null,
+                        expected_date: formData.expected_delivery_date || null,
                         subtotal: totals.subtotal,
-                        discount_amount: totals.orderDiscount,
-                        discount_percentage: formData.discount_percentage,
                         tax_amount: totals.tax,
-                        total_amount: totals.total,
+                        total: totals.total,
                         notes: formData.notes,
                         status
-                    }])
+                    } as never)
                     .select()
                     .single()
 
                 if (poError || !newPO) throw poError
 
                 const itemsToInsert = items.map(item => ({
-                    purchase_order_id: newPO.id,
+                    po_id: newPO.id,
                     product_id: item.product_id,
-                    product_name: item.product_name,
-                    description: item.description,
-                    quantity: item.quantity,
+                    quantity_ordered: item.quantity,
                     unit_price: item.unit_price,
-                    discount_amount: item.discount_amount,
-                    discount_percentage: item.discount_percentage,
-                    tax_rate: item.tax_rate,
-                    line_total: item.line_total
+                    total_price: item.line_total,
+                    notes: item.description
                 }))
 
                 const { error: itemsError } = await supabase
                     .from('purchase_order_items')
-                    .insert(itemsToInsert)
+                    .insert(itemsToInsert as never)
 
                 if (itemsError) throw itemsError
             }
 
             navigate('/purchasing/purchase-orders')
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error saving purchase order:', error)
-            alert(`Erreur lors de l'enregistrement du bon de commande:\n${error?.message || JSON.stringify(error)}`)
+            alert(`Erreur lors de l'enregistrement du bon de commande:\n${error instanceof Error ? error.message : 'Erreur inconnue'}`)
         } finally {
             setLoading(false)
         }

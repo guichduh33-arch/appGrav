@@ -66,15 +66,16 @@ export function isPromotionValid(
     }
 
     // Check time range
-    if (promotion.time_start && promotion.time_end) {
+    const promoAny = promotion as any
+    if (promoAny.time_start && promoAny.time_end) {
         const currentTime = now.toTimeString().slice(0, 5) // HH:MM format
-        if (currentTime < promotion.time_start || currentTime > promotion.time_end) {
+        if (currentTime < promoAny.time_start || currentTime > promoAny.time_end) {
             return { valid: false, reason: 'Promotion not valid at this time' }
         }
     }
 
     // Check total usage limit
-    if (promotion.max_uses_total && promotion.current_uses >= promotion.max_uses_total) {
+    if (promoAny.max_uses_total && promoAny.current_uses >= promoAny.max_uses_total) {
         return { valid: false, reason: 'Promotion usage limit reached' }
     }
 
@@ -126,10 +127,11 @@ export async function getApplicablePromotions(
 
             // Check if any cart item matches promotion products/categories
             const hasMatchingItem = cartItems.some(item => {
-                return promotionProducts.some(pp =>
-                    (pp.product_id && pp.product_id === item.product_id) ||
-                    (pp.category_id && pp.category_id === item.category_id)
-                )
+                return promotionProducts.some(pp => {
+                    const ppAny = pp as any
+                    return (pp.product_id && pp.product_id === item.product_id) ||
+                        (ppAny.category_id && ppAny.category_id === item.category_id)
+                })
             })
 
             if (hasMatchingItem) {
@@ -165,10 +167,11 @@ export async function calculatePromotionDiscount(
 
         if (promotionProducts && promotionProducts.length > 0) {
             applicableItems = cartItems.filter(item =>
-                promotionProducts.some(pp =>
-                    (pp.product_id && pp.product_id === item.product_id) ||
-                    (pp.category_id && pp.category_id === item.category_id)
-                )
+                promotionProducts.some(pp => {
+                    const ppAny = pp as any
+                    return (pp.product_id && pp.product_id === item.product_id) ||
+                        (ppAny.category_id && ppAny.category_id === item.category_id)
+                })
             )
         }
 
@@ -218,16 +221,19 @@ export async function calculatePromotionDiscount(
                 // Get free products
                 const { data: freeProductsData } = await supabase
                     .from('promotion_free_products')
-                    .select('free_product_id, quantity')
+                    .select('product_id, quantity')
                     .eq('promotion_id', promotion.id)
 
                 if (freeProductsData) {
-                    freeProducts.push(
-                        ...freeProductsData.map(fp => ({
-                            product_id: fp.free_product_id,
-                            quantity: fp.quantity
+                    type FreeProductRow = { product_id?: string; free_product_id?: string; quantity?: number };
+                    const rawData = freeProductsData as unknown as FreeProductRow[];
+                    const validItems = rawData
+                        .map((fp) => ({
+                            product_id: fp.product_id || fp.free_product_id || '',
+                            quantity: fp.quantity || 1
                         }))
-                    )
+                        .filter((fp) => fp.product_id !== '');
+                    freeProducts.push(...validItems)
                 }
                 break
         }
@@ -275,13 +281,13 @@ export async function applyBestPromotions(
 
         // Apply stacking logic
         const appliedPromotions: AppliedPromotion[] = []
-        const appliedNonStackable = results.find(r => !r.promotion.is_stackable)
+        const appliedNonStackable = results.find(r => !(r.promotion as any).is_stackable)
 
         if (appliedNonStackable) {
             // If we have a non-stackable promotion, only apply that one
             appliedPromotions.push({
                 promotion_id: appliedNonStackable.promotion.id,
-                promotion_code: appliedNonStackable.promotion.code,
+                promotion_code: appliedNonStackable.promotion.code || '',
                 promotion_name: appliedNonStackable.promotion.name,
                 discount_amount: appliedNonStackable.discount_amount,
                 free_products: appliedNonStackable.free_products
@@ -289,10 +295,10 @@ export async function applyBestPromotions(
         } else {
             // Apply all stackable promotions
             for (const result of results) {
-                if (result.promotion.is_stackable || appliedPromotions.length === 0) {
+                if ((result.promotion as any).is_stackable || appliedPromotions.length === 0) {
                     appliedPromotions.push({
                         promotion_id: result.promotion.id,
-                        promotion_code: result.promotion.code,
+                        promotion_code: result.promotion.code || '',
                         promotion_name: result.promotion.name,
                         discount_amount: result.discount_amount,
                         free_products: result.free_products
@@ -318,9 +324,9 @@ export async function recordPromotionUsage(
     discountAmount: number
 ): Promise<void> {
     try {
-        await supabase.rpc('record_promotion_usage', {
+        await supabase.rpc('record_promotion_usage' as any, {
             p_promotion_id: promotionId,
-            p_customer_id: customerId,
+            p_customer_id: customerId || undefined,
             p_order_id: orderId,
             p_discount_amount: discountAmount
         })

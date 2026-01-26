@@ -33,7 +33,8 @@ interface ProductWithSection extends Product {
 
 const ProductionPage = () => {
     const { user } = useAuthStore()
-    const isAdmin = user?.role === 'admin' || user?.role === 'manager'
+    const userAny = user as any
+    const isAdmin = userAny?.role === 'admin' || userAny?.role === 'manager'
 
     // State
     const [selectedDate, setSelectedDate] = useState(new Date())
@@ -65,11 +66,13 @@ const ProductionPage = () => {
             const { data, error } = await supabase
                 .from('sections')
                 .select('*')
-                .eq('is_production_point', true)
                 .order('name')
 
             if (error) throw error
-            setSections(data || [])
+            // Filter production sections client-side
+            const rawData = data as unknown as Array<{ id: string; name: string; is_production_point?: boolean }>;
+            const productionSections = rawData.filter((s) => s.is_production_point === true)
+            setSections(productionSections as unknown as Section[])
 
             // Auto-select first section
             if (data && data.length > 0 && !selectedSectionId) {
@@ -100,10 +103,11 @@ const ProductionPage = () => {
 
             if (error) throw error
 
-            const products = data
-                ?.map((ps: any) => ps.product)
-                .filter(Boolean)
-                .filter((p: any) => p.product_type === 'finished' || p.product_type === 'semi_finished')
+            const rawData = data as unknown as Array<{ product: ProductWithSection | null }>;
+            const products = rawData
+                .map((ps) => ps.product)
+                .filter((p): p is ProductWithSection => p !== null)
+                .filter((p) => p.product_type === 'finished' || p.product_type === 'semi_finished')
 
             setSectionProducts(products || [])
         } catch (error) {
@@ -119,21 +123,23 @@ const ProductionPage = () => {
 
             const { data, error } = await supabase
                 .from('production_records')
-                .select(`
-                    *,
-                    product:products(
-                        name,
-                        sku,
-                        unit,
-                        product_uoms(id, unit_name, is_consumption_unit)
-                    )
-                `)
-                .eq('section_id', selectedSectionId)
+                .select('*')
                 .eq('production_date', dateStr)
                 .order('created_at', { ascending: false })
 
             if (error) throw error
-            setTodayHistory(data || [])
+            // Fetch product details separately
+            type ProductionRow = { id: string; product_id: string; quantity_produced: number; production_date: string; created_at: string };
+            const rawRecords = data as unknown as ProductionRow[];
+            const recordsWithProducts = await Promise.all((rawRecords || []).map(async (rec) => {
+                const { data: product } = await supabase
+                    .from('products')
+                    .select('name, sku, unit')
+                    .eq('id', rec.product_id)
+                    .single()
+                return { ...rec, product }
+            }))
+            setTodayHistory(recordsWithProducts as unknown as typeof todayHistory)
         } catch (error) {
             console.error('Error fetching history:', error)
         }
@@ -169,10 +175,11 @@ const ProductionPage = () => {
     }
 
     // Get unit from history record
-    const getRecordUnit = (record: any): string => {
+    type RecordWithProduct = { product?: { unit?: string; product_uoms?: Array<{ is_consumption_unit?: boolean; unit_name?: string }> } };
+    const getRecordUnit = (record: RecordWithProduct): string => {
         const product = record.product
         if (!product) return 'pcs'
-        const consumptionUom = product.product_uoms?.find((u: any) => u.is_consumption_unit)
+        const consumptionUom = product.product_uoms?.find((u) => u.is_consumption_unit)
         return consumptionUom?.unit_name || product.unit || 'pcs'
     }
 
@@ -223,18 +230,17 @@ const ProductionPage = () => {
 
             for (const item of productionItems) {
                 // 1. Insert production record
+                const productionNumber = `PROD-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`
                 const { data: prodRecord, error: prodError } = await supabase
                     .from('production_records')
                     .insert({
+                        production_number: productionNumber,
                         product_id: item.productId,
-                        section_id: selectedSectionId,
                         quantity_produced: item.quantity,
-                        quantity_waste: item.wasted,
                         production_date: dateStr,
-                        created_by: user?.id,
-                        notes: item.wasteReason ? `Waste: ${item.wasteReason}` : null,
-                        stock_updated: true
-                    })
+                        produced_by: user?.id,
+                        notes: item.wasteReason ? `Waste (${item.wasted}): ${item.wasteReason}` : null
+                    } as never)
                     .select()
                     .single()
 
@@ -252,32 +258,36 @@ const ProductionPage = () => {
 
                 // 3. Create stock movement for production_in (positive)
                 if (item.quantity > 0) {
+                    const movementId1 = `MV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
                     const { error: stockError } = await supabase
                         .from('stock_movements')
                         .insert({
+                            movement_id: movementId1,
                             product_id: item.productId,
                             movement_type: 'production_in',
                             quantity: item.quantity,
-                            reason: `Production ${selectedSection?.name || ''} - ${dateStr}`,
+                            notes: `Production ${selectedSection?.name || ''} - ${dateStr}`,
                             reference_id: prodRecord.id,
-                            staff_id: user?.id
-                        })
+                            performed_by: user?.id
+                        } as never)
 
                     if (stockError) throw stockError
                 }
 
                 // 4. Create stock movement for waste (negative)
                 if (item.wasted > 0) {
+                    const movementId2 = `MV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
                     const { error: wasteError } = await supabase
                         .from('stock_movements')
                         .insert({
+                            movement_id: movementId2,
                             product_id: item.productId,
                             movement_type: 'waste',
                             quantity: -item.wasted,
-                            reason: item.wasteReason || `Production waste ${dateStr}`,
+                            notes: item.wasteReason || `Production waste ${dateStr}`,
                             reference_id: prodRecord.id,
-                            staff_id: user?.id
-                        })
+                            performed_by: user?.id
+                        } as never)
 
                     if (wasteError) throw wasteError
                 }
@@ -293,42 +303,44 @@ const ProductionPage = () => {
                 // 6. Deduct recipe ingredients from stock
                 const { data: recipeItems } = await supabase
                     .from('recipes')
-                    .select(`
-                        id,
-                        material_id,
-                        quantity,
-                        unit,
-                        material:products!material_id(id, name, current_stock, cost_price, unit)
-                    `)
+                    .select('id, ingredient_id, quantity, unit')
                     .eq('product_id', item.productId)
                     .eq('is_active', true)
 
                 if (recipeItems && recipeItems.length > 0) {
-                    for (const recipe of recipeItems) {
-                        const material = recipe.material as { id: string; name: string; current_stock: number; cost_price: number; unit: string } | null
-                        if (!material) continue
+                    for (const recipe of recipeItems as any[]) {
+                        // Fetch ingredient details
+                        const { data: ingredient } = await supabase
+                            .from('products')
+                            .select('id, name, current_stock, cost_price, unit')
+                            .eq('id', recipe.ingredient_id)
+                            .single()
+
+                        if (!ingredient) continue
 
                         // Calculate quantity to deduct (recipe qty per unit × production qty)
                         const qtyToDeduct = recipe.quantity * item.quantity
-                        const materialCurrentStock = material.current_stock || 0
+                        const ingredientCurrentStock = ingredient.current_stock || 0
 
                         // Create stock movement for production_out (negative)
+                        const movementId3 = `MV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
                         await supabase
                             .from('stock_movements')
                             .insert({
-                                product_id: recipe.material_id,
+                                movement_id: movementId3,
+                                product_id: recipe.ingredient_id,
                                 movement_type: 'production_out',
                                 quantity: -qtyToDeduct,
-                                reason: `Used for: ${item.name} (×${item.quantity}) - ${dateStr}`,
+                                notes: `Used for: ${item.name} (×${item.quantity}) - ${dateStr}`,
                                 reference_id: prodRecord.id,
-                                staff_id: user?.id
-                            })
+                                performed_by: user?.id
+                            } as never)
 
                         // Update ingredient current_stock
                         await supabase
                             .from('products')
-                            .update({ current_stock: materialCurrentStock - qtyToDeduct })
-                            .eq('id', recipe.material_id)
+                            .update({ current_stock: ingredientCurrentStock - qtyToDeduct })
+                            .eq('id', recipe.ingredient_id)
                     }
                 }
             }
@@ -336,9 +348,9 @@ const ProductionPage = () => {
             toast.success('Production saved')
             setProductionItems([])
             fetchTodayHistory()
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error saving:', error)
-            toast.error('Error: ' + error.message)
+            toast.error('Error: ' + (error instanceof Error ? error.message : 'Unknown error'))
         } finally {
             setIsSaving(false)
         }
@@ -352,7 +364,7 @@ const ProductionPage = () => {
             // 1. Get the production record to know quantities
             const { data: record } = await supabase
                 .from('production_records')
-                .select('product_id, quantity_produced, quantity_waste')
+                .select('product_id, quantity_produced')
                 .eq('id', recordId)
                 .single()
 
@@ -365,7 +377,7 @@ const ProductionPage = () => {
                     .single()
 
                 const currentStock = productData?.current_stock || 0
-                const netChange = record.quantity_produced - (record.quantity_waste || 0)
+                const netChange = record.quantity_produced
 
                 // 3. Reverse the stock change
                 await supabase
@@ -389,14 +401,14 @@ const ProductionPage = () => {
             if (error) throw error
             toast.success('Entry and movements deleted')
             fetchTodayHistory()
-        } catch (error: any) {
-            toast.error('Error: ' + error.message)
+        } catch (error) {
+            toast.error('Error: ' + (error instanceof Error ? error.message : 'Unknown error'))
         }
     }
 
     const selectedSection = sections.find(s => s.id === selectedSectionId)
     const totalProduced = todayHistory.reduce((sum, r) => sum + r.quantity_produced, 0)
-    const totalWaste = todayHistory.reduce((sum, r) => sum + (r.quantity_waste || 0), 0)
+    const totalWaste = 0 // Waste is tracked separately via stock_movements
 
     return (
         <div className="p-8 max-w-[1400px] mx-auto">
@@ -717,11 +729,6 @@ const ProductionPage = () => {
                                                     <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-bold">
                                                         +{record.quantity_produced} {getRecordUnit(record)}
                                                     </span>
-                                                    {record.quantity_waste > 0 && (
-                                                        <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-bold">
-                                                            -{record.quantity_waste} {getRecordUnit(record)}
-                                                        </span>
-                                                    )}
                                                     {isAdmin && (
                                                         <button
                                                             onClick={() => handleDeleteRecord(record.id)}

@@ -72,8 +72,8 @@ const playNotificationSound = () => {
 
         oscillator.start(audioContext.currentTime)
         oscillator.stop(audioContext.currentTime + 0.5)
-    } catch (e) {
-        console.log('Audio not available')
+    } catch {
+        // Audio API not available in this browser
     }
 }
 
@@ -128,11 +128,33 @@ export default function KDSMainPage() {
 
             if (error) throw error
 
-            // Transform data
-            const transformedOrders: Order[] = (data || [])
-                .map((order: any) => {
+            // Define types for Supabase raw data
+            type RawOrderItem = {
+                id: string;
+                product_name?: string;
+                quantity: number;
+                notes?: string;
+                item_status?: string;
+                dispatch_station?: string;
+                modifiers?: string | Array<{ name?: string }>;
+            };
+            type RawOrder = {
+                id: string;
+                order_number: string;
+                order_type: string;
+                table_number?: string | null;
+                customer_name?: string | null;
+                created_at: string;
+                status: string;
+                order_items?: RawOrderItem[];
+            };
+
+            // Transform data with cast through unknown
+            const rawOrders = data as unknown as RawOrder[];
+            const transformedOrders: Order[] = (rawOrders || [])
+                .map((order) => {
                     // Map items with modifiers
-                    let items = (order.order_items || []).map((item: any) => {
+                    let items = (order.order_items || []).map((item) => {
                         // Parse modifiers if stored as JSON
                         let modifiersText = ''
                         if (item.modifiers) {
@@ -141,7 +163,7 @@ export default function KDSMainPage() {
                                     ? JSON.parse(item.modifiers)
                                     : item.modifiers
                                 if (Array.isArray(mods)) {
-                                    modifiersText = mods.map((m: any) => m.name || m).filter(Boolean).join(', ')
+                                    modifiersText = mods.map((m: { name?: string } | string) => typeof m === 'object' ? m.name : m).filter(Boolean).join(', ')
                                 }
                             } catch {
                                 modifiersText = String(item.modifiers)
@@ -154,14 +176,14 @@ export default function KDSMainPage() {
                             quantity: item.quantity,
                             modifiers: modifiersText,
                             notes: item.notes,
-                            item_status: item.item_status || 'new',
+                            item_status: (item.item_status || 'new') as OrderItem['item_status'],
                             dispatch_station: item.dispatch_station || 'none'
                         }
                     })
 
                     // Filter by station (unless waiter)
                     if (station !== 'waiter' && stationConfig) {
-                        items = items.filter((item: OrderItem) =>
+                        items = items.filter((item) =>
                             item.dispatch_station === stationConfig.dbStation
                         )
                     }
@@ -169,15 +191,15 @@ export default function KDSMainPage() {
                     return {
                         id: order.id,
                         order_number: order.order_number,
-                        order_type: order.order_type,
+                        order_type: order.order_type as Order['order_type'],
                         table_name: order.table_number ? `Table ${order.table_number}` : undefined,
-                        customer_name: order.customer_name,
+                        customer_name: order.customer_name ?? undefined,
                         items,
                         created_at: order.created_at,
                         status: order.status
                     }
                 })
-                .filter((order: Order) => order.items.length > 0)
+                .filter((order) => order.items.length > 0)
 
             // Check for new orders and play sound
             if (soundEnabled && transformedOrders.length > lastOrderCount && lastOrderCount > 0) {

@@ -116,7 +116,8 @@ const OrdersPage = () => {
                 return [];
             }
 
-            return (data || []).map((order: any) => ({
+            const rawOrders = data as unknown as Array<Omit<Order, 'items'> & { order_items?: OrderItem[] }>;
+            return rawOrders.map((order) => ({
                 ...order,
                 items: order.order_items || []
             })) as Order[];

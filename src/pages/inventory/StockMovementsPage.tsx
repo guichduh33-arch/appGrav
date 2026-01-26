@@ -142,7 +142,18 @@ export default function StockMovementsPage() {
 
             if (error) throw error
 
-            const formattedData: StockMovement[] = (data || []).map((m: any) => ({
+            const rawData = data as unknown as Array<{
+                id: string;
+                product_id: string;
+                product?: { name?: string; sku?: string; unit?: string; cost_price?: number };
+                staff?: { display_name?: string };
+                movement_type: string;
+                quantity: number;
+                reason?: string | null;
+                reference_id?: string | null;
+                created_at: string;
+            }>;
+            const formattedData: StockMovement[] = rawData.map((m) => ({
                 id: m.id,
                 product_id: m.product_id,
                 product_name: m.product?.name || 'Inconnu',
@@ -151,8 +162,8 @@ export default function StockMovementsPage() {
                 product_cost: m.product?.cost_price || 0,
                 movement_type: m.movement_type,
                 quantity: m.quantity,
-                reason: m.reason,
-                reference_id: m.reference_id,
+                reason: m.reason ?? null,
+                reference_id: m.reference_id ?? null,
                 created_at: m.created_at,
                 staff_name: m.staff?.display_name || null
             }))

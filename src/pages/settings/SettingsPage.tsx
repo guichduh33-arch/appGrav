@@ -88,7 +88,29 @@ const SettingsPage = () => {
                 .select('*')
                 .order('name');
             if (error) throw error;
-            if (data) setSections(data);
+            if (data) {
+                // Map database fields to interface
+                type SectionRow = {
+                    id: string;
+                    name: string;
+                    code?: string;
+                    slug?: string;
+                    is_sales_point?: boolean;
+                    is_production_point?: boolean;
+                    is_warehouse?: boolean;
+                    created_at: string;
+                };
+                const mapped = data.map((s: SectionRow) => ({
+                    id: s.id,
+                    name: s.name,
+                    slug: s.code || s.slug || '',
+                    is_sales_point: s.is_sales_point ?? false,
+                    is_production_point: s.is_production_point ?? false,
+                    is_warehouse: s.is_warehouse ?? false,
+                    created_at: s.created_at,
+                }));
+                setSections(mapped);
+            }
         } catch (error) {
             console.error('Error fetching sections:', error);
         } finally {
@@ -105,7 +127,13 @@ const SettingsPage = () => {
                 .eq('is_active', true)
                 .order('name');
             if (error) throw error;
-            if (data) setCategories(data);
+            if (data) {
+                const mapped = data.map(c => ({
+                    ...c,
+                    icon: c.icon || '',
+                }));
+                setCategories(mapped);
+            }
         } catch (error) {
             console.error('Error fetching categories:', error);
         } finally {
@@ -118,7 +146,7 @@ const SettingsPage = () => {
         try {
             const { error } = await supabase
                 .from('categories')
-                .update({ dispatch_station: newStation })
+                .update({ dispatch_station: newStation } as never)
                 .eq('id', categoryId);
 
             if (error) throw error;
@@ -186,34 +214,32 @@ const SettingsPage = () => {
 
         setSavingSection(true);
         try {
+            // Map interface fields to database schema
             const sectionData = {
                 name: sectionForm.name,
-                slug: sectionForm.slug || generateSlug(sectionForm.name),
-                is_sales_point: sectionForm.is_sales_point,
-                is_production_point: sectionForm.is_production_point,
-                is_warehouse: sectionForm.is_warehouse
+                code: sectionForm.slug || generateSlug(sectionForm.name),
             };
 
             if (editingSection) {
                 const { error } = await supabase
                     .from('sections')
-                    .update(sectionData)
+                    .update(sectionData as never)
                     .eq('id', editingSection.id);
 
                 if (error) throw error;
             } else {
                 const { error } = await supabase
                     .from('sections')
-                    .insert(sectionData);
+                    .insert(sectionData as never);
 
                 if (error) throw error;
             }
 
             setShowSectionModal(false);
             fetchSections();
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error saving section:', error);
-            alert('Erreur lors de la sauvegarde: ' + error.message);
+            alert('Erreur lors de la sauvegarde: ' + (error instanceof Error ? error.message : 'Erreur inconnue'));
         } finally {
             setSavingSection(false);
         }
@@ -232,9 +258,9 @@ const SettingsPage = () => {
 
             if (error) throw error;
             fetchSections();
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error deleting section:', error);
-            alert('Erreur lors de la suppression: ' + error.message);
+            alert('Erreur lors de la suppression: ' + (error instanceof Error ? error.message : 'Erreur inconnue'));
         }
     };
 
