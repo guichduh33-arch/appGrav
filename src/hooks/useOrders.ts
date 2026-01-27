@@ -58,6 +58,7 @@ export function useOrders() {
                 modifiers: item.modifiers,
                 modifiers_total: item.modifiersTotal,
                 notes: item.notes,
+                selected_variants: item.selectedVariants ? { variants: item.selectedVariants } : null,
                 dispatch_station: (item.product as { category?: { dispatch_station?: string } })?.category?.dispatch_station || 'none',
                 item_status: 'new' as const
             })) as unknown as Insertable<'order_items'>[]
