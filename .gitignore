@@ -134,3 +134,23 @@ __pycache__/
 .idea/
 *.swp
 *.swo
+
+# Development tools and configurations
+.agent/
+.antigravity/
+.claude/
+_bmad/
+_bmad-output/
+
+# Scripts and data
+scripts/agents/
+scripts/deploy/
+data/
+
+# Documentation drafts
+docs/designs/
+
+# Misc
+migration_output.txt
+nul
+*.vsix
