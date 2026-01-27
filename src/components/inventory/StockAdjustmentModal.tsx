@@ -1,18 +1,26 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { X, Check } from 'lucide-react'
-import type { Product } from '../../types/database'
-import { useStockAdjustment, useSuppliers } from '../../hooks/useInventory'
-// Removed unused import: formatPrice
+import { useStockAdjustment, useSuppliers } from '@/hooks/inventory'
 import './StockAdjustmentModal.css'
 
+// Local interface to avoid type import issues
+interface IProduct {
+    id: string
+    name: string
+    current_stock: number
+    unit: string | null
+}
+
 interface StockAdjustmentModalProps {
-    product: Product
+    product: IProduct
     onClose: () => void
 }
 
 type AdjustmentType = 'purchase' | 'waste' | 'adjustment_in' | 'adjustment_out'
 
 export default function StockAdjustmentModal({ product, onClose }: StockAdjustmentModalProps) {
+    const { t } = useTranslation()
     const { mutate: adjustStock, isPending } = useStockAdjustment()
     const { data: suppliers } = useSuppliers()
 
@@ -20,7 +28,7 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
     const [quantity, setQuantity] = useState('')
     const [reason, setReason] = useState('')
     const [notes, setNotes] = useState('')
-    const [supplierId, setSupplierId] = useState('') // New state
+    const [supplierId, setSupplierId] = useState('')
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -31,7 +39,7 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
             quantity: Number(quantity),
             reason,
             notes,
-            supplierId: supplierId || undefined // Pass supplierId
+            supplierId: supplierId || undefined
         }, {
             onSuccess: () => {
                 onClose()
@@ -46,10 +54,17 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
             <div className="modal modal-md is-active">
                 <div className="modal__header">
                     <div>
-                        <h3 className="modal__title">Ajustement de stock</h3>
-                        <p className="modal__subtitle">{product.name} (Actuel: {product.current_stock} {product.unit})</p>
+                        <h3 className="modal__title">{t('stock_adjustment.title', 'Stock Adjustment')}</h3>
+                        <p className="modal__subtitle">
+                            {product.name} ({t('stock_adjustment.current', 'Current')}: {product.current_stock} {product.unit})
+                        </p>
                     </div>
-                    <button className="modal__close" onClick={onClose} title="Fermer" aria-label="Fermer">
+                    <button
+                        className="modal__close"
+                        onClick={onClose}
+                        title={t('common.close', 'Close')}
+                        aria-label={t('common.close', 'Close')}
+                    >
                         <X size={24} />
                     </button>
                 </div>
@@ -57,7 +72,7 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                 <form onSubmit={handleSubmit} className="modal__body">
                     {/* Adjustment Type */}
                     <div className="form-group">
-                        <label className="form-label">Type d'opération</label>
+                        <label className="form-label">{t('stock_adjustment.operation_type', 'Operation Type')}</label>
                         <div className="adjustment-type-grid">
                             <button
                                 type="button"
@@ -66,8 +81,8 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                             >
                                 <span className="adjustment-type-icon">📥</span>
                                 <div>
-                                    <span className="adjustment-type-label">Réception</span>
-                                    <span className="adjustment-type-desc">Arrivage fournisseur</span>
+                                    <span className="adjustment-type-label">{t('stock_adjustment.types.reception', 'Reception')}</span>
+                                    <span className="adjustment-type-desc">{t('stock_adjustment.types.reception_desc', 'Supplier delivery')}</span>
                                 </div>
                             </button>
                             <button
@@ -77,8 +92,8 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                             >
                                 <span className="adjustment-type-icon">🗑️</span>
                                 <div>
-                                    <span className="adjustment-type-label">Perte / Gaspi</span>
-                                    <span className="adjustment-type-desc">Produit abîmé/périmé</span>
+                                    <span className="adjustment-type-label">{t('stock_adjustment.types.waste', 'Waste / Loss')}</span>
+                                    <span className="adjustment-type-desc">{t('stock_adjustment.types.waste_desc', 'Damaged/expired product')}</span>
                                 </div>
                             </button>
                             <button
@@ -88,8 +103,8 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                             >
                                 <span className="adjustment-type-icon">➕</span>
                                 <div>
-                                    <span className="adjustment-type-label">Correction (+)</span>
-                                    <span className="adjustment-type-desc">Erreur comptage</span>
+                                    <span className="adjustment-type-label">{t('stock_adjustment.types.correction_plus', 'Correction (+)')}</span>
+                                    <span className="adjustment-type-desc">{t('stock_adjustment.types.correction_desc', 'Count error')}</span>
                                 </div>
                             </button>
                             <button
@@ -99,8 +114,8 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                             >
                                 <span className="adjustment-type-icon">➖</span>
                                 <div>
-                                    <span className="adjustment-type-label">Correction (-)</span>
-                                    <span className="adjustment-type-desc">Erreur comptage</span>
+                                    <span className="adjustment-type-label">{t('stock_adjustment.types.correction_minus', 'Correction (-)')}</span>
+                                    <span className="adjustment-type-desc">{t('stock_adjustment.types.correction_desc', 'Count error')}</span>
                                 </div>
                             </button>
                         </div>
@@ -109,14 +124,14 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                     {/* Supplier - only for Purchase */}
                     {type === 'purchase' && (
                         <div className="form-group">
-                            <label className="form-label">Fournisseur</label>
+                            <label className="form-label">{t('stock_adjustment.supplier', 'Supplier')}</label>
                             <select
                                 className="form-select"
                                 value={supplierId}
                                 onChange={(e) => setSupplierId(e.target.value)}
-                                aria-label="Sélectionner fournisseur"
+                                aria-label={t('stock_adjustment.select_supplier', 'Select supplier')}
                             >
-                                <option value="">Sélectionner un fournisseur...</option>
+                                <option value="">{t('stock_adjustment.select_supplier', 'Select a supplier...')}</option>
                                 {suppliers?.map((supplier) => (
                                     <option key={supplier.id} value={supplier.id}>
                                         {supplier.name}
@@ -128,7 +143,7 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
 
                     {/* Quantity */}
                     <div className="form-group">
-                        <label className="form-label">Quantité ({product.unit})</label>
+                        <label className="form-label">{t('stock_adjustment.quantity', 'Quantity')} ({product.unit})</label>
                         <input
                             type="number"
                             className="form-input"
@@ -137,47 +152,47 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                             min="0.001"
                             step="0.001"
                             required
-                            placeholder="ex: 10"
+                            placeholder={t('stock_adjustment.quantity_placeholder', 'e.g. 10')}
                             autoFocus
                         />
                     </div>
 
                     {/* Reason */}
                     <div className="form-group">
-                        <label className="form-label">Motif</label>
+                        <label className="form-label">{t('stock_adjustment.reason', 'Reason')}</label>
                         <select
                             className="form-select"
                             value={reason}
                             onChange={(e) => setReason(e.target.value)}
                             required
-                            aria-label="Motif d'ajustement"
+                            aria-label={t('stock_adjustment.reason', 'Reason')}
                         >
-                            <option value="">Sélectionner un motif...</option>
+                            <option value="">{t('stock_adjustment.select_reason', 'Select a reason...')}</option>
                             {type === 'purchase' && (
-                                <option value="Livraison fournisseur">Livraison fournisseur</option>
+                                <option value="Supplier delivery">{t('stock_adjustment.reasons.supplier_delivery', 'Supplier delivery')}</option>
                             )}
                             {type === 'waste' && (
                                 <>
-                                    <option value="Périmé">Périmé</option>
-                                    <option value="Abîmé">Abîmé</option>
-                                    <option value="Erreur préparation">Erreur préparation</option>
+                                    <option value="Expired">{t('stock_adjustment.reasons.expired', 'Expired')}</option>
+                                    <option value="Damaged">{t('stock_adjustment.reasons.damaged', 'Damaged')}</option>
+                                    <option value="Preparation error">{t('stock_adjustment.reasons.preparation_error', 'Preparation error')}</option>
                                 </>
                             )}
                             {(type === 'adjustment_in' || type === 'adjustment_out') && (
-                                <option value="Inventaire">Inventaire (Correction)</option>
+                                <option value="Inventory">{t('stock_adjustment.reasons.inventory', 'Inventory (Correction)')}</option>
                             )}
-                            <option value="Autre">Autre</option>
+                            <option value="Other">{t('stock_adjustment.reasons.other', 'Other')}</option>
                         </select>
                     </div>
 
                     {/* Notes */}
                     <div className="form-group">
-                        <label className="form-label">Notes (Optionnel)</label>
+                        <label className="form-label">{t('stock_adjustment.notes', 'Notes')} ({t('common.optional', 'Optional')})</label>
                         <textarea
                             className="form-textarea"
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
-                            placeholder="Détails supplémentaires..."
+                            placeholder={t('stock_adjustment.notes_placeholder', 'Additional details...')}
                         />
                     </div>
 
@@ -187,10 +202,12 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                         className={`btn btn-block ${isPositiveAdjustment ? 'btn-primary' : 'btn-danger'}`}
                         disabled={isPending}
                     >
-                        {isPending ? 'Enregistrement...' : (
+                        {isPending ? t('common.saving', 'Saving...') : (
                             <>
                                 <Check size={18} />
-                                {isPositiveAdjustment ? 'Ajouter au Stock' : 'Retirer du Stock'}
+                                {isPositiveAdjustment
+                                    ? t('stock_adjustment.add_to_stock', 'Add to Stock')
+                                    : t('stock_adjustment.remove_from_stock', 'Remove from Stock')}
                             </>
                         )}
                     </button>

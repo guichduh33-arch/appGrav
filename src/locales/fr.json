@@ -107,7 +107,10 @@
         "print_toast": "Impression en cours...",
         "new_order": "Nouvelle commande",
         "toast_error": "Erreur lors du paiement",
-        "toast_new_ready": "Nouvelle commande prête!"
+        "toast_new_ready": "Nouvelle commande prête!",
+        "offline_mode": "Mode Hors-ligne",
+        "offline_cash_only": "Mode hors-ligne: Seuls les paiements en espèces sont disponibles",
+        "requires_internet": "Connexion requise"
     },
     "modifiers": {
         "subtitle": "Personnalisez votre commande",
@@ -325,6 +328,7 @@
         "settings": "Paramètres",
         "roles": "Rôles",
         "audit": "Audit",
+        "sync": "Synchronisation",
         "users": "Utilisateurs",
         "suppliers": "Fournisseurs",
         "customers": "Clients",
@@ -599,5 +603,190 @@
                 "LOGOUT": "Déconnexion"
             }
         }
+    },
+    "network": {
+        "online": "En ligne",
+        "offline": "Hors ligne",
+        "lanOnly": "Mode LAN",
+        "alerts": {
+            "connectionLost": "Connexion perdue - Mode hors-ligne activé",
+            "connectionRestored": "Connexion rétablie - Synchronisation en cours..."
+        }
+    },
+    "sync": {
+        "pending_count": "{{count}} en attente",
+        "pending_count_one": "{{count}} en attente",
+        "pending_count_other": "{{count}} en attente",
+        "failed_count": "{{count}} échoué",
+        "failed_count_one": "{{count}} échoué",
+        "failed_count_other": "{{count}} échoués",
+        "syncing": "Synchronisation...",
+        "all_synced": "Tout synchronisé",
+        "sync_error": "Erreur de sync",
+        "idle": "Prêt",
+        "complete": "Terminé",
+        "error": "Erreur",
+        "dashboard": {
+            "title": "Statut de Synchronisation",
+            "description": "Surveillance des transactions offline",
+            "status": "Statut",
+            "pending": "En attente",
+            "failed": "Échoué",
+            "lastSync": "Dernière sync",
+            "never": "Jamais",
+            "cleanup": "Nettoyer",
+            "syncNow": "Synchroniser",
+            "offlineWarning": "Mode hors-ligne",
+            "offlineWarningDesc": "La synchronisation reprendra automatiquement lorsque la connexion sera rétablie.",
+            "tabPending": "En attente",
+            "tabFailed": "Échoué",
+            "tabAll": "Tous",
+            "type": "Type",
+            "createdAt": "Créé le",
+            "statusColumn": "Statut",
+            "attempts": "Tentatives",
+            "error": "Erreur",
+            "retry": "Réessayer",
+            "remove": "Supprimer",
+            "noFailed": "Aucun élément en erreur",
+            "noItems": "Aucun élément en attente",
+            "queueInfo": "File d'attente:",
+            "items": "éléments",
+            "syncedCount": "Synchronisés:"
+        },
+        "report": {
+            "title": "Rapport de Synchronisation",
+            "all_synced": "Toutes les transactions ont été synchronisées avec succès.",
+            "some_failed": "Certaines transactions n'ont pas pu être synchronisées.",
+            "sync_complete": "Synchronisation terminée.",
+            "duration": "Durée hors-ligne",
+            "created": "Créées",
+            "synced": "Synchronisées",
+            "failed": "Échouées",
+            "failure_warning": "Les transactions échouées seront réessayées automatiquement. Vous pouvez également les réessayer manuellement depuis le tableau de bord de synchronisation.",
+            "retry_failed": "Réessayer les échecs"
+        },
+        "history": {
+            "title": "Historique Hors-Ligne",
+            "no_periods": "Aucune période hors-ligne enregistrée",
+            "period": "Période",
+            "duration": "Durée",
+            "transactions": "Transactions",
+            "synced": "Sync",
+            "failed": "Échecs",
+            "view_details": "Voir détails"
+        }
+    },
+    "settings": {
+        "terminal": {
+            "title": "Terminal POS",
+            "registerTitle": "Enregistrer le Terminal POS",
+            "registerSubtitle": "Configurez cet appareil comme terminal POS",
+            "deviceId": "Identifiant Appareil",
+            "deviceIdHelp": "Identifiant unique généré automatiquement pour cet appareil",
+            "name": "Nom du Terminal",
+            "namePlaceholder": "ex: Caisse 1",
+            "nameRequired": "Le nom du terminal est requis",
+            "nameMinLength": "Le nom doit contenir au moins 3 caractères",
+            "location": "Emplacement",
+            "locationPlaceholder": "ex: Rez-de-chaussée, Près de l'entrée",
+            "isHub": "Ce terminal est le hub principal",
+            "isHubHelp": "Le hub coordonne la communication LAN entre les appareils",
+            "isHubYes": "Ce terminal est le hub principal",
+            "isHubNo": "Pas un hub",
+            "hubStatus": "Statut Hub",
+            "status": "Statut",
+            "register": "Enregistrer le Terminal",
+            "registerNow": "Enregistrer maintenant",
+            "notRegistered": "Terminal non enregistré",
+            "notRegisteredHelp": "Enregistrez cet appareil pour activer la communication LAN et la synchronisation hors ligne",
+            "synced": "Synchronisé",
+            "pendingSync": "En attente de sync",
+            "syncNow": "Synchroniser maintenant"
+        }
+    },
+    "stock_movements": {
+        "loading": "Chargement des mouvements...",
+        "stats": {
+            "total_movements": "Total Mouvements",
+            "records": "enregistrements",
+            "total_in": "Total Entrées",
+            "total_out": "Total Sorties",
+            "production_in": "Production In",
+            "production_out": "Production Out"
+        },
+        "search_placeholder": "Rechercher par produit, SKU, raison...",
+        "to": "à",
+        "filter": "Filtrer",
+        "all": "Tous",
+        "history": "Historique des Mouvements",
+        "empty": {
+            "title": "Aucun mouvement",
+            "filtered": "Aucun mouvement de ce type trouvé",
+            "default": "Les mouvements de stock apparaîtront ici"
+        },
+        "types": {
+            "production_in": "Production In",
+            "production_out": "Production Out",
+            "stock_in": "Entrée Stock",
+            "purchase": "Achat",
+            "sale": "Vente",
+            "sale_pos": "Vente POS",
+            "sale_b2b": "Vente B2B",
+            "waste": "Perte",
+            "adjustment": "Ajustement",
+            "adjustment_in": "Ajustement +",
+            "adjustment_out": "Ajustement -",
+            "transfer": "Transfert",
+            "opname": "Inventaire"
+        },
+        "descriptions": {
+            "production_in": "Produits finis/semi-finis produits",
+            "production_out": "Ingrédients utilisés en production",
+            "stock_in": "Achat / Réception fournisseur",
+            "purchase": "Commande fournisseur reçue",
+            "sale": "Vendu au POS",
+            "sale_pos": "Vendu au POS",
+            "sale_b2b": "Vente B2B wholesale",
+            "waste": "Perte / Casse",
+            "adjustment": "Ajustement de stock",
+            "adjustment_in": "Ajustement positif",
+            "adjustment_out": "Ajustement négatif",
+            "transfer": "Transfert entre emplacements",
+            "opname": "Correction inventaire",
+            "unknown": "Mouvement"
+        }
+    },
+    "stock_adjustment": {
+        "title": "Ajustement de stock",
+        "current": "Actuel",
+        "operation_type": "Type d'opération",
+        "types": {
+            "reception": "Réception",
+            "reception_desc": "Arrivage fournisseur",
+            "waste": "Perte / Gaspi",
+            "waste_desc": "Produit abîmé/périmé",
+            "correction_plus": "Correction (+)",
+            "correction_minus": "Correction (-)",
+            "correction_desc": "Erreur comptage"
+        },
+        "supplier": "Fournisseur",
+        "select_supplier": "Sélectionner un fournisseur...",
+        "quantity": "Quantité",
+        "quantity_placeholder": "ex: 10",
+        "reason": "Motif",
+        "select_reason": "Sélectionner un motif...",
+        "reasons": {
+            "supplier_delivery": "Livraison fournisseur",
+            "expired": "Périmé",
+            "damaged": "Abîmé",
+            "preparation_error": "Erreur préparation",
+            "inventory": "Inventaire (Correction)",
+            "other": "Autre"
+        },
+        "notes": "Notes",
+        "notes_placeholder": "Détails supplémentaires...",
+        "add_to_stock": "Ajouter au Stock",
+        "remove_from_stock": "Retirer du Stock"
     }
 }

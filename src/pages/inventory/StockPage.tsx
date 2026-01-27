@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import InventoryTable from '../../components/inventory/InventoryTable'
 import StockAdjustmentModal from '../../components/inventory/StockAdjustmentModal'
-import { useInventoryItems } from '../../hooks/useInventory'
+import { useInventoryItems } from '@/hooks/inventory'
 import type { Product } from '../../types/database'
 import './StockPage.css'
 

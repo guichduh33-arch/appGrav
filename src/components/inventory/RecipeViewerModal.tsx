@@ -1,6 +1,6 @@
 import { X, Package, AlertCircle } from 'lucide-react'
 import type { Product } from '../../types/database'
-import { useProductRecipe } from '../../hooks/useInventory'
+import { useProductRecipe } from '@/hooks/inventory'
 import './RecipeViewerModal.css'
 
 interface RecipeViewerModalProps {

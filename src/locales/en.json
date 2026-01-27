@@ -107,7 +107,10 @@
         "print_toast": "Printing in progress...",
         "new_order": "New Order",
         "toast_error": "Error during payment",
-        "toast_new_ready": "New order ready!"
+        "toast_new_ready": "New order ready!",
+        "offline_mode": "Offline Mode",
+        "offline_cash_only": "Offline mode: Only cash payments available",
+        "requires_internet": "Requires internet"
     },
     "modifiers": {
         "subtitle": "Customize your order",
@@ -314,6 +317,7 @@
         "settings": "Settings",
         "roles": "Roles",
         "audit": "Audit",
+        "sync": "Sync",
         "users": "Users",
         "suppliers": "Suppliers",
         "customers": "Customers",
@@ -588,5 +592,190 @@
                 "LOGOUT": "Logout"
             }
         }
+    },
+    "network": {
+        "online": "Online",
+        "offline": "Offline",
+        "lanOnly": "LAN Mode",
+        "alerts": {
+            "connectionLost": "Connection lost - Offline mode activated",
+            "connectionRestored": "Connection restored - Syncing..."
+        }
+    },
+    "sync": {
+        "pending_count": "{{count}} pending",
+        "pending_count_one": "{{count}} pending",
+        "pending_count_other": "{{count}} pending",
+        "failed_count": "{{count}} failed",
+        "failed_count_one": "{{count}} failed",
+        "failed_count_other": "{{count}} failed",
+        "syncing": "Syncing...",
+        "all_synced": "All synced",
+        "sync_error": "Sync error",
+        "idle": "Ready",
+        "complete": "Complete",
+        "error": "Error",
+        "dashboard": {
+            "title": "Sync Status",
+            "description": "Offline transaction monitoring",
+            "status": "Status",
+            "pending": "Pending",
+            "failed": "Failed",
+            "lastSync": "Last sync",
+            "never": "Never",
+            "cleanup": "Cleanup",
+            "syncNow": "Sync Now",
+            "offlineWarning": "Offline mode",
+            "offlineWarningDesc": "Synchronization will resume automatically when connection is restored.",
+            "tabPending": "Pending",
+            "tabFailed": "Failed",
+            "tabAll": "All",
+            "type": "Type",
+            "createdAt": "Created",
+            "statusColumn": "Status",
+            "attempts": "Attempts",
+            "error": "Error",
+            "retry": "Retry",
+            "remove": "Remove",
+            "noFailed": "No failed items",
+            "noItems": "No pending items",
+            "queueInfo": "Queue:",
+            "items": "items",
+            "syncedCount": "Synced:"
+        },
+        "report": {
+            "title": "Sync Report",
+            "all_synced": "All transactions have been synced successfully.",
+            "some_failed": "Some transactions could not be synced.",
+            "sync_complete": "Synchronization complete.",
+            "duration": "Offline duration",
+            "created": "Created",
+            "synced": "Synced",
+            "failed": "Failed",
+            "failure_warning": "Failed transactions will be retried automatically. You can also retry them manually from the sync dashboard.",
+            "retry_failed": "Retry failed"
+        },
+        "history": {
+            "title": "Offline History",
+            "no_periods": "No offline periods recorded",
+            "period": "Period",
+            "duration": "Duration",
+            "transactions": "Transactions",
+            "synced": "Synced",
+            "failed": "Failed",
+            "view_details": "View details"
+        }
+    },
+    "settings": {
+        "terminal": {
+            "title": "POS Terminal",
+            "registerTitle": "Register POS Terminal",
+            "registerSubtitle": "Configure this device as a POS terminal",
+            "deviceId": "Device ID",
+            "deviceIdHelp": "Unique identifier automatically generated for this device",
+            "name": "Terminal Name",
+            "namePlaceholder": "e.g.: Cashier 1",
+            "nameRequired": "Terminal name is required",
+            "nameMinLength": "Name must be at least 3 characters",
+            "location": "Location",
+            "locationPlaceholder": "e.g.: Ground floor, Near entrance",
+            "isHub": "This terminal is the main hub",
+            "isHubHelp": "The hub coordinates LAN communication between devices",
+            "isHubYes": "This terminal is the main hub",
+            "isHubNo": "Not a hub",
+            "hubStatus": "Hub Status",
+            "status": "Status",
+            "register": "Register Terminal",
+            "registerNow": "Register now",
+            "notRegistered": "Terminal not registered",
+            "notRegisteredHelp": "Register this device to enable LAN communication and offline sync",
+            "synced": "Synced",
+            "pendingSync": "Pending sync",
+            "syncNow": "Sync now"
+        }
+    },
+    "stock_movements": {
+        "loading": "Loading movements...",
+        "stats": {
+            "total_movements": "Total Movements",
+            "records": "records",
+            "total_in": "Total In",
+            "total_out": "Total Out",
+            "production_in": "Production In",
+            "production_out": "Production Out"
+        },
+        "search_placeholder": "Search by product, SKU, reason...",
+        "to": "to",
+        "filter": "Filter",
+        "all": "All",
+        "history": "Movement History",
+        "empty": {
+            "title": "No movements",
+            "filtered": "No movements of this type found",
+            "default": "Stock movements will appear here"
+        },
+        "types": {
+            "production_in": "Production In",
+            "production_out": "Production Out",
+            "stock_in": "Stock In",
+            "purchase": "Purchase",
+            "sale": "Sale",
+            "sale_pos": "Sale POS",
+            "sale_b2b": "Sale B2B",
+            "waste": "Waste",
+            "adjustment": "Adjustment",
+            "adjustment_in": "Adjustment +",
+            "adjustment_out": "Adjustment -",
+            "transfer": "Transfer",
+            "opname": "Stock Count"
+        },
+        "descriptions": {
+            "production_in": "Finished/semi-finished produced",
+            "production_out": "Ingredients used in production",
+            "stock_in": "Purchase / Supplier receipt",
+            "purchase": "Supplier order received",
+            "sale": "Sold at POS",
+            "sale_pos": "Sold at POS",
+            "sale_b2b": "B2B wholesale sale",
+            "waste": "Loss / Breakage",
+            "adjustment": "Stock adjustment",
+            "adjustment_in": "Positive adjustment",
+            "adjustment_out": "Negative adjustment",
+            "transfer": "Transfer between locations",
+            "opname": "Stock count adjustment",
+            "unknown": "Movement"
+        }
+    },
+    "stock_adjustment": {
+        "title": "Stock Adjustment",
+        "current": "Current",
+        "operation_type": "Operation Type",
+        "types": {
+            "reception": "Reception",
+            "reception_desc": "Supplier delivery",
+            "waste": "Waste / Loss",
+            "waste_desc": "Damaged/expired product",
+            "correction_plus": "Correction (+)",
+            "correction_minus": "Correction (-)",
+            "correction_desc": "Count error"
+        },
+        "supplier": "Supplier",
+        "select_supplier": "Select a supplier...",
+        "quantity": "Quantity",
+        "quantity_placeholder": "e.g. 10",
+        "reason": "Reason",
+        "select_reason": "Select a reason...",
+        "reasons": {
+            "supplier_delivery": "Supplier delivery",
+            "expired": "Expired",
+            "damaged": "Damaged",
+            "preparation_error": "Preparation error",
+            "inventory": "Inventory (Correction)",
+            "other": "Other"
+        },
+        "notes": "Notes",
+        "notes_placeholder": "Additional details...",
+        "add_to_stock": "Add to Stock",
+        "remove_from_stock": "Remove from Stock"
     }
 }

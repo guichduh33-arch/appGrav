@@ -9,12 +9,20 @@ export * from './settings'
 // Shift hooks
 export * from './shift'
 
+// Inventory hooks (new modular structure)
+export * from './inventory'
+
 // Individual hooks
-export * from './useInventory'
+export * from './useLanDevices'
+export * from './useNetworkAlerts'
+export * from './useNetworkStatus'
+export * from './useOfflineData'
 export * from './useOrders'
 export * from './usePermissions'
 // useRLSValidation is empty - excluded from barrel export
-export * from './useStock'
+export * from './useSyncQueue'
+export * from './useSyncReport'
+export * from './useTerminal'
 
 // Legacy exports for backward compatibility
 export { useShift } from './useShift'

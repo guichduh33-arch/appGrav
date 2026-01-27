@@ -1,0 +1,101 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { supabase } from '@/lib/supabase'
+import { useAuthStore } from '@/stores/authStore'
+
+// Local type definition to avoid import issues
+interface ISupplier {
+  id: string
+  name: string
+  is_active: boolean
+}
+
+export type TStockAdjustmentType = 'purchase' | 'stock_in' | 'waste' | 'adjustment_in' | 'adjustment_out' | 'transfer'
+
+export interface IStockAdjustmentParams {
+  productId: string
+  type: TStockAdjustmentType
+  quantity: number
+  reason: string
+  notes?: string
+  supplierId?: string
+}
+
+/**
+ * Hook to fetch active suppliers
+ */
+export function useSuppliers() {
+  return useQuery({
+    queryKey: ['suppliers'],
+    queryFn: async (): Promise<ISupplier[]> => {
+      const { data, error } = await supabase
+        .from('suppliers')
+        .select('*')
+        .eq('is_active', true)
+        .order('name')
+
+      if (error) {
+        throw error
+      }
+
+      return (data || []) as unknown as ISupplier[]
+    }
+  })
+}
+
+/**
+ * Hook to perform stock adjustments (mutations)
+ * Creates a stock movement record and invalidates relevant caches
+ */
+export function useStockAdjustment() {
+  const queryClient = useQueryClient()
+  const { user } = useAuthStore()
+
+  return useMutation({
+    mutationFn: async ({
+      productId,
+      type,
+      quantity,
+      reason,
+      notes,
+      supplierId
+    }: IStockAdjustmentParams) => {
+      if (!user) {
+        throw new Error('User must be logged in to perform stock adjustments')
+      }
+
+      // Ensure quantity sign is correct based on movement type
+      // Outgoing movements (waste, adjustment_out) should be negative
+      const isOutgoing = type === 'waste' || type === 'adjustment_out'
+      const signedQuantity = isOutgoing ? -Math.abs(quantity) : Math.abs(quantity)
+
+      const movementData = {
+        product_id: productId,
+        movement_type: type,
+        quantity: signedQuantity,
+        reason: reason,
+        notes: notes || null,
+        created_by: user.id,
+        supplier_id: supplierId || null
+      }
+
+      const { data, error } = await supabase
+        .from('stock_movements')
+        // @ts-expect-error - Supabase types are stricter than runtime allows
+        .insert(movementData)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => {
+      // Invalidate all related queries
+      queryClient.invalidateQueries({ queryKey: ['inventory'] })
+      queryClient.invalidateQueries({ queryKey: ['products'] })
+      queryClient.invalidateQueries({ queryKey: ['stock-movements'] })
+    },
+    onError: (error: Error) => {
+      console.error('[useStockAdjustment] Stock adjustment failed:', error.message)
+    }
+  })
+}
