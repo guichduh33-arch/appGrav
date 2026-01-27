@@ -1,0 +1,205 @@
+/* Mobile Orders Page Styles
+ * Story 6.7 - Order Status Tracking
+ */
+
+.mobile-orders {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-bg-secondary, #f5f5f5);
+}
+
+/* Header */
+.mobile-orders__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md, 1rem);
+  background: white;
+  border-bottom: 1px solid var(--color-border, #e5e5e5);
+}
+
+.mobile-orders__header h1 {
+  font-size: var(--text-xl, 1.25rem);
+  font-weight: 600;
+  margin: 0;
+}
+
+.mobile-orders__clear-btn {
+  background: none;
+  border: none;
+  color: var(--color-primary, #BA90A2);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Empty State */
+.mobile-orders__empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-xl, 2rem);
+  color: var(--color-text-secondary, #666);
+}
+
+.mobile-orders__empty-icon {
+  color: var(--color-text-muted, #ccc);
+  margin-bottom: var(--space-md, 1rem);
+}
+
+.mobile-orders__empty h2 {
+  font-size: var(--text-xl, 1.25rem);
+  margin: 0 0 var(--space-xs, 0.25rem);
+  color: var(--color-text-primary, #1a1a1a);
+}
+
+.mobile-orders__empty p {
+  margin: 0;
+}
+
+/* List */
+.mobile-orders__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-md, 1rem);
+}
+
+/* Section */
+.mobile-orders__section {
+  margin-bottom: var(--space-lg, 1.5rem);
+}
+
+.mobile-orders__section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm, 0.5rem);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-secondary, #666);
+  margin: 0 0 var(--space-sm, 0.5rem);
+}
+
+.mobile-orders__section-title--ready {
+  color: var(--color-success, #22c55e);
+}
+
+.mobile-orders__section-title--preparing {
+  color: var(--color-warning, #f59e0b);
+}
+
+/* Order Card */
+.mobile-orders__card {
+  background: white;
+  border-radius: var(--radius-lg, 0.75rem);
+  padding: var(--space-md, 1rem);
+  margin-bottom: var(--space-sm, 0.5rem);
+  border: 1px solid var(--color-border, #e5e5e5);
+}
+
+.mobile-orders__card--ready {
+  border-color: var(--color-success, #22c55e);
+  background: var(--color-success-bg, #dcfce7);
+}
+
+.mobile-orders__card--preparing {
+  border-color: var(--color-warning, #f59e0b);
+}
+
+.mobile-orders__card-main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm, 0.5rem);
+  margin-bottom: var(--space-xs, 0.25rem);
+}
+
+.mobile-orders__order-number {
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: 700;
+}
+
+.mobile-orders__table {
+  padding: 2px var(--space-sm, 0.5rem);
+  background: var(--color-bg-secondary, #f5f5f5);
+  border-radius: var(--radius-full, 999px);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-secondary, #666);
+}
+
+.mobile-orders__card--ready .mobile-orders__table {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.mobile-orders__card-details {
+  display: flex;
+  gap: var(--space-md, 1rem);
+  margin-bottom: var(--space-sm, 0.5rem);
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text-secondary, #666);
+}
+
+.mobile-orders__card--ready .mobile-orders__card-details {
+  color: var(--color-success-dark, #16a34a);
+}
+
+.mobile-orders__card-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mobile-orders__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs, 0.25rem);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: 500;
+  color: var(--color-text-secondary, #666);
+}
+
+.mobile-orders__status--ready {
+  color: var(--color-success, #22c55e);
+}
+
+.mobile-orders__status--preparing {
+  color: var(--color-warning, #f59e0b);
+}
+
+.mobile-orders__done-btn {
+  padding: var(--space-xs, 0.25rem) var(--space-md, 1rem);
+  background: var(--color-success, #22c55e);
+  border: none;
+  border-radius: var(--radius-md, 0.5rem);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  /* NFR-U2: Touch target */
+  min-height: 36px;
+}
+
+.mobile-orders__done-btn:active {
+  background: var(--color-success-dark, #16a34a);
+}
+
+.mobile-orders__remove-btn {
+  padding: var(--space-xs, 0.25rem);
+  background: var(--color-error-bg, #fee2e2);
+  border: none;
+  border-radius: var(--radius-md, 0.5rem);
+  color: var(--color-error, #ef4444);
+  cursor: pointer;
+}
+
+/* Animations */
+.animate-pulse {
+  animation: pulse-icon 1s ease-in-out infinite;
+}
+
+@keyframes pulse-icon {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

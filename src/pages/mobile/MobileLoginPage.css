@@ -1,0 +1,191 @@
+/* Mobile Login Page Styles
+ * Story 6.1 - Mobile App Authentication
+ */
+
+.mobile-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #BA90A2 0%, #DDB892 100%);
+  padding: var(--space-lg, 1.5rem);
+}
+
+.mobile-login__container {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xl, 2rem);
+}
+
+/* Logo */
+.mobile-login__logo {
+  text-align: center;
+  color: white;
+}
+
+.mobile-login__logo-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: var(--space-md, 1rem);
+}
+
+.mobile-login__title {
+  font-size: var(--text-3xl, 1.875rem);
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-login__subtitle {
+  font-size: var(--text-lg, 1.125rem);
+  margin: var(--space-xs, 0.25rem) 0 0;
+  opacity: 0.9;
+}
+
+/* PIN Display */
+.mobile-login__pin-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm, 0.5rem);
+}
+
+.mobile-login__pin-dots {
+  display: flex;
+  gap: var(--space-md, 1rem);
+}
+
+.mobile-login__pin-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: 2px solid white;
+  transition: all 0.15s ease;
+}
+
+.mobile-login__pin-dot--filled {
+  background: white;
+  transform: scale(1.1);
+}
+
+.mobile-login__error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs, 0.25rem);
+  color: #fee2e2;
+  font-size: var(--text-sm, 0.875rem);
+  margin-top: var(--space-sm, 0.5rem);
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.mobile-login__lockout {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs, 0.25rem);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--text-sm, 0.875rem);
+  margin-top: var(--space-sm, 0.5rem);
+}
+
+/* Keypad */
+.mobile-login__keypad {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 0.5rem);
+  width: 100%;
+}
+
+.mobile-login__keypad-row {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm, 0.5rem);
+}
+
+.mobile-login__key {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-xl, 1rem);
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: var(--text-2xl, 1.5rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  /* NFR-U2: Touch target 44x44px minimum */
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.mobile-login__key:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.mobile-login__key:active {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(0.95);
+}
+
+.mobile-login__key--action {
+  font-size: var(--text-lg, 1.125rem);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-login__key:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Submit Button */
+.mobile-login__submit {
+  width: 100%;
+  padding: var(--space-md, 1rem);
+  background: white;
+  border: none;
+  border-radius: var(--radius-xl, 1rem);
+  color: var(--color-primary, #BA90A2);
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm, 0.5rem);
+  /* NFR-U2: Touch target */
+  min-height: 56px;
+}
+
+.mobile-login__submit:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-1px);
+}
+
+.mobile-login__submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.mobile-login__submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Animate spinner */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
