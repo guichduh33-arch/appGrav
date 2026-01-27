@@ -458,8 +458,13 @@
         text-align: left;
     }
 
-    .movement-date {
+    .movement-stock-info {
         order: 3;
+        width: 100%;
+    }
+
+    .movement-date {
+        order: 4;
         text-align: left;
     }
 }

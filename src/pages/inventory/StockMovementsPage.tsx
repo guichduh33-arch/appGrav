@@ -1,13 +1,16 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
     Factory, ShoppingCart, Package, Trash2, ArrowUpCircle,
     Filter, TrendingUp, TrendingDown, Clock, Truck, ArrowRight,
-    Search, Calendar
+    Search, Calendar, Download, X
 } from 'lucide-react'
 import { useStockMovements, type IStockMovement, type TMovementFilterType } from '@/hooks/inventory'
 import { MOVEMENT_STYLES, getMovementStyle } from '@/constants/inventory'
 import { formatCurrency } from '@/utils/helpers'
+import { supabase } from '@/lib/supabase'
+import * as XLSX from 'xlsx'
+import toast from 'react-hot-toast'
 import './StockMovementsPage.css'
 
 // Icon mapping for movement types
@@ -37,6 +40,23 @@ export default function StockMovementsPage() {
     const [filterType, setFilterType] = useState<TMovementFilterType>('all')
     const [dateFrom, setDateFrom] = useState('')
     const [dateTo, setDateTo] = useState('')
+    const [selectedProductId, setSelectedProductId] = useState<string>('')
+    const [products, setProducts] = useState<Array<{ id: string; name: string; sku: string }>>([])
+    const [productSearch, setProductSearch] = useState('')
+
+    // Load products for filter
+    useEffect(() => {
+        loadProducts()
+    }, [])
+
+    async function loadProducts() {
+        const { data } = await supabase
+            .from('products')
+            .select('id, name, sku')
+            .order('name')
+
+        if (data) setProducts(data)
+    }
 
     // Use the hook instead of direct Supabase call
     const { data: movements = [], isLoading } = useStockMovements({
@@ -45,18 +65,28 @@ export default function StockMovementsPage() {
         dateTo: dateTo || undefined
     })
 
-    // Filter movements by search term (client-side for instant feedback)
+    // Filter movements by search term and product (client-side for instant feedback)
     const filteredMovements = useMemo(() => {
-        if (!searchTerm) return movements
+        let filtered = movements
 
-        const search = searchTerm.toLowerCase()
-        return movements.filter((m: IStockMovement) => {
-            const matchesProduct = m.product_name.toLowerCase().includes(search)
-            const matchesSku = m.product_sku.toLowerCase().includes(search)
-            const matchesReason = m.reason?.toLowerCase().includes(search)
-            return matchesProduct || matchesSku || matchesReason
-        })
-    }, [movements, searchTerm])
+        // Filter by product if selected
+        if (selectedProductId) {
+            filtered = filtered.filter((m: IStockMovement) => m.product_id === selectedProductId)
+        }
+
+        // Filter by search term
+        if (searchTerm) {
+            const search = searchTerm.toLowerCase()
+            filtered = filtered.filter((m: IStockMovement) => {
+                const matchesProduct = m.product_name.toLowerCase().includes(search)
+                const matchesSku = m.product_sku.toLowerCase().includes(search)
+                const matchesReason = m.reason?.toLowerCase().includes(search)
+                return matchesProduct || matchesSku || matchesReason
+            })
+        }
+
+        return filtered
+    }, [movements, searchTerm, selectedProductId])
 
     // Calculate stats
     const stats = useMemo(() => {
@@ -87,6 +117,59 @@ export default function StockMovementsPage() {
             time: date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
         }
     }
+
+    // Export to Excel
+    const handleExportExcel = () => {
+        try {
+            // Prepare data for export
+            const exportData = filteredMovements.map((m: IStockMovement) => {
+                const { date, time } = formatDate(m.created_at)
+                const style = getMovementStyle(m.movement_type)
+                return {
+                    'Date': date,
+                    'Heure': time,
+                    'Produit': m.product_name,
+                    'SKU': m.product_sku,
+                    'Type': t(style.labelKey, style.label),
+                    'Quantité': m.quantity,
+                    'Unité': m.product_unit,
+                    'Prix Unitaire': m.product_cost,
+                    'Valeur': Math.abs(m.quantity * m.product_cost),
+                    'Stock Avant': m.stock_before || '-',
+                    'Stock Après': m.stock_after || '-',
+                    'Raison': m.reason || '',
+                    'Personnel': m.staff_name || ''
+                }
+            })
+
+            // Create workbook
+            const ws = XLSX.utils.json_to_sheet(exportData)
+            const wb = XLSX.utils.book_new()
+            XLSX.utils.book_append_sheet(wb, ws, 'Mouvements')
+
+            // Generate filename with date
+            const now = new Date()
+            const filename = `mouvements_stock_${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}.xlsx`
+
+            // Save file
+            XLSX.writeFile(wb, filename)
+
+            toast.success(`Export réussi: ${filteredMovements.length} mouvements exportés`)
+        } catch (error) {
+            console.error('Error exporting to Excel:', error)
+            toast.error('Erreur lors de l\'export Excel')
+        }
+    }
+
+    // Filtered products for autocomplete
+    const filteredProducts = useMemo(() => {
+        if (!productSearch) return products
+        const search = productSearch.toLowerCase()
+        return products.filter(p =>
+            p.name.toLowerCase().includes(search) ||
+            p.sku.toLowerCase().includes(search)
+        )
+    }, [products, productSearch])
 
     if (isLoading) {
         return (
@@ -155,7 +238,7 @@ export default function StockMovementsPage() {
                 </div>
             </div>
 
-            {/* Search & Date Filters */}
+            {/* Search & Filters */}
             <div className="movements-search-bar">
                 <div className="search-input-wrapper">
                     <Search size={18} />
@@ -166,6 +249,84 @@ export default function StockMovementsPage() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
+
+                {/* Product Filter */}
+                <div className="product-filter-wrapper" style={{ position: 'relative', minWidth: '200px' }}>
+                    <div className="search-input-wrapper">
+                        <Package size={16} />
+                        <input
+                            type="text"
+                            placeholder="Filtrer par produit..."
+                            value={selectedProductId ? products.find(p => p.id === selectedProductId)?.name || '' : productSearch}
+                            onChange={(e) => {
+                                setProductSearch(e.target.value)
+                                if (!e.target.value) setSelectedProductId('')
+                            }}
+                            onFocus={() => setProductSearch('')}
+                        />
+                        {selectedProductId && (
+                            <button
+                                onClick={() => {
+                                    setSelectedProductId('')
+                                    setProductSearch('')
+                                }}
+                                style={{
+                                    position: 'absolute',
+                                    right: '8px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    color: '#6B7280',
+                                    padding: '4px'
+                                }}
+                            >
+                                <X size={16} />
+                            </button>
+                        )}
+                    </div>
+                    {productSearch && !selectedProductId && filteredProducts.length > 0 && (
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: '100%',
+                                left: 0,
+                                right: 0,
+                                background: 'white',
+                                border: '1px solid #E5E7EB',
+                                borderRadius: '8px',
+                                marginTop: '4px',
+                                maxHeight: '300px',
+                                overflowY: 'auto',
+                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                                zIndex: 1000
+                            }}
+                        >
+                            {filteredProducts.slice(0, 50).map(product => (
+                                <div
+                                    key={product.id}
+                                    onClick={() => {
+                                        setSelectedProductId(product.id)
+                                        setProductSearch('')
+                                    }}
+                                    style={{
+                                        padding: '8px 12px',
+                                        cursor: 'pointer',
+                                        borderBottom: '1px solid #F3F4F6',
+                                        fontSize: '0.875rem'
+                                    }}
+                                    onMouseEnter={(e) => e.currentTarget.style.background = '#F9FAFB'}
+                                    onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+                                >
+                                    <div style={{ fontWeight: 500 }}>{product.name}</div>
+                                    <div style={{ color: '#6B7280', fontSize: '0.75rem' }}>{product.sku}</div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
                 <div className="date-filters">
                     <div className="date-input-wrapper">
                         <Calendar size={16} />
@@ -185,6 +346,30 @@ export default function StockMovementsPage() {
                         />
                     </div>
                 </div>
+
+                {/* Export Button */}
+                <button
+                    onClick={handleExportExcel}
+                    disabled={filteredMovements.length === 0}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '10px 16px',
+                        background: filteredMovements.length > 0 ? '#10B981' : '#E5E7EB',
+                        color: filteredMovements.length > 0 ? 'white' : '#9CA3AF',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: filteredMovements.length > 0 ? 'pointer' : 'not-allowed',
+                        fontWeight: 500,
+                        fontSize: '0.875rem',
+                        whiteSpace: 'nowrap'
+                    }}
+                    title="Exporter en Excel"
+                >
+                    <Download size={18} />
+                    Excel
+                </button>
             </div>
 
             {/* Type Filters */}
@@ -284,6 +469,49 @@ export default function StockMovementsPage() {
                                         </div>
                                         <div className={`qty-cost ${isPositive ? 'positive' : 'negative'}`}>
                                             {isPositive ? '+' : '-'}{formatCurrency(value)}
+                                        </div>
+                                    </div>
+
+                                    {/* Stock Before/After */}
+                                    <div className="movement-stock-info" style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '4px',
+                                        minWidth: '120px',
+                                        fontSize: '0.8125rem'
+                                    }}>
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            padding: '4px 8px',
+                                            background: '#F9FAFB',
+                                            borderRadius: '4px'
+                                        }}>
+                                            <span style={{ color: '#6B7280', fontSize: '0.75rem' }}>Stock avant:</span>
+                                            <span style={{ fontWeight: 600, color: '#374151' }}>
+                                                {movement.stock_before !== null && movement.stock_before !== undefined
+                                                    ? `${movement.stock_before} ${movement.product_unit}`
+                                                    : '-'}
+                                            </span>
+                                        </div>
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            padding: '4px 8px',
+                                            background: isPositive ? '#ECFDF5' : '#FEF2F2',
+                                            borderRadius: '4px'
+                                        }}>
+                                            <span style={{ color: '#6B7280', fontSize: '0.75rem' }}>Stock après:</span>
+                                            <span style={{
+                                                fontWeight: 600,
+                                                color: isPositive ? '#059669' : '#DC2626'
+                                            }}>
+                                                {movement.stock_after !== null && movement.stock_after !== undefined
+                                                    ? `${movement.stock_after} ${movement.product_unit}`
+                                                    : '-'}
+                                            </span>
                                         </div>
                                     </div>
 

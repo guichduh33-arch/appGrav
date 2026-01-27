@@ -14,6 +14,8 @@ export interface IStockMovement {
   product_cost: number
   movement_type: string
   quantity: number
+  stock_before: number | null
+  stock_after: number | null
   reason: string | null
   reference_id: string | null
   created_at: string
@@ -85,6 +87,8 @@ export function useStockMovements(filters: IStockMovementsFilter = {}) {
           product_cost: product?.cost_price as number || 0,
           movement_type: m.movement_type as string,
           quantity: m.quantity as number,
+          stock_before: m.stock_before as number | null,
+          stock_after: m.stock_after as number | null,
           reason: m.reason as string | null,
           reference_id: m.reference_id as string | null,
           created_at: m.created_at as string,
@@ -132,6 +136,8 @@ export function useProductStockMovements(productId: string | null) {
           product_cost: product?.cost_price as number || 0,
           movement_type: m.movement_type as string,
           quantity: m.quantity as number,
+          stock_before: m.stock_before as number | null,
+          stock_after: m.stock_after as number | null,
           reason: m.reason as string | null,
           reference_id: m.reference_id as string | null,
           created_at: m.created_at as string,
