@@ -34,7 +34,16 @@
       "Bash(powershell:*)",
       "Bash(cmd /c \"dir .claude\\\\*.json /s /b\")",
       "Bash(cmd /c \"dir .claude /s /b\")",
-      "Bash(npm ls:*)"
+      "Bash(npm ls:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npm install:*)",
+      "Read(//c/**)",
+      "Bash(python3:*)",
+      "Bash(cd:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(npx tsx:*)",
+      "Bash(tee:*)",
+      "Bash(del \"c:\\\\Users\\\\guich\\\\appGrav\\\\src\\\\pages\\\\inventory\\\\tabs\\\\VariantsTab_v2.tsx\")"
     ]
   }
 }

@@ -38,14 +38,38 @@
     animation: pulse-critical 1s infinite;
 }
 
+/* Reduced animation intensity for accessibility and less distraction */
 @keyframes pulse-new {
-    0%, 100% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
-    50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+    0%, 100% { box-shadow: 0 0 6px rgba(59, 130, 246, 0.2); }
+    50% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.35); }
 }
 
 @keyframes pulse-critical {
-    0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
-    50% { box-shadow: 0 0 40px rgba(239, 68, 68, 0.8); }
+    0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.3); }
+    50% { box-shadow: 0 0 14px rgba(239, 68, 68, 0.5); }
+}
+
+/* Slow down animations to reduce visual noise */
+.kds-order-card--new {
+    animation-duration: 3s; /* Slower pulse */
+}
+
+.kds-order-card--critical {
+    animation-duration: 2s; /* Slower critical pulse */
+}
+
+/* Reduced motion: disable all animations */
+@media (prefers-reduced-motion: reduce) {
+    .kds-order-card--new,
+    .kds-order-card--critical,
+    .kds-order-card__source--mobile,
+    .kds-order-card__item-preparing {
+        animation: none !important;
+    }
+
+    .kds-order-card {
+        transition: none !important;
+    }
 }
 
 /* Header */
@@ -268,4 +292,84 @@
 .kds-order-card__btn--served:hover {
     transform: scale(1.02);
     box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+}
+
+/* Story 8.1: Mobile order source indicator */
+.kds-order-card__source {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #333;
+}
+
+.kds-order-card__source--mobile {
+    background: #8B5CF6;
+    color: white;
+    animation: pulse-mobile 2s infinite;
+}
+
+@keyframes pulse-mobile {
+    0%, 100% { box-shadow: 0 0 5px rgba(139, 92, 246, 0.3); }
+    50% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.6); }
+}
+
+/* Story 8.4: Hold button */
+.kds-order-card__hold-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: #374151;
+    color: #9CA3AF;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.kds-order-card__hold-btn:hover {
+    background: #4B5563;
+    color: white;
+}
+
+.kds-order-card__hold-btn--held {
+    background: #DC2626;
+    color: white;
+}
+
+.kds-order-card__hold-btn--held:hover {
+    background: #EF4444;
+}
+
+/* Story 8.4: Held item styling */
+.kds-order-card__item--held {
+    border-left-color: #DC2626 !important;
+    background: rgba(220, 38, 38, 0.15) !important;
+    opacity: 0.9;
+}
+
+.kds-order-card__item--held .kds-order-card__item-name {
+    color: #FCA5A5;
+}
+
+.kds-order-card__item-held-badge {
+    padding: 2px 8px;
+    background: #DC2626;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 4px;
+    text-transform: uppercase;
+    animation: blink-hold 1s infinite;
+}
+
+@keyframes blink-hold {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
 }

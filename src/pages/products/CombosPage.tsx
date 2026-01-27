@@ -84,16 +84,18 @@ export default function CombosPage() {
                         const rawGroups = groupsWithItems as unknown as RawGroup[];
                         const mappedGroups = rawGroups.map((g) => ({
                             ...g,
-                            group_name: g.name,
+                            group_name: g.group_name ?? '',
                             items: (g.items || []).map((item) => ({
                                 ...item,
+                                price_adjustment: item.price_adjustment ?? 0,
+                                is_default: item.is_default ?? false,
                                 product: item.product
                             }))
                         }))
                         return {
                             ...combo,
-                            combo_price: combo.base_price,
-                            available_at_pos: combo.pos_visible,
+                            combo_price: combo.combo_price ?? 0,
+                            available_at_pos: combo.available_at_pos ?? true,
                             groups: mappedGroups
                         }
                     })
@@ -152,10 +154,10 @@ export default function CombosPage() {
                 // Find default item or cheapest item
                 const defaultItem = group.items.find(item => item.is_default)
                 const cheapestItem = group.items.reduce((min, item) =>
-                    item.price_adjustment < min.price_adjustment ? item : min
+                    (item.price_adjustment ?? 0) < (min.price_adjustment ?? 0) ? item : min
                 )
                 const selectedItem = defaultItem || cheapestItem
-                minAdjustment += selectedItem.price_adjustment
+                minAdjustment += selectedItem.price_adjustment ?? 0
             }
         })
         return combo.combo_price + minAdjustment
@@ -167,9 +169,9 @@ export default function CombosPage() {
         combo.groups.forEach(group => {
             if (group.items.length > 0) {
                 const maxItem = group.items.reduce((max, item) =>
-                    item.price_adjustment > max.price_adjustment ? item : max
+                    (item.price_adjustment ?? 0) > (max.price_adjustment ?? 0) ? item : max
                 )
-                maxAdjustment += maxItem.price_adjustment
+                maxAdjustment += maxItem.price_adjustment ?? 0
             }
         })
         return combo.combo_price + maxAdjustment
@@ -320,10 +322,10 @@ export default function CombosPage() {
                                                         {group.items.map((item, itemIdx) => (
                                                             <li key={itemIdx}>
                                                                 {item.product?.name || 'Produit inconnu'}
-                                                                {item.price_adjustment !== 0 && (
+                                                                {(item.price_adjustment ?? 0) !== 0 && (
                                                                     <span className="price-adj">
-                                                                        {item.price_adjustment > 0 ? '+' : ''}
-                                                                        {formatCurrency(item.price_adjustment)}
+                                                                        {(item.price_adjustment ?? 0) > 0 ? '+' : ''}
+                                                                        {formatCurrency(item.price_adjustment ?? 0)}
                                                                     </span>
                                                                 )}
                                                                 {item.is_default && (

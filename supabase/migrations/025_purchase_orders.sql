@@ -21,7 +21,7 @@ CREATE TABLE public.suppliers (
     postal_code TEXT,
     country TEXT DEFAULT 'France',
     tax_id TEXT,
-    payment_terms TEXT,
+    payment_terms payment_terms DEFAULT 'net30',
     notes TEXT,
     is_active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -371,9 +371,9 @@ CREATE POLICY "Allow authenticated users to delete purchase order returns"
 
 -- Insert sample suppliers
 INSERT INTO public.suppliers (name, contact_person, email, phone, address, city, postal_code, payment_terms) VALUES
-    ('Metro Cash & Carry', 'Jean Dupont', 'contact@metro.fr', '+33 1 23 45 67 89', '123 Avenue des Champs', 'Paris', '75008', 'Net 30'),
-    ('Sysco France', 'Marie Martin', 'info@sysco.fr', '+33 1 98 76 54 32', '456 Rue de la Paix', 'Lyon', '69001', 'Net 45'),
-    ('Pomona Foodservice', 'Pierre Leclerc', 'service@pomona.fr', '+33 4 56 78 90 12', '789 Boulevard Haussmann', 'Marseille', '13001', 'Net 30');
+    ('Metro Cash & Carry', 'Jean Dupont', 'contact@metro.fr', '+33 1 23 45 67 89', '123 Avenue des Champs', 'Paris', '75008', 'net30'),
+    ('Sysco France', 'Marie Martin', 'info@sysco.fr', '+33 1 98 76 54 32', '456 Rue de la Paix', 'Lyon', '69001', 'net60'),
+    ('Pomona Foodservice', 'Pierre Leclerc', 'service@pomona.fr', '+33 4 56 78 90 12', '789 Boulevard Haussmann', 'Marseille', '13001', 'net30');
 
 -- Add comments
 COMMENT ON TABLE public.suppliers IS 'Stores supplier information for purchase orders';

@@ -1,44 +1,51 @@
-// Database Types for Supabase
-// Re-export all types from the auto-generated file
+/**
+ * Database Types - Re-exports from generated Supabase types
+ *
+ * This file provides type aliases for common database entities.
+ * Types are generated from Supabase schema via: npx supabase gen types typescript
+ */
 
+// Re-export everything from generated types
 export * from './database.generated'
-export type { Database, Json } from './database.generated'
 
-// Import Database type for convenience aliases
-import type { Database } from './database.generated'
+import type { Database, Tables, TablesInsert, TablesUpdate, Enums } from './database.generated'
 
-// =====================================================
-// Convenience Type Helpers
-// =====================================================
+// ============================================================================
+// TABLE ROW TYPES (Read operations)
+// ============================================================================
 
-export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
-export type Insertable<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
-export type Updatable<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']
-
-// =====================================================
-// Common Table Row Types
-// =====================================================
-
-export type Category = Tables<'categories'>
+// Core entities
 export type Product = Tables<'products'>
-export type ProductModifier = Tables<'product_modifiers'>
-export type Customer = Tables<'customers'>
-export type POSSession = Tables<'pos_sessions'>
+export type Category = Tables<'categories'>
+export type Section = Tables<'sections'>
+export type Supplier = Tables<'suppliers'>
+
+// Sales
 export type Order = Tables<'orders'>
 export type OrderItem = Tables<'order_items'>
-export type UserProfile = Tables<'user_profiles'>
-export type StockMovement = Tables<'stock_movements'>
-export type Recipe = Tables<'recipes'>
-export type ProductUOM = Tables<'product_uoms'>
-export type InventoryCount = Tables<'inventory_counts'>
-export type InventoryCountItem = Tables<'inventory_count_items'>
-export type Supplier = Tables<'suppliers'>
-export type ProductionRecord = Tables<'production_records'>
-export type Section = Tables<'sections'>
-export type ProductStock = Tables<'product_stocks'>
-export type ProductSection = Tables<'product_sections'>
+export type PosSession = Tables<'pos_sessions'>
+export type FloorPlanItem = Tables<'floor_plan_items'>
 
-// Combos and Promotions types
+// Customers
+export type Customer = Tables<'customers'>
+export type CustomerCategory = Tables<'customer_categories'>
+export type LoyaltyTier = Tables<'loyalty_tiers'>
+export type LoyaltyTransaction = Tables<'loyalty_transactions'>
+
+// Inventory
+export type StockMovement = Tables<'stock_movements'>
+export type ProductionRecord = Tables<'production_records'>
+export type Recipe = Tables<'recipes'>
+export type InventoryCount = Tables<'inventory_counts'>
+export type ProductUOM = Tables<'product_uoms'>
+
+// Product modifiers
+export type ProductModifier = Tables<'product_modifiers'>
+
+// ModifierGroup and ModifierOption are UI types, not database tables
+// They are defined below in the MODIFIER GROUP TYPES section
+
+// Combos & Promotions
 export type ProductCombo = Tables<'product_combos'>
 export type ProductComboGroup = Tables<'product_combo_groups'>
 export type ProductComboGroupItem = Tables<'product_combo_group_items'>
@@ -47,109 +54,173 @@ export type PromotionProduct = Tables<'promotion_products'>
 export type PromotionFreeProduct = Tables<'promotion_free_products'>
 export type PromotionUsage = Tables<'promotion_usage'>
 
-// Users & Permissions types
-export type Role = Tables<'roles'>
-export type Permission = Tables<'permissions'>
-export type RolePermission = Tables<'role_permissions'>
-export type UserRole = Tables<'user_roles'>
-export type UserPermissionRow = Tables<'user_permissions'>
-export type UserSession = Tables<'user_sessions'>
-export type AuditLog = Tables<'audit_logs'>
-
-// Floor Plan
-export type FloorPlanItem = Tables<'floor_plan_items'>
-
-// Purchasing
-export type PurchaseOrder = Tables<'purchase_orders'>
-export type PurchaseOrderItem = Tables<'purchase_order_items'>
-export type PurchaseOrderHistory = Tables<'purchase_order_history'>
-export type PurchaseOrderReturn = Tables<'purchase_order_returns'>
-
 // B2B
 export type B2BOrder = Tables<'b2b_orders'>
 export type B2BOrderItem = Tables<'b2b_order_items'>
 export type B2BPayment = Tables<'b2b_payments'>
 
-// Stock Locations and Transfers
-export type StockLocation = Tables<'stock_locations'>
-export type InternalTransfer = Tables<'internal_transfers'>
-export type TransferItem = Tables<'transfer_items'>
+// Purchasing
+export type PurchaseOrder = Tables<'purchase_orders'>
+export type POItem = Tables<'po_items'>
 
-// Customer Categories
-export type CustomerCategory = Tables<'customer_categories'>
-export type ProductCategoryPrice = Tables<'product_category_prices'>
+// Users & Permissions
+export type UserProfile = Tables<'user_profiles'>
+export type Role = Tables<'roles'>
+export type Permission = Tables<'permissions'>
+export type RolePermission = Tables<'role_permissions'>
+export type UserRole = Tables<'user_roles'>
+export type UserPermission = Tables<'user_permissions'>
 
-// Settings Module
-export type SettingsCategory = Tables<'settings_categories'>
+// System
+export type AuditLog = Tables<'audit_log'>
 export type Setting = Tables<'settings'>
-export type SettingsHistory = Tables<'settings_history'>
-export type TaxRate = Tables<'tax_rates'>
-export type PaymentMethodRow = Tables<'payment_methods'>
-export type BusinessHour = Tables<'business_hours'>
-export type PrinterConfiguration = Tables<'printer_configurations'>
-export type EmailTemplate = Tables<'email_templates'>
-export type ReceiptTemplate = Tables<'receipt_templates'>
 
-// Loyalty
-export type LoyaltyTier = Tables<'loyalty_tiers'>
-export type LoyaltyTransaction = Tables<'loyalty_transactions'>
+// ============================================================================
+// INSERT TYPES (Create operations)
+// ============================================================================
 
-// =====================================================
-// Promotion Type Enum
-// =====================================================
+export type Insertable<T extends keyof Database['public']['Tables']> = TablesInsert<T>
+export type ProductInsert = TablesInsert<'products'>
+export type OrderInsert = TablesInsert<'orders'>
+export type OrderItemInsert = TablesInsert<'order_items'>
+export type StockMovementInsert = TablesInsert<'stock_movements'>
+export type CustomerInsert = TablesInsert<'customers'>
 
-export type PromotionType = 'percentage' | 'fixed_amount' | 'buy_x_get_y' | 'free_product'
+// ============================================================================
+// UPDATE TYPES (Update operations)
+// ============================================================================
 
-// =====================================================
-// Extended Types with Relations
-// =====================================================
+export type Updatable<T extends keyof Database['public']['Tables']> = TablesUpdate<T>
+export type ProductUpdate = TablesUpdate<'products'>
+export type OrderUpdate = TablesUpdate<'orders'>
+
+// ============================================================================
+// ENUM TYPES
+// ============================================================================
+
+export type OrderStatus = Enums<'order_status'>
+export type OrderType = Enums<'order_type'>
+export type PaymentMethod = Enums<'payment_method'>
+export type PaymentStatus = Enums<'payment_status'>
+export type ProductType = Enums<'product_type'>
+export type MovementType = Enums<'movement_type'>
+export type DispatchStation = Enums<'dispatch_station'>
+export type UserRoleEnum = Enums<'user_role'>
+export type SessionStatus = Enums<'session_status'>
+export type ItemStatus = Enums<'item_status'>
+export type DiscountType = Enums<'discount_type'>
+// PromotionType includes all promotion variations used in the UI
+export type PromotionType = 'percentage' | 'fixed_amount' | 'buy_x_get_y' | 'free_product' | 'fixed' | 'free'
+
+// ============================================================================
+// EXTENDED/JOINED TYPES
+// ============================================================================
 
 export interface ProductWithCategory extends Product {
-    category: Category | null
+    category?: Category | null
+    sections?: Section | null
 }
 
-export interface ProductSectionWithDetails extends ProductSection {
-    section: Section
-}
-
-export interface ProductWithSections extends Product {
-    sections: ProductSectionWithDetails[]
+export interface RecipeWithProduct extends Recipe {
+    ingredient?: Product | null
 }
 
 export interface OrderWithItems extends Order {
-    items: OrderItemWithProduct[]
+    order_items?: OrderItem[]
 }
 
-export interface OrderItemWithProduct extends OrderItem {
-    product: Product
+// ============================================================================
+// POS TERMINAL TYPES (matches pos_terminals table)
+// ============================================================================
+
+export interface IPosTerminal {
+    id: string
+    terminal_name: string
+    device_id: string
+    is_hub: boolean | null
+    location: string | null
+    status: string | null
+    created_at: string | null
+    updated_at: string | null
 }
 
-// Combo with groups
-export interface ProductComboWithGroups extends ProductCombo {
-    groups: ProductComboGroupWithItems[]
+export type TPosTerminalStatus = 'active' | 'inactive' | 'maintenance'
+
+// ============================================================================
+// SYNC TYPES
+// ============================================================================
+
+export interface ISyncDevice {
+    id: string
+    device_type: TSyncDeviceType
+    device_name: string
+    last_sync: string | null
+    status: 'online' | 'offline' | 'syncing'
 }
 
-export interface ProductComboGroupWithItems extends ProductComboGroup {
-    items: ProductComboGroupItemWithProduct[]
+export type TSyncDeviceType = 'pos' | 'kds' | 'display' | 'mobile'
+
+// ============================================================================
+// LAN NODE TYPES (matches lan_nodes table)
+// ============================================================================
+
+export interface ILanNode {
+    id: string
+    device_id: string
+    device_name: string | null
+    device_type: string
+    ip_address: unknown
+    port: number
+    status: string | null
+    is_hub: boolean | null
+    last_heartbeat: string | null
+    created_at: string | null
+    updated_at: string | null
 }
 
-export interface ProductComboGroupItemWithProduct extends ProductComboGroupItem {
-    product: Product
+export type TLanNodeStatus = 'online' | 'offline' | 'connecting'
+
+// ============================================================================
+// DISPLAY TYPES
+// ============================================================================
+
+export interface IDisplayPromotion {
+    id: string
+    title: string
+    description: string | null
+    subtitle: string | null
+    image_url: string | null
+    start_date: string | null
+    end_date: string | null
+    is_active: boolean
+    priority: number | null
+    background_color: string | null
+    text_color: string | null
 }
 
-// Promotion with products
-export interface PromotionWithProducts extends Promotion {
-    promotion_products: PromotionProduct[]
-    promotion_free_products: PromotionFreeProduct[]
+// ============================================================================
+// MODIFIER GROUP TYPES (UI types - not database tables)
+// ============================================================================
+
+export interface ModifierGroup {
+    id: string
+    name: string
+    type: 'single' | 'multiple'
+    is_required: boolean
+    min_selections?: number
+    max_selections?: number
+    options: ModifierOption[]
 }
 
-// Transfer with items
-export interface InternalTransferWithItems extends InternalTransfer {
-    items: TransferItemWithProduct[]
-    from_location: StockLocation
-    to_location: StockLocation
+export interface ModifierOption {
+    id: string
+    name: string
+    price_adjustment: number
 }
 
-export interface TransferItemWithProduct extends TransferItem {
-    product: Product
-}
+// ============================================================================
+// HELPER TYPES
+// ============================================================================
+
+export type { Json } from './database.generated'
+export type { Database } from './database.generated'

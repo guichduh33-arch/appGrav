@@ -77,7 +77,7 @@ export default function CustomersPage() {
             .select('*')
             .eq('is_active', true)
             .order('name')
-        if (data) setCategories(data)
+        if (data) setCategories(data as unknown as CustomerCategory[])
     }
 
     const fetchCustomers = async () => {
@@ -93,7 +93,7 @@ export default function CustomersPage() {
             if (error) throw error
 
             if (data) {
-                const typedData = data as Customer[]
+                const typedData = data as unknown as Customer[]
                 setCustomers(typedData)
 
                 // Calculate stats

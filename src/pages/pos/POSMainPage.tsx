@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Search, PauseCircle, CheckCircle, AlertCircle, Clock, Users } from 'lucide-react'
@@ -8,6 +8,9 @@ import { useOrderStore } from '../../stores/orderStore'
 import { useAuthStore } from '../../stores/authStore'
 import { useProducts, useCategories } from '../../hooks/products'
 import { useShift, ShiftUser } from '../../hooks/useShift'
+import { useNetworkAlerts } from '../../hooks/useNetworkAlerts'
+import { useSyncReport } from '../../hooks/useSyncReport'
+import { PostOfflineSyncReport } from '../../components/sync/PostOfflineSyncReport'
 import CategoryNav from '../../components/pos/CategoryNav'
 import ProductGrid from '../../components/pos/ProductGrid'
 import Cart from '../../components/pos/Cart'
@@ -35,6 +38,12 @@ import './POSMainPage.css'
 
 export default function POSMainPage() {
     const { t } = useTranslation()
+
+    // Enable network status alerts (Story 3.2)
+    useNetworkAlerts()
+
+    // Enable post-offline sync report modal (Story 3.3)
+    const { showReport: showSyncReport, period: syncPeriod, dismissReport: dismissSyncReport, retryFailed: retrySyncFailed } = useSyncReport()
 
     const {
         items, itemCount, clearCart,
@@ -71,7 +80,6 @@ export default function POSMainPage() {
     // Modal states
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
     const [editItem, setEditItem] = useState<CartItem | undefined>(undefined)
-    const [productVariants, setProductVariants] = useState<Product[] | null>(null)
     const [showModifierModal, setShowModifierModal] = useState(false)
     const [showPaymentModal, setShowPaymentModal] = useState(false)
     const [showVariantModal, setShowVariantModal] = useState(false)
@@ -96,46 +104,42 @@ export default function POSMainPage() {
     const { data: categories = [], isLoading: categoriesLoading } = useCategories()
     const { data: products = [], isLoading: productsLoading } = useProducts(selectedCategory)
 
-    // Filter products by search
-    const filteredProducts = products.filter(product =>
-        searchQuery === '' ||
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.sku.toLowerCase().includes(searchQuery.toLowerCase())
+    // Filter products by search - memoized to prevent unnecessary recalculations
+    const filteredProducts = useMemo(() =>
+        products.filter(product =>
+            searchQuery === '' ||
+            product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.sku.toLowerCase().includes(searchQuery.toLowerCase())
+        ),
+        [products, searchQuery]
     )
 
     // Handle product click - allow even without shift (block at checkout/send)
-    const handleProductClick = (product: Product, variants?: Product[]) => {
+    const handleProductClick = useCallback((product: Product) => {
         setEditItem(undefined) // Reset edit item when adding new
         setSelectedProduct(product)
-        if (variants && variants.length > 1) {
-            // Product has variants - show variant modal
-            setProductVariants(variants)
-            setShowVariantModal(true)
-        } else {
-            // No variants - show modifier modal directly
-            setProductVariants(null)
-            setShowModifierModal(true)
-        }
-    }
+        // Always show variant modal first - it will load variants from database
+        // If no variants exist, it will add directly to cart
+        setShowVariantModal(true)
+    }, [])
 
-    const handleCartItemClick = (item: CartItem) => {
+    const handleCartItemClick = useCallback((item: CartItem) => {
         setEditItem(item)
         setSelectedProduct(item.product || null)
         setShowModifierModal(true)
-    }
+    }, [])
 
     // Handle variant selection complete
-    const handleVariantClose = () => {
+    const handleVariantClose = useCallback(() => {
         setShowVariantModal(false)
         setSelectedProduct(null)
-        setProductVariants(null)
-    }
+    }, [])
 
     // Show toast notification
-    const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success') => {
         setToast({ message, type })
         setTimeout(() => setToast(null), 3000)
-    }
+    }, [])
 
     // Get kitchen helper functions
     const { sendToKitchenAsHeldOrder, updateKitchenHeldOrder } = useOrderStore()
@@ -210,7 +214,7 @@ export default function POSMainPage() {
     void _handleHoldOrder
 
     // Handle restore held order
-    const handleRestoreHeldOrder = (heldOrderId: string) => {
+    const handleRestoreHeldOrder = useCallback((heldOrderId: string) => {
         const heldOrder = restoreHeldOrder(heldOrderId)
         if (heldOrder) {
             // Restore items to cart with full state (including locks and active order ID)
@@ -224,10 +228,10 @@ export default function POSMainPage() {
             setShowHeldOrdersModal(false)
             showToast(t('pos.toasts.order_restored', { number: heldOrder.orderNumber }), 'success')
         }
-    }
+    }, [restoreHeldOrder, restoreCartState, showToast, t])
 
     // Handle checkout - block if no shift open
-    const handleCheckout = () => {
+    const handleCheckout = useCallback(() => {
         if (!hasOpenShift) {
             setShowNoShiftModal(true)
             return
@@ -235,19 +239,19 @@ export default function POSMainPage() {
         if (itemCount > 0) {
             setShowPaymentModal(true)
         }
-    }
+    }, [hasOpenShift, itemCount])
 
     // Handle open shift request - show PIN verification first
-    const handleOpenShiftRequest = () => {
+    const handleOpenShiftRequest = useCallback(() => {
         setPinModalAction('open')
         setShowPinModal(true)
-    }
+    }, [])
 
     // Handle close shift request - show PIN verification first
-    const handleCloseShiftRequest = () => {
+    const handleCloseShiftRequest = useCallback(() => {
         setPinModalAction('close')
         setShowPinModal(true)
-    }
+    }, [])
 
     // Handle PIN verification result
     const handlePinVerified = (verified: boolean, user?: { id: string; name: string; role: string }) => {
@@ -382,10 +386,9 @@ export default function POSMainPage() {
             )}
 
             {/* Modals */}
-            {showVariantModal && selectedProduct && productVariants && (
+            {showVariantModal && selectedProduct && (
                 <VariantModal
                     baseProduct={selectedProduct}
-                    variants={productVariants}
                     onClose={handleVariantClose}
                 />
             )}
@@ -597,6 +600,15 @@ export default function POSMainPage() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Post-Offline Sync Report Modal (Story 3.3) */}
+            {showSyncReport && syncPeriod && (
+                <PostOfflineSyncReport
+                    period={syncPeriod}
+                    onClose={dismissSyncReport}
+                    onRetryFailed={retrySyncFailed}
+                />
             )}
         </div>
     )

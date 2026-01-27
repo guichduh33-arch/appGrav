@@ -336,12 +336,19 @@ export const useOrderStore = create<OrderState>()(
                         const newLockedIds = order.lockedItemIds.filter(id => id !== itemId)
                         const newSubtotal = newItems.reduce((sum, item) => sum + item.totalPrice, 0)
 
+                        // Recalculate discount based on new subtotal
+                        // If original discount was percentage-based, we need to preserve that ratio
+                        const originalDiscountRatio = order.subtotal > 0 ? order.discountAmount / order.subtotal : 0
+                        const newDiscountAmount = Math.round(newSubtotal * originalDiscountRatio)
+                        const newTotal = Math.max(0, newSubtotal - newDiscountAmount)
+
                         return {
                             ...order,
                             items: newItems,
                             lockedItemIds: newLockedIds,
                             subtotal: newSubtotal,
-                            total: newSubtotal - order.discountAmount,
+                            discountAmount: newDiscountAmount,
+                            total: newTotal,
                         }
                     })
                 }))

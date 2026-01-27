@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Clock, CheckCircle, ChefHat, AlertTriangle } from 'lucide-react'
+import { Clock, CheckCircle, ChefHat, AlertTriangle, Pause, Play, Smartphone } from 'lucide-react'
 import './KDSOrderCard.css'
 
 interface OrderItem {
@@ -10,6 +10,7 @@ interface OrderItem {
     notes?: string
     item_status: 'new' | 'preparing' | 'ready' | 'served'
     dispatch_station: string
+    is_held: boolean // Story 8.4
 }
 
 interface KDSOrderCardProps {
@@ -21,9 +22,11 @@ interface KDSOrderCardProps {
     items: OrderItem[]
     createdAt: string
     station: string
+    source?: 'pos' | 'mobile' | 'web' // Story 8.1
     onStartPreparing: (orderId: string, itemIds: string[]) => void
     onMarkReady: (orderId: string, itemIds: string[]) => void
     onMarkServed: (orderId: string, itemIds: string[]) => void
+    onToggleHold?: (itemId: string, currentHoldStatus: boolean) => void // Story 8.4
 }
 
 const ORDER_TYPE_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
@@ -42,9 +45,11 @@ export default function KDSOrderCard({
     items,
     createdAt,
     station,
+    source,
     onStartPreparing,
     onMarkReady,
-    onMarkServed
+    onMarkServed,
+    onToggleHold
 }: KDSOrderCardProps) {
     const [elapsedTime, setElapsedTime] = useState(0)
 
@@ -129,6 +134,12 @@ export default function KDSOrderCard({
                     >
                         {orderConfig.icon} {orderConfig.label}
                     </span>
+                    {/* Story 8.1: Mobile order indicator */}
+                    {source === 'mobile' && (
+                        <span className="kds-order-card__source kds-order-card__source--mobile">
+                            <Smartphone size={14} />
+                        </span>
+                    )}
                 </div>
                 <div className={`kds-order-card__timer kds-order-card__timer--${urgency}`}>
                     <Clock size={16} />
@@ -149,16 +160,33 @@ export default function KDSOrderCard({
                 {stationItems.map((item) => (
                     <div
                         key={item.id}
-                        className={`kds-order-card__item kds-order-card__item--${item.item_status}`}
+                        className={`kds-order-card__item kds-order-card__item--${item.item_status} ${item.is_held ? 'kds-order-card__item--held' : ''}`}
                     >
                         <div className="kds-order-card__item-main">
                             <span className="kds-order-card__item-qty">{item.quantity}×</span>
                             <span className="kds-order-card__item-name">{item.product_name}</span>
-                            {item.item_status === 'ready' && (
+                            {/* Story 8.4: Hold indicator */}
+                            {item.is_held && (
+                                <span className="kds-order-card__item-held-badge">HOLD</span>
+                            )}
+                            {item.item_status === 'ready' && !item.is_held && (
                                 <CheckCircle className="kds-order-card__item-ready" size={18} />
                             )}
-                            {item.item_status === 'preparing' && (
+                            {item.item_status === 'preparing' && !item.is_held && (
                                 <ChefHat className="kds-order-card__item-preparing" size={18} />
+                            )}
+                            {/* Story 8.4: Hold button */}
+                            {onToggleHold && item.item_status !== 'served' && (
+                                <button
+                                    className={`kds-order-card__hold-btn ${item.is_held ? 'kds-order-card__hold-btn--held' : ''}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation()
+                                        onToggleHold(item.id, item.is_held)
+                                    }}
+                                    title={item.is_held ? 'Reprendre' : 'Mettre en attente'}
+                                >
+                                    {item.is_held ? <Play size={14} /> : <Pause size={14} />}
+                                </button>
                             )}
                         </div>
                         {item.modifiers && (

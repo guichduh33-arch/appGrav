@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { X, Check, CreditCard, Banknote, QrCode, Printer, RotateCcw } from 'lucide-react'
+import { X, Check, CreditCard, Banknote, QrCode, Printer, RotateCcw, WifiOff } from 'lucide-react'
 import { useCartStore } from '../../../stores/cartStore'
 import { formatPrice } from '../../../utils/helpers'
 import { useOrders } from '../../../hooks/useOrders'
+import { useNetworkStore } from '../../../stores/networkStore'
 import toast from 'react-hot-toast'
 import './PaymentModal.css'
 
@@ -18,12 +19,21 @@ const QUICK_AMOUNTS = [100000, 150000, 200000, 250000, 500000]
 export default function PaymentModal({ onClose }: PaymentModalProps) {
     const { t } = useTranslation()
     const { total, clearCart } = useCartStore()
+    const isOnline = useNetworkStore((state) => state.isOnline)
 
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash')
     const [amountReceived, setAmountReceived] = useState<number>(0)
     const [isProcessing, setIsProcessing] = useState(false)
     const [showSuccess, setShowSuccess] = useState(false)
     const { createOrder, isCreating } = useOrders()
+
+    // Force cash payment when offline (Story 2.3)
+    useEffect(() => {
+        if (!isOnline && paymentMethod !== 'cash') {
+            setPaymentMethod('cash')
+            toast(t('payment.offline_cash_only'), { icon: '📴' })
+        }
+    }, [isOnline, paymentMethod, t])
 
     const totalRounded = Math.round(total)
     const change = amountReceived - totalRounded
@@ -141,7 +151,15 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                 <div className="modal__body payment-body">
                     {/* Top: Payment Methods */}
                     <div className="payment-methods-container">
-                        <label className="section-label">{t('payment.method_title')}</label>
+                        <label className="section-label">
+                            {t('payment.method_title')}
+                            {!isOnline && (
+                                <span className="offline-badge" style={{ marginLeft: '8px', fontSize: '12px', color: '#f59e0b' }}>
+                                    <WifiOff size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                                    {t('payment.offline_mode')}
+                                </span>
+                            )}
+                        </label>
                         <div className="payment-methods">
                             <div className="payment-method">
                                 <input
@@ -156,30 +174,38 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                                     <span className="payment-method__name">{t('payment.cash')}</span>
                                 </label>
                             </div>
-                            <div className="payment-method">
+                            <div className={`payment-method ${!isOnline ? 'payment-method--disabled' : ''}`}>
                                 <input
                                     type="radio"
                                     name="paymentMethod"
                                     id="payCard"
                                     checked={paymentMethod === 'card'}
-                                    onChange={() => setPaymentMethod('card')}
+                                    onChange={() => isOnline && setPaymentMethod('card')}
+                                    disabled={!isOnline}
                                 />
-                                <label htmlFor="payCard" className="payment-method__label">
+                                <label htmlFor="payCard" className={`payment-method__label ${!isOnline ? 'disabled' : ''}`}>
                                     <CreditCard size={24} className="payment-method__icon" />
                                     <span className="payment-method__name">{t('payment.card')}</span>
+                                    {!isOnline && (
+                                        <span className="payment-method__offline">{t('payment.requires_internet')}</span>
+                                    )}
                                 </label>
                             </div>
-                            <div className="payment-method">
+                            <div className={`payment-method ${!isOnline ? 'payment-method--disabled' : ''}`}>
                                 <input
                                     type="radio"
                                     name="paymentMethod"
                                     id="payQris"
                                     checked={paymentMethod === 'qris'}
-                                    onChange={() => setPaymentMethod('qris')}
+                                    onChange={() => isOnline && setPaymentMethod('qris')}
+                                    disabled={!isOnline}
                                 />
-                                <label htmlFor="payQris" className="payment-method__label">
+                                <label htmlFor="payQris" className={`payment-method__label ${!isOnline ? 'disabled' : ''}`}>
                                     <QrCode size={24} className="payment-method__icon" />
                                     <span className="payment-method__name">{t('payment.qris')}</span>
+                                    {!isOnline && (
+                                        <span className="payment-method__offline">{t('payment.requires_internet')}</span>
+                                    )}
                                 </label>
                             </div>
                         </div>

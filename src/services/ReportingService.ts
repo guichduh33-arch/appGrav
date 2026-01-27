@@ -55,9 +55,8 @@ export const ReportingService = {
      */
     async getPaymentMethodStats(): Promise<PaymentMethodStat[]> {
         const { data, error } = await supabase
-            .from('view_payment_method_stats')
-            .select('*')
-            .order('total_revenue' as any, { ascending: false });
+            .from('view_payment_method_stats' as never)
+            .select('*') as { data: unknown[] | null; error: Error | null };
 
         if (error) throw error;
         return (data || []) as unknown as PaymentMethodStat[];
@@ -68,11 +67,11 @@ export const ReportingService = {
      */
     async getDailySales(startDate: Date, endDate: Date): Promise<DailySalesStat[]> {
         const { data, error } = await supabase
-            .from('view_daily_kpis')
+            .from('view_daily_kpis' as never)
             .select('*')
             .gte('date', startDate.toISOString())
             .lte('date', endDate.toISOString())
-            .order('date', { ascending: true });
+            .order('date', { ascending: true }) as { data: unknown[] | null; error: Error | null };
 
         if (error) throw error;
 
@@ -83,8 +82,8 @@ export const ReportingService = {
             avg_order_value: number | null;
             total_tax: number | null;
         };
-        const rawData = data as unknown as KpiRow[];
-        return (rawData || []).map((row) => ({
+        const rawData = (data || []) as KpiRow[];
+        return rawData.map((row) => ({
             date: row.date || '',
             total_sales: row.total_revenue || 0,
             total_orders: row.total_orders || 0,
@@ -230,19 +229,26 @@ export const ReportingService = {
      * Get Real-time Inventory Valuation
      */
     async getInventoryValuation(): Promise<InventoryValuation> {
+        // This view may not exist in the schema, calculate from products table
         const { data, error } = await supabase
-            .from('view_inventory_valuation')
-            .select('*');
+            .from('products')
+            .select('current_stock, cost_price, retail_price')
+            .eq('is_active', true);
 
         if (error) throw error;
 
-        // Aggregate the results from the view
-        const items = data || [];
+        // Aggregate the results
+        type InventoryRow = {
+            current_stock: number | null;
+            cost_price: number | null;
+            retail_price: number | null;
+        };
+        const items = (data || []) as InventoryRow[];
         return {
             total_skus: items.length,
             total_items_in_stock: items.reduce((sum, i) => sum + (i.current_stock || 0), 0),
-            total_valuation_cost: items.reduce((sum, i) => sum + (i.stock_value_cost || 0), 0),
-            total_valuation_retail: items.reduce((sum, i) => sum + (i.stock_value_retail || 0), 0),
+            total_valuation_cost: items.reduce((sum, i) => sum + ((i.current_stock || 0) * (i.cost_price || 0)), 0),
+            total_valuation_retail: items.reduce((sum, i) => sum + ((i.current_stock || 0) * (i.retail_price || 0)), 0),
         };
     },
 

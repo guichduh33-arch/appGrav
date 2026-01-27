@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     Store, Printer, Bell, Shield, Save, Plus, Settings, RefreshCw, Layers,
-    Edit2, Trash2, X, ShoppingCart, Factory, Warehouse, ChefHat, Coffee, Monitor, Grid
+    Edit2, Trash2, X, ShoppingCart, Factory, Warehouse, ChefHat, Coffee, Monitor, Grid, Wifi
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import FloorPlanEditor from '../../components/settings/FloorPlanEditor';
+import TerminalSettingsSection from '../../components/settings/TerminalSettingsSection';
 import './SettingsPage.css';
 
-type SettingsTab = 'general' | 'printers' | 'notifications' | 'security' | 'sections' | 'kds' | 'floorplan';
+type SettingsTab = 'general' | 'terminal' | 'printers' | 'notifications' | 'security' | 'sections' | 'kds' | 'floorplan';
 
 interface Section {
     id: string;
@@ -217,20 +218,23 @@ const SettingsPage = () => {
             // Map interface fields to database schema
             const sectionData = {
                 name: sectionForm.name,
-                code: sectionForm.slug || generateSlug(sectionForm.name),
+                slug: sectionForm.slug || generateSlug(sectionForm.name),
+                is_sales_point: sectionForm.is_sales_point,
+                is_production_point: sectionForm.is_production_point,
+                is_warehouse: sectionForm.is_warehouse,
             };
 
             if (editingSection) {
                 const { error } = await supabase
                     .from('sections')
-                    .update(sectionData as never)
+                    .update(sectionData)
                     .eq('id', editingSection.id);
 
                 if (error) throw error;
             } else {
                 const { error } = await supabase
                     .from('sections')
-                    .insert(sectionData as never);
+                    .insert(sectionData);
 
                 if (error) throw error;
             }
@@ -279,6 +283,7 @@ const SettingsPage = () => {
 
     const tabs = [
         { id: 'general' as const, label: 'Général', icon: <Store size={18} /> },
+        { id: 'terminal' as const, label: 'Terminal POS', icon: <Wifi size={18} /> },
         { id: 'sections' as const, label: 'Sections', icon: <Layers size={18} /> },
         { id: 'floorplan' as const, label: 'Plan de Salle', icon: <Grid size={18} /> },
         { id: 'kds' as const, label: 'Stations KDS', icon: <ChefHat size={18} /> },
@@ -375,6 +380,10 @@ const SettingsPage = () => {
                                 </div>
                             </div>
                         </div>
+                    )}
+
+                    {activeTab === 'terminal' && (
+                        <TerminalSettingsSection />
                     )}
 
                     {activeTab === 'sections' && (

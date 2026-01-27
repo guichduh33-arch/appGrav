@@ -90,11 +90,11 @@ export default function ComboFormPage() {
             if (comboData) {
                 setName(comboData.name)
                 setDescription(comboData.description || '')
-                setComboPrice(comboData.base_price)
-                setIsActive(comboData.is_active)
-                setAvailableAtPos(comboData.pos_visible)
+                setComboPrice(comboData.combo_price ?? 0)
+                setIsActive(comboData.is_active ?? true)
+                setAvailableAtPos(comboData.available_at_pos ?? true)
                 setImageUrl(comboData.image_url || '')
-                setSortOrder(comboData.sort_order)
+                setSortOrder(comboData.sort_order ?? 0)
 
                 // Fetch groups with items
                 const { data: groupsData, error: groupsError } = await supabase
@@ -115,24 +115,30 @@ export default function ComboFormPage() {
                                 .order('sort_order')
 
                             // Fetch product details for each item
-                            type RawGroupItem = { id: string; product_id: string; price_adjustment?: number; is_default?: boolean; sort_order?: number };
+                            type RawGroupItem = { id: string; product_id: string; price_adjustment?: number | null; is_default?: boolean | null; sort_order?: number | null };
                             const itemsWithProducts = await Promise.all((itemsData || []).map(async (item: RawGroupItem) => {
                                 const { data: product } = await supabase
                                     .from('products')
                                     .select('*')
                                     .eq('id', item.product_id)
                                     .single()
-                                return { ...item, product }
+                                return {
+                                    ...item,
+                                    product,
+                                    price_adjustment: item.price_adjustment ?? 0,
+                                    is_default: item.is_default ?? false,
+                                    sort_order: item.sort_order ?? 0
+                                }
                             }))
 
                             return {
                                 id: group.id,
-                                group_name: group.name,
-                                group_type: group.max_selections === 1 ? 'single' : 'multiple',
-                                is_required: group.is_required,
-                                min_selections: group.min_selections,
-                                max_selections: group.max_selections,
-                                sort_order: group.sort_order,
+                                group_name: group.group_name ?? '',
+                                group_type: (group.max_selections ?? 1) === 1 ? 'single' : 'multiple',
+                                is_required: group.is_required ?? true,
+                                min_selections: group.min_selections ?? 1,
+                                max_selections: group.max_selections ?? 1,
+                                sort_order: group.sort_order ?? 0,
                                 items: itemsWithProducts,
                                 expanded: true
                             } as ComboGroup
@@ -306,12 +312,12 @@ export default function ComboFormPage() {
                     .update({
                         name,
                         description: description || null,
-                        base_price: comboPrice,
+                        combo_price: comboPrice,
                         is_active: isActive,
-                        pos_visible: availableAtPos,
+                        available_at_pos: availableAtPos,
                         image_url: imageUrl || null,
                         sort_order: sortOrder
-                    })
+                    } as never)
                     .eq('id', id!)
 
                 if (comboError) throw comboError
@@ -335,12 +341,12 @@ export default function ComboFormPage() {
                     .insert({
                         name,
                         description: description || null,
-                        base_price: comboPrice,
+                        combo_price: comboPrice,
                         is_active: isActive,
-                        pos_visible: availableAtPos,
+                        available_at_pos: availableAtPos,
                         image_url: imageUrl || null,
                         sort_order: sortOrder
-                    })
+                    } as never)
                     .select()
                     .single()
 

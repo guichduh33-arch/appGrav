@@ -24,7 +24,7 @@ interface B2BOrder {
     discount_amount: number
     tax_amount: number
     total_amount: number
-    payment_status: 'unpaid' | 'partial' | 'paid' | 'overdue'
+    payment_status: 'unpaid' | 'partial' | 'paid'
     payment_terms: string | null
     due_date: string | null
     amount_paid: number
@@ -42,11 +42,10 @@ const STATUS_CONFIG = {
     cancelled: { label: 'Annulée', color: 'red', icon: AlertCircle }
 }
 
-const PAYMENT_STATUS_CONFIG = {
+const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
     unpaid: { label: 'Non payé', color: 'red' },
     partial: { label: 'Partiel', color: 'orange' },
     paid: { label: 'Payé', color: 'green' },
-    overdue: { label: 'En retard', color: 'red' }
 }
 
 export default function B2BOrdersPage() {
@@ -72,7 +71,18 @@ export default function B2BOrdersPage() {
                 .order('order_date', { ascending: false })
 
             if (error) throw error
-            if (data) setOrders(data)
+            if (data) {
+                // Map database fields to UI expected fields
+                const mappedOrders = data.map(order => ({
+                    ...order,
+                    total_amount: order.total ?? 0,
+                    amount_paid: order.paid_amount ?? 0,
+                    amount_due: (order.total ?? 0) - (order.paid_amount ?? 0),
+                    requested_delivery_date: order.delivery_date,
+                    payment_status: order.payment_status ?? 'unpaid',
+                })) as unknown as B2BOrder[]
+                setOrders(mappedOrders)
+            }
         } catch (error) {
             console.error('Error fetching B2B orders:', error)
         } finally {
@@ -122,8 +132,8 @@ export default function B2BOrdersPage() {
         )
     }
 
-    const getPaymentBadge = (status: keyof typeof PAYMENT_STATUS_CONFIG) => {
-        const config = PAYMENT_STATUS_CONFIG[status]
+    const getPaymentBadge = (status: string) => {
+        const config = PAYMENT_STATUS_CONFIG[status] || { label: status, color: 'gray' }
         return (
             <span className={`b2b-payment-badge b2b-payment-badge--${config.color}`}>
                 {config.label}
@@ -231,7 +241,6 @@ export default function B2BOrdersPage() {
                         <option value="unpaid">Non payé</option>
                         <option value="partial">Partiel</option>
                         <option value="paid">Payé</option>
-                        <option value="overdue">En retard</option>
                     </select>
                 </div>
             </div>

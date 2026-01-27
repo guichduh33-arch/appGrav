@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Plus, Trash2, Save, Send, Percent } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import { formatCurrency } from '@/utils/helpers'
 import './PurchaseOrderFormPage.css'
 
 interface Supplier {
@@ -13,6 +14,7 @@ interface Product {
     id: string
     name: string
     cost_price: number | null
+    unit: string
 }
 
 interface POItem {
@@ -21,6 +23,7 @@ interface POItem {
     product_name: string
     description: string
     quantity: number
+    unit: string
     unit_price: number
     discount_amount: number
     discount_percentage: number | null
@@ -51,10 +54,11 @@ export default function PurchaseOrderFormPage() {
         product_name: '',
         description: '',
         quantity: 1,
+        unit: 'kg',
         unit_price: 0,
         discount_amount: 0,
         discount_percentage: null,
-        tax_rate: 20,
+        tax_rate: 10,
         line_total: 0
     }])
 
@@ -88,7 +92,7 @@ export default function PurchaseOrderFormPage() {
             // First, try to load products with product_type filter
             let { data, error } = await supabase
                 .from('products')
-                .select('id, name, cost_price, product_type')
+                .select('id, name, cost_price, product_type, unit')
                 .eq('is_active', true)
                 .order('name')
 
@@ -149,6 +153,7 @@ export default function PurchaseOrderFormPage() {
                     notes?: string | null;
                     quantity?: number;
                     quantity_ordered?: number;
+                    unit?: string;
                     unit_price?: number;
                     discount_amount?: number;
                     discount_percentage?: number | null;
@@ -157,16 +162,27 @@ export default function PurchaseOrderFormPage() {
                     total_price?: number;
                 };
                 const rawItems = poItems as unknown as RawPOItem[];
+
+                // Fetch product details to get unit if not in PO items
+                const productIds = rawItems.map(item => item.product_id).filter(Boolean)
+                const { data: productsData } = await supabase
+                    .from('products')
+                    .select('id, unit')
+                    .in('id', productIds)
+
+                const productUnitsMap = new Map(productsData?.map(p => [p.id, p.unit]) || [])
+
                 setItems(rawItems.map((item) => ({
                     id: item.id,
                     product_id: item.product_id,
                     product_name: item.product_name || '',
                     description: item.description || item.notes || '',
                     quantity: parseFloat(String(item.quantity || item.quantity_ordered || 0)),
+                    unit: item.unit || (item.product_id ? productUnitsMap.get(item.product_id) : undefined) || 'kg',
                     unit_price: parseFloat(String(item.unit_price || 0)),
                     discount_amount: parseFloat(String(item.discount_amount || 0)),
                     discount_percentage: item.discount_percentage || null,
-                    tax_rate: parseFloat(String(item.tax_rate || 0)),
+                    tax_rate: parseFloat(String(item.tax_rate || 10)),
                     line_total: parseFloat(String(item.line_total || item.total_price || 0))
                 })))
             }
@@ -192,6 +208,7 @@ export default function PurchaseOrderFormPage() {
             const product = products.find(p => p.id === value)
             if (product) {
                 newItems[index].product_name = product.name
+                newItems[index].unit = product.unit
                 newItems[index].unit_price = product.cost_price || 0
             }
         }
@@ -208,10 +225,11 @@ export default function PurchaseOrderFormPage() {
             product_name: '',
             description: '',
             quantity: 1,
+            unit: 'kg',
             unit_price: 0,
             discount_amount: 0,
             discount_percentage: null,
-            tax_rate: 20,
+            tax_rate: 10,
             line_total: 0
         }])
     }
@@ -291,16 +309,21 @@ export default function PurchaseOrderFormPage() {
                 await supabase
                     .from('purchase_order_items')
                     .delete()
-                    .eq('po_id', id!)
+                    .eq('purchase_order_id', id!)
 
                 // Insert new items
                 const itemsToInsert = items.map(item => ({
-                    po_id: id!,
+                    purchase_order_id: id!,
                     product_id: item.product_id,
-                    quantity_ordered: item.quantity,
+                    product_name: item.product_name,
+                    description: item.description,
+                    quantity: item.quantity,
+                    unit: item.unit,
                     unit_price: item.unit_price,
-                    total_price: item.line_total,
-                    notes: item.description
+                    discount_amount: item.discount_amount,
+                    discount_percentage: item.discount_percentage,
+                    tax_rate: item.tax_rate,
+                    line_total: item.line_total
                 }))
 
                 const { error: itemsError } = await supabase
@@ -330,12 +353,17 @@ export default function PurchaseOrderFormPage() {
                 if (poError || !newPO) throw poError
 
                 const itemsToInsert = items.map(item => ({
-                    po_id: newPO.id,
+                    purchase_order_id: newPO.id,
                     product_id: item.product_id,
-                    quantity_ordered: item.quantity,
+                    product_name: item.product_name,
+                    description: item.description,
+                    quantity: item.quantity,
+                    unit: item.unit,
                     unit_price: item.unit_price,
-                    total_price: item.line_total,
-                    notes: item.description
+                    discount_amount: item.discount_amount,
+                    discount_percentage: item.discount_percentage,
+                    tax_rate: item.tax_rate,
+                    line_total: item.line_total
                 }))
 
                 const { error: itemsError } = await supabase
@@ -441,6 +469,7 @@ export default function PurchaseOrderFormPage() {
                                         <th>Produit</th>
                                         <th>Description</th>
                                         <th style={{ width: '100px' }}>Quantité</th>
+                                        <th style={{ width: '80px' }}>Unité</th>
                                         <th style={{ width: '120px' }}>Prix Unit.</th>
                                         <th style={{ width: '100px' }}>Remise</th>
                                         <th style={{ width: '80px' }}>TVA %</th>
@@ -494,10 +523,25 @@ export default function PurchaseOrderFormPage() {
                                                 />
                                             </td>
                                             <td>
+                                                <select
+                                                    value={item.unit}
+                                                    onChange={e => handleItemChange(index, 'unit', e.target.value)}
+                                                    aria-label="Unité"
+                                                >
+                                                    <option value="kg">kg</option>
+                                                    <option value="g">g</option>
+                                                    <option value="L">L</option>
+                                                    <option value="mL">mL</option>
+                                                    <option value="pcs">pcs</option>
+                                                    <option value="box">box</option>
+                                                    <option value="bag">bag</option>
+                                                </select>
+                                            </td>
+                                            <td>
                                                 <input
                                                     type="number"
                                                     min="0"
-                                                    step="0.01"
+                                                    step="100"
                                                     value={item.unit_price}
                                                     onChange={e => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
                                                     aria-label="Prix Unitaire"
@@ -525,7 +569,7 @@ export default function PurchaseOrderFormPage() {
                                                 />
                                             </td>
                                             <td>
-                                                <strong>{item.line_total.toFixed(2)}€</strong>
+                                                <strong>{formatCurrency(item.line_total)}</strong>
                                             </td>
                                             <td>
                                                 <button
@@ -553,7 +597,7 @@ export default function PurchaseOrderFormPage() {
 
                         <div className="po-summary__line">
                             <span>Sous-total</span>
-                            <span>{totals.subtotal.toFixed(2)}€</span>
+                            <span>{formatCurrency(totals.subtotal)}</span>
                         </div>
 
                         <button
@@ -567,20 +611,20 @@ export default function PurchaseOrderFormPage() {
                         {totals.orderDiscount > 0 && (
                             <div className="po-summary__line po-summary__line--discount">
                                 <span>Remise</span>
-                                <span>-{totals.orderDiscount.toFixed(2)}€</span>
+                                <span>-{formatCurrency(totals.orderDiscount)}</span>
                             </div>
                         )}
 
                         <div className="po-summary__line">
                             <span>TVA</span>
-                            <span>{totals.tax.toFixed(2)}€</span>
+                            <span>{formatCurrency(totals.tax)}</span>
                         </div>
 
                         <div className="po-summary__divider"></div>
 
                         <div className="po-summary__total">
                             <span>Total</span>
-                            <span>{totals.total.toFixed(2)}€</span>
+                            <span>{formatCurrency(totals.total)}</span>
                         </div>
 
                         <div className="po-summary__actions">
@@ -614,11 +658,11 @@ export default function PurchaseOrderFormPage() {
                         </div>
                         <div className="modal__body">
                             <div className="form-group">
-                                <label>Montant fixe (€)</label>
+                                <label>Montant fixe (IDR)</label>
                                 <input
                                     type="number"
                                     min="0"
-                                    step="0.01"
+                                    step="100"
                                     value={formData.discount_amount}
                                     onChange={e => setFormData({
                                         ...formData,

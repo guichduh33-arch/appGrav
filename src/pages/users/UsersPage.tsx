@@ -111,7 +111,6 @@ const UsersPage = () => {
       }
 
       const { data, error } = await query;
-
       if (error) throw error;
       setUsers((data as unknown as UserWithRoles[]) || []);
     } catch (error) {
@@ -226,17 +225,10 @@ const UsersPage = () => {
     }
   };
 
-  // Handle toggle active
+  // Handle toggle active - use direct method
   const handleToggleActive = async (userId: string, currentStatus: boolean) => {
-    if (!currentUser?.id) return;
-
     try {
-      let result = await authService.toggleUserActive(userId, !currentStatus, currentUser.id);
-
-      // Fallback to direct method if Edge Function fails
-      if (!result.success && result.error?.includes('Network')) {
-        result = await authService.toggleUserActiveDirect(userId, !currentStatus);
-      }
+      const result = await authService.toggleUserActiveDirect(userId, !currentStatus);
 
       if (result.success) {
         toast.success(
@@ -254,17 +246,10 @@ const UsersPage = () => {
     }
   };
 
-  // Handle delete
+  // Handle delete - use direct method
   const handleDelete = async (userId: string) => {
-    if (!currentUser?.id) return;
-
     try {
-      let result = await authService.deleteUser(userId, currentUser.id);
-
-      // Fallback to direct method if Edge Function fails
-      if (!result.success && result.error?.includes('Network')) {
-        result = await authService.deleteUserDirect(userId);
-      }
+      const result = await authService.deleteUserDirect(userId);
 
       if (result.success) {
         toast.success(t('auth.users.deleted') || 'Utilisateur supprimé');
@@ -304,7 +289,8 @@ const UsersPage = () => {
           </p>
         </div>
         <PermissionGuard permission="users.create">
-          <Button leftIcon={<UserPlus size={18} />} onClick={handleCreate}>
+          <Button onClick={handleCreate}>
+            <UserPlus size={18} />
             {t('auth.users.createUser') || 'Nouvel Utilisateur'}
           </Button>
         </PermissionGuard>
@@ -569,7 +555,7 @@ const UsersPage = () => {
         </div>
       )}
 
-      {/* User Form Modal - TODO: Implement UserFormModal component */}
+      {/* User Form Modal */}
       {showUserModal && (
         <UserFormModal
           user={editingUser}
@@ -628,6 +614,17 @@ function UserFormModal({
   const { user: currentUser } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
 
+  // Safely extract role_ids with error handling
+  let initialRoleIds: string[] = [];
+  let initialPrimaryRoleId = '';
+  if (user?.user_roles && Array.isArray(user.user_roles)) {
+    initialRoleIds = user.user_roles
+      .map(ur => ur.role?.id)
+      .filter((id): id is string => Boolean(id));
+    const primaryRole = user.user_roles.find(ur => ur.is_primary);
+    initialPrimaryRoleId = primaryRole?.role?.id || '';
+  }
+
   const [formData, setFormData] = useState({
     first_name: user?.first_name || '',
     last_name: user?.last_name || '',
@@ -636,9 +633,32 @@ function UserFormModal({
     phone: user?.phone || '',
     preferred_language: 'id' as 'fr' | 'en' | 'id',
     pin: '',
-    role_ids: user?.user_roles?.map(ur => ur.role?.id).filter(Boolean) as string[] || [],
-    primary_role_id: user?.user_roles?.find(ur => ur.is_primary)?.role?.id || '',
+    role_ids: initialRoleIds,
+    primary_role_id: initialPrimaryRoleId,
   });
+
+  // Safety check - if roles is not available, show loading state
+  if (!roles || roles.length === 0) {
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Chargement des rôles...
+          </h2>
+          <p className="text-gray-600 mb-4">
+            Les rôles ne sont pas encore disponibles. Veuillez patienter ou rafraîchir la page.
+          </p>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={onClose}
+          >
+            Fermer
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const getRoleName = (role: Role) => {
     const lang = i18n.language;
@@ -649,14 +669,18 @@ function UserFormModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentUser?.id) return;
+
+    if (!currentUser?.id) {
+      toast.error('Utilisateur non connecté');
+      return;
+    }
 
     setIsLoading(true);
 
     try {
       if (user) {
-        // Update existing user - try Edge Function first, fallback to direct
-        let result = await authService.updateUser(
+        // Update existing user
+        const result = await authService.updateUserDirect(
           user.id,
           {
             first_name: formData.first_name,
@@ -666,25 +690,8 @@ function UserFormModal({
             phone: formData.phone || undefined,
             role_ids: formData.role_ids,
             primary_role_id: formData.primary_role_id,
-          },
-          currentUser.id
+          }
         );
-
-        // Fallback to direct method if Edge Function fails
-        if (!result.success && result.error?.includes('Network')) {
-          result = await authService.updateUserDirect(
-            user.id,
-            {
-              first_name: formData.first_name,
-              last_name: formData.last_name,
-              display_name: formData.display_name || undefined,
-              employee_code: formData.employee_code || undefined,
-              phone: formData.phone || undefined,
-              role_ids: formData.role_ids,
-              primary_role_id: formData.primary_role_id,
-            }
-          );
-        }
 
         if (result.success) {
           toast.success(t('common.saved') || 'Enregistré');
@@ -700,36 +707,17 @@ function UserFormModal({
           return;
         }
 
-        // Try Edge Function first
-        let result = await authService.createUser(
-          {
-            first_name: formData.first_name,
-            last_name: formData.last_name,
-            display_name: formData.display_name || undefined,
-            employee_code: formData.employee_code || undefined,
-            phone: formData.phone || undefined,
-            preferred_language: formData.preferred_language,
-            pin: formData.pin || undefined,
-            role_ids: formData.role_ids.length > 0 ? formData.role_ids : [formData.primary_role_id],
-            primary_role_id: formData.primary_role_id,
-          },
-          currentUser.id
-        );
-
-        // Fallback to direct method if Edge Function fails
-        if (!result.success && result.error?.includes('Network')) {
-          result = await authService.createUserDirect({
-            first_name: formData.first_name,
-            last_name: formData.last_name,
-            display_name: formData.display_name || undefined,
-            employee_code: formData.employee_code || undefined,
-            phone: formData.phone || undefined,
-            preferred_language: formData.preferred_language,
-            pin: formData.pin || undefined,
-            role_ids: formData.role_ids.length > 0 ? formData.role_ids : [formData.primary_role_id],
-            primary_role_id: formData.primary_role_id,
-          });
-        }
+        const result = await authService.createUserDirect({
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          display_name: formData.display_name || undefined,
+          employee_code: formData.employee_code || undefined,
+          phone: formData.phone || undefined,
+          preferred_language: formData.preferred_language,
+          pin: formData.pin || undefined,
+          role_ids: formData.role_ids.length > 0 ? formData.role_ids : [formData.primary_role_id],
+          primary_role_id: formData.primary_role_id,
+        });
 
         if (result.success) {
           toast.success(t('auth.users.created') || 'Utilisateur créé');

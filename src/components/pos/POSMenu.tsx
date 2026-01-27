@@ -64,9 +64,15 @@ export default function POSMenu({
 
     if (!isOpen) return null
 
-    const handleLogout = () => {
-        logout()
-        navigate('/login')
+    const handleLogout = async () => {
+        try {
+            await logout()
+        } catch (error) {
+            console.error('Logout error:', error)
+        } finally {
+            // Always navigate to login, even if logout fails
+            navigate('/login')
+        }
     }
 
     return (

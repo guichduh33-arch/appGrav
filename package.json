@@ -26,6 +26,8 @@
     "@tanstack/react-query": "^5.17.0",
     "csv-parse": "^6.1.0",
     "date-fns": "^3.2.0",
+    "dexie": "^4.2.1",
+    "dexie-react-hooks": "^4.2.0",
     "dotenv": "^17.2.3",
     "i18next": "^25.7.4",
     "i18next-browser-languagedetector": "^8.2.0",
@@ -36,6 +38,7 @@
     "react-i18next": "^16.5.3",
     "react-router-dom": "^6.21.1",
     "recharts": "^3.6.0",
+    "xlsx": "^0.18.5",
     "zustand": "^4.4.7"
   },
   "devDependencies": {
@@ -49,10 +52,14 @@
     "eslint": "^8.55.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "fake-indexeddb": "^6.2.5",
     "jsdom": "^27.4.0",
+    "supabase": "^2.72.8",
     "ts-node": "^10.9.2",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
-    "vitest": "^4.0.17"
+    "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^4.0.17",
+    "workbox-window": "^7.4.0"
   }
 }

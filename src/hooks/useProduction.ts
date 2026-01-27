@@ -134,7 +134,7 @@ export function useProduction() {
                 .order('created_at', { ascending: false })
 
             if (error) throw error
-            setTodayHistory(data || [])
+            setTodayHistory((data || []) as unknown as ProductionRecordWithProduct[])
         } catch (error) {
             console.error('Error fetching history:', error)
         }

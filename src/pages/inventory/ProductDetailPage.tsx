@@ -17,8 +17,9 @@ import { UnitsTab } from './tabs/UnitsTab'
 import { RecipeTab } from './tabs/RecipeTab'
 import { CostingTab } from './tabs/CostingTab'
 import { PricesTab } from './tabs/PricesTab'
+import { VariantsTab } from './tabs/VariantsTab'
 
-type Tab = 'general' | 'units' | 'recipe' | 'costing' | 'prices'
+type Tab = 'general' | 'units' | 'recipe' | 'costing' | 'prices' | 'variants'
 
 export default function ProductDetailPage() {
     const { t } = useTranslation()
@@ -180,6 +181,7 @@ export default function ProductDetailPage() {
                     description: product.description,
                     pos_visible: product.pos_visible,
                     is_active: product.is_active,
+                    deduct_ingredients_on_sale: product.deduct_ingredients_on_sale,
                     unit: product.unit
                 })
                 .eq('id', product.id)
@@ -363,6 +365,9 @@ export default function ProductDetailPage() {
                 <button className={`tab-btn ${activeTab === 'recipe' ? 'active' : ''}`} onClick={() => setActiveTab('recipe')}>
                     <Layers size={16} /> {t('product_detail.tabs.recipe')}
                 </button>
+                <button className={`tab-btn ${activeTab === 'variants' ? 'active' : ''}`} onClick={() => setActiveTab('variants')}>
+                    <Layers size={16} /> Variants
+                </button>
                 <button className={`tab-btn ${activeTab === 'costing' ? 'active' : ''}`} onClick={() => setActiveTab('costing')}>
                     <DollarSign size={16} /> {t('product_detail.tabs.costing')}
                 </button>
@@ -405,6 +410,9 @@ export default function ProductDetailPage() {
                 )}
                 {activeTab === 'prices' && (
                     <PricesTab product={product} priceHistory={priceHistory} />
+                )}
+                {activeTab === 'variants' && id && (
+                    <VariantsTab productId={id} />
                 )}
             </div>
         </div>

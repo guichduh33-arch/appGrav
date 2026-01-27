@@ -76,7 +76,7 @@ export default function CustomerCategoriesPage() {
                 .order('name')
 
             if (error) throw error
-            if (data) setCategories(data)
+            if (data) setCategories(data as unknown as CustomerCategory[])
         } catch (error) {
             console.error('Error fetching categories:', error)
             toast.error('Erreur lors du chargement')

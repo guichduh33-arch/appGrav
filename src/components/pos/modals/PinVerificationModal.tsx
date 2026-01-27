@@ -78,16 +78,19 @@ export default function PinVerificationModal({
                     }
                 }
 
-                // Filter users that have at least one allowed role
+                // Normalize allowed roles to lowercase for comparison
+                const normalizedAllowedRoles = allowedRoles.map(r => r.toLowerCase())
+
+                // Filter users that have at least one allowed role (case-insensitive)
                 const filteredUsers = (users || []).filter(user => {
-                    // Check legacy role field
-                    if (user.role && allowedRoles.includes(user.role)) {
+                    // Check legacy role field (case-insensitive)
+                    if (user.role && normalizedAllowedRoles.includes(user.role.toLowerCase())) {
                         return true
                     }
-                    // Check user_roles map
+                    // Check user_roles map (case-insensitive)
                     const roles = userRoleMap.get(user.id)
                     if (roles && roles.length > 0) {
-                        return roles.some(r => allowedRoles.includes(r))
+                        return roles.some(r => normalizedAllowedRoles.includes(r.toLowerCase()))
                     }
                     return false
                 }).map(user => {
@@ -95,8 +98,8 @@ export default function PinVerificationModal({
                     let primaryRole: string = user.role || 'unknown'
                     const roles = userRoleMap.get(user.id)
                     if (roles && roles.length > 0) {
-                        // Use the first role that matches allowed roles
-                        const matchedRole = roles.find(r => allowedRoles.includes(r))
+                        // Use the first role that matches allowed roles (case-insensitive)
+                        const matchedRole = roles.find(r => normalizedAllowedRoles.includes(r.toLowerCase()))
                         if (matchedRole) {
                             primaryRole = matchedRole
                         }

@@ -80,7 +80,7 @@ export default function B2BPaymentsPage() {
                 .order('payment_date', { ascending: false })
 
             if (error) throw error
-            if (data) setPayments(data)
+            if (data) setPayments(data as unknown as Payment[])
         } catch (error) {
             console.error('Error fetching payments:', error)
         } finally {
@@ -90,18 +90,32 @@ export default function B2BPaymentsPage() {
 
     const fetchOutstandingOrders = async () => {
         try {
+            // Note: DB uses 'total' not 'total_amount', and 'paid_amount' not 'amount_due'
+            // Also 'overdue' is not a valid payment_status enum value
             const { data, error } = await supabase
                 .from('b2b_orders')
                 .select(`
-                    id, order_number, total_amount, amount_due, due_date, payment_status,
+                    id, order_number, total, paid_amount, delivery_date, payment_status,
                     customer:customers(name, company_name)
                 `)
-                .in('payment_status', ['unpaid', 'partial', 'overdue'])
+                .in('payment_status', ['unpaid', 'partial'])
                 .neq('status', 'cancelled')
-                .order('due_date', { ascending: true, nullsFirst: false })
+                .order('delivery_date', { ascending: true, nullsFirst: false })
 
             if (error) throw error
-            if (data) setOutstandingOrders(data)
+            if (data) {
+                // Map DB fields to UI expected fields
+                const mappedOrders = data.map(order => ({
+                    id: order.id,
+                    order_number: order.order_number,
+                    customer: order.customer,
+                    total_amount: order.total ?? 0,
+                    amount_due: (order.total ?? 0) - (order.paid_amount ?? 0),
+                    due_date: order.delivery_date,
+                    payment_status: order.payment_status ?? 'unpaid',
+                })) as unknown as OutstandingOrder[]
+                setOutstandingOrders(mappedOrders)
+            }
         } catch (error) {
             console.error('Error fetching outstanding orders:', error)
         }

@@ -86,28 +86,52 @@ export default function StockProductionPage() {
         if (!selectedSectionId) return
 
         try {
-            const { data, error } = await supabase
+            console.log('📦 [StockProduction] Fetching products for section:', selectedSectionId)
+
+            // First, get all product_sections for this section
+            const { data: psData, error: psError } = await supabase
                 .from('product_sections')
-                .select(`
-                    product:products(
-                        *,
-                        category:categories(name, icon),
-                        product_uoms(id, unit_name, conversion_factor, is_consumption_unit)
-                    )
-                `)
+                .select('product_id')
                 .eq('section_id', selectedSectionId)
+
+            console.log('📦 [StockProduction] Product IDs:', psData)
+
+            if (psError) {
+                console.error('❌ [StockProduction] Error fetching product_sections:', psError)
+                throw psError
+            }
+
+            if (!psData || psData.length === 0) {
+                console.log('📦 [StockProduction] No products found for this section')
+                setSectionProducts([])
+                return
+            }
+
+            const productIds = psData.map(ps => ps.product_id)
+            console.log('📦 [StockProduction] Product IDs to fetch:', productIds.length)
+
+            // Then fetch the full product details
+            const { data, error } = await supabase
+                .from('products')
+                .select(`
+                    *,
+                    category:categories(name, icon)
+                `)
+                .in('id', productIds)
+                .in('product_type', ['finished', 'semi_finished'])
+                .eq('is_active', true)
+
+            console.log('📦 [StockProduction] Products fetched:', data?.length)
+            console.log('📦 [StockProduction] Error:', error)
 
             if (error) throw error
 
-            const rawData = data as unknown as Array<{ product: ProductWithSection | null }>;
-            const products = rawData
-                .map((ps) => ps.product)
-                .filter((p): p is ProductWithSection => p !== null)
-                .filter((p) => p.product_type === 'finished' || p.product_type === 'semi_finished')
+            const products = (data || []) as unknown as ProductWithSection[]
+            console.log('📦 [StockProduction] Final products:', products.length, products.slice(0, 5).map(p => p.name))
 
-            setSectionProducts(products || [])
+            setSectionProducts(products)
         } catch (error) {
-            console.error('Error fetching section products:', error)
+            console.error('❌ [StockProduction] Error fetching section products:', error)
         }
     }
 
@@ -121,7 +145,7 @@ export default function StockProductionPage() {
                 .from('production_records')
                 .select(`
                     *,
-                    product:products(
+                    products!product_id(
                         name,
                         sku,
                         unit
@@ -224,11 +248,12 @@ export default function StockProductionPage() {
                 const productionNumber = `PROD-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`
 
                 const productionData = {
-                    production_number: productionNumber,
+                    production_id: productionNumber,
                     product_id: item.productId,
                     quantity_produced: item.quantity,
+                    quantity_waste: item.wasted,
                     production_date: dateStr,
-                    produced_by: user?.id,
+                    staff_id: user?.id,
                     notes: item.wasteReason ? `Waste: ${item.wasteReason}. Section: ${selectedSection?.name || ''}` : `Section: ${selectedSection?.name || ''}`
                 }
 
@@ -256,9 +281,12 @@ export default function StockProductionPage() {
                         product_id: item.productId,
                         movement_type: 'production_in' as const,
                         quantity: item.quantity,
-                        notes: `Production ${selectedSection?.name || ''} - ${dateStr}`,
+                        stock_before: currentStock,
+                        stock_after: currentStock + item.quantity,
+                        reason: `Production ${selectedSection?.name || ''} - ${dateStr}`,
+                        reference_type: 'production',
                         reference_id: prodRecord.id,
-                        performed_by: user?.id
+                        staff_id: user?.id
                     }
 
                     const { error: stockError } = await supabase
@@ -270,14 +298,18 @@ export default function StockProductionPage() {
 
                 if (item.wasted > 0) {
                     const wasteMovementId = `MV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
+                    const stockAfterProduction = currentStock + item.quantity
                     const wasteData = {
                         movement_id: wasteMovementId,
                         product_id: item.productId,
                         movement_type: 'waste' as const,
                         quantity: -item.wasted,
-                        notes: item.wasteReason || `Production waste ${dateStr}`,
+                        stock_before: stockAfterProduction,
+                        stock_after: stockAfterProduction - item.wasted,
+                        reason: item.wasteReason || `Production waste ${dateStr}`,
+                        reference_type: 'production',
                         reference_id: prodRecord.id,
-                        performed_by: user?.id
+                        staff_id: user?.id
                     }
 
                     const { error: wasteError } = await supabase
@@ -298,30 +330,33 @@ export default function StockProductionPage() {
                     .from('recipes')
                     .select(`
                         id,
-                        ingredient_id,
+                        material_id,
                         quantity,
                         unit,
-                        ingredient:products!ingredient_id(id, name, current_stock, cost_price, unit)
+                        material:products!material_id(id, name, current_stock, cost_price, unit)
                     `)
                     .eq('product_id', item.productId)
 
                 if (recipeItems && recipeItems.length > 0) {
                     for (const recipe of recipeItems as any[]) {
-                        const material = recipe.ingredient as { id: string; name: string; current_stock: number | null; cost_price: number | null; unit: string | null } | null
+                        const material = recipe.material as { id: string; name: string; current_stock: number | null; cost_price: number | null; unit: string | null } | null
                         if (!material) continue
 
                         const qtyToDeduct = recipe.quantity * item.quantity
                         const materialCurrentStock = material.current_stock || 0
 
-                        const ingredientMovementId = `MV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
+                        const materialMovementId = `MV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
                         const movementData = {
-                            movement_id: ingredientMovementId,
-                            product_id: recipe.ingredient_id,
+                            movement_id: materialMovementId,
+                            product_id: recipe.material_id,
                             movement_type: 'production_out' as const,
                             quantity: -qtyToDeduct,
-                            notes: `Used for: ${item.name} (x${item.quantity}) - ${dateStr}`,
+                            stock_before: materialCurrentStock,
+                            stock_after: materialCurrentStock - qtyToDeduct,
+                            reason: `Used for: ${item.name} (x${item.quantity}) - ${dateStr}`,
+                            reference_type: 'production',
                             reference_id: prodRecord.id,
-                            performed_by: user?.id
+                            staff_id: user?.id
                         }
 
                         await supabase
@@ -331,7 +366,7 @@ export default function StockProductionPage() {
                         await supabase
                             .from('products')
                             .update({ current_stock: materialCurrentStock - qtyToDeduct })
-                            .eq('id', recipe.ingredient_id)
+                            .eq('id', recipe.material_id)
                     }
                 }
             }
@@ -638,16 +673,16 @@ export default function StockProductionPage() {
                                                 <div className="history-product">{record.product?.name}</div>
                                                 <div className="history-time">
                                                     <Clock size={12} />
-                                                    {new Date(record.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                                    {record.created_at ? new Date(record.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : ''}
                                                 </div>
                                             </div>
                                             <div className="history-item-actions">
                                                 <span className="badge-produced">
-                                                    +{record.quantity_produced} {getRecordUnit(record)}
+                                                    +{record.quantity_produced} {getRecordUnit(record as RecordWithProduct)}
                                                 </span>
-                                                {(record as any).quantity_waste > 0 && (
+                                                {(record as unknown as { quantity_waste?: number }).quantity_waste && (record as unknown as { quantity_waste: number }).quantity_waste > 0 && (
                                                     <span className="badge-waste">
-                                                        -{(record as any).quantity_waste} {getRecordUnit(record)}
+                                                        -{(record as unknown as { quantity_waste: number }).quantity_waste} {getRecordUnit(record as RecordWithProduct)}
                                                     </span>
                                                 )}
                                                 {isAdmin && (

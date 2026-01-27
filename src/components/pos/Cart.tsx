@@ -120,8 +120,12 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
     }
 
     // Handle quantity change - only allow decrease on unlocked items
-    const handleQuantityChange = (itemId: string, newQuantity: number, currentQuantity: number) => {
-        if (isItemLocked(itemId) && newQuantity < currentQuantity) {
+    // Note: We get current quantity from item state, not as parameter, to avoid stale closure
+    const handleQuantityChange = (itemId: string, newQuantity: number) => {
+        const item = items.find(i => i.id === itemId)
+        if (!item) return
+
+        if (isItemLocked(itemId) && newQuantity < item.quantity) {
             // Trying to reduce locked item quantity - show PIN modal
             setPendingDeleteItemId(itemId)
             setShowPinModal(true)
@@ -307,7 +311,7 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                                             className="qty-btn"
                                             onClick={(e) => {
                                                 e.stopPropagation()
-                                                handleQuantityChange(item.id, item.quantity - 1, item.quantity)
+                                                handleQuantityChange(item.id, item.quantity - 1)
                                             }}
                                             disabled={isLocked}
                                             title={isLocked ? t('cart.qty_pin_required') : t('cart.qty_decrease')}
@@ -321,7 +325,7 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                                             className="qty-btn"
                                             onClick={(e) => {
                                                 e.stopPropagation()
-                                                handleQuantityChange(item.id, item.quantity + 1, item.quantity)
+                                                handleQuantityChange(item.id, item.quantity + 1)
                                             }}
                                             title={t('cart.qty_increase')}
                                             aria-label={t('cart.qty_increase')}

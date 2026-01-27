@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { Menu } from 'lucide-react'
 import type { Category } from '../../types/database'
+import { NetworkIndicator } from '../ui/NetworkIndicator'
+import { SyncIndicator } from '../ui/SyncIndicator'
 import './CategoryNav.css'
 
 interface CategoryNavProps {
@@ -37,6 +39,10 @@ export default function CategoryNav({
                 <button className="pos-menu-btn" onClick={onOpenMenu} title="Menu">
                     <Menu size={28} />
                 </button>
+                {/* Network Status Indicator - Always visible per NFR-U4 */}
+                <NetworkIndicator compact className="mt-2" />
+                {/* Sync Status Indicator - Story 2.6 */}
+                <SyncIndicator compact className="mt-1" />
             </div>
 
             <button

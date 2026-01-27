@@ -85,7 +85,7 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
 
                     return {
                         ...group,
-                        items: (itemsData || []) as GroupItemWithProduct[]
+                        items: (itemsData || []) as unknown as GroupItemWithProduct[]
                     }
                 })
             )

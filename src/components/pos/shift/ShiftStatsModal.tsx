@@ -70,7 +70,7 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
     const hourlyData = new Map<number, number>()
     transactions.forEach(t => {
         const hour = new Date(t.created_at).getHours()
-        hourlyData.set(hour, (hourlyData.get(hour) || 0) + t.total_amount)
+        hourlyData.set(hour, (hourlyData.get(hour) || 0) + t.total)
     })
 
     const maxHourly = Math.max(...Array.from(hourlyData.values()), 1)
@@ -238,7 +238,7 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                                         </div>
                                         <div className="shift-stats__tx-details">
                                             <span className="shift-stats__tx-method">{tx.payment_method}</span>
-                                            <span className="shift-stats__tx-amount">{formatCurrency(tx.total_amount)}</span>
+                                            <span className="shift-stats__tx-amount">{formatCurrency(tx.total)}</span>
                                         </div>
                                     </div>
                                 ))}

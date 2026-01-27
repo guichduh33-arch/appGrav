@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import KDSOrderCard from '../../components/kds/KDSOrderCard'
 import { ArrowLeft, Volume2, VolumeX, RefreshCw, ChefHat, Coffee, Store, Users } from 'lucide-react'
+import { lanClient } from '../../services/lan/lanClient'
+import { LAN_MESSAGE_TYPES } from '../../services/lan/lanProtocol'
+import { broadcastOrderStatus } from '../../services/display/displayBroadcast'
 import './KDSMainPage.css'
 
 interface OrderItem {
@@ -13,6 +16,7 @@ interface OrderItem {
     notes?: string
     item_status: 'new' | 'preparing' | 'ready' | 'served'
     dispatch_station: string
+    is_held: boolean // Story 8.4: Item Hold Flag
 }
 
 interface Order {
@@ -24,6 +28,7 @@ interface Order {
     items: OrderItem[]
     created_at: string
     status: string
+    source?: 'pos' | 'mobile' | 'web' // Story 8.1: Mobile order source
 }
 
 const STATION_CONFIG: Record<string, { name: string; icon: React.ReactNode; color: string; dbStation: string }> = {
@@ -137,6 +142,7 @@ export default function KDSMainPage() {
                 item_status?: string;
                 dispatch_station?: string;
                 modifiers?: string | Array<{ name?: string }>;
+                is_held?: boolean; // Story 8.4
             };
             type RawOrder = {
                 id: string;
@@ -146,6 +152,7 @@ export default function KDSMainPage() {
                 customer_name?: string | null;
                 created_at: string;
                 status: string;
+                source?: string; // Story 8.1
                 order_items?: RawOrderItem[];
             };
 
@@ -177,7 +184,8 @@ export default function KDSMainPage() {
                             modifiers: modifiersText,
                             notes: item.notes,
                             item_status: (item.item_status || 'new') as OrderItem['item_status'],
-                            dispatch_station: item.dispatch_station || 'none'
+                            dispatch_station: item.dispatch_station || 'none',
+                            is_held: item.is_held || false // Story 8.4
                         }
                     })
 
@@ -196,7 +204,8 @@ export default function KDSMainPage() {
                         customer_name: order.customer_name ?? undefined,
                         items,
                         created_at: order.created_at,
-                        status: order.status
+                        status: order.status,
+                        source: (order.source || 'pos') as Order['source'] // Story 8.1
                     }
                 })
                 .filter((order) => order.items.length > 0)
@@ -246,6 +255,21 @@ export default function KDSMainPage() {
         }
     }, [fetchOrders])
 
+    // Story 8.1: Listen for mobile orders via LAN
+    useEffect(() => {
+        const unsubscribe = lanClient.on(LAN_MESSAGE_TYPES.KDS_NEW_ORDER, () => {
+            // Refresh orders when mobile order received
+            if (soundEnabled) {
+                playNotificationSound()
+            }
+            fetchOrders()
+        })
+
+        return () => {
+            unsubscribe()
+        }
+    }, [fetchOrders, soundEnabled])
+
     // Handle item status updates
     const handleStartPreparing = async (orderId: string, itemIds: string[]) => {
         try {
@@ -274,7 +298,7 @@ export default function KDSMainPage() {
         }
     }
 
-    const handleMarkReady = async (_orderId: string, itemIds: string[]) => {
+    const handleMarkReady = async (orderId: string, itemIds: string[]) => {
         try {
             await supabase
                 .from('order_items')
@@ -284,9 +308,35 @@ export default function KDSMainPage() {
                 })
                 .in('id', itemIds)
 
+            // Story 8.7: Broadcast order ready to Customer Display
+            const order = orders.find(o => o.id === orderId)
+            if (order) {
+                // Check if all items are now ready
+                const allReady = order.items.every(item =>
+                    itemIds.includes(item.id) || item.item_status === 'ready' || item.item_status === 'served'
+                )
+                if (allReady) {
+                    broadcastOrderStatus(orderId, order.order_number, 'ready')
+                }
+            }
+
             fetchOrders()
         } catch (error) {
             console.error('Error updating item status:', error)
+        }
+    }
+
+    // Story 8.4: Toggle item hold status
+    const handleToggleHold = async (itemId: string, currentHoldStatus: boolean) => {
+        try {
+            await supabase
+                .from('order_items')
+                .update({ is_held: !currentHoldStatus })
+                .eq('id', itemId)
+
+            fetchOrders()
+        } catch (error) {
+            console.error('Error toggling hold status:', error)
         }
     }
 
@@ -401,9 +451,11 @@ export default function KDSMainPage() {
                                 items={order.items}
                                 createdAt={order.created_at}
                                 station={station}
+                                source={order.source}
                                 onStartPreparing={handleStartPreparing}
                                 onMarkReady={handleMarkReady}
                                 onMarkServed={handleMarkServed}
+                                onToggleHold={handleToggleHold}
                             />
                         ))}
                     </div>

@@ -17,6 +17,18 @@ export interface ComboSelectedItem {
     price_adjustment: number
 }
 
+export interface VariantMaterial {
+    materialId: string
+    quantity: number
+}
+
+export interface SelectedVariant {
+    groupName: string
+    optionIds: string[]
+    optionLabels: string[]
+    materials: VariantMaterial[]
+}
+
 export interface CartItem {
     id: string // Unique ID for this cart item
     type: 'product' | 'combo'
@@ -28,6 +40,7 @@ export interface CartItem {
     comboSelections?: ComboSelectedItem[] // For combos
     modifiersTotal: number // Sum of modifier/adjustment prices
     notes: string
+    selectedVariants?: SelectedVariant[] // Product variants with material tracking
     totalPrice: number // (unitPrice + modifiersTotal) * quantity
 }
 
@@ -53,7 +66,7 @@ interface CartState {
     itemCount: number
 
     // Actions
-    addItem: (product: Product, quantity: number, modifiers: CartModifier[], notes: string) => void
+    addItem: (product: Product, quantity: number, modifiers: CartModifier[], notes: string, selectedVariants?: SelectedVariant[]) => void
     addCombo: (combo: ProductCombo, quantity: number, comboSelections: ComboSelectedItem[], totalPrice: number, notes: string) => void
     updateItem: (itemId: string, modifiers: CartModifier[], notes: string) => void
     updateItemQuantity: (itemId: string, quantity: number) => void
@@ -85,10 +98,16 @@ function calculateTotals(items: CartItem[], discountType: 'percent' | 'amount' |
     const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0)
     let discountAmount = 0
 
+    // Validate discount value - must be non-negative
+    const safeDiscountValue = Math.max(0, discountValue)
+
     if (discountType === 'percent') {
-        discountAmount = Math.round(subtotal * (discountValue / 100))
+        // Cap percentage at 100%
+        const cappedPercent = Math.min(100, safeDiscountValue)
+        discountAmount = Math.round(subtotal * (cappedPercent / 100))
     } else if (discountType === 'amount') {
-        discountAmount = discountValue
+        // Cap amount at subtotal
+        discountAmount = Math.min(subtotal, safeDiscountValue)
     }
 
     const total = Math.max(0, subtotal - discountAmount)
@@ -114,7 +133,7 @@ export const useCartStore = create<CartState>((set, get) => ({
     total: 0,
     itemCount: 0,
 
-    addItem: (product, quantity, modifiers, notes) => {
+    addItem: (product, quantity, modifiers, notes, selectedVariants) => {
         const modifiersTotal = modifiers.reduce((sum, m) => sum + m.priceAdjustment, 0)
         const unitPrice = product.retail_price || 0
         const totalPrice = (unitPrice + modifiersTotal) * quantity
@@ -128,6 +147,7 @@ export const useCartStore = create<CartState>((set, get) => ({
             modifiers,
             modifiersTotal,
             notes,
+            selectedVariants,
             totalPrice,
         }
 

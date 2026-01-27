@@ -132,7 +132,7 @@ export const authService = {
 
       return {
         success: response.ok,
-        error: response.ok ? undefined : data.error,
+        error: response.ok ? undefined : (data.error || data.message || 'Unknown error'),
       };
     } catch (error) {
       console.error('Logout error:', error);
@@ -214,7 +214,7 @@ export const authService = {
 
       return {
         success: response.ok,
-        error: response.ok ? undefined : data.error,
+        error: response.ok ? undefined : (data.error || data.message || 'Unknown error'),
       };
     } catch (error) {
       console.error('Change PIN error:', error);
@@ -262,7 +262,7 @@ export const authService = {
       return {
         success: response.ok,
         user: response.ok ? data.user : undefined,
-        error: response.ok ? undefined : data.error,
+        error: response.ok ? undefined : (data.error || data.message || 'Unknown error'),
       };
     } catch (error) {
       console.error('Create user error:', error);
@@ -311,7 +311,7 @@ export const authService = {
       return {
         success: response.ok,
         user: response.ok ? data.user : undefined,
-        error: response.ok ? undefined : data.error,
+        error: response.ok ? undefined : (data.error || data.message || 'Unknown error'),
       };
     } catch (error) {
       console.error('Update user error:', error);
@@ -347,7 +347,7 @@ export const authService = {
 
       return {
         success: response.ok,
-        error: response.ok ? undefined : data.error,
+        error: response.ok ? undefined : (data.error || data.message || 'Unknown error'),
       };
     } catch (error) {
       console.error('Delete user error:', error);
@@ -385,7 +385,7 @@ export const authService = {
 
       return {
         success: response.ok,
-        error: response.ok ? undefined : data.error,
+        error: response.ok ? undefined : (data.error || data.message || 'Unknown error'),
       };
     } catch (error) {
       console.error('Toggle user active error:', error);

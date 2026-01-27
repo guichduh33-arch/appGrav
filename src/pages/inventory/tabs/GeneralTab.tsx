@@ -151,12 +151,27 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                             <input
                                 type="checkbox"
                                 className="w-5 h-5 text-blue-600 rounded"
-                                checked={product.pos_visible}
+                                checked={product.pos_visible ?? false}
                                 onChange={e => onChange({ ...product, pos_visible: e.target.checked })}
                             />
                             <div>
                                 <span className="font-medium text-gray-900">Visible sur le POS</span>
                                 <p className="text-xs text-gray-500 mt-1">Si décoché, le produit ne sera pas proposé aux vendeurs.</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div className="form-group">
+                        <label className="flex items-center gap-3 cursor-pointer p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                            <input
+                                type="checkbox"
+                                className="w-5 h-5 text-blue-600 rounded"
+                                checked={product.deduct_ingredients_on_sale ?? false}
+                                onChange={e => onChange({ ...product, deduct_ingredients_on_sale: e.target.checked })}
+                            />
+                            <div>
+                                <span className="font-medium text-gray-900">Déduire les ingrédients à la vente</span>
+                                <p className="text-xs text-gray-500 mt-1">Pour les produits faits à la demande (café, sandwiches, etc.). Les ingrédients de la recette seront automatiquement déduits du stock lors de chaque vente.</p>
                             </div>
                         </label>
                     </div>

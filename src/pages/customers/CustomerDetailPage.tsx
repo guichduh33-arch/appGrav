@@ -132,11 +132,17 @@ export default function CustomerDetailPage() {
     const fetchOrders = async () => {
         const { data } = await supabase
             .from('orders')
-            .select('id, order_number, total_amount, status, created_at')
+            .select('id, order_number, total, status, created_at')
             .eq('customer_id', id as string)
             .order('created_at', { ascending: false })
             .limit(20)
-        if (data) setOrders(data as Order[])
+        if (data) setOrders(data.map(d => ({
+            id: d.id,
+            order_number: d.order_number ?? '',
+            total_amount: d.total ?? 0,
+            status: d.status ?? '',
+            created_at: d.created_at ?? ''
+        })) as Order[])
     }
 
     const fetchTiers = async () => {
@@ -145,7 +151,7 @@ export default function CustomerDetailPage() {
             .select('*')
             .eq('is_active', true)
             .order('min_points')
-        if (data) setTiers(data as LoyaltyTier[])
+        if (data) setTiers(data as unknown as LoyaltyTier[])
     }
 
     const handlePointsSubmit = async () => {

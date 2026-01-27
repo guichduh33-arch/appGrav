@@ -12,17 +12,20 @@ import {
 } from 'lucide-react'
 import InventoryTable from '../../components/inventory/InventoryTable'
 import StockAdjustmentModal from '../../components/inventory/StockAdjustmentModal'
-import { useInventoryItems } from '@/hooks/inventory'
+import { useInventoryItems, type TInventoryItem } from '@/hooks/inventory'
 import type { Product } from '../../types/database'
 import './StockPage.css'
 
 type FilterType = 'all' | 'raw_material' | 'finished' | 'low_stock'
 
+// Type alias for item with category that matches InventoryTable props
+type InventoryItemWithCategory = Product & { category: { name: string } | null }
+
 export default function StockPage() {
     const { t } = useTranslation()
     const { data: items = [], isLoading } = useInventoryItems()
     const [activeFilter, setActiveFilter] = useState<FilterType>('all')
-    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+    const [selectedProduct, setSelectedProduct] = useState<TInventoryItem | null>(null)
     const navigate = useNavigate()
 
     // Calculate stats
@@ -142,16 +145,21 @@ export default function StockPage() {
             {/* Inventory Table */}
             <div className="stock-table-section">
                 <InventoryTable
-                    items={filteredItems}
+                    items={filteredItems as unknown as InventoryItemWithCategory[]}
                     isLoading={isLoading}
-                    onAdjustStock={setSelectedProduct}
+                    onAdjustStock={(product) => setSelectedProduct(product as unknown as TInventoryItem)}
                     onViewDetails={(product) => navigate(`/inventory/product/${product.id}`)}
                 />
             </div>
 
             {selectedProduct && (
                 <StockAdjustmentModal
-                    product={selectedProduct}
+                    product={{
+                        id: selectedProduct.id,
+                        name: selectedProduct.name,
+                        current_stock: selectedProduct.current_stock,
+                        unit: selectedProduct.unit
+                    }}
                     onClose={() => setSelectedProduct(null)}
                 />
             )}

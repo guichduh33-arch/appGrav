@@ -121,7 +121,7 @@ export function useShift() {
 
             // RPC returns an array, get first element
             const session = Array.isArray(data) ? data[0] : data
-            return session as PosSession | null
+            return session as unknown as PosSession | null
         },
         enabled: !!(activeShiftUserId || user?.id)
     })

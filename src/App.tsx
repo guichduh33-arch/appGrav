@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './stores/authStore'
 import { supabase } from './lib/supabase'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
+import { initializeSyncEngine } from './services/sync/syncEngine'
 import toast from 'react-hot-toast'
 
 // Layouts - loaded immediately as they're shells
@@ -30,6 +31,14 @@ const KDSStationSelector = lazy(() => import('./pages/kds/KDSStationSelector'))
 // Display
 const CustomerDisplayPage = lazy(() => import('./pages/display/CustomerDisplayPage'))
 
+// Mobile Module
+const MobileLayout = lazy(() => import('./components/mobile/MobileLayout'))
+const MobileLoginPage = lazy(() => import('./pages/mobile/MobileLoginPage'))
+const MobileHomePage = lazy(() => import('./pages/mobile/MobileHomePage'))
+const MobileCatalogPage = lazy(() => import('./pages/mobile/MobileCatalogPage'))
+const MobileCartPage = lazy(() => import('./pages/mobile/MobileCartPage'))
+const MobileOrdersPage = lazy(() => import('./pages/mobile/MobileOrdersPage'))
+
 // Inventory Module
 const InventoryLayout = lazy(() => import('./pages/inventory/InventoryLayout'))
 const StockPage = lazy(() => import('./pages/inventory/StockPage'))
@@ -54,6 +63,7 @@ const SalesReportsPage = lazy(() => import('./pages/reports/SalesReportsPage'))
 
 // Users
 const UsersPage = lazy(() => import('./pages/users/UsersPage'))
+const PermissionsPage = lazy(() => import('./pages/users/PermissionsPage'))
 
 // Settings Module
 const SettingsPage = lazy(() => import('./pages/settings/SettingsPage'))
@@ -65,6 +75,7 @@ const BusinessHoursPage = lazy(() => import('./pages/settings/BusinessHoursPage'
 const SettingsHistoryPage = lazy(() => import('./pages/settings/SettingsHistoryPage'))
 const RolesPage = lazy(() => import('./pages/settings/RolesPage'))
 const AuditPage = lazy(() => import('./pages/settings/AuditPage'))
+const SyncStatusPage = lazy(() => import('./pages/settings/SyncStatusPage'))
 
 // Profile
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
@@ -96,6 +107,7 @@ const CombosPage = lazy(() => import('./pages/products/CombosPage'))
 const ComboFormPage = lazy(() => import('./pages/products/ComboFormPage'))
 const PromotionsPage = lazy(() => import('./pages/products/PromotionsPage'))
 const PromotionFormPage = lazy(() => import('./pages/products/PromotionFormPage'))
+const ProductFormPage = lazy(() => import('./pages/products/ProductFormPage'))
 
 function App() {
     const { isAuthenticated, user, logout } = useAuthStore()
@@ -114,6 +126,11 @@ function App() {
         checkAndRepairSession();
     }, [isAuthenticated, user, logout])
 
+    // Initialize sync engine for automatic background sync (Story 3.5)
+    useEffect(() => {
+        initializeSyncEngine();
+    }, [])
+
     return (
         <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>
@@ -121,6 +138,21 @@ function App() {
                     {/* Public Routes */}
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/display" element={<CustomerDisplayPage />} />
+                    <Route path="/mobile/login" element={<MobileLoginPage />} />
+
+                    {/* Mobile App Routes (Fullscreen, mobile-optimized) */}
+                    <Route
+                        path="/mobile"
+                        element={
+                            isAuthenticated ? <MobileLayout /> : <Navigate to="/mobile/login" replace />
+                        }
+                    >
+                        <Route index element={<MobileHomePage />} />
+                        <Route path="catalog" element={<MobileCatalogPage />} />
+                        <Route path="cart" element={<MobileCartPage />} />
+                        <Route path="orders" element={<MobileOrdersPage />} />
+                        <Route path="profile" element={<ProfilePage />} />
+                    </Route>
 
                     {/* POS Routes (Fullscreen) - Critical path, loaded immediately */}
                     <Route
@@ -208,6 +240,8 @@ function App() {
                             <Route path="combos" element={<CombosPage />} />
                             <Route path="promotions" element={<PromotionsPage />} />
                         </Route>
+                        {/* Product Form Route (outside layout for full page form) */}
+                        <Route path="/products/new" element={<ProductFormPage />} />
                         {/* Combo Routes (outside layout for full page forms) */}
                         <Route path="/products/combos/new" element={<ComboFormPage />} />
                         <Route path="/products/combos/:id" element={<ComboFormPage />} />
@@ -218,12 +252,13 @@ function App() {
                         <Route path="/products/promotions/:id/edit" element={<PromotionFormPage />} />
                         {/* Product Detail Routes */}
                         <Route path="/products/:id" element={<ProductDetailPage />} />
-                        <Route path="/products/:id/edit" element={<ProductDetailPage />} />
+                        <Route path="/products/:id/edit" element={<ProductFormPage />} />
                         <Route path="/products/:id/pricing" element={<ProductCategoryPricingPage />} />
 
                         <Route path="/reports" element={<ReportsPage />} />
                         <Route path="/reports/sales" element={<SalesReportsPage />} />
                         <Route path="/users" element={<UsersPage />} />
+                        <Route path="/users/permissions" element={<PermissionsPage />} />
 
                         {/* Settings Module Routes with Layout */}
                         <Route path="/settings" element={<SettingsLayout />}>
@@ -253,6 +288,7 @@ function App() {
                         {/* Settings sub-pages outside layout */}
                         <Route path="/settings/roles" element={<RolesPage />} />
                         <Route path="/settings/audit" element={<AuditPage />} />
+                        <Route path="/settings/sync" element={<SyncStatusPage />} />
 
                         <Route path="/profile" element={<ProfilePage />} />
                     </Route>

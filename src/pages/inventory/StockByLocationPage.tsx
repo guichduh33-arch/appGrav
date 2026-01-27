@@ -55,7 +55,7 @@ export default function StockByLocationPage() {
                 .order('product_name')
 
             if (error) throw error
-            setBalances(data || [])
+            setBalances((data ?? []) as unknown as StockBalance[])
         } catch (error) {
             console.error('Error fetching balances:', error)
             toast.error('Erreur lors du chargement')

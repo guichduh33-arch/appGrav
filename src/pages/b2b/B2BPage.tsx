@@ -83,34 +83,39 @@ const B2BPage = () => {
             const { data: ordersData } = await supabase
                 .from('b2b_orders')
                 .select(`
-                    id, order_number, total_amount, status, payment_status, order_date,
+                    id, order_number, total, status, payment_status, order_date,
                     customer:customers(name, company_name)
                 `)
                 .order('order_date', { ascending: false })
                 .limit(5);
 
             if (ordersData) {
-                setRecentOrders(ordersData);
+                // Map DB field 'total' to UI field 'total_amount'
+                const mappedOrders = ordersData.map(order => ({
+                    ...order,
+                    total_amount: order.total ?? 0,
+                })) as unknown as RecentOrder[]
+                setRecentOrders(mappedOrders);
 
                 // Calculate stats from orders
                 const { data: allOrders } = await supabase
                     .from('b2b_orders')
-                    .select('total_amount, status, payment_status, amount_due')
+                    .select('total, status, payment_status, paid_amount')
                     .neq('status', 'cancelled');
 
                 if (allOrders && allOrders.length > 0) {
                     const typedOrders = allOrders as Array<{
-                        total_amount: number
+                        total: number | null
                         status: string
                         payment_status: string
-                        amount_due: number
+                        paid_amount: number | null
                     }>;
                     setStats(s => ({
                         ...s,
                         totalOrders: typedOrders.length,
                         pendingOrders: typedOrders.filter(o => ['confirmed', 'processing', 'ready'].includes(o.status)).length,
-                        totalRevenue: typedOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0),
-                        unpaidAmount: typedOrders.reduce((sum, o) => sum + (o.amount_due || 0), 0)
+                        totalRevenue: typedOrders.reduce((sum, o) => sum + (o.total || 0), 0),
+                        unpaidAmount: typedOrders.reduce((sum, o) => sum + ((o.total || 0) - (o.paid_amount || 0)), 0)
                     }));
                 }
             }

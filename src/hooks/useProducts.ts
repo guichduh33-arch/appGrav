@@ -1,6 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import type { Category, Product, ProductWithCategory } from '../types/database'
+import { useNetworkStore } from '../stores/networkStore'
+import {
+    syncCategoriesToOffline,
+    getCategoriesFromOffline,
+    syncProductsToOffline,
+    getProductsFromOffline,
+    IOfflineCategory,
+    IOfflineProduct,
+} from '../services/sync/productSync'
 
 // --- MOCK DATA FOR DEMO MODE (Matches CSV Files exactly) ---
 export const MOCK_CATEGORIES = [
@@ -2851,9 +2860,33 @@ export const MOCK_PRODUCTS = [
 
 // Fetch all categories
 export function useCategories() {
+    const isOnline = useNetworkStore((state) => state.isOnline)
+
     return useQuery({
-        queryKey: ['categories'],
+        queryKey: ['categories', isOnline],
         queryFn: async (): Promise<Category[]> => {
+            // If offline, use IndexedDB data
+            if (!isOnline) {
+                console.log('[useCategories] Offline mode - loading from IndexedDB')
+                try {
+                    const offlineCategories = await getCategoriesFromOffline()
+                    if (offlineCategories.length > 0) {
+                        // Transform to Category type
+                        return offlineCategories.map((c: IOfflineCategory) => ({
+                            id: c.id,
+                            name: c.name,
+                            sort_order: c.display_order,
+                            is_active: c.is_active,
+                        })) as Category[]
+                    }
+                } catch (err) {
+                    console.error('[useCategories] Error loading offline data:', err)
+                }
+                // Fallback to mock if no offline data
+                return MOCK_CATEGORIES
+            }
+
+            // Online mode - fetch from Supabase and cache
             try {
                 const { data, error } = await supabase
                     .from('categories')
@@ -2863,7 +2896,13 @@ export function useCategories() {
                     .order('sort_order')
 
                 if (error) throw error
-                if (data && data.length > 0) return data
+                if (data && data.length > 0) {
+                    // Cache to IndexedDB for offline use
+                    syncCategoriesToOffline().catch((err) =>
+                        console.error('[useCategories] Error caching categories:', err)
+                    )
+                    return data
+                }
 
                 console.warn('No categories from Supabase, using mock')
                 return MOCK_CATEGORIES
@@ -2877,9 +2916,40 @@ export function useCategories() {
 
 // Fetch products (optionally filtered by category)
 export function useProducts(categoryId: string | null = null) {
+    const isOnline = useNetworkStore((state) => state.isOnline)
+
     return useQuery({
-        queryKey: ['products', categoryId],
+        queryKey: ['products', categoryId, isOnline],
         queryFn: async (): Promise<ProductWithCategory[]> => {
+            // If offline, use IndexedDB data
+            if (!isOnline) {
+                console.log('[useProducts] Offline mode - loading from IndexedDB')
+                try {
+                    const offlineProducts = await getProductsFromOffline(categoryId)
+                    if (offlineProducts.length > 0) {
+                        // Transform to ProductWithCategory type (category will be minimal)
+                        return offlineProducts.map((p: IOfflineProduct) => ({
+                            id: p.id,
+                            name: p.name,
+                            sku: p.sku,
+                            category_id: p.category_id,
+                            retail_price: p.price,
+                            is_active: p.is_active,
+                            image_url: p.image_url,
+                            category: p.category_id ? { id: p.category_id } : null,
+                        })) as ProductWithCategory[]
+                    }
+                } catch (err) {
+                    console.error('[useProducts] Error loading offline data:', err)
+                }
+                // Fallback to mock if no offline data
+                if (categoryId) {
+                    return MOCK_PRODUCTS.filter(p => p.category_id === categoryId) as ProductWithCategory[]
+                }
+                return MOCK_PRODUCTS as ProductWithCategory[]
+            }
+
+            // Online mode - fetch from Supabase and cache
             try {
                 let query = supabase
                     .from('products')
@@ -2896,7 +2966,15 @@ export function useProducts(categoryId: string | null = null) {
                 const { data, error } = await query
 
                 if (error) throw error
-                if (data && data.length > 0) return data as ProductWithCategory[]
+                if (data && data.length > 0) {
+                    // Cache to IndexedDB for offline use (only on full fetch, not category-filtered)
+                    if (!categoryId) {
+                        syncProductsToOffline().catch((err) =>
+                            console.error('[useProducts] Error caching products:', err)
+                        )
+                    }
+                    return data as ProductWithCategory[]
+                }
 
                 console.warn('No products from Supabase, using mock')
                 // Filter mock by category if provided

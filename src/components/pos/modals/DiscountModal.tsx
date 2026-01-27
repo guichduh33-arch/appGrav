@@ -14,7 +14,7 @@ interface DiscountModalProps {
 
 export default function DiscountModal({
     itemName,
-    itemPrice: _itemPrice,
+    // itemPrice is kept for potential future per-item discount features
     totalPrice,
     onApplyDiscount,
     onClose

@@ -31,9 +31,9 @@ export default function StockOpnameList() {
     async function createNewSession() {
         try {
             // Create a new draft session
-            const sessionData: Insertable<'inventory_counts'> = {
+            const sessionData = {
                 notes: 'Nouvel inventaire',
-                status: 'draft'
+                status: 'draft' as const
             }
             const { data, error } = await supabase
                 .from('inventory_counts')
@@ -82,12 +82,12 @@ export default function StockOpnameList() {
                         <tbody>
                             {counts.map(session => (
                                 <tr key={session.id}>
-                                    <td className="font-medium">{session.count_number}</td>
+                                    <td className="font-medium">{session.count_number ?? ''}</td>
                                     <td>
-                                        {new Date(session.created_at).toLocaleDateString()}
+                                        {session.created_at ? new Date(session.created_at).toLocaleDateString() : ''}
                                     </td>
                                     <td>
-                                        <StatusBadge status={session.status} />
+                                        <StatusBadge status={session.status ?? 'draft'} />
                                     </td>
                                     <td className="text-muted italic">
                                         {session.notes || '-'}

@@ -196,11 +196,11 @@ export default function StockOpnameForm() {
                     </button>
                     <div>
                         <div className="flex items-center gap-2">
-                            <h1 className="text-xl font-bold">{session.count_number}</h1>
-                            <StatusBadge status={session.status} />
+                            <h1 className="text-xl font-bold">{session.count_number ?? ''}</h1>
+                            <StatusBadge status={session.status ?? 'draft'} />
                         </div>
                         <p className="opname-subtitle">
-                            {new Date(session.created_at).toLocaleDateString()}
+                            {session.created_at ? new Date(session.created_at).toLocaleDateString() : ''}
                         </p>
                     </div>
                 </div>

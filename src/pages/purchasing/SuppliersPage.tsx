@@ -21,6 +21,18 @@ interface Supplier {
     updated_at: string
 }
 
+// Helper function to format payment terms for display
+const formatPaymentTerms = (term: string | null): string => {
+    if (!term) return ''
+    const termMap: Record<string, string> = {
+        'cod': 'Comptant (COD)',
+        'net15': 'Net 15 jours',
+        'net30': 'Net 30 jours',
+        'net60': 'Net 60 jours'
+    }
+    return termMap[term] || term
+}
+
 export default function SuppliersPage() {
     const [suppliers, setSuppliers] = useState<Supplier[]>([])
     const [loading, setLoading] = useState(true)
@@ -37,7 +49,7 @@ export default function SuppliersPage() {
         postal_code: '',
         country: 'France',
         tax_id: '',
-        payment_terms: 'Net 30',
+        payment_terms: 'net30',
         notes: '',
         is_active: true
     })
@@ -80,7 +92,7 @@ export default function SuppliersPage() {
                 postal_code: '',
                 country: 'France',
                 tax_id: '',
-                payment_terms: 'Net 30',
+                payment_terms: 'net30',
                 notes: '',
                 is_active: true
             })
@@ -301,7 +313,7 @@ export default function SuppliersPage() {
                                 )}
                                 {supplier.payment_terms && (
                                     <div className="supplier-card__info">
-                                        <strong>Conditions:</strong> {supplier.payment_terms}
+                                        <strong>Conditions:</strong> {formatPaymentTerms(supplier.payment_terms)}
                                     </div>
                                 )}
                             </div>
@@ -430,11 +442,10 @@ export default function SuppliersPage() {
                                                     onChange={e => setFormData({ ...formData, payment_terms: e.target.value })}
                                                     aria-label="Conditions de paiement"
                                                 >
-                                                    <option value="Net 15">Net 15</option>
-                                                    <option value="Net 30">Net 30</option>
-                                                    <option value="Net 45">Net 45</option>
-                                                    <option value="Net 60">Net 60</option>
-                                                    <option value="Comptant">Comptant</option>
+                                                    <option value="cod">Comptant (COD)</option>
+                                                    <option value="net15">Net 15 jours</option>
+                                                    <option value="net30">Net 30 jours</option>
+                                                    <option value="net60">Net 60 jours</option>
                                                 </select>
                                             </div>
                                             <div className="form-group form-group--full">

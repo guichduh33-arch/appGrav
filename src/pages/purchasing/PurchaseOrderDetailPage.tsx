@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Edit2, DollarSign, Clock, RotateCcw } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import { formatCurrency } from '@/utils/helpers'
 import './PurchaseOrderDetailPage.css'
 
 interface PurchaseOrder {
@@ -433,10 +434,10 @@ export default function PurchaseOrderDetailPage() {
                                                 )}
                                             </td>
                                             <td>{parseFloat(item.quantity.toString()).toFixed(2)}</td>
-                                            <td>{parseFloat(item.unit_price.toString()).toFixed(2)}€</td>
-                                            <td>{parseFloat(item.discount_amount.toString()).toFixed(2)}€</td>
+                                            <td>{formatCurrency(parseFloat(item.unit_price.toString()))}</td>
+                                            <td>{formatCurrency(parseFloat(item.discount_amount.toString()))}</td>
                                             <td>{parseFloat(item.tax_rate.toString())}%</td>
-                                            <td><strong>{parseFloat(item.line_total.toString()).toFixed(2)}€</strong></td>
+                                            <td><strong>{formatCurrency(parseFloat(item.line_total.toString()))}</strong></td>
                                             <td>
                                                 <input
                                                     type="number"
@@ -484,7 +485,7 @@ export default function PurchaseOrderDetailPage() {
                                             <div>Raison: <strong>{RETURN_REASON_LABELS[ret.reason]}</strong></div>
                                             {ret.reason_details && <div>Détails: {ret.reason_details}</div>}
                                             {ret.refund_amount && (
-                                                <div>Remboursement: <strong>{parseFloat(ret.refund_amount.toString()).toFixed(2)}€</strong></div>
+                                                <div>Remboursement: <strong>{formatCurrency(parseFloat(ret.refund_amount.toString()))}</strong></div>
                                             )}
                                             <div className="po-return-item__date">
                                                 {new Date(ret.return_date).toLocaleDateString('fr-FR')}
@@ -524,22 +525,22 @@ export default function PurchaseOrderDetailPage() {
                         <h3>Résumé financier</h3>
                         <div className="po-summary-line">
                             <span>Sous-total</span>
-                            <span>{parseFloat(purchaseOrder.subtotal.toString()).toFixed(2)}€</span>
+                            <span>{formatCurrency(parseFloat(purchaseOrder.subtotal.toString()))}</span>
                         </div>
                         {parseFloat(purchaseOrder.discount_amount.toString()) > 0 && (
                             <div className="po-summary-line po-summary-line--discount">
                                 <span>Remise</span>
-                                <span>-{parseFloat(purchaseOrder.discount_amount.toString()).toFixed(2)}€</span>
+                                <span>-{formatCurrency(parseFloat(purchaseOrder.discount_amount.toString()))}</span>
                             </div>
                         )}
                         <div className="po-summary-line">
                             <span>TVA</span>
-                            <span>{parseFloat(purchaseOrder.tax_amount.toString()).toFixed(2)}€</span>
+                            <span>{formatCurrency(parseFloat(purchaseOrder.tax_amount.toString()))}</span>
                         </div>
                         <div className="po-summary-divider"></div>
                         <div className="po-summary-total">
                             <span>Total</span>
-                            <span>{parseFloat(purchaseOrder.total_amount.toString()).toFixed(2)}€</span>
+                            <span>{formatCurrency(parseFloat(purchaseOrder.total_amount.toString()))}</span>
                         </div>
                     </div>
 

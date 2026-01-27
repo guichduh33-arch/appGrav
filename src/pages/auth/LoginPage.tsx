@@ -193,7 +193,7 @@ export default function LoginPage() {
         `)
         .eq('user_id', user.id) as { data: Array<{ id: string; is_primary: boolean; role: { id: string; code: string; name_fr: string; name_en: string; name_id: string; hierarchy_level: number } | null }> | null };
 
-      const roles = userRoles?.map(ur => ur.role).filter(Boolean) || [];
+      const roles = (userRoles?.map(ur => ur.role).filter((r): r is NonNullable<typeof r> => r !== null) || []) as Role[];
 
       // Get permissions from role_permissions
       const roleIds = roles.map((r) => (r as { id: string }).id);

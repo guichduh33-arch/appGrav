@@ -76,7 +76,7 @@ export default function IncomingStockPage() {
                 .order('order_date', { ascending: false })
 
             if (error) throw error
-            setOrders(data || [])
+            setOrders((data ?? []) as unknown as PurchaseOrderWithItems[])
         } catch (err) {
             console.error('Error loading orders:', err)
         } finally {

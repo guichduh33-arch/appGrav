@@ -179,7 +179,7 @@ export default function CustomerFormPage() {
             }
 
             if (isEditing) {
-                const { data, error } = await supabase
+                const { error } = await supabase
                     .from('customers')
                     .update(customerData)
                     .eq('id', id as string)
@@ -191,9 +191,9 @@ export default function CustomerFormPage() {
                 }
                 toast.success('Client mis à jour avec succès')
             } else {
-                const { data, error } = await supabase
+                const { error } = await supabase
                     .from('customers')
-                    .insert(customerData)
+                    .insert(customerData as never)
                     .select()
 
                 if (error) {

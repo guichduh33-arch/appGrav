@@ -69,15 +69,21 @@ export default function ProductCategoryPricingPage() {
             ])
 
             if (productRes.error) throw productRes.error
-            if (productRes.data) setProduct(productRes.data)
-            if (categoriesRes.data) setCategories(categoriesRes.data)
+            if (productRes.data) setProduct({
+                id: productRes.data.id,
+                name: productRes.data.name,
+                sku: productRes.data.sku ?? '',
+                retail_price: productRes.data.retail_price ?? 0,
+                wholesale_price: productRes.data.wholesale_price ?? null
+            })
+            if (categoriesRes.data) setCategories(categoriesRes.data as unknown as CustomerCategory[])
 
             if (pricesRes.data) {
                 setCategoryPrices(pricesRes.data.map(p => ({
                     id: p.id,
                     customer_category_id: p.customer_category_id,
                     price: p.price,
-                    is_active: p.is_active
+                    is_active: p.is_active ?? true
                 })))
             }
         } catch (error) {

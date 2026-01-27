@@ -6,8 +6,13 @@ import {
     FileText, Building2,
     ShoppingCart, BarChart3, Users, Settings, Store, Utensils,
     ChevronLeft, ChevronRight, LogOut, Truck, UserCircle, Coffee, Boxes,
-    Shield, ScrollText
+    Shield, ScrollText, CloudCog
 } from 'lucide-react';
+import { NetworkIndicator } from '../components/ui/NetworkIndicator';
+import { SyncIndicator } from '../components/ui/SyncIndicator';
+import { PostOfflineSyncReport } from '../components/sync/PostOfflineSyncReport';
+import { useNetworkAlerts } from '../hooks/useNetworkAlerts';
+import { useSyncReport } from '../hooks/useSyncReport';
 import './BackOfficeLayout.css';
 
 const BackOfficeLayout: React.FC = () => {
@@ -15,6 +20,12 @@ const BackOfficeLayout: React.FC = () => {
     const { user, logout } = useAuthStore();
     const navigate = useNavigate();
     const [isCollapsed, setIsCollapsed] = useState(false);
+
+    // Enable network status alerts (Story 3.2)
+    useNetworkAlerts();
+
+    // Enable post-offline sync report modal (Story 3.3)
+    const { showReport, period, dismissReport, retryFailed } = useSyncReport();
 
     const handleLogout = () => {
         logout();
@@ -42,6 +53,10 @@ const BackOfficeLayout: React.FC = () => {
                             </div>
                         )}
                     </div>
+                    {/* Network Status Indicator - Always visible per NFR-U4 */}
+                    <NetworkIndicator compact={isCollapsed} className="mt-2" />
+                    {/* Sync Status Indicator - Story 2.6 */}
+                    <SyncIndicator compact={isCollapsed} className="mt-1" />
                 </div>
 
                 {/* Navigation */}
@@ -112,6 +127,10 @@ const BackOfficeLayout: React.FC = () => {
                             <ScrollText size={22} strokeWidth={2} />
                             {!isCollapsed && <span className="fade-in">{t('nav.audit') || 'Audit'}</span>}
                         </NavLink>
+                        <NavLink to="/settings/sync" className="nav-item" title={isCollapsed ? t('nav.sync') : ""}>
+                            <CloudCog size={22} strokeWidth={2} />
+                            {!isCollapsed && <span className="fade-in">{t('nav.sync') || 'Sync'}</span>}
+                        </NavLink>
                     </div>
                 </nav>
 
@@ -152,6 +171,15 @@ const BackOfficeLayout: React.FC = () => {
             <main className="backoffice-content">
                 <Outlet />
             </main>
+
+            {/* Post-Offline Sync Report Modal (Story 3.3) */}
+            {showReport && period && (
+                <PostOfflineSyncReport
+                    period={period}
+                    onClose={dismissReport}
+                    onRetryFailed={retryFailed}
+                />
+            )}
         </div>
     );
 };
