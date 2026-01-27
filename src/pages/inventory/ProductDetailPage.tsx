@@ -180,8 +180,7 @@ export default function ProductDetailPage() {
                     description: product.description,
                     pos_visible: product.pos_visible,
                     is_active: product.is_active,
-                    unit: product.unit,
-                    default_producing_section_id: primarySectionId // Keep backward compatibility
+                    unit: product.unit
                 })
                 .eq('id', product.id)
 
@@ -398,7 +397,7 @@ export default function ProductDetailPage() {
                         onAddIngredient={addIngredient}
                         onRemoveIngredient={removeIngredient}
                         onUpdateQuantity={updateRecipeQuantity}
-                        productType={product.product_type}
+                        productType={product.product_type ?? undefined}
                     />
                 )}
                 {activeTab === 'costing' && (
