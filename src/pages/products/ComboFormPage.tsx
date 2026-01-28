@@ -373,7 +373,7 @@ export default function ComboFormPage() {
                 .from('product_combo_groups')
                 .insert({
                     combo_id: comboId,
-                    name: group.group_name,
+                    group_name: group.group_name,
                     is_required: group.is_required,
                     min_selections: group.min_selections,
                     max_selections: group.max_selections,

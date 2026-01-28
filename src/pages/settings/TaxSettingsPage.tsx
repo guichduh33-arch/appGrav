@@ -77,9 +77,9 @@ const TaxSettingsPage = () => {
       name_en: rate.name_en,
       name_id: rate.name_id,
       rate: rate.rate,
-      is_inclusive: rate.is_inclusive,
-      is_default: rate.is_default,
-      is_active: rate.is_active,
+      is_inclusive: rate.is_inclusive ?? false,
+      is_default: rate.is_default ?? false,
+      is_active: rate.is_active ?? true,
     });
     setShowModal(true);
   };
@@ -254,7 +254,7 @@ const TaxSettingsPage = () => {
                       className="btn-ghost btn-ghost--danger"
                       onClick={() => handleDelete(rate)}
                       title="Supprimer"
-                      disabled={rate.is_default}
+                      disabled={rate.is_default ?? false}
                     >
                       <Trash2 size={16} />
                     </button>

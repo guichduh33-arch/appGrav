@@ -71,14 +71,14 @@ export async function syncCustomersToOffline(): Promise<number> {
     email: c.email,
     loyalty_points: c.loyalty_points || 0,
     customer_category_slug: null, // Will be populated from category join if needed
-    updated_at: c.updated_at,
+    updated_at: c.updated_at || new Date().toISOString(),
   }));
 
   // Bulk upsert to IndexedDB
   await offlineDb.customers.bulkPut(offlineCustomers);
 
   // Update last sync timestamp
-  const latestTimestamp = data[0].updated_at;
+  const latestTimestamp = data[0].updated_at || new Date().toISOString();
   setLastSyncTimestamp(latestTimestamp);
 
   console.log(`[CustomerSync] Synced ${offlineCustomers.length} customers`);

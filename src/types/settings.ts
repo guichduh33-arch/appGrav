@@ -28,6 +28,12 @@ export type CurrencyPosition = 'before' | 'after'
 export type RoundingMethod = 'round' | 'floor' | 'ceil'
 export type BackupFrequency = 'hourly' | 'daily' | 'weekly' | 'monthly'
 export type POSLayout = 'grid' | 'list'
+export type TerminalMode = 'primary' | 'secondary' | 'self_service' | 'kds_only'
+export type KDSStation = 'kitchen' | 'barista' | 'display' | null
+export type OrderType = 'dine_in' | 'takeaway' | 'delivery' | null
+export type SoundType = 'chime' | 'bell' | 'beep' | 'cash' | 'success' | 'error' | 'none'
+export type ProfileType = 'production' | 'test' | 'training' | 'custom'
+export type SoundCategory = 'order' | 'payment' | 'error' | 'notification'
 
 // =====================================================
 // Validation Rules (for settings)
@@ -159,12 +165,146 @@ export interface AppearanceSettings {
 }
 
 // =====================================================
+// POS Advanced Settings (New)
+// =====================================================
+
+export interface POSAdvancedSettings {
+  cart: {
+    lock_on_kitchen_send: boolean
+    require_pin_locked_remove: boolean
+  }
+  rounding: {
+    amount: 100 | 500 | 1000
+    method: RoundingMethod
+  }
+  payment: {
+    allow_split: boolean
+    max_split_count: number
+  }
+  sound: {
+    enabled: boolean
+    new_order: SoundType
+    payment_success: SoundType
+    error: SoundType
+  }
+  screensaver: {
+    enabled: boolean
+    timeout: number
+    show_clock: boolean
+  }
+  offline: {
+    enabled: boolean
+    auto_switch: boolean
+    sync_interval: number
+    max_offline_orders: number
+  }
+  customer_display: {
+    enabled: boolean
+    show_items: boolean
+    show_promotions: boolean
+    show_logo: boolean
+  }
+}
+
+// =====================================================
+// Module Settings (New)
+// =====================================================
+
+export interface ModuleSettings {
+  production: {
+    enabled: boolean
+    auto_consume_stock: boolean
+  }
+  b2b: {
+    enabled: boolean
+    min_order_amount: number
+    default_payment_terms: number
+  }
+  purchasing: {
+    enabled: boolean
+    auto_reorder_threshold: number
+  }
+  loyalty: {
+    enabled: boolean
+    points_per_idr: number
+    points_expiry_days: number
+  }
+  kds: {
+    enabled: boolean
+    auto_acknowledge_delay: number
+    sound_new_order: boolean
+  }
+}
+
+// =====================================================
+// Terminal Settings (New)
+// =====================================================
+
+export interface TerminalSettings {
+  mode: TerminalMode
+  default_printer_id: string | null
+  kitchen_printer_id: string | null
+  kds_station: KDSStation
+  allowed_payment_methods: string[]
+  default_order_type: OrderType
+  floor_plan_id: string | null
+  auto_logout_timeout: number | null
+}
+
+// =====================================================
+// Settings Profile (New)
+// =====================================================
+
+export interface SettingsProfile {
+  id: string
+  name: string
+  description: string | null
+  profile_type: ProfileType
+  settings_snapshot: Record<string, unknown>
+  terminal_settings_snapshot: Record<string, unknown>
+  is_active: boolean
+  is_system: boolean
+  created_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+// =====================================================
+// Sound Asset (New)
+// =====================================================
+
+export interface SoundAsset {
+  id: string
+  code: string
+  name: string
+  category: SoundCategory
+  file_path: string | null
+  is_system: boolean
+  is_active: boolean
+  created_at: string
+}
+
+// =====================================================
+// Terminal Setting Row (New)
+// =====================================================
+
+export interface TerminalSettingRow {
+  id: string
+  terminal_id: string
+  key: string
+  value: unknown
+  created_at: string
+  updated_at: string
+}
+
+// =====================================================
 // All Settings Combined
 // =====================================================
 
 export interface AllSettings {
   company: CompanySettings
   pos: POSSettings
+  pos_advanced: POSAdvancedSettings
   tax: TaxSettings
   inventory: InventorySettings
   localization: LocalizationSettings
@@ -172,6 +312,7 @@ export interface AllSettings {
   notifications: NotificationSettings
   backup: BackupSettings
   appearance: AppearanceSettings
+  modules: ModuleSettings
 }
 
 // =====================================================

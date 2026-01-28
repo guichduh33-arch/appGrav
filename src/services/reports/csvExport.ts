@@ -1,11 +1,34 @@
 /**
  * CSV Export Service
- * Epic 10: Story 10.5
+ * Epic 10: Story 10.5 + Epic 2: Story 2.1
  *
  * Export reports and data to CSV format
  */
 
 import { supabase } from '@/lib/supabase'
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
+
+// =============================================================
+// Types
+// =============================================================
+
+export interface CsvColumn<T> {
+  key: keyof T | string;
+  header: string;
+  format?: (value: unknown, row: T) => string;
+}
+
+export interface CsvExportOptions {
+  filename: string;
+  reportName?: string;
+  dateRange?: { from: Date; to: Date };
+  includeTimestamp?: boolean;
+}
+
+// =============================================================
+// Helper Functions
+// =============================================================
 
 // Helper to escape CSV values
 function escapeCSV(value: unknown): string {
@@ -39,6 +62,127 @@ function downloadCSV(content: string, filename: string) {
     URL.revokeObjectURL(link.href)
 }
 
+// =============================================================
+// Generic Export Function (Story 2.1: Enhanced CSV Export)
+// =============================================================
+
+/**
+ * Export any data array to CSV with custom columns
+ * This is the main function for exporting report data
+ */
+export function exportToCSV<T extends Record<string, unknown>>(
+  data: T[],
+  columns: CsvColumn<T>[],
+  options: CsvExportOptions
+): { success: boolean; error?: string } {
+  try {
+    // Build rows
+    const rows = data.map((row) =>
+      columns.map((col) => {
+        const key = col.key as keyof T;
+        const value = key.toString().includes('.')
+          ? getNestedValue(row, key.toString())
+          : row[key];
+
+        if (col.format) {
+          return escapeCSV(col.format(value, row));
+        }
+        return escapeCSV(value);
+      }).join(',')
+    );
+
+    // Build headers
+    const headers = columns.map((c) => escapeCSV(c.header)).join(',');
+
+    // Combine
+    const csvContent = [headers, ...rows].join('\n');
+
+    // Generate filename
+    let filename = options.filename;
+    if (options.dateRange) {
+      const fromStr = format(options.dateRange.from, 'yyyy-MM-dd');
+      const toStr = format(options.dateRange.to, 'yyyy-MM-dd');
+      filename = `${filename}_${fromStr}_${toStr}`;
+    } else if (options.includeTimestamp !== false) {
+      filename = `${filename}_${format(new Date(), 'yyyy-MM-dd')}`;
+    }
+    filename = `${filename}.csv`;
+
+    downloadCSV(csvContent, filename);
+
+    return { success: true };
+  } catch (err) {
+    console.error('CSV Export error:', err);
+    return { success: false, error: 'Erreur lors de l\'export CSV' };
+  }
+}
+
+/**
+ * Helper to get nested value from object using dot notation
+ */
+function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
+  return path.split('.').reduce((current, key) => {
+    if (current && typeof current === 'object') {
+      return (current as Record<string, unknown>)[key];
+    }
+    return undefined;
+  }, obj as unknown);
+}
+
+/**
+ * Format number for CSV export (French locale)
+ */
+export function formatNumber(value: unknown): string {
+  if (value === null || value === undefined) return '';
+  const num = Number(value);
+  if (isNaN(num)) return String(value);
+  return num.toLocaleString('fr-FR');
+}
+
+/**
+ * Format currency for CSV export (IDR)
+ */
+export function formatCurrency(value: unknown): string {
+  if (value === null || value === undefined) return '';
+  const num = Number(value);
+  if (isNaN(num)) return String(value);
+  return `${num.toLocaleString('fr-FR')} IDR`;
+}
+
+/**
+ * Format date for CSV export
+ */
+export function formatDate(value: unknown): string {
+  if (!value) return '';
+  const date = new Date(value as string);
+  if (isNaN(date.getTime())) return String(value);
+  return format(date, 'dd/MM/yyyy', { locale: fr });
+}
+
+/**
+ * Format datetime for CSV export
+ */
+export function formatDateTime(value: unknown): string {
+  if (!value) return '';
+  const date = new Date(value as string);
+  if (isNaN(date.getTime())) return String(value);
+  return format(date, 'dd/MM/yyyy HH:mm', { locale: fr });
+}
+
+/**
+ * Format percentage for CSV export
+ */
+export function formatPercentage(value: unknown): string {
+  if (value === null || value === undefined) return '';
+  const num = Number(value);
+  if (isNaN(num)) return String(value);
+  return `${(num * 100).toFixed(1)}%`;
+}
+
+// =============================================================
+// Legacy Export Functions (backwards compatibility)
+// =============================================================
+
 // Story 10.5: Export sales report
 export async function exportSalesReport(
     startDate: Date,
@@ -54,7 +198,7 @@ export async function exportSalesReport(
                 subtotal,
                 discount_value,
                 tax_amount,
-                total_amount,
+                total,
                 payment_method,
                 customer:customers(name),
                 created_at
@@ -65,17 +209,17 @@ export async function exportSalesReport(
 
         if (error) throw error
 
-        const csvData = (data || []).map((o: Record<string, unknown>) => ({
+        const csvData = (data || []).map((o) => ({
             order_number: o.order_number,
-            date: new Date(o.created_at as string).toLocaleDateString('fr-FR'),
-            time: new Date(o.created_at as string).toLocaleTimeString('fr-FR'),
+            date: new Date(o.created_at || '').toLocaleDateString('fr-FR'),
+            time: new Date(o.created_at || '').toLocaleTimeString('fr-FR'),
             type: o.order_type,
             status: o.status,
-            customer: (o.customer as Record<string, string>)?.name || '-',
+            customer: (o.customer as { name: string } | null)?.name || '-',
             subtotal: o.subtotal,
             discount: o.discount_value || 0,
             tax: o.tax_amount || 0,
-            total: o.total_amount,
+            total: o.total,
             payment: o.payment_method
         }))
 
@@ -113,27 +257,27 @@ export async function exportInventoryReport(): Promise<{ success: boolean; error
                 name,
                 category:categories(name),
                 product_type,
-                stock_quantity,
+                current_stock,
                 unit,
                 min_stock_level,
                 cost_price,
-                sale_price,
+                retail_price,
                 is_active
             `)
             .order('name')
 
         if (error) throw error
 
-        const csvData = (data || []).map((p: Record<string, unknown>) => ({
+        const csvData = (data || []).map((p) => ({
             sku: p.sku || '-',
             name: p.name,
-            category: (p.category as Record<string, string>)?.name || '-',
+            category: (p.category as { name: string } | null)?.name || '-',
             type: p.product_type,
-            stock: p.stock_quantity,
+            stock: p.current_stock,
             unit: p.unit,
             min_stock: p.min_stock_level || 0,
             cost: p.cost_price,
-            price: p.sale_price,
+            price: p.retail_price,
             active: p.is_active ? 'Oui' : 'Non'
         }))
 
@@ -302,13 +446,13 @@ export async function exportPurchaseOrdersReport(
                 po_number,
                 supplier:suppliers(name),
                 order_date,
-                expected_date,
-                received_date,
+                expected_delivery_date,
+                actual_delivery_date,
                 status,
                 subtotal,
-                discount,
+                discount_amount,
                 tax_amount,
-                total,
+                total_amount,
                 payment_status
             `)
             .gte('order_date', startDate.toISOString())
@@ -317,17 +461,17 @@ export async function exportPurchaseOrdersReport(
 
         if (error) throw error
 
-        const csvData = (data || []).map((po: Record<string, unknown>) => ({
+        const csvData = (data || []).map((po) => ({
             po_number: po.po_number,
-            supplier: (po.supplier as Record<string, string>)?.name || '-',
-            order_date: new Date(po.order_date as string).toLocaleDateString('fr-FR'),
-            expected: po.expected_date ? new Date(po.expected_date as string).toLocaleDateString('fr-FR') : '-',
-            received: po.received_date ? new Date(po.received_date as string).toLocaleDateString('fr-FR') : '-',
+            supplier: (po.supplier as { name: string } | null)?.name || '-',
+            order_date: new Date(po.order_date).toLocaleDateString('fr-FR'),
+            expected: po.expected_delivery_date ? new Date(po.expected_delivery_date).toLocaleDateString('fr-FR') : '-',
+            received: po.actual_delivery_date ? new Date(po.actual_delivery_date).toLocaleDateString('fr-FR') : '-',
             status: po.status,
             subtotal: po.subtotal,
-            discount: po.discount || 0,
+            discount: po.discount_amount || 0,
             tax: po.tax_amount || 0,
-            total: po.total,
+            total: po.total_amount,
             payment: po.payment_status
         }))
 

@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabase';
 import toast from 'react-hot-toast';
 import './LoginPage.css';
 import { UserProfile } from '../../types/database';
+import type { Role } from '../../types/auth';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -193,7 +194,19 @@ export default function LoginPage() {
         `)
         .eq('user_id', user.id) as { data: Array<{ id: string; is_primary: boolean; role: { id: string; code: string; name_fr: string; name_en: string; name_id: string; hierarchy_level: number } | null }> | null };
 
-      const roles = (userRoles?.map(ur => ur.role).filter((r): r is NonNullable<typeof r> => r !== null) || []) as Role[];
+      const roles: Role[] = (userRoles?.map(ur => ur.role).filter((r): r is NonNullable<typeof r> => r !== null) || []).map(r => ({
+        id: r.id,
+        code: r.code,
+        name_fr: r.name_fr,
+        name_en: r.name_en,
+        name_id: r.name_id,
+        description: null,
+        is_system: false,
+        is_active: true,
+        hierarchy_level: r.hierarchy_level,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }));
 
       // Get permissions from role_permissions
       const roleIds = roles.map((r) => (r as { id: string }).id);

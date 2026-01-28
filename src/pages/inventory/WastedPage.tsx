@@ -32,9 +32,9 @@ interface Product {
     id: string
     name: string
     sku: string
-    unit: string
-    cost_price: number
-    current_stock: number
+    unit: string | null
+    cost_price: number | null
+    current_stock: number | null
 }
 
 const WASTE_REASONS = [
@@ -181,7 +181,8 @@ export default function WastedPage() {
         }
 
         const qty = parseFloat(quantity)
-        if (qty > selectedProduct.current_stock) {
+        const currentStock = selectedProduct.current_stock ?? 0
+        if (qty > currentStock) {
             toast.error(t('inventory.wasted.error_insufficient', 'Quantity exceeds current stock'))
             return
         }
@@ -208,7 +209,7 @@ export default function WastedPage() {
             // Update product stock
             const { error: updateError } = await supabase
                 .from('products')
-                .update({ current_stock: selectedProduct.current_stock - qty })
+                .update({ current_stock: currentStock - qty })
                 .eq('id', selectedProduct.id)
 
             if (updateError) throw updateError

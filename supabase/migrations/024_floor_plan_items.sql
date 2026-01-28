@@ -5,48 +5,36 @@
 -- Drop old tables table if exists
 DROP TABLE IF EXISTS public.tables CASCADE;
 
--- Create floor_plan_items table
-CREATE TABLE IF NOT EXISTS public.floor_plan_items (
+-- Drop floor_plan_items if exists to recreate with correct structure
+DROP TABLE IF EXISTS public.floor_plan_items CASCADE;
+
+-- Create floor_plan_items table without named constraints (PostgreSQL will auto-name them)
+CREATE TABLE public.floor_plan_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    type TEXT NOT NULL CHECK (type IN ('table', 'decoration')),
+    name TEXT NOT NULL DEFAULT '',
+    type TEXT NOT NULL DEFAULT 'table' CHECK (type IN ('table', 'decoration')),
 
     -- Table-specific fields
     number TEXT,
     capacity INTEGER,
     section TEXT,
-    status TEXT CHECK (status IN ('available', 'occupied', 'reserved')),
+    status TEXT DEFAULT 'available' CHECK (status IN ('available', 'occupied', 'reserved')),
 
     -- Common fields
-    shape TEXT NOT NULL CHECK (shape IN ('square', 'round', 'rectangle')),
+    shape TEXT NOT NULL DEFAULT 'square' CHECK (shape IN ('square', 'round', 'rectangle')),
 
     -- Decoration-specific fields
     decoration_type TEXT CHECK (decoration_type IN ('plant', 'wall', 'bar', 'entrance')),
 
     -- Position and size
-    x NUMERIC(5,2) NOT NULL DEFAULT 50.00,
-    y NUMERIC(5,2) NOT NULL DEFAULT 50.00,
-    width INTEGER,
-    height INTEGER,
+    x INTEGER NOT NULL DEFAULT 50,
+    y INTEGER NOT NULL DEFAULT 50,
+    width INTEGER DEFAULT 80,
+    height INTEGER DEFAULT 80,
+    rotation INTEGER DEFAULT 0,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-
-    -- Constraints
-    CONSTRAINT floor_plan_items_x_check CHECK (x >= 0 AND x <= 100),
-    CONSTRAINT floor_plan_items_y_check CHECK (y >= 0 AND y <= 100),
-    CONSTRAINT floor_plan_items_table_number_unique UNIQUE NULLS NOT DISTINCT (number),
-    CONSTRAINT floor_plan_items_table_capacity_check CHECK (
-        type != 'table' OR (capacity IS NOT NULL AND capacity > 0 AND capacity <= 20)
-    ),
-    CONSTRAINT floor_plan_items_table_section_check CHECK (
-        type != 'table' OR section IS NOT NULL
-    ),
-    CONSTRAINT floor_plan_items_table_status_check CHECK (
-        type != 'table' OR status IS NOT NULL
-    ),
-    CONSTRAINT floor_plan_items_decoration_type_check CHECK (
-        type != 'decoration' OR decoration_type IS NOT NULL
-    )
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- Add indexes for faster queries

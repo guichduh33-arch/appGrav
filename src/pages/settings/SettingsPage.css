@@ -1618,3 +1618,190 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* ============================================
+   SETTINGS GROUP (POS Advanced / Module)
+   ============================================ */
+
+.settings-group {
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.settings-group:last-child {
+    border-bottom: none;
+}
+
+.settings-group__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-brun-chocolat);
+    margin: 0 0 var(--space-md) 0;
+}
+
+.settings-group__title svg {
+    color: var(--color-rose-poudre);
+}
+
+/* Form Group Inline */
+.form-group--inline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    margin-bottom: var(--space-sm);
+}
+
+.form-group--inline .form-label {
+    margin-bottom: 0;
+    font-size: var(--text-sm);
+}
+
+.form-input-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.form-input--narrow {
+    width: 100px;
+}
+
+.form-input-suffix {
+    font-size: var(--text-sm);
+    color: var(--color-gris-chaud);
+}
+
+/* ============================================
+   MODULE CARDS GRID
+   ============================================ */
+
+.module-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+}
+
+.module-card {
+    background: white;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.module-card.is-enabled {
+    border-color: var(--color-vert-menthe);
+}
+
+.module-card.is-disabled {
+    opacity: 0.7;
+}
+
+.module-card__header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+}
+
+.module-card__icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-blanc-creme);
+    border-radius: var(--radius-md);
+    color: var(--color-rose-poudre);
+    flex-shrink: 0;
+}
+
+.module-card.is-enabled .module-card__icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-vert-menthe);
+}
+
+.module-card__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.module-card__title {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--color-brun-chocolat);
+    margin: 0 0 4px 0;
+}
+
+.module-card__description {
+    font-size: var(--text-sm);
+    color: var(--color-gris-chaud);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.module-card__toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--color-gris-chaud);
+    transition: color var(--duration-fast) var(--ease-standard);
+}
+
+.module-card__toggle.is-on {
+    color: var(--color-vert-menthe);
+}
+
+.module-card__settings {
+    padding: 0 var(--space-lg) var(--space-lg);
+    border-top: 1px solid var(--color-border);
+    margin-top: calc(-1 * var(--space-sm));
+    padding-top: var(--space-md);
+}
+
+/* Toggle Group Compact */
+.toggle-group--compact {
+    padding: var(--space-sm) 0;
+}
+
+.toggle-group--compact .toggle-group__label {
+    font-size: var(--text-sm);
+}
+
+.toggle-switch--sm {
+    width: 36px;
+    height: 20px;
+}
+
+.toggle-switch--sm::after {
+    width: 16px;
+    height: 16px;
+    top: 2px;
+    left: 2px;
+}
+
+.toggle-switch--sm.is-on::after {
+    left: 18px;
+}
+
+/* Toggle Switch Disabled */
+.toggle-switch.is-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ============================================
+   RESPONSIVE - MODULE CARDS
+   ============================================ */
+
+@media (max-width: 768px) {
+    .module-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}

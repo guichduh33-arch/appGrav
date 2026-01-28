@@ -27,7 +27,10 @@
         "welcome": "Selamat datang",
         "choose": "Pilih",
         "online": "Online",
-        "requiredFields": "Kolom wajib tidak lengkap"
+        "requiredFields": "Kolom wajib tidak lengkap",
+        "days": "hari",
+        "seconds": "det",
+        "units": "unit"
     },
     "pos": {
         "header": {
@@ -703,6 +706,100 @@
             "synced": "Tersinkronisasi",
             "pendingSync": "Menunggu sinkronisasi",
             "syncNow": "Sinkronkan sekarang"
+        },
+        "posAdvanced": {
+            "title": "Pengaturan POS Lanjutan",
+            "description": "Konfigurasi lanjutan point of sale",
+            "cart": {
+                "title": "Keranjang",
+                "lockOnKitchenSend": "Kunci setelah kirim ke dapur",
+                "lockOnKitchenSendDesc": "Item yang dikirim ke dapur tidak dapat diubah tanpa PIN",
+                "requirePinLockedRemove": "PIN diperlukan untuk menghapus",
+                "requirePinLockedRemoveDesc": "Minta PIN untuk menghapus item yang terkunci"
+            },
+            "rounding": {
+                "title": "Pembulatan IDR",
+                "amount": "Bulatkan ke",
+                "method": "Metode",
+                "round": "Pembulatan standar",
+                "floor": "Bulatkan ke bawah",
+                "ceil": "Bulatkan ke atas"
+            },
+            "payment": {
+                "title": "Pembayaran",
+                "allowSplit": "Pembayaran terpisah",
+                "allowSplitDesc": "Izinkan membagi pembayaran menjadi beberapa bagian",
+                "maxSplitCount": "Jumlah pembagian maksimal"
+            },
+            "sound": {
+                "title": "Suara",
+                "enabled": "Suara aktif",
+                "enabledDesc": "Aktifkan notifikasi suara",
+                "newOrder": "Pesanan baru",
+                "paymentSuccess": "Pembayaran berhasil",
+                "none": "Tidak ada",
+                "chime": "Lonceng",
+                "bell": "Bel",
+                "beep": "Beep",
+                "cash": "Kasir",
+                "success": "Sukses"
+            },
+            "screensaver": {
+                "title": "Screen Saver",
+                "enabled": "Aktifkan screen saver",
+                "enabledDesc": "Tampilkan screen saver setelah tidak aktif",
+                "timeout": "Timeout (detik)",
+                "showClock": "Tampilkan jam"
+            },
+            "offline": {
+                "title": "Mode Offline",
+                "enabled": "Mode offline aktif",
+                "enabledDesc": "Izinkan penjualan tanpa koneksi internet",
+                "autoSwitch": "Beralih otomatis",
+                "autoSwitchDesc": "Beralih otomatis ke mode offline saat koneksi terputus",
+                "syncInterval": "Interval sinkronisasi (det)",
+                "maxOfflineOrders": "Maks pesanan offline"
+            },
+            "customerDisplay": {
+                "title": "Tampilan Pelanggan",
+                "enabled": "Aktifkan tampilan pelanggan",
+                "enabledDesc": "Tampilkan informasi di layar kedua",
+                "showItems": "Tampilkan item",
+                "showPromotions": "Tampilkan promosi",
+                "showLogo": "Tampilkan logo"
+            }
+        },
+        "modules": {
+            "title": "Modul",
+            "description": "Aktifkan atau nonaktifkan modul aplikasi",
+            "production": {
+                "title": "Produksi",
+                "description": "Manajemen produksi dan resep",
+                "autoConsumeStock": "Konsumsi stok otomatis"
+            },
+            "b2b": {
+                "title": "B2B / Grosir",
+                "description": "Pesanan grosir dan pelanggan bisnis",
+                "minOrderAmount": "Pesanan minimum",
+                "defaultPaymentTerms": "Jangka waktu pembayaran"
+            },
+            "purchasing": {
+                "title": "Pembelian",
+                "description": "PO dan manajemen pemasok",
+                "autoReorderThreshold": "Ambang batas pesan ulang otomatis"
+            },
+            "loyalty": {
+                "title": "Loyalitas",
+                "description": "Program poin dan hadiah",
+                "pointsPerIdr": "Poin per Rp",
+                "pointsExpiryDays": "Kedaluwarsa poin"
+            },
+            "kds": {
+                "title": "KDS",
+                "description": "Tampilan dapur dan manajemen pesanan",
+                "autoAcknowledgeDelay": "Delay pengakuan otomatis",
+                "soundNewOrder": "Suara pesanan baru"
+            }
         }
     },
     "stock_movements": {

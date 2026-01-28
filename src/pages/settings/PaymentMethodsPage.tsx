@@ -34,6 +34,7 @@ interface PaymentMethodFormData {
   is_default: boolean;
   requires_reference: boolean;
   sort_order: number;
+  settings: object;
 }
 
 const emptyForm: PaymentMethodFormData = {
@@ -47,6 +48,7 @@ const emptyForm: PaymentMethodFormData = {
   is_default: false,
   requires_reference: false,
   sort_order: 0,
+  settings: {},
 };
 
 const PAYMENT_TYPES: { value: PaymentType; label: string; icon: React.ReactNode }[] = [
@@ -111,6 +113,7 @@ const PaymentMethodsPage = () => {
       is_default: method.is_default ?? false,
       requires_reference: method.requires_reference ?? false,
       sort_order: method.sort_order ?? 0,
+      settings: method.settings as object ?? {},
     });
     setShowModal(true);
   };
@@ -126,11 +129,11 @@ const PaymentMethodsPage = () => {
       if (editingMethod) {
         await updateMethod.mutateAsync({
           id: editingMethod.id,
-          updates: formData,
+          updates: formData as never,
         });
         toast.success('Mode de paiement mis à jour');
       } else {
-        await createMethod.mutateAsync(formData);
+        await createMethod.mutateAsync(formData as never);
         toast.success('Mode de paiement créé');
       }
       setShowModal(false);

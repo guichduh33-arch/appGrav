@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, CheckCircle, Clock, XCircle, ArrowRight } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import type { InventoryCount, Insertable } from '../../types/database'
+import type { InventoryCount } from '../../types/database'
 import './StockOpname.css'
 
 export default function StockOpnameList() {
@@ -30,8 +30,10 @@ export default function StockOpnameList() {
 
     async function createNewSession() {
         try {
-            // Create a new draft session
+            // Create a new draft session with unique count number
+            const countNumber = `INV-${Date.now()}`
             const sessionData = {
+                count_number: countNumber,
                 notes: 'Nouvel inventaire',
                 status: 'draft' as const
             }

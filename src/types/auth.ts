@@ -214,10 +214,17 @@ export type PermissionCode =
   | 'customers.delete'
   | 'customers.loyalty'
   // Reports
+  | 'reports.view'
   | 'reports.sales'
+  | 'reports.sales.personal'
   | 'reports.inventory'
   | 'reports.financial'
   | 'reports.analytics'
+  | 'reports.purchases'
+  | 'reports.audit'
+  | 'reports.alerts'
+  | 'reports.export'
+  | 'reports.configure'
   // Users
   | 'users.view'
   | 'users.create'

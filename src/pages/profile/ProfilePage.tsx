@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { usePermissions } from '../../hooks/usePermissions';
-import { authService } from '../../services/authService';
+import { authService } from '../../services/AuthService';
 import { supabase } from '../../lib/supabase';
 import { format } from 'date-fns';
 import { fr, enUS, id } from 'date-fns/locale';
@@ -58,11 +58,10 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (user) {
-      const userAny = user as any;
       setFormData({
         display_name: user.display_name || '',
         phone: user.phone || '',
-        preferred_language: userAny.preferred_language || user.language || 'fr',
+        preferred_language: user.preferred_language || 'fr',
       });
       loadSessions();
     }
@@ -377,9 +376,9 @@ export default function ProfilePage() {
                     <div>
                       <label className="text-sm text-gray-500">{t('auth.profile.language') || 'Langue'}</label>
                       <p className="font-medium">
-                        {user.language === 'fr' ? 'Français' :
-                          user.language === 'en' ? 'English' :
-                            user.language === 'id' ? 'Bahasa Indonesia' : '-'}
+                        {user.preferred_language === 'fr' ? 'Français' :
+                          user.preferred_language === 'en' ? 'English' :
+                            user.preferred_language === 'id' ? 'Bahasa Indonesia' : '-'}
                       </p>
                     </div>
                   </div>

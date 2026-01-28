@@ -14,7 +14,8 @@ interface Product {
     id: string
     name: string
     cost_price: number | null
-    unit: string
+    unit: string | null
+    product_type?: string | null
 }
 
 interface POItem {
@@ -103,14 +104,12 @@ export default function PurchaseOrderFormPage() {
 
             // Filter raw materials in JavaScript if product_type exists
             if (data && data.length > 0) {
-                // Check if product_type field exists
-                type ProductRow = { product_type?: string };
-                if ('product_type' in data[0]) {
-                    data = data.filter((p: ProductRow) => p.product_type === 'raw_material')
-                }
+                // Check if product_type field exists and filter
+                const filtered = data.filter(p => p.product_type === 'raw_material')
+                setProducts(filtered as Product[])
+            } else if (data) {
+                setProducts(data as Product[])
             }
-
-            if (data) setProducts(data)
         } catch (error) {
             console.error('Error fetching products:', error)
             alert(`Erreur lors du chargement des produits:\n${error instanceof Error ? error.message : 'Erreur inconnue'}`)
@@ -134,13 +133,12 @@ export default function PurchaseOrderFormPage() {
 
             if (itemsError) throw itemsError
 
-            const poAny = po as any
             setFormData({
                 supplier_id: po.supplier_id,
-                expected_delivery_date: (poAny.expected_delivery_date || po.expected_date || '').split('T')[0],
+                expected_delivery_date: (po.expected_delivery_date || '').split('T')[0],
                 notes: po.notes || '',
-                discount_amount: parseFloat(poAny.discount_amount || '0'),
-                discount_percentage: poAny.discount_percentage || null,
+                discount_amount: po.discount_amount ?? 0,
+                discount_percentage: po.discount_percentage ?? null,
                 status: po.status as 'draft'
             })
 
@@ -208,7 +206,7 @@ export default function PurchaseOrderFormPage() {
             const product = products.find(p => p.id === value)
             if (product) {
                 newItems[index].product_name = product.name
-                newItems[index].unit = product.unit
+                newItems[index].unit = product.unit ?? 'kg'
                 newItems[index].unit_price = product.cost_price || 0
             }
         }
@@ -340,13 +338,15 @@ export default function PurchaseOrderFormPage() {
                     .insert({
                         po_number: poNumber,
                         supplier_id: formData.supplier_id,
-                        expected_date: formData.expected_delivery_date || null,
+                        expected_delivery_date: formData.expected_delivery_date || null,
                         subtotal: totals.subtotal,
+                        discount_amount: totals.orderDiscount,
+                        discount_percentage: formData.discount_percentage,
                         tax_amount: totals.tax,
-                        total: totals.total,
+                        total_amount: totals.total,
                         notes: formData.notes,
                         status
-                    } as never)
+                    } as any)
                     .select()
                     .single()
 
@@ -374,9 +374,10 @@ export default function PurchaseOrderFormPage() {
             }
 
             navigate('/purchasing/purchase-orders')
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error saving purchase order:', error)
-            alert(`Erreur lors de l'enregistrement du bon de commande:\n${error instanceof Error ? error.message : 'Erreur inconnue'}`)
+            const errorMessage = error?.message || error?.error_description || error?.hint || JSON.stringify(error)
+            alert(`Erreur lors de l'enregistrement du bon de commande:\n${errorMessage}`)
         } finally {
             setLoading(false)
         }

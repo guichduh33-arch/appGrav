@@ -113,15 +113,19 @@ export default function SuppliersPage() {
                 // Update existing supplier
                 const { error } = await supabase
                     .from('suppliers')
-                    .update(formData)
+                    .update(formData as never)
                     .eq('id', editingSupplier.id)
 
                 if (error) throw error
             } else {
-                // Create new supplier
+                // Create new supplier - ensure required fields
+                const insertData = {
+                    ...formData,
+                    name: formData.name || 'Nouveau fournisseur'
+                }
                 const { error } = await supabase
                     .from('suppliers')
-                    .insert([formData])
+                    .insert([insertData] as never)
 
                 if (error) throw error
             }

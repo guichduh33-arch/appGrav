@@ -77,6 +77,12 @@ export default function ProductDetailPage() {
                         is_active: true,
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString(),
+                        deduct_ingredients_on_sale: null,
+                        default_producing_section_id: null,
+                        preferred_purchase_unit_id: null,
+                        preferred_recipe_unit_id: null,
+                        preferred_stock_unit_id: null,
+                        shelf_life_days: null,
                     }
                     setProduct(mockProduct)
                     setCategories(MOCK_CATEGORIES)
@@ -97,6 +103,12 @@ export default function ProductDetailPage() {
                         is_active: true,
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString(),
+                        deduct_ingredients_on_sale: null,
+                        default_producing_section_id: null,
+                        preferred_purchase_unit_id: null,
+                        preferred_recipe_unit_id: null,
+                        preferred_stock_unit_id: null,
+                        shelf_life_days: null,
                     } as Product)))
                     return
                 }

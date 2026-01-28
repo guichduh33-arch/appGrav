@@ -13,14 +13,18 @@ const PROMOTION_TYPE_LABELS: Record<PromotionType, string> = {
     percentage: 'Réduction %',
     fixed_amount: 'Montant fixe',
     buy_x_get_y: 'Achetez X obtenez Y',
-    free_product: 'Produit offert'
+    free_product: 'Produit offert',
+    fixed: 'Montant fixe',
+    free: 'Gratuit'
 }
 
 const PROMOTION_TYPE_ICONS: Record<PromotionType, React.ReactNode> = {
     percentage: <Percent size={16} />,
     fixed_amount: <TrendingDown size={16} />,
     buy_x_get_y: <Gift size={16} />,
-    free_product: <Gift size={16} />
+    free_product: <Gift size={16} />,
+    fixed: <TrendingDown size={16} />,
+    free: <Gift size={16} />
 }
 
 const DAYS_OF_WEEK = [
@@ -72,7 +76,7 @@ export default function PromotionsPage() {
         if (promo.end_date && new Date(promo.end_date) < now) return false
 
         // Check usage limits
-        if (promo.max_uses_total && promo.current_uses >= promo.max_uses_total) return false
+        if (promo.max_uses_total && (promo.current_uses ?? 0) >= promo.max_uses_total) return false
 
         return true
     }
@@ -286,8 +290,8 @@ export default function PromotionsPage() {
                             >
                                 <div className="promotion-card__header">
                                     <div className="promotion-card__type">
-                                        {PROMOTION_TYPE_ICONS[promo.promotion_type]}
-                                        <span>{PROMOTION_TYPE_LABELS[promo.promotion_type]}</span>
+                                        {PROMOTION_TYPE_ICONS[promo.promotion_type as PromotionType]}
+                                        <span>{PROMOTION_TYPE_LABELS[promo.promotion_type as PromotionType]}</span>
                                     </div>
                                     <span className={`status-badge ${active ? 'active' : 'inactive'}`}>
                                         {active ? 'Active' : 'Inactive'}

@@ -297,12 +297,12 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER update_product_combos_updated_at
     BEFORE UPDATE ON product_combos
     FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
+    EXECUTE FUNCTION update_updated_at();
 
 CREATE TRIGGER update_promotions_updated_at
     BEFORE UPDATE ON promotions
     FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
+    EXECUTE FUNCTION update_updated_at();
 
 -- =====================================================
 -- RLS Policies

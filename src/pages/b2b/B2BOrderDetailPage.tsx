@@ -290,6 +290,7 @@ export default function B2BOrderDetailPage() {
         if (!order || paymentForm.amount <= 0) return
 
         try {
+            const paymentNumber = `PAY-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`
             const { error } = await supabase
                 .from('b2b_payments')
                 .insert({
@@ -297,6 +298,7 @@ export default function B2BOrderDetailPage() {
                     customer_id: order.customer_id,
                     amount: paymentForm.amount,
                     payment_method: paymentForm.payment_method,
+                    payment_number: paymentNumber,
                     reference_number: paymentForm.reference_number || null,
                     notes: paymentForm.notes || null
                 })

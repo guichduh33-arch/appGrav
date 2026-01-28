@@ -288,8 +288,8 @@ export default function CustomerDisplayPage() {
           <div
             className="display-promo-content"
             style={{
-              backgroundColor: currentPromo.background_color,
-              color: currentPromo.text_color,
+              backgroundColor: currentPromo.background_color ?? undefined,
+              color: currentPromo.text_color ?? undefined,
             }}
           >
             {currentPromo.image_url && (

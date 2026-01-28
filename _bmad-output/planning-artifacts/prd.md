@@ -11,6 +11,7 @@ stepsCompleted:
   - step-09-functional
   - step-10-nonfunctional
   - step-11-polish
+  - step-reports-extension
 status: 'ready-for-validation'
 inputDocuments:
   - CLAUDE.md
@@ -35,6 +36,7 @@ classification:
     - offline_cloud_sync
     - android_ios_integration
     - new_customer_display_module
+    - reports_module_complete
 ---
 
 # Product Requirements Document - AppGrav
@@ -652,4 +654,401 @@ Confiance totale dans le système. Pak Made peut partir en réunion sans craindr
 ---
 
 *Document généré avec le workflow BMAD PRD v1.0*
+
+---
+
+# Extension PRD - Module Reports & Analytics
+
+**Version Extension:** 1.1.0
+**Date:** 2026-01-28
+**Auteur:** Guich
+
+---
+
+## Contexte Module Reports
+
+### État Actuel
+Le module Reports existe partiellement avec 11 composants sur 26 rapports définis dans la configuration.
+
+| Catégorie | Implémenté | À implémenter |
+|-----------|------------|---------------|
+| **Overview** | Dashboard KPIs | - |
+| **Sales** | Daily Sales, Product Performance, Sales by Category, Payment Methods | Sales by Customer, Sales by Hour, Profit/Loss, Cancellations |
+| **Inventory** | Stock Movement, Inventory Valuation | Stock Balance, Stock Warning, Expired Stock |
+| **Purchases** | Purchase Details, Purchase by Supplier | Purchase Returns, Outstanding Payments |
+| **Finance** | - | Cash Balance, Receivables, Expenses |
+| **Audit** | General Audit Log | Price Changes, Deleted Products |
+
+### Infrastructure Existante
+- **ReportingService** : 15+ méthodes de récupération de données
+- **Système d'alertes** : Détection d'anomalies (voids, stock négatif, changements de prix)
+- **Export CSV** : Sales, Inventory, Customers, Stock Movements, Purchase Orders
+- **Vues SQL** : view_daily_kpis, view_payment_method_stats, view_inventory_valuation, view_stock_waste
+
+### Objectifs
+1. Compléter tous les rapports manquants (15+ rapports)
+2. Ajouter Date Range Picker personnalisable
+3. Implémenter filtres avancés (produit, catégorie, employé, méthode paiement)
+4. Activer drill-down (catégorie → produits → transactions)
+5. Ajouter export PDF professionnel
+6. Configurer permissions par rôle
+
+---
+
+## User Journeys - Module Reports
+
+### Parcours 6 : Pak Made, le Manager (Analytics & Décisions)
+
+**Persona :** Pak Made, manager de The Breakery, supervise les opérations quotidiennes
+
+**Situation :** Pak Made doit comprendre la performance du restaurant pour prendre des décisions stratégiques. Il a besoin de données claires, pas de chiffres bruts.
+
+**Scène d'ouverture :**
+C'est lundi matin, 8h. Pak Made arrive et veut comprendre comment s'est passée la semaine dernière. Il ouvre le module Reports sur son PC.
+
+**Action montante :**
+Il sélectionne une plage de dates personnalisée (semaine dernière) via le Date Range Picker. Le dashboard lui montre les KPIs : chiffre d'affaires +12%, panier moyen 85,000 IDR, 1,247 commandes.
+
+**Climax :**
+Il clique sur "Sales by Category" et voit que les viennoiseries représentent 45% du CA. Il drill-down sur cette catégorie et découvre que les croissants nature ont explosé (+35%) grâce à une promo qu'il avait oubliée. Il exporte le rapport en PDF pour la réunion d'équipe.
+
+**Résolution :**
+Pak Made a les insights pour reconduire la promo croissants. Il identifie aussi que les boissons chaudes sont en baisse (-8%) → action : former les serveurs à suggérer un café.
+
+**Fonctionnalités révélées :** Date Range Picker, Dashboard KPIs, Sales by Category, Drill-down, Export PDF, Comparaison périodes
+
+---
+
+### Parcours 7 : Ibu Ayu, la Comptable (Finance & Réconciliation)
+
+**Persona :** Ibu Ayu, comptable externe, vient 2x/mois pour les comptes
+
+**Situation :** Ibu Ayu doit réconcilier les ventes avec les encaissements et préparer les déclarations fiscales.
+
+**Scène d'ouverture :**
+C'est le 15 du mois. Ibu Ayu a besoin des rapports financiers pour clôturer la période.
+
+**Action montante :**
+Elle accède au module Reports avec son compte "comptable". Elle génère le rapport "Profit/Loss" pour le mois écoulé : revenus bruts 45M IDR, coût des marchandises 18M IDR, marge brute 27M IDR.
+
+**Climax :**
+Elle consulte le rapport "Payment Methods" et voit une différence de 500,000 IDR entre les paiements carte enregistrés et le relevé bancaire. Elle drill-down sur les transactions carte, filtre par date suspecte, et identifie 3 transactions annulées non remboursées.
+
+**Résolution :**
+Elle exporte les rapports en PDF et CSV pour ses archives. Le rapport des taxes (10% incluses) lui donne directement le montant à déclarer : 4.09M IDR.
+
+**Fonctionnalités révélées :** Rapport Profit/Loss, Payment Methods détaillé, Filtres avancés, Drill-down transactions, Export PDF/CSV, Calcul taxes automatique
+
+---
+
+### Parcours 8 : Marie, la Serveuse (Performance personnelle)
+
+**Persona :** Marie, serveuse, veut suivre sa performance
+
+**Situation :** Marie est payée avec un bonus basé sur ses ventes. Elle veut voir sa performance.
+
+**Scène d'ouverture :**
+Fin de journée. Marie veut savoir combien elle a vendu aujourd'hui.
+
+**Action montante :**
+Elle ouvre l'app mobile et accède à "Mes Rapports" (vue limitée à ses propres ventes). Elle voit : 42 commandes, 3.2M IDR de ventes, panier moyen 76,000 IDR.
+
+**Climax :**
+Elle compare avec la semaine dernière. Son panier moyen a augmenté de 12% depuis qu'elle suggère systématiquement des viennoiseries avec le café.
+
+**Résolution :**
+Marie est motivée. Elle sait que son bonus ce mois-ci sera bon. Elle partage ses "best practices" avec les autres serveurs.
+
+**Fonctionnalités révélées :** Rapports filtrés par utilisateur, Vue mobile, Comparaisons, Permissions par rôle
+
+---
+
+### Parcours 9 : Budi, le Caissier (Clôture de session)
+
+**Persona :** Budi, caissier, clôture sa session chaque soir
+
+**Situation :** Budi doit réconcilier sa caisse avant de partir.
+
+**Scène d'ouverture :**
+21h, fin de service. Budi clôture sa session POS.
+
+**Action montante :**
+Il accède au rapport "Session Summary" qui lui montre : 89 transactions, 7.2M IDR encaissés, répartition espèces/carte/QRIS.
+
+**Climax :**
+Le rapport "Cash Balance" indique un écart de -15,000 IDR entre le théorique et le réel. Budi vérifie les annulations du jour : une erreur de rendu monnaie identifiée.
+
+**Résolution :**
+Budi note l'écart dans le système avec la raison. Le manager pourra voir cette information dans le rapport d'audit.
+
+**Fonctionnalités révélées :** Session Summary, Cash Balance, Historique annulations, Notes d'écart, Audit trail
+
+---
+
+### Parcours 10 : Ketut, le Cuisinier (Gestion Stock & Alertes)
+
+**Persona :** Ketut, chef cuisine, gère les stocks de production
+
+**Situation :** Ketut doit anticiper les ruptures et gérer la production.
+
+**Scène d'ouverture :**
+6h du matin. Ketut prépare la production du jour.
+
+**Action montante :**
+Il consulte le rapport "Stock Warning" qui affiche les produits en alerte : farine en zone critique (< 5kg), beurre en warning (< 10kg), levure OK.
+
+**Climax :**
+Il vérifie le rapport "Stock Movement" pour comprendre la consommation récente. Il filtre sur "farine" et voit que la consommation a doublé cette semaine (nouvelle recette de brioche). Il consulte aussi "Expired Stock" : 2kg de crème fraîche expire demain.
+
+**Résolution :**
+Ketut passe commande d'urgence de farine et décide d'utiliser la crème fraîche aujourd'hui pour des quiches. Zéro gaspillage, zéro rupture.
+
+**Fonctionnalités révélées :** Stock Warning avec seuils visuels, Stock Movement avec filtres produit, Expired Stock, Historique consommation
+
+---
+
+### Journey Requirements Summary - Module Reports
+
+| Parcours | Utilisateur | Fonctionnalités Clés |
+|----------|-------------|----------------------|
+| **6. Analytics** | Manager | Date Range Picker, Dashboard KPIs, Drill-down, Export PDF, Comparaisons |
+| **7. Finance** | Comptable | Profit/Loss, Payment Methods, Filtres avancés, Réconciliation, Export PDF/CSV |
+| **8. Performance** | Serveur | Rapports personnels, Vue mobile, Comparaisons, Permissions rôle |
+| **9. Clôture** | Caissier | Session Summary, Cash Balance, Annulations, Audit |
+| **10. Stock** | Cuisinier | Stock Warning, Stock Movement, Expired Stock, Filtres produit |
+
+---
+
+## Functional Requirements - Module Reports
+
+### Infrastructure Reports
+
+- **FR29:** Le Système peut afficher un Date Range Picker permettant de sélectionner des périodes personnalisées (aujourd'hui, hier, cette semaine, ce mois, personnalisé)
+- **FR30:** Le Système peut appliquer des filtres avancés sur les rapports (par produit, catégorie, employé, méthode de paiement)
+- **FR31:** Le Système peut permettre le drill-down depuis une vue agrégée vers les détails (catégorie → produits → transactions)
+- **FR32:** Le Système peut exporter les rapports en format CSV
+- **FR33:** Le Système peut exporter les rapports en format PDF avec mise en page professionnelle
+- **FR34:** Le Système peut restreindre l'accès aux rapports selon les permissions du rôle utilisateur
+
+### Rapports de Ventes
+
+- **FR35:** Le Manager peut voir un rapport Profit/Loss avec revenus bruts, coûts, marge brute et marge nette
+- **FR36:** Le Manager peut voir un rapport Sales by Customer avec CA par client et fréquence d'achat
+- **FR37:** Le Manager peut voir un rapport Sales by Hour montrant les pics d'activité par tranche horaire
+- **FR38:** Le Manager peut voir un rapport Cancellations listant les commandes annulées avec raisons
+- **FR39:** Le Manager peut comparer deux périodes sur n'importe quel rapport de ventes
+
+### Rapports d'Inventaire
+
+- **FR40:** Le Cuisinier peut voir un rapport Stock Balance avec quantités actuelles vs seuils d'alerte
+- **FR41:** Le Cuisinier peut voir un rapport Stock Warning affichant uniquement les produits en alerte (< seuil)
+- **FR42:** Le Cuisinier peut voir un rapport Expired Stock listant les produits proches de la date de péremption
+- **FR43:** Le Manager peut voir un rapport Unsold Products identifiant les produits sans vente sur une période
+
+### Rapports Finance & Paiements
+
+- **FR44:** La Comptable peut voir un rapport Cash Balance avec réconciliation espèces théorique vs réel
+- **FR45:** La Comptable peut voir un rapport Receivables listant les créances clients B2B en attente
+- **FR46:** La Comptable peut voir un rapport Expenses avec les dépenses par catégorie (achats, pertes, ajustements)
+- **FR47:** La Comptable peut voir le détail des taxes collectées (10% inclus) pour les déclarations
+
+### Rapports Achats
+
+- **FR48:** Le Manager peut voir un rapport Purchase Returns avec les retours fournisseurs et motifs
+- **FR49:** Le Manager peut voir un rapport Outstanding Payments listant les factures fournisseurs impayées
+
+### Rapports Audit & Logs
+
+- **FR50:** Le Manager peut voir un rapport Price Changes traçant toutes les modifications de prix
+- **FR51:** Le Manager peut voir un rapport Deleted Products avec historique des produits supprimés
+- **FR52:** Le Système peut enregistrer toutes les actions utilisateur dans un audit trail consultable
+
+### Alertes & Notifications
+
+- **FR53:** Le Système peut générer des alertes automatiques pour les anomalies (taux d'annulation élevé, stock négatif, écart de caisse)
+- **FR54:** Le Manager peut configurer les seuils d'alerte pour chaque type d'anomalie
+- **FR55:** Le Manager peut voir un tableau de bord des alertes avec filtres (non lues, non résolues, par sévérité)
+- **FR56:** Le Manager peut marquer une alerte comme résolue avec une note explicative
+
+---
+
+## Non-Functional Requirements - Module Reports
+
+### Performance
+
+| NFR ID | Exigence | Mesure | Seuil |
+|--------|----------|--------|-------|
+| **NFR-RP1** | Temps de chargement rapport | Durée affichage initial | < 2 secondes pour 30 jours de données |
+| **NFR-RP2** | Temps drill-down | Durée navigation détail | < 500ms |
+| **NFR-RP3** | Génération export CSV | Durée téléchargement | < 5 secondes pour 10,000 lignes |
+| **NFR-RP4** | Génération export PDF | Durée création document | < 10 secondes |
+| **NFR-RP5** | Filtrage temps réel | Durée application filtres | < 300ms |
+
+### Disponibilité
+
+| NFR ID | Exigence | Mesure | Seuil |
+|--------|----------|--------|-------|
+| **NFR-RA1** | Rapports en mode offline | Accès aux données locales | Données des 7 derniers jours disponibles offline |
+| **NFR-RA2** | Cache des rapports | Durée validité cache | 5 minutes (configurable) |
+
+### Sécurité
+
+| NFR ID | Exigence | Mesure | Seuil |
+|--------|----------|--------|-------|
+| **NFR-RS1** | Contrôle d'accès | Granularité permissions | Par catégorie de rapport |
+| **NFR-RS2** | Audit des accès | Traçabilité consultation | 100% des accès rapports loggés |
+| **NFR-RS3** | Protection exports | Filigrane PDF | Nom utilisateur + date sur exports |
+
+### Utilisabilité
+
+| NFR ID | Exigence | Mesure | Seuil |
+|--------|----------|--------|-------|
+| **NFR-RU1** | Visualisations | Types graphiques | Bar, Line, Pie, Table minimum |
+| **NFR-RU2** | Responsive | Affichage mobile | Rapports consultables sur tablette/mobile |
+| **NFR-RU3** | Accessibilité couleurs | Contraste | Graphiques lisibles pour daltoniens |
+
+---
+
+## Matrice de Traçabilité - Module Reports
+
+| Fonctionnalité | FR | NFR Associés |
+|----------------|-----|--------------|
+| Date Range Picker | FR29 | NFR-RU1 |
+| Filtres avancés | FR30 | NFR-RP5 |
+| Drill-down | FR31 | NFR-RP2 |
+| Export CSV | FR32 | NFR-RP3 |
+| Export PDF | FR33 | NFR-RP4, NFR-RS3 |
+| Permissions | FR34 | NFR-RS1, NFR-RS2 |
+| Rapports Sales | FR35-FR39 | NFR-RP1 |
+| Rapports Inventory | FR40-FR43 | NFR-RP1, NFR-RA1 |
+| Rapports Finance | FR44-FR47 | NFR-RP1, NFR-RS1 |
+| Rapports Achats | FR48-FR49 | NFR-RP1 |
+| Audit & Logs | FR50-FR52 | NFR-RS2 |
+| Alertes | FR53-FR56 | NFR-RA2 |
+
+---
+
+## Permissions par Rôle - Module Reports
+
+| Rapport/Fonctionnalité | Admin | Manager | Comptable | Caissier | Serveur | Cuisinier |
+|------------------------|-------|---------|-----------|----------|---------|-----------|
+| Dashboard Overview | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Sales Reports (tous) | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Sales (ventes perso) | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ |
+| Inventory Reports | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ |
+| Finance Reports | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Cash Balance | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+| Purchase Reports | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Audit Logs | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Alertes Dashboard | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Export PDF/CSV | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
+
+---
+
+## Codes de Permission - Module Reports
+
+```
+reports.view           - Accès de base au module reports
+reports.sales          - Rapports de ventes complets
+reports.sales.personal - Ventes personnelles uniquement
+reports.inventory      - Rapports d'inventaire
+reports.finance        - Rapports financiers
+reports.purchases      - Rapports achats
+reports.audit          - Logs d'audit
+reports.alerts         - Dashboard d'alertes
+reports.export         - Export PDF/CSV
+reports.configure      - Configuration des seuils d'alerte
+```
+
+---
+
+## Priorités d'Implémentation - Module Reports
+
+### Phase 1 - Infrastructure (Critique)
+
+| Priorité | Fonctionnalité | FR | Effort |
+|----------|----------------|-----|--------|
+| P0 | Date Range Picker | FR29 | Moyen |
+| P0 | Permissions par rôle | FR34 | Moyen |
+| P1 | Filtres avancés | FR30 | Moyen |
+| P1 | Export CSV amélioré | FR32 | Faible |
+
+### Phase 2 - Rapports Ventes (Haute)
+
+| Priorité | Fonctionnalité | FR | Effort |
+|----------|----------------|-----|--------|
+| P1 | Profit/Loss | FR35 | Élevé |
+| P1 | Sales by Customer | FR36 | Moyen |
+| P2 | Sales by Hour | FR37 | Moyen |
+| P2 | Cancellations | FR38 | Faible |
+
+### Phase 3 - Rapports Inventaire (Haute)
+
+| Priorité | Fonctionnalité | FR | Effort |
+|----------|----------------|-----|--------|
+| P1 | Stock Warning | FR41 | Moyen |
+| P1 | Expired Stock | FR42 | Moyen |
+| P2 | Stock Balance | FR40 | Faible |
+
+### Phase 4 - Finance & Achats (Moyenne)
+
+| Priorité | Fonctionnalité | FR | Effort |
+|----------|----------------|-----|--------|
+| P2 | Cash Balance | FR44 | Moyen |
+| P2 | Receivables B2B | FR45 | Moyen |
+| P3 | Expenses | FR46 | Moyen |
+| P3 | Outstanding Payments | FR49 | Faible |
+
+### Phase 5 - Avancé (Basse)
+
+| Priorité | Fonctionnalité | FR | Effort |
+|----------|----------------|-----|--------|
+| P3 | Drill-down | FR31 | Élevé |
+| P3 | Export PDF | FR33 | Élevé |
+| P3 | Price Changes audit | FR50 | Moyen |
+| P4 | Configuration alertes | FR54 | Moyen |
+
+---
+
+## Dépendances Techniques - Module Reports
+
+### Nouvelles Vues SQL Requises
+
+```sql
+-- Vue Profit/Loss
+CREATE VIEW view_profit_loss AS ...
+
+-- Vue Sales by Customer
+CREATE VIEW view_sales_by_customer AS ...
+
+-- Vue Stock Warning
+CREATE VIEW view_stock_warning AS ...
+
+-- Vue Expired Stock
+CREATE VIEW view_expired_stock AS ...
+
+-- Vue Cash Balance par session
+CREATE VIEW view_session_cash_balance AS ...
+```
+
+### Nouveaux Types TypeScript
+
+```typescript
+// src/types/reporting.ts - Extensions
+interface ProfitLossReport { ... }
+interface SalesByCustomerReport { ... }
+interface StockWarningReport { ... }
+interface ExpiredStockReport { ... }
+```
+
+### Composants UI Requis
+
+- `DateRangePicker.tsx` - Sélecteur de période
+- `ReportFilters.tsx` - Panneau de filtres avancés
+- `DrilldownTable.tsx` - Table avec navigation drill-down
+- `PdfExporter.tsx` - Générateur PDF (jspdf ou react-pdf)
+
+---
+
+*Extension PRD générée avec le workflow BMAD v1.0 - 2026-01-28*
 

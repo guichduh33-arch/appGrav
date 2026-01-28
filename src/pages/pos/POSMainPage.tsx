@@ -298,20 +298,6 @@ export default function POSMainPage() {
 
     return (
         <div className="pos-app">
-            {/* Multi-Shift Indicator */}
-            {terminalSessions.length > 1 && (
-                <div className="pos-multi-shift-bar">
-                    <Users size={16} />
-                    <span>{terminalSessions.length} shifts actifs sur ce terminal</span>
-                    <button
-                        className="pos-multi-shift-bar__btn"
-                        onClick={() => setShowShiftSelector(true)}
-                    >
-                        Changer de caisse
-                    </button>
-                </div>
-            )}
-
             {/* Main Content (3 Zones) */}
             <main className="pos-main">
                 {/* Zone 1: Categories Sidebar */}

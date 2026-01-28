@@ -27,7 +27,10 @@
         "welcome": "Welcome",
         "choose": "Choose",
         "online": "Online",
-        "requiredFields": "Required fields missing"
+        "requiredFields": "Required fields missing",
+        "days": "days",
+        "seconds": "sec",
+        "units": "units"
     },
     "pos": {
         "header": {
@@ -692,6 +695,100 @@
             "synced": "Synced",
             "pendingSync": "Pending sync",
             "syncNow": "Sync now"
+        },
+        "posAdvanced": {
+            "title": "Advanced POS Settings",
+            "description": "Advanced point of sale configuration",
+            "cart": {
+                "title": "Cart",
+                "lockOnKitchenSend": "Lock after kitchen send",
+                "lockOnKitchenSendDesc": "Items sent to kitchen cannot be modified without PIN",
+                "requirePinLockedRemove": "PIN required to remove",
+                "requirePinLockedRemoveDesc": "Require PIN to remove a locked item"
+            },
+            "rounding": {
+                "title": "IDR Rounding",
+                "amount": "Round to",
+                "method": "Method",
+                "round": "Standard rounding",
+                "floor": "Round down",
+                "ceil": "Round up"
+            },
+            "payment": {
+                "title": "Payment",
+                "allowSplit": "Split payment",
+                "allowSplitDesc": "Allow splitting payment into multiple parts",
+                "maxSplitCount": "Max split count"
+            },
+            "sound": {
+                "title": "Sounds",
+                "enabled": "Sounds enabled",
+                "enabledDesc": "Enable sound notifications",
+                "newOrder": "New order",
+                "paymentSuccess": "Payment success",
+                "none": "None",
+                "chime": "Chime",
+                "bell": "Bell",
+                "beep": "Beep",
+                "cash": "Cash register",
+                "success": "Success"
+            },
+            "screensaver": {
+                "title": "Screensaver",
+                "enabled": "Enable screensaver",
+                "enabledDesc": "Display screensaver after inactivity",
+                "timeout": "Timeout (seconds)",
+                "showClock": "Show clock"
+            },
+            "offline": {
+                "title": "Offline Mode",
+                "enabled": "Offline mode enabled",
+                "enabledDesc": "Allow sales without internet connection",
+                "autoSwitch": "Automatic switch",
+                "autoSwitchDesc": "Automatically switch to offline mode when connection is lost",
+                "syncInterval": "Sync interval (sec)",
+                "maxOfflineOrders": "Max offline orders"
+            },
+            "customerDisplay": {
+                "title": "Customer Display",
+                "enabled": "Enable customer display",
+                "enabledDesc": "Display information on a secondary screen",
+                "showItems": "Show items",
+                "showPromotions": "Show promotions",
+                "showLogo": "Show logo"
+            }
+        },
+        "modules": {
+            "title": "Modules",
+            "description": "Enable or disable application modules",
+            "production": {
+                "title": "Production",
+                "description": "Production management and recipes",
+                "autoConsumeStock": "Auto consume stock"
+            },
+            "b2b": {
+                "title": "B2B / Wholesale",
+                "description": "Bulk orders and business customers",
+                "minOrderAmount": "Minimum order",
+                "defaultPaymentTerms": "Payment terms"
+            },
+            "purchasing": {
+                "title": "Purchasing",
+                "description": "Purchase orders and supplier management",
+                "autoReorderThreshold": "Auto reorder threshold"
+            },
+            "loyalty": {
+                "title": "Loyalty",
+                "description": "Points program and rewards",
+                "pointsPerIdr": "Points per Rp",
+                "pointsExpiryDays": "Points expiry"
+            },
+            "kds": {
+                "title": "KDS",
+                "description": "Kitchen display and order management",
+                "autoAcknowledgeDelay": "Auto acknowledge delay",
+                "soundNewOrder": "New order sound"
+            }
         }
     },
     "stock_movements": {

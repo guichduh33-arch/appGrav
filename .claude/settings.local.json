@@ -43,7 +43,15 @@
       "Bash(git rev-parse:*)",
       "Bash(npx tsx:*)",
       "Bash(tee:*)",
-      "Bash(del \"c:\\\\Users\\\\guich\\\\appGrav\\\\src\\\\pages\\\\inventory\\\\tabs\\\\VariantsTab_v2.tsx\")"
+      "Bash(del \"c:\\\\Users\\\\guich\\\\appGrav\\\\src\\\\pages\\\\inventory\\\\tabs\\\\VariantsTab_v2.tsx\")",
+      "WebFetch(domain:supabase.com)",
+      "Bash(node -e:*)",
+      "Bash(docker rm:*)",
+      "Bash(docker:*)",
+      "Bash(PGPASSWORD=postgres psql:*)",
+      "Bash(comm -23:*)",
+      "Bash(gh repo view:*)",
+      "Bash(git fetch:*)"
     ]
   }
 }

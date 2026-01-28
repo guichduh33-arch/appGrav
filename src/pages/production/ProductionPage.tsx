@@ -412,12 +412,12 @@ function HistoryCard({ history, isAdmin, getRecordUnit, onDelete }: {
                                     <div className="font-semibold text-gray-800 text-sm">{record.product?.name}</div>
                                     <div className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
                                         <Clock size={12} />
-                                        {new Date(record.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                        {record.created_at ? new Date(record.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '-'}
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-bold">+{record.quantity_produced} {getRecordUnit(record)}</span>
-                                    {record.quantity_waste > 0 && (
+                                    {(record.quantity_waste ?? 0) > 0 && (
                                         <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-bold">-{record.quantity_waste} {getRecordUnit(record)}</span>
                                     )}
                                     {isAdmin && (

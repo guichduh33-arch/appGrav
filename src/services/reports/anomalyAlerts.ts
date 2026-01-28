@@ -191,7 +191,7 @@ export async function checkVoidRateAnomaly(): Promise<number> {
 
     if (!orders || orders.length === 0) return 0
 
-    const voidedCount = orders.filter(o => o.status === 'cancelled' || o.status === 'voided').length
+    const voidedCount = orders.filter(o => o.status === 'cancelled' || String(o.status) === 'voided').length
     const voidRate = (voidedCount / orders.length) * 100
 
     // Alert if void rate > 10%
@@ -225,8 +225,8 @@ export async function checkVoidRateAnomaly(): Promise<number> {
 export async function checkNegativeStockAnomaly(): Promise<number> {
     const { data: products } = await supabase
         .from('products')
-        .select('id, name, stock_quantity')
-        .lt('stock_quantity', 0)
+        .select('id, name, current_stock')
+        .lt('current_stock', 0)
         .eq('is_active', true)
 
     if (!products || products.length === 0) return 0
@@ -236,7 +236,7 @@ export async function checkNegativeStockAnomaly(): Promise<number> {
             'negative_stock',
             'critical',
             'Stock négatif détecté',
-            `${product.name}: ${product.stock_quantity} unités`,
+            `${product.name}: ${product.current_stock} unités`,
             'product',
             product.id
         )

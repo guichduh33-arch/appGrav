@@ -65,7 +65,7 @@ export default function PurchaseOrdersPage() {
 
             if (error) throw error
             if (data) {
-                setPurchaseOrders(data)
+                setPurchaseOrders(data as PurchaseOrder[])
             }
         } catch (error) {
             console.error('Error fetching purchase orders:', error)
@@ -129,7 +129,7 @@ export default function PurchaseOrdersPage() {
         draft: purchaseOrders.filter(po => po.status === 'draft').length,
         pending: purchaseOrders.filter(po => ['sent', 'confirmed', 'partially_received'].includes(po.status)).length,
         completed: purchaseOrders.filter(po => po.status === 'received').length,
-        totalValue: purchaseOrders.reduce((sum, po) => sum + parseFloat(po.total_amount.toString()), 0)
+        totalValue: purchaseOrders.reduce((sum, po) => sum + (parseFloat(po.total_amount?.toString() ?? '0') || 0), 0)
     }
 
     const getStatusBadgeClass = (status: string) => {
@@ -308,7 +308,7 @@ export default function PurchaseOrdersPage() {
                                         </span>
                                     </td>
                                     <td>
-                                        <strong>{parseFloat(po.total_amount.toString()).toFixed(2)}€</strong>
+                                        <strong>{(parseFloat(po.total_amount?.toString() ?? '0') || 0).toFixed(2)}€</strong>
                                     </td>
                                     <td>
                                         <div className="purchase-orders-table__actions">

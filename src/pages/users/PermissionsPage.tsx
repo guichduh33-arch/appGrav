@@ -61,7 +61,7 @@ const MODULE_LABELS: Record<string, { fr: string; en: string; id: string }> = {
 }
 
 export default function PermissionsPage() {
-    const { t, i18n } = useTranslation()
+    const { i18n } = useTranslation()
     const [roles, setRoles] = useState<Role[]>([])
     const [permissions, setPermissions] = useState<Permission[]>([])
     const [rolePermissions, setRolePermissions] = useState<Map<string, Set<string>>>(new Map())
@@ -84,7 +84,7 @@ export default function PermissionsPage() {
                 supabase.from('role_permissions').select('role_id, permission_id')
             ])
 
-            if (rolesRes.data) setRoles(rolesRes.data)
+            if (rolesRes.data) setRoles(rolesRes.data as Role[])
             if (permsRes.data) setPermissions(permsRes.data)
 
             if (rolePermsRes.data) {

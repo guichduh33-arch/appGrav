@@ -171,7 +171,15 @@ describe('orderSync', () => {
     });
 
     it('should handle items without modifiers', () => {
-      const cartItem = {
+      const cartItem: {
+        id: string;
+        productId: string;
+        name: string;
+        quantity: number;
+        unitPrice: number;
+        totalPrice: number;
+        modifiers: Array<{ id: string; name: string; priceAdjustment: number }> | undefined;
+      } = {
         id: 'cart-item-2',
         productId: 'prod-456',
         name: 'Croissant',
@@ -181,7 +189,7 @@ describe('orderSync', () => {
         modifiers: undefined,
       };
 
-      const modifiers = cartItem.modifiers?.map((m: { id: string; name: string; priceAdjustment: number }) => ({
+      const modifiers = cartItem.modifiers?.map((m) => ({
         id: m.id,
         name: m.name,
         price_adjustment: m.priceAdjustment,

@@ -12,7 +12,16 @@ import type {
   PrinterConfiguration,
   EmailTemplate,
   ReceiptTemplate,
+  POSAdvancedSettings,
+  ModuleSettings,
+  TerminalSettings,
 } from '../types/settings';
+import type { ITerminalSetting, ISettingsProfile, ISoundAsset } from '../types/database';
+import type { Json } from '../types/database.generated';
+
+// Helper for tables not yet in generated types
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const untypedFrom = (table: string) => supabase.from(table as any);
 
 // =====================================================
 // Query Keys
@@ -31,6 +40,13 @@ export const settingsKeys = {
   printers: () => [...settingsKeys.all, 'printers'] as const,
   emailTemplates: () => [...settingsKeys.all, 'emailTemplates'] as const,
   receiptTemplates: () => [...settingsKeys.all, 'receiptTemplates'] as const,
+  // New settings keys
+  posAdvanced: () => [...settingsKeys.all, 'posAdvanced'] as const,
+  modules: () => [...settingsKeys.all, 'modules'] as const,
+  terminalSettings: (terminalId: string) => [...settingsKeys.all, 'terminal', terminalId] as const,
+  profiles: () => [...settingsKeys.all, 'profiles'] as const,
+  profile: (id: string) => [...settingsKeys.profiles(), id] as const,
+  soundAssets: () => [...settingsKeys.all, 'soundAssets'] as const,
 };
 
 // =====================================================
@@ -572,4 +588,378 @@ export function useSetAppearance() {
  */
 export function useSetLocalization() {
   return useSettingsStore((state) => state.setLocalization);
+}
+
+// =====================================================
+// POS Advanced Settings
+// =====================================================
+
+const defaultPOSAdvanced: POSAdvancedSettings = {
+  cart: { lock_on_kitchen_send: true, require_pin_locked_remove: true },
+  rounding: { amount: 100, method: 'round' },
+  payment: { allow_split: true, max_split_count: 4 },
+  sound: { enabled: true, new_order: 'chime', payment_success: 'cash', error: 'error' },
+  screensaver: { enabled: false, timeout: 300, show_clock: true },
+  offline: { enabled: true, auto_switch: true, sync_interval: 30, max_offline_orders: 100 },
+  customer_display: { enabled: false, show_items: true, show_promotions: true, show_logo: true },
+};
+
+export function usePOSAdvancedSettings() {
+  return useQuery({
+    queryKey: settingsKeys.posAdvanced(),
+    queryFn: async (): Promise<POSAdvancedSettings> => {
+      const { data, error } = await supabase
+        .from('settings')
+        .select('key, value')
+        .like('key', 'pos_advanced.%');
+
+      if (error) throw error;
+
+      // Build the nested object from flat key-value pairs
+      const result = { ...defaultPOSAdvanced };
+      for (const row of data || []) {
+        const parts = row.key.replace('pos_advanced.', '').split('.');
+        if (parts.length === 2) {
+          const [group, key] = parts;
+          if (group in result) {
+            (result as Record<string, Record<string, unknown>>)[group][key] = row.value;
+          }
+        }
+      }
+      return result;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useUpdatePOSAdvancedSetting() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      group,
+      key,
+      value,
+    }: {
+      group: keyof POSAdvancedSettings;
+      key: string;
+      value: unknown;
+    }) => {
+      const settingKey = `pos_advanced.${group}.${key}`;
+      const { error } = await supabase
+        .from('settings')
+        .update({ value: value as Json })
+        .eq('key', settingKey);
+
+      if (error) throw error;
+      return { group, key, value };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: settingsKeys.posAdvanced() });
+    },
+  });
+}
+
+// =====================================================
+// Module Settings
+// =====================================================
+
+const defaultModuleSettings: ModuleSettings = {
+  production: { enabled: true, auto_consume_stock: true },
+  b2b: { enabled: true, min_order_amount: 100000, default_payment_terms: 7 },
+  purchasing: { enabled: true, auto_reorder_threshold: 0 },
+  loyalty: { enabled: false, points_per_idr: 1000, points_expiry_days: 365 },
+  kds: { enabled: true, auto_acknowledge_delay: 0, sound_new_order: true },
+};
+
+export function useModuleSettings() {
+  return useQuery({
+    queryKey: settingsKeys.modules(),
+    queryFn: async (): Promise<ModuleSettings> => {
+      const { data, error } = await supabase
+        .from('settings')
+        .select('key, value')
+        .like('key', 'modules.%');
+
+      if (error) throw error;
+
+      const result = { ...defaultModuleSettings };
+      for (const row of data || []) {
+        const parts = row.key.replace('modules.', '').split('.');
+        if (parts.length === 2) {
+          const [module, key] = parts;
+          if (module in result) {
+            (result as Record<string, Record<string, unknown>>)[module][key] = row.value;
+          }
+        }
+      }
+      return result;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useUpdateModuleSetting() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      module,
+      key,
+      value,
+    }: {
+      module: keyof ModuleSettings;
+      key: string;
+      value: unknown;
+    }) => {
+      const settingKey = `modules.${module}.${key}`;
+      const { error } = await supabase
+        .from('settings')
+        .update({ value: value as Json })
+        .eq('key', settingKey);
+
+      if (error) throw error;
+      return { module, key, value };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: settingsKeys.modules() });
+    },
+  });
+}
+
+export function useIsModuleEnabled(moduleName: keyof ModuleSettings): boolean {
+  const { data } = useModuleSettings();
+  return data?.[moduleName]?.enabled ?? defaultModuleSettings[moduleName].enabled;
+}
+
+// =====================================================
+// Terminal Settings
+// =====================================================
+
+export function useTerminalSettings(terminalId: string) {
+  return useQuery({
+    queryKey: settingsKeys.terminalSettings(terminalId),
+    queryFn: async (): Promise<TerminalSettings | null> => {
+      // Get the terminal with its settings (columns added by migration)
+      const { data: terminal, error: terminalError } = await untypedFrom('pos_terminals')
+        .select('mode, default_printer_id, kitchen_printer_id, kds_station, allowed_payment_methods, default_order_type, floor_plan_id, auto_logout_timeout')
+        .eq('id', terminalId)
+        .single();
+
+      if (terminalError) {
+        if (terminalError.code === 'PGRST116') return null;
+        throw terminalError;
+      }
+
+      return terminal as unknown as TerminalSettings;
+    },
+    enabled: !!terminalId,
+  });
+}
+
+export function useUpdateTerminalSettings() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      terminalId,
+      updates,
+    }: {
+      terminalId: string;
+      updates: Partial<TerminalSettings>;
+    }) => {
+      const { error } = await untypedFrom('pos_terminals')
+        .update(updates)
+        .eq('id', terminalId);
+
+      if (error) throw error;
+      return { terminalId, updates };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: settingsKeys.terminalSettings(data.terminalId) });
+    },
+  });
+}
+
+// Terminal-specific key-value overrides
+export function useTerminalSettingOverrides(terminalId: string) {
+  return useQuery({
+    queryKey: [...settingsKeys.terminalSettings(terminalId), 'overrides'] as const,
+    queryFn: async (): Promise<ITerminalSetting[]> => {
+      const { data, error } = await untypedFrom('terminal_settings')
+        .select('*')
+        .eq('terminal_id', terminalId);
+
+      if (error) throw error;
+      return (data || []) as unknown as ITerminalSetting[];
+    },
+    enabled: !!terminalId,
+  });
+}
+
+export function useSetTerminalSettingOverride() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      terminalId,
+      key,
+      value,
+    }: {
+      terminalId: string;
+      key: string;
+      value: unknown;
+    }) => {
+      const { error } = await untypedFrom('terminal_settings')
+        .upsert({ terminal_id: terminalId, key, value }, { onConflict: 'terminal_id,key' });
+
+      if (error) throw error;
+      return { terminalId, key, value };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: settingsKeys.terminalSettings(data.terminalId) });
+    },
+  });
+}
+
+// =====================================================
+// Settings Profiles
+// =====================================================
+
+export function useSettingsProfiles() {
+  return useQuery({
+    queryKey: settingsKeys.profiles(),
+    queryFn: async (): Promise<ISettingsProfile[]> => {
+      const { data, error } = await untypedFrom('settings_profiles')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+      return (data || []) as unknown as ISettingsProfile[];
+    },
+  });
+}
+
+export function useSettingsProfile(id: string) {
+  return useQuery({
+    queryKey: settingsKeys.profile(id),
+    queryFn: async (): Promise<ISettingsProfile | null> => {
+      const { data, error } = await untypedFrom('settings_profiles')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') return null;
+        throw error;
+      }
+      return data as unknown as ISettingsProfile;
+    },
+    enabled: !!id,
+  });
+}
+
+export function useCreateSettingsProfile() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (profile: Omit<ISettingsProfile, 'id' | 'created_at' | 'updated_at'>) => {
+      const { data, error } = await untypedFrom('settings_profiles')
+        .insert(profile)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as unknown as ISettingsProfile;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: settingsKeys.profiles() });
+    },
+  });
+}
+
+export function useUpdateSettingsProfile() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: Partial<ISettingsProfile>;
+    }) => {
+      const { error } = await untypedFrom('settings_profiles')
+        .update(updates)
+        .eq('id', id);
+
+      if (error) throw error;
+      return { id, updates };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: settingsKeys.profiles() });
+      queryClient.invalidateQueries({ queryKey: settingsKeys.profile(data.id) });
+    },
+  });
+}
+
+export function useDeleteSettingsProfile() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await untypedFrom('settings_profiles')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: settingsKeys.profiles() });
+    },
+  });
+}
+
+export function useApplySettingsProfile() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (profileId: string) => {
+      // Call the database function to apply profile
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.rpc as any)('apply_settings_profile', { p_profile_id: profileId });
+      if (error) throw error;
+      return profileId;
+    },
+    onSuccess: () => {
+      // Invalidate all settings as they may have changed
+      queryClient.invalidateQueries({ queryKey: settingsKeys.all });
+    },
+  });
+}
+
+// =====================================================
+// Sound Assets
+// =====================================================
+
+export function useSoundAssets() {
+  return useQuery({
+    queryKey: settingsKeys.soundAssets(),
+    queryFn: async (): Promise<ISoundAsset[]> => {
+      const { data, error } = await untypedFrom('sound_assets')
+        .select('*')
+        .eq('is_active', true)
+        .order('category', { ascending: true })
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      return (data || []) as unknown as ISoundAsset[];
+    },
+  });
+}
+
+export function useSoundAssetsByCategory(category: ISoundAsset['category']) {
+  const { data: allSounds } = useSoundAssets();
+  return allSounds?.filter((s) => s.category === category) || [];
 }

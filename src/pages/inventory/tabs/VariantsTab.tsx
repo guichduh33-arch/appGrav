@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Plus, X, Edit2, Trash2, GripVertical, Check } from 'lucide-react'
+import { Plus, X, Trash2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
 
@@ -34,12 +34,11 @@ interface VariantsTabProps {
 export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
     const [variantGroups, setVariantGroups] = useState<VariantGroup[]>([])
     const [loading, setLoading] = useState(true)
-    const [editingGroup, setEditingGroup] = useState<string | null>(null)
     const [newGroupName, setNewGroupName] = useState('')
     const [newGroupType, setNewGroupType] = useState<'single' | 'multiple'>('single')
     const [newGroupRequired, setNewGroupRequired] = useState(false)
     const [showAddGroup, setShowAddGroup] = useState(false)
-    const [availableProducts, setAvailableProducts] = useState<Array<{ id: string; name: string; sku: string; unit: string }>>([])
+    const [availableProducts, setAvailableProducts] = useState<Array<{ id: string; name: string; sku: string; unit: string | null }>>([])
 
     useEffect(() => {
         loadVariants()
@@ -264,12 +263,17 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
         handleUpdateOption(option.id!, 'materials', option.materials)
     }
 
-    function handleUpdateMaterial(groupName: string, optionId: string, materialIndex: number, field: 'material_id' | 'quantity', value: any) {
+    function handleUpdateMaterial(groupName: string, optionId: string, materialIndex: number, field: 'material_id' | 'quantity', value: string | number) {
         const newGroups = [...variantGroups]
         const groupIndex = newGroups.findIndex(g => g.group_name === groupName)
         const optionIndex = newGroups[groupIndex].options.findIndex(o => o.id === optionId)
 
-        newGroups[groupIndex].options[optionIndex].materials[materialIndex][field] = value
+        const materials = [...newGroups[groupIndex].options[optionIndex].materials]
+        materials[materialIndex] = {
+            ...materials[materialIndex],
+            [field]: value
+        }
+        newGroups[groupIndex].options[optionIndex].materials = materials
 
         setVariantGroups(newGroups)
 

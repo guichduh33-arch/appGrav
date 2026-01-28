@@ -186,10 +186,10 @@ export default function MobileHomePage() {
                 <button
                   key={table.id}
                   className="mobile-home__table-btn"
-                  onClick={() => handleTableSelect(table.table_number?.toString() || '')}
+                  onClick={() => handleTableSelect(table.number?.toString() || '')}
                 >
                   <Table2 size={24} />
-                  <span>Table {table.table_number}</span>
+                  <span>Table {table.number}</span>
                 </button>
               ))}
               <button

@@ -12,6 +12,24 @@ import { PurchaseBySupplierTab } from './components/PurchaseBySupplierTab';
 import { AuditTab } from './components/AuditTab';
 import { DailySalesTab } from './components/DailySalesTab';
 import { ProductPerformanceTab } from './components/ProductPerformanceTab';
+// Epic 4: Sales Reports
+import { ProfitLossTab } from './components/ProfitLossTab';
+import { SalesByCustomerTab } from './components/SalesByCustomerTab';
+import { SalesByHourTab } from './components/SalesByHourTab';
+import { SalesCancellationTab } from './components/SalesCancellationTab';
+// Epic 5: Inventory Reports
+import { StockWarningTab } from './components/StockWarningTab';
+import { ExpiredStockTab } from './components/ExpiredStockTab';
+import { UnsoldProductsTab } from './components/UnsoldProductsTab';
+// Epic 6: Finance Reports
+import { SessionCashBalanceTab } from './components/SessionCashBalanceTab';
+import { B2BReceivablesTab } from './components/B2BReceivablesTab';
+import { ExpensesTab } from './components/ExpensesTab';
+// Epic 7: Audit & Purchases
+import { PriceChangesTab } from './components/PriceChangesTab';
+import { DeletedProductsTab } from './components/DeletedProductsTab';
+import { PurchaseByDateTab } from './components/PurchaseByDateTab';
+import { OutstandingPurchasePaymentTab } from './components/OutstandingPurchasePaymentTab';
 import { REPORT_CATEGORIES } from './ReportsConfig';
 import './ReportsPage.css';
 
@@ -48,7 +66,39 @@ const ReportsPage = () => {
                 return <InventoryTab />;
             case 'audit_log':
                 return <AuditTab />;
-            // Placeholders for new reports
+            // Epic 4: Sales Reports
+            case 'profit_loss':
+                return <ProfitLossTab />;
+            case 'sales_by_customer':
+                return <SalesByCustomerTab />;
+            case 'sales_by_hour':
+                return <SalesByHourTab />;
+            case 'sales_cancellation':
+                return <SalesCancellationTab />;
+            // Epic 5: Inventory Reports
+            case 'stock_warning':
+                return <StockWarningTab />;
+            case 'expired_stock':
+                return <ExpiredStockTab />;
+            case 'unsold_products':
+                return <UnsoldProductsTab />;
+            // Epic 6: Finance Reports
+            case 'cash_balance':
+                return <SessionCashBalanceTab />;
+            case 'receivables':
+                return <B2BReceivablesTab />;
+            case 'expenses':
+                return <ExpensesTab />;
+            // Epic 7: Audit & Purchases
+            case 'price_changes':
+                return <PriceChangesTab />;
+            case 'deleted_products':
+                return <DeletedProductsTab />;
+            case 'purchase_by_date':
+                return <PurchaseByDateTab />;
+            case 'outstanding_purchase_payment':
+                return <OutstandingPurchasePaymentTab />;
+            // Placeholders for remaining reports
             default:
                 return (
                     <div className="flex flex-col items-center justify-center h-96 text-gray-400">

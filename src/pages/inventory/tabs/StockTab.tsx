@@ -92,7 +92,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
     const movementsWithBalance = useMemo(() => {
         // Sort by date ascending (oldest first) to calculate running balance
         const sorted = [...stockHistory].sort((a, b) =>
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime()
         )
 
         // Start from current stock and work backwards to find initial stock
@@ -148,7 +148,8 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
         }
     }
 
-    const formatDate = (dateStr: string) => {
+    const formatDate = (dateStr: string | null) => {
+        if (!dateStr) return { date: '-', time: '-' }
         const date = new Date(dateStr)
         return {
             date: date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }),
@@ -377,7 +378,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
             </div>
 
             {/* Low Stock Warning */}
-            {product.current_stock <= (product.min_stock_level || 0) && (
+            {(product.current_stock ?? 0) <= (product.min_stock_level || 0) && (
                 <div className="bg-amber-100 rounded-2xl p-5 border border-amber-300 flex items-center gap-3">
                     <AlertTriangle size={20} className="text-amber-600" />
                     <div>

@@ -143,7 +143,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <input
-                            value={product.unit}
+                            value={product.unit ?? ''}
                             onChange={e => onProductChange({ ...product, unit: e.target.value })}
                             style={{
                                 width: '100px',

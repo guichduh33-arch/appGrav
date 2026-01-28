@@ -81,15 +81,15 @@ async function syncOrder(item: ISyncQueueItem): Promise<void> {
   // Using explicit type assertion for dynamic sync payload
   const orderData = {
     order_number: orderPayload.order_number as string,
-    order_type: orderPayload.order_type as string,
+    order_type: orderPayload.order_type as 'dine_in' | 'takeaway' | 'delivery' | 'b2b',
     table_number: orderPayload.table_number as string | null,
     customer_id: orderPayload.customer_id as string | null,
     subtotal: orderPayload.subtotal as number,
     discount_amount: orderPayload.discount_amount as number | null,
-    discount_type: orderPayload.discount_type as string | null,
+    discount_type: orderPayload.discount_type as 'percentage' | 'fixed' | 'free' | null,
     total: orderPayload.total as number,
     tax_amount: orderPayload.tax_amount as number | null,
-    payment_status: orderPayload.payment_status as string,
+    payment_status: orderPayload.payment_status as 'pending' | 'paid' | 'partial' | 'refunded',
     payment_method: orderPayload.payment_method as string | null,
     notes: orderPayload.notes as string | null,
     pos_terminal_id: orderPayload.pos_terminal_id as string | null,
@@ -98,7 +98,7 @@ async function syncOrder(item: ISyncQueueItem): Promise<void> {
   // Insert order
   const { data: order, error: orderError } = await supabase
     .from('orders')
-    .insert(orderData)
+    .insert(orderData as never)
     .select()
     .single();
 
@@ -116,12 +116,12 @@ async function syncOrder(item: ISyncQueueItem): Promise<void> {
       quantity: orderItem.quantity as number,
       unit_price: orderItem.unit_price as number,
       total_price: orderItem.total_price as number,
-      modifiers: orderItem.modifiers as Record<string, unknown> | null,
+      modifiers: orderItem.modifiers ?? null,
     }));
 
     const { error: itemsError } = await supabase
       .from('order_items')
-      .insert(orderItems);
+      .insert(orderItems as never);
 
     if (itemsError) {
       console.error('[SyncEngine] Error inserting order items:', itemsError);
@@ -156,15 +156,17 @@ async function syncStockMovement(item: ISyncQueueItem): Promise<void> {
   // stock_movements requires movement_id, stock_before, stock_after
   const movementId = `OFF-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
+  type MovementType = 'transfer' | 'purchase' | 'production_in' | 'production_out' | 'sale_pos' | 'sale_b2b' | 'adjustment_in' | 'adjustment_out' | 'waste';
   const { error } = await supabase.from('stock_movements').insert({
     movement_id: movementId,
     product_id: movementPayload.product_id as string,
-    movement_type: movementPayload.movement_type as string,
+    movement_type: (movementPayload.movement_type || 'adjustment_out') as MovementType,
     quantity: movementPayload.quantity as number,
     reason: movementPayload.reason as string | null,
     reference_id: movementPayload.reference_id as string | null,
     stock_before: (movementPayload.stock_before as number) ?? 0,
     stock_after: (movementPayload.stock_after as number) ?? 0,
+    unit: (movementPayload.unit as string) || 'pcs',
   });
 
   if (error) {

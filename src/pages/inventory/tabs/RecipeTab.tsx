@@ -122,7 +122,7 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
                                         type="text"
                                         className="form-input w-20 py-1"
                                         value={item.unit || ''}
-                                        placeholder={item.material.unit}
+                                        placeholder={item.material.unit ?? ''}
                                         title="Entrez l'unité"
                                         onChange={e => onUpdateQuantity(item.id, item.quantity, e.target.value)}
                                     />

@@ -27,7 +27,10 @@
         "welcome": "Bienvenue",
         "choose": "Choisir",
         "online": "En ligne",
-        "requiredFields": "Champs requis manquants"
+        "requiredFields": "Champs requis manquants",
+        "days": "jours",
+        "seconds": "sec",
+        "units": "unités"
     },
     "pos": {
         "header": {
@@ -703,6 +706,100 @@
             "synced": "Synchronisé",
             "pendingSync": "En attente de sync",
             "syncNow": "Synchroniser maintenant"
+        },
+        "posAdvanced": {
+            "title": "Paramètres POS Avancés",
+            "description": "Configuration avancée du point de vente",
+            "cart": {
+                "title": "Panier",
+                "lockOnKitchenSend": "Verrouiller après envoi cuisine",
+                "lockOnKitchenSendDesc": "Les articles envoyés en cuisine ne peuvent plus être modifiés sans PIN",
+                "requirePinLockedRemove": "PIN requis pour supprimer",
+                "requirePinLockedRemoveDesc": "Demander le PIN pour supprimer un article verrouillé"
+            },
+            "rounding": {
+                "title": "Arrondi IDR",
+                "amount": "Arrondi au",
+                "method": "Méthode",
+                "round": "Arrondi standard",
+                "floor": "Arrondi inférieur",
+                "ceil": "Arrondi supérieur"
+            },
+            "payment": {
+                "title": "Paiement",
+                "allowSplit": "Paiement fractionné",
+                "allowSplitDesc": "Permettre de diviser le paiement en plusieurs parties",
+                "maxSplitCount": "Nombre max de fractions"
+            },
+            "sound": {
+                "title": "Sons",
+                "enabled": "Sons activés",
+                "enabledDesc": "Activer les notifications sonores",
+                "newOrder": "Nouvelle commande",
+                "paymentSuccess": "Paiement réussi",
+                "none": "Aucun",
+                "chime": "Carillon",
+                "bell": "Cloche",
+                "beep": "Bip",
+                "cash": "Caisse",
+                "success": "Succès"
+            },
+            "screensaver": {
+                "title": "Économiseur d'écran",
+                "enabled": "Activer l'économiseur",
+                "enabledDesc": "Afficher un économiseur d'écran après inactivité",
+                "timeout": "Délai (secondes)",
+                "showClock": "Afficher l'horloge"
+            },
+            "offline": {
+                "title": "Mode Hors-ligne",
+                "enabled": "Mode hors-ligne activé",
+                "enabledDesc": "Permettre les ventes sans connexion internet",
+                "autoSwitch": "Basculement automatique",
+                "autoSwitchDesc": "Passer automatiquement en mode hors-ligne si la connexion est perdue",
+                "syncInterval": "Intervalle de sync (sec)",
+                "maxOfflineOrders": "Max commandes hors-ligne"
+            },
+            "customerDisplay": {
+                "title": "Affichage Client",
+                "enabled": "Activer l'affichage client",
+                "enabledDesc": "Afficher les informations sur un second écran",
+                "showItems": "Afficher les articles",
+                "showPromotions": "Afficher les promotions",
+                "showLogo": "Afficher le logo"
+            }
+        },
+        "modules": {
+            "title": "Modules",
+            "description": "Activez ou désactivez les modules de l'application",
+            "production": {
+                "title": "Production",
+                "description": "Gestion de la production et des recettes",
+                "autoConsumeStock": "Consommation auto du stock"
+            },
+            "b2b": {
+                "title": "B2B / Wholesale",
+                "description": "Commandes en gros et clients professionnels",
+                "minOrderAmount": "Commande minimum",
+                "defaultPaymentTerms": "Délai de paiement"
+            },
+            "purchasing": {
+                "title": "Achats",
+                "description": "Bons de commande et gestion des fournisseurs",
+                "autoReorderThreshold": "Seuil de réapprovisionnement auto"
+            },
+            "loyalty": {
+                "title": "Fidélité",
+                "description": "Programme de points et récompenses",
+                "pointsPerIdr": "Points par Rp",
+                "pointsExpiryDays": "Expiration des points"
+            },
+            "kds": {
+                "title": "KDS",
+                "description": "Affichage cuisine et gestion des commandes",
+                "autoAcknowledgeDelay": "Délai accusé auto",
+                "soundNewOrder": "Son nouvelle commande"
+            }
         }
     },
     "stock_movements": {

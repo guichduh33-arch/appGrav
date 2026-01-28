@@ -33,8 +33,8 @@ function calculateTax(total: number): number {
 function transformCartItems(items: CartItem[]): IOfflineOrderItem[] {
   return items.map((item) => ({
     id: item.id,
-    product_id: item.type === 'combo' ? item.combo?.id : item.product?.id,
-    product_name: item.type === 'combo' ? item.combo?.name : item.product?.name,
+    product_id: (item.type === 'combo' ? item.combo?.id : item.product?.id) || '',
+    product_name: (item.type === 'combo' ? item.combo?.name : item.product?.name) || '',
     quantity: item.quantity,
     unit_price: item.unitPrice,
     total_price: item.totalPrice,

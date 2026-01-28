@@ -30,10 +30,10 @@ const SettingsHistoryPage = () => {
     id: string;
     old_value: unknown;
     new_value: unknown;
-    change_reason?: string;
-    changed_at: string;
-    setting?: { key?: string; name_fr?: string; name_en?: string; name_id?: string };
-    user?: { display_name?: string; first_name?: string; last_name?: string };
+    change_reason?: string | null;
+    changed_at: string | null;
+    setting?: { key?: string; name_fr?: string; name_en?: string; name_id?: string } | null;
+    user?: { display_name?: string; first_name?: string; last_name?: string } | null;
   };
 
   // Filter history
@@ -132,10 +132,10 @@ const SettingsHistoryPage = () => {
                       </span>
                       <span className="settings-history-item__time">
                         <Clock size={12} />
-                        {formatDistanceToNow(new Date(item.changed_at), {
+                        {item.changed_at ? formatDistanceToNow(new Date(item.changed_at), {
                           addSuffix: true,
                           locale,
-                        })}
+                        }) : '-'}
                       </span>
                     </div>
                   </div>

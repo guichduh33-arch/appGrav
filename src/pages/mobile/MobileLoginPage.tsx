@@ -100,23 +100,39 @@ export default function MobileLoginPage() {
     setError(null);
 
     try {
-      // Call Supabase RPC to verify PIN
-      const { data, error: rpcError } = await supabase.rpc('verify_user_pin', {
-        p_pin: pin,
-      });
+      // Search for user by PIN hash
+      const { data: users, error: queryError } = await supabase
+        .from('user_profiles')
+        .select('id, name, display_name, role, pin_hash, is_active')
+        .eq('is_active', true)
+        .not('pin_hash', 'is', null);
 
-      if (rpcError) {
-        throw new Error(rpcError.message);
+      if (queryError) {
+        throw new Error(queryError.message);
       }
 
-      if (!data || data.length === 0) {
+      // Find user with matching PIN using bcrypt comparison
+      let matchedUser = null;
+      for (const u of users || []) {
+        // For demo purposes, compare plain text PIN (in production, use proper bcrypt)
+        const { data: isValid } = await supabase.rpc('verify_user_pin', {
+          p_user_id: u.id,
+          p_pin: pin,
+        });
+        if (isValid) {
+          matchedUser = u;
+          break;
+        }
+      }
+
+      if (!matchedUser) {
         incrementLoginAttempts();
         setError('PIN incorrect');
         setPin('');
         return;
       }
 
-      const user = data[0];
+      const user = matchedUser;
 
       // Check if user has server/waiter role
       const hasServerRole = ['admin', 'server', 'waiter', 'manager'].includes(user.role);
@@ -127,7 +143,7 @@ export default function MobileLoginPage() {
       }
 
       // Login successful
-      login(user.id, user.display_name || user.email || 'Serveur');
+      login(user.id, user.display_name || user.name || 'Serveur');
       navigate('/mobile');
     } catch (err) {
       console.error('[MobileLogin] Error:', err);

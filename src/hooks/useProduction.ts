@@ -4,6 +4,9 @@ import { useAuthStore } from '../stores/authStore'
 import { Product, Section, ProductionRecord } from '../types/database'
 import toast from 'react-hot-toast'
 
+// Generate UUID using native crypto API
+const generateUUID = (): string => crypto.randomUUID()
+
 export interface ProductionItem {
     productId: string
     name: string
@@ -200,9 +203,11 @@ export function useProduction() {
             const dateStr = selectedDate.toISOString().split('T')[0]
 
             for (const item of productionItems) {
+                const productionId = generateUUID()
                 const { data: prodRecord, error: prodError } = await supabase
                     .from('production_records')
                     .insert({
+                        production_id: productionId,
                         product_id: item.productId,
                         section_id: selectedSectionId,
                         quantity_produced: item.quantity,
@@ -230,9 +235,13 @@ export function useProduction() {
                     await supabase
                         .from('stock_movements')
                         .insert({
+                            movement_id: generateUUID(),
                             product_id: item.productId,
                             movement_type: 'production_in',
                             quantity: item.quantity,
+                            stock_before: currentStock,
+                            stock_after: currentStock + item.quantity,
+                            unit: item.unit,
                             reason: `Production ${selectedSection?.name || ''} - ${dateStr}`,
                             reference_id: prodRecord.id,
                             staff_id: user?.id
@@ -240,12 +249,17 @@ export function useProduction() {
                 }
 
                 if (item.wasted > 0) {
+                    const stockAfterProduction = currentStock + item.quantity
                     await supabase
                         .from('stock_movements')
                         .insert({
+                            movement_id: generateUUID(),
                             product_id: item.productId,
                             movement_type: 'waste',
                             quantity: -item.wasted,
+                            stock_before: stockAfterProduction,
+                            stock_after: stockAfterProduction - item.wasted,
+                            unit: item.unit,
                             reason: item.wasteReason || `Production waste ${dateStr}`,
                             reference_id: prodRecord.id,
                             staff_id: user?.id
@@ -271,12 +285,17 @@ export function useProduction() {
 
                         const qtyToDeduct = recipe.quantity * item.quantity
 
+                        const materialStock = material.current_stock || 0
                         await supabase
                             .from('stock_movements')
                             .insert({
+                                movement_id: generateUUID(),
                                 product_id: recipe.material_id,
                                 movement_type: 'production_out',
                                 quantity: -qtyToDeduct,
+                                stock_before: materialStock,
+                                stock_after: materialStock - qtyToDeduct,
+                                unit: recipe.unit || 'pcs',
                                 reason: `Used for: ${item.name} (×${item.quantity}) - ${dateStr}`,
                                 reference_id: prodRecord.id,
                                 staff_id: user?.id

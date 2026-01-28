@@ -10,7 +10,17 @@ import {
     SessionDiscrepancy,
     InventoryValuation,
     DashboardSummary,
-    AuditLogEntry
+    AuditLogEntry,
+    // Epic 3: New report types
+    IProfitLossReport,
+    ISalesByCustomerReport,
+    ISalesByHourReport,
+    ISessionCashBalanceReport,
+    IB2BReceivablesReport,
+    IStockWarningReport,
+    IExpiredStockReport,
+    IUnsoldProductsReport,
+    ICancellationsReport,
 } from '../types/reporting';
 
 export const ReportingService = {
@@ -332,5 +342,170 @@ export const ReportingService = {
         });
 
         return Array.from(map.values()).sort((a, b) => b.total_value - a.total_value);
-    }
+    },
+
+    // =============================================================
+    // Epic 3: New Report Methods (Story 3.3)
+    // =============================================================
+
+    /**
+     * Get Profit/Loss Report (FR35)
+     */
+    async getProfitLoss(startDate: Date, endDate: Date): Promise<IProfitLossReport[]> {
+        const { data, error } = await supabase
+            .from('view_profit_loss' as never)
+            .select('*')
+            .gte('report_date', startDate.toISOString().split('T')[0])
+            .lte('report_date', endDate.toISOString().split('T')[0])
+            .order('report_date', { ascending: false }) as { data: unknown[] | null; error: Error | null };
+
+        if (error) throw error;
+        return (data || []) as unknown as IProfitLossReport[];
+    },
+
+    /**
+     * Get Sales by Customer Report (FR36)
+     */
+    async getSalesByCustomer(startDate: Date, endDate: Date): Promise<ISalesByCustomerReport[]> {
+        // Query from orders with customer join and filter by date
+        const { data, error } = await supabase
+            .from('view_sales_by_customer' as never)
+            .select('*') as { data: unknown[] | null; error: Error | null };
+
+        if (error) throw error;
+
+        // Filter by date range if last_order_at is within range
+        const filtered = (data || []) as ISalesByCustomerReport[];
+        return filtered.filter(c =>
+            c.last_order_at &&
+            new Date(c.last_order_at) >= startDate &&
+            new Date(c.last_order_at) <= endDate
+        );
+    },
+
+    /**
+     * Get Sales by Hour Report (FR37)
+     */
+    async getSalesByHour(startDate: Date, endDate: Date): Promise<ISalesByHourReport[]> {
+        const { data, error } = await supabase
+            .from('view_sales_by_hour' as never)
+            .select('*')
+            .gte('report_date', startDate.toISOString().split('T')[0])
+            .lte('report_date', endDate.toISOString().split('T')[0])
+            .order('hour_of_day', { ascending: true }) as { data: unknown[] | null; error: Error | null };
+
+        if (error) throw error;
+        return (data || []) as unknown as ISalesByHourReport[];
+    },
+
+    /**
+     * Get Session Cash Balance Report (FR44)
+     */
+    async getSessionCashBalance(startDate: Date, endDate: Date): Promise<ISessionCashBalanceReport[]> {
+        const { data, error } = await supabase
+            .from('view_session_cash_balance' as never)
+            .select('*')
+            .gte('started_at', startDate.toISOString())
+            .lte('started_at', endDate.toISOString())
+            .order('started_at', { ascending: false }) as { data: unknown[] | null; error: Error | null };
+
+        if (error) throw error;
+        return (data || []) as unknown as ISessionCashBalanceReport[];
+    },
+
+    /**
+     * Get B2B Receivables Report (FR45)
+     */
+    async getB2BReceivables(): Promise<IB2BReceivablesReport[]> {
+        const { data, error } = await supabase
+            .from('view_b2b_receivables' as never)
+            .select('*')
+            .gt('outstanding_amount', 0)
+            .order('outstanding_amount', { ascending: false }) as { data: unknown[] | null; error: Error | null };
+
+        if (error) throw error;
+        return (data || []) as unknown as IB2BReceivablesReport[];
+    },
+
+    /**
+     * Get Stock Warning Report (FR40, FR41)
+     */
+    async getStockWarning(): Promise<IStockWarningReport[]> {
+        const { data, error } = await supabase
+            .from('view_stock_warning' as never)
+            .select('*') as { data: unknown[] | null; error: Error | null };
+
+        if (error) throw error;
+        return (data || []) as unknown as IStockWarningReport[];
+    },
+
+    /**
+     * Get Expired Stock Report (FR42)
+     */
+    async getExpiredStock(): Promise<IExpiredStockReport[]> {
+        const { data, error } = await supabase
+            .from('view_expired_stock' as never)
+            .select('*')
+            .in('expiry_status', ['expired', 'expiring_soon', 'expiring']) as { data: unknown[] | null; error: Error | null };
+
+        if (error) throw error;
+        return (data || []) as unknown as IExpiredStockReport[];
+    },
+
+    /**
+     * Get Unsold Products Report (FR43)
+     */
+    async getUnsoldProducts(daysSinceLastSale: number = 30): Promise<IUnsoldProductsReport[]> {
+        const { data, error } = await supabase
+            .from('view_unsold_products' as never)
+            .select('*')
+            .gte('days_since_sale', daysSinceLastSale)
+            .order('days_since_sale', { ascending: false }) as { data: unknown[] | null; error: Error | null };
+
+        if (error) throw error;
+        return (data || []) as unknown as IUnsoldProductsReport[];
+    },
+
+    /**
+     * Get Cancellations Report (FR38)
+     */
+    async getCancellations(startDate: Date, endDate: Date): Promise<ICancellationsReport[]> {
+        const { data, error } = await supabase
+            .from('orders')
+            .select(`
+                id,
+                order_number,
+                cancelled_at,
+                total,
+                cancellation_reason,
+                staff:user_profiles!orders_staff_id_fkey(name),
+                order_items(id)
+            `)
+            .eq('status', 'cancelled')
+            .gte('cancelled_at', startDate.toISOString())
+            .lte('cancelled_at', endDate.toISOString())
+            .order('cancelled_at', { ascending: false });
+
+        if (error) throw error;
+
+        type CancellationRow = {
+            id: string;
+            order_number: string;
+            cancelled_at: string;
+            total: number;
+            cancellation_reason: string | null;
+            staff: { name: string } | null;
+            order_items: { id: string }[];
+        };
+
+        return ((data || []) as unknown as CancellationRow[]).map(o => ({
+            order_id: o.id,
+            order_number: o.order_number,
+            cancelled_at: o.cancelled_at,
+            cashier_name: o.staff?.name || null,
+            order_total: o.total,
+            cancel_reason: o.cancellation_reason,
+            items_count: o.order_items?.length || 0,
+        }));
+    },
 };

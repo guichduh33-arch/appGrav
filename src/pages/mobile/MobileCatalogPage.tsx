@@ -174,7 +174,7 @@ export default function MobileCatalogPage() {
 
     const modifiersArray = Array.from(selectedModifiers.values()).map((m) => ({
       id: m.id,
-      name: m.name,
+      name: m.option_label,
       priceAdjustment: m.price_adjustment || 0,
     }));
 
@@ -183,7 +183,7 @@ export default function MobileCatalogPage() {
       productId: selectedProduct.id,
       productName: selectedProduct.name,
       quantity,
-      unitPrice: selectedProduct.price || 0,
+      unitPrice: selectedProduct.retail_price || 0,
       modifiers: modifiersArray,
       notes,
       totalPrice: calculateTotalPrice(),
@@ -266,7 +266,7 @@ export default function MobileCatalogPage() {
               </button>
               <div className="mobile-catalog__product-name">{product.name}</div>
               <div className="mobile-catalog__product-price">
-                Rp {(product.price || 0).toLocaleString('id-ID')}
+                Rp {(product.retail_price || 0).toLocaleString('id-ID')}
               </div>
             </div>
           ))
@@ -294,7 +294,7 @@ export default function MobileCatalogPage() {
 
             <h2>{selectedProduct.name}</h2>
             <p className="mobile-catalog__modal-price">
-              Rp {(selectedProduct.price || 0).toLocaleString('id-ID')}
+              Rp {(selectedProduct.retail_price || 0).toLocaleString('id-ID')}
             </p>
 
             {/* Modifiers */}
@@ -307,11 +307,11 @@ export default function MobileCatalogPage() {
                     className={`mobile-catalog__modifier ${selectedModifiers.has(mod.id) ? 'mobile-catalog__modifier--selected' : ''}`}
                     onClick={() => handleModifierToggle(mod)}
                   >
-                    <span>{mod.name}</span>
+                    <span>{mod.option_label}</span>
                     <span className="mobile-catalog__modifier-price">
-                      {mod.price_adjustment > 0 ? '+' : ''}
-                      {mod.price_adjustment !== 0
-                        ? `Rp ${mod.price_adjustment.toLocaleString('id-ID')}`
+                      {(mod.price_adjustment || 0) > 0 ? '+' : ''}
+                      {(mod.price_adjustment || 0) !== 0
+                        ? `Rp ${(mod.price_adjustment || 0).toLocaleString('id-ID')}`
                         : 'Gratuit'}
                     </span>
                     {selectedModifiers.has(mod.id) && (

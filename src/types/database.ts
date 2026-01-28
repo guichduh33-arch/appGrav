@@ -72,8 +72,11 @@ export type UserRole = Tables<'user_roles'>
 export type UserPermission = Tables<'user_permissions'>
 
 // System
-export type AuditLog = Tables<'audit_log'>
+export type AuditLog = Tables<'audit_logs'>
 export type Setting = Tables<'settings'>
+
+// Settings Module (manual types - not yet in generated types)
+// These tables were added in migration 20260128100000_settings_enhancements.sql
 
 // ============================================================================
 // INSERT TYPES (Create operations)
@@ -130,8 +133,12 @@ export interface OrderWithItems extends Order {
 }
 
 // ============================================================================
-// POS TERMINAL TYPES (matches pos_terminals table)
+// POS TERMINAL TYPES (matches pos_terminals table with enhancements)
 // ============================================================================
+
+export type TTerminalMode = 'primary' | 'secondary' | 'self_service' | 'kds_only'
+export type TKDSStation = 'kitchen' | 'barista' | 'display' | null
+export type TDefaultOrderType = 'dine_in' | 'takeaway' | 'delivery' | null
 
 export interface IPosTerminal {
     id: string
@@ -140,8 +147,67 @@ export interface IPosTerminal {
     is_hub: boolean | null
     location: string | null
     status: string | null
+    // New columns from settings enhancements
+    mode: TTerminalMode | null
+    default_printer_id: string | null
+    kitchen_printer_id: string | null
+    kds_station: TKDSStation
+    allowed_payment_methods: string[] | null
+    default_order_type: TDefaultOrderType
+    floor_plan_id: string | null
+    auto_logout_timeout: number | null
     created_at: string | null
     updated_at: string | null
+}
+
+// ============================================================================
+// TERMINAL SETTINGS TYPES (key-value per terminal)
+// ============================================================================
+
+export interface ITerminalSetting {
+    id: string
+    terminal_id: string
+    key: string
+    value: unknown
+    created_at: string
+    updated_at: string
+}
+
+// ============================================================================
+// SETTINGS PROFILE TYPES
+// ============================================================================
+
+export type TSettingsProfileType = 'production' | 'test' | 'training' | 'custom'
+
+export interface ISettingsProfile {
+    id: string
+    name: string
+    description: string | null
+    profile_type: TSettingsProfileType
+    settings_snapshot: Record<string, unknown>
+    terminal_settings_snapshot: Record<string, unknown>
+    is_active: boolean
+    is_system: boolean
+    created_by: string | null
+    created_at: string
+    updated_at: string
+}
+
+// ============================================================================
+// SOUND ASSETS TYPES
+// ============================================================================
+
+export type TSoundCategory = 'order' | 'payment' | 'error' | 'notification'
+
+export interface ISoundAsset {
+    id: string
+    code: string
+    name: string
+    category: TSoundCategory
+    file_path: string | null
+    is_system: boolean
+    is_active: boolean
+    created_at: string
 }
 
 export type TPosTerminalStatus = 'active' | 'inactive' | 'maintenance'

@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     Store, Printer, Bell, Shield, Save, Plus, Settings, RefreshCw, Layers,
-    Edit2, Trash2, X, ShoppingCart, Factory, Warehouse, ChefHat, Coffee, Monitor, Grid, Wifi
+    Edit2, Trash2, X, ShoppingCart, Factory, Warehouse, ChefHat, Coffee, Monitor, Grid, Wifi, Sliders, Package
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import FloorPlanEditor from '../../components/settings/FloorPlanEditor';
 import TerminalSettingsSection from '../../components/settings/TerminalSettingsSection';
+import POSAdvancedSettingsSection from '../../components/settings/POSAdvancedSettingsSection';
+import ModuleSettingsSection from '../../components/settings/ModuleSettingsSection';
 import './SettingsPage.css';
 
-type SettingsTab = 'general' | 'terminal' | 'printers' | 'notifications' | 'security' | 'sections' | 'kds' | 'floorplan';
+type SettingsTab = 'general' | 'terminal' | 'pos_advanced' | 'modules' | 'printers' | 'notifications' | 'security' | 'sections' | 'kds' | 'floorplan';
 
 interface Section {
     id: string;
@@ -91,20 +93,10 @@ const SettingsPage = () => {
             if (error) throw error;
             if (data) {
                 // Map database fields to interface
-                type SectionRow = {
-                    id: string;
-                    name: string;
-                    code?: string;
-                    slug?: string;
-                    is_sales_point?: boolean;
-                    is_production_point?: boolean;
-                    is_warehouse?: boolean;
-                    created_at: string;
-                };
-                const mapped = data.map((s: SectionRow) => ({
+                const mapped = data.map((s) => ({
                     id: s.id,
                     name: s.name,
-                    slug: s.code || s.slug || '',
+                    slug: s.slug || '',
                     is_sales_point: s.is_sales_point ?? false,
                     is_production_point: s.is_production_point ?? false,
                     is_warehouse: s.is_warehouse ?? false,
@@ -132,8 +124,9 @@ const SettingsPage = () => {
                 const mapped = data.map(c => ({
                     ...c,
                     icon: c.icon || '',
+                    is_active: c.is_active ?? true,
                 }));
-                setCategories(mapped);
+                setCategories(mapped as Category[]);
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -284,6 +277,8 @@ const SettingsPage = () => {
     const tabs = [
         { id: 'general' as const, label: 'Général', icon: <Store size={18} /> },
         { id: 'terminal' as const, label: 'Terminal POS', icon: <Wifi size={18} /> },
+        { id: 'pos_advanced' as const, label: 'POS Avancé', icon: <Sliders size={18} /> },
+        { id: 'modules' as const, label: 'Modules', icon: <Package size={18} /> },
         { id: 'sections' as const, label: 'Sections', icon: <Layers size={18} /> },
         { id: 'floorplan' as const, label: 'Plan de Salle', icon: <Grid size={18} /> },
         { id: 'kds' as const, label: 'Stations KDS', icon: <ChefHat size={18} /> },
@@ -384,6 +379,14 @@ const SettingsPage = () => {
 
                     {activeTab === 'terminal' && (
                         <TerminalSettingsSection />
+                    )}
+
+                    {activeTab === 'pos_advanced' && (
+                        <POSAdvancedSettingsSection />
+                    )}
+
+                    {activeTab === 'modules' && (
+                        <ModuleSettingsSection />
                     )}
 
                     {activeTab === 'sections' && (

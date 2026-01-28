@@ -132,6 +132,7 @@ export interface IOfflineOrder {
   synced: boolean;
   synced_at: string | null;
   pos_terminal_id: string | null;
+  server_order_id?: string;
 }
 
 /**
