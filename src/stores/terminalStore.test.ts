@@ -167,6 +167,15 @@ describe('terminalStore', () => {
         status: 'active' as const,
         created_at: '2026-01-27T00:00:00Z',
         updated_at: '2026-01-27T00:00:00Z',
+        // New fields from Settings module
+        mode: null,
+        default_printer_id: null,
+        kitchen_printer_id: null,
+        kds_station: null,
+        allowed_payment_methods: null,
+        default_order_type: null,
+        floor_plan_id: null,
+        auto_logout_timeout: null,
       };
 
       useTerminalStore.getState().setServerData(serverData);

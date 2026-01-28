@@ -20,45 +20,58 @@ interface DeletedProduct {
   reason: string | null;
 }
 
+// Types for Supabase query results
+interface AuditLogDeleteQueryResult {
+  id: string;
+  old_values: Record<string, unknown> | null;
+  user_id: string | null;
+  created_at: string;
+}
+
+interface UserProfileQueryResult {
+  id: string;
+  name: string;
+}
+
 async function getDeletedProducts(from: Date, to: Date): Promise<DeletedProduct[]> {
   const { data, error } = await supabase
     .from('audit_logs')
     .select(`
       id,
-      old_value,
+      old_values,
       user_id,
-      created_at,
-      reason
+      created_at
     `)
     .eq('entity_type', 'product')
-    .eq('action_type', 'delete')
+    .eq('action', 'delete')
     .gte('created_at', from.toISOString())
     .lte('created_at', to.toISOString())
     .order('created_at', { ascending: false });
 
   if (error) throw error;
 
+  const auditLogs = (data || []) as AuditLogDeleteQueryResult[];
+
   // Fetch user names
-  const userIds = [...new Set(data?.map(d => d.user_id) || [])];
-  const { data: users } = await supabase
-    .from('user_profiles')
-    .select('id, name')
-    .in('id', userIds);
+  const userIds = [...new Set(auditLogs.map((d) => d.user_id).filter(Boolean))] as string[];
+  const { data: users } = userIds.length > 0
+    ? await supabase.from('user_profiles').select('id, name').in('id', userIds)
+    : { data: [] };
 
-  const userMap = new Map(users?.map(u => [u.id, u.name]) || []);
+  const userMap = new Map((users as UserProfileQueryResult[] || []).map(u => [u.id, u.name]));
 
-  return (data || []).map(d => {
-    const oldVal = d.old_value || {};
+  return auditLogs.map((d) => {
+    const oldVal = d.old_values || {};
     return {
       id: d.id,
-      product_name: oldVal.name || 'Produit inconnu',
-      sku: oldVal.sku || null,
-      category_name: oldVal.category_name || null,
-      retail_price: oldVal.retail_price || 0,
-      cost_price: oldVal.cost_price || 0,
-      deleted_by: userMap.get(d.user_id) || 'Inconnu',
+      product_name: (oldVal.name as string) || 'Produit inconnu',
+      sku: (oldVal.sku as string) || null,
+      category_name: (oldVal.category_name as string) || null,
+      retail_price: (oldVal.retail_price as number) || 0,
+      cost_price: (oldVal.cost_price as number) || 0,
+      deleted_by: userMap.get(d.user_id || '') || 'Inconnu',
       deleted_at: d.created_at,
-      reason: d.reason,
+      reason: null,
     };
   });
 }

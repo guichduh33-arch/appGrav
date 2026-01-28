@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Receipt, Calendar, Loader2, DollarSign, TrendingDown } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+// import { supabase } from '@/lib/supabase'; // TODO: uncomment when expenses table is created
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
 import { useDateRange } from '@/hooks/reports/useDateRange';
@@ -19,68 +19,39 @@ interface Expense {
   created_by: string;
 }
 
-interface ExpenseByCategory {
-  category: string;
-  total: number;
-  count: number;
-}
-
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#6B7280', '#14B8A6'];
 
-async function getExpenses(from: Date, to: Date): Promise<Expense[]> {
-  // Try to fetch from expenses table if it exists
+// Note: expenses table doesn't exist yet - this is a placeholder
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function getExpenses(_from: Date, _to: Date): Promise<Expense[]> {
+  // Table doesn't exist yet, return empty array
+  // When expenses table is created, uncomment and use this:
+  /*
   const { data, error } = await supabase
     .from('expenses')
-    .select(`
-      id,
-      expense_date,
-      category,
-      description,
-      amount,
-      payment_method,
-      user_id
-    `)
+    .select('*')
     .gte('expense_date', from.toISOString().split('T')[0])
     .lte('expense_date', to.toISOString().split('T')[0])
     .order('expense_date', { ascending: false });
 
-  if (error) {
-    // Table might not exist, return empty array
-    console.warn('Expenses table not found:', error);
-    return [];
-  }
-
-  // Fetch user names
-  const userIds = [...new Set(data?.map(d => d.user_id).filter(Boolean) || [])];
-  let userMap = new Map<string, string>();
-
-  if (userIds.length > 0) {
-    const { data: users } = await supabase
-      .from('user_profiles')
-      .select('id, name')
-      .in('id', userIds);
-    userMap = new Map(users?.map(u => [u.id, u.name]) || []);
-  }
-
-  return (data || []).map(d => ({
-    id: d.id,
-    expense_date: d.expense_date,
-    category: d.category || 'Autre',
-    description: d.description || '',
-    amount: d.amount || 0,
-    payment_method: d.payment_method || 'cash',
-    created_by: userMap.get(d.user_id) || 'Inconnu',
-  }));
+  if (error) return [];
+  return data || [];
+  */
+  return [];
 }
 
 export function ExpensesTab() {
   const { t } = useTranslation();
   const { dateRange } = useDateRange({ defaultPreset: 'thisMonth' });
 
+  // Feature not yet available - expenses table doesn't exist
+  const isFeatureAvailable = false;
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['expenses', dateRange.from, dateRange.to],
     queryFn: () => getExpenses(dateRange.from, dateRange.to),
     staleTime: 5 * 60 * 1000,
+    enabled: isFeatureAvailable, // Don't run query if feature not available
   });
 
   // Group by category
@@ -118,11 +89,11 @@ export function ExpensesTab() {
     });
 
     return Array.from(dayMap.entries())
+      .sort(([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime()) // Sort by ISO date first
       .map(([date, amount]) => ({
         date: new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
         amount,
-      }))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      }));
   }, [data]);
 
   // Summary stats
@@ -168,6 +139,27 @@ export function ExpensesTab() {
     return (
       <div className="p-8 text-center text-red-600">
         {t('common.error', 'Erreur lors du chargement des données')}
+      </div>
+    );
+  }
+
+  // Show feature not available message
+  if (!isFeatureAvailable) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
+          <div className="flex justify-center mb-4">
+            <div className="p-3 bg-amber-100 rounded-full">
+              <Receipt className="w-8 h-8 text-amber-600" />
+            </div>
+          </div>
+          <h3 className="text-lg font-semibold text-amber-800 mb-2">
+            {t('reports.expenses.notAvailable', 'Module de Dépenses - Bientôt disponible')}
+          </h3>
+          <p className="text-amber-700">
+            {t('reports.expenses.notAvailableDesc', 'Le suivi des dépenses sera disponible dans une prochaine version. Cette fonctionnalité permettra de gérer et suivre toutes les dépenses opérationnelles.')}
+          </p>
+        </div>
       </div>
     );
   }
@@ -270,7 +262,7 @@ export function ExpensesTab() {
                   paddingAngle={2}
                   dataKey="total"
                   nameKey="category"
-                  label={({ category, percent }) => `${category}: ${((percent || 0) * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => `${name || ''}: ${((percent || 0) * 100).toFixed(0)}%`}
                   labelLine={false}
                 >
                   {categoryData.map((_, index) => (

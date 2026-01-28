@@ -16,34 +16,60 @@ interface PurchaseByDate {
   items_count: number;
 }
 
+// Types for Supabase query results
+interface PurchaseOrderQueryResult {
+  id: string;
+  order_date: string;
+  total_amount: number | null;
+}
+
+interface POItemQueryResult {
+  po_id: string;
+  quantity_ordered: number;
+}
+
 async function getPurchasesByDate(from: Date, to: Date): Promise<PurchaseByDate[]> {
-  const { data, error } = await supabase
+  // Fetch purchase orders
+  const { data: orders, error: ordersError } = await supabase
     .from('purchase_orders')
-    .select(`
-      id,
-      order_date,
-      total,
-      po_items(quantity)
-    `)
+    .select('id, order_date, total_amount')
     .gte('order_date', from.toISOString().split('T')[0])
     .lte('order_date', to.toISOString().split('T')[0])
     .in('status', ['received', 'partial'])
     .order('order_date', { ascending: true });
 
-  if (error) throw error;
+  if (ordersError) throw ordersError;
+
+  const purchaseOrders = (orders || []) as PurchaseOrderQueryResult[];
+  const poIds = purchaseOrders.map((po) => po.id);
+
+  // Fetch items count for these POs
+  let itemsByPo = new Map<string, number>();
+  if (poIds.length > 0) {
+    const { data: items } = await supabase
+      .from('po_items')
+      .select('po_id, quantity_ordered')
+      .in('po_id', poIds);
+
+    // Group items by PO
+    ((items || []) as POItemQueryResult[]).forEach((item) => {
+      const current = itemsByPo.get(item.po_id) || 0;
+      itemsByPo.set(item.po_id, current + (item.quantity_ordered || 0));
+    });
+  }
 
   // Group by date
   const dateMap = new Map<string, { orders: number; amount: number; items: number }>();
 
-  (data || []).forEach((po) => {
+  purchaseOrders.forEach((po) => {
     const date = po.order_date;
     const existing = dateMap.get(date) || { orders: 0, amount: 0, items: 0 };
-    const itemsCount = (po.po_items || []).reduce((sum: number, item: { quantity: number }) => sum + item.quantity, 0);
+    const poItemsCount = itemsByPo.get(po.id) || 0;
 
     dateMap.set(date, {
       orders: existing.orders + 1,
-      amount: existing.amount + (po.total || 0),
-      items: existing.items + itemsCount,
+      amount: existing.amount + (po.total_amount || 0),
+      items: existing.items + poItemsCount,
     });
   });
 

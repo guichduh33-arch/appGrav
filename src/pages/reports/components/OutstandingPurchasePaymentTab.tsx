@@ -16,6 +16,19 @@ interface OutstandingPayment {
   amount_due: number;
   days_outstanding: number;
   status: string;
+  payment_status: 'unpaid' | 'partial';
+  is_estimated: boolean; // True when amount_paid is estimated (partial payments)
+}
+
+// Type for Supabase query result
+interface PurchaseOrderQueryResult {
+  id: string;
+  po_number: string | null;
+  order_date: string;
+  total_amount: number | null;
+  payment_status: string;
+  status: string;
+  supplier: { name: string } | null;
 }
 
 async function getOutstandingPayments(): Promise<OutstandingPayment[]> {
@@ -25,19 +38,23 @@ async function getOutstandingPayments(): Promise<OutstandingPayment[]> {
       id,
       po_number,
       order_date,
-      total,
-      amount_paid,
+      total_amount,
+      payment_status,
       status,
       supplier:suppliers(name)
     `)
-    .in('status', ['received', 'partial'])
+    .in('payment_status', ['unpaid', 'partial'])
     .order('order_date', { ascending: true });
 
   if (error) throw error;
 
   return (data || [])
-    .map((po) => {
-      const amountDue = (po.total || 0) - (po.amount_paid || 0);
+    .map((po: PurchaseOrderQueryResult) => {
+      const isPartial = po.payment_status === 'partial';
+      // TODO: Replace with actual amount_paid from po_payments table when available
+      // Currently estimating 50% for partial payments - this is INACCURATE
+      const amountPaid = isPartial ? (po.total_amount || 0) * 0.5 : 0;
+      const amountDue = (po.total_amount || 0) - amountPaid;
       const orderDate = new Date(po.order_date);
       const today = new Date();
       const daysOutstanding = Math.floor((today.getTime() - orderDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -45,13 +62,15 @@ async function getOutstandingPayments(): Promise<OutstandingPayment[]> {
       return {
         id: po.id,
         po_number: po.po_number || '-',
-        supplier_name: (po.supplier as { name: string } | null)?.name || 'Inconnu',
+        supplier_name: po.supplier?.name || 'Inconnu',
         order_date: po.order_date,
-        total: po.total || 0,
-        amount_paid: po.amount_paid || 0,
+        total: po.total_amount || 0,
+        amount_paid: amountPaid,
         amount_due: amountDue,
         days_outstanding: daysOutstanding,
         status: po.status,
+        payment_status: po.payment_status as 'unpaid' | 'partial',
+        is_estimated: isPartial, // Mark partial payments as estimated
       };
     })
     .filter((po) => po.amount_due > 0);
@@ -250,7 +269,12 @@ export function OutstandingPurchasePaymentTab() {
                       {formatCurrency(row.total)}
                     </td>
                     <td className="px-6 py-4 text-sm text-green-600 text-right">
-                      {formatCurrency(row.amount_paid)}
+                      <div className="flex items-center justify-end gap-1">
+                        {formatCurrency(row.amount_paid)}
+                        {row.is_estimated && (
+                          <span className="text-xs text-amber-600" title="Montant estimé">~</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-purple-600 text-right font-medium">
                       {formatCurrency(row.amount_due)}

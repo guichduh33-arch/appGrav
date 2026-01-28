@@ -22,60 +22,80 @@ interface PriceChange {
   reason: string | null;
 }
 
+// Types for Supabase query results
+interface AuditLogQueryResult {
+  id: string;
+  entity_id: string;
+  old_values: Record<string, unknown> | null;
+  new_values: Record<string, unknown> | null;
+  user_id: string | null;
+  created_at: string;
+}
+
+interface ProductQueryResult {
+  id: string;
+  name: string;
+  sku: string | null;
+}
+
+interface UserQueryResult {
+  id: string;
+  name: string;
+}
+
 async function getPriceChanges(from: Date, to: Date): Promise<PriceChange[]> {
   const { data, error } = await supabase
     .from('audit_logs')
     .select(`
       id,
       entity_id,
-      old_value,
-      new_value,
+      old_values,
+      new_values,
       user_id,
-      created_at,
-      reason
+      created_at
     `)
     .eq('entity_type', 'product')
-    .eq('action_type', 'price_change')
+    .eq('action', 'price_change')
     .gte('created_at', from.toISOString())
     .lte('created_at', to.toISOString())
     .order('created_at', { ascending: false });
 
   if (error) throw error;
 
-  // Fetch product names
-  const productIds = [...new Set(data?.map(d => d.entity_id) || [])];
-  const { data: products } = await supabase
-    .from('products')
-    .select('id, name, sku')
-    .in('id', productIds);
+  const auditLogs = (data || []) as AuditLogQueryResult[];
 
-  const productMap = new Map(products?.map(p => [p.id, p]) || []);
+  // Fetch product names
+  const productIds = [...new Set(auditLogs.map((d) => d.entity_id).filter(Boolean))];
+  const { data: products } = productIds.length > 0
+    ? await supabase.from('products').select('id, name, sku').in('id', productIds)
+    : { data: [] };
+
+  const productMap = new Map((products as ProductQueryResult[] || []).map(p => [p.id, p]));
 
   // Fetch user names
-  const userIds = [...new Set(data?.map(d => d.user_id) || [])];
-  const { data: users } = await supabase
-    .from('user_profiles')
-    .select('id, name')
-    .in('id', userIds);
+  const userIds = [...new Set(auditLogs.map((d) => d.user_id).filter(Boolean))] as string[];
+  const { data: users } = userIds.length > 0
+    ? await supabase.from('user_profiles').select('id, name').in('id', userIds)
+    : { data: [] };
 
-  const userMap = new Map(users?.map(u => [u.id, u.name]) || []);
+  const userMap = new Map((users as UserQueryResult[] || []).map(u => [u.id, u.name]));
 
-  return (data || []).map(d => {
+  return auditLogs.map((d) => {
     const product = productMap.get(d.entity_id);
-    const oldVal = d.old_value || {};
-    const newVal = d.new_value || {};
+    const oldVal = d.old_values || {};
+    const newVal = d.new_values || {};
     return {
       id: d.id,
       product_id: d.entity_id,
       product_name: product?.name || 'Produit inconnu',
       sku: product?.sku || null,
-      old_retail_price: oldVal.retail_price || 0,
-      new_retail_price: newVal.retail_price || 0,
-      old_cost_price: oldVal.cost_price || 0,
-      new_cost_price: newVal.cost_price || 0,
-      changed_by: userMap.get(d.user_id) || 'Inconnu',
+      old_retail_price: (oldVal.retail_price as number) || 0,
+      new_retail_price: (newVal.retail_price as number) || 0,
+      old_cost_price: (oldVal.cost_price as number) || 0,
+      new_cost_price: (newVal.cost_price as number) || 0,
+      changed_by: userMap.get(d.user_id || '') || 'Inconnu',
       changed_at: d.created_at,
-      reason: d.reason,
+      reason: null,
     };
   });
 }
