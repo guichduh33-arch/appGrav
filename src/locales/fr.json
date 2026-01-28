@@ -810,7 +810,14 @@
             "total_in": "Total Entrées",
             "total_out": "Total Sorties",
             "production_in": "Production In",
-            "production_out": "Production Out"
+            "production_out": "Production Out",
+            "current_stock": "Stock Actuel"
+        },
+        "before": "Avant",
+        "after": "Après",
+        "low_stock": {
+            "title": "Stock Bas",
+            "message": "Stock actuel ({{current}} {{unit}}) inférieur au seuil minimum ({{min}} {{unit}})"
         },
         "search_placeholder": "Rechercher par produit, SKU, raison...",
         "to": "à",
@@ -885,5 +892,34 @@
         "notes_placeholder": "Détails supplémentaires...",
         "add_to_stock": "Ajouter au Stock",
         "remove_from_stock": "Retirer du Stock"
+    },
+    "dashboard": {
+        "title": "Tableau de Bord",
+        "subtitle": "Vue d'ensemble de votre activité",
+        "today_sales": "Ventes du Jour",
+        "orders_count": "Commandes",
+        "avg_basket": "Panier Moyen",
+        "vs_yesterday": "vs hier",
+        "vs_last_week": "vs semaine dernière",
+        "sales_trend": "Tendance des Ventes",
+        "payment_methods": "Méthodes de Paiement",
+        "hourly_sales": "Ventes par Heure",
+        "top_products": "Top 5 Produits",
+        "b2b_pending": "Commandes B2B en Attente",
+        "open_sessions": "Sessions de Caisse Ouvertes",
+        "no_data": "Aucune donnée",
+        "last_updated": "Dernière mise à jour",
+        "period_7d": "7 jours",
+        "period_30d": "30 jours",
+        "retry": "Réessayer",
+        "error_loading": "Erreur de chargement",
+        "peak_hour": "Heure de pointe",
+        "amount_due": "Montant dû",
+        "days_overdue": "jours de retard",
+        "cashier": "Caissier",
+        "opened_at": "Ouvert à",
+        "expected_cash": "Espèces attendues",
+        "qty_sold": "vendus",
+        "revenue": "CA"
     }
 }

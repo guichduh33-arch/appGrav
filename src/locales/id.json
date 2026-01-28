@@ -810,7 +810,14 @@
             "total_in": "Total Masuk",
             "total_out": "Total Keluar",
             "production_in": "Produksi Masuk",
-            "production_out": "Produksi Keluar"
+            "production_out": "Produksi Keluar",
+            "current_stock": "Stok Saat Ini"
+        },
+        "before": "Sebelum",
+        "after": "Sesudah",
+        "low_stock": {
+            "title": "Stok Rendah",
+            "message": "Stok saat ini ({{current}} {{unit}}) di bawah ambang minimum ({{min}} {{unit}})"
         },
         "search_placeholder": "Cari berdasarkan produk, SKU, alasan...",
         "to": "hingga",
@@ -885,5 +892,34 @@
         "notes_placeholder": "Detail tambahan...",
         "add_to_stock": "Tambahkan ke Stok",
         "remove_from_stock": "Kurangi dari Stok"
+    },
+    "dashboard": {
+        "title": "Dasbor",
+        "subtitle": "Ringkasan aktivitas Anda",
+        "today_sales": "Penjualan Hari Ini",
+        "orders_count": "Pesanan",
+        "avg_basket": "Rata-rata Keranjang",
+        "vs_yesterday": "vs kemarin",
+        "vs_last_week": "vs minggu lalu",
+        "sales_trend": "Tren Penjualan",
+        "payment_methods": "Metode Pembayaran",
+        "hourly_sales": "Penjualan per Jam",
+        "top_products": "5 Produk Teratas",
+        "b2b_pending": "Pesanan B2B Tertunda",
+        "open_sessions": "Sesi Kasir Terbuka",
+        "no_data": "Tidak ada data",
+        "last_updated": "Terakhir diperbarui",
+        "period_7d": "7 hari",
+        "period_30d": "30 hari",
+        "retry": "Coba lagi",
+        "error_loading": "Gagal memuat",
+        "peak_hour": "Jam sibuk",
+        "amount_due": "Jumlah terutang",
+        "days_overdue": "hari terlambat",
+        "cashier": "Kasir",
+        "opened_at": "Dibuka pada",
+        "expected_cash": "Kas yang diharapkan",
+        "qty_sold": "terjual",
+        "revenue": "Pendapatan"
     }
 }

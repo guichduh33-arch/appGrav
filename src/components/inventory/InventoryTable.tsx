@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Edit2, AlertTriangle, Search, Package, FileText } from 'lucide-react'
 import type { Product } from '../../types/database'
@@ -11,15 +11,32 @@ interface InventoryTableProps {
     isLoading?: boolean
 }
 
+// Debounce hook for search term
+function useDebouncedValue<T>(value: T, delay: number): T {
+    const [debouncedValue, setDebouncedValue] = useState(value)
+
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedValue(value), delay)
+        return () => clearTimeout(timer)
+    }, [value, delay])
+
+    return debouncedValue
+}
+
 export default function InventoryTable({ items, onAdjustStock, onViewDetails, isLoading }: InventoryTableProps) {
     const { t } = useTranslation()
     const [searchTerm, setSearchTerm] = useState('')
+    const debouncedSearchTerm = useDebouncedValue(searchTerm, 300)
 
-    const filteredItems = items.filter(item =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.category?.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    const filteredItems = useMemo(() => {
+        if (!debouncedSearchTerm) return items
+        const search = debouncedSearchTerm.toLowerCase()
+        return items.filter(item =>
+            item.name.toLowerCase().includes(search) ||
+            item.sku?.toLowerCase().includes(search) ||
+            item.category?.name.toLowerCase().includes(search)
+        )
+    }, [items, debouncedSearchTerm])
 
     if (isLoading) {
         return <div className="inventory-loading">{t('inventory_table.loading')}</div>
@@ -70,6 +87,12 @@ export default function InventoryTable({ items, onAdjustStock, onViewDetails, is
                                                 <div
                                                     className="product-name clickable"
                                                     onClick={() => onViewDetails(item)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' || e.key === ' ') {
+                                                            e.preventDefault()
+                                                            onViewDetails(item)
+                                                        }
+                                                    }}
                                                     role="button"
                                                     tabIndex={0}
                                                 >

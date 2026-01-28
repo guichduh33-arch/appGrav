@@ -799,7 +799,14 @@
             "total_in": "Total In",
             "total_out": "Total Out",
             "production_in": "Production In",
-            "production_out": "Production Out"
+            "production_out": "Production Out",
+            "current_stock": "Current Stock"
+        },
+        "before": "Before",
+        "after": "After",
+        "low_stock": {
+            "title": "Low Stock",
+            "message": "Current stock ({{current}} {{unit}}) is below minimum threshold ({{min}} {{unit}})"
         },
         "search_placeholder": "Search by product, SKU, reason...",
         "to": "to",
@@ -874,5 +881,34 @@
         "notes_placeholder": "Additional details...",
         "add_to_stock": "Add to Stock",
         "remove_from_stock": "Remove from Stock"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "subtitle": "Overview of your activity",
+        "today_sales": "Today's Sales",
+        "orders_count": "Orders",
+        "avg_basket": "Avg Basket",
+        "vs_yesterday": "vs yesterday",
+        "vs_last_week": "vs last week",
+        "sales_trend": "Sales Trend",
+        "payment_methods": "Payment Methods",
+        "hourly_sales": "Hourly Sales",
+        "top_products": "Top 5 Products",
+        "b2b_pending": "Pending B2B Orders",
+        "open_sessions": "Open Cash Sessions",
+        "no_data": "No data",
+        "last_updated": "Last updated",
+        "period_7d": "7 days",
+        "period_30d": "30 days",
+        "retry": "Retry",
+        "error_loading": "Loading error",
+        "peak_hour": "Peak hour",
+        "amount_due": "Amount due",
+        "days_overdue": "days overdue",
+        "cashier": "Cashier",
+        "opened_at": "Opened at",
+        "expected_cash": "Expected cash",
+        "qty_sold": "sold",
+        "revenue": "Revenue"
     }
 }

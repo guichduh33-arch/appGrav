@@ -5,78 +5,35 @@ import {
     Filter, TrendingUp, TrendingDown, Clock, AlertTriangle, Truck, ArrowRight
 } from 'lucide-react'
 import { Product, StockMovement } from '../../../types/database'
+import { MOVEMENT_STYLES, getMovementStyle, type TMovementType } from '@/constants/inventory'
 
 interface StockTabProps {
     product: Product
     stockHistory: StockMovement[]
 }
 
-type MovementType = 'all' | 'production_in' | 'production_out' | 'stock_in' | 'sale_pos' | 'sale_b2b' | 'waste' | 'opname' | 'purchase' | 'adjustment_in' | 'adjustment_out' | 'sale' | 'production'
+type MovementFilterType = 'all' | TMovementType
 
-const MOVEMENT_CONFIG: Record<string, {
-    label: string
-    icon: React.ReactNode
-    bgColor: string
-    textColor: string
-    borderColor: string
-    description: string
-}> = {
-    production_in: {
-        label: 'Production In',
-        icon: <Factory size={16} />,
-        bgColor: '#FEF3C7',
-        textColor: '#B45309',
-        borderColor: '#FCD34D',
-        description: 'Finished/semi-finished produced'
-    },
-    production_out: {
-        label: 'Production Out',
-        icon: <Package size={16} />,
-        bgColor: '#FDF2F8',
-        textColor: '#BE185D',
-        borderColor: '#F9A8D4',
-        description: 'Ingredients used in production'
-    },
-    stock_in: {
-        label: 'Stock In',
-        icon: <Truck size={16} />,
-        bgColor: '#D1FAE5',
-        textColor: '#047857',
-        borderColor: '#6EE7B7',
-        description: 'Purchase / Supplier receipt'
-    },
-    sale_pos: {
-        label: 'Sale POS',
-        icon: <ShoppingCart size={16} />,
-        bgColor: '#DBEAFE',
-        textColor: '#1D4ED8',
-        borderColor: '#93C5FD',
-        description: 'Sold at POS'
-    },
-    sale_b2b: {
-        label: 'Sale B2B',
-        icon: <ShoppingCart size={16} />,
-        bgColor: '#E0E7FF',
-        textColor: '#4338CA',
-        borderColor: '#A5B4FC',
-        description: 'B2B wholesale sale'
-    },
-    waste: {
-        label: 'Waste',
-        icon: <Trash2 size={16} />,
-        bgColor: '#FEE2E2',
-        textColor: '#DC2626',
-        borderColor: '#FCA5A5',
-        description: 'Loss / Breakage'
-    },
-    opname: {
-        label: 'Opname',
-        icon: <ArrowUpCircle size={16} />,
-        bgColor: '#F3F4F6',
-        textColor: '#4B5563',
-        borderColor: '#D1D5DB',
-        description: 'Weekly stock control'
-    }
+// Icon mapping for movement types - typed to sync with MOVEMENT_STYLES
+const MOVEMENT_ICONS: Record<TMovementType, React.ReactNode> = {
+    production_in: <Factory size={16} />,
+    production_out: <Package size={16} />,
+    stock_in: <Truck size={16} />,
+    purchase: <Truck size={16} />,
+    sale: <ShoppingCart size={16} />,
+    sale_pos: <ShoppingCart size={16} />,
+    sale_b2b: <ShoppingCart size={16} />,
+    waste: <Trash2 size={16} />,
+    adjustment: <ArrowUpCircle size={16} />,
+    adjustment_in: <ArrowUpCircle size={16} />,
+    adjustment_out: <ArrowUpCircle size={16} />,
+    transfer: <ArrowRight size={16} />,
+    opname: <ArrowUpCircle size={16} />
+}
+
+function getMovementIcon(type: string): React.ReactNode {
+    const key = type as TMovementType
+    return MOVEMENT_ICONS[key] ?? <Package size={16} />
 }
 
 interface MovementWithBalance extends StockMovement {
@@ -85,8 +42,8 @@ interface MovementWithBalance extends StockMovement {
 }
 
 export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => {
-    useTranslation() // Translation hook for future use
-    const [filterType, setFilterType] = useState<MovementType>('all')
+    const { t, i18n } = useTranslation()
+    const [filterType, setFilterType] = useState<MovementFilterType>('all')
 
     // Calculate running balance for each movement (oldest to newest, then reverse for display)
     const movementsWithBalance = useMemo(() => {
@@ -137,23 +94,13 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
         currentStockValue: (product.current_stock || 0) * costPrice
     }
 
-    const getMovementConfig = (type: string) => {
-        return MOVEMENT_CONFIG[type] || {
-            label: type,
-            icon: <Package size={16} />,
-            bgColor: '#F3F4F6',
-            textColor: '#6B7280',
-            borderColor: '#E5E7EB',
-            description: 'Movement'
-        }
-    }
-
     const formatDate = (dateStr: string | null) => {
         if (!dateStr) return { date: '-', time: '-' }
         const date = new Date(dateStr)
+        const locale = i18n.language === 'fr' ? 'fr-FR' : i18n.language === 'id' ? 'id-ID' : 'en-US'
         return {
-            date: date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }),
-            time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+            date: date.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' }),
+            time: date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
         }
     }
 
@@ -178,7 +125,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
             <div className="grid grid-cols-5 gap-4">
                 {/* Current Stock */}
                 <div className="rounded-2xl p-5 text-white bg-gradient-to-br from-blue-500 to-blue-700">
-                    <div className="text-xs opacity-90 mb-1">Current Stock</div>
+                    <div className="text-xs opacity-90 mb-1">{t('stock_movements.stats.current_stock', 'Current Stock')}</div>
                     <div className="text-2xl font-bold">{product.current_stock} {product.unit}</div>
                     <div className="text-xs opacity-90 mt-1">{formatIDR(stats.currentStockValue)}</div>
                 </div>
@@ -187,7 +134,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 <div className="bg-white rounded-2xl p-5 border border-gray-200">
                     <div className="flex items-center gap-2 mb-2">
                         <TrendingUp size={18} className="text-emerald-500" />
-                        <span className="text-xs text-gray-500">Total In</span>
+                        <span className="text-xs text-gray-500">{t('stock_movements.stats.total_in', 'Total In')}</span>
                     </div>
                     <div className="text-2xl font-bold text-emerald-500">+{stats.totalIn}</div>
                     <div className="text-xs text-emerald-600 font-medium">+{formatIDR(stats.totalInValue)}</div>
@@ -197,7 +144,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 <div className="bg-white rounded-2xl p-5 border border-gray-200">
                     <div className="flex items-center gap-2 mb-2">
                         <TrendingDown size={18} className="text-red-500" />
-                        <span className="text-xs text-gray-500">Total Out</span>
+                        <span className="text-xs text-gray-500">{t('stock_movements.stats.total_out', 'Total Out')}</span>
                     </div>
                     <div className="text-2xl font-bold text-red-500">-{stats.totalOut}</div>
                     <div className="text-xs text-red-600 font-medium">-{formatIDR(stats.totalOutValue)}</div>
@@ -207,7 +154,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 <div className="bg-white rounded-2xl p-5 border border-gray-200">
                     <div className="flex items-center gap-2 mb-2">
                         <Factory size={18} className="text-amber-500" />
-                        <span className="text-xs text-gray-500">Production In</span>
+                        <span className="text-xs text-gray-500">{t('stock_movements.stats.production_in', 'Production In')}</span>
                     </div>
                     <div className="text-2xl font-bold text-amber-700">+{stats.productionIn}</div>
                     <div className="text-xs text-amber-800 font-medium">+{formatIDR(stats.productionIn * costPrice)}</div>
@@ -217,7 +164,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 <div className="bg-white rounded-2xl p-5 border border-gray-200">
                     <div className="flex items-center gap-2 mb-2">
                         <Package size={18} className="text-pink-600" />
-                        <span className="text-xs text-gray-500">Production Out</span>
+                        <span className="text-xs text-gray-500">{t('stock_movements.stats.production_out', 'Production Out')}</span>
                     </div>
                     <div className="text-2xl font-bold text-pink-600">-{stats.productionOut}</div>
                     <div className="text-xs text-pink-800 font-medium">-{formatIDR(stats.productionOut * costPrice)}</div>
@@ -229,7 +176,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 <div className="flex items-center gap-3 flex-wrap">
                     <div className="flex items-center gap-2 text-gray-500">
                         <Filter size={18} />
-                        <span className="font-medium text-sm">Filter:</span>
+                        <span className="font-medium text-sm">{t('stock_movements.filter', 'Filter')}:</span>
                     </div>
 
                     <button
@@ -239,27 +186,27 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                                 : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
                             }`}
                     >
-                        All ({stockHistory.length})
+                        {t('stock_movements.all', 'All')} ({stockHistory.length})
                     </button>
 
-                    {Object.entries(MOVEMENT_CONFIG).map(([type, config]) => {
+                    {Object.entries(MOVEMENT_STYLES).map(([type, style]) => {
                         const count = stockHistory.filter(m => m.movement_type === type).length
                         if (count === 0) return null
                         const isActive = filterType === type
                         return (
                             <button
                                 key={type}
-                                onClick={() => setFilterType(type as MovementType)}
+                                onClick={() => setFilterType(type as MovementFilterType)}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-colors ${isActive ? 'border-2 font-semibold' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
                                     }`}
                                 style={isActive ? {
-                                    backgroundColor: config.bgColor,
-                                    color: config.textColor,
-                                    borderColor: config.borderColor
+                                    backgroundColor: style.bgColor,
+                                    color: style.textColor,
+                                    borderColor: style.borderColor
                                 } : {}}
                             >
-                                {config.icon}
-                                {config.label} ({count})
+                                {getMovementIcon(type)}
+                                {t(style.labelKey, style.label)} ({count})
                             </button>
                         )
                     })}
@@ -270,14 +217,14 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
             <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
                 <div className="px-5 py-4 border-b border-gray-200 bg-gray-50">
                     <h3 className="m-0 text-base font-semibold text-gray-800">
-                        Movement History ({filteredHistory.length})
+                        {t('stock_movements.history', 'Movement History')} ({filteredHistory.length})
                     </h3>
                 </div>
 
                 {filteredHistory.length > 0 ? (
                     <div className="max-h-[500px] overflow-y-auto">
                         {filteredHistory.map((movement, index) => {
-                            const config = getMovementConfig(movement.movement_type)
+                            const style = getMovementStyle(movement.movement_type)
                             const { date, time } = formatDate(movement.created_at)
                             const isPositive = movement.quantity > 0
 
@@ -291,12 +238,12 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                                     <div
                                         className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border"
                                         style={{
-                                            backgroundColor: config.bgColor,
-                                            borderColor: config.borderColor,
-                                            color: config.textColor
+                                            backgroundColor: style.bgColor,
+                                            borderColor: style.borderColor,
+                                            color: style.textColor
                                         }}
                                     >
-                                        {config.icon}
+                                        {getMovementIcon(movement.movement_type)}
                                     </div>
 
                                     {/* Details */}
@@ -305,14 +252,14 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                                             <span
                                                 className="px-2 py-1 rounded-md text-xs font-semibold uppercase"
                                                 style={{
-                                                    backgroundColor: config.bgColor,
-                                                    color: config.textColor
+                                                    backgroundColor: style.bgColor,
+                                                    color: style.textColor
                                                 }}
                                             >
-                                                {config.label}
+                                                {t(style.labelKey, style.label)}
                                             </span>
                                             <span className="text-xs text-gray-400">
-                                                {config.description}
+                                                {t(style.descriptionKey, style.description)}
                                             </span>
                                         </div>
                                         {movement.reason && (
@@ -328,12 +275,12 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                                     {/* Stock Before → After */}
                                     <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg shrink-0">
                                         <div className="text-center">
-                                            <div className="text-xs text-gray-400 uppercase">Before</div>
+                                            <div className="text-xs text-gray-400 uppercase">{t('stock_movements.before', 'Before')}</div>
                                             <div className="text-base font-semibold text-gray-600">{movement.stockBefore}</div>
                                         </div>
                                         <ArrowRight size={16} className="text-gray-400" />
                                         <div className="text-center">
-                                            <div className="text-xs text-gray-400 uppercase">After</div>
+                                            <div className="text-xs text-gray-400 uppercase">{t('stock_movements.after', 'After')}</div>
                                             <div className={`text-base font-bold ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
                                                 {movement.stockAfter}
                                             </div>
@@ -367,11 +314,11 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 ) : (
                     <div className="py-16 px-8 text-center text-gray-400">
                         <Package size={48} className="mx-auto mb-4 opacity-50" />
-                        <p className="m-0 font-medium">No stock movements</p>
+                        <p className="m-0 font-medium">{t('stock_movements.empty.title', 'No stock movements')}</p>
                         <p className="mt-2 text-sm">
                             {filterType !== 'all'
-                                ? 'No movements of this type found'
-                                : 'Stock movements will appear here'}
+                                ? t('stock_movements.empty.filtered', 'No movements of this type found')
+                                : t('stock_movements.empty.default', 'Stock movements will appear here')}
                         </p>
                     </div>
                 )}
@@ -382,9 +329,13 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 <div className="bg-amber-100 rounded-2xl p-5 border border-amber-300 flex items-center gap-3">
                     <AlertTriangle size={20} className="text-amber-600" />
                     <div>
-                        <div className="font-semibold text-amber-800">Low Stock</div>
+                        <div className="font-semibold text-amber-800">{t('stock_movements.low_stock.title', 'Low Stock')}</div>
                         <div className="text-sm text-amber-700">
-                            Current stock ({product.current_stock} {product.unit}) is below minimum threshold ({product.min_stock_level} {product.unit})
+                            {t('stock_movements.low_stock.message', 'Current stock ({{current}} {{unit}}) is below minimum threshold ({{min}} {{unit}})', {
+                                current: product.current_stock,
+                                unit: product.unit,
+                                min: product.min_stock_level
+                            })}
                         </div>
                     </div>
                 </div>
