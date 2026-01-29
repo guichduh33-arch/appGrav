@@ -173,10 +173,10 @@ export default function PurchaseOrderDetailPage() {
                 setItems(mappedItems)
             }
 
-            // Fetch History
+            // Fetch History with metadata
             const { data: poHistory, error: historyError } = await supabase
                 .from('purchase_order_history')
-                .select('*')
+                .select('*, changed_by_user:user_profiles(display_name)')
                 .eq('purchase_order_id', id!)
                 .order('created_at', { ascending: false })
 
@@ -188,6 +188,8 @@ export default function PurchaseOrderDetailPage() {
                     previous_status: h.previous_status || null,
                     new_status: h.new_status || null,
                     description: h.description || h.action_type,
+                    metadata: h.metadata || null,
+                    changed_by_name: h.changed_by_user?.display_name || null,
                     created_at: h.created_at,
                 }))
                 setHistory(mappedHistory)
@@ -559,19 +561,153 @@ export default function PurchaseOrderDetailPage() {
                     <div className="po-detail-card">
                         <h2>Historique</h2>
                         <div className="po-history-timeline">
-                            {history.map(entry => (
-                                <div key={entry.id} className="po-history-item">
-                                    <div className="po-history-item__icon">
-                                        <Clock size={16} />
-                                    </div>
-                                    <div className="po-history-item__content">
-                                        <div className="po-history-item__description">{entry.description}</div>
-                                        <div className="po-history-item__date">
-                                            {new Date(entry.created_at).toLocaleString('fr-FR')}
+                            {history.map(entry => {
+                                const getActionIcon = () => {
+                                    switch (entry.action_type) {
+                                        case 'created': return <Plus size={16} />
+                                        case 'sent': return <Send size={16} />
+                                        case 'confirmed': return <CheckCircle size={16} />
+                                        case 'received':
+                                        case 'partially_received': return <Package size={16} />
+                                        case 'cancelled': return <XCircle size={16} />
+                                        case 'payment_made': return <CreditCard size={16} />
+                                        case 'item_returned': return <Undo2 size={16} />
+                                        case 'modified': return <Edit2 size={16} />
+                                        default: return <FileText size={16} />
+                                    }
+                                }
+
+                                const getActionColor = () => {
+                                    switch (entry.action_type) {
+                                        case 'created': return 'history-icon--info'
+                                        case 'sent': return 'history-icon--info'
+                                        case 'confirmed': return 'history-icon--warning'
+                                        case 'received': return 'history-icon--success'
+                                        case 'partially_received': return 'history-icon--warning'
+                                        case 'cancelled': return 'history-icon--danger'
+                                        case 'payment_made': return 'history-icon--success'
+                                        case 'item_returned': return 'history-icon--danger'
+                                        case 'modified': return 'history-icon--info'
+                                        default: return ''
+                                    }
+                                }
+
+                                const getActionLabel = () => {
+                                    switch (entry.action_type) {
+                                        case 'created': return 'Création'
+                                        case 'sent': return 'Envoi'
+                                        case 'confirmed': return 'Confirmation'
+                                        case 'received': return 'Réception complète'
+                                        case 'partially_received': return 'Réception partielle'
+                                        case 'cancelled': return 'Annulation'
+                                        case 'payment_made': return 'Paiement'
+                                        case 'item_returned': return 'Retour'
+                                        case 'modified': return 'Modification'
+                                        default: return entry.action_type
+                                    }
+                                }
+
+                                return (
+                                    <div key={entry.id} className="po-history-item">
+                                        <div className={`po-history-item__icon ${getActionColor()}`}>
+                                            {getActionIcon()}
+                                        </div>
+                                        <div className="po-history-item__content">
+                                            <div className="po-history-item__header">
+                                                <span className="po-history-item__action">{getActionLabel()}</span>
+                                                {entry.previous_status && entry.new_status && (
+                                                    <div className="po-history-item__status-change">
+                                                        <span className={`status-badge status-badge--${entry.previous_status}`}>
+                                                            {STATUS_LABELS[entry.previous_status] || entry.previous_status}
+                                                        </span>
+                                                        <span className="po-history-arrow">→</span>
+                                                        <span className={`status-badge status-badge--${entry.new_status}`}>
+                                                            {STATUS_LABELS[entry.new_status] || entry.new_status}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Metadata details */}
+                                            {entry.metadata && (
+                                                <div className="po-history-item__details">
+                                                    {entry.metadata.items_added && entry.metadata.items_added.length > 0 && (
+                                                        <div className="po-history-detail">
+                                                            <span className="po-history-detail__label">Articles ajoutés:</span>
+                                                            <ul className="po-history-detail__list">
+                                                                {entry.metadata.items_added.map((item, i) => (
+                                                                    <li key={i}>{item.quantity}x {item.name} @ {formatCurrency(item.unit_price)}</li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    )}
+                                                    {entry.metadata.items_removed && entry.metadata.items_removed.length > 0 && (
+                                                        <div className="po-history-detail">
+                                                            <span className="po-history-detail__label">Articles retirés:</span>
+                                                            <ul className="po-history-detail__list">
+                                                                {entry.metadata.items_removed.map((item, i) => (
+                                                                    <li key={i}>{item.quantity}x {item.name}</li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    )}
+                                                    {entry.metadata.items_modified && entry.metadata.items_modified.length > 0 && (
+                                                        <div className="po-history-detail">
+                                                            <span className="po-history-detail__label">Modifications:</span>
+                                                            <ul className="po-history-detail__list">
+                                                                {entry.metadata.items_modified.map((item, i) => (
+                                                                    <li key={i}>{item.name}: {item.field} {item.old_value} → {item.new_value}</li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    )}
+                                                    {entry.metadata.quantity_received && entry.metadata.product_name && (
+                                                        <div className="po-history-detail">
+                                                            <span className="po-history-detail__label">Réception:</span>
+                                                            <span>{entry.metadata.quantity_received} unités de {entry.metadata.product_name}</span>
+                                                        </div>
+                                                    )}
+                                                    {entry.metadata.return_quantity && entry.metadata.product_name && (
+                                                        <div className="po-history-detail">
+                                                            <span className="po-history-detail__label">Retour:</span>
+                                                            <span>{entry.metadata.return_quantity} unités de {entry.metadata.product_name}</span>
+                                                            {entry.metadata.return_reason && (
+                                                                <span className="po-history-detail__reason">
+                                                                    ({RETURN_REASON_LABELS[entry.metadata.return_reason] || entry.metadata.return_reason})
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    {entry.metadata.payment_amount && (
+                                                        <div className="po-history-detail">
+                                                            <span className="po-history-detail__label">Montant:</span>
+                                                            <span>{formatCurrency(entry.metadata.payment_amount)}</span>
+                                                            {entry.metadata.payment_method && (
+                                                                <span className="po-history-detail__method">({entry.metadata.payment_method})</span>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    {entry.metadata.old_total !== undefined && entry.metadata.new_total !== undefined && (
+                                                        <div className="po-history-detail">
+                                                            <span className="po-history-detail__label">Total:</span>
+                                                            <span>{formatCurrency(entry.metadata.old_total)} → {formatCurrency(entry.metadata.new_total)}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            <div className="po-history-item__footer">
+                                                <span className="po-history-item__date">
+                                                    {new Date(entry.created_at).toLocaleString('fr-FR')}
+                                                </span>
+                                                {entry.changed_by_name && (
+                                                    <span className="po-history-item__user">par {entry.changed_by_name}</span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                )
+                            })}
                         </div>
                     </div>
                 </div>

@@ -282,11 +282,12 @@ export default function B2BOrderFormPage() {
         try {
             const totals = calculateTotals()
 
-            // Map UI status to DB status: draft -> new, confirmed -> preparing
-            const dbStatus = status === 'draft' ? 'new' : 'preparing'
+            // Map UI status to DB status (must match CHECK constraint)
+            const dbStatus = status === 'draft' ? 'draft' : 'confirmed'
 
             // Map UI fields to database column names
             // Use type assertion to bypass strict type checking for dynamic insert
+            // Note: tax_rate in DB is stored as decimal (0.10 = 10%), not percentage
             const orderData = {
                 customer_id: formData.customer_id,
                 status: dbStatus,
@@ -295,7 +296,7 @@ export default function B2BOrderFormPage() {
                 subtotal: totals.subtotal,
                 discount_percent: formData.discount_type === 'percentage' ? formData.discount_value : null,
                 discount_amount: totals.discountAmount,
-                tax_rate: formData.tax_rate,
+                tax_rate: formData.tax_rate / 100, // Convert percentage to decimal (10% -> 0.10)
                 tax_amount: totals.taxAmount,
                 total: totals.total,
                 paid_amount: 0,
