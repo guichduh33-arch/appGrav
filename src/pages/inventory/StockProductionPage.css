@@ -352,6 +352,94 @@
     color: var(--color-red-600, #dc2626);
 }
 
+/* Quantity Input Group (new) */
+.quantity-input-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.quantity-input-group.waste .qty-input {
+    border-color: var(--color-gray-200, #e5e7eb);
+}
+
+.quantity-input-group.waste .qty-input:focus {
+    border-color: var(--color-red-400, #f87171);
+}
+
+.qty-input {
+    width: 80px;
+    padding: 0.5rem 0.75rem;
+    border: 2px solid var(--color-gray-200, #e5e7eb);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--color-gray-800, #1f2937);
+    transition: border-color 0.15s ease;
+}
+
+.qty-input:focus {
+    outline: none;
+    border-color: var(--color-amber-500, #f59e0b);
+}
+
+.qty-input.waste-active {
+    border-color: var(--color-red-300, #fca5a5);
+    color: var(--color-red-600, #dc2626);
+    background: var(--color-red-50, #fef2f2);
+}
+
+.qty-input.waste-active:focus {
+    border-color: var(--color-red-500, #ef4444);
+}
+
+/* Hide number input arrows */
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.qty-input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.unit-select {
+    padding: 0.5rem 0.75rem;
+    border: 2px solid var(--color-gray-200, #e5e7eb);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-gray-700, #374151);
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+    min-width: 70px;
+}
+
+.unit-select:focus {
+    outline: none;
+    border-color: var(--color-amber-500, #f59e0b);
+}
+
+.unit-select:hover {
+    border-color: var(--color-gray-300, #d1d5db);
+}
+
+.unit-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-gray-500, #6b7280);
+    min-width: 40px;
+}
+
+.unit-label.text-red {
+    color: var(--color-red-600, #dc2626);
+}
+
 .waste-reason-input {
     width: 100%;
     padding: 0.5rem;

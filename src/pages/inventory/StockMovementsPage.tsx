@@ -8,6 +8,12 @@ import {
 import { useStockMovements, type IStockMovement, type TMovementFilterType } from '@/hooks/inventory'
 import { MOVEMENT_STYLES, getMovementStyle } from '@/constants/inventory'
 import { formatCurrency } from '@/utils/helpers'
+
+// Format number with thousand separators (French locale)
+const formatNumber = (num: number | null | undefined): string => {
+    if (num === null || num === undefined) return '-'
+    return num.toLocaleString('fr-FR')
+}
 import { supabase } from '@/lib/supabase'
 import * as XLSX from 'xlsx'
 import toast from 'react-hot-toast'
@@ -198,7 +204,7 @@ export default function StockMovementsPage() {
                     </div>
                     <div className="stat-content">
                         <div className="stat-label">{t('stock_movements.stats.total_in', 'Total In')}</div>
-                        <div className="stat-value text-green">+{stats.totalIn}</div>
+                        <div className="stat-value text-green">+{formatNumber(stats.totalIn)}</div>
                         <div className="stat-sub text-green">+{formatCurrency(stats.totalInValue)}</div>
                     </div>
                 </div>
@@ -210,7 +216,7 @@ export default function StockMovementsPage() {
                     </div>
                     <div className="stat-content">
                         <div className="stat-label">{t('stock_movements.stats.total_out', 'Total Out')}</div>
-                        <div className="stat-value text-red">-{stats.totalOut}</div>
+                        <div className="stat-value text-red">-{formatNumber(stats.totalOut)}</div>
                         <div className="stat-sub text-red">-{formatCurrency(stats.totalOutValue)}</div>
                     </div>
                 </div>
@@ -222,7 +228,7 @@ export default function StockMovementsPage() {
                     </div>
                     <div className="stat-content">
                         <div className="stat-label">{t('stock_movements.stats.production_in', 'Production In')}</div>
-                        <div className="stat-value text-amber">+{stats.productionIn}</div>
+                        <div className="stat-value text-amber">+{formatNumber(stats.productionIn)}</div>
                     </div>
                 </div>
 
@@ -233,7 +239,7 @@ export default function StockMovementsPage() {
                     </div>
                     <div className="stat-content">
                         <div className="stat-label">{t('stock_movements.stats.production_out', 'Production Out')}</div>
-                        <div className="stat-value text-pink">-{stats.productionOut}</div>
+                        <div className="stat-value text-pink">-{formatNumber(stats.productionOut)}</div>
                     </div>
                 </div>
             </div>
@@ -465,7 +471,7 @@ export default function StockMovementsPage() {
                                     {/* Quantity & Value */}
                                     <div className="movement-quantity">
                                         <div className={`qty-value ${isPositive ? 'positive' : 'negative'}`}>
-                                            {isPositive ? '+' : ''}{movement.quantity} {movement.product_unit}
+                                            {isPositive ? '+' : ''}{formatNumber(movement.quantity)} {movement.product_unit}
                                         </div>
                                         <div className={`qty-cost ${isPositive ? 'positive' : 'negative'}`}>
                                             {isPositive ? '+' : '-'}{formatCurrency(value)}
@@ -491,7 +497,7 @@ export default function StockMovementsPage() {
                                             <span style={{ color: '#6B7280', fontSize: '0.75rem' }}>Stock avant:</span>
                                             <span style={{ fontWeight: 600, color: '#374151' }}>
                                                 {movement.stock_before !== null && movement.stock_before !== undefined
-                                                    ? `${movement.stock_before} ${movement.product_unit}`
+                                                    ? `${formatNumber(movement.stock_before)} ${movement.product_unit}`
                                                     : '-'}
                                             </span>
                                         </div>
@@ -509,7 +515,7 @@ export default function StockMovementsPage() {
                                                 color: isPositive ? '#059669' : '#DC2626'
                                             }}>
                                                 {movement.stock_after !== null && movement.stock_after !== undefined
-                                                    ? `${movement.stock_after} ${movement.product_unit}`
+                                                    ? `${formatNumber(movement.stock_after)} ${movement.product_unit}`
                                                     : '-'}
                                             </span>
                                         </div>

@@ -163,7 +163,7 @@ export default function ProductDetailPage() {
 
             // 8. Fetch Price History (PO Items)
             const { data: prices } = await supabase
-                .from('po_items')
+                .from('purchase_order_items')
                 .select('*, purchase_order:purchase_orders(order_date, supplier:suppliers(name))')
                 .eq('product_id', id)
                 .order('created_at', { ascending: false })
@@ -397,6 +397,7 @@ export default function ProductDetailPage() {
                         sections={sections}
                         selectedSections={productSections}
                         primarySectionId={primarySectionId}
+                        uoms={uoms}
                         onSectionsChange={setProductSections}
                         onPrimarySectionChange={setPrimarySectionId}
                         onChange={setProduct}

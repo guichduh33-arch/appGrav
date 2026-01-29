@@ -83,7 +83,7 @@ export default function StockOpnameForm() {
         const { data: products } = await supabase
             .from('products')
             .select('*')
-            .eq('is_active', true)
+            .neq('is_active', false)
 
         if (!products) return
 

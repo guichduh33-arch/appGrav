@@ -78,7 +78,7 @@ export default function PurchaseOrderFormPage() {
             const { data, error } = await supabase
                 .from('suppliers')
                 .select('id, name')
-                .eq('is_active', true)
+                .neq('is_active', false)
                 .order('name')
 
             if (error) throw error
@@ -94,7 +94,7 @@ export default function PurchaseOrderFormPage() {
             let { data, error } = await supabase
                 .from('products')
                 .select('id, name, cost_price, product_type, unit')
-                .eq('is_active', true)
+                .neq('is_active', false)
                 .order('name')
 
             if (error) {

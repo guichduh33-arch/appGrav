@@ -40,7 +40,7 @@ export default function StockByLocationPage() {
         const { data } = await supabase
             .from('stock_locations')
             .select('*')
-            .eq('is_active', true)
+            .neq('is_active', false)
             .order('name')
         if (data) setLocations(data)
     }

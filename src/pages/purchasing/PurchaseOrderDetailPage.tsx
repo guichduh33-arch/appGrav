@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Edit2, DollarSign, Clock, RotateCcw } from 'lucide-react'
+import { ArrowLeft, Edit2, DollarSign, Clock, RotateCcw, FileText, Send, CheckCircle, Package, XCircle, CreditCard, Undo2, Plus } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { formatCurrency } from '@/utils/helpers'
 import './PurchaseOrderDetailPage.css'
@@ -36,12 +36,29 @@ interface POItem {
     quantity_returned: number
 }
 
+interface POHistoryMetadata {
+    items_added?: Array<{ name: string; quantity: number; unit_price: number }>
+    items_removed?: Array<{ name: string; quantity: number }>
+    items_modified?: Array<{ name: string; field: string; old_value: string; new_value: string }>
+    quantity_received?: number
+    product_name?: string
+    return_quantity?: number
+    return_reason?: string
+    payment_amount?: number
+    payment_method?: string
+    old_total?: number
+    new_total?: number
+    [key: string]: unknown
+}
+
 interface POHistory {
     id: string
     action_type: string
     previous_status: string | null
     new_status: string | null
     description: string
+    metadata: POHistoryMetadata | null
+    changed_by_name?: string
     created_at: string
 }
 
@@ -134,92 +151,67 @@ export default function PurchaseOrderDetailPage() {
             setPurchaseOrder(mappedPO)
 
             // Fetch Items
-            const { data: poItems, error: itemsError } = await (supabase as any)
-                .from('po_items')
+            const { data: poItems, error: itemsError } = await supabase
+                .from('purchase_order_items')
                 .select('*, product:products(name)')
-                .eq('po_id', id!)
+                .eq('purchase_order_id', id!)
 
             if (itemsError) throw itemsError
             if (poItems) {
-                type RawPOItem = {
-                    id: string;
-                    product?: { name: string };
-                    notes?: string;
-                    quantity_ordered: number;
-                    unit_price: number;
-                    total_price: number;
-                    quantity_received?: number;
-                };
-                const mappedItems: POItem[] = poItems.map((item: RawPOItem) => ({
+                const mappedItems: POItem[] = (poItems as any[]).map((item) => ({
                     id: item.id,
-                    product_name: item.product?.name || 'Unknown',
-                    description: item.notes,
-                    quantity: item.quantity_ordered,
+                    product_name: item.product?.name || item.product_name || 'Unknown',
+                    description: item.description || item.notes || null,
+                    quantity: item.quantity,
                     unit_price: item.unit_price,
-                    discount_amount: 0,
-                    tax_rate: 0,
-                    line_total: item.total_price,
+                    discount_amount: item.discount_amount || 0,
+                    tax_rate: item.tax_rate || 0,
+                    line_total: item.line_total,
                     quantity_received: item.quantity_received || 0,
-                    quantity_returned: 0,
+                    quantity_returned: item.quantity_returned || 0,
                 }))
                 setItems(mappedItems)
             }
 
             // Fetch History
-            const { data: poHistory, error: historyError } = await (supabase as any)
-                .from('po_history')
+            const { data: poHistory, error: historyError } = await supabase
+                .from('purchase_order_history')
                 .select('*')
-                .eq('po_id', id!)
+                .eq('purchase_order_id', id!)
                 .order('created_at', { ascending: false })
 
             if (historyError) throw historyError
             if (poHistory) {
-                type RawPOHistory = {
-                    id: string;
-                    action: string;
-                    old_status?: string;
-                    new_status?: string;
-                    notes?: string;
-                    created_at: string;
-                };
-                const mappedHistory: POHistory[] = poHistory.map((h: RawPOHistory) => ({
+                const mappedHistory: POHistory[] = (poHistory as any[]).map((h) => ({
                     id: h.id,
-                    action_type: h.action,
-                    previous_status: h.old_status,
-                    new_status: h.new_status,
-                    description: h.notes || h.action,
+                    action_type: h.action_type,
+                    previous_status: h.previous_status || null,
+                    new_status: h.new_status || null,
+                    description: h.description || h.action_type,
                     created_at: h.created_at,
                 }))
                 setHistory(mappedHistory)
             }
 
             // Fetch Returns
-            const { data: poReturns, error: returnsError } = await (supabase as any)
-                .from('po_returns')
-                .select('*, product:products(name)')
-                .eq('po_id', id!)
+            const { data: poReturns, error: returnsError } = await supabase
+                .from('purchase_order_returns')
+                .select('*, item:purchase_order_items(product_name)')
+                .eq('purchase_order_id', id!)
                 .order('return_date', { ascending: false })
 
             if (returnsError) throw returnsError
             if (poReturns) {
-                type RawPOReturn = {
-                    id: string;
-                    product_id: string;
-                    product?: { name: string };
-                    quantity: number;
-                    reason?: string;
-                    return_date: string;
-                };
-                const mappedReturns: POReturn[] = poReturns.map((r: RawPOReturn) => ({
+                const mappedReturns: POReturn[] = (poReturns as any[]).map((r) => ({
                     id: r.id,
-                    purchase_order_item_id: r.product_id,
-                    item: { product_name: r.product?.name || 'Unknown' },
-                    quantity_returned: r.quantity,
-                    reason: r.reason || 'other',
-                    reason_details: null,
+                    purchase_order_item_id: r.purchase_order_item_id,
+                    item: { product_name: r.item?.product_name || 'Unknown' },
+                    quantity_returned: r.quantity_returned,
+                    reason: r.reason,
+                    reason_details: r.reason_details || null,
                     return_date: r.return_date,
-                    refund_amount: null,
-                    status: 'completed',
+                    refund_amount: r.refund_amount || null,
+                    status: r.status,
                 }))
                 setReturns(mappedReturns)
             }
@@ -252,9 +244,73 @@ export default function PurchaseOrderDetailPage() {
 
     const handleReceiveItem = async (itemId: string, quantityReceived: number) => {
         try {
-            const { error } = await (supabase as any)
-                .from('po_items')
-                .update({ quantity_received: quantityReceived })
+            // Find the item and get current received quantity
+            const item = items.find(i => i.id === itemId)
+            if (!item) return
+
+            const previousReceived = parseFloat(item.quantity_received.toString()) || 0
+            const newReceived = quantityReceived
+            const delta = newReceived - previousReceived
+
+            // Only create stock movement if there's a change
+            if (delta !== 0) {
+                // Get product_id from purchase_order_items
+                const { data: poItem } = await supabase
+                    .from('purchase_order_items')
+                    .select('product_id, unit_price')
+                    .eq('id', itemId)
+                    .single()
+
+                if (poItem?.product_id) {
+                    // Get current stock
+                    const { data: product } = await supabase
+                        .from('products')
+                        .select('current_stock')
+                        .eq('id', poItem.product_id)
+                        .single()
+
+                    const currentStock = product?.current_stock || 0
+                    const newStock = currentStock + delta
+
+                    // Create stock movement
+                    const movementId = `MV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
+                    const { error: mvError } = await supabase
+                        .from('stock_movements')
+                        .insert({
+                            movement_id: movementId,
+                            product_id: poItem.product_id,
+                            movement_type: 'stock_in',
+                            quantity: delta,
+                            stock_before: currentStock,
+                            stock_after: newStock,
+                            unit_cost: poItem.unit_price,
+                            reference_type: 'purchase_order',
+                            reference_id: id,
+                            reason: `Réception PO ${purchaseOrder?.po_number || ''}`,
+                            notes: `${item.product_name} - ${delta > 0 ? '+' : ''}${delta}`
+                        } as never)
+
+                    if (mvError) {
+                        console.error('Stock movement error:', mvError)
+                        alert(`Erreur mouvement stock: ${mvError.message}`)
+                    }
+
+                    // Update product stock
+                    const { error: stockError } = await supabase
+                        .from('products')
+                        .update({ current_stock: newStock } as never)
+                        .eq('id', poItem.product_id)
+
+                    if (stockError) {
+                        console.error('Stock update error:', stockError)
+                    }
+                }
+            }
+
+            // Update quantity received in PO item
+            const { error } = await supabase
+                .from('purchase_order_items')
+                .update({ quantity_received: quantityReceived } as never)
                 .eq('id', itemId)
 
             if (error) throw error
@@ -305,15 +361,17 @@ export default function PurchaseOrderDetailPage() {
         }
 
         try {
-            const { error } = await (supabase as any)
-                .from('po_returns')
+            const { error } = await supabase
+                .from('purchase_order_returns')
                 .insert({
-                    po_id: id!,
-                    product_id: selectedItem.id,
-                    quantity: returnForm.quantity,
-                    reason: returnForm.reason || null,
+                    purchase_order_id: id!,
+                    purchase_order_item_id: selectedItem.id,
+                    quantity_returned: returnForm.quantity,
+                    reason: returnForm.reason || 'other',
+                    reason_details: returnForm.reason_details || null,
+                    refund_amount: returnForm.refund_amount || null,
                     return_date: new Date().toISOString(),
-                })
+                } as never)
 
             if (error) throw error
 

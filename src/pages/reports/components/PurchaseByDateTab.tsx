@@ -24,8 +24,8 @@ interface PurchaseOrderQueryResult {
 }
 
 interface POItemQueryResult {
-  po_id: string;
-  quantity_ordered: number;
+  purchase_order_id: string;
+  quantity: number;
 }
 
 async function getPurchasesByDate(from: Date, to: Date): Promise<PurchaseByDate[]> {
@@ -47,14 +47,14 @@ async function getPurchasesByDate(from: Date, to: Date): Promise<PurchaseByDate[
   let itemsByPo = new Map<string, number>();
   if (poIds.length > 0) {
     const { data: items } = await supabase
-      .from('po_items')
-      .select('po_id, quantity_ordered')
-      .in('po_id', poIds);
+      .from('purchase_order_items')
+      .select('purchase_order_id, quantity')
+      .in('purchase_order_id', poIds);
 
     // Group items by PO
     ((items || []) as POItemQueryResult[]).forEach((item) => {
-      const current = itemsByPo.get(item.po_id) || 0;
-      itemsByPo.set(item.po_id, current + (item.quantity_ordered || 0));
+      const current = itemsByPo.get(item.purchase_order_id) || 0;
+      itemsByPo.set(item.purchase_order_id, current + (item.quantity || 0));
     });
   }
 

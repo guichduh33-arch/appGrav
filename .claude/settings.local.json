@@ -51,7 +51,9 @@
       "Bash(PGPASSWORD=postgres psql:*)",
       "Bash(comm -23:*)",
       "Bash(gh repo view:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(Remove-Item -Recurse -Force node_modules)",
+      "Bash(supabase db pull:*)"
     ]
   }
 }

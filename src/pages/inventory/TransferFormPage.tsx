@@ -58,7 +58,7 @@ export default function TransferFormPage() {
         const { data } = await supabase
             .from('stock_locations')
             .select('*')
-            .eq('is_active', true)
+            .neq('is_active', false)
             .order('name')
         if (data) setLocations(data as unknown as Location[])
     }
@@ -67,7 +67,7 @@ export default function TransferFormPage() {
         const { data } = await supabase
             .from('products')
             .select('id, name, sku, cost_price, unit')
-            .eq('is_active', true)
+            .neq('is_active', false)
             .order('name')
         if (data) setProducts(data as unknown as Product[])
     }

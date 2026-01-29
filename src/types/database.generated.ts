@@ -6138,7 +6138,7 @@ export type Database = {
         | "completed"
         | "cancelled"
       order_type: "dine_in" | "takeaway" | "delivery" | "b2b"
-      payment_method: "cash" | "card" | "qris" | "split" | "transfer"
+      payment_method: "cash" | "card" | "qris" | "split" | "transfer" | "edc"
       payment_status: "unpaid" | "partial" | "paid"
       payment_terms: "cod" | "net15" | "net30" | "net60"
       po_status: "draft" | "sent" | "partial" | "received" | "cancelled"
@@ -6310,7 +6310,7 @@ export const Constants = {
         "cancelled",
       ],
       order_type: ["dine_in", "takeaway", "delivery", "b2b"],
-      payment_method: ["cash", "card", "qris", "split", "transfer"],
+      payment_method: ["cash", "card", "qris", "split", "transfer", "edc"],
       payment_status: ["unpaid", "partial", "paid"],
       payment_terms: ["cod", "net15", "net30", "net60"],
       po_status: ["draft", "sent", "partial", "received", "cancelled"],

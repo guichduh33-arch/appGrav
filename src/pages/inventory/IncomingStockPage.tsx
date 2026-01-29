@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -10,7 +10,9 @@ import {
     AlertCircle,
     Search,
     Eye,
-    FileText
+    FileText,
+    ChevronDown,
+    ChevronRight
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { formatCurrency, formatDate } from '../../utils/helpers'
@@ -18,19 +20,19 @@ import './IncomingStockPage.css'
 
 interface PurchaseOrderWithItems {
     id: string
-    order_number: string
+    po_number: string
     supplier: { id: string; name: string } | null
     status: string
     order_date: string
     expected_delivery_date: string | null
-    received_date: string | null
+    actual_delivery_date: string | null
     total_amount: number
     notes: string | null
-    po_items: {
+    purchase_order_items: {
         id: string
         product: { id: string; name: string; sku: string } | null
         quantity: number
-        received_quantity: number
+        quantity_received: number
         unit_price: number
     }[]
 }
@@ -44,6 +46,7 @@ export default function IncomingStockPage() {
     const [isLoading, setIsLoading] = useState(true)
     const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
     const [searchTerm, setSearchTerm] = useState('')
+    const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set())
 
     // Load purchase orders
     useEffect(() => {
@@ -57,19 +60,19 @@ export default function IncomingStockPage() {
                 .from('purchase_orders')
                 .select(`
                     id,
-                    order_number,
+                    po_number,
                     supplier:suppliers(id, name),
                     status,
                     order_date,
                     expected_delivery_date,
-                    received_date,
+                    actual_delivery_date,
                     total_amount,
                     notes,
-                    po_items(
+                    purchase_order_items(
                         id,
                         product:products(id, name, sku),
                         quantity,
-                        received_quantity,
+                        quantity_received,
                         unit_price
                     )
                 `)
@@ -104,9 +107,9 @@ export default function IncomingStockPage() {
         // Search filter
         if (searchTerm) {
             const search = searchTerm.toLowerCase()
-            const matchesOrder = order.order_number.toLowerCase().includes(search)
+            const matchesOrder = order.po_number.toLowerCase().includes(search)
             const matchesSupplier = order.supplier?.name.toLowerCase().includes(search)
-            const matchesProduct = order.po_items.some(item =>
+            const matchesProduct = order.purchase_order_items.some(item =>
                 item.product?.name.toLowerCase().includes(search) ||
                 item.product?.sku.toLowerCase().includes(search)
             )
@@ -131,6 +134,18 @@ export default function IncomingStockPage() {
             case 'partial': return <AlertCircle size={16} />
             default: return <Clock size={16} />
         }
+    }
+
+    const toggleExpanded = (orderId: string) => {
+        setExpandedOrders(prev => {
+            const newSet = new Set(prev)
+            if (newSet.has(orderId)) {
+                newSet.delete(orderId)
+            } else {
+                newSet.add(orderId)
+            }
+            return newSet
+        })
     }
 
     return (
@@ -237,6 +252,7 @@ export default function IncomingStockPage() {
                     <table className="incoming-table">
                         <thead>
                             <tr>
+                                <th className="th-expand"><span className="sr-only">Détails</span></th>
                                 <th>{t('inventory.incoming.order_number', 'Order #')}</th>
                                 <th>{t('inventory.incoming.supplier', 'Supplier')}</th>
                                 <th>{t('inventory.incoming.order_date', 'Order Date')}</th>
@@ -248,50 +264,133 @@ export default function IncomingStockPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredOrders.map(order => (
-                                <tr key={order.id}>
-                                    <td className="cell-order">
-                                        <span className="order-number">{order.order_number}</span>
-                                    </td>
-                                    <td className="cell-supplier">
-                                        {order.supplier?.name || '-'}
-                                    </td>
-                                    <td className="cell-date">
-                                        <Calendar size={14} />
-                                        {formatDate(order.order_date)}
-                                    </td>
-                                    <td className="cell-date">
-                                        {order.expected_delivery_date ? (
-                                            <>
-                                                <TruckIcon size={14} />
-                                                {formatDate(order.expected_delivery_date)}
-                                            </>
-                                        ) : '-'}
-                                    </td>
-                                    <td className="cell-items">
-                                        <Package size={14} />
-                                        {order.po_items.length} {t('inventory.incoming.products', 'products')}
-                                    </td>
-                                    <td className="cell-total">
-                                        {formatCurrency(order.total_amount)}
-                                    </td>
-                                    <td className="cell-status">
-                                        <span className={`status-badge ${getStatusColor(order.status)}`}>
-                                            {getStatusIcon(order.status)}
-                                            {order.status}
-                                        </span>
-                                    </td>
-                                    <td className="cell-actions">
-                                        <button
-                                            className="btn-icon-sm"
-                                            onClick={() => navigate(`/purchasing/purchase-orders/${order.id}`)}
-                                            title={t('common.view', 'View')}
-                                        >
-                                            <Eye size={16} />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
+                            {filteredOrders.map(order => {
+                                const isExpanded = expandedOrders.has(order.id)
+                                return (
+                                    <Fragment key={order.id}>
+                                        <tr className={`order-row ${isExpanded ? 'expanded' : ''}`}>
+                                            <td className="cell-expand">
+                                                <button
+                                                    type="button"
+                                                    className="btn-expand"
+                                                    onClick={() => toggleExpanded(order.id)}
+                                                    title={isExpanded ? 'Réduire' : 'Voir les produits'}
+                                                >
+                                                    {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                                                </button>
+                                            </td>
+                                            <td className="cell-order">
+                                                <span className="order-number">{order.po_number}</span>
+                                            </td>
+                                            <td className="cell-supplier">
+                                                {order.supplier?.name || '-'}
+                                            </td>
+                                            <td className="cell-date">
+                                                <Calendar size={14} />
+                                                {formatDate(order.order_date)}
+                                            </td>
+                                            <td className="cell-date">
+                                                {order.expected_delivery_date ? (
+                                                    <>
+                                                        <TruckIcon size={14} />
+                                                        {formatDate(order.expected_delivery_date)}
+                                                    </>
+                                                ) : '-'}
+                                            </td>
+                                            <td className="cell-items">
+                                                <Package size={14} />
+                                                {order.purchase_order_items.length} {t('inventory.incoming.products', 'products')}
+                                            </td>
+                                            <td className="cell-total">
+                                                {formatCurrency(order.total_amount)}
+                                            </td>
+                                            <td className="cell-status">
+                                                <span className={`status-badge ${getStatusColor(order.status)}`}>
+                                                    {getStatusIcon(order.status)}
+                                                    {order.status}
+                                                </span>
+                                            </td>
+                                            <td className="cell-actions">
+                                                <button
+                                                    type="button"
+                                                    className="btn-icon-sm"
+                                                    onClick={() => navigate(`/purchasing/purchase-orders/${order.id}`)}
+                                                    title={t('common.view', 'View')}
+                                                >
+                                                    <Eye size={16} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {isExpanded && (
+                                            <tr className="order-details-row">
+                                                <td colSpan={9}>
+                                                    <div className="order-products-detail">
+                                                        <div className="products-detail-header">
+                                                            <Package size={16} />
+                                                            <span>{t('inventory.incoming.products_in_order', 'Produits de la commande')}</span>
+                                                        </div>
+                                                        <table className="products-detail-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>{t('inventory.incoming.product_name', 'Produit')}</th>
+                                                                    <th>{t('inventory.incoming.sku', 'SKU')}</th>
+                                                                    <th className="text-right">{t('inventory.incoming.qty_ordered', 'Qté Commandée')}</th>
+                                                                    <th className="text-right">{t('inventory.incoming.qty_received', 'Qté Reçue')}</th>
+                                                                    <th className="text-right">{t('inventory.incoming.unit_price', 'Prix Unit.')}</th>
+                                                                    <th className="text-right">{t('inventory.incoming.line_total', 'Total')}</th>
+                                                                    <th>{t('inventory.incoming.reception_status', 'Statut')}</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {order.purchase_order_items.map(item => {
+                                                                    const receptionPercent = item.quantity > 0
+                                                                        ? Math.round((item.quantity_received / item.quantity) * 100)
+                                                                        : 0
+                                                                    const isComplete = item.quantity_received >= item.quantity
+                                                                    const isPartial = item.quantity_received > 0 && item.quantity_received < item.quantity
+                                                                    return (
+                                                                        <tr key={item.id}>
+                                                                            <td className="product-name">
+                                                                                {item.product?.name || '-'}
+                                                                            </td>
+                                                                            <td className="product-sku">
+                                                                                {item.product?.sku || '-'}
+                                                                            </td>
+                                                                            <td className="text-right">
+                                                                                {item.quantity}
+                                                                            </td>
+                                                                            <td className="text-right">
+                                                                                <span className={`qty-received ${isComplete ? 'complete' : isPartial ? 'partial' : 'pending'}`}>
+                                                                                    {item.quantity_received}
+                                                                                </span>
+                                                                            </td>
+                                                                            <td className="text-right">
+                                                                                {formatCurrency(item.unit_price)}
+                                                                            </td>
+                                                                            <td className="text-right font-semibold">
+                                                                                {formatCurrency(item.quantity * item.unit_price)}
+                                                                            </td>
+                                                                            <td>
+                                                                                <div className="reception-progress">
+                                                                                    <div
+                                                                                        className={`progress-bar ${isComplete ? 'complete' : isPartial ? 'partial' : 'pending'}`}
+                                                                                        style={{ '--progress-width': `${Math.min(receptionPercent, 100)}%` } as React.CSSProperties}
+                                                                                    />
+                                                                                    <span className="progress-text">{receptionPercent}%</span>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    )
+                                                                })}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </Fragment>
+                                )
+                            })}
                         </tbody>
                     </table>
                 )}

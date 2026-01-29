@@ -2,12 +2,23 @@ import React from 'react'
 import { Product, Category, Section } from '../../../types/database'
 import { Star, Factory, ShoppingCart, Warehouse, Check, Layers } from 'lucide-react'
 
+interface ProductUOM {
+    id: string
+    product_id: string
+    unit_name: string
+    conversion_factor: number
+    is_purchase_unit?: boolean | null
+    is_consumption_unit?: boolean | null
+    is_stock_opname_unit?: boolean | null
+}
+
 interface GeneralTabProps {
     product: Product
     categories: Category[]
     sections: Section[]
     selectedSections: string[]
     primarySectionId: string | null
+    uoms?: ProductUOM[]
     onSectionsChange: (sectionIds: string[]) => void
     onPrimarySectionChange: (sectionId: string | null) => void
     onChange: (product: Product) => void
@@ -19,10 +30,14 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
     sections,
     selectedSections,
     primarySectionId,
+    uoms = [],
     onSectionsChange,
     onPrimarySectionChange,
     onChange
 }) => {
+    // Get the purchase unit for cost display
+    const purchaseUnit = uoms.find(u => u.is_purchase_unit) || uoms[0]
+    const costUnitLabel = purchaseUnit?.unit_name || product.unit || 'unité'
     const handleSectionToggle = (sectionId: string) => {
         if (selectedSections.includes(sectionId)) {
             const newSections = selectedSections.filter(id => id !== sectionId)
@@ -130,7 +145,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                             </div>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="prod-cost">Coût Fixe</label>
+                            <label htmlFor="prod-cost">Coût Fixe <span className="label-unit-suffix">/ {costUnitLabel}</span></label>
                             <div className="form-input-prefix">
                                 <span>Rp</span>
                                 <input

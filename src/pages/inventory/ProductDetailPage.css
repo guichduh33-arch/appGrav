@@ -293,6 +293,13 @@
     background: var(--color-primary-50);
 }
 
+/* Label Unit Suffix */
+.label-unit-suffix {
+    font-weight: 400;
+    color: var(--color-gray-500);
+    font-size: 0.875rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .detail-content {

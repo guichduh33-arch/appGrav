@@ -176,7 +176,7 @@ export async function getReorderSuggestions(): Promise<IReorderSuggestion[]> {
 
         // Get last purchase price
         const { data: lastPO } = await supabase
-            .from('po_items')
+            .from('purchase_order_items')
             .select('unit_price')
             .eq('product_id', product.id)
             .order('created_at', { ascending: false })
@@ -369,7 +369,7 @@ export async function receivePoItems(
         for (const item of items) {
             // Get PO item details
             const { data: poItem } = await supabase
-                .from('po_items')
+                .from('purchase_order_items')
                 .select('product_id, quantity_ordered, quantity_received')
                 .eq('id', item.poItemId)
                 .single()
@@ -379,7 +379,7 @@ export async function receivePoItems(
             // Update received quantity
             const newReceivedQty = (poItem.quantity_received || 0) + item.receivedQuantity
             await supabase
-                .from('po_items')
+                .from('purchase_order_items')
                 .update({ quantity_received: newReceivedQty })
                 .eq('id', item.poItemId)
 
@@ -417,7 +417,7 @@ export async function receivePoItems(
 
         // Check if all items are fully received
         const { data: allItems } = await supabase
-            .from('po_items')
+            .from('purchase_order_items')
             .select('quantity_ordered, quantity_received')
             .eq('po_id', poId)
 
@@ -490,7 +490,7 @@ export async function createPoFromLowStock(
         }))
 
         const { error: itemsError } = await supabase
-            .from('po_items')
+            .from('purchase_order_items')
             .insert(poItems)
 
         if (itemsError) {

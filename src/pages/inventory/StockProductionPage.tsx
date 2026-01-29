@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-    Calendar, ChevronLeft, ChevronRight, Search, Plus, Minus,
+    Calendar, ChevronLeft, ChevronRight, Search,
     Trash2, Save, Clock, Package, Lock, Eye, Layers
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
@@ -9,12 +9,26 @@ import { Product, Section, ProductionRecord } from '../../types/database'
 import toast from 'react-hot-toast'
 import './StockProductionPage.css'
 
+// Format number with thousand separators (French locale uses spaces)
+const formatNumber = (num: number): string => {
+    return num.toLocaleString('fr-FR')
+}
+
+interface AvailableUnit {
+    name: string
+    conversionFactor: number
+    isBase: boolean
+}
+
 interface ProductionItem {
     productId: string
     name: string
     category: string
     icon: string
     unit: string
+    selectedUnit: string
+    conversionFactor: number
+    availableUnits: AvailableUnit[]
     quantity: number
     wasted: number
     wasteReason: string
@@ -119,14 +133,29 @@ export default function StockProductionPage() {
                 `)
                 .in('id', productIds)
                 .in('product_type', ['finished', 'semi_finished'])
-                .eq('is_active', true)
+                .neq('is_active', false)
 
             console.log('📦 [StockProduction] Products fetched:', data?.length)
             console.log('📦 [StockProduction] Error:', error)
 
             if (error) throw error
 
-            const products = (data || []) as unknown as ProductWithSection[]
+            // Fetch UOMs separately for each product
+            const productsWithUoms = await Promise.all(
+                (data || []).map(async (product) => {
+                    const { data: uoms } = await supabase
+                        .from('product_uoms')
+                        .select('id, unit_name, conversion_factor, is_consumption_unit')
+                        .eq('product_id', product.id)
+
+                    return {
+                        ...product,
+                        product_uoms: uoms || []
+                    }
+                })
+            )
+
+            const products = productsWithUoms as unknown as ProductWithSection[]
             console.log('📦 [StockProduction] Final products:', products.length, products.slice(0, 5).map(p => p.name))
 
             setSectionProducts(products)
@@ -183,9 +212,31 @@ export default function StockProductionPage() {
         !productionItems.find(item => item.productId === p.id)
     )
 
-    const getProductionUnit = (product: ProductWithSection): string => {
+    const getAvailableUnits = (product: ProductWithSection): AvailableUnit[] => {
+        const baseUnit = product.unit || 'pcs'
+        const units: AvailableUnit[] = [
+            { name: baseUnit, conversionFactor: 1, isBase: true }
+        ]
+
+        if (product.product_uoms) {
+            product.product_uoms.forEach(uom => {
+                units.push({
+                    name: uom.unit_name,
+                    conversionFactor: uom.conversion_factor,
+                    isBase: false
+                })
+            })
+        }
+
+        return units
+    }
+
+    const getDefaultUnit = (product: ProductWithSection): { name: string; conversionFactor: number } => {
         const consumptionUom = product.product_uoms?.find(u => u.is_consumption_unit)
-        return consumptionUom?.unit_name || product.unit || 'pcs'
+        if (consumptionUom) {
+            return { name: consumptionUom.unit_name, conversionFactor: consumptionUom.conversion_factor }
+        }
+        return { name: product.unit || 'pcs', conversionFactor: 1 }
     }
 
     type RecordWithProduct = { product?: { unit?: string; product_uoms?: ProductUOM[] } };
@@ -197,12 +248,18 @@ export default function StockProductionPage() {
     }
 
     const addProduct = (product: ProductWithSection) => {
+        const availableUnits = getAvailableUnits(product)
+        const defaultUnit = getDefaultUnit(product)
+
         setProductionItems([...productionItems, {
             productId: product.id,
             name: product.name,
             category: product.category?.name || 'General',
             icon: product.category?.icon || '',
-            unit: getProductionUnit(product),
+            unit: product.unit || 'pcs',
+            selectedUnit: defaultUnit.name,
+            conversionFactor: defaultUnit.conversionFactor,
+            availableUnits,
             quantity: 1,
             wasted: 0,
             wasteReason: ''
@@ -210,13 +267,27 @@ export default function StockProductionPage() {
         setSearchQuery('')
     }
 
-    const updateQuantity = (productId: string, field: 'quantity' | 'wasted', delta: number) => {
+    const updateQuantity = (productId: string, field: 'quantity' | 'wasted', value: number) => {
         setProductionItems(items =>
             items.map(item =>
                 item.productId === productId
-                    ? { ...item, [field]: Math.max(0, item[field] + delta) }
+                    ? { ...item, [field]: Math.max(0, value) }
                     : item
             )
+        )
+    }
+
+    const updateUnit = (productId: string, unitName: string) => {
+        setProductionItems(items =>
+            items.map(item => {
+                if (item.productId !== productId) return item
+                const unit = item.availableUnits.find(u => u.name === unitName)
+                return {
+                    ...item,
+                    selectedUnit: unitName,
+                    conversionFactor: unit?.conversionFactor || 1
+                }
+            })
         )
     }
 
@@ -244,17 +315,35 @@ export default function StockProductionPage() {
             const dateStr = selectedDate.toISOString().split('T')[0]
 
             for (const item of productionItems) {
+                // Convert quantity to base unit using conversion factor
+                const quantityInBaseUnit = item.quantity * item.conversionFactor
+                const wastedInBaseUnit = item.wasted * item.conversionFactor
+
+                // Validate numeric overflow (DECIMAL(10,3) max = 9,999,999.999)
+                const MAX_DECIMAL = 9999999.999
+                if (quantityInBaseUnit > MAX_DECIMAL || wastedInBaseUnit > MAX_DECIMAL) {
+                    throw new Error(`Quantité trop grande (${quantityInBaseUnit.toLocaleString()}). Maximum: ${MAX_DECIMAL.toLocaleString()}. Utilisez une unité plus grande.`)
+                }
+
                 // Generate production number
                 const productionNumber = `PROD-${Date.now()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`
+
+                // Build notes with unit info
+                const unitNote = item.selectedUnit !== item.unit
+                    ? `Saisi: ${item.quantity} ${item.selectedUnit} (= ${quantityInBaseUnit} ${item.unit})`
+                    : ''
+                const wasteNote = item.wasteReason ? `Perte: ${item.wasteReason}` : ''
+                const sectionNote = `Section: ${selectedSection?.name || ''}`
+                const notes = [unitNote, wasteNote, sectionNote].filter(Boolean).join('. ')
 
                 const productionData = {
                     production_id: productionNumber,
                     product_id: item.productId,
-                    quantity_produced: item.quantity,
-                    quantity_waste: item.wasted,
+                    quantity_produced: quantityInBaseUnit,
+                    quantity_waste: wastedInBaseUnit,
                     production_date: dateStr,
                     staff_id: user?.id,
-                    notes: item.wasteReason ? `Waste: ${item.wasteReason}. Section: ${selectedSection?.name || ''}` : `Section: ${selectedSection?.name || ''}`
+                    notes
                 }
 
                 const { data: prodRecord, error: prodError } = await supabase
@@ -272,17 +361,16 @@ export default function StockProductionPage() {
                     .single()
 
                 const currentStock = productData?.current_stock || 0
-                const netChange = item.quantity - item.wasted
 
-                if (item.quantity > 0) {
+                if (quantityInBaseUnit > 0) {
                     const movementId = `MV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
                     const stockData = {
                         movement_id: movementId,
                         product_id: item.productId,
                         movement_type: 'production_in' as const,
-                        quantity: item.quantity,
+                        quantity: quantityInBaseUnit,
                         stock_before: currentStock,
-                        stock_after: currentStock + item.quantity,
+                        stock_after: currentStock + quantityInBaseUnit,
                         reason: `Production ${selectedSection?.name || ''} - ${dateStr}`,
                         reference_type: 'production',
                         reference_id: prodRecord.id,
@@ -296,16 +384,16 @@ export default function StockProductionPage() {
                     if (stockError) throw stockError
                 }
 
-                if (item.wasted > 0) {
+                if (wastedInBaseUnit > 0) {
                     const wasteMovementId = `MV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
-                    const stockAfterProduction = currentStock + item.quantity
+                    const stockAfterProduction = currentStock + quantityInBaseUnit
                     const wasteData = {
                         movement_id: wasteMovementId,
                         product_id: item.productId,
                         movement_type: 'waste' as const,
-                        quantity: -item.wasted,
+                        quantity: wastedInBaseUnit, // Positive value - trigger handles subtraction for 'waste' type
                         stock_before: stockAfterProduction,
-                        stock_after: stockAfterProduction - item.wasted,
+                        stock_after: stockAfterProduction - wastedInBaseUnit,
                         reason: item.wasteReason || `Production waste ${dateStr}`,
                         reference_type: 'production',
                         reference_id: prodRecord.id,
@@ -319,12 +407,8 @@ export default function StockProductionPage() {
                     if (wasteError) throw wasteError
                 }
 
-                const { error: updateError } = await supabase
-                    .from('products')
-                    .update({ current_stock: currentStock + netChange })
-                    .eq('id', item.productId)
-
-                if (updateError) throw updateError
+                // Note: Stock update is handled automatically by the database trigger 'tr_stock_update'
+                // when stock_movements are inserted, so no manual update needed here
 
                 const { data: recipeItems } = await supabase
                     .from('recipes')
@@ -342,7 +426,8 @@ export default function StockProductionPage() {
                         const material = recipe.material as { id: string; name: string; current_stock: number | null; cost_price: number | null; unit: string | null } | null
                         if (!material) continue
 
-                        const qtyToDeduct = recipe.quantity * item.quantity
+                        // Use quantity in base unit for recipe deduction
+                        const qtyToDeduct = recipe.quantity * quantityInBaseUnit
                         const materialCurrentStock = material.current_stock || 0
 
                         const materialMovementId = `MV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
@@ -350,7 +435,7 @@ export default function StockProductionPage() {
                             movement_id: materialMovementId,
                             product_id: recipe.material_id,
                             movement_type: 'production_out' as const,
-                            quantity: -qtyToDeduct,
+                            quantity: qtyToDeduct, // Positive value - trigger handles subtraction for 'production_out' type
                             stock_before: materialCurrentStock,
                             stock_after: materialCurrentStock - qtyToDeduct,
                             reason: `Used for: ${item.name} (x${item.quantity}) - ${dateStr}`,
@@ -363,10 +448,7 @@ export default function StockProductionPage() {
                             .from('stock_movements')
                             .insert(movementData as never)
 
-                        await supabase
-                            .from('products')
-                            .update({ current_stock: materialCurrentStock - qtyToDeduct })
-                            .eq('id', recipe.material_id)
+                        // Note: Material stock update is handled automatically by the database trigger 'tr_stock_update'
                     }
                 }
             }
@@ -558,31 +640,47 @@ export default function StockProductionPage() {
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div className="quantity-control">
-                                                        <button onClick={() => updateQuantity(item.productId, 'quantity', -1)} className="qty-btn" title="Diminuer" aria-label="Diminuer Quantité">
-                                                            <Minus size={16} />
-                                                        </button>
-                                                        <div className="qty-value">
-                                                            <span className="qty-number">{item.quantity}</span>
-                                                            <span className="qty-unit">{item.unit}</span>
-                                                        </div>
-                                                        <button onClick={() => updateQuantity(item.productId, 'quantity', 1)} className="qty-btn" title="Augmenter" aria-label="Augmenter Quantité">
-                                                            <Plus size={16} />
-                                                        </button>
+                                                    <div className="quantity-input-group">
+                                                        <input
+                                                            type="number"
+                                                            value={item.quantity}
+                                                            onChange={(e) => updateQuantity(item.productId, 'quantity', parseFloat(e.target.value) || 0)}
+                                                            className="qty-input"
+                                                            min="0"
+                                                            step="0.1"
+                                                            placeholder="0"
+                                                        />
+                                                        {item.availableUnits.length > 1 ? (
+                                                            <select
+                                                                value={item.selectedUnit}
+                                                                onChange={(e) => updateUnit(item.productId, e.target.value)}
+                                                                className="unit-select"
+                                                                title="Sélectionner l'unité"
+                                                                aria-label="Sélectionner l'unité"
+                                                            >
+                                                                {item.availableUnits.map(u => (
+                                                                    <option key={u.name} value={u.name}>
+                                                                        {u.name}
+                                                                    </option>
+                                                                ))}
+                                                            </select>
+                                                        ) : (
+                                                            <span className="unit-label">{item.selectedUnit}</span>
+                                                        )}
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div className="quantity-control waste">
-                                                        <button onClick={() => updateQuantity(item.productId, 'wasted', -1)} className="qty-btn waste" title="Diminuer" aria-label="Diminuer Perte">
-                                                            <Minus size={16} />
-                                                        </button>
-                                                        <div className="qty-value">
-                                                            <span className={`qty-number ${item.wasted > 0 ? 'text-red' : ''}`}>{item.wasted}</span>
-                                                            {item.wasted > 0 && <span className="qty-unit text-red">{item.unit}</span>}
-                                                        </div>
-                                                        <button onClick={() => updateQuantity(item.productId, 'wasted', 1)} className="qty-btn waste" title="Augmenter" aria-label="Augmenter Perte">
-                                                            <Plus size={16} />
-                                                        </button>
+                                                    <div className="quantity-input-group waste">
+                                                        <input
+                                                            type="number"
+                                                            value={item.wasted}
+                                                            onChange={(e) => updateQuantity(item.productId, 'wasted', parseFloat(e.target.value) || 0)}
+                                                            className={`qty-input ${item.wasted > 0 ? 'waste-active' : ''}`}
+                                                            min="0"
+                                                            step="0.1"
+                                                            placeholder="0"
+                                                        />
+                                                        <span className={`unit-label ${item.wasted > 0 ? 'text-red' : ''}`}>{item.selectedUnit}</span>
                                                     </div>
                                                 </td>
                                                 <td>
@@ -643,11 +741,11 @@ export default function StockProductionPage() {
                             <h3>Resume du jour</h3>
                             <div className="summary-grid">
                                 <div className="summary-item produced">
-                                    <div className="summary-value">{totalProduced}</div>
+                                    <div className="summary-value">{formatNumber(totalProduced)}</div>
                                     <div className="summary-label">Produit</div>
                                 </div>
                                 <div className="summary-item waste">
-                                    <div className="summary-value">{totalWaste}</div>
+                                    <div className="summary-value">{formatNumber(totalWaste)}</div>
                                     <div className="summary-label">Perte</div>
                                 </div>
                             </div>
@@ -678,11 +776,11 @@ export default function StockProductionPage() {
                                             </div>
                                             <div className="history-item-actions">
                                                 <span className="badge-produced">
-                                                    +{record.quantity_produced} {getRecordUnit(record as RecordWithProduct)}
+                                                    +{formatNumber(record.quantity_produced)} {getRecordUnit(record as RecordWithProduct)}
                                                 </span>
                                                 {(record as unknown as { quantity_waste?: number }).quantity_waste && (record as unknown as { quantity_waste: number }).quantity_waste > 0 && (
                                                     <span className="badge-waste">
-                                                        -{(record as unknown as { quantity_waste: number }).quantity_waste} {getRecordUnit(record as RecordWithProduct)}
+                                                        -{formatNumber((record as unknown as { quantity_waste: number }).quantity_waste)} {getRecordUnit(record as RecordWithProduct)}
                                                     </span>
                                                 )}
                                                 {isAdmin && (

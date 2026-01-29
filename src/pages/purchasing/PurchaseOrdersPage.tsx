@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Plus, Search, FileText, DollarSign, Package, Trash2, Eye, Edit2, Check, Clock } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useNavigate } from 'react-router-dom'
+import { formatCurrency } from '@/utils/helpers'
 import './PurchaseOrdersPage.css'
 
 interface PurchaseOrder {
@@ -210,7 +211,7 @@ export default function PurchaseOrdersPage() {
                         <DollarSign size={24} />
                     </div>
                     <div className="purchase-orders-stat__content">
-                        <div className="purchase-orders-stat__value">{stats.totalValue.toFixed(2)}€</div>
+                        <div className="purchase-orders-stat__value">{formatCurrency(stats.totalValue)}</div>
                         <div className="purchase-orders-stat__label">Valeur Totale</div>
                     </div>
                 </div>
@@ -308,7 +309,7 @@ export default function PurchaseOrdersPage() {
                                         </span>
                                     </td>
                                     <td>
-                                        <strong>{(parseFloat(po.total_amount?.toString() ?? '0') || 0).toFixed(2)}€</strong>
+                                        <strong>{formatCurrency(parseFloat(po.total_amount?.toString() ?? '0') || 0)}</strong>
                                     </td>
                                     <td>
                                         <div className="purchase-orders-table__actions">

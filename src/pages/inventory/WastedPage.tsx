@@ -23,7 +23,8 @@ interface WasteRecord {
     quantity: number
     reason: string
     notes: string | null
-    performed_by: string | null
+    created_by: string | null
+    created_by_name: string | null
     created_at: string
     unit_cost: number | null
 }
@@ -80,7 +81,8 @@ export default function WastedPage() {
                     product:products(id, name, sku, unit),
                     quantity,
                     notes,
-                    performed_by,
+                    created_by,
+                    created_by_name,
                     created_at,
                     unit_cost
                 `)
@@ -110,7 +112,8 @@ export default function WastedPage() {
                 product: { id: string; name: string; sku: string; unit: string } | null;
                 quantity: number;
                 notes?: string | null;
-                performed_by?: string | null;
+                created_by?: string | null;
+                created_by_name?: string | null;
                 created_at: string;
                 unit_cost?: number | null;
             }>;
@@ -121,17 +124,18 @@ export default function WastedPage() {
                 quantity: r.quantity,
                 reason: r.notes?.split(':')[0] || 'other',
                 notes: r.notes ?? null,
-                performed_by: r.performed_by ?? null,
+                created_by: r.created_by ?? null,
+                created_by_name: r.created_by_name ?? null,
                 created_at: r.created_at,
                 unit_cost: r.unit_cost ?? null
             }))
             setWasteRecords(mappedData)
 
-            // Load products for the form
+            // Load products for the form (include null is_active as active)
             const { data: productsData, error: productsError } = await supabase
                 .from('products')
                 .select('id, name, sku, unit, cost_price, current_stock')
-                .eq('is_active', true)
+                .neq('is_active', false)
                 .order('name')
 
             if (productsError) throw productsError
@@ -200,7 +204,7 @@ export default function WastedPage() {
                     movement_type: 'waste',
                     quantity: -qty, // Negative for waste
                     notes: combinedNotes,
-                    performed_by: user?.id,
+                    created_by: user?.id,
                     unit_cost: selectedProduct.cost_price || 0
                 } as never)
 
@@ -368,7 +372,7 @@ export default function WastedPage() {
                                         {formatCurrency(Math.abs(record.quantity) * (record.unit_cost || 0))}
                                     </td>
                                     <td className="cell-user">
-                                        {record.performed_by || '-'}
+                                        {record.created_by_name || '-'}
                                     </td>
                                     <td className="cell-notes">
                                         {record.notes || '-'}
