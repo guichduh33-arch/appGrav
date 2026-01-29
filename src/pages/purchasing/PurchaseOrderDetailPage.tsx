@@ -229,15 +229,34 @@ export default function PurchaseOrderDetailPage() {
         if (!purchaseOrder) return
 
         try {
+            const paymentDate = new Date().toISOString()
+
             const { error } = await supabase
                 .from('purchase_orders')
                 .update({
                     payment_status: 'paid',
-                    payment_date: new Date().toISOString()
+                    payment_date: paymentDate
                 } as never)
                 .eq('id', id!)
 
             if (error) throw error
+
+            // Log history with metadata
+            await supabase
+                .from('purchase_order_history')
+                .insert({
+                    purchase_order_id: id!,
+                    action_type: 'payment_made',
+                    previous_status: purchaseOrder.payment_status,
+                    new_status: 'paid',
+                    description: `Paiement complet effectué - ${formatCurrency(purchaseOrder.total_amount)}`,
+                    metadata: {
+                        payment_amount: purchaseOrder.total_amount,
+                        previous_payment_status: purchaseOrder.payment_status,
+                        payment_date: paymentDate
+                    }
+                } as never)
+
             await fetchPurchaseOrderDetails()
         } catch (error) {
             console.error('Error updating payment status:', error)
@@ -317,6 +336,27 @@ export default function PurchaseOrderDetailPage() {
 
             if (error) throw error
 
+            // Log history with metadata for reception
+            if (delta !== 0) {
+                const actionType = delta > 0 ? 'partially_received' : 'modified'
+                await supabase
+                    .from('purchase_order_history')
+                    .insert({
+                        purchase_order_id: id!,
+                        action_type: actionType,
+                        description: delta > 0
+                            ? `Réception de ${delta} unité(s) de ${item.product_name}`
+                            : `Ajustement réception: ${item.product_name} (${previousReceived} → ${newReceived})`,
+                        metadata: {
+                            product_name: item.product_name,
+                            quantity_received: delta > 0 ? delta : newReceived,
+                            previous_received: previousReceived,
+                            new_received: newReceived,
+                            total_ordered: item.quantity
+                        }
+                    } as never)
+            }
+
             // Check if all items received
             const allReceived = items.every(item =>
                 item.id === itemId
@@ -376,6 +416,29 @@ export default function PurchaseOrderDetailPage() {
                 } as never)
 
             if (error) throw error
+
+            // Log history with metadata for return
+            await supabase
+                .from('purchase_order_history')
+                .insert({
+                    purchase_order_id: id!,
+                    action_type: 'item_returned',
+                    description: `Retour de ${returnForm.quantity} unité(s) de ${selectedItem.product_name}`,
+                    metadata: {
+                        product_name: selectedItem.product_name,
+                        return_quantity: returnForm.quantity,
+                        return_reason: returnForm.reason,
+                        return_reason_details: returnForm.reason_details || null,
+                        refund_amount: returnForm.refund_amount || null
+                    }
+                } as never)
+
+            // Update quantity_returned in PO item
+            const newTotalReturned = parseFloat(selectedItem.quantity_returned.toString()) + returnForm.quantity
+            await supabase
+                .from('purchase_order_items')
+                .update({ quantity_returned: newTotalReturned } as never)
+                .eq('id', selectedItem.id)
 
             await fetchPurchaseOrderDetails()
             setShowReturnModal(false)
