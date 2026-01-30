@@ -80,19 +80,19 @@ describe('NetworkIndicator', () => {
       });
     });
 
-    it('should render offline status with red styling', () => {
+    it('should render offline status with gray styling (non-alarming per Story 1.4)', () => {
       render(<NetworkIndicator />);
 
       expect(screen.getByText('Offline')).toBeInTheDocument();
-      expect(screen.getByRole('status')).toHaveClass('bg-red-100');
+      expect(screen.getByRole('status')).toHaveClass('bg-gray-100');
     });
 
-    it('should render WifiOff icon when offline', () => {
+    it('should render WifiOff icon when offline with gray color', () => {
       const { container } = render(<NetworkIndicator />);
 
       const svg = container.querySelector('svg');
       expect(svg).toBeInTheDocument();
-      expect(svg).toHaveClass('text-red-600');
+      expect(svg).toHaveClass('text-gray-500');
     });
   });
 

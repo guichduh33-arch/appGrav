@@ -14,6 +14,12 @@ interface IUseNetworkStatusReturn {
 /**
  * Hook for monitoring and managing network connectivity status
  *
+ * **IMPORTANT:** This is the PRIMARY network status hook for the application.
+ * Uses Zustand store (networkStore) for centralized state management.
+ *
+ * For simple online/offline checks without LAN mode, see:
+ * - `src/hooks/offline/useNetworkStatus.ts` (simpler, standalone version)
+ *
  * Features:
  * - Listens to browser online/offline events
  * - Updates networkStore state on changes
@@ -87,3 +93,5 @@ export function useNetworkStatus(): IUseNetworkStatusReturn {
     lastOnlineAt
   };
 }
+
+export default useNetworkStatus;

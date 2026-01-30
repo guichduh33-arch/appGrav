@@ -406,6 +406,43 @@
 }
 
 /* ============================================
+   OFFLINE MODE INDICATOR (Story 1.2)
+   ============================================ */
+.login-offline-indicator {
+    background-color: #6b7280;
+    color: white;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    font-size: var(--text-sm);
+    font-family: var(--font-body);
+}
+
+/* Rate limit cooldown display (Story 1.2) */
+.login-cooldown {
+    text-align: center;
+    color: var(--color-gold-light);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
+    background: rgba(201, 165, 92, 0.1);
+    border: 1px solid rgba(201, 165, 92, 0.3);
+    border-radius: var(--radius-lg);
+}
+
+.login-cooldown__timer {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    display: block;
+    margin-top: var(--space-xs);
+}
+
+/* ============================================
    DEMO HINT
    ============================================ */
 .login-hint {

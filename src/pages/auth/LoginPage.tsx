@@ -7,11 +7,22 @@ import toast from 'react-hot-toast';
 import './LoginPage.css';
 import { UserProfile } from '../../types/database';
 import type { Role } from '../../types/auth';
+// Offline authentication imports (Story 1.2)
+import { useNetworkStatus, useOfflineAuth } from '../../hooks/offline';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { loginWithPin, isLoading: authLoading, isAuthenticated } = useAuthStore();
+
+  // Offline authentication hooks (Story 1.2)
+  const { isOffline } = useNetworkStatus();
+  const {
+    loginOffline,
+    isRateLimited,
+    cooldownSeconds,
+    clearError: clearOfflineError,
+  } = useOfflineAuth();
 
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>('');
@@ -90,11 +101,44 @@ export default function LoginPage() {
       return;
     }
 
+    // Check rate limiting for offline auth (Story 1.2)
+    if (isRateLimited) {
+      setError(t('auth.offline.rateLimited', { seconds: cooldownSeconds }));
+      return;
+    }
+
     setIsLoading(true);
     setError('');
+    clearOfflineError();
     setAttemptsRemaining(null);
     setLockedUntil(null);
 
+    // OFFLINE MODE: Use offline authentication (Story 1.2)
+    if (isOffline) {
+      try {
+        await loginOffline(selectedUser, pin);
+        const user = users.find(u => u.id === selectedUser);
+        toast.success(`${t('common.welcome')}, ${user?.display_name || user?.name}! (${t('auth.offline.mode')})`);
+        navigate('/pos');
+        return;
+      } catch (offlineErr) {
+        const errCode = (offlineErr as Error).message;
+        if (errCode === 'CACHE_EXPIRED') {
+          setError(t('auth.offline.sessionExpiredOnlineRequired'));
+        } else if (errCode === 'RATE_LIMITED') {
+          setError(t('auth.offline.rateLimited', { seconds: cooldownSeconds }));
+        } else {
+          // Generic error for security (don't reveal cache state)
+          setError(t('auth.offline.pinIncorrect'));
+        }
+        setIsLoading(false);
+        return;
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    // ONLINE MODE: Standard authentication flow
     try {
       // Try the new auth system first
       const result = await loginWithPin(selectedUser, pin);
@@ -262,6 +306,22 @@ export default function LoginPage() {
           <h1 className="login-logo__text">The Breakery</h1>
           <p className="login-logo__subtitle">{t('auth.login.title') || 'Point de Vente'}</p>
         </div>
+
+        {/* Offline Mode Indicator (Story 1.2) */}
+        {isOffline && (
+          <div className="login-offline-indicator">
+            <span>📶</span>
+            <span>{t('auth.offline.mode')}</span>
+          </div>
+        )}
+
+        {/* Rate Limit Cooldown Display (Story 1.2) */}
+        {isRateLimited && (
+          <div className="login-cooldown">
+            <span>{t('auth.offline.rateLimitedWait')}</span>
+            <span className="login-cooldown__timer">{cooldownSeconds}s</span>
+          </div>
+        )}
 
         {/* Language selector */}
         <div className="login-language">

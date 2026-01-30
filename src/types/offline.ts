@@ -52,6 +52,37 @@ export interface IOfflineUser {
 }
 
 // =====================================================
+// Offline Auth Types (Story 1.2)
+// =====================================================
+
+/**
+ * Error codes for offline authentication
+ * Used to return generic errors without revealing cache state
+ */
+export type TOfflineAuthError =
+  | 'INVALID_PIN'       // PIN verification failed (also used for cache miss - security)
+  | 'CACHE_EXPIRED'     // Cache older than 24h - online login required
+  | 'RATE_LIMITED';     // Too many failed attempts
+
+/**
+ * Result of offline PIN verification
+ * @see offlineAuthService.verifyPinOffline()
+ */
+export interface IOfflineAuthResult {
+  /** Whether authentication succeeded */
+  success: boolean;
+
+  /** Error code if authentication failed */
+  error?: TOfflineAuthError;
+
+  /** Cached user data if authentication succeeded */
+  user?: IOfflineUser;
+
+  /** Seconds to wait if rate limited */
+  waitSeconds?: number;
+}
+
+// =====================================================
 // Sync Queue Types (Foundation for Story 3.1)
 // =====================================================
 

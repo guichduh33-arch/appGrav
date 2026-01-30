@@ -5,3 +5,5 @@
  */
 
 export { offlineAuthService } from './offlineAuthService';
+export { rateLimitService } from './rateLimitService';
+export type { IRateLimitCheck } from './rateLimitService';

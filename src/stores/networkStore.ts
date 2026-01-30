@@ -34,7 +34,7 @@ export interface INetworkState {
  * State transitions:
  * - online: Internet available (green indicator)
  * - lan-only: No internet but LAN available (yellow indicator)
- * - offline: No connectivity (red indicator)
+ * - offline: No connectivity (gray indicator - non-alarming per Story 1.4)
  *
  * Persistence: lastOnlineAt and lanHubUrl are persisted to localStorage
  */
@@ -81,23 +81,37 @@ export const useNetworkStore = create<INetworkState>()(
         lastOnlineAt: state.lastOnlineAt,
         lanHubUrl: state.lanHubUrl
       }),
-      // Custom storage to handle Date serialization
+      // Custom storage to handle Date serialization with error handling
       storage: {
         getItem: (name) => {
-          const str = localStorage.getItem(name);
-          if (!str) return null;
-          const parsed = JSON.parse(str);
-          // Restore lastOnlineAt as Date object
-          if (parsed.state?.lastOnlineAt) {
-            parsed.state.lastOnlineAt = new Date(parsed.state.lastOnlineAt);
+          try {
+            const str = localStorage.getItem(name);
+            if (!str) return null;
+            const parsed = JSON.parse(str);
+            // Restore lastOnlineAt as Date object
+            if (parsed.state?.lastOnlineAt) {
+              parsed.state.lastOnlineAt = new Date(parsed.state.lastOnlineAt);
+            }
+            return parsed;
+          } catch (error) {
+            // If localStorage is corrupted, return null to use default state
+            console.warn('[networkStore] Failed to parse persisted state, using defaults:', error);
+            return null;
           }
-          return parsed;
         },
         setItem: (name, value) => {
-          localStorage.setItem(name, JSON.stringify(value));
+          try {
+            localStorage.setItem(name, JSON.stringify(value));
+          } catch (error) {
+            console.warn('[networkStore] Failed to persist state:', error);
+          }
         },
         removeItem: (name) => {
-          localStorage.removeItem(name);
+          try {
+            localStorage.removeItem(name);
+          } catch (error) {
+            console.warn('[networkStore] Failed to remove persisted state:', error);
+          }
         },
       },
     }

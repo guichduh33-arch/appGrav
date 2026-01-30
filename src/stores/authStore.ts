@@ -8,6 +8,16 @@ import { offlineAuthService } from '../services/offline/offlineAuthService';
 // Session storage keys
 const SESSION_TOKEN_KEY = 'breakery-session-token';
 
+/**
+ * Minimal user data for offline session
+ * Used when full UserProfile is not available
+ */
+interface IOfflineUserData {
+  id: string;
+  display_name: string | null;
+  preferred_language: 'fr' | 'en' | 'id';
+}
+
 interface AuthState {
   // User data
   user: UserProfile | null;
@@ -20,11 +30,21 @@ interface AuthState {
   sessionId: string | null;
   sessionToken: string | null;
 
+  // Offline session state (Story 1.2)
+  isOfflineSession: boolean;
+
   // Actions
   loginWithPin: (userId: string, pin: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<boolean>;
   setLoading: (isLoading: boolean) => void;
+
+  // Offline session actions (Story 1.2)
+  setOfflineSession: (
+    userData: IOfflineUserData,
+    roles: Role[],
+    permissions: EffectivePermission[]
+  ) => void;
 
   // Legacy support
   login: (user: UserProfile) => void;
@@ -42,6 +62,7 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
       sessionId: null,
       sessionToken: null,
+      isOfflineSession: false,
 
       /**
        * Login with PIN using the new auth system
@@ -115,7 +136,7 @@ export const useAuthStore = create<AuthState>()(
         // Clear session token from storage
         sessionStorage.removeItem(SESSION_TOKEN_KEY);
 
-        // Clear state
+        // Clear state including offline session flag (Story 1.2)
         set({
           user: null,
           roles: [],
@@ -124,6 +145,7 @@ export const useAuthStore = create<AuthState>()(
           isLoading: false,
           sessionId: null,
           sessionToken: null,
+          isOfflineSession: false,
         });
       },
 
@@ -180,6 +202,67 @@ export const useAuthStore = create<AuthState>()(
        */
       setLoading: (isLoading: boolean) => set({ isLoading }),
 
+      /**
+       * Set offline session (Story 1.2)
+       *
+       * Called when user authenticates offline using cached credentials.
+       * Creates a local session without server validation.
+       */
+      setOfflineSession: (
+        userData: IOfflineUserData,
+        roles: Role[],
+        permissions: EffectivePermission[]
+      ) => {
+        // Build a minimal UserProfile from cached data
+        // Using 'as UserProfile' since we're constructing from offline cache
+        // with only the essential fields needed for the UI
+        const offlineUser = {
+          id: userData.id,
+          name: userData.display_name || 'User', // Required field
+          display_name: userData.display_name,
+          preferred_language: userData.preferred_language,
+          // Required fields with defaults
+          role: 'cashier' as const, // Default role for offline - actual roles are in the roles array
+          is_active: true,
+          can_apply_discount: false,
+          can_cancel_order: false,
+          can_access_reports: false,
+          // Nullable fields
+          auth_user_id: null,
+          phone: null,
+          pin_hash: null, // Never expose PIN hash in session
+          pin_code: null,
+          avatar_url: null,
+          employee_code: null,
+          first_name: null,
+          last_name: null,
+          timezone: 'Asia/Makassar',
+          last_login_at: null,
+          failed_login_attempts: 0,
+          locked_until: null,
+          password_changed_at: null,
+          must_change_password: false,
+          created_by: null,
+          updated_by: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        } as UserProfile;
+
+        set({
+          user: offlineUser,
+          roles,
+          permissions,
+          isAuthenticated: true,
+          isOfflineSession: true,
+          isLoading: false,
+          // No server session in offline mode
+          sessionId: null,
+          sessionToken: null,
+        });
+
+        console.debug('[authStore] Offline session created for user:', userData.id);
+      },
+
       // ========================================
       // Legacy support methods
       // ========================================
@@ -208,6 +291,7 @@ export const useAuthStore = create<AuthState>()(
         permissions: state.permissions,
         isAuthenticated: state.isAuthenticated,
         sessionId: state.sessionId,
+        isOfflineSession: state.isOfflineSession,
       }),
     }
   )

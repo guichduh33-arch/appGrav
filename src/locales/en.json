@@ -500,7 +500,12 @@
             "pos.no_sale": "No sale opening",
             "pos.price_override": "Override price",
             "kds.view": "View kitchen display",
-            "kds.update": "Update status"
+            "kds.update": "Update status",
+            "manager_pin_required": "Manager PIN required",
+            "sensitive_action_offline": "This action requires manager confirmation because you are offline",
+            "action_void": "Void an order",
+            "action_refund": "Process a refund",
+            "action_discount": "Apply a significant discount"
         },
         "modules": {
             "sales": "Sales",
@@ -522,6 +527,14 @@
             "sessionExpired": "Session expired. Please log in again",
             "accessDenied": "Access Denied",
             "noPermission": "You do not have permission to access this resource"
+        },
+        "offline": {
+            "mode": "Offline Mode",
+            "sessionExpiredOnlineRequired": "Session expired - internet connection required",
+            "rateLimited": "Too many attempts. Please wait {{seconds}} seconds",
+            "rateLimitedWait": "Please wait",
+            "pinIncorrect": "Incorrect PIN",
+            "sessionIndicator": "Offline Session"
         },
         "profile": {
             "title": "My Profile",

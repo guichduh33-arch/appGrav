@@ -5,19 +5,28 @@
  * Uses fake-indexeddb for IndexedDB simulation.
  *
  * @see Story 1.1: Offline PIN Cache Setup
+ * @see Story 1.2: Offline PIN Authentication
  */
 
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import 'fake-indexeddb/auto';
+import bcryptjs from 'bcryptjs';
 import { db } from '@/lib/db';
 import { offlineAuthService } from '../offlineAuthService';
 import type { Role, EffectivePermission } from '@/types/auth';
 import { OFFLINE_USER_CACHE_TTL_MS } from '@/types/offline';
 
+// Real PIN for testing (will be hashed)
+const TEST_PIN = '1234';
+
+// Generate a real bcrypt hash for testing
+// bcrypt.hashSync is used only in tests - production uses server-generated hashes
+const REAL_PIN_HASH = bcryptjs.hashSync(TEST_PIN, 10);
+
 // Mock user data
 const mockUser = {
   id: 'user-123-uuid',
-  pin_hash: '$2b$10$hashed.pin.value.here',
+  pin_hash: REAL_PIN_HASH,
   display_name: 'Test User',
   preferred_language: 'fr' as const,
 };
@@ -293,6 +302,287 @@ describe('offlineAuthService', () => {
       const available = await offlineAuthService.isOfflineAuthAvailable(mockUser.id);
 
       expect(available).toBe(false);
+    });
+  });
+
+  // =====================================================
+  // Story 1.2: Offline PIN Authentication Tests
+  // =====================================================
+
+  describe('verifyPinOffline', () => {
+    it('should return success with user data when PIN is correct', async () => {
+      await offlineAuthService.cacheUserCredentials(mockUser, mockRoles, mockPermissions);
+
+      const result = await offlineAuthService.verifyPinOffline(mockUser.id, TEST_PIN);
+
+      expect(result.success).toBe(true);
+      expect(result.user).toBeDefined();
+      expect(result.user?.id).toBe(mockUser.id);
+      expect(result.user?.display_name).toBe(mockUser.display_name);
+      expect(result.user?.roles).toHaveLength(1);
+      expect(result.user?.permissions).toHaveLength(2);
+      expect(result.error).toBeUndefined();
+    });
+
+    it('should return INVALID_PIN error when PIN is incorrect', async () => {
+      await offlineAuthService.cacheUserCredentials(mockUser, mockRoles, mockPermissions);
+
+      const result = await offlineAuthService.verifyPinOffline(mockUser.id, '9999');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('INVALID_PIN');
+      expect(result.user).toBeUndefined();
+    });
+
+    it('should return INVALID_PIN error when user not in cache (security)', async () => {
+      // Security: Don't reveal whether user exists in cache
+      const result = await offlineAuthService.verifyPinOffline('non-existent-id', TEST_PIN);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('INVALID_PIN');
+      expect(result.user).toBeUndefined();
+    });
+
+    it('should return CACHE_EXPIRED error when cache has expired', async () => {
+      await offlineAuthService.cacheUserCredentials(mockUser, mockRoles, mockPermissions);
+
+      // Mock Date.now to simulate 25 hours later
+      const originalNow = Date.now;
+      vi.spyOn(Date, 'now').mockImplementation(() => originalNow() + OFFLINE_USER_CACHE_TTL_MS + 3600000);
+
+      const result = await offlineAuthService.verifyPinOffline(mockUser.id, TEST_PIN);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('CACHE_EXPIRED');
+      expect(result.user).toBeUndefined();
+    });
+
+    it('should return success when cache is still valid (23h old)', async () => {
+      await offlineAuthService.cacheUserCredentials(mockUser, mockRoles, mockPermissions);
+
+      // Mock Date.now to simulate 23 hours later (still valid)
+      const originalNow = Date.now;
+      vi.spyOn(Date, 'now').mockImplementation(() => originalNow() + OFFLINE_USER_CACHE_TTL_MS - 3600000);
+
+      const result = await offlineAuthService.verifyPinOffline(mockUser.id, TEST_PIN);
+
+      expect(result.success).toBe(true);
+      expect(result.user).toBeDefined();
+    });
+
+    it('should handle empty PIN input', async () => {
+      await offlineAuthService.cacheUserCredentials(mockUser, mockRoles, mockPermissions);
+
+      const result = await offlineAuthService.verifyPinOffline(mockUser.id, '');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('INVALID_PIN');
+    });
+
+    it('should preserve roles and permissions in returned user', async () => {
+      await offlineAuthService.cacheUserCredentials(mockUser, mockRoles, mockPermissions);
+
+      const result = await offlineAuthService.verifyPinOffline(mockUser.id, TEST_PIN);
+
+      expect(result.success).toBe(true);
+      expect(result.user?.roles[0].code).toBe('CASHIER');
+      expect(result.user?.permissions.some(p => p.permission_code === 'sales.create')).toBe(true);
+      expect(result.user?.permissions.some(p => p.permission_code === 'sales.view')).toBe(true);
+    });
+  });
+
+  // =====================================================
+  // Story 1.3: Offline Permissions Cache Tests
+  // =====================================================
+
+  describe('hasPermissionOffline', () => {
+    it('should return true for granted permission', async () => {
+      await offlineAuthService.cacheUserCredentials(mockUser, mockRoles, mockPermissions);
+
+      const hasPermission = await offlineAuthService.hasPermissionOffline(mockUser.id, 'sales.create');
+
+      expect(hasPermission).toBe(true);
+    });
+
+    it('should return false for non-existent permission', async () => {
+      await offlineAuthService.cacheUserCredentials(mockUser, mockRoles, mockPermissions);
+
+      const hasPermission = await offlineAuthService.hasPermissionOffline(mockUser.id, 'inventory.delete');
+
+      expect(hasPermission).toBe(false);
+    });
+
+    it('should return false for denied permission (is_granted: false)', async () => {
+      const permissionsWithDenied: EffectivePermission[] = [
+        ...mockPermissions,
+        {
+          permission_code: 'sales.void',
+          permission_module: 'sales',
+          permission_action: 'void',
+          is_granted: false, // Explicitly denied
+          source: 'role',
+          is_sensitive: true,
+        },
+      ];
+
+      await offlineAuthService.cacheUserCredentials(mockUser, mockRoles, permissionsWithDenied);
+
+      const hasPermission = await offlineAuthService.hasPermissionOffline(mockUser.id, 'sales.void');
+
+      expect(hasPermission).toBe(false);
+    });
+
+    it('should return false for non-cached user', async () => {
+      const hasPermission = await offlineAuthService.hasPermissionOffline('non-existent-id', 'sales.create');
+
+      expect(hasPermission).toBe(false);
+    });
+  });
+
+  describe('hasRoleOffline', () => {
+    it('should return true for existing role', async () => {
+      await offlineAuthService.cacheUserCredentials(mockUser, mockRoles, mockPermissions);
+
+      const hasRole = await offlineAuthService.hasRoleOffline(mockUser.id, 'CASHIER');
+
+      expect(hasRole).toBe(true);
+    });
+
+    it('should return false for non-existent role', async () => {
+      await offlineAuthService.cacheUserCredentials(mockUser, mockRoles, mockPermissions);
+
+      const hasRole = await offlineAuthService.hasRoleOffline(mockUser.id, 'ADMIN');
+
+      expect(hasRole).toBe(false);
+    });
+
+    it('should return false for non-cached user', async () => {
+      const hasRole = await offlineAuthService.hasRoleOffline('non-existent-id', 'CASHIER');
+
+      expect(hasRole).toBe(false);
+    });
+  });
+
+  describe('getOfflinePermissions', () => {
+    it('should return all cached permissions', async () => {
+      await offlineAuthService.cacheUserCredentials(mockUser, mockRoles, mockPermissions);
+
+      const permissions = await offlineAuthService.getOfflinePermissions(mockUser.id);
+
+      expect(permissions).toHaveLength(2);
+      expect(permissions.some(p => p.permission_code === 'sales.create')).toBe(true);
+      expect(permissions.some(p => p.permission_code === 'sales.view')).toBe(true);
+    });
+
+    it('should return empty array for non-cached user', async () => {
+      const permissions = await offlineAuthService.getOfflinePermissions('non-existent-id');
+
+      expect(permissions).toEqual([]);
+    });
+  });
+
+  describe('getOfflineRoles', () => {
+    it('should return all cached roles', async () => {
+      await offlineAuthService.cacheUserCredentials(mockUser, mockRoles, mockPermissions);
+
+      const roles = await offlineAuthService.getOfflineRoles(mockUser.id);
+
+      expect(roles).toHaveLength(1);
+      expect(roles[0].code).toBe('CASHIER');
+    });
+
+    it('should return empty array for non-cached user', async () => {
+      const roles = await offlineAuthService.getOfflineRoles('non-existent-id');
+
+      expect(roles).toEqual([]);
+    });
+  });
+
+  describe('isManagerOrAboveOffline', () => {
+    it('should return false for CASHIER role', async () => {
+      await offlineAuthService.cacheUserCredentials(mockUser, mockRoles, mockPermissions);
+
+      const isManager = await offlineAuthService.isManagerOrAboveOffline(mockUser.id);
+
+      expect(isManager).toBe(false);
+    });
+
+    it('should return true for MANAGER role', async () => {
+      const managerRoles: Role[] = [
+        {
+          id: 'role-manager',
+          code: 'MANAGER',
+          name_fr: 'Manager',
+          name_en: 'Manager',
+          name_id: 'Manajer',
+          description: null,
+          is_system: false,
+          is_active: true,
+          hierarchy_level: 30,
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-01-01T00:00:00Z',
+        },
+      ];
+
+      await offlineAuthService.cacheUserCredentials(mockUser, managerRoles, mockPermissions);
+
+      const isManager = await offlineAuthService.isManagerOrAboveOffline(mockUser.id);
+
+      expect(isManager).toBe(true);
+    });
+
+    it('should return true for ADMIN role', async () => {
+      const adminRoles: Role[] = [
+        {
+          id: 'role-admin',
+          code: 'ADMIN',
+          name_fr: 'Admin',
+          name_en: 'Admin',
+          name_id: 'Admin',
+          description: null,
+          is_system: false,
+          is_active: true,
+          hierarchy_level: 40,
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-01-01T00:00:00Z',
+        },
+      ];
+
+      await offlineAuthService.cacheUserCredentials(mockUser, adminRoles, mockPermissions);
+
+      const isManager = await offlineAuthService.isManagerOrAboveOffline(mockUser.id);
+
+      expect(isManager).toBe(true);
+    });
+
+    it('should return true for SUPER_ADMIN role', async () => {
+      const superAdminRoles: Role[] = [
+        {
+          id: 'role-superadmin',
+          code: 'SUPER_ADMIN',
+          name_fr: 'Super Admin',
+          name_en: 'Super Admin',
+          name_id: 'Super Admin',
+          description: null,
+          is_system: true,
+          is_active: true,
+          hierarchy_level: 100,
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-01-01T00:00:00Z',
+        },
+      ];
+
+      await offlineAuthService.cacheUserCredentials(mockUser, superAdminRoles, mockPermissions);
+
+      const isManager = await offlineAuthService.isManagerOrAboveOffline(mockUser.id);
+
+      expect(isManager).toBe(true);
+    });
+
+    it('should return false for non-cached user', async () => {
+      const isManager = await offlineAuthService.isManagerOrAboveOffline('non-existent-id');
+
+      expect(isManager).toBe(false);
     });
   });
 });

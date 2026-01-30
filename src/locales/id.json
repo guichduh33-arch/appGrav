@@ -511,7 +511,12 @@
             "pos.no_sale": "Pembukaan tanpa penjualan",
             "pos.price_override": "Ubah harga jual",
             "kds.view": "Lihat tampilan dapur",
-            "kds.update": "Perbarui status"
+            "kds.update": "Perbarui status",
+            "manager_pin_required": "PIN Manajer diperlukan",
+            "sensitive_action_offline": "Tindakan ini memerlukan konfirmasi manajer karena Anda sedang offline",
+            "action_void": "Batalkan pesanan",
+            "action_refund": "Proses pengembalian dana",
+            "action_discount": "Terapkan diskon besar"
         },
         "modules": {
             "sales": "Penjualan",
@@ -533,6 +538,14 @@
             "sessionExpired": "Sesi kedaluwarsa. Silakan masuk kembali",
             "accessDenied": "Akses Ditolak",
             "noPermission": "Anda tidak memiliki izin untuk mengakses sumber daya ini"
+        },
+        "offline": {
+            "mode": "Mode Offline",
+            "sessionExpiredOnlineRequired": "Sesi kedaluwarsa - koneksi internet diperlukan",
+            "rateLimited": "Terlalu banyak percobaan. Harap tunggu {{seconds}} detik",
+            "rateLimitedWait": "Harap tunggu",
+            "pinIncorrect": "PIN salah",
+            "sessionIndicator": "Sesi Offline"
         },
         "profile": {
             "title": "Profil Saya",

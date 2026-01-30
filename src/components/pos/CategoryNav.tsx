@@ -3,6 +3,7 @@ import { Menu } from 'lucide-react'
 import type { Category } from '../../types/database'
 import { NetworkIndicator } from '../ui/NetworkIndicator'
 import { SyncIndicator } from '../ui/SyncIndicator'
+import { OfflineSessionIndicator } from '../ui/OfflineSessionIndicator'
 import './CategoryNav.css'
 
 interface CategoryNavProps {
@@ -41,6 +42,8 @@ export default function CategoryNav({
                 </button>
                 {/* Network Status Indicator - Always visible per NFR-U4 */}
                 <NetworkIndicator compact className="mt-2" />
+                {/* Offline Session Indicator - Story 1.2 */}
+                <OfflineSessionIndicator compact className="mt-1" />
                 {/* Sync Status Indicator - Story 2.6 */}
                 <SyncIndicator compact className="mt-1" />
             </div>

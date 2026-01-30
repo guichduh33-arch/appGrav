@@ -13,8 +13,9 @@
  * @see _bmad-output/planning-artifacts/architecture.md#ADR-005
  */
 
+import bcryptjs from 'bcryptjs';
 import { db } from '@/lib/db';
-import type { IOfflineUser } from '@/types/offline';
+import type { IOfflineUser, IOfflineAuthResult } from '@/types/offline';
 import { OFFLINE_USER_CACHE_TTL_MS } from '@/types/offline';
 import type { Role, EffectivePermission, UserProfileExtended } from '@/types/auth';
 
@@ -198,6 +199,190 @@ export const offlineAuthService = {
     }
 
     return this.isCacheValid(userId);
+  },
+
+  /**
+   * Verify PIN offline using cached bcrypt hash
+   *
+   * SECURITY: Returns generic INVALID_PIN error for both "wrong PIN" and
+   * "user not cached" to prevent cache enumeration attacks.
+   *
+   * @param userId - User UUID to authenticate
+   * @param pinInput - PIN entered by user (plaintext)
+   * @returns Authentication result with user data on success
+   *
+   * @see ADR-004: PIN Verification Offline
+   */
+  async verifyPinOffline(
+    userId: string,
+    pinInput: string
+  ): Promise<IOfflineAuthResult> {
+    try {
+      // Check if cache exists and is valid (not expired)
+      const cacheValid = await this.isCacheValid(userId);
+      if (!cacheValid) {
+        // Check if user exists but cache expired vs not cached at all
+        const cached = await this.getCachedUser(userId);
+        if (cached) {
+          // Cache exists but expired - need online reconnection
+          console.debug('[offlineAuth] Cache expired for user:', userId);
+          return { success: false, error: 'CACHE_EXPIRED' };
+        }
+        // User not cached - return generic error (security: don't reveal cache state)
+        console.debug('[offlineAuth] User not in cache:', userId);
+        return { success: false, error: 'INVALID_PIN' };
+      }
+
+      // Get cached user data
+      const cached = await this.getCachedUser(userId);
+      if (!cached) {
+        // Should not happen if isCacheValid returned true, but handle gracefully
+        return { success: false, error: 'INVALID_PIN' };
+      }
+
+      // Verify PIN using bcrypt compare
+      const isValid = await bcryptjs.compare(pinInput, cached.pin_hash);
+      if (!isValid) {
+        console.debug('[offlineAuth] PIN verification failed for user:', userId);
+        return { success: false, error: 'INVALID_PIN' };
+      }
+
+      // Success - return cached user data
+      console.debug('[offlineAuth] PIN verified successfully for user:', userId);
+      return { success: true, user: cached };
+    } catch (error) {
+      console.error('[offlineAuth] PIN verification error:', error);
+      // Return generic error on any exception
+      return { success: false, error: 'INVALID_PIN' };
+    }
+  },
+
+  // =====================================================
+  // Offline Permission Functions (Story 1.3)
+  // =====================================================
+
+  /**
+   * Check if a user has a specific permission offline
+   *
+   * Uses cached permissions from IndexedDB to verify access rights.
+   *
+   * @param userId - User UUID
+   * @param code - Permission code (e.g., 'sales.void', 'inventory.adjust')
+   * @returns true if permission is granted, false otherwise
+   *
+   * @see ADR-005: Permissions Offline
+   *
+   * @example
+   * ```ts
+   * const canVoid = await offlineAuthService.hasPermissionOffline(userId, 'sales.void');
+   * ```
+   */
+  async hasPermissionOffline(userId: string, code: string): Promise<boolean> {
+    try {
+      const cached = await this.getCachedUser(userId);
+      if (!cached || !cached.permissions) {
+        return false;
+      }
+
+      const perm = cached.permissions.find(p => p.permission_code === code);
+      return perm?.is_granted ?? false;
+    } catch (error) {
+      console.error('[offlineAuth] Failed to check permission offline:', error);
+      return false;
+    }
+  },
+
+  /**
+   * Check if a user has a specific role offline
+   *
+   * Uses cached roles from IndexedDB to verify role membership.
+   *
+   * @param userId - User UUID
+   * @param roleCode - Role code (e.g., 'ADMIN', 'MANAGER', 'CASHIER')
+   * @returns true if user has the role, false otherwise
+   *
+   * @example
+   * ```ts
+   * const isManager = await offlineAuthService.hasRoleOffline(userId, 'MANAGER');
+   * ```
+   */
+  async hasRoleOffline(userId: string, roleCode: string): Promise<boolean> {
+    try {
+      const cached = await this.getCachedUser(userId);
+      if (!cached || !cached.roles) {
+        return false;
+      }
+
+      return cached.roles.some(r => r.code === roleCode);
+    } catch (error) {
+      console.error('[offlineAuth] Failed to check role offline:', error);
+      return false;
+    }
+  },
+
+  /**
+   * Get all cached permissions for a user
+   *
+   * @param userId - User UUID
+   * @returns Array of EffectivePermission, empty array if not cached
+   */
+  async getOfflinePermissions(userId: string): Promise<EffectivePermission[]> {
+    try {
+      const cached = await this.getCachedUser(userId);
+      return cached?.permissions ?? [];
+    } catch (error) {
+      console.error('[offlineAuth] Failed to get offline permissions:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Get all cached roles for a user
+   *
+   * @param userId - User UUID
+   * @returns Array of Role, empty array if not cached
+   */
+  async getOfflineRoles(userId: string): Promise<Role[]> {
+    try {
+      const cached = await this.getCachedUser(userId);
+      return cached?.roles ?? [];
+    } catch (error) {
+      console.error('[offlineAuth] Failed to get offline roles:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Check if user is manager or above (for sensitive actions)
+   *
+   * Returns true if user has SUPER_ADMIN, ADMIN, or MANAGER role.
+   * Used to determine if a user can approve sensitive offline actions.
+   *
+   * @param userId - User UUID
+   * @returns true if user is manager or above, false otherwise
+   *
+   * @example
+   * ```ts
+   * const canApprove = await offlineAuthService.isManagerOrAboveOffline(userId);
+   * if (canApprove) {
+   *   // Allow sensitive action approval
+   * }
+   * ```
+   */
+  async isManagerOrAboveOffline(userId: string): Promise<boolean> {
+    try {
+      const cached = await this.getCachedUser(userId);
+      if (!cached || !cached.roles) {
+        return false;
+      }
+
+      return cached.roles.some(r =>
+        ['SUPER_ADMIN', 'ADMIN', 'MANAGER'].includes(r.code)
+      );
+    } catch (error) {
+      console.error('[offlineAuth] Failed to check manager status offline:', error);
+      return false;
+    }
   },
 };
 

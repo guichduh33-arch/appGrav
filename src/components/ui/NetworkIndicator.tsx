@@ -35,8 +35,8 @@ const STATUS_CONFIG: Record<TNetworkMode, IStatusConfig> = {
   },
   offline: {
     icon: WifiOff,
-    color: 'text-red-600',
-    bgColor: 'bg-red-100',
+    color: 'text-gray-500',
+    bgColor: 'bg-gray-100',
     labelKey: 'network.offline',
   },
 } as const;
@@ -55,7 +55,7 @@ interface INetworkIndicatorProps {
  * Network status indicator component
  *
  * Displays the current network connectivity status with:
- * - Distinct colors: Green (online), Yellow (LAN-only), Red (offline)
+ * - Distinct colors: Green (online), Yellow (LAN-only), Gray (offline - non-alarming per Story 1.4)
  * - Status icons from Lucide React
  * - Translated status text
  *

@@ -511,7 +511,12 @@
             "pos.no_sale": "Ouverture sans vente",
             "pos.price_override": "Modifier prix vente",
             "kds.view": "Voir écran cuisine",
-            "kds.update": "Mettre à jour statut"
+            "kds.update": "Mettre à jour statut",
+            "manager_pin_required": "PIN Manager requis",
+            "sensitive_action_offline": "Cette action nécessite une confirmation manager car vous êtes hors ligne",
+            "action_void": "Annuler une commande",
+            "action_refund": "Effectuer un remboursement",
+            "action_discount": "Appliquer une remise importante"
         },
         "modules": {
             "sales": "Ventes",
@@ -533,6 +538,14 @@
             "sessionExpired": "Session expirée. Veuillez vous reconnecter",
             "accessDenied": "Accès refusé",
             "noPermission": "Vous n'avez pas la permission d'accéder à cette ressource"
+        },
+        "offline": {
+            "mode": "Mode Hors Ligne",
+            "sessionExpiredOnlineRequired": "Session expirée - connexion internet requise",
+            "rateLimited": "Trop de tentatives. Veuillez attendre {{seconds}} secondes",
+            "rateLimitedWait": "Veuillez patienter",
+            "pinIncorrect": "PIN incorrect",
+            "sessionIndicator": "Session Hors Ligne"
         },
         "profile": {
             "title": "Mon Profil",

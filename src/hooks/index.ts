@@ -19,6 +19,7 @@ export * from './useNetworkStatus'
 export * from './useOfflineData'
 export * from './useOrders'
 export * from './usePermissions'
+export * from './usePermissionsUnified'
 // useRLSValidation is empty - excluded from barrel export
 export * from './useSyncQueue'
 export * from './useSyncReport'
