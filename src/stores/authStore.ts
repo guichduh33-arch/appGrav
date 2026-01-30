@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { UserProfile } from '../types/database';
 import type { Role, EffectivePermission } from '../types/auth';
 import { authService } from '../services/authService';
+import { offlineAuthService } from '../services/offline/offlineAuthService';
 
 // Session storage keys
 const SESSION_TOKEN_KEY = 'breakery-session-token';
@@ -72,6 +73,16 @@ export const useAuthStore = create<AuthState>()(
             sessionToken: response.session?.token || null,
           });
 
+          // Cache user credentials for offline authentication (Story 1.1)
+          // This enables PIN login when internet is unavailable
+          if (response.user) {
+            await offlineAuthService.cacheUserCredentials(
+              response.user,
+              response.roles || [],
+              response.permissions || []
+            );
+          }
+
           return { success: true };
         } catch (error) {
           console.error('Login error:', error);
@@ -94,6 +105,11 @@ export const useAuthStore = create<AuthState>()(
             console.error('Logout API error:', error);
             // Continue with local logout even if API fails
           }
+        }
+
+        // Clear offline cache for security (Story 1.1)
+        if (user?.id) {
+          await offlineAuthService.clearUserCache(user.id);
         }
 
         // Clear session token from storage
@@ -141,6 +157,15 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             sessionId: response.session?.id || get().sessionId,
           });
+
+          // Refresh offline cache with updated credentials (Story 1.1)
+          if (response.user) {
+            await offlineAuthService.cacheUserCredentials(
+              response.user,
+              response.roles || [],
+              response.permissions || []
+            );
+          }
 
           return true;
         } catch (error) {
