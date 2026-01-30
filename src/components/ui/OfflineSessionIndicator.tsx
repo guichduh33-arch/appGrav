@@ -78,3 +78,5 @@ export const OfflineSessionIndicator: React.FC<IOfflineSessionIndicatorProps> = 
     </div>
   );
 };
+
+export default OfflineSessionIndicator;

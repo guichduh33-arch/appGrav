@@ -15,6 +15,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/authStore';
 import { offlineAuthService, rateLimitService } from '@/services/offline';
 import type { TOfflineAuthError } from '@/types/offline';
@@ -65,6 +66,7 @@ export interface IUseOfflineAuthReturn {
  * ```
  */
 export function useOfflineAuth(): IUseOfflineAuthReturn {
+  const { t } = useTranslation();
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<IOfflineAuthError | null>(null);
@@ -103,7 +105,7 @@ export function useOfflineAuth(): IUseOfflineAuthReturn {
         setCooldownSeconds(rateLimitCheck.waitSeconds ?? 30);
         const authError: IOfflineAuthError = {
           code: 'RATE_LIMITED',
-          message: `Trop de tentatives. Veuillez attendre ${rateLimitCheck.waitSeconds} secondes.`,
+          message: t('auth.offline.rateLimited', { seconds: rateLimitCheck.waitSeconds }),
         };
         setError(authError);
         throw new Error('RATE_LIMITED');
@@ -127,12 +129,13 @@ export function useOfflineAuth(): IUseOfflineAuthReturn {
           }
 
           // Set error based on result
+          const errorCode = result.error ?? 'INVALID_PIN';
           const authError: IOfflineAuthError = {
-            code: result.error ?? 'INVALID_PIN',
-            message: getErrorMessage(result.error ?? 'INVALID_PIN'),
+            code: errorCode,
+            message: getErrorMessage(errorCode, t),
           };
           setError(authError);
-          throw new Error(result.error ?? 'INVALID_PIN');
+          throw new Error(errorCode);
         }
 
         // Success - reset rate limit and set session
@@ -173,18 +176,22 @@ export function useOfflineAuth(): IUseOfflineAuthReturn {
 }
 
 /**
- * Get user-friendly error message for auth error codes
+ * Get user-friendly error message for auth error codes using i18n
+ *
+ * @param code - Error code from offline authentication
+ * @param t - Translation function from useTranslation
+ * @returns Localized error message
  */
-function getErrorMessage(code: TOfflineAuthError): string {
+function getErrorMessage(code: TOfflineAuthError, t: (key: string) => string): string {
   switch (code) {
     case 'INVALID_PIN':
-      return 'PIN incorrect';
+      return t('auth.offline.pinIncorrect');
     case 'CACHE_EXPIRED':
-      return 'Session expirée - connexion internet requise';
+      return t('auth.offline.sessionExpiredOnlineRequired');
     case 'RATE_LIMITED':
-      return 'Trop de tentatives. Veuillez patienter.';
+      return t('auth.offline.rateLimitedWait');
     default:
-      return 'Erreur d\'authentification';
+      return t('common.error');
   }
 }
 
