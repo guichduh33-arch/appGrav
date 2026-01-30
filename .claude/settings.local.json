@@ -53,7 +53,8 @@
       "Bash(gh repo view:*)",
       "Bash(git fetch:*)",
       "Bash(Remove-Item -Recurse -Force node_modules)",
-      "Bash(supabase db pull:*)"
+      "Bash(supabase db pull:*)",
+      "Bash(npx shadcn@latest init)"
     ]
   }
 }
