@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { usePermissions } from '../../hooks/usePermissions';
-import { authService } from '../../services/AuthService';
+import { authService } from '../../services/authService';
 import { supabase } from '../../lib/supabase';
 import { format } from 'date-fns';
 import { fr, enUS, id } from 'date-fns/locale';

@@ -13,13 +13,13 @@ import {
   RefreshCw,
   Clock,
 } from 'lucide-react';
-import { Button } from '../../components/ui/Button';
-import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/button';
+import { Badge } from '../../components/ui/badge';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
 import { usePermissions } from '../../hooks/usePermissions';
 import { PermissionGuard } from '../../components/auth/PermissionGuard';
-import { authService } from '../../services/AuthService';
+import { authService } from '../../services/authService';
 import toast from 'react-hot-toast';
 import type { Role } from '../../types/auth';
 import './UsersPage.css';

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { UserProfile } from '../types/database';
 import type { Role, EffectivePermission } from '../types/auth';
-import { authService } from '../services/AuthService';
+import { authService } from '../services/authService';
 
 // Session storage keys
 const SESSION_TOKEN_KEY = 'breakery-session-token';

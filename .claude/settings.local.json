@@ -54,7 +54,13 @@
       "Bash(git fetch:*)",
       "Bash(Remove-Item -Recurse -Force node_modules)",
       "Bash(supabase db pull:*)",
-      "Bash(npx shadcn@latest init)"
+      "Bash(npx shadcn@latest init)",
+      "Bash(npx tailwindcss init -p)",
+      "Bash(./node_modules/.bin/tailwindcss:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(node:*)",
+      "Bash(npx shadcn@latest init --yes --defaults)",
+      "Bash(npx shadcn@latest add:*)"
     ]
   }
 }
