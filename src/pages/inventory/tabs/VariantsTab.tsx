@@ -223,6 +223,17 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
     }
 
     async function handleUpdateOption(optionId: string, field: string, value: any) {
+        // Update local state immediately for responsive UI
+        setVariantGroups(prevGroups => {
+            return prevGroups.map(group => ({
+                ...group,
+                options: group.options.map(opt =>
+                    opt.id === optionId ? { ...opt, [field]: value } : opt
+                )
+            }))
+        })
+
+        // Then update database
         try {
             const { error } = await supabase
                 .from('product_modifiers')
@@ -233,6 +244,8 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
         } catch (error) {
             console.error('Error updating option:', error)
             toast.error('Erreur lors de la mise à jour')
+            // Reload to get correct state on error
+            loadVariants()
         }
     }
 
