@@ -61,7 +61,8 @@
       "Bash(node:*)",
       "Bash(npx shadcn@latest init --yes --defaults)",
       "Bash(npx shadcn@latest add:*)",
-      "Bash(where:*)"
+      "Bash(where:*)",
+      "Bash(git check-ignore:*)"
     ]
   }
 }
