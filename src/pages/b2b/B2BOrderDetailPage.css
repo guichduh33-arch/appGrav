@@ -223,6 +223,16 @@
     color: var(--color-urgent);
 }
 
+/* Payment button in card */
+.b2b-detail-card__content .btn,
+.b2b-payment-btn {
+    margin-top: var(--space-md);
+    position: relative;
+    z-index: 1;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
 /* Tabs */
 .b2b-detail-tabs {
     display: flex;
@@ -499,19 +509,29 @@
     border-top: none;
 }
 
-/* Modal */
-.modal-backdrop {
+/* Modal - B2B Payment Modal */
+.b2b-order-detail-page .modal-backdrop,
+.b2b-payment-modal-backdrop {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 99999;
     padding: var(--space-lg);
+    /* Override any hidden state from other modal CSS */
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
-.modal {
+.b2b-order-detail-page .modal,
+.b2b-payment-modal {
     background: white;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-3);
@@ -521,6 +541,11 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    /* Override any hidden state from other modal CSS */
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: scale(1) !important;
+    color: var(--color-brun-chocolat);
 }
 
 .modal__header {

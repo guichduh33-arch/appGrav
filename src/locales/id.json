@@ -893,6 +893,63 @@
         "add_to_stock": "Tambahkan ke Stok",
         "remove_from_stock": "Kurangi dari Stok"
     },
+    "product_import": {
+        "title": "Impor Produk",
+        "subtitle": "Impor produk dari file CSV",
+        "download_template": "Unduh Template",
+        "template_hint": "Gunakan file ini sebagai template untuk impor Anda",
+        "drag_drop": "Seret dan lepas file CSV di sini",
+        "or_click": "atau klik untuk memilih",
+        "file_selected": "File dipilih",
+        "invalid_format": "Silakan pilih file CSV",
+        "rows_shown": "baris ditampilkan",
+        "options": {
+            "update_existing": "Perbarui produk yang sudah ada",
+            "skip_errors": "Lewati kesalahan dan lanjutkan"
+        },
+        "preview": "Pratinjau",
+        "import": "Impor",
+        "importing": "Mengimpor...",
+        "results": {
+            "title": "Hasil Impor",
+            "created": "produk dibuat",
+            "updated": "produk diperbarui",
+            "errors": "kesalahan"
+        },
+        "error_details": "Detail Kesalahan",
+        "error_row": "Baris",
+        "and_more": "dan",
+        "more_errors": "kesalahan lainnya",
+        "import_another": "Impor file lain"
+    },
+    "recipe_import": {
+        "title": "Impor Resep",
+        "subtitle": "Impor komposisi produk dari file CSV",
+        "download_template": "Unduh Template",
+        "template_hint": "Format: product_sku, material_sku, quantity, unit",
+        "drag_drop": "Seret dan lepas file CSV di sini",
+        "or_click": "atau klik untuk memilih",
+        "invalid_format": "Silakan pilih file CSV",
+        "rows_shown": "baris ditampilkan",
+        "options": {
+            "update_existing": "Perbarui resep yang sudah ada",
+            "skip_errors": "Lewati kesalahan dan lanjutkan"
+        },
+        "preview": "Pratinjau",
+        "import": "Impor",
+        "importing": "Mengimpor...",
+        "results": {
+            "title": "Hasil Impor",
+            "created": "resep dibuat",
+            "updated": "resep diperbarui",
+            "errors": "kesalahan"
+        },
+        "error_details": "Detail Kesalahan",
+        "error_row": "Baris",
+        "and_more": "dan",
+        "more_errors": "kesalahan lainnya",
+        "import_another": "Impor file lain"
+    },
     "dashboard": {
         "title": "Dasbor",
         "subtitle": "Ringkasan aktivitas Anda",

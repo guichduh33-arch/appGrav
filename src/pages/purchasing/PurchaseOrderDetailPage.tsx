@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Edit2, DollarSign, Clock, RotateCcw, FileText, Send, CheckCircle, Package, XCircle, CreditCard, Undo2, Plus } from 'lucide-react'
+import { ArrowLeft, Edit2, DollarSign, RotateCcw, FileText, Send, CheckCircle, Package, XCircle, CreditCard, Undo2, Plus } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { formatCurrency } from '@/utils/helpers'
+import PinVerificationModal from '../../components/pos/modals/PinVerificationModal'
 import './PurchaseOrderDetailPage.css'
 
 interface PurchaseOrder {
@@ -103,6 +104,7 @@ export default function PurchaseOrderDetailPage() {
     const [loading, setLoading] = useState(true)
     const [showReturnModal, setShowReturnModal] = useState(false)
     const [selectedItem, setSelectedItem] = useState<POItem | null>(null)
+    const [showPinModal, setShowPinModal] = useState(false)
     const [returnForm, setReturnForm] = useState({
         quantity: 0,
         reason: 'damaged' as string,
@@ -173,10 +175,10 @@ export default function PurchaseOrderDetailPage() {
                 setItems(mappedItems)
             }
 
-            // Fetch History with metadata
+            // Fetch History (no join - changed_by has no FK to user_profiles)
             const { data: poHistory, error: historyError } = await supabase
                 .from('purchase_order_history')
-                .select('*, changed_by_user:user_profiles(display_name)')
+                .select('*')
                 .eq('purchase_order_id', id!)
                 .order('created_at', { ascending: false })
 
@@ -189,7 +191,7 @@ export default function PurchaseOrderDetailPage() {
                     new_status: h.new_status || null,
                     description: h.description || h.action_type,
                     metadata: h.metadata || null,
-                    changed_by_name: h.changed_by_user?.display_name || null,
+                    changed_by_name: undefined, // FK not defined, can't join user_profiles
                     created_at: h.created_at,
                 }))
                 setHistory(mappedHistory)
@@ -448,6 +450,24 @@ export default function PurchaseOrderDetailPage() {
         }
     }
 
+    // Check if PO requires PIN to edit (received or partially received)
+    const requiresPinToEdit = purchaseOrder?.status === 'received' || purchaseOrder?.status === 'partially_received'
+
+    const handleEditClick = () => {
+        if (requiresPinToEdit) {
+            setShowPinModal(true)
+        } else {
+            navigate(`/purchasing/purchase-orders/${id}/edit`)
+        }
+    }
+
+    const handlePinVerify = (verified: boolean) => {
+        setShowPinModal(false)
+        if (verified) {
+            navigate(`/purchasing/purchase-orders/${id}/edit`)
+        }
+    }
+
     if (loading) {
         return <div className="po-detail-loading">Chargement...</div>
     }
@@ -472,7 +492,7 @@ export default function PurchaseOrderDetailPage() {
                 </div>
                 <button
                     className="btn btn-primary"
-                    onClick={() => navigate(`/purchasing/purchase-orders/${id}/edit`)}
+                    onClick={handleEditClick}
                 >
                     <Edit2 size={20} />
                     Modifier
@@ -893,6 +913,17 @@ export default function PurchaseOrderDetailPage() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* PIN Verification Modal for editing received POs */}
+            {showPinModal && (
+                <PinVerificationModal
+                    title="Autorisation requise"
+                    message="Ce bon de commande a déjà été reçu. Entrez un PIN manager pour modifier."
+                    onVerify={handlePinVerify}
+                    onClose={() => setShowPinModal(false)}
+                    allowedRoles={['manager', 'admin']}
+                />
             )}
         </div>
     )

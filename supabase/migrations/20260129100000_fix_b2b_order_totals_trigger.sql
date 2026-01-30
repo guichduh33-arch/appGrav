@@ -58,7 +58,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Recreate the trigger
+-- Drop the OLD trigger that references 'line_total' (from 027_b2b_sales_module.sql)
+DROP TRIGGER IF EXISTS trigger_update_b2b_order_totals ON public.b2b_order_items;
+
+-- Recreate the trigger with the new function
 DROP TRIGGER IF EXISTS trigger_recalculate_b2b_order_totals ON public.b2b_order_items;
 CREATE TRIGGER trigger_recalculate_b2b_order_totals
     AFTER INSERT OR UPDATE OR DELETE ON public.b2b_order_items

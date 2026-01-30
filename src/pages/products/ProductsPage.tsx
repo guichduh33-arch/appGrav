@@ -2,10 +2,16 @@ import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     Package, Coffee, Croissant, Search, Plus,
-    Eye, Edit, Tag, DollarSign, LayoutGrid, List
+    Eye, Edit, Tag, DollarSign, LayoutGrid, List,
+    Upload, Download, ChefHat
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { formatCurrency } from '../../utils/helpers'
+import { exportProducts } from '@/services/products/productImportExport'
+import { exportRecipes } from '@/services/products/recipeImportExport'
+import ProductImportModal from '@/components/products/ProductImportModal'
+import RecipeImportModal from '@/components/products/RecipeImportModal'
+import toast from 'react-hot-toast'
 import './ProductsPage.css'
 
 interface Category {
@@ -41,10 +47,46 @@ export default function ProductsPage() {
     const [categoryFilter, setCategoryFilter] = useState<string>('all')
     const [activeTab, setActiveTab] = useState<TabType>('all')
     const [viewMode, setViewMode] = useState<ViewMode>('list')
+    const [showImportModal, setShowImportModal] = useState(false)
+    const [showRecipeImportModal, setShowRecipeImportModal] = useState(false)
+    const [exporting, setExporting] = useState(false)
+    const [exportingRecipes, setExportingRecipes] = useState(false)
 
     useEffect(() => {
         fetchData()
     }, [])
+
+    const handleExport = async () => {
+        setExporting(true)
+        try {
+            const result = await exportProducts()
+            if (result.success) {
+                toast.success('Export réussi')
+            } else {
+                toast.error(result.error || 'Erreur lors de l\'export')
+            }
+        } catch (error) {
+            toast.error('Erreur lors de l\'export')
+        } finally {
+            setExporting(false)
+        }
+    }
+
+    const handleExportRecipes = async () => {
+        setExportingRecipes(true)
+        try {
+            const result = await exportRecipes()
+            if (result.success) {
+                toast.success('Export des recettes réussi')
+            } else {
+                toast.error(result.error || 'Erreur lors de l\'export des recettes')
+            }
+        } catch (error) {
+            toast.error('Erreur lors de l\'export des recettes')
+        } finally {
+            setExportingRecipes(false)
+        }
+    }
 
     const fetchData = async () => {
         try {
@@ -126,13 +168,54 @@ export default function ProductsPage() {
                         Gérez vos produits, prix et tarification par catégorie client
                     </p>
                 </div>
-                <button
-                    className="btn btn-primary"
-                    onClick={() => navigate('/products/new')}
-                >
-                    <Plus size={18} />
-                    Nouveau Produit
-                </button>
+                <div className="products-header__actions">
+                    <button
+                        type="button"
+                        className="btn btn-outline"
+                        onClick={handleExport}
+                        disabled={exporting}
+                        title="Exporter les produits"
+                    >
+                        <Download size={18} />
+                        {exporting ? 'Export...' : 'Produits'}
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-outline"
+                        onClick={() => setShowImportModal(true)}
+                        title="Importer des produits"
+                    >
+                        <Upload size={18} />
+                        Produits
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-outline"
+                        onClick={handleExportRecipes}
+                        disabled={exportingRecipes}
+                        title="Exporter les recettes"
+                    >
+                        <ChefHat size={18} />
+                        {exportingRecipes ? 'Export...' : 'Recettes'}
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-outline"
+                        onClick={() => setShowRecipeImportModal(true)}
+                        title="Importer des recettes"
+                    >
+                        <ChefHat size={18} />
+                        <Upload size={14} style={{ marginLeft: -4 }} />
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => navigate('/products/new')}
+                    >
+                        <Plus size={18} />
+                        Nouveau Produit
+                    </button>
+                </div>
             </header>
 
             {/* Stats */}
@@ -411,6 +494,26 @@ export default function ProductsPage() {
                         </tbody>
                     </table>
                 </div>
+            )}
+
+            {/* Import Modal */}
+            {showImportModal && (
+                <ProductImportModal
+                    onClose={() => setShowImportModal(false)}
+                    onSuccess={() => {
+                        fetchData()
+                    }}
+                />
+            )}
+
+            {/* Recipe Import Modal */}
+            {showRecipeImportModal && (
+                <RecipeImportModal
+                    onClose={() => setShowRecipeImportModal(false)}
+                    onSuccess={() => {
+                        toast.success('Recettes importées avec succès')
+                    }}
+                />
             )}
         </div>
     )

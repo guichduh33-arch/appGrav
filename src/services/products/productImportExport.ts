@@ -2,7 +2,7 @@
  * Product Import/Export Service
  * Epic 10: Stories 10.9, 10.10
  *
- * Import and export products from/to CSV
+ * Import and export products from/to CSV with section support
  */
 
 import { supabase } from '@/lib/supabase'
@@ -12,6 +12,7 @@ export interface IProductImport {
     name: string
     description?: string
     category?: string
+    section?: string // Section slug (e.g., "breakery", "pastry", "warehouse")
     product_type: 'finished' | 'semi_finished' | 'raw_material'
     unit: string
     cost_price: number
@@ -29,12 +30,14 @@ export interface IImportResult {
     errors: Array<{ row: number; sku: string; error: string }>
 }
 
-// Story 10.10: Export products to CSV
+// Story 10.10: Export products to CSV with sections
 export async function exportProducts(): Promise<{ success: boolean; error?: string }> {
     try {
-        const { data, error } = await supabase
+        // Fetch products with category
+        const { data: products, error } = await supabase
             .from('products')
             .select(`
+                id,
                 sku,
                 name,
                 description,
@@ -52,19 +55,46 @@ export async function exportProducts(): Promise<{ success: boolean; error?: stri
 
         if (error) throw error
 
+        // Fetch product sections with section details
+        const { data: productSections } = await supabase
+            .from('product_sections')
+            .select(`
+                product_id,
+                is_primary,
+                section:sections(slug, name)
+            `)
+
+        // Build a map of product_id -> primary section slug
+        const sectionMap = new Map<string, string>()
+        for (const ps of productSections || []) {
+            const section = ps.section as { slug: string; name: string } | null
+            if (ps.is_primary && section) {
+                sectionMap.set(ps.product_id, section.slug)
+            }
+        }
+        // If no primary, use first section found
+        for (const ps of productSections || []) {
+            const section = ps.section as { slug: string; name: string } | null
+            if (!sectionMap.has(ps.product_id) && section) {
+                sectionMap.set(ps.product_id, section.slug)
+            }
+        }
+
         const csvRows = [
-            // Header
-            'sku,name,description,category,product_type,unit,cost_price,sale_price,wholesale_price,min_stock_level,stock_quantity,is_active'
+            // Header with section
+            'sku,name,description,category,section,product_type,unit,cost_price,sale_price,wholesale_price,min_stock_level,stock_quantity,is_active'
         ]
 
-        for (const p of data || []) {
+        for (const p of products || []) {
             const product = p as unknown as Record<string, unknown>
             const category = product.category as { name: string } | null
+            const sectionSlug = sectionMap.get(product.id as string) || ''
             const row = [
                 escapeCSV(product.sku || ''),
                 escapeCSV(product.name),
                 escapeCSV(product.description || ''),
                 escapeCSV(category?.name || ''),
+                escapeCSV(sectionSlug),
                 escapeCSV(product.product_type),
                 escapeCSV(product.unit),
                 product.cost_price || 0,
@@ -87,12 +117,12 @@ export async function exportProducts(): Promise<{ success: boolean; error?: stri
     }
 }
 
-// Story 10.10: Export product template for import
+// Story 10.10: Export product template for import with sections
 export function downloadImportTemplate(): void {
-    const template = `sku,name,description,category,product_type,unit,cost_price,sale_price,wholesale_price,min_stock_level,stock_quantity,is_active
-PRD-001,Pain au chocolat,Viennoiserie au chocolat,Viennoiseries,finished,pièce,5000,15000,12000,10,50,true
-PRD-002,Baguette tradition,Pain tradition française,Pains,finished,pièce,3000,8000,6500,20,100,true
-ING-001,Farine T55,Farine de blé type 55,Ingrédients,raw_material,kg,15000,0,,50,200,true`
+    const template = `sku,name,description,category,section,product_type,unit,cost_price,sale_price,wholesale_price,min_stock_level,stock_quantity,is_active
+PRD-001,Pain au chocolat,Viennoiserie au chocolat,Viennoiseries,viennoiserie,finished,pièce,5000,15000,12000,10,50,true
+PRD-002,Baguette tradition,Pain tradition française,Pains,breakery,finished,pièce,3000,8000,6500,20,100,true
+ING-001,Farine T55,Farine de blé type 55,Ingrédients,warehouse,raw_material,kg,15000,0,,50,200,true`
 
     downloadCSV(template, 'template_import_produits.csv')
 }
@@ -145,7 +175,7 @@ function parseCSVLine(line: string): string[] {
     return values
 }
 
-// Story 10.10: Import products from CSV
+// Story 10.10: Import products from CSV with section support
 export async function importProducts(
     fileContent: string,
     options?: {
@@ -178,6 +208,17 @@ export async function importProducts(
     const categoryMap = new Map<string, string>()
     for (const cat of categories || []) {
         categoryMap.set(cat.name.toLowerCase(), cat.id)
+    }
+
+    // Get section mapping
+    const { data: sections } = await supabase
+        .from('sections')
+        .select('id, slug, name')
+
+    const sectionMap = new Map<string, string>()
+    for (const sec of sections || []) {
+        sectionMap.set(sec.slug.toLowerCase(), sec.id)
+        sectionMap.set(sec.name.toLowerCase(), sec.id) // Also map by name
     }
 
     for (let i = 0; i < rows.length; i++) {
@@ -213,6 +254,16 @@ export async function importProducts(
                 }
             }
 
+            // Get section ID if provided
+            let sectionId: string | null = null
+            if (row.section) {
+                sectionId = sectionMap.get(row.section.toLowerCase()) || null
+                if (!sectionId) {
+                    // Section not found - add warning but continue
+                    console.warn(`Section "${row.section}" non trouvée pour SKU ${row.sku}`)
+                }
+            }
+
             // Check if product exists
             const { data: existing } = await supabase
                 .from('products')
@@ -235,6 +286,8 @@ export async function importProducts(
                 is_active: row.is_active !== 'false'
             }
 
+            let productId: string | null = null
+
             if (existing) {
                 if (options?.updateExisting) {
                     const { error } = await supabase
@@ -246,6 +299,7 @@ export async function importProducts(
                         .eq('id', existing.id)
 
                     if (error) throw error
+                    productId = existing.id
                     result.updated++
                 } else {
                     result.errors.push({
@@ -253,14 +307,41 @@ export async function importProducts(
                         sku: row.sku,
                         error: 'Produit existe déjà (activer "Mettre à jour" pour modifier)'
                     })
+                    continue
                 }
             } else {
-                const { error } = await supabase
+                const { data: newProduct, error } = await supabase
                     .from('products')
                     .insert(productData)
+                    .select('id')
+                    .single()
 
                 if (error) throw error
+                productId = newProduct?.id || null
                 result.created++
+            }
+
+            // Link product to section if both exist
+            if (productId && sectionId) {
+                // First, remove existing primary section if updating
+                if (existing && options?.updateExisting) {
+                    await supabase
+                        .from('product_sections')
+                        .update({ is_primary: false })
+                        .eq('product_id', productId)
+                        .eq('is_primary', true)
+                }
+
+                // Upsert product_section link
+                await supabase
+                    .from('product_sections')
+                    .upsert({
+                        product_id: productId,
+                        section_id: sectionId,
+                        is_primary: true
+                    }, {
+                        onConflict: 'product_id,section_id'
+                    })
             }
         } catch (err) {
             result.errors.push({

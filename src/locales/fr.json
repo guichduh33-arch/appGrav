@@ -893,6 +893,63 @@
         "add_to_stock": "Ajouter au Stock",
         "remove_from_stock": "Retirer du Stock"
     },
+    "product_import": {
+        "title": "Importer des produits",
+        "subtitle": "Importez des produits depuis un fichier CSV",
+        "download_template": "Télécharger le template",
+        "template_hint": "Utilisez ce fichier comme modèle pour vos imports",
+        "drag_drop": "Glissez-déposez un fichier CSV ici",
+        "or_click": "ou cliquez pour sélectionner",
+        "file_selected": "Fichier sélectionné",
+        "invalid_format": "Veuillez sélectionner un fichier CSV",
+        "rows_shown": "lignes affichées",
+        "options": {
+            "update_existing": "Mettre à jour les produits existants",
+            "skip_errors": "Ignorer les erreurs et continuer"
+        },
+        "preview": "Aperçu",
+        "import": "Importer",
+        "importing": "Importation en cours...",
+        "results": {
+            "title": "Résultats de l'import",
+            "created": "produits créés",
+            "updated": "produits mis à jour",
+            "errors": "erreurs"
+        },
+        "error_details": "Détails des erreurs",
+        "error_row": "Ligne",
+        "and_more": "et",
+        "more_errors": "autres erreurs",
+        "import_another": "Importer un autre fichier"
+    },
+    "recipe_import": {
+        "title": "Importer des recettes",
+        "subtitle": "Importez les compositions de produits depuis un fichier CSV",
+        "download_template": "Télécharger le template",
+        "template_hint": "Format: product_sku, material_sku, quantity, unit",
+        "drag_drop": "Glissez-déposez un fichier CSV ici",
+        "or_click": "ou cliquez pour sélectionner",
+        "invalid_format": "Veuillez sélectionner un fichier CSV",
+        "rows_shown": "lignes affichées",
+        "options": {
+            "update_existing": "Mettre à jour les recettes existantes",
+            "skip_errors": "Ignorer les erreurs et continuer"
+        },
+        "preview": "Aperçu",
+        "import": "Importer",
+        "importing": "Importation en cours...",
+        "results": {
+            "title": "Résultats de l'import",
+            "created": "recettes créées",
+            "updated": "recettes mises à jour",
+            "errors": "erreurs"
+        },
+        "error_details": "Détails des erreurs",
+        "error_row": "Ligne",
+        "and_more": "et",
+        "more_errors": "autres erreurs",
+        "import_another": "Importer un autre fichier"
+    },
     "dashboard": {
         "title": "Tableau de Bord",
         "subtitle": "Vue d'ensemble de votre activité",

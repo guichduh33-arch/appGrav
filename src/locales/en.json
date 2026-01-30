@@ -882,6 +882,63 @@
         "add_to_stock": "Add to Stock",
         "remove_from_stock": "Remove from Stock"
     },
+    "product_import": {
+        "title": "Import Products",
+        "subtitle": "Import products from a CSV file",
+        "download_template": "Download Template",
+        "template_hint": "Use this file as a template for your imports",
+        "drag_drop": "Drag and drop a CSV file here",
+        "or_click": "or click to select",
+        "file_selected": "File selected",
+        "invalid_format": "Please select a CSV file",
+        "rows_shown": "rows shown",
+        "options": {
+            "update_existing": "Update existing products",
+            "skip_errors": "Skip errors and continue"
+        },
+        "preview": "Preview",
+        "import": "Import",
+        "importing": "Importing...",
+        "results": {
+            "title": "Import Results",
+            "created": "products created",
+            "updated": "products updated",
+            "errors": "errors"
+        },
+        "error_details": "Error Details",
+        "error_row": "Row",
+        "and_more": "and",
+        "more_errors": "more errors",
+        "import_another": "Import another file"
+    },
+    "recipe_import": {
+        "title": "Import Recipes",
+        "subtitle": "Import product compositions from a CSV file",
+        "download_template": "Download Template",
+        "template_hint": "Format: product_sku, material_sku, quantity, unit",
+        "drag_drop": "Drag and drop a CSV file here",
+        "or_click": "or click to select",
+        "invalid_format": "Please select a CSV file",
+        "rows_shown": "rows shown",
+        "options": {
+            "update_existing": "Update existing recipes",
+            "skip_errors": "Skip errors and continue"
+        },
+        "preview": "Preview",
+        "import": "Import",
+        "importing": "Importing...",
+        "results": {
+            "title": "Import Results",
+            "created": "recipes created",
+            "updated": "recipes updated",
+            "errors": "errors"
+        },
+        "error_details": "Error Details",
+        "error_row": "Row",
+        "and_more": "and",
+        "more_errors": "more errors",
+        "import_another": "Import another file"
+    },
     "dashboard": {
         "title": "Dashboard",
         "subtitle": "Overview of your activity",

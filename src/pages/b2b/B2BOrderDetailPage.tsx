@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { formatCurrency } from '../../utils/helpers'
+import PinVerificationModal from '../../components/pos/modals/PinVerificationModal'
 import './B2BOrderDetailPage.css'
 
 interface B2BOrder {
@@ -127,6 +128,9 @@ export default function B2BOrderDetailPage() {
         notes: ''
     })
 
+    // PIN verification modal for editing delivered orders
+    const [showPinModal, setShowPinModal] = useState(false)
+
     useEffect(() => {
         if (id) {
             fetchOrder()
@@ -151,16 +155,21 @@ export default function B2BOrderDetailPage() {
             if (error) throw error
             // Map database fields to UI expected fields
             if (data) {
+                // Convert tax_rate from decimal (0.10) to percentage (10)
+                const dbTaxRate = data.tax_rate ?? 0.1
+                const displayTaxRate = dbTaxRate < 1 ? dbTaxRate * 100 : dbTaxRate
+
                 const mappedOrder = {
                     ...data,
-                    total_amount: data.total ?? 0,
-                    amount_paid: data.paid_amount ?? 0,
-                    amount_due: (data.total ?? 0) - (data.paid_amount ?? 0),
+                    total_amount: data.total ?? data.total_amount ?? 0,
+                    amount_paid: data.paid_amount ?? data.amount_paid ?? 0,
+                    amount_due: (data.total ?? data.total_amount ?? 0) - (data.paid_amount ?? data.amount_paid ?? 0),
                     requested_delivery_date: data.delivery_date,
                     actual_delivery_date: data.delivered_at,
                     discount_type: data.discount_percent ? 'percentage' : null,
                     discount_value: data.discount_percent ?? 0,
                     payment_status: data.payment_status ?? 'unpaid',
+                    tax_rate: displayTaxRate,
                 } as unknown as B2BOrder
                 setOrder(mappedOrder)
             }
@@ -269,7 +278,7 @@ export default function B2BOrderDetailPage() {
             const updateData: any = { status: newStatus }
 
             if (newStatus === 'delivered') {
-                updateData.actual_delivery_date = new Date().toISOString()
+                updateData.delivered_at = new Date().toISOString()
             }
 
             const { error } = await supabase
@@ -281,17 +290,33 @@ export default function B2BOrderDetailPage() {
 
             fetchOrder()
             fetchHistory()
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error updating status:', error)
+            alert(`Erreur lors de la mise à jour du statut: ${error?.message || 'Erreur inconnue'}`)
         }
     }
 
     const handleAddPayment = async () => {
-        if (!order || paymentForm.amount <= 0) return
+        if (!order) {
+            alert('Erreur: Commande non chargée')
+            return
+        }
+        if (paymentForm.amount <= 0) {
+            alert('Erreur: Le montant doit être supérieur à 0')
+            return
+        }
 
         try {
             const paymentNumber = `PAY-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`
-            const { error } = await supabase
+            console.log('Inserting payment:', {
+                order_id: order.id,
+                customer_id: order.customer_id,
+                amount: paymentForm.amount,
+                payment_method: paymentForm.payment_method,
+                payment_number: paymentNumber,
+            })
+
+            const { data, error } = await supabase
                 .from('b2b_payments')
                 .insert({
                     order_id: order.id,
@@ -302,9 +327,11 @@ export default function B2BOrderDetailPage() {
                     reference_number: paymentForm.reference_number || null,
                     notes: paymentForm.notes || null
                 })
+                .select()
 
             if (error) throw error
 
+            console.log('Payment inserted:', data)
             setShowPaymentModal(false)
             setPaymentForm({ amount: 0, payment_method: 'transfer', reference_number: '', notes: '' })
             fetchOrder()
@@ -312,7 +339,7 @@ export default function B2BOrderDetailPage() {
             fetchHistory()
         } catch (error: any) {
             console.error('Error adding payment:', error)
-            alert(`Erreur: ${error?.message}`)
+            alert(`Erreur: ${error?.message || JSON.stringify(error)}`)
         }
     }
 
@@ -360,6 +387,153 @@ export default function B2BOrderDetailPage() {
         )
     }
 
+    // Check if order requires PIN to edit (delivered or partially delivered)
+    const requiresPinToEdit = order?.status === 'delivered' || order?.status === 'partially_delivered'
+
+    const handleEditClick = () => {
+        if (requiresPinToEdit) {
+            setShowPinModal(true)
+        } else {
+            navigate(`/b2b/orders/${id}/edit`)
+        }
+    }
+
+    const handlePinVerify = (verified: boolean) => {
+        setShowPinModal(false)
+        if (verified) {
+            navigate(`/b2b/orders/${id}/edit`)
+        }
+    }
+
+    const handlePrint = () => {
+        if (!order) return
+
+        const printWindow = window.open('', '_blank')
+        if (!printWindow) {
+            alert('Impossible d\'ouvrir la fenêtre d\'impression. Vérifiez que les popups ne sont pas bloqués.')
+            return
+        }
+
+        const printContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Commande ${order.order_number}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+                    h1 { font-size: 24px; margin-bottom: 5px; }
+                    .order-info { color: #666; margin-bottom: 20px; }
+                    .section { margin-bottom: 20px; }
+                    .section-title { font-size: 14px; font-weight: bold; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 10px; }
+                    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+                    .card { border: 1px solid #ddd; padding: 15px; border-radius: 4px; }
+                    .card h3 { margin: 0 0 10px; font-size: 14px; color: #666; }
+                    .card p { margin: 5px 0; font-size: 13px; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                    th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; font-size: 13px; }
+                    th { background: #f5f5f5; font-weight: bold; }
+                    .text-right { text-align: right; }
+                    .summary { margin-left: auto; width: 250px; }
+                    .summary-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
+                    .summary-row.total { font-weight: bold; font-size: 16px; border-top: 2px solid #333; padding-top: 10px; margin-top: 5px; }
+                    .status { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+                    .status-delivered { background: #d4edda; color: #155724; }
+                    .status-confirmed { background: #cce5ff; color: #004085; }
+                    .status-draft { background: #e2e3e5; color: #383d41; }
+                    @media print { body { padding: 0; } }
+                </style>
+            </head>
+            <body>
+                <h1>Commande ${order.order_number}</h1>
+                <p class="order-info">
+                    Créée le ${formatDate(order.order_date)} |
+                    Statut: <span class="status status-${order.status}">${STATUS_CONFIG[order.status]?.label || order.status}</span>
+                </p>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3>Client</h3>
+                        <p><strong>${order.customer?.company_name || order.customer?.name || '-'}</strong></p>
+                        ${order.customer?.company_name ? `<p>${order.customer.name}</p>` : ''}
+                        ${order.customer?.phone ? `<p>Tél: ${order.customer.phone}</p>` : ''}
+                        ${order.customer?.email ? `<p>Email: ${order.customer.email}</p>` : ''}
+                    </div>
+                    <div class="card">
+                        <h3>Livraison</h3>
+                        ${order.requested_delivery_date ? `<p>Date demandée: ${formatDate(order.requested_delivery_date)}</p>` : ''}
+                        ${order.actual_delivery_date ? `<p>Date livrée: ${formatDate(order.actual_delivery_date)}</p>` : ''}
+                        ${order.delivery_address ? `<p>Adresse: ${order.delivery_address}</p>` : ''}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Articles</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th class="text-right">Qté</th>
+                                <th class="text-right">Prix Unit.</th>
+                                <th class="text-right">Remise</th>
+                                <th class="text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${items.map(item => `
+                                <tr>
+                                    <td>
+                                        ${item.product_name}
+                                        ${item.product_sku ? `<br><small style="color:#666">${item.product_sku}</small>` : ''}
+                                    </td>
+                                    <td class="text-right">${item.quantity} ${item.unit}</td>
+                                    <td class="text-right">${formatCurrency(item.unit_price)}</td>
+                                    <td class="text-right">${item.discount_percentage > 0 ? `${item.discount_percentage}%` : '-'}</td>
+                                    <td class="text-right">${formatCurrency(item.line_total)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+
+                    <div class="summary">
+                        <div class="summary-row">
+                            <span>Sous-total</span>
+                            <span>${formatCurrency(order.subtotal)}</span>
+                        </div>
+                        ${order.discount_amount > 0 ? `
+                        <div class="summary-row">
+                            <span>Remise</span>
+                            <span>-${formatCurrency(order.discount_amount)}</span>
+                        </div>
+                        ` : ''}
+                        <div class="summary-row">
+                            <span>TVA (${order.tax_rate}%)</span>
+                            <span>${formatCurrency(order.tax_amount)}</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span>${formatCurrency(order.total_amount)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                ${order.notes ? `
+                <div class="section">
+                    <div class="section-title">Notes</div>
+                    <p>${order.notes}</p>
+                </div>
+                ` : ''}
+
+                <script>
+                    window.onload = function() { window.print(); }
+                </script>
+            </body>
+            </html>
+        `
+
+        printWindow.document.write(printContent)
+        printWindow.document.close()
+    }
+
     if (loading) {
         return (
             <div className="b2b-detail-loading">
@@ -400,13 +574,14 @@ export default function B2BOrderDetailPage() {
                     </div>
                 </div>
                 <div className="b2b-detail-header__actions">
-                    {order.status === 'draft' && (
-                        <button className="btn btn-secondary" onClick={() => navigate(`/b2b/orders/${id}/edit`)}>
+                    {/* Show edit button for all orders - PIN required for delivered orders */}
+                    {order.status !== 'cancelled' && (
+                        <button className="btn btn-secondary" onClick={handleEditClick}>
                             <Edit2 size={18} />
                             Modifier
                         </button>
                     )}
-                    <button className="btn btn-secondary">
+                    <button className="btn btn-secondary" onClick={handlePrint}>
                         <Printer size={18} />
                         Imprimer
                     </button>
@@ -519,9 +694,10 @@ export default function B2BOrderDetailPage() {
                                 </div>
                                 {order.amount_due > 0 && (
                                     <button
-                                        className="btn btn-primary btn-sm btn-block"
+                                        type="button"
+                                        className="btn btn-primary btn-sm btn-block b2b-payment-btn"
                                         onClick={() => {
-                                            setPaymentForm({ ...paymentForm, amount: order.amount_due })
+                                            setPaymentForm(prev => ({ ...prev, amount: order.amount_due }))
                                             setShowPaymentModal(true)
                                         }}
                                     >
@@ -758,18 +934,25 @@ export default function B2BOrderDetailPage() {
 
             {/* Payment Modal */}
             {showPaymentModal && (
-                <div className="modal-backdrop" onClick={() => setShowPaymentModal(false)}>
-                    <div className="modal" onClick={e => e.stopPropagation()}>
+                <div className="b2b-payment-modal-backdrop" onClick={(e) => e.target === e.currentTarget && setShowPaymentModal(false)}>
+                    <div className="b2b-payment-modal">
                         <div className="modal__header">
-                            <h2>Enregistrer un paiement</h2>
-                            <button className="modal__close" onClick={() => setShowPaymentModal(false)}>
+                            <h2 className="modal__title">Enregistrer un paiement</h2>
+                            <button
+                                type="button"
+                                className="modal__close"
+                                onClick={() => setShowPaymentModal(false)}
+                                aria-label="Fermer"
+                                title="Fermer"
+                            >
                                 <X size={20} />
                             </button>
                         </div>
                         <div className="modal__body">
                             <div className="form-group">
-                                <label>Montant *</label>
+                                <label htmlFor="payment-amount">Montant *</label>
                                 <input
+                                    id="payment-amount"
                                     type="number"
                                     min="0"
                                     value={paymentForm.amount}
@@ -777,8 +960,9 @@ export default function B2BOrderDetailPage() {
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Méthode de paiement *</label>
+                                <label htmlFor="payment-method">Méthode de paiement *</label>
                                 <select
+                                    id="payment-method"
                                     value={paymentForm.payment_method}
                                     onChange={(e) => setPaymentForm({ ...paymentForm, payment_method: e.target.value })}
                                 >
@@ -790,8 +974,9 @@ export default function B2BOrderDetailPage() {
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label>Référence (optionnel)</label>
+                                <label htmlFor="payment-reference">Référence (optionnel)</label>
                                 <input
+                                    id="payment-reference"
                                     type="text"
                                     value={paymentForm.reference_number}
                                     onChange={(e) => setPaymentForm({ ...paymentForm, reference_number: e.target.value })}
@@ -799,25 +984,46 @@ export default function B2BOrderDetailPage() {
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Notes</label>
+                                <label htmlFor="payment-notes">Notes</label>
                                 <textarea
+                                    id="payment-notes"
                                     rows={2}
                                     value={paymentForm.notes}
                                     onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })}
+                                    placeholder="Notes optionnelles..."
                                 />
                             </div>
                         </div>
                         <div className="modal__footer">
-                            <button className="btn btn-secondary" onClick={() => setShowPaymentModal(false)}>
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={() => setShowPaymentModal(false)}
+                            >
                                 Annuler
                             </button>
-                            <button className="btn btn-primary" onClick={handleAddPayment}>
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={handleAddPayment}
+                            >
                                 <CreditCard size={18} />
                                 Enregistrer
                             </button>
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* PIN Verification Modal for editing delivered orders */}
+            {showPinModal && (
+                <PinVerificationModal
+                    title="Autorisation requise"
+                    message="Cette commande a déjà été livrée. Entrez un PIN manager pour modifier."
+                    onVerify={handlePinVerify}
+                    onClose={() => setShowPinModal(false)}
+                    allowedRoles={['manager', 'admin']}
+                />
             )}
         </div>
     )

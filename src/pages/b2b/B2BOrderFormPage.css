@@ -155,12 +155,19 @@
 /* Items Table */
 .b2b-items-table {
     overflow-x: auto;
+    overflow-y: visible;
     margin-top: var(--space-md);
 }
 
 .b2b-items-table table {
     width: 100%;
     border-collapse: collapse;
+    overflow: visible;
+}
+
+/* Ensure product dropdown is not clipped */
+.b2b-items-table td:first-child {
+    overflow: visible;
 }
 
 .b2b-items-table th {
@@ -202,6 +209,7 @@
 /* Product Selector */
 .b2b-product-selector {
     position: relative;
+    z-index: 10;
 }
 
 .b2b-product-selector__input {
@@ -226,14 +234,14 @@
     position: absolute;
     top: 100%;
     left: 0;
-    right: 0;
     margin-top: 4px;
     background: white;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-2);
-    z-index: 100;
-    max-height: 300px;
+    box-shadow: var(--shadow-3);
+    z-index: 1000;
+    min-width: 350px;
+    max-height: 400px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -261,7 +269,7 @@
 
 .b2b-product-dropdown__list {
     overflow-y: auto;
-    max-height: 250px;
+    max-height: 350px;
 }
 
 .b2b-product-dropdown__item {

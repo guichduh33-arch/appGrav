@@ -65,6 +65,10 @@ export default function PurchaseOrderFormPage() {
 
     const [showDiscountModal, setShowDiscountModal] = useState(false)
 
+    // Store original data for comparison when editing
+    const [originalItems, setOriginalItems] = useState<POItem[]>([])
+    const [originalTotal, setOriginalTotal] = useState<number>(0)
+
     useEffect(() => {
         fetchSuppliers()
         fetchProducts()
@@ -170,7 +174,7 @@ export default function PurchaseOrderFormPage() {
 
                 const productUnitsMap = new Map(productsData?.map(p => [p.id, p.unit]) || [])
 
-                setItems(rawItems.map((item) => ({
+                const mappedItems = rawItems.map((item) => ({
                     id: item.id,
                     product_id: item.product_id,
                     product_name: item.product_name || '',
@@ -182,7 +186,11 @@ export default function PurchaseOrderFormPage() {
                     discount_percentage: item.discount_percentage || null,
                     tax_rate: parseFloat(String(item.tax_rate || 10)),
                     line_total: parseFloat(String(item.line_total || item.total_price || 0))
-                })))
+                }))
+                setItems(mappedItems)
+                // Store original items for comparison when saving
+                setOriginalItems(JSON.parse(JSON.stringify(mappedItems)))
+                setOriginalTotal(po.total_amount || 0)
             }
         } catch (error) {
             console.error('Error fetching purchase order:', error)
@@ -268,6 +276,105 @@ export default function PurchaseOrderFormPage() {
         return `PO-${year}-${nextNumber}`
     }
 
+    // Helper function to build modification metadata for history
+    const buildModificationMetadata = (
+        oldItems: POItem[],
+        newItems: POItem[],
+        oldTotal: number,
+        newTotal: number
+    ) => {
+        const itemsAdded: Array<{ name: string; quantity: number; unit_price: number }> = []
+        const itemsRemoved: Array<{ name: string; quantity: number }> = []
+        const itemsModified: Array<{ name: string; field: string; old_value: string; new_value: string }> = []
+
+        // Create maps by product_name for comparison
+        const oldItemsMap = new Map(oldItems.map(item => [item.product_name, item]))
+        const newItemsMap = new Map(newItems.map(item => [item.product_name, item]))
+
+        // Find added items
+        newItems.forEach(newItem => {
+            if (!oldItemsMap.has(newItem.product_name)) {
+                itemsAdded.push({
+                    name: newItem.product_name,
+                    quantity: newItem.quantity,
+                    unit_price: newItem.unit_price
+                })
+            }
+        })
+
+        // Find removed items
+        oldItems.forEach(oldItem => {
+            if (!newItemsMap.has(oldItem.product_name)) {
+                itemsRemoved.push({
+                    name: oldItem.product_name,
+                    quantity: oldItem.quantity
+                })
+            }
+        })
+
+        // Find modified items
+        oldItems.forEach(oldItem => {
+            const newItem = newItemsMap.get(oldItem.product_name)
+            if (newItem) {
+                if (oldItem.quantity !== newItem.quantity) {
+                    itemsModified.push({
+                        name: oldItem.product_name,
+                        field: 'quantité',
+                        old_value: String(oldItem.quantity),
+                        new_value: String(newItem.quantity)
+                    })
+                }
+                if (oldItem.unit_price !== newItem.unit_price) {
+                    itemsModified.push({
+                        name: oldItem.product_name,
+                        field: 'prix unitaire',
+                        old_value: formatCurrency(oldItem.unit_price),
+                        new_value: formatCurrency(newItem.unit_price)
+                    })
+                }
+                if (oldItem.discount_amount !== newItem.discount_amount) {
+                    itemsModified.push({
+                        name: oldItem.product_name,
+                        field: 'remise',
+                        old_value: formatCurrency(oldItem.discount_amount),
+                        new_value: formatCurrency(newItem.discount_amount)
+                    })
+                }
+            }
+        })
+
+        const hasChanges = itemsAdded.length > 0 || itemsRemoved.length > 0 || itemsModified.length > 0 || oldTotal !== newTotal
+
+        return {
+            hasChanges,
+            items_added: itemsAdded.length > 0 ? itemsAdded : undefined,
+            items_removed: itemsRemoved.length > 0 ? itemsRemoved : undefined,
+            items_modified: itemsModified.length > 0 ? itemsModified : undefined,
+            old_total: oldTotal !== newTotal ? oldTotal : undefined,
+            new_total: oldTotal !== newTotal ? newTotal : undefined
+        }
+    }
+
+    // Helper function to build human-readable modification description
+    const buildModificationDescription = (metadata: ReturnType<typeof buildModificationMetadata>) => {
+        const parts: string[] = []
+
+        if (metadata.items_added && metadata.items_added.length > 0) {
+            parts.push(`${metadata.items_added.length} article(s) ajouté(s)`)
+        }
+        if (metadata.items_removed && metadata.items_removed.length > 0) {
+            parts.push(`${metadata.items_removed.length} article(s) supprimé(s)`)
+        }
+        if (metadata.items_modified && metadata.items_modified.length > 0) {
+            parts.push(`${metadata.items_modified.length} modification(s)`)
+        }
+        if (metadata.old_total !== undefined && metadata.new_total !== undefined) {
+            parts.push(`Total: ${formatCurrency(metadata.old_total)} → ${formatCurrency(metadata.new_total)}`)
+        }
+
+        return parts.length > 0 ? parts.join(', ') : 'Modification du bon de commande'
+    }
+
     const handleSubmit = async (sendToSupplier: boolean = false) => {
         if (!formData.supplier_id) {
             alert('Veuillez sélectionner un fournisseur')
@@ -329,6 +436,19 @@ export default function PurchaseOrderFormPage() {
                     .insert(itemsToInsert as never)
 
                 if (itemsError) throw itemsError
+
+                // Log detailed modification history
+                const historyMetadata = buildModificationMetadata(originalItems, items, originalTotal, totals.total)
+                if (historyMetadata.hasChanges) {
+                    await supabase
+                        .from('purchase_order_history')
+                        .insert({
+                            purchase_order_id: id!,
+                            action_type: 'modified',
+                            description: buildModificationDescription(historyMetadata),
+                            metadata: historyMetadata
+                        } as never)
+                }
             } else {
                 // Create new PO
                 const poNumber = await generatePONumber()
