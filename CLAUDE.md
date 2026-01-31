@@ -36,27 +36,39 @@ npm run test:claude      # Test Claude API integration
 ### Key Directory Structure
 ```
 src/
-├── components/       # By feature (pos/, inventory/, kds/, ui/, offline/)
-├── pages/           # Route-based pages
+├── components/       # By feature
+│   ├── auth/        # Authentication components
+│   ├── inventory/   # Stock management UI
+│   ├── kds/         # Kitchen Display System
+│   ├── mobile/      # Mobile-specific components
+│   ├── pos/         # Point of Sale UI (Cart, ProductGrid, etc.)
+│   ├── products/    # Product management
+│   ├── reports/     # Analytics & reports
+│   ├── settings/    # Configuration UI
+│   ├── sync/        # Offline/sync indicators
+│   └── ui/          # Shared UI components (shadcn/ui)
+├── pages/           # Route-based pages (95+ pages)
 ├── stores/          # Zustand stores (see State Management)
 ├── hooks/           # Custom hooks by module
-│   ├── products/    # useProducts, useProductSearch, useCategories...
-│   ├── inventory/   # useInventory, useStockAlerts, useRecipes...
-│   ├── offline/     # useNetwork, useOfflineAuth, useOfflinePermissions
-│   ├── sync/        # useSyncStatus
-│   ├── settings/    # useSettings, useBusinessSettings, useTaxSettings
-│   └── ...          # useOrders, useCustomers, useShift, usePermissions
+│   ├── products/    # useProducts, useProductSearch, useCategories, useProductModifiers...
+│   ├── inventory/   # useInventoryItems, useStockMovements, useStockAdjustment, useProductRecipe...
+│   ├── offline/     # useNetworkStatus, useOfflineAuth, useOfflinePermissions
+│   ├── reports/     # useDateRange, useReportFilters, useReportPermissions
+│   ├── settings/    # useSettingsCore, useBusinessSettings, useTaxSettings, usePaymentSettings
+│   ├── shift/       # Shift management hooks
+│   └── ...          # useOrders, useShift, usePermissions, useSyncQueue, useSyncReport, useTerminal, useOfflineOrder, usePWAInstall
 ├── services/        # Business logic & external APIs
 │   ├── offline/     # offlineAuthService, rateLimitService
-│   ├── sync/        # syncEngine, syncQueue, orderSync, productSync, customerSync
+│   ├── sync/        # syncEngine, syncQueue, orderSync, productSync, customerSync, offlineDb, offlinePeriod, syncDeviceService
 │   ├── inventory/   # Stock management
 │   ├── products/    # Product import/export
 │   ├── b2b/         # B2B credit system
-│   ├── lan/         # LAN device discovery
+│   ├── lan/         # LAN device discovery (lanClient, lanHub, lanProtocol)
 │   ├── display/     # Customer display broadcast
-│   └── ...          # ClaudeService, promotionService, ReportingService
+│   └── ...          # ClaudeService, anthropicService, promotionService, ReportingService
 ├── types/           # TypeScript definitions
 │   ├── database.ts  # Full Supabase schema
+│   ├── database.generated.ts  # Auto-generated Supabase types
 │   ├── offline.ts   # Offline types (sync queue, cached data)
 │   └── auth.ts      # Auth types
 ├── lib/
@@ -65,7 +77,7 @@ src/
 └── locales/         # Translation files (fr.json, en.json, id.json)
 
 supabase/
-├── migrations/      # SQL migrations (97+)
+├── migrations/      # SQL migrations (113)
 └── functions/       # Edge Functions (Deno)
 ```
 
@@ -213,31 +225,61 @@ Used with `usePermissions` hook and `PermissionGuard` component:
 
 ### Main Application
 - `/pos` - Main POS (fullscreen, touch-optimized)
-- `/kds/:station` - Kitchen Display System (barista/kitchen/display)
+- `/kds` - Kitchen Display System station selector
+- `/kds/:station` - KDS by station (barista/kitchen/display)
 - `/display/customers` - Customer-facing display
+- `/orders` - Order history
+- `/production` - Production management
 
 ### Products & Inventory
 - `/products` - Products management
+- `/products/new` - Create new product
+- `/products/:id` - Edit product
 - `/products/combos` - Combo deals
+- `/products/combos/new` - Create combo
 - `/products/promotions` - Promotions (time-based rules)
-- `/inventory` - Stock management
+- `/products/promotions/new` - Create promotion
+- `/products/category-pricing` - Category-based pricing
+- `/inventory` - Stock management (tabs: general, stock, recipe, modifiers, units, prices, costing, variants)
 - `/inventory/movements` - Stock movements history
 - `/inventory/transfers` - Internal transfers
-- `/inventory/opname` - Stock opname (physical inventory)
+- `/inventory/transfers/new` - Create transfer
+- `/inventory/opname` - Stock opname list
+- `/inventory/opname/new` - New stock count
+- `/inventory/incoming` - Incoming stock
+- `/inventory/production` - Stock production
+- `/inventory/wasted` - Waste tracking
+- `/inventory/by-location` - Stock by location
 
 ### Customers & B2B
 - `/customers` - Customer management with loyalty
+- `/customers/new` - Create customer
+- `/customers/:id` - Customer detail
+- `/customers/categories` - Customer categories
 - `/b2b` - B2B wholesale module
 - `/b2b/orders` - B2B orders
+- `/b2b/orders/new` - Create B2B order
+- `/b2b/orders/:id` - B2B order detail
 - `/b2b/payments` - B2B payments
 
 ### Purchasing & Reports
 - `/purchasing/purchase-orders` - Purchase orders
-- `/reports` - Analytics and reports
+- `/purchasing/purchase-orders/new` - Create PO
+- `/purchasing/purchase-orders/:id` - PO detail
+- `/purchasing/suppliers` - Supplier management
+- `/reports` - Analytics dashboard (20+ report tabs)
+- `/profile` - User profile
 
 ### Settings & Admin
 - `/settings` - General settings
 - `/settings/sync-status` - Sync queue status and management
+- `/settings/history` - Settings change history
+- `/settings/audit` - Audit log
+- `/settings/business-hours` - Business hours
+- `/settings/categories` - Category settings
+- `/settings/payment-methods` - Payment methods
+- `/settings/tax` - Tax settings
+- `/settings/roles` - Role management
 - `/users` - User management
 - `/users/permissions` - Permissions management
 
@@ -274,7 +316,7 @@ ANTHROPIC_API_KEY=your-claude-api-key
 - **Missing translations**: Must add to ALL 3 locale files
 - **Locked cart items**: Items sent to kitchen are locked and require PIN to modify (see `cartStore.ts`)
 - **Offline sync**: New entities that need offline support must be added to sync services
-- **Network state**: Use `useNetwork` hook to check connectivity before online-only operations
+- **Network state**: Use `useNetworkStatus` hook to check connectivity before online-only operations
 
 ## Mobile (Capacitor)
 
@@ -294,13 +336,36 @@ npx vitest run src/services/sync     # Test sync engine
 ```
 
 Key test files:
-- `src/services/offline/__tests__/` - Offline auth, rate limiting
-- `src/services/sync/__tests__/` - Sync queue, reconciliation
+- `src/services/offline/__tests__/offlineAuthService.test.ts` - Offline authentication
+- `src/services/offline/__tests__/rateLimitService.test.ts` - Rate limiting
+- `src/services/sync/syncQueue.test.ts` - Sync queue operations
+- `src/services/sync/orderSync.test.ts` - Order synchronization
+- `src/services/sync/productSync.test.ts` - Product synchronization
+- `src/services/sync/syncDeviceService.test.ts` - Device sync
+- `src/services/sync/offlineDb.test.ts` - IndexedDB operations
+- `src/services/lan/lanProtocol.test.ts` - LAN protocol
+- `src/stores/networkStore.test.ts` - Network state
+- `src/stores/terminalStore.test.ts` - Terminal state
+- `src/hooks/useNetworkStatus.test.ts` - Network hook
+- `src/hooks/useOfflineData.test.ts` - Offline data hook
 
 ## Documentation
 
 - `DEVELOPMENT_INSTRUCTIONS.md` - Detailed patterns and workflow (French)
+- `CURRENT_STATE.md` - Current project state
+- `DATABASE_SCHEMA.md` - Database schema reference
 - `docs/COMBOS_AND_PROMOTIONS.md` - Combos & promotions spec
 - `docs/COMBO_CHOICE_GROUPS.md` - Choice groups with price adjustments
 - `docs/COMBO_POS_INTEGRATION.md` - POS integration
 - `docs/STOCK_MOVEMENTS_MODULE.md` - Stock module spec
+- `_bmad-output/` - Planning artifacts (architecture, epics, PRD)
+
+## Project Statistics
+
+- **Components**: 56 React components across 10 feature directories
+- **Pages**: 95+ route-based pages
+- **Hooks**: 49 custom hooks
+- **Services**: 40+ business logic services
+- **Stores**: 12 Zustand stores
+- **Migrations**: 113 SQL migrations
+- **Codebase**: ~84,500 lines of TypeScript/React
