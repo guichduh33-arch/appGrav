@@ -120,7 +120,7 @@ dist
 Thumbs.db
 
 # Legacy folders
-_legacy/
+# _legacy/
 
 # Python cache
 __pycache__/
@@ -136,11 +136,11 @@ __pycache__/
 *.swo
 
 # Development tools and configurations
-.agent/
-.antigravity/
-.claude/
-_bmad/
-_bmad-output/
+# .agent/
+# .antigravity/
+# .claude/
+# _bmad/
+# _bmad-output/
 
 # Scripts and data
 scripts/agents/

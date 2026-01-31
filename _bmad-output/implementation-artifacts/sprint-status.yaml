@@ -1,0 +1,132 @@
+# generated: 2026-01-30
+# project: AppGrav
+# project_key: appgrav
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-01-30
+project: AppGrav
+project_key: appgrav
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # Epic 1: Core System — Authentification, Permissions & Configuration
+  epic-1: in-progress
+  1-1-offline-pin-cache-setup: done
+  1-2-offline-pin-authentication: done
+  1-3-offline-permissions-cache: done
+  1-4-network-status-indicator: done
+  1-5-settings-offline-cache: backlog
+  epic-1-retrospective: optional
+
+  # Epic 2: Catalogue & Costing — Produits, Recettes & Production
+  epic-2: backlog
+  2-1-products-offline-cache: backlog
+  2-2-categories-offline-cache: backlog
+  2-3-product-modifiers-offline-cache: backlog
+  2-4-recipes-read-only-cache-costing-display: backlog
+  2-5-production-records-online-only-with-deferred-sync: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3: POS & Ventes — Commandes, Encaissement & Sessions
+  epic-3: backlog
+  3-1-dexie-schema-for-orders-sync-queue: backlog
+  3-2-cart-persistence-offline: backlog
+  3-3-offline-order-creation: backlog
+  3-4-offline-payment-processing: backlog
+  3-5-pos-session-management-offline: backlog
+  3-6-sync-queue-processing: backlog
+  3-7-kitchen-dispatch-via-lan-offline: backlog
+  3-8-pending-sync-counter-display: backlog
+  epic-3-retrospective: optional
+
+  # Epic 4: Cuisine & Dispatch — Kitchen Display System
+  epic-4: backlog
+  4-1-socket-io-server-on-pos-lan-hub: backlog
+  4-2-kds-socket-io-client-connection: backlog
+  4-3-order-dispatch-to-kds-via-lan: backlog
+  4-4-kds-order-queue-display: backlog
+  4-5-kds-item-status-update: backlog
+  4-6-order-completion-auto-remove: backlog
+  epic-4-retrospective: optional
+
+  # Epic 5: Stock & Approvisionnement — Inventaire, Transferts & Achats
+  epic-5: backlog
+  5-1-stock-levels-read-only-cache: backlog
+  5-2-stock-alerts-offline-display: backlog
+  5-3-stock-adjustment-online-only: backlog
+  5-4-internal-transfer-creation: backlog
+  5-5-transfer-reception-validation: backlog
+  5-6-purchase-order-creation: backlog
+  5-7-purchase-order-workflow: backlog
+  5-8-purchase-reception-stock-update: backlog
+  epic-5-retrospective: optional
+
+  # Epic 6: Clients & Marketing — Fidélité, B2B, Combos & Promotions
+  epic-6: backlog
+  6-1-customers-offline-cache: backlog
+  6-2-customer-category-pricing-offline: backlog
+  6-3-loyalty-points-display-read-only: backlog
+  6-4-promotions-offline-cache: backlog
+  6-5-automatic-promotion-application: backlog
+  6-6-combos-selection-flow: backlog
+  6-7-b2b-order-creation: backlog
+  6-8-b2b-payments-tracking: backlog
+  epic-6-retrospective: optional
+
+  # Epic 7: Multi-Device — Customer Display, Mobile Serveurs & LAN Hub
+  epic-7: backlog
+  7-1-customer-display-socket-io-connection: backlog
+  7-2-customer-display-cart-updates: backlog
+  7-3-customer-display-total-branding: backlog
+  7-4-mobile-app-authentication: backlog
+  7-5-mobile-app-product-catalog: backlog
+  7-6-mobile-app-order-creation: backlog
+  7-7-mobile-app-order-status: backlog
+  7-8-lan-discovery-via-qr-code: backlog
+  7-9-system-monitoring-dashboard: backlog
+  7-10-offline-period-logging: backlog
+  epic-7-retrospective: optional
+
+  # Epic 8: Analytics & Intelligence — Reports Complets
+  epic-8: backlog
+  8-1-report-framework-base: backlog
+  8-2-sales-reports-suite: backlog
+  8-3-inventory-reports-suite: backlog
+  8-4-financial-reports-suite: backlog
+  8-5-report-drill-down: backlog
+  8-6-report-export-csv-pdf: backlog
+  8-7-period-comparison: backlog
+  8-8-reports-offline-cache-7-days: backlog
+  8-9-audit-trail-alerts: backlog
+  epic-8-retrospective: optional

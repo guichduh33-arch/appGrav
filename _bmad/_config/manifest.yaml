@@ -1,0 +1,43 @@
+installation:
+  version: 6.0.0-Beta.1
+  installDate: 2026-01-26T06:54:50.596Z
+  lastUpdated: 2026-01-26T06:54:50.596Z
+modules:
+  - name: core
+    version: 6.0.0-Beta.1
+    installDate: 2026-01-26T06:54:48.768Z
+    lastUpdated: 2026-01-26T06:54:48.768Z
+    source: built-in
+    npmPackage: null
+    repoUrl: null
+  - name: bmm
+    version: 6.0.0-Beta.1
+    installDate: 2026-01-26T06:54:39.137Z
+    lastUpdated: 2026-01-26T06:54:48.768Z
+    source: built-in
+    npmPackage: null
+    repoUrl: null
+  - name: bmb
+    version: 0.1.2
+    installDate: 2026-01-26T06:54:42.657Z
+    lastUpdated: 2026-01-26T06:54:49.386Z
+    source: external
+    npmPackage: bmad-builder
+    repoUrl: https://github.com/bmad-code-org/bmad-builder
+  - name: gds
+    version: 0.1.2
+    installDate: 2026-01-26T06:54:45.961Z
+    lastUpdated: 2026-01-26T06:54:49.987Z
+    source: external
+    npmPackage: bmad-game-dev-studio
+    repoUrl: https://github.com/bmad-code-org/bmad-module-game-dev-studio.git
+  - name: cis
+    version: 0.1.2
+    installDate: 2026-01-26T06:54:48.663Z
+    lastUpdated: 2026-01-26T06:54:50.596Z
+    source: external
+    npmPackage: bmad-creative-intelligence-suite
+    repoUrl: https://github.com/bmad-code-org/bmad-module-creative-intelligence-suite
+ides:
+  - claude-code
+  - antigravity
