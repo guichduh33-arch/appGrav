@@ -42,7 +42,30 @@
         "products": {
             "title_all": "Semua Produk",
             "search_placeholder": "Cari produk...",
-            "options_label": "pilihan"
+            "options_label": "pilihan",
+            "offlineCache": {
+                "dataFrom": "Data per {{timestamp}}",
+                "syncing": "Menyinkronkan produk...",
+                "syncSuccess": "{{count}} produk tersinkronisasi",
+                "syncError": "Gagal menyinkronkan produk",
+                "staleWarning": "Data mungkin sudah usang"
+            }
+        },
+        "categories": {
+            "offlineCache": {
+                "dataFrom": "Kategori per {{timestamp}}",
+                "syncing": "Menyinkronkan kategori...",
+                "syncSuccess": "{{count}} kategori tersinkronisasi",
+                "syncError": "Gagal menyinkronkan kategori",
+                "staleWarning": "Kategori mungkin sudah usang"
+            }
+        },
+        "modifiersCache": {
+            "dataFrom": "Pengubah per {{timestamp}}",
+            "syncing": "Menyinkronkan pengubah...",
+            "syncSuccess": "{{count}} pengubah tersinkronisasi",
+            "syncError": "Gagal menyinkronkan pengubah",
+            "staleWarning": "Pengubah mungkin sudah usang"
         },
         "footer": {
             "on_hold": "Ditunda",
@@ -404,7 +427,13 @@
             "ingredients_count": "Bahan",
             "avg_cost_per_ingredient": "Biaya Rata-rata/Bahan",
             "warning_loss": "Peringatan: Biaya material melebihi harga jual. Produk ini menghasilkan kerugian.",
-            "warning_low_margin": "Peringatan: Margin di bawah 30%. Pertimbangkan menyesuaikan harga atau biaya."
+            "warning_low_margin": "Peringatan: Margin di bawah 30%. Pertimbangkan menyesuaikan harga atau biaya.",
+            "offlineCache": {
+                "dataFrom": "Data per {{timestamp}}",
+                "readOnly": "Hanya baca (offline)",
+                "staleWarning": "Data mungkin tidak terbaru (>24jam)",
+                "noRecipesOffline": "Resep tidak tersedia offline"
+            }
         },
         "history": {
             "title": "Riwayat Pergerakan",
@@ -813,6 +842,12 @@
                 "autoAcknowledgeDelay": "Delay pengakuan otomatis",
                 "soundNewOrder": "Suara pesanan baru"
             }
+        },
+        "offlineCache": {
+            "dataFrom": "Data dari {{date}}",
+            "syncError": "Kesalahan sinkronisasi pengaturan",
+            "syncSuccess": "Pengaturan disinkronkan untuk mode offline",
+            "usingCached": "Menggunakan data cache"
         }
     },
     "stock_movements": {
@@ -962,6 +997,24 @@
         "and_more": "dan",
         "more_errors": "kesalahan lainnya",
         "import_another": "Impor file lain"
+    },
+    "production": {
+        "offline": {
+            "requiresConnection": "Produksi memerlukan koneksi internet",
+            "saveReminder": "Simpan sebagai pengingat",
+            "reminderSaved": "Pengingat disimpan",
+            "pendingReminders": "{{count}} pengingat produksi tertunda",
+            "viewReminders": "Lihat pengingat",
+            "restoreReminder": "Pulihkan",
+            "deleteReminder": "Hapus",
+            "noReminders": "Tidak ada pengingat tertunda",
+            "remindersTitle": "Pengingat produksi",
+            "reminderNote": "Catatan",
+            "addNote": "Tambahkan catatan (opsional)",
+            "section": "Bagian",
+            "items": "item",
+            "createdAt": "Dibuat pada"
+        }
     },
     "dashboard": {
         "title": "Dasbor",

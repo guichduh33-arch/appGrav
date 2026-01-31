@@ -62,11 +62,12 @@
       "Bash(npx shadcn@latest init --yes --defaults)",
       "Bash(npx shadcn@latest add:*)",
       "Bash(where:*)",
-      "Bash(git check-ignore:*)"
+      "Bash(git check-ignore:*)",
+      "Bash(./node_modules/.bin/tsc:*)"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "supabase"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

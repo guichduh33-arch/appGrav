@@ -42,7 +42,30 @@
         "products": {
             "title_all": "Tous les produits",
             "search_placeholder": "Rechercher un produit...",
-            "options_label": "options"
+            "options_label": "options",
+            "offlineCache": {
+                "dataFrom": "Données au {{timestamp}}",
+                "syncing": "Synchronisation des produits...",
+                "syncSuccess": "{{count}} produits synchronisés",
+                "syncError": "Erreur de synchronisation des produits",
+                "staleWarning": "Données potentiellement obsolètes"
+            }
+        },
+        "categories": {
+            "offlineCache": {
+                "dataFrom": "Catégories au {{timestamp}}",
+                "syncing": "Synchronisation des catégories...",
+                "syncSuccess": "{{count}} catégories synchronisées",
+                "syncError": "Erreur de synchronisation des catégories",
+                "staleWarning": "Catégories potentiellement obsolètes"
+            }
+        },
+        "modifiersCache": {
+            "dataFrom": "Modificateurs au {{timestamp}}",
+            "syncing": "Synchronisation des modificateurs...",
+            "syncSuccess": "{{count}} modificateurs synchronisés",
+            "syncError": "Erreur de synchronisation des modificateurs",
+            "staleWarning": "Modificateurs potentiellement obsolètes"
         },
         "footer": {
             "on_hold": "En attente",
@@ -404,7 +427,13 @@
             "ingredients_count": "Ingrédients",
             "avg_cost_per_ingredient": "Coût Moyen/Ingrédient",
             "warning_loss": "Attention: Le coût des matières dépasse le prix de vente. Ce produit génère une perte.",
-            "warning_low_margin": "Avertissement: La marge est inférieure à 30%. Envisagez d'ajuster le prix ou les coûts."
+            "warning_low_margin": "Avertissement: La marge est inférieure à 30%. Envisagez d'ajuster le prix ou les coûts.",
+            "offlineCache": {
+                "dataFrom": "Données au {{timestamp}}",
+                "readOnly": "Lecture seule (hors ligne)",
+                "staleWarning": "Données potentiellement obsolètes (>24h)",
+                "noRecipesOffline": "Recettes non disponibles hors ligne"
+            }
         },
         "history": {
             "title": "Historique des Mouvements",
@@ -813,6 +842,12 @@
                 "autoAcknowledgeDelay": "Délai accusé auto",
                 "soundNewOrder": "Son nouvelle commande"
             }
+        },
+        "offlineCache": {
+            "dataFrom": "Données au {{date}}",
+            "syncError": "Erreur de synchronisation des paramètres",
+            "syncSuccess": "Paramètres synchronisés pour le mode hors-ligne",
+            "usingCached": "Utilisation des données en cache"
         }
     },
     "stock_movements": {
@@ -962,6 +997,24 @@
         "and_more": "et",
         "more_errors": "autres erreurs",
         "import_another": "Importer un autre fichier"
+    },
+    "production": {
+        "offline": {
+            "requiresConnection": "La production nécessite une connexion internet",
+            "saveReminder": "Sauvegarder comme rappel",
+            "reminderSaved": "Rappel sauvegardé",
+            "pendingReminders": "{{count}} rappel(s) de production en attente",
+            "viewReminders": "Voir les rappels",
+            "restoreReminder": "Restaurer",
+            "deleteReminder": "Supprimer",
+            "noReminders": "Aucun rappel en attente",
+            "remindersTitle": "Rappels de production",
+            "reminderNote": "Note",
+            "addNote": "Ajouter une note (optionnel)",
+            "section": "Section",
+            "items": "articles",
+            "createdAt": "Créé le"
+        }
     },
     "dashboard": {
         "title": "Tableau de Bord",

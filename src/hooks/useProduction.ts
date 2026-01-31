@@ -189,6 +189,10 @@ export function useProduction() {
         setProductionItems([])
     }, [])
 
+    const restoreFromReminder = useCallback((items: ProductionItem[]) => {
+        setProductionItems(items)
+    }, [])
+
     const navigateDate = useCallback((direction: number) => {
         const newDate = new Date(selectedDate)
         newDate.setDate(newDate.getDate() + direction)
@@ -392,6 +396,7 @@ export function useProduction() {
         updateReason,
         removeItem,
         clearItems,
+        restoreFromReminder,
         handleSave,
         handleDeleteRecord,
         getProductionUnit,

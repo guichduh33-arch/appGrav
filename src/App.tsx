@@ -4,6 +4,7 @@ import { useAuthStore } from './stores/authStore'
 import { supabase } from './lib/supabase'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
 import { initializeSyncEngine } from './services/sync/syncEngine'
+import { initProductsCache, stopProductsCacheRefresh } from './services/offline/productsCacheInit'
 import toast from 'react-hot-toast'
 
 // Layouts - loaded immediately as they're shells
@@ -130,6 +131,20 @@ function App() {
     useEffect(() => {
         initializeSyncEngine();
     }, [])
+
+    // Initialize products cache when authenticated (Story 2.1)
+    useEffect(() => {
+        if (isAuthenticated && navigator.onLine) {
+            initProductsCache();
+        }
+
+        // Cleanup: stop refresh interval on logout
+        return () => {
+            if (!isAuthenticated) {
+                stopProductsCacheRefresh();
+            }
+        };
+    }, [isAuthenticated])
 
     return (
         <ErrorBoundary>

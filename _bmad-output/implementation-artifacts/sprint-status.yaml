@@ -41,22 +41,22 @@ story_location: _bmad-output/implementation-artifacts
 
 development_status:
   # Epic 1: Core System — Authentification, Permissions & Configuration
-  epic-1: in-progress
+  epic-1: done
   1-1-offline-pin-cache-setup: done
   1-2-offline-pin-authentication: done
   1-3-offline-permissions-cache: done
   1-4-network-status-indicator: done
-  1-5-settings-offline-cache: backlog
-  epic-1-retrospective: optional
+  1-5-settings-offline-cache: done
+  epic-1-retrospective: done
 
   # Epic 2: Catalogue & Costing — Produits, Recettes & Production
-  epic-2: backlog
-  2-1-products-offline-cache: backlog
-  2-2-categories-offline-cache: backlog
-  2-3-product-modifiers-offline-cache: backlog
-  2-4-recipes-read-only-cache-costing-display: backlog
-  2-5-production-records-online-only-with-deferred-sync: backlog
-  epic-2-retrospective: optional
+  epic-2: done
+  2-1-products-offline-cache: done
+  2-2-categories-offline-cache: done
+  2-3-product-modifiers-offline-cache: done
+  2-4-recipes-read-only-cache-costing-display: done
+  2-5-production-records-online-only-with-deferred-sync: done
+  epic-2-retrospective: done
 
   # Epic 3: POS & Ventes — Commandes, Encaissement & Sessions
   epic-3: backlog

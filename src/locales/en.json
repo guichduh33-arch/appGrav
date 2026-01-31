@@ -42,7 +42,30 @@
         "products": {
             "title_all": "All Products",
             "search_placeholder": "Search a product...",
-            "options_label": "options"
+            "options_label": "options",
+            "offlineCache": {
+                "dataFrom": "Data as of {{timestamp}}",
+                "syncing": "Syncing products...",
+                "syncSuccess": "{{count}} products synced",
+                "syncError": "Failed to sync products",
+                "staleWarning": "Data may be outdated"
+            }
+        },
+        "categories": {
+            "offlineCache": {
+                "dataFrom": "Categories as of {{timestamp}}",
+                "syncing": "Syncing categories...",
+                "syncSuccess": "{{count}} categories synced",
+                "syncError": "Failed to sync categories",
+                "staleWarning": "Categories may be outdated"
+            }
+        },
+        "modifiersCache": {
+            "dataFrom": "Modifiers as of {{timestamp}}",
+            "syncing": "Syncing modifiers...",
+            "syncSuccess": "{{count}} modifiers synced",
+            "syncError": "Failed to sync modifiers",
+            "staleWarning": "Modifiers may be outdated"
         },
         "footer": {
             "on_hold": "Held",
@@ -393,7 +416,13 @@
             "ingredients_count": "Ingredients",
             "avg_cost_per_ingredient": "Avg Cost/Ingredient",
             "warning_loss": "Warning: Material cost exceeds selling price. This product generates a loss.",
-            "warning_low_margin": "Warning: Margin is below 30%. Consider adjusting price or costs."
+            "warning_low_margin": "Warning: Margin is below 30%. Consider adjusting price or costs.",
+            "offlineCache": {
+                "dataFrom": "Data from {{timestamp}}",
+                "readOnly": "Read-only (offline)",
+                "staleWarning": "Data may be outdated (>24h)",
+                "noRecipesOffline": "Recipes not available offline"
+            }
         },
         "history": {
             "title": "Movement History",
@@ -802,6 +831,12 @@
                 "autoAcknowledgeDelay": "Auto acknowledge delay",
                 "soundNewOrder": "New order sound"
             }
+        },
+        "offlineCache": {
+            "dataFrom": "Data from {{date}}",
+            "syncError": "Settings sync error",
+            "syncSuccess": "Settings synced for offline mode",
+            "usingCached": "Using cached data"
         }
     },
     "stock_movements": {
@@ -951,6 +986,24 @@
         "and_more": "and",
         "more_errors": "more errors",
         "import_another": "Import another file"
+    },
+    "production": {
+        "offline": {
+            "requiresConnection": "Production requires an internet connection",
+            "saveReminder": "Save as reminder",
+            "reminderSaved": "Reminder saved",
+            "pendingReminders": "{{count}} production reminder(s) pending",
+            "viewReminders": "View reminders",
+            "restoreReminder": "Restore",
+            "deleteReminder": "Delete",
+            "noReminders": "No pending reminders",
+            "remindersTitle": "Production reminders",
+            "reminderNote": "Note",
+            "addNote": "Add a note (optional)",
+            "section": "Section",
+            "items": "items",
+            "createdAt": "Created on"
+        }
     },
     "dashboard": {
         "title": "Dashboard",

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '../lib/supabase';
+import { cacheAllSettingsData } from '../services/offline/settingsCacheService';
 import type {
   SettingsCategory,
   Setting,
@@ -183,6 +184,21 @@ export const useSettingsStore = create<SettingsState>()(
             appearance,
             localization,
           });
+
+          // Cache settings data for offline access (Story 1.5)
+          // Run in background, don't block initialization
+          cacheAllSettingsData()
+            .then((result) => {
+              if (result.success) {
+                console.debug('[Settings] Offline cache updated at', result.lastSyncAt);
+              } else {
+                console.warn('[Settings] Offline cache partial failure:', result.errors);
+              }
+            })
+            .catch((error) => {
+              // Don't fail initialization if cache fails
+              console.warn('[Settings] Failed to cache settings for offline:', error);
+            });
         } catch (error) {
           console.error('Failed to initialize settings:', error);
           set({
