@@ -1158,5 +1158,28 @@
         "allDispatched": "Tous les envois effectués",
         "noItems": "Aucun article à dispatcher",
         "lanRequired": "Connexion LAN requise pour le dispatch"
+    },
+    "lan": {
+        "hub": {
+            "starting": "Démarrage du hub LAN...",
+            "started": "Hub LAN actif",
+            "stopped": "Hub LAN arrêté",
+            "error": "Erreur du hub LAN",
+            "deviceConnected": "Appareil connecté: {{name}}",
+            "deviceDisconnected": "Appareil déconnecté: {{name}}",
+            "connectedDevices": "{{count}} appareil(s) connecté(s)",
+            "status": {
+                "active": "Hub LAN actif",
+                "inactive": "Hub LAN inactif",
+                "uptime": "Uptime: {{seconds}}s"
+            }
+        },
+        "client": {
+            "connecting": "Connexion au hub LAN...",
+            "connected": "Connecté au hub LAN",
+            "disconnected": "Déconnecté du hub LAN",
+            "reconnecting": "Reconnexion en cours...",
+            "error": "Erreur de connexion LAN"
+        }
     }
 }

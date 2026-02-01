@@ -1158,5 +1158,28 @@
         "allDispatched": "Semua pengiriman selesai",
         "noItems": "Tidak ada item untuk dikirim",
         "lanRequired": "Koneksi LAN diperlukan untuk pengiriman"
+    },
+    "lan": {
+        "hub": {
+            "starting": "Memulai hub LAN...",
+            "started": "Hub LAN aktif",
+            "stopped": "Hub LAN berhenti",
+            "error": "Kesalahan hub LAN",
+            "deviceConnected": "Perangkat terhubung: {{name}}",
+            "deviceDisconnected": "Perangkat terputus: {{name}}",
+            "connectedDevices": "{{count}} perangkat terhubung",
+            "status": {
+                "active": "Hub LAN aktif",
+                "inactive": "Hub LAN tidak aktif",
+                "uptime": "Uptime: {{seconds}} detik"
+            }
+        },
+        "client": {
+            "connecting": "Menghubungkan ke hub LAN...",
+            "connected": "Terhubung ke hub LAN",
+            "disconnected": "Terputus dari hub LAN",
+            "reconnecting": "Menghubungkan ulang...",
+            "error": "Kesalahan koneksi LAN"
+        }
     }
 }

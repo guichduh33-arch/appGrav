@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Search, PauseCircle, CheckCircle, AlertCircle, Clock, Users } from 'lucide-react'
@@ -10,6 +10,7 @@ import { useProducts, useCategories } from '../../hooks/products'
 import { useShift, ShiftUser } from '../../hooks/useShift'
 import { useNetworkAlerts } from '../../hooks/useNetworkAlerts'
 import { useSyncReport } from '../../hooks/useSyncReport'
+import { useLanHub } from '../../hooks/lan'
 import { PostOfflineSyncReport } from '../../components/sync/PostOfflineSyncReport'
 import CategoryNav from '../../components/pos/CategoryNav'
 import ProductGrid from '../../components/pos/ProductGrid'
@@ -44,6 +45,24 @@ export default function POSMainPage() {
 
     // Enable post-offline sync report modal (Story 3.3)
     const { showReport: showSyncReport, period: syncPeriod, dismissReport: dismissSyncReport, retryFailed: retrySyncFailed } = useSyncReport()
+
+    // Enable LAN Hub for KDS communication (Story 4.1)
+    const { isRunning: lanHubRunning, error: lanHubError } = useLanHub({
+        deviceName: 'Caisse Principale',
+        autoStart: true,
+    })
+
+    // Log LAN hub errors
+    useEffect(() => {
+        if (lanHubError) {
+            console.error('[POS] LAN Hub error:', lanHubError)
+        }
+    }, [lanHubError])
+
+    // Debug: Log LAN hub status changes
+    useEffect(() => {
+        console.log('[POS] LAN Hub running:', lanHubRunning)
+    }, [lanHubRunning])
 
     const {
         items, itemCount, clearCart,

@@ -293,9 +293,21 @@ class LanHub {
   /**
    * Handle device deregistration
    */
-  private handleDeviceDeregister(message: ILanMessage): void {
-    useLanStore.getState().removeConnectedDevice(message.from);
+  private async handleDeviceDeregister(message: ILanMessage): Promise<void> {
+    const store = useLanStore.getState();
+    const device = store.connectedDevices.find(d => d.deviceId === message.from);
+    const deviceName = device?.deviceName || message.from;
+
+    // Remove from store
+    store.removeConnectedDevice(message.from);
     console.log(`[LanHub] Device deregistered: ${message.from}`);
+
+    // Notify other devices about this disconnection (AC3 requirement)
+    await this.broadcast(LAN_MESSAGE_TYPES.NODE_DEREGISTER, {
+      deviceId: message.from,
+      deviceName: deviceName,
+      reason: 'deregistered',
+    });
   }
 
   /**

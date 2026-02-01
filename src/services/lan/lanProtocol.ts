@@ -233,6 +233,49 @@ export async function getHubNode(): Promise<ILanNode | null> {
 }
 
 /**
+ * Hub connection info for clients
+ */
+export interface IHubConnectionInfo {
+  available: boolean;
+  hubId: string | null;
+  hubName: string | null;
+  ipAddress: string | null;
+  port: number | null;
+  lastHeartbeat: string | null;
+  realtimeChannel: string;
+}
+
+/**
+ * Get connection info for the LAN hub
+ * Used by KDS, Display, and Mobile clients to connect
+ */
+export async function getHubConnectionInfo(): Promise<IHubConnectionInfo> {
+  const hubNode = await getHubNode();
+
+  if (!hubNode) {
+    return {
+      available: false,
+      hubId: null,
+      hubName: null,
+      ipAddress: null,
+      port: null,
+      lastHeartbeat: null,
+      realtimeChannel: 'lan-hub',
+    };
+  }
+
+  return {
+    available: true,
+    hubId: hubNode.device_id,
+    hubName: hubNode.device_name,
+    ipAddress: hubNode.ip_address,
+    port: hubNode.port,
+    lastHeartbeat: hubNode.last_heartbeat,
+    realtimeChannel: 'lan-hub',
+  };
+}
+
+/**
  * Get nodes by type
  */
 export async function getNodesByType(deviceType: TSyncDeviceType): Promise<ILanNode[]> {
