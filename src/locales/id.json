@@ -1107,6 +1107,16 @@
             "createdAt": "Dibuat pada"
         }
     },
+    "kds": {
+        "source": {
+            "lan": "LAN",
+            "supabase": "Cloud",
+            "pos": "POS",
+            "mobile": "Mobile"
+        },
+        "orderReceived": "Pesanan baru diterima",
+        "ackSent": "Pengakuan terkirim"
+    },
     "orders": {
         "local": "Lokal",
         "pendingSync": "Menunggu sinkronisasi",

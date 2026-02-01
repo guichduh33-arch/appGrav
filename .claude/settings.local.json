@@ -65,7 +65,9 @@
       "Bash(git check-ignore:*)",
       "Bash(./node_modules/.bin/tsc:*)",
       "Bash(npx eslint:*)",
-      "Bash(if not exist \"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\hooks\\\\sync\" mkdir \"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\hooks\\\\sync\")"
+      "Bash(if not exist \"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\hooks\\\\sync\" mkdir \"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\hooks\\\\sync\")",
+      "Bash(npx @kayvan/markdown-tree-parser:*)",
+      "Bash(if not exist \"C:\\\\Users\\\\guich\\\\test2\\\\appGrav\\\\_bmad-output\\\\implementation-artifacts\" mkdir \"C:\\\\Users\\\\guich\\\\test2\\\\appGrav\\\\_bmad-output\\\\implementation-artifacts\")"
     ]
   },
   "enableAllProjectMcpServers": true,

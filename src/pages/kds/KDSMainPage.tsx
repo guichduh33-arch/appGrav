@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import KDSOrderCard from '../../components/kds/KDSOrderCard'
 import { ArrowLeft, Volume2, VolumeX, RefreshCw, ChefHat, Coffee, Store, Users } from 'lucide-react'
-import { lanClient } from '../../services/lan/lanClient'
-import { LAN_MESSAGE_TYPES } from '../../services/lan/lanProtocol'
 import { broadcastOrderStatus } from '../../services/display/displayBroadcast'
 import { useLanClient } from '../../hooks/lan/useLanClient'
+import { useKdsOrderReceiver } from '../../hooks/kds/useKdsOrderReceiver'
 import { LanConnectionIndicator } from '../../components/lan/LanConnectionIndicator'
+import type { IKdsNewOrderPayload, TKitchenStation } from '../../types/offline'
 import './KDSMainPage.css'
 
 interface OrderItem {
@@ -30,7 +30,7 @@ interface Order {
     items: OrderItem[]
     created_at: string
     status: string
-    source?: 'pos' | 'mobile' | 'web' // Story 8.1: Mobile order source
+    source?: 'pos' | 'mobile' | 'web' | 'lan' // Story 8.1 + Story 4.3: Order source indicator
 }
 
 const STATION_CONFIG: Record<string, { name: string; icon: React.ReactNode; color: string; dbStation: string }> = {
@@ -105,6 +105,56 @@ export default function KDSMainPage() {
         deviceName: 'Kitchen Display',
         station: stationConfig?.dbStation,
         autoConnect: true,
+    })
+
+    // Memoize existing order IDs for duplicate detection
+    const existingOrderIds = useMemo(() => new Set(orders.map(o => o.id)), [orders])
+
+    // Story 4.3: Callback to handle orders received via LAN
+    const handleLanOrder = useCallback((payload: IKdsNewOrderPayload, source: 'lan') => {
+        // Convert LAN payload to Order format
+        const newOrder: Order = {
+            id: payload.order_id,
+            order_number: payload.order_number,
+            order_type: payload.order_type,
+            table_name: payload.table_number ? `Table ${payload.table_number}` : undefined,
+            items: payload.items.map(item => ({
+                id: item.id,
+                product_name: item.name,
+                quantity: item.quantity,
+                modifiers: item.modifiers.join(', '),
+                notes: item.notes || undefined,
+                item_status: 'new' as const,
+                dispatch_station: payload.station,
+                is_held: false,
+            })),
+            created_at: payload.timestamp,
+            status: 'preparing',
+            source: source, // Mark as LAN source
+        }
+
+        setOrders(prev => {
+            // Extra duplicate check (also done in hook, but belt & suspenders)
+            if (prev.some(o => o.id === newOrder.id)) {
+                return prev
+            }
+            // Insert in FIFO order (oldest first)
+            return [...prev, newOrder].sort(
+                (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            )
+        })
+
+        // Update order count for sound tracking
+        setLastOrderCount(prev => prev + 1)
+    }, [])
+
+    // Story 4.3: KDS Order Receiver via LAN
+    useKdsOrderReceiver({
+        station: (stationConfig?.dbStation as TKitchenStation) || 'kitchen',
+        soundEnabled,
+        playSound: playNotificationSound,
+        onNewOrder: handleLanOrder,
+        existingOrderIds,
     })
 
     // Update time every second
@@ -268,20 +318,9 @@ export default function KDSMainPage() {
         }
     }, [fetchOrders])
 
-    // Story 8.1: Listen for mobile orders via LAN
-    useEffect(() => {
-        const unsubscribe = lanClient.on(LAN_MESSAGE_TYPES.KDS_NEW_ORDER, () => {
-            // Refresh orders when mobile order received
-            if (soundEnabled) {
-                playNotificationSound()
-            }
-            fetchOrders()
-        })
-
-        return () => {
-            unsubscribe()
-        }
-    }, [fetchOrders, soundEnabled])
+    // Note: Story 4.3 - LAN order reception is now handled by useKdsOrderReceiver hook
+    // which uses the payload directly instead of refetching from Supabase.
+    // Supabase Realtime subscription above serves as fallback when LAN is unavailable.
 
     // Handle item status updates
     const handleStartPreparing = async (orderId: string, itemIds: string[]) => {

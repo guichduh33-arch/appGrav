@@ -1107,6 +1107,16 @@
             "createdAt": "Créé le"
         }
     },
+    "kds": {
+        "source": {
+            "lan": "LAN",
+            "supabase": "Cloud",
+            "pos": "POS",
+            "mobile": "Mobile"
+        },
+        "orderReceived": "Nouvelle commande reçue",
+        "ackSent": "Accusé de réception envoyé"
+    },
     "orders": {
         "local": "Local",
         "pendingSync": "En attente sync",

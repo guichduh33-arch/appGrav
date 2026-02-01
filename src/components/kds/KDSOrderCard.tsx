@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Clock, CheckCircle, ChefHat, AlertTriangle, Pause, Play, Smartphone } from 'lucide-react'
+import { Clock, CheckCircle, ChefHat, AlertTriangle, Pause, Play, Smartphone, Wifi } from 'lucide-react'
 import './KDSOrderCard.css'
 
 interface OrderItem {
@@ -22,7 +22,7 @@ interface KDSOrderCardProps {
     items: OrderItem[]
     createdAt: string
     station: string
-    source?: 'pos' | 'mobile' | 'web' // Story 8.1
+    source?: 'pos' | 'mobile' | 'web' | 'lan' // Story 8.1 + Story 4.3
     onStartPreparing: (orderId: string, itemIds: string[]) => void
     onMarkReady: (orderId: string, itemIds: string[]) => void
     onMarkServed: (orderId: string, itemIds: string[]) => void
@@ -138,6 +138,13 @@ export default function KDSOrderCard({
                     {source === 'mobile' && (
                         <span className="kds-order-card__source kds-order-card__source--mobile">
                             <Smartphone size={14} />
+                        </span>
+                    )}
+                    {/* Story 4.3: LAN order indicator */}
+                    {source === 'lan' && (
+                        <span className="kds-order-card__source kds-order-card__source--lan">
+                            <Wifi size={14} />
+                            LAN
                         </span>
                     )}
                 </div>
