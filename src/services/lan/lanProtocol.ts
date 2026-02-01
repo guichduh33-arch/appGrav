@@ -45,6 +45,7 @@ export const LAN_MESSAGE_TYPES = {
 
   // KDS Sync
   KDS_NEW_ORDER: 'kds_new_order',
+  KDS_ORDER_ACK: 'kds_order_ack',
   KDS_ORDER_READY: 'kds_order_ready',
   KDS_ORDER_BUMP: 'kds_order_bump',
 

@@ -1,5 +1,7 @@
 import { create } from 'zustand'
+import { subscribeWithSelector } from 'zustand/middleware'
 import type { Product, ProductCombo } from '../types/database'
+import { saveCart, clearPersistedCart, type TSaveCartInput } from '@/services/offline/cartPersistenceService'
 
 export interface CartModifier {
     groupName: string
@@ -116,7 +118,8 @@ function calculateTotals(items: CartItem[], discountType: 'percent' | 'amount' |
     return { subtotal, discountAmount, total, itemCount }
 }
 
-export const useCartStore = create<CartState>((set, get) => ({
+export const useCartStore = create<CartState>()(
+  subscribeWithSelector((set, get) => ({
     items: [],
     orderType: 'dine_in',
     tableNumber: null,
@@ -243,6 +246,8 @@ export const useCartStore = create<CartState>((set, get) => ({
     },
 
     clearCart: () => {
+        // Clear persisted cart from localStorage (Story 3.2)
+        clearPersistedCart()
         set({
             items: [],
             tableNumber: null,
@@ -329,5 +334,46 @@ export const useCartStore = create<CartState>((set, get) => ({
             }
         })
     },
-}))
+})))
+
+// =====================================================
+// Cart Persistence (Story 3.2)
+// =====================================================
+
+/**
+ * Initialize cart persistence subscription
+ *
+ * Sets up a debounced subscription to persist cart state to localStorage
+ * on every relevant state change. Call once at app startup.
+ *
+ * @see Story 3.2: Cart Persistence Offline
+ */
+export function initCartPersistence(): void {
+    let saveTimeout: ReturnType<typeof setTimeout> | null = null
+
+    useCartStore.subscribe(
+        // Selector: only watch persistable state (not computed values)
+        (state) => ({
+            items: state.items,
+            lockedItemIds: state.lockedItemIds,
+            activeOrderId: state.activeOrderId,
+            activeOrderNumber: state.activeOrderNumber,
+            orderType: state.orderType,
+            tableNumber: state.tableNumber,
+            customerId: state.customerId,
+            customerName: state.customerName,
+            discountType: state.discountType,
+            discountValue: state.discountValue,
+            discountReason: state.discountReason,
+        }),
+        // Callback: debounced save to localStorage
+        (persistState) => {
+            if (saveTimeout) clearTimeout(saveTimeout)
+            saveTimeout = setTimeout(() => {
+                saveCart(persistState as TSaveCartInput)
+            }, 300) // 300ms debounce to avoid excessive writes
+        },
+        { fireImmediately: false }
+    )
+}
 

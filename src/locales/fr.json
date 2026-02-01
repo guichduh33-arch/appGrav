@@ -110,7 +110,9 @@
         "clear_title": "Effacer le panier",
         "hold_error_locked": "Impossible avec une commande en cuisine",
         "pin_modal_title": "Suppression d'article",
-        "pin_modal_message": "Cet article est en cuisine. PIN manager requis."
+        "pin_modal_message": "Cet article est en cuisine. PIN manager requis.",
+        "restored": "Panier restauré",
+        "itemsRemoved": "{{count}} article(s) supprimé(s) (produits indisponibles)"
     },
     "payment": {
         "title": "Encaissement",
@@ -136,7 +138,45 @@
         "toast_new_ready": "Nouvelle commande prête!",
         "offline_mode": "Mode Hors-ligne",
         "offline_cash_only": "Mode hors-ligne: Seuls les paiements en espèces sont disponibles",
-        "requires_internet": "Connexion requise"
+        "requires_internet": "Connexion requise",
+        "pendingValidation": "Validation en attente",
+        "offlinePaymentSaved": "Paiement enregistré hors ligne",
+        "willValidateOnline": "Sera validé lors de la reconnexion"
+    },
+    "session": {
+        "title": "Session de Caisse",
+        "open": "Ouvrir Session",
+        "close": "Fermer Session",
+        "opening_amount": "Fond de caisse",
+        "closing_amounts": "Montants de clôture",
+        "opened": "Session ouverte",
+        "closed": "Session fermée",
+        "already_active": "Une session est déjà active",
+        "no_active": "Aucune session active",
+        "not_found": "Session introuvable",
+        "not_open": "La session n'est pas ouverte",
+        "user_required": "L'utilisateur doit être authentifié",
+        "expected_totals": "Totaux attendus",
+        "actual_totals": "Totaux réels",
+        "variance": "Écart",
+        "cash_variance": "Écart de caisse",
+        "surplus": "Excédent",
+        "shortage": "Manque",
+        "notes": "Notes",
+        "notes_placeholder": "Remarques sur la clôture...",
+        "payment_methods": {
+            "cash": "Espèces",
+            "card": "Carte",
+            "qris": "QRIS",
+            "transfer": "Virement",
+            "ewallet": "E-wallet"
+        },
+        "offline": {
+            "created": "Session créée hors ligne",
+            "pending_sync": "En attente de synchronisation",
+            "synced": "Session synchronisée",
+            "conflict": "Conflit de synchronisation"
+        }
     },
     "modifiers": {
         "subtitle": "Personnalisez votre commande",
@@ -671,6 +711,12 @@
         "idle": "Prêt",
         "complete": "Terminé",
         "error": "Erreur",
+        "queue": {
+            "orderCreated": "Commande créée hors ligne",
+            "orderPending": "En attente de synchronisation",
+            "orderSynced": "Synchronisé avec le serveur",
+            "orderConflict": "Conflit de synchronisation"
+        },
         "dashboard": {
             "title": "Statut de Synchronisation",
             "description": "Surveillance des transactions offline",
@@ -1016,6 +1062,13 @@
             "createdAt": "Créé le"
         }
     },
+    "orders": {
+        "local": "Local",
+        "pendingSync": "En attente sync",
+        "synced": "Synchronisé",
+        "conflict": "Conflit",
+        "createdOffline": "Commande créée hors ligne"
+    },
     "dashboard": {
         "title": "Tableau de Bord",
         "subtitle": "Vue d'ensemble de votre activité",
@@ -1044,5 +1097,21 @@
         "expected_cash": "Espèces attendues",
         "qty_sold": "vendus",
         "revenue": "CA"
+    },
+    "dispatch": {
+        "status": {
+            "pending": "En attente d'envoi",
+            "dispatched": "Envoyé en cuisine",
+            "failed": "Échec d'envoi"
+        },
+        "sentToKitchen": "Commande envoyée en cuisine",
+        "sentToBarista": "Commande envoyée au bar",
+        "queuedForLater": "En attente de connexion LAN",
+        "dispatchFailed": "Échec de l'envoi vers la cuisine",
+        "pendingCount": "{{count}} en attente",
+        "retrying": "Nouvel essai en cours...",
+        "allDispatched": "Tous les envois effectués",
+        "noItems": "Aucun article à dispatcher",
+        "lanRequired": "Connexion LAN requise pour le dispatch"
     }
 }

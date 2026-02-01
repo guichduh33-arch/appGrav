@@ -1,10 +1,13 @@
-import { useEffect, Suspense, lazy } from 'react'
+import { useEffect, Suspense, lazy, useRef } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from './stores/authStore'
+import { useCartStore, initCartPersistence } from './stores/cartStore'
 import { supabase } from './lib/supabase'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
 import { initializeSyncEngine } from './services/sync/syncEngine'
 import { initProductsCache, stopProductsCacheRefresh } from './services/offline/productsCacheInit'
+import { loadCart, validateAndFilterCartItems } from './services/offline/cartPersistenceService'
 import toast from 'react-hot-toast'
 
 // Layouts - loaded immediately as they're shells
@@ -145,6 +148,70 @@ function App() {
             }
         };
     }, [isAuthenticated])
+
+    // Initialize cart persistence and restore cart on startup (Story 3.2)
+    const cartPersistenceInitialized = useRef(false)
+    const { t } = useTranslation()
+
+    useEffect(() => {
+        // Only initialize once
+        if (cartPersistenceInitialized.current) return
+        cartPersistenceInitialized.current = true
+
+        // Setup persistence subscription (debounced save on every change)
+        initCartPersistence()
+
+        // Restore persisted cart if it exists
+        const restorePersistedCart = async () => {
+            const persisted = loadCart()
+            if (!persisted || persisted.items.length === 0) return
+
+            // Validate items against current product catalog
+            const { validItems, removedNames } = await validateAndFilterCartItems(persisted.items)
+
+            // Filter locked items to only include valid item IDs
+            const validItemIds = new Set(validItems.map(item => item.id))
+            const validLockedIds = persisted.lockedItemIds.filter(id => validItemIds.has(id))
+
+            // Restore cart state using existing restoreCartState function
+            useCartStore.getState().restoreCartState(
+                validItems,
+                validLockedIds,
+                persisted.activeOrderId,
+                persisted.activeOrderNumber
+            )
+
+            // Restore other state fields
+            if (persisted.orderType) {
+                useCartStore.getState().setOrderType(persisted.orderType)
+            }
+            if (persisted.tableNumber) {
+                useCartStore.getState().setTableNumber(persisted.tableNumber)
+            }
+            if (persisted.customerId || persisted.customerName) {
+                useCartStore.getState().setCustomer(persisted.customerId, persisted.customerName)
+            }
+            if (persisted.discountType) {
+                useCartStore.getState().setDiscount(
+                    persisted.discountType,
+                    persisted.discountValue,
+                    persisted.discountReason
+                )
+            }
+
+            // Notify user about cart restoration
+            if (validItems.length > 0) {
+                toast.success(t('cart.restored'))
+            }
+
+            // Notify if items were removed due to unavailable products
+            if (removedNames.length > 0) {
+                toast(t('cart.itemsRemoved', { count: removedNames.length }), { icon: 'ℹ️' })
+            }
+        }
+
+        restorePersistedCart()
+    }, [t])
 
     return (
         <ErrorBoundary>

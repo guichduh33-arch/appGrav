@@ -37,3 +37,20 @@ export {
   useOfflineRecipesRaw,
 } from './useRecipesOffline';
 export type { IUseRecipesOfflineReturn } from './useRecipesOffline';
+
+export { useOfflineOrder } from './useOfflineOrder';
+export type {
+  ICreateOrderResult,
+  IUseOfflineOrderResult,
+} from './useOfflineOrder';
+
+export { useOfflinePayment } from './useOfflinePayment';
+export type {
+  IPaymentInput,
+  IPaymentResult,
+  IUseOfflinePaymentResult,
+} from './useOfflinePayment';
+
+export { useOfflineSession } from './useOfflineSession';
+
+export { useKitchenDispatch, useOrderDispatchStatus } from './useKitchenDispatch';

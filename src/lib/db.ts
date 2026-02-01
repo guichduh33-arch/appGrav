@@ -19,6 +19,11 @@ import type {
   IOfflineCategory,
   IOfflineModifier,
   IOfflineRecipe,
+  IOfflineOrder,
+  IOfflineOrderItem,
+  IOfflinePayment,
+  IOfflineSession,
+  IDispatchQueueItem,
 } from '@/types/offline';
 
 /**
@@ -54,6 +59,21 @@ export class OfflineDatabase extends Dexie {
 
   // Recipes cache (Story 2.4)
   offline_recipes!: Table<IOfflineRecipe>;
+
+  // Orders cache (Story 3.1)
+  offline_orders!: Table<IOfflineOrder>;
+
+  // Order items cache (Story 3.1)
+  offline_order_items!: Table<IOfflineOrderItem>;
+
+  // Payments cache (Story 3.4)
+  offline_payments!: Table<IOfflinePayment>;
+
+  // Sessions cache (Story 3.5)
+  offline_sessions!: Table<IOfflineSession>;
+
+  // Dispatch queue for KDS (Story 3.7)
+  offline_dispatch_queue!: Table<IDispatchQueueItem>;
 
   constructor() {
     super('appgrav-offline');
@@ -169,6 +189,103 @@ export class OfflineDatabase extends Dexie {
       // Compound index [is_active+product_id] for efficient costing queries
       offline_recipes: 'id, product_id, material_id, is_active, [is_active+product_id]',
     });
+
+    // Version 7: Orders cache (Story 3.1)
+    this.version(7).stores({
+      // Preserve existing tables
+      offline_users: 'id, cached_at',
+      offline_sync_queue: '++id, entity, status, created_at',
+      offline_settings: 'key, category_id, updated_at',
+      offline_tax_rates: 'id, is_active, is_default, [is_active+is_default]',
+      offline_payment_methods: 'id, is_active, is_default, sort_order, [is_active+is_default]',
+      offline_business_hours: 'day_of_week',
+      offline_sync_meta: 'entity',
+      offline_products: 'id, category_id, sku, name, is_active, pos_visible, [is_active+pos_visible+available_for_sale]',
+      offline_categories: 'id, name, sort_order, is_active, dispatch_station, [is_active+is_raw_material]',
+      offline_modifiers: 'id, product_id, category_id, group_name, is_active, [is_active+product_id], [is_active+category_id]',
+      offline_recipes: 'id, product_id, material_id, is_active, [is_active+product_id]',
+
+      // NEW: Orders cache (Story 3.1)
+      // Indexes: id (primary), order_number (unique display), status, order_type,
+      // customer_id, session_id, created_at, sync_status
+      // Compound index [status+created_at] for common order queries
+      offline_orders: 'id, order_number, status, order_type, customer_id, session_id, created_at, sync_status, [status+created_at]',
+
+      // NEW: Order items cache (Story 3.1)
+      // Indexes: id (primary), order_id (FK), product_id, item_status
+      offline_order_items: 'id, order_id, product_id, item_status',
+    });
+
+    // Version 8: Payments cache (Story 3.4)
+    this.version(8).stores({
+      // Preserve existing tables
+      offline_users: 'id, cached_at',
+      offline_sync_queue: '++id, entity, status, created_at',
+      offline_settings: 'key, category_id, updated_at',
+      offline_tax_rates: 'id, is_active, is_default, [is_active+is_default]',
+      offline_payment_methods: 'id, is_active, is_default, sort_order, [is_active+is_default]',
+      offline_business_hours: 'day_of_week',
+      offline_sync_meta: 'entity',
+      offline_products: 'id, category_id, sku, name, is_active, pos_visible, [is_active+pos_visible+available_for_sale]',
+      offline_categories: 'id, name, sort_order, is_active, dispatch_station, [is_active+is_raw_material]',
+      offline_modifiers: 'id, product_id, category_id, group_name, is_active, [is_active+product_id], [is_active+category_id]',
+      offline_recipes: 'id, product_id, material_id, is_active, [is_active+product_id]',
+      offline_orders: 'id, order_number, status, order_type, customer_id, session_id, created_at, sync_status, [status+created_at]',
+      offline_order_items: 'id, order_id, product_id, item_status',
+
+      // NEW: Payments cache (Story 3.4)
+      // Indexes: id (primary), order_id (FK), method, sync_status, created_at
+      offline_payments: 'id, order_id, method, sync_status, created_at',
+    });
+
+    // Version 9: Sessions cache (Story 3.5)
+    this.version(9).stores({
+      // Preserve existing tables
+      offline_users: 'id, cached_at',
+      offline_sync_queue: '++id, entity, status, created_at',
+      offline_settings: 'key, category_id, updated_at',
+      offline_tax_rates: 'id, is_active, is_default, [is_active+is_default]',
+      offline_payment_methods: 'id, is_active, is_default, sort_order, [is_active+is_default]',
+      offline_business_hours: 'day_of_week',
+      offline_sync_meta: 'entity',
+      offline_products: 'id, category_id, sku, name, is_active, pos_visible, [is_active+pos_visible+available_for_sale]',
+      offline_categories: 'id, name, sort_order, is_active, dispatch_station, [is_active+is_raw_material]',
+      offline_modifiers: 'id, product_id, category_id, group_name, is_active, [is_active+product_id], [is_active+category_id]',
+      offline_recipes: 'id, product_id, material_id, is_active, [is_active+product_id]',
+      offline_orders: 'id, order_number, status, order_type, customer_id, session_id, created_at, sync_status, [status+created_at]',
+      offline_order_items: 'id, order_id, product_id, item_status',
+      offline_payments: 'id, order_id, method, sync_status, created_at',
+
+      // NEW: Sessions cache (Story 3.5)
+      // Indexes: id (primary), user_id, status, opened_at, sync_status
+      offline_sessions: 'id, user_id, status, opened_at, sync_status',
+    });
+
+    // Version 10: Kitchen Dispatch Queue (Story 3.7)
+    this.version(10).stores({
+      // Preserve existing tables
+      offline_users: 'id, cached_at',
+      offline_sync_queue: '++id, entity, status, created_at',
+      offline_settings: 'key, category_id, updated_at',
+      offline_tax_rates: 'id, is_active, is_default, [is_active+is_default]',
+      offline_payment_methods: 'id, is_active, is_default, sort_order, [is_active+is_default]',
+      offline_business_hours: 'day_of_week',
+      offline_sync_meta: 'entity',
+      offline_products: 'id, category_id, sku, name, is_active, pos_visible, [is_active+pos_visible+available_for_sale]',
+      offline_categories: 'id, name, sort_order, is_active, dispatch_station, [is_active+is_raw_material]',
+      offline_modifiers: 'id, product_id, category_id, group_name, is_active, [is_active+product_id], [is_active+category_id]',
+      offline_recipes: 'id, product_id, material_id, is_active, [is_active+product_id]',
+      // Updated: Added dispatch_status index for Story 3.7
+      offline_orders: 'id, order_number, status, order_type, customer_id, session_id, created_at, sync_status, dispatch_status, [status+created_at]',
+      offline_order_items: 'id, order_id, product_id, item_status',
+      offline_payments: 'id, order_id, method, sync_status, created_at',
+      offline_sessions: 'id, user_id, status, opened_at, sync_status',
+
+      // NEW: Dispatch queue for KDS (Story 3.7)
+      // Indexes: ++id (auto-increment), order_id, station, status, created_at
+      // Compound index [status+station] for processing queue by station
+      offline_dispatch_queue: '++id, order_id, station, status, created_at, [status+station]',
+    });
   }
 }
 
@@ -188,4 +305,9 @@ export type {
   IOfflineCategory,
   IOfflineModifier,
   IOfflineRecipe,
+  IOfflineOrder,
+  IOfflineOrderItem,
+  IOfflinePayment,
+  IOfflineSession,
+  IDispatchQueueItem,
 };

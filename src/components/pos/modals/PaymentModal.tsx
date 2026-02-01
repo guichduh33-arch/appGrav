@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { X, Check, CreditCard, Banknote, QrCode, Printer, RotateCcw, WifiOff } from 'lucide-react'
+import { X, Check, CreditCard, Banknote, QrCode, Printer, RotateCcw, WifiOff, Clock } from 'lucide-react'
 import { useCartStore } from '../../../stores/cartStore'
 import { formatPrice } from '../../../utils/helpers'
-import { useOrders } from '../../../hooks/useOrders'
+import { useOfflinePayment } from '../../../hooks/offline/useOfflinePayment'
 import { useNetworkStore } from '../../../stores/networkStore'
 import toast from 'react-hot-toast'
 import './PaymentModal.css'
@@ -18,22 +18,36 @@ const QUICK_AMOUNTS = [100000, 150000, 200000, 250000, 500000]
 
 export default function PaymentModal({ onClose }: PaymentModalProps) {
     const { t } = useTranslation()
-    const { total, clearCart } = useCartStore()
+    const { total } = useCartStore()
     const isOnline = useNetworkStore((state) => state.isOnline)
 
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash')
     const [amountReceived, setAmountReceived] = useState<number>(0)
-    const [isProcessing, setIsProcessing] = useState(false)
     const [showSuccess, setShowSuccess] = useState(false)
-    const { createOrder, isCreating } = useOrders()
+    const [successChange, setSuccessChange] = useState<number>(0)
 
-    // Force cash payment when offline (Story 2.3)
+    // Use the new offline payment hook (Story 3.4)
+    const { processPayment, isProcessing, error, clearError } = useOfflinePayment()
+
+    // Track if error toast was shown to prevent duplicates
+    const errorShownRef = useRef(false)
+
+    // Show error toast when error changes
     useEffect(() => {
-        if (!isOnline && paymentMethod !== 'cash') {
-            setPaymentMethod('cash')
-            toast(t('payment.offline_cash_only'), { icon: '📴' })
+        if (error && !errorShownRef.current) {
+            toast.error(`${t('payment.toast_error')}: ${error}`)
+            errorShownRef.current = true
+        } else if (!error) {
+            errorShownRef.current = false
         }
-    }, [isOnline, paymentMethod, t])
+    }, [error, t])
+
+    // Clear error on unmount
+    useEffect(() => {
+        return () => {
+            clearError()
+        }
+    }, [clearError])
 
     const totalRounded = Math.round(total)
     const change = amountReceived - totalRounded
@@ -63,36 +77,35 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
         }
     }
 
-    // Handle payment completion
+    // Handle payment completion using offline-capable hook
     const handleConfirmPayment = async () => {
-        if (!canComplete || isCreating) return
-
-        setIsProcessing(true)
+        if (!canComplete || isProcessing) return
 
         try {
-            await createOrder({
+            const result = await processPayment({
                 method: paymentMethod,
+                amount: totalRounded,
                 cashReceived: paymentMethod === 'cash' ? amountReceived : undefined,
-                changeGiven: paymentMethod === 'cash' ? Math.max(0, change) : undefined
             })
 
-            setShowSuccess(true)
+            if (result) {
+                setSuccessChange(result.change)
+                setShowSuccess(true)
 
-        } catch (error: any) {
-            console.error('Payment error detail:', {
-                message: error.message,
-                details: error.details,
-                hint: error.hint,
-                code: error.code
-            })
-            toast.error(`${t('payment.toast_error')}: ${error.message || 'Unknown error'}`)
-            setIsProcessing(false)
+                // Show appropriate toast based on online/offline status
+                if (!isOnline && paymentMethod !== 'cash') {
+                    toast.success(t('payment.offlinePaymentSaved'))
+                }
+            }
+        } catch (err: unknown) {
+            // Error is already handled by the hook and useEffect above
+            console.error('Payment error:', err)
         }
     }
 
     // Handle new order
     const handleNewOrder = () => {
-        clearCart()
+        // Cart is already cleared by processPayment
         onClose()
         toast.success(t('payment.toast_new_ready'))
     }
@@ -109,10 +122,27 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                         <h2>{t('payment.success_title')}</h2>
                         <p className="success-subtitle">{t('payment.success_subtitle')}</p>
 
-                        {paymentMethod === 'cash' && change > 0 && (
+                        {paymentMethod === 'cash' && successChange > 0 && (
                             <div className="success-change">
                                 <span className="success-change__label">{t('payment.change_given')}</span>
-                                <span className="success-change__value">{formatPrice(change)}</span>
+                                <span className="success-change__value">{formatPrice(successChange)}</span>
+                            </div>
+                        )}
+
+                        {/* Show pending validation notice for card/QRIS offline */}
+                        {!isOnline && paymentMethod !== 'cash' && (
+                            <div className="success-offline-notice" style={{
+                                marginTop: '16px',
+                                padding: '12px',
+                                backgroundColor: '#fef3c7',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                color: '#92400e'
+                            }}>
+                                <Clock size={20} />
+                                <span>{t('payment.willValidateOnline')}</span>
                             </div>
                         )}
 
@@ -161,6 +191,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                             )}
                         </label>
                         <div className="payment-methods">
+                            {/* Cash - always available */}
                             <div className="payment-method">
                                 <input
                                     type="radio"
@@ -174,37 +205,45 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                                     <span className="payment-method__name">{t('payment.cash')}</span>
                                 </label>
                             </div>
-                            <div className={`payment-method ${!isOnline ? 'payment-method--disabled' : ''}`}>
+
+                            {/* Card - available offline with pending validation (Story 3.4) */}
+                            <div className="payment-method">
                                 <input
                                     type="radio"
                                     name="paymentMethod"
                                     id="payCard"
                                     checked={paymentMethod === 'card'}
-                                    onChange={() => isOnline && setPaymentMethod('card')}
-                                    disabled={!isOnline}
+                                    onChange={() => setPaymentMethod('card')}
                                 />
-                                <label htmlFor="payCard" className={`payment-method__label ${!isOnline ? 'disabled' : ''}`}>
+                                <label htmlFor="payCard" className="payment-method__label">
                                     <CreditCard size={24} className="payment-method__icon" />
                                     <span className="payment-method__name">{t('payment.card')}</span>
                                     {!isOnline && (
-                                        <span className="payment-method__offline">{t('payment.requires_internet')}</span>
+                                        <span className="payment-method__offline" style={{ color: '#f59e0b', fontSize: '11px' }}>
+                                            <Clock size={12} style={{ display: 'inline', marginRight: '2px' }} />
+                                            {t('payment.pendingValidation')}
+                                        </span>
                                     )}
                                 </label>
                             </div>
-                            <div className={`payment-method ${!isOnline ? 'payment-method--disabled' : ''}`}>
+
+                            {/* QRIS - available offline with pending validation (Story 3.4) */}
+                            <div className="payment-method">
                                 <input
                                     type="radio"
                                     name="paymentMethod"
                                     id="payQris"
                                     checked={paymentMethod === 'qris'}
-                                    onChange={() => isOnline && setPaymentMethod('qris')}
-                                    disabled={!isOnline}
+                                    onChange={() => setPaymentMethod('qris')}
                                 />
-                                <label htmlFor="payQris" className={`payment-method__label ${!isOnline ? 'disabled' : ''}`}>
+                                <label htmlFor="payQris" className="payment-method__label">
                                     <QrCode size={24} className="payment-method__icon" />
                                     <span className="payment-method__name">{t('payment.qris')}</span>
                                     {!isOnline && (
-                                        <span className="payment-method__offline">{t('payment.requires_internet')}</span>
+                                        <span className="payment-method__offline" style={{ color: '#f59e0b', fontSize: '11px' }}>
+                                            <Clock size={12} style={{ display: 'inline', marginRight: '2px' }} />
+                                            {t('payment.pendingValidation')}
+                                        </span>
                                     )}
                                 </label>
                             </div>
@@ -294,9 +333,9 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                     <button
                         className="btn btn-primary-lg"
                         onClick={handleConfirmPayment}
-                        disabled={!canComplete || isProcessing || isCreating}
+                        disabled={!canComplete || isProcessing}
                     >
-                        {isProcessing || isCreating ? (
+                        {isProcessing ? (
                             t('payment.processing')
                         ) : (
                             <>

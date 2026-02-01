@@ -110,7 +110,9 @@
         "clear_title": "Clear cart",
         "hold_error_locked": "Wait not possible while items are in kitchen",
         "pin_modal_title": "Item removal",
-        "pin_modal_message": "This item is in the kitchen. Manager PIN required."
+        "pin_modal_message": "This item is in the kitchen. Manager PIN required.",
+        "restored": "Cart restored",
+        "itemsRemoved": "{{count}} item(s) removed (products unavailable)"
     },
     "payment": {
         "title": "Checkout",
@@ -136,7 +138,45 @@
         "toast_new_ready": "New order ready!",
         "offline_mode": "Offline Mode",
         "offline_cash_only": "Offline mode: Only cash payments available",
-        "requires_internet": "Requires internet"
+        "requires_internet": "Requires internet",
+        "pendingValidation": "Pending validation",
+        "offlinePaymentSaved": "Payment saved offline",
+        "willValidateOnline": "Will be validated when back online"
+    },
+    "session": {
+        "title": "POS Session",
+        "open": "Open Session",
+        "close": "Close Session",
+        "opening_amount": "Opening cash",
+        "closing_amounts": "Closing amounts",
+        "opened": "Session opened",
+        "closed": "Session closed",
+        "already_active": "A session is already active",
+        "no_active": "No active session",
+        "not_found": "Session not found",
+        "not_open": "Session is not open",
+        "user_required": "User must be authenticated",
+        "expected_totals": "Expected totals",
+        "actual_totals": "Actual totals",
+        "variance": "Variance",
+        "cash_variance": "Cash variance",
+        "surplus": "Surplus",
+        "shortage": "Shortage",
+        "notes": "Notes",
+        "notes_placeholder": "Closing remarks...",
+        "payment_methods": {
+            "cash": "Cash",
+            "card": "Card",
+            "qris": "QRIS",
+            "transfer": "Transfer",
+            "ewallet": "E-wallet"
+        },
+        "offline": {
+            "created": "Session created offline",
+            "pending_sync": "Pending synchronization",
+            "synced": "Session synced",
+            "conflict": "Sync conflict"
+        }
     },
     "modifiers": {
         "subtitle": "Customize your order",
@@ -660,6 +700,12 @@
         "idle": "Ready",
         "complete": "Complete",
         "error": "Error",
+        "queue": {
+            "orderCreated": "Order created offline",
+            "orderPending": "Pending synchronization",
+            "orderSynced": "Synced with server",
+            "orderConflict": "Sync conflict"
+        },
         "dashboard": {
             "title": "Sync Status",
             "description": "Offline transaction monitoring",
@@ -1005,6 +1051,13 @@
             "createdAt": "Created on"
         }
     },
+    "orders": {
+        "local": "Local",
+        "pendingSync": "Pending sync",
+        "synced": "Synced",
+        "conflict": "Conflict",
+        "createdOffline": "Order created offline"
+    },
     "dashboard": {
         "title": "Dashboard",
         "subtitle": "Overview of your activity",
@@ -1033,5 +1086,21 @@
         "expected_cash": "Expected cash",
         "qty_sold": "sold",
         "revenue": "Revenue"
+    },
+    "dispatch": {
+        "status": {
+            "pending": "Pending dispatch",
+            "dispatched": "Sent to kitchen",
+            "failed": "Dispatch failed"
+        },
+        "sentToKitchen": "Order sent to kitchen",
+        "sentToBarista": "Order sent to bar",
+        "queuedForLater": "Queued for LAN connection",
+        "dispatchFailed": "Failed to send to kitchen",
+        "pendingCount": "{{count}} pending",
+        "retrying": "Retrying...",
+        "allDispatched": "All dispatches completed",
+        "noItems": "No items to dispatch",
+        "lanRequired": "LAN connection required for dispatch"
     }
 }

@@ -63,7 +63,8 @@
       "Bash(npx shadcn@latest add:*)",
       "Bash(where:*)",
       "Bash(git check-ignore:*)",
-      "Bash(./node_modules/.bin/tsc:*)"
+      "Bash(./node_modules/.bin/tsc:*)",
+      "Bash(npx eslint:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

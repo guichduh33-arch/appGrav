@@ -110,7 +110,9 @@
         "clear_title": "Kosongkan keranjang",
         "hold_error_locked": "Tidak dapat ditunda saat item di dapur",
         "pin_modal_title": "Hapus item",
-        "pin_modal_message": "Item ini sedang di dapur. PIN manajer diperlukan."
+        "pin_modal_message": "Item ini sedang di dapur. PIN manajer diperlukan.",
+        "restored": "Keranjang dipulihkan",
+        "itemsRemoved": "{{count}} item dihapus (produk tidak tersedia)"
     },
     "payment": {
         "title": "Pembayaran",
@@ -136,7 +138,45 @@
         "toast_new_ready": "Pesanan baru siap!",
         "offline_mode": "Mode Offline",
         "offline_cash_only": "Mode offline: Hanya pembayaran tunai yang tersedia",
-        "requires_internet": "Perlu internet"
+        "requires_internet": "Perlu internet",
+        "pendingValidation": "Menunggu validasi",
+        "offlinePaymentSaved": "Pembayaran disimpan offline",
+        "willValidateOnline": "Akan divalidasi saat kembali online"
+    },
+    "session": {
+        "title": "Sesi Kasir",
+        "open": "Buka Sesi",
+        "close": "Tutup Sesi",
+        "opening_amount": "Kas pembukaan",
+        "closing_amounts": "Jumlah penutupan",
+        "opened": "Sesi dibuka",
+        "closed": "Sesi ditutup",
+        "already_active": "Sesi sudah aktif",
+        "no_active": "Tidak ada sesi aktif",
+        "not_found": "Sesi tidak ditemukan",
+        "not_open": "Sesi tidak terbuka",
+        "user_required": "Pengguna harus terautentikasi",
+        "expected_totals": "Total yang diharapkan",
+        "actual_totals": "Total aktual",
+        "variance": "Selisih",
+        "cash_variance": "Selisih kas",
+        "surplus": "Kelebihan",
+        "shortage": "Kekurangan",
+        "notes": "Catatan",
+        "notes_placeholder": "Catatan penutupan...",
+        "payment_methods": {
+            "cash": "Tunai",
+            "card": "Kartu",
+            "qris": "QRIS",
+            "transfer": "Transfer",
+            "ewallet": "E-wallet"
+        },
+        "offline": {
+            "created": "Sesi dibuat secara offline",
+            "pending_sync": "Menunggu sinkronisasi",
+            "synced": "Sesi tersinkron",
+            "conflict": "Konflik sinkronisasi"
+        }
     },
     "modifiers": {
         "subtitle": "Sesuaikan pesanan Anda",
@@ -671,6 +711,12 @@
         "idle": "Siap",
         "complete": "Selesai",
         "error": "Kesalahan",
+        "queue": {
+            "orderCreated": "Pesanan dibuat secara offline",
+            "orderPending": "Menunggu sinkronisasi",
+            "orderSynced": "Disinkronkan dengan server",
+            "orderConflict": "Konflik sinkronisasi"
+        },
         "dashboard": {
             "title": "Status Sinkronisasi",
             "description": "Pemantauan transaksi offline",
@@ -1016,6 +1062,13 @@
             "createdAt": "Dibuat pada"
         }
     },
+    "orders": {
+        "local": "Lokal",
+        "pendingSync": "Menunggu sinkronisasi",
+        "synced": "Tersinkronisasi",
+        "conflict": "Konflik",
+        "createdOffline": "Pesanan dibuat secara offline"
+    },
     "dashboard": {
         "title": "Dasbor",
         "subtitle": "Ringkasan aktivitas Anda",
@@ -1044,5 +1097,21 @@
         "expected_cash": "Kas yang diharapkan",
         "qty_sold": "terjual",
         "revenue": "Pendapatan"
+    },
+    "dispatch": {
+        "status": {
+            "pending": "Menunggu pengiriman",
+            "dispatched": "Dikirim ke dapur",
+            "failed": "Gagal mengirim"
+        },
+        "sentToKitchen": "Pesanan dikirim ke dapur",
+        "sentToBarista": "Pesanan dikirim ke bar",
+        "queuedForLater": "Menunggu koneksi LAN",
+        "dispatchFailed": "Gagal mengirim ke dapur",
+        "pendingCount": "{{count}} tertunda",
+        "retrying": "Mencoba lagi...",
+        "allDispatched": "Semua pengiriman selesai",
+        "noItems": "Tidak ada item untuk dikirim",
+        "lanRequired": "Koneksi LAN diperlukan untuk pengiriman"
     }
 }
