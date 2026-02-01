@@ -700,6 +700,21 @@
         "idle": "Ready",
         "complete": "Complete",
         "error": "Error",
+        "processing": {
+            "starting": "Synchronizing...",
+            "orderSynced": "Order synchronized",
+            "paymentSynced": "Payment synchronized",
+            "sessionSynced": "Session synchronized",
+            "complete": "Synchronization complete",
+            "itemsRemaining": "{{count}} items remaining"
+        },
+        "errorMessages": {
+            "retrying": "Retrying in {{seconds}}s",
+            "maxRetriesReached": "Failed after {{count}} attempts",
+            "orderFailed": "Order sync failed",
+            "paymentFailed": "Payment sync failed",
+            "sessionFailed": "Session sync failed"
+        },
         "queue": {
             "orderCreated": "Order created offline",
             "orderPending": "Pending synchronization",
@@ -755,6 +770,36 @@
             "synced": "Synced",
             "failed": "Failed",
             "view_details": "View details"
+        },
+        "counter": {
+            "pending": "{{count}} pending",
+            "syncing": "Syncing...",
+            "allSynced": "All synced"
+        },
+        "panel": {
+            "title": "Pending Sync",
+            "subtitle": "{{count}} items pending",
+            "noItems": "No items pending",
+            "refresh": "Refresh",
+            "retry": "Retry",
+            "delete": "Delete",
+            "deleteConfirm": "Are you sure you want to delete this item?",
+            "deleteWarning": "This action cannot be undone. The item will not be synced.",
+            "error": "Error"
+        },
+        "entity": {
+            "pos_sessions": "Sessions",
+            "orders": "Orders",
+            "order_items": "Items",
+            "payments": "Payments",
+            "customers": "Customers",
+            "products": "Products",
+            "categories": "Categories"
+        },
+        "status": {
+            "pending": "Pending",
+            "syncing": "Syncing",
+            "failed": "Failed"
         }
     },
     "settings": {

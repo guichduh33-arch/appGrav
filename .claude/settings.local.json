@@ -64,7 +64,8 @@
       "Bash(where:*)",
       "Bash(git check-ignore:*)",
       "Bash(./node_modules/.bin/tsc:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(if not exist \"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\hooks\\\\sync\" mkdir \"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\hooks\\\\sync\")"
     ]
   },
   "enableAllProjectMcpServers": true,

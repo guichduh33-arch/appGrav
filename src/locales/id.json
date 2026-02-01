@@ -711,6 +711,21 @@
         "idle": "Siap",
         "complete": "Selesai",
         "error": "Kesalahan",
+        "processing": {
+            "starting": "Menyinkronkan...",
+            "orderSynced": "Pesanan tersinkronisasi",
+            "paymentSynced": "Pembayaran tersinkronisasi",
+            "sessionSynced": "Sesi tersinkronisasi",
+            "complete": "Sinkronisasi selesai",
+            "itemsRemaining": "{{count}} item tersisa"
+        },
+        "errorMessages": {
+            "retrying": "Mencoba lagi dalam {{seconds}} detik",
+            "maxRetriesReached": "Gagal setelah {{count}} percobaan",
+            "orderFailed": "Gagal sinkronisasi pesanan",
+            "paymentFailed": "Gagal sinkronisasi pembayaran",
+            "sessionFailed": "Gagal sinkronisasi sesi"
+        },
         "queue": {
             "orderCreated": "Pesanan dibuat secara offline",
             "orderPending": "Menunggu sinkronisasi",
@@ -766,6 +781,36 @@
             "synced": "Tersinkron",
             "failed": "Gagal",
             "view_details": "Lihat detail"
+        },
+        "counter": {
+            "pending": "{{count}} tertunda",
+            "syncing": "Menyinkronkan...",
+            "allSynced": "Semua tersinkron"
+        },
+        "panel": {
+            "title": "Sync Tertunda",
+            "subtitle": "{{count}} item tertunda",
+            "noItems": "Tidak ada item tertunda",
+            "refresh": "Segarkan",
+            "retry": "Coba lagi",
+            "delete": "Hapus",
+            "deleteConfirm": "Apakah Anda yakin ingin menghapus item ini?",
+            "deleteWarning": "Tindakan ini tidak dapat dibatalkan. Item tidak akan disinkronkan.",
+            "error": "Error"
+        },
+        "entity": {
+            "pos_sessions": "Sesi",
+            "orders": "Pesanan",
+            "order_items": "Item",
+            "payments": "Pembayaran",
+            "customers": "Pelanggan",
+            "products": "Produk",
+            "categories": "Kategori"
+        },
+        "status": {
+            "pending": "Tertunda",
+            "syncing": "Menyinkronkan",
+            "failed": "Gagal"
         }
     },
     "settings": {

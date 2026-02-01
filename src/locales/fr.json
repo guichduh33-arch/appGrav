@@ -711,6 +711,21 @@
         "idle": "Prêt",
         "complete": "Terminé",
         "error": "Erreur",
+        "processing": {
+            "starting": "Synchronisation en cours...",
+            "orderSynced": "Commande synchronisée",
+            "paymentSynced": "Paiement synchronisé",
+            "sessionSynced": "Session synchronisée",
+            "complete": "Synchronisation terminée",
+            "itemsRemaining": "{{count}} éléments restants"
+        },
+        "errorMessages": {
+            "retrying": "Nouvelle tentative dans {{seconds}}s",
+            "maxRetriesReached": "Échec après {{count}} tentatives",
+            "orderFailed": "Échec sync commande",
+            "paymentFailed": "Échec sync paiement",
+            "sessionFailed": "Échec sync session"
+        },
         "queue": {
             "orderCreated": "Commande créée hors ligne",
             "orderPending": "En attente de synchronisation",
@@ -766,6 +781,36 @@
             "synced": "Sync",
             "failed": "Échecs",
             "view_details": "Voir détails"
+        },
+        "counter": {
+            "pending": "{{count}} en attente",
+            "syncing": "Synchronisation...",
+            "allSynced": "Tout est synchronisé"
+        },
+        "panel": {
+            "title": "Sync en Attente",
+            "subtitle": "{{count}} éléments en attente",
+            "noItems": "Aucun élément en attente",
+            "refresh": "Actualiser",
+            "retry": "Réessayer",
+            "delete": "Supprimer",
+            "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet élément ?",
+            "deleteWarning": "Cette action est irréversible. L'élément ne sera pas synchronisé.",
+            "error": "Erreur"
+        },
+        "entity": {
+            "pos_sessions": "Sessions",
+            "orders": "Commandes",
+            "order_items": "Articles",
+            "payments": "Paiements",
+            "customers": "Clients",
+            "products": "Produits",
+            "categories": "Catégories"
+        },
+        "status": {
+            "pending": "En attente",
+            "syncing": "En cours",
+            "failed": "Échec"
         }
     },
     "settings": {

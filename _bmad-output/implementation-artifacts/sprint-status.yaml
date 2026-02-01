@@ -59,16 +59,16 @@ development_status:
   epic-2-retrospective: done
 
   # Epic 3: POS & Ventes — Commandes, Encaissement & Sessions
-  epic-3: in-progress
+  epic-3: done
   3-1-dexie-schema-for-orders-sync-queue: done
   3-2-cart-persistence-offline: done
   3-3-offline-order-creation: done
   3-4-offline-payment-processing: done
   3-5-pos-session-management-offline: done
-  3-6-sync-queue-processing: ready-for-dev
+  3-6-sync-queue-processing: done
   3-7-kitchen-dispatch-via-lan-offline: done
-  3-8-pending-sync-counter-display: backlog
-  epic-3-retrospective: optional
+  3-8-pending-sync-counter-display: done
+  epic-3-retrospective: done
 
   # Epic 4: Cuisine & Dispatch — Kitchen Display System
   epic-4: backlog
@@ -130,3 +130,17 @@ development_status:
   8-8-reports-offline-cache-7-days: backlog
   8-9-audit-trail-alerts: backlog
   epic-8-retrospective: optional
+
+  # Epic 9: Comptabilité & Fiscalité — Journal, Grand Livre, États Financiers, TVA
+  epic-9: backlog
+  9-1-chart-of-accounts: backlog
+  9-2-sales-journal-auto: backlog
+  9-3-purchase-journal-auto: backlog
+  9-4-bank-cash-journal: backlog
+  9-5-general-ledger: backlog
+  9-6-trial-balance: backlog
+  9-7-balance-sheet: backlog
+  9-8-income-statement: backlog
+  9-9-vat-management: backlog
+  9-10-vat-declaration: backlog
+  epic-9-retrospective: optional

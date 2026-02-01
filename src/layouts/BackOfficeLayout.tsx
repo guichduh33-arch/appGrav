@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { NetworkIndicator } from '../components/ui/NetworkIndicator';
 import { SyncIndicator } from '../components/ui/SyncIndicator';
+import { PendingSyncCounter } from '../components/sync/PendingSyncCounter';
 import { PostOfflineSyncReport } from '../components/sync/PostOfflineSyncReport';
 import { useNetworkAlerts } from '../hooks/useNetworkAlerts';
 import { useSyncReport } from '../hooks/useSyncReport';
@@ -57,6 +58,8 @@ const BackOfficeLayout: React.FC = () => {
                     <NetworkIndicator compact={isCollapsed} className="mt-2" />
                     {/* Sync Status Indicator - Story 2.6 */}
                     <SyncIndicator compact={isCollapsed} className="mt-1" />
+                    {/* Pending Sync Counter - Story 3.8 */}
+                    <PendingSyncCounter className="mt-1" />
                 </div>
 
                 {/* Navigation */}

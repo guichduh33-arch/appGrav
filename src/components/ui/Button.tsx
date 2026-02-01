@@ -11,11 +11,7 @@ const buttonVariants = cva(
       variant: {
         default:
           "bg-primary text-primary-foreground shadow hover:bg-primary/90",
-        primary:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
-        danger:
           "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
           "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
@@ -23,14 +19,6 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        success:
-          "bg-success text-white shadow-sm hover:bg-success/90",
-        warning:
-          "bg-warning text-white shadow-sm hover:bg-warning/90",
-        info:
-          "bg-info text-white shadow-sm hover:bg-info/90",
-        neutral:
-          "bg-muted text-muted-foreground shadow-sm hover:bg-muted/80",
       },
       size: {
         default: "h-9 px-4 py-2",
@@ -50,23 +38,17 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean
-  leftIcon?: React.ReactNode
-  rightIcon?: React.ReactNode
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, leftIcon, rightIcon, children, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
-      >
-        {leftIcon && <span className="shrink-0">{leftIcon}</span>}
-        {children}
-        {rightIcon && <span className="shrink-0">{rightIcon}</span>}
-      </Comp>
+      />
     )
   }
 )

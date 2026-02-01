@@ -1118,3 +1118,209 @@ Les managers et comptables peuvent consulter tous les rapports avec filtres, dri
 **When** le système génère une alerte
 **Then** elle apparaît dans le dashboard alertes
 **And** je peux la marquer comme "résolue"
+
+---
+
+### Epic 9: Comptabilité & Fiscalité — Journal, Grand Livre, États Financiers, TVA
+
+Les comptables et managers peuvent gérer la comptabilité de l'entreprise avec journal, grand livre, états financiers et déclarations TVA pour conformité fiscale Indonésie.
+
+**FRs couverts:** FR-ACCT-01 à FR-ACCT-15
+
+**Offline Integration:** Online-only (pas de sync offline - comptabilité requiert cohérence temps réel)
+
+#### Story 9.1: Plan Comptable Configurable
+
+**As a** Admin,
+**I want** configurer le plan comptable,
+**So that** les écritures utilisent les bons comptes.
+
+**Acceptance Criteria:**
+
+**Given** j'ouvre la configuration comptable
+**When** je consulte le plan comptable
+**Then** je vois les comptes par classe (1-Actif, 2-Passif, 3-Capitaux, 4-Tiers, 5-Financier, 6-Charges, 7-Produits)
+**And** un plan comptable PME indonésien est pré-chargé par défaut
+
+**Given** je souhaite ajouter un compte
+**When** je crée un nouveau compte avec code et libellé
+**Then** il est ajouté à la hiérarchie appropriée
+**And** le type (actif/passif/charge/produit) est défini
+
+#### Story 9.2: Journal des Ventes (Auto-génération)
+
+**As a** Système,
+**I want** générer automatiquement les écritures de vente,
+**So that** chaque commande POS est comptabilisée.
+
+**Acceptance Criteria:**
+
+**Given** une commande est finalisée et payée
+**When** le paiement est enregistré
+**Then** une écriture est créée automatiquement:
+  - Débit: 411 Clients (ou 512 Banque/531 Caisse si cash)
+  - Crédit: 707 Ventes de marchandises (HT)
+  - Crédit: 44571 TVA collectée (10% PPN)
+
+**Given** une commande est annulée (void)
+**When** l'annulation est confirmée
+**Then** une écriture d'extourne est générée avec référence à l'écriture d'origine
+
+#### Story 9.3: Journal des Achats (Auto-génération)
+
+**As a** Système,
+**I want** générer automatiquement les écritures d'achat,
+**So that** chaque réception de commande fournisseur est comptabilisée.
+
+**Acceptance Criteria:**
+
+**Given** une réception de Purchase Order est enregistrée
+**When** les quantités sont validées
+**Then** une écriture est créée automatiquement:
+  - Débit: 607 Achats de marchandises (HT)
+  - Débit: 44566 TVA déductible (10% PPN)
+  - Crédit: 401 Fournisseurs
+
+**Given** le paiement fournisseur est enregistré
+**When** le règlement est effectué
+**Then** une écriture de règlement est créée:
+  - Débit: 401 Fournisseurs
+  - Crédit: 512 Banque
+
+#### Story 9.4: Journal de Banque/Caisse
+
+**As a** Comptable,
+**I want** enregistrer les mouvements de trésorerie manuels,
+**So that** la comptabilité reflète tous les flux financiers.
+
+**Acceptance Criteria:**
+
+**Given** je crée une écriture manuelle
+**When** je saisis les comptes débit/crédit et montants
+**Then** le système vérifie que total débit = total crédit
+**And** l'écriture est enregistrée avec ma signature (user_id)
+
+**Given** je consulte le journal de banque
+**When** je sélectionne une période
+**Then** je vois tous les mouvements avec solde progressif
+
+#### Story 9.5: Grand Livre par Compte
+
+**As a** Comptable,
+**I want** consulter le grand livre d'un compte,
+**So that** je vois tous les mouvements et le solde.
+
+**Acceptance Criteria:**
+
+**Given** je sélectionne un compte et une période
+**When** le grand livre s'affiche
+**Then** je vois toutes les écritures avec date, référence, libellé, débit, crédit
+**And** le solde progressif est calculé ligne par ligne
+**And** le solde final est affiché
+
+**Given** je clique sur une écriture
+**When** le détail s'ouvre
+**Then** je vois l'écriture complète avec toutes ses lignes
+
+#### Story 9.6: Balance des Comptes
+
+**As a** Comptable,
+**I want** générer la balance des comptes,
+**So that** je vérifie l'équilibre comptable.
+
+**Acceptance Criteria:**
+
+**Given** je sélectionne une période
+**When** la balance s'affiche
+**Then** je vois pour chaque compte: solde début, mouvements débit, mouvements crédit, solde fin
+**And** le total des débits = total des crédits (équilibre vérifié)
+
+**Given** je filtre par classe de compte
+**When** j'applique le filtre
+**Then** seuls les comptes de cette classe sont affichés
+
+#### Story 9.7: Bilan (État Financier)
+
+**As a** Manager,
+**I want** générer le bilan comptable,
+**So that** je connais la situation patrimoniale de l'entreprise.
+
+**Acceptance Criteria:**
+
+**Given** je demande le bilan à une date
+**When** le rapport s'affiche
+**Then** je vois l'Actif:
+  - Actif immobilisé (classe 2)
+  - Actif circulant (stocks, créances, trésorerie)
+**And** je vois le Passif:
+  - Capitaux propres (classe 1)
+  - Dettes (fournisseurs, fiscales, financières)
+**And** Total Actif = Total Passif
+
+**Given** je compare avec une période précédente
+**When** j'active la comparaison
+**Then** les variations sont affichées en valeur et %
+
+#### Story 9.8: Compte de Résultat (État Financier)
+
+**As a** Manager,
+**I want** générer le compte de résultat,
+**So that** je connais la performance financière de l'entreprise.
+
+**Acceptance Criteria:**
+
+**Given** je sélectionne une période
+**When** le rapport s'affiche
+**Then** je vois les Produits:
+  - Ventes de marchandises (707)
+  - Autres produits
+**And** je vois les Charges:
+  - Achats (607)
+  - Services extérieurs
+  - Charges de personnel
+  - Amortissements
+**And** le Résultat net = Total Produits - Total Charges
+
+**Given** je compare avec la période précédente
+**When** j'active la comparaison
+**Then** les variations sont affichées avec tendance (hausse/baisse)
+
+#### Story 9.9: Gestion TVA (Collectée/Déductible)
+
+**As a** Comptable,
+**I want** suivre la TVA collectée et déductible,
+**So that** je prépare les déclarations fiscales.
+
+**Acceptance Criteria:**
+
+**Given** je consulte le module TVA
+**When** je sélectionne une période mensuelle
+**Then** je vois:
+  - TVA collectée (compte 44571) = somme des ventes
+  - TVA déductible (compte 44566) = somme des achats
+  - TVA à payer = collectée - déductible
+
+**Given** la TVA déductible > TVA collectée
+**When** le calcul est effectué
+**Then** le crédit de TVA est affiché (report possible)
+
+#### Story 9.10: Déclaration TVA Mensuelle
+
+**As a** Comptable,
+**I want** générer et suivre les déclarations TVA,
+**So that** je suis en conformité fiscale indonésienne.
+
+**Acceptance Criteria:**
+
+**Given** une période mensuelle est complète
+**When** je génère la déclaration
+**Then** un récapitulatif TVA est créé avec:
+  - Montant TVA collectée
+  - Montant TVA déductible
+  - Montant TVA à payer (ou crédit)
+**And** je peux exporter au format requis par le fisc
+
+**Given** la déclaration est soumise
+**When** je marque comme "déclarée"
+**Then** la date et référence de soumission sont enregistrées
+**And** la période est clôturée (écritures verrouillées)
