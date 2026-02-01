@@ -1168,7 +1168,8 @@
             "connected": "Connected to LAN hub",
             "disconnected": "Disconnected from LAN hub",
             "reconnecting": "Reconnecting...",
-            "error": "LAN connection error"
+            "error": "LAN connection error",
+            "reconnectAttempt": "Attempt {{count}}/{{max}}"
         }
     }
 }

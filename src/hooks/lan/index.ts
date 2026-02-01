@@ -1,8 +1,8 @@
 /**
- * LAN Hooks
- * Story 4.1 - LAN Hub management
- * Story 4.2 - LAN Client connection
+ * LAN Hooks Barrel Export
+ * Story 4.1 - LAN Hub lifecycle management
+ * Story 4.2 - KDS Socket.IO Client Connection
  */
 
 export { useLanHub } from './useLanHub';
-export type { IUseLanHubOptions, IUseLanHubResult } from './useLanHub';
+export { useLanClient } from './useLanClient';

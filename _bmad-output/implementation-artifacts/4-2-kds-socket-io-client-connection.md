@@ -1,6 +1,6 @@
 # Story 4.2: KDS Socket.IO Client Connection
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -35,38 +35,38 @@ so that **je reçois les commandes même sans internet**.
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1: Créer le hook useLanClient pour KDS** (AC: 1, 2, 3)
-  - [ ] 1.1: Créer `src/hooks/lan/useLanClient.ts`
-  - [ ] 1.2: Implémenter `connect(deviceType, deviceName, station?)` avec options
-  - [ ] 1.3: Implémenter `disconnect()` pour cleanup propre
-  - [ ] 1.4: Exposer `isConnected`, `connectionStatus`, `error`
-  - [ ] 1.5: Gérer auto-reconnexion via lanClient existant
+- [x] **Task 1: Créer le hook useLanClient pour KDS** (AC: 1, 2, 3)
+  - [x] 1.1: Créer `src/hooks/lan/useLanClient.ts`
+  - [x] 1.2: Implémenter `connect(deviceType, deviceName, station?)` avec options
+  - [x] 1.3: Implémenter `disconnect()` pour cleanup propre
+  - [x] 1.4: Exposer `isConnected`, `connectionStatus`, `error`
+  - [x] 1.5: Gérer auto-reconnexion via lanClient existant
 
-- [ ] **Task 2: Intégrer useLanClient dans KDSMainPage** (AC: 1, 2, 4)
-  - [ ] 2.1: Importer et utiliser useLanClient dans KDSMainPage.tsx
-  - [ ] 2.2: Configurer la connexion au démarrage avec station courante
-  - [ ] 2.3: Ajouter indicateur de connexion LAN dans le header
-  - [ ] 2.4: Gérer cleanup à la fermeture de la page
+- [x] **Task 2: Intégrer useLanClient dans KDSMainPage** (AC: 1, 2, 4)
+  - [x] 2.1: Importer et utiliser useLanClient dans KDSMainPage.tsx
+  - [x] 2.2: Configurer la connexion au démarrage avec station courante
+  - [x] 2.3: Ajouter indicateur de connexion LAN dans le header
+  - [x] 2.4: Gérer cleanup à la fermeture de la page
 
-- [ ] **Task 3: Améliorer KDSStationSelector avec pré-connexion** (AC: 1, 2)
-  - [ ] 3.1: Optionnel: Initier la connexion dès le sélecteur de station
-  - [ ] 3.2: Passer la station sélectionnée au KDSMainPage
+- [x] **Task 3: Améliorer KDSStationSelector avec pré-connexion** (AC: 1, 2)
+  - [x] 3.1: Optionnel: Initier la connexion dès le sélecteur de station (SKIPPED - connexion auto dans KDSMainPage suffit)
+  - [x] 3.2: Passer la station sélectionnée au KDSMainPage (déjà fait via useParams)
 
-- [ ] **Task 4: Créer le composant LanConnectionIndicator** (AC: 4)
-  - [ ] 4.1: Créer `src/components/lan/LanConnectionIndicator.tsx`
-  - [ ] 4.2: Afficher icône (wifi/wifi-off) avec couleur selon statut
-  - [ ] 4.3: Afficher tooltip avec détails (tentatives reconnexion, etc.)
+- [x] **Task 4: Créer le composant LanConnectionIndicator** (AC: 4)
+  - [x] 4.1: Créer `src/components/lan/LanConnectionIndicator.tsx`
+  - [x] 4.2: Afficher icône (wifi/wifi-off) avec couleur selon statut
+  - [x] 4.3: Afficher tooltip avec détails (tentatives reconnexion, etc.)
 
-- [ ] **Task 5: Tests unitaires** (AC: 1, 2, 3)
-  - [ ] 5.1: Créer `src/hooks/lan/__tests__/useLanClient.test.ts`
-  - [ ] 5.2: Tester connexion avec différents device types
-  - [ ] 5.3: Tester reconnexion automatique
-  - [ ] 5.4: Tester cleanup on unmount
+- [x] **Task 5: Tests unitaires** (AC: 1, 2, 3)
+  - [x] 5.1: Créer `src/hooks/lan/__tests__/useLanClient.test.ts`
+  - [x] 5.2: Tester connexion avec différents device types
+  - [x] 5.3: Tester reconnexion automatique (via mock)
+  - [x] 5.4: Tester cleanup on unmount
 
-- [ ] **Task 6: Traductions** (AC: 4)
-  - [ ] 6.1: Ajouter clés `lan.client.*` dans `fr.json`
-  - [ ] 6.2: Ajouter clés dans `en.json`
-  - [ ] 6.3: Ajouter clés dans `id.json`
+- [x] **Task 6: Traductions** (AC: 4)
+  - [x] 6.1: Ajouter clés `lan.client.*` dans `fr.json` (déjà existantes, ajouté reconnectAttempt)
+  - [x] 6.2: Ajouter clés dans `en.json` (déjà existantes, ajouté reconnectAttempt)
+  - [x] 6.3: Ajouter clés dans `id.json` (déjà existantes, ajouté reconnectAttempt)
 
 ## Dev Notes
 
@@ -502,10 +502,54 @@ Cette story est la **2ème** de l'Epic 4 (Cuisine & Dispatch - Kitchen Display S
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude Opus 4.5 (claude-opus-4-5-20251101)
 
 ### Debug Log References
 
+- Tests: 28/28 passing (useLanClient.test.ts + LanConnectionIndicator.test.tsx)
+- Tests LAN existants: 41/42 passing (1 échec pré-existant dans lanProtocol.test.ts)
+
 ### Completion Notes List
 
+1. Le hook `useLanClient` utilise le singleton `lanClient` existant (ne crée pas de nouveau client)
+2. Le deviceId est persisté dans localStorage pour maintenir l'identité entre sessions
+3. La connexion ne se déconnecte PAS au unmount du composant pour rester active entre les pages
+4. L'indicateur LAN est placé dans le header KDS à côté du bouton son
+5. Les traductions `lan.client.*` existaient déjà, seule la clé `reconnectAttempt` a été ajoutée
+6. Task 3 (pré-connexion dans KDSStationSelector) a été marquée comme SKIPPED car la connexion auto dans KDSMainPage est suffisante
+
+### Code Review Fixes Applied
+
+**H1 & H2 - Race condition et gestion d'erreur (FIXED):**
+- Refactorisé `connect()` callback pour utiliser `optionsRef.current` sans dépendances stales
+- Ajouté try/catch complet avec gestion d'erreur locale (`localError` state)
+- Gestion gracieuse si localStorage n'est pas disponible
+
+**M1 - Polling inefficace (FIXED):**
+- Remplacé le polling 5s par une synchronisation basée sur le changement de `connectionStatus`
+
+**M2 - Tests manquants pour erreurs (FIXED):**
+- Ajouté 4 tests: échec connect, exception connect, localStorage indisponible, clear error
+
+**M3 - Mélange Tailwind/CSS custom (FIXED):**
+- Remplacé `className="mr-2"` par classe CSS custom `.kds-header__lan-indicator`
+
+**M4 - Tests LanConnectionIndicator manquants (FIXED):**
+- Créé `src/components/lan/__tests__/LanConnectionIndicator.test.tsx` avec 10 tests
+
 ### File List
+
+**Créés:**
+- `src/hooks/lan/useLanClient.ts` - Hook React pour la connexion LAN client
+- `src/components/lan/LanConnectionIndicator.tsx` - Composant indicateur visuel
+- `src/components/lan/index.ts` - Barrel export
+- `src/hooks/lan/__tests__/useLanClient.test.ts` - Tests unitaires (18 tests)
+- `src/components/lan/__tests__/LanConnectionIndicator.test.tsx` - Tests composant (10 tests)
+
+**Modifiés:**
+- `src/hooks/lan/index.ts` - Ajout export useLanClient et useLanHub
+- `src/pages/kds/KDSMainPage.tsx` - Intégration useLanClient et LanConnectionIndicator
+- `src/pages/kds/KDSMainPage.css` - Ajout style `.kds-header__lan-indicator`
+- `src/locales/fr.json` - Ajout clé `lan.client.reconnectAttempt`
+- `src/locales/en.json` - Ajout clé `lan.client.reconnectAttempt`
+- `src/locales/id.json` - Ajout clé `lan.client.reconnectAttempt`

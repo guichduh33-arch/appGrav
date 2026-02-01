@@ -6,6 +6,8 @@ import { ArrowLeft, Volume2, VolumeX, RefreshCw, ChefHat, Coffee, Store, Users }
 import { lanClient } from '../../services/lan/lanClient'
 import { LAN_MESSAGE_TYPES } from '../../services/lan/lanProtocol'
 import { broadcastOrderStatus } from '../../services/display/displayBroadcast'
+import { useLanClient } from '../../hooks/lan/useLanClient'
+import { LanConnectionIndicator } from '../../components/lan/LanConnectionIndicator'
 import './KDSMainPage.css'
 
 interface OrderItem {
@@ -93,6 +95,17 @@ export default function KDSMainPage() {
     const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
     const stationConfig = station ? STATION_CONFIG[station] : null
+
+    // Story 4.2: LAN Client Connection
+    const {
+        connectionStatus,
+        reconnectAttempts,
+    } = useLanClient({
+        deviceType: 'kds',
+        deviceName: 'Kitchen Display',
+        station: stationConfig?.dbStation,
+        autoConnect: true,
+    })
 
     // Update time every second
     useEffect(() => {
@@ -410,6 +423,12 @@ export default function KDSMainPage() {
                         <span className="kds-header__stat kds-header__stat--preparing">{preparingOrders.length} Prep</span>
                         <span className="kds-header__stat kds-header__stat--ready">{readyOrders.length} Ready</span>
                     </div>
+                    {/* Story 4.2: LAN Connection Indicator */}
+                    <LanConnectionIndicator
+                        status={connectionStatus}
+                        reconnectAttempts={reconnectAttempts}
+                        className="kds-header__lan-indicator"
+                    />
                     <button
                         className={`kds-header__sound ${!soundEnabled ? 'kds-header__sound--muted' : ''}`}
                         onClick={() => setSoundEnabled(!soundEnabled)}

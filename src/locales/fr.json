@@ -1179,7 +1179,8 @@
             "connected": "Connecté au hub LAN",
             "disconnected": "Déconnecté du hub LAN",
             "reconnecting": "Reconnexion en cours...",
-            "error": "Erreur de connexion LAN"
+            "error": "Erreur de connexion LAN",
+            "reconnectAttempt": "Tentative {{count}}/{{max}}"
         }
     }
 }

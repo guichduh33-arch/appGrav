@@ -1179,7 +1179,8 @@
             "connected": "Terhubung ke hub LAN",
             "disconnected": "Terputus dari hub LAN",
             "reconnecting": "Menghubungkan ulang...",
-            "error": "Kesalahan koneksi LAN"
+            "error": "Kesalahan koneksi LAN",
+            "reconnectAttempt": "Percobaan {{count}}/{{max}}"
         }
     }
 }
