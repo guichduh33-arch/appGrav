@@ -35,13 +35,13 @@ describe('useKdsStatusListener', () => {
     vi.mocked(lanClient.on).mockImplementation((type, handler) => {
       if (type === LAN_MESSAGE_TYPES.KDS_ITEM_PREPARING) {
         preparingHandler = handler as (message: unknown) => void;
-        return mockUnsubscribePreparing;
+        return mockUnsubscribePreparing as unknown as () => void;
       }
       if (type === LAN_MESSAGE_TYPES.KDS_ITEM_READY) {
         readyHandler = handler as (message: unknown) => void;
-        return mockUnsubscribeReady;
+        return mockUnsubscribeReady as unknown as () => void;
       }
-      return vi.fn();
+      return vi.fn() as unknown as () => void;
     });
 
     vi.mocked(lanClient.isActive).mockReturnValue(true);

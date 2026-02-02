@@ -169,7 +169,7 @@ const OrdersPage = () => {
     const recentlyUpdatedItemsRef = useRef<Set<string>>(new Set());
 
     // Story 4.7: Update local item status when KDS sends updates via LAN
-    const handleItemPreparing = useCallback((orderId: string, itemIds: string[], _station: TKitchenStation) => {
+    const handleItemPreparing = useCallback((_orderId: string, itemIds: string[], _station: TKitchenStation) => {
         // Mark items as recently updated for animation
         itemIds.forEach(id => recentlyUpdatedItemsRef.current.add(id));
         setTimeout(() => {

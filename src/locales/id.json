@@ -1145,6 +1145,13 @@
             "preparing": "Disiapkan",
             "ready": "Siap",
             "served": "Disajikan"
+        },
+        "autoRemove": {
+            "countdown": "Hapus otomatis dalam {{seconds}}d",
+            "cancel": "Simpan",
+            "cancelled": "Penghapusan dibatalkan",
+            "completed": "Pesanan selesai",
+            "notification": "Pesanan #{{orderNumber}} siap"
         }
     },
     "orders": {

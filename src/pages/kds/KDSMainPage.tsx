@@ -93,6 +93,7 @@ export default function KDSMainPage() {
         addOrder,
         setOrders,
         updateOrderItem,
+        removeOrder,
     } = useKdsOrderQueue({
         urgentThresholdSeconds: KDS_URGENT_THRESHOLD_SECONDS,
         onOrderBecameUrgent: () => {
@@ -453,7 +454,7 @@ export default function KDSMainPage() {
 
         if (result.success) {
             // Remove order from local state (already animated out)
-            setOrders(prev => prev.filter(o => o.id !== orderId))
+            removeOrder(orderId)
 
             // Broadcast order ready to Customer Display
             broadcastOrderStatus(orderId, order.order_number, 'ready')
@@ -462,7 +463,7 @@ export default function KDSMainPage() {
             // Refetch in case of error to ensure state consistency
             fetchOrders()
         }
-    }, [orders, stationConfig, fetchOrders, setOrders])
+    }, [orders, stationConfig, fetchOrders, removeOrder])
 
     if (!station || !stationConfig) {
         navigate('/kds')
