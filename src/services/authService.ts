@@ -68,9 +68,11 @@ export const authService = {
   /**
    * Login with PIN
    * Returns user data, session, roles and permissions on success
+   * Creates a real Supabase Auth session for RLS to work properly
    */
   async loginWithPin(userId: string, pin: string): Promise<AuthResponse> {
     try {
+      // 1. Call edge function to verify PIN and get auth token
       const response = await fetch(`${SUPABASE_URL}/functions/v1/auth-verify-pin`, {
         method: 'POST',
         headers: {
@@ -94,6 +96,26 @@ export const authService = {
         };
       }
 
+      // 2. Use the magic link token to create a real Supabase Auth session
+      if (data.auth?.token && data.auth?.email) {
+        try {
+          const { data: authData, error: authError } = await supabase.auth.verifyOtp({
+            token_hash: data.auth.token,
+            type: 'magiclink',
+          });
+
+          if (authError) {
+            console.error('Supabase Auth session creation failed:', authError);
+            // Continue anyway - the app will work but RLS might not
+          } else {
+            console.log('[Auth] Supabase Auth session created successfully');
+          }
+        } catch (authErr) {
+          console.error('Error creating Supabase Auth session:', authErr);
+          // Non-blocking - continue with the login
+        }
+      }
+
       return {
         success: true,
         user: data.user,
@@ -111,29 +133,44 @@ export const authService = {
   },
 
   /**
-   * Logout - end the current session
+   * Logout - end the current session and Supabase Auth session
    */
   async logout(sessionId: string, userId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/auth-logout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
-          session_id: sessionId,
-          user_id: userId,
-          reason: 'logout',
-        }),
-      });
+      // 1. Sign out from Supabase Auth
+      try {
+        await supabase.auth.signOut();
+        console.log('[Auth] Supabase Auth session ended');
+      } catch (authErr) {
+        console.error('Supabase Auth signOut error:', authErr);
+        // Continue anyway
+      }
 
-      const data = await response.json();
+      // 2. Call the logout edge function if available
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/auth-logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            session_id: sessionId,
+            user_id: userId,
+            reason: 'logout',
+          }),
+        });
 
-      return {
-        success: response.ok,
-        error: response.ok ? undefined : (data.error || data.message || 'Unknown error'),
-      };
+        const data = await response.json();
+
+        return {
+          success: response.ok,
+          error: response.ok ? undefined : (data.error || data.message || 'Unknown error'),
+        };
+      } catch {
+        // Edge function might not exist, that's OK
+        return { success: true };
+      }
     } catch (error) {
       console.error('Logout error:', error);
       return {
