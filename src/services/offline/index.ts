@@ -83,6 +83,22 @@ export {
   clearModifiersCache,
 } from './modifiersCacheService';
 
+// Recipes cache service (Story 2.4)
+export {
+  cacheAllRecipes,
+  getCachedRecipesForProduct,
+  getCachedRecipesWithMaterials,
+  getCachedRecipeById,
+  getAllCachedRecipes,
+  getLastRecipesSyncAt,
+  getRecipesSyncMeta,
+  getCachedRecipesCount,
+  shouldRefreshRecipes,
+  shouldRefreshRecipesHourly,
+  refreshRecipesCacheIfNeeded,
+  clearRecipesCache,
+} from './recipesCacheService';
+
 // Production reminder service (Story 2.5)
 export {
   saveProductionReminder,

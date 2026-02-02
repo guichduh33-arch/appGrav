@@ -259,7 +259,137 @@
         "unit": "Unit",
         "stock_movement": "Stock Movement",
         "current_stock": "Current Stock",
-        "min_stock": "Min Stock"
+        "min_stock": "Min Stock",
+        "offline": {
+            "read_only_mode": "Read-only mode",
+            "adjustments_disabled": "Stock adjustments are disabled offline",
+            "last_sync": "Last sync",
+            "never_synced": "never",
+            "products": "products",
+            "stock_synced": "{{count}} stock levels synced",
+            "sync_error": "Stock sync error"
+        },
+        "alerts": {
+            "title": "Stock Alerts",
+            "badge": "{{count}} alert(s)",
+            "badge_one": "{{count}} alert",
+            "badge_other": "{{count}} alerts",
+            "critical": "Critical",
+            "warning": "Warning",
+            "outOfStock": "Out of Stock",
+            "noAlerts": "No stock alerts",
+            "staleWarning": "Data may be outdated - last sync: {{time}}",
+            "currentStock": "Current stock",
+            "minStock": "Minimum threshold",
+            "viewAll": "View all alerts",
+            "filterAll": "All",
+            "filterCritical": "Critical",
+            "filterWarning": "Warning",
+            "productName": "Product"
+        },
+        "adjustment": {
+            "offline": {
+                "title": "Offline Mode",
+                "message": "Stock adjustments require an internet connection to ensure traceability.",
+                "product": "Product",
+                "noteLabel": "Note for later (optional)",
+                "notePlaceholder": "E.g.: Adjust +5 pcs (counting error)...",
+                "noteHint": "This note will be saved locally. You can process it when you are back online.",
+                "saveNote": "Save note",
+                "deferredNotes": "Pending notes",
+                "deferredNotesCount": "{{count}} pending adjustment note(s)",
+                "noNotes": "No pending notes",
+                "noProduct": "General adjustment",
+                "markAsProcessed": "Delete",
+                "createAdjustment": "Create adjustment",
+                "saveError": "Error saving note. Please try again."
+            }
+        },
+        "transfers": {
+            "title": "Internal Transfers",
+            "subtitle": "Manage transfers between warehouse and sections",
+            "newTransfer": "New Transfer",
+            "editTransfer": "Edit Transfer",
+            "stats": {
+                "total": "Total Transfers",
+                "pending": "In Progress",
+                "completed": "Completed",
+                "totalValue": "Total Value"
+            },
+            "status": {
+                "all": "All statuses",
+                "draft": "Draft",
+                "pending": "Pending",
+                "in_transit": "In Transit",
+                "received": "Received",
+                "cancelled": "Cancelled"
+            },
+            "form": {
+                "from": "From (Origin)",
+                "to": "To (Destination)",
+                "responsible": "Section Responsible",
+                "date": "Transfer Date",
+                "notes": "Notes",
+                "notesPlaceholder": "Optional notes...",
+                "items": "Items to Transfer",
+                "addItem": "Add Item",
+                "noItems": "No items. Click \"Add Item\" to begin.",
+                "product": "Product",
+                "quantity": "Quantity",
+                "unitCost": "Unit Cost",
+                "lineTotal": "Total",
+                "totalItems": "Total Items",
+                "totalValue": "Total Value",
+                "selectLocation": "Select...",
+                "selectProduct": "Select product..."
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "saveDraft": "Save Draft",
+                "saveAndSend": "Save and Send",
+                "viewDetails": "View Details"
+            },
+            "validation": {
+                "selectLocations": "Please select locations",
+                "responsibleRequired": "Please enter the responsible person",
+                "addItems": "Please add at least one item",
+                "fillItems": "Please fill all items correctly"
+            },
+            "messages": {
+                "created": "Transfer created",
+                "updated": "Transfer updated",
+                "loadError": "Error loading data"
+            },
+            "empty": {
+                "title": "No transfers",
+                "description": "Start by creating your first transfer"
+            },
+            "offline": {
+                "blocked": "Transfers require an internet connection",
+                "connectionLost": "Connection lost. Save disabled."
+            },
+            "reception": {
+                "title": "Transfer Details",
+                "receiveButton": "Validate Reception",
+                "quantityReceived": "Qty Received",
+                "quantityRequested": "Qty Requested",
+                "variance": "Variance",
+                "receptionNotes": "Reception Notes",
+                "receptionNotesPlaceholder": "Comments on reception (variances, issues, etc.)",
+                "success": "Transfer received successfully",
+                "error": "Error during reception",
+                "offlineBlocked": "Transfer reception requires an internet connection",
+                "alreadyReceived": "This transfer has already been received",
+                "statusReceived": "Received on",
+                "varianceWarning": "Warning: received quantities differ from requested quantities",
+                "notFound": "Transfer not found",
+                "validation": {
+                    "negativeQuantity": "Negative quantity not allowed",
+                    "overQuantityNeedsNote": "Notes required for positive variance",
+                    "fixErrors": "Please fix the errors"
+                }
+            }
+        }
     },
     "inventory_page": {
         "title": "Stock Management",

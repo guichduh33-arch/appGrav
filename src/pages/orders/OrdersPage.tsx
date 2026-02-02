@@ -9,7 +9,9 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { formatCurrency } from '../../utils/helpers';
+import { playOrderReadySound } from '../../utils/audio';
 import { useKdsStatusListener } from '../../hooks/pos/useKdsStatusListener';
+import { useModuleSettings } from '../../hooks/useSettings';
 import { OrderItemStatusBadge, type TItemStatus } from '../../components/orders/OrderItemStatusBadge';
 import type { TKitchenStation } from '../../types/offline';
 import './OrdersPage.css';
@@ -55,6 +57,7 @@ const ITEMS_PER_PAGE = 20;
 const OrdersPage = () => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
+    const { data: moduleSettings } = useModuleSettings();
 
     const [statusFilter, setStatusFilter] = useState<OrderStatus>('all');
     const [typeFilter, setTypeFilter] = useState<OrderType>('all');
@@ -167,14 +170,20 @@ const OrdersPage = () => {
 
     // Story 4.7: Track recently updated items for animation
     const recentlyUpdatedItemsRef = useRef<Set<string>>(new Set());
+    // Track timeouts for cleanup to prevent memory leaks
+    const animationTimeoutsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
 
     // Story 4.7: Update local item status when KDS sends updates via LAN
     const handleItemPreparing = useCallback((_orderId: string, itemIds: string[], _station: TKitchenStation) => {
         // Mark items as recently updated for animation
         itemIds.forEach(id => recentlyUpdatedItemsRef.current.add(id));
-        setTimeout(() => {
+
+        // Track timeout for cleanup to prevent memory leaks
+        const timeoutId = setTimeout(() => {
             itemIds.forEach(id => recentlyUpdatedItemsRef.current.delete(id));
+            animationTimeoutsRef.current.delete(timeoutId);
         }, 2000);
+        animationTimeoutsRef.current.add(timeoutId);
 
         // Invalidate query to refetch with updated statuses
         queryClient.invalidateQueries({ queryKey: ['orders-backoffice'] });
@@ -183,40 +192,29 @@ const OrdersPage = () => {
     const handleItemReady = useCallback((orderId: string, itemIds: string[], _station: TKitchenStation, _preparedAt: string) => {
         // Mark items as recently updated for animation
         itemIds.forEach(id => recentlyUpdatedItemsRef.current.add(id));
-        setTimeout(() => {
+
+        // Track timeout for cleanup to prevent memory leaks
+        const timeoutId = setTimeout(() => {
             itemIds.forEach(id => recentlyUpdatedItemsRef.current.delete(id));
+            animationTimeoutsRef.current.delete(timeoutId);
         }, 2000);
+        animationTimeoutsRef.current.add(timeoutId);
 
         // Invalidate query to refetch with updated statuses
         queryClient.invalidateQueries({ queryKey: ['orders-backoffice'] });
 
         // Check if all items in order are now ready - show notification
+        // Note: Using orders from closure - may be slightly stale but acceptable for notification
         const order = orders.find(o => o.id === orderId);
         if (order) {
             const allItemsReady = order.items.every(item =>
                 itemIds.includes(item.id) || item.item_status === 'ready' || item.item_status === 'served'
             );
             if (allItemsReady) {
-                // Play notification sound
-                try {
-                    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-                    const audioContext = new AudioContextClass();
-                    const oscillator = audioContext.createOscillator();
-                    const gainNode = audioContext.createGain();
-
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-
-                    oscillator.frequency.value = 880;
-                    oscillator.type = 'sine';
-
-                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-
-                    oscillator.start(audioContext.currentTime);
-                    oscillator.stop(audioContext.currentTime + 0.3);
-                } catch {
-                    // Audio API not available
+                // Play notification sound if enabled in settings (AC3)
+                const soundEnabled = moduleSettings?.kds?.sound_new_order ?? true;
+                if (soundEnabled) {
+                    playOrderReadySound();
                 }
 
                 // Show toast notification
@@ -226,7 +224,7 @@ const OrdersPage = () => {
                 });
             }
         }
-    }, [orders, queryClient, t]);
+    }, [orders, queryClient, t, moduleSettings]);
 
     // Story 4.7: KDS Status Listener for real-time item updates via LAN
     useKdsStatusListener({
@@ -234,6 +232,14 @@ const OrdersPage = () => {
         onItemReady: handleItemReady,
         enabled: true,
     });
+
+    // Cleanup animation timeouts on unmount to prevent memory leaks
+    useEffect(() => {
+        return () => {
+            animationTimeoutsRef.current.forEach(timeoutId => clearTimeout(timeoutId));
+            animationTimeoutsRef.current.clear();
+        };
+    }, []);
 
     // Filter orders
     const filteredOrders = useMemo(() => {

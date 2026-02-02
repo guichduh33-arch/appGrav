@@ -11,6 +11,7 @@ import { useLanClient } from '../../hooks/lan/useLanClient'
 import { useKdsOrderReceiver } from '../../hooks/kds/useKdsOrderReceiver'
 import { useKdsOrderQueue, type IKdsOrder, type IKdsOrderItem } from '../../hooks/kds/useKdsOrderQueue'
 import { LanConnectionIndicator } from '../../components/lan/LanConnectionIndicator'
+import { playNewOrderSound } from '../../utils/audio'
 import type { IKdsNewOrderPayload, TKitchenStation } from '../../types/offline'
 import './KDSMainPage.css'
 
@@ -47,30 +48,6 @@ const STATION_CONFIG: Record<string, { name: string; icon: React.ReactNode; colo
 // TODO: Make configurable via settings (Story 4.x)
 const KDS_URGENT_THRESHOLD_SECONDS = 600 // 10 minutes - orders older than this are marked urgent
 
-// Notification sound
-const playNotificationSound = () => {
-    try {
-        const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
-        const audioContext = new AudioContextClass()
-        const oscillator = audioContext.createOscillator()
-        const gainNode = audioContext.createGain()
-
-        oscillator.connect(gainNode)
-        gainNode.connect(audioContext.destination)
-
-        oscillator.frequency.value = 880
-        oscillator.type = 'sine'
-
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5)
-
-        oscillator.start(audioContext.currentTime)
-        oscillator.stop(audioContext.currentTime + 0.5)
-    } catch {
-        // Audio API not available in this browser
-    }
-}
-
 export default function KDSMainPage() {
     const { station } = useParams<{ station: string }>()
     const navigate = useNavigate()
@@ -98,7 +75,7 @@ export default function KDSMainPage() {
         urgentThresholdSeconds: KDS_URGENT_THRESHOLD_SECONDS,
         onOrderBecameUrgent: () => {
             if (soundEnabled) {
-                playNotificationSound()
+                playNewOrderSound()
             }
         },
     })
@@ -152,7 +129,7 @@ export default function KDSMainPage() {
     useKdsOrderReceiver({
         station: (stationConfig?.dbStation as TKitchenStation) || 'kitchen',
         soundEnabled,
-        playSound: playNotificationSound,
+        playSound: playNewOrderSound,
         onNewOrder: handleLanOrder,
         existingOrderIds,
     })
@@ -275,7 +252,7 @@ export default function KDSMainPage() {
 
             // Check for new orders and play sound (using ref to avoid dependency cycle)
             if (soundEnabled && transformedOrders.length > lastOrderCountRef.current && lastOrderCountRef.current > 0) {
-                playNotificationSound()
+                playNewOrderSound()
             }
             lastOrderCountRef.current = transformedOrders.length
 

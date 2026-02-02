@@ -28,9 +28,9 @@ export function KDSCountdownBar({
   const progressPercent = (timeRemaining / totalTime) * 100;
 
   return (
-    <div className="kds-countdown-bar">
+    <div className="kds-countdown-bar" role="alert" aria-live="polite">
       <div className="kds-countdown-bar__content">
-        <Clock size={16} className="kds-countdown-bar__icon" />
+        <Clock size={16} className="kds-countdown-bar__icon" aria-hidden="true" />
         <span className="kds-countdown-bar__text">
           {t('kds.autoRemove.countdown', { seconds: timeRemaining })}
         </span>

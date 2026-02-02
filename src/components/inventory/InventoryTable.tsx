@@ -6,7 +6,8 @@ import './InventoryTable.css'
 
 interface InventoryTableProps {
     items: (Product & { category: { name: string } | null })[]
-    onAdjustStock: (product: Product) => void
+    /** Callback for stock adjustment. If undefined, adjustment button is hidden (offline mode). */
+    onAdjustStock?: (product: Product) => void
     onViewDetails: (product: Product) => void
     isLoading?: boolean
 }
@@ -131,13 +132,15 @@ export default function InventoryTable({ items, onAdjustStock, onViewDetails, is
                                             >
                                                 <FileText size={16} />
                                             </button>
-                                            <button
-                                                className="btn-icon-sm"
-                                                onClick={() => onAdjustStock(item)}
-                                                title={t('inventory_table.adjust_stock')}
-                                            >
-                                                <Edit2 size={16} />
-                                            </button>
+                                            {onAdjustStock && (
+                                                <button
+                                                    className="btn-icon-sm"
+                                                    onClick={() => onAdjustStock(item)}
+                                                    title={t('inventory_table.adjust_stock')}
+                                                >
+                                                    <Edit2 size={16} />
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>

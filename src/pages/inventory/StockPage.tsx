@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
     LayoutDashboard,
     Package,
@@ -12,7 +12,15 @@ import {
 } from 'lucide-react'
 import InventoryTable from '../../components/inventory/InventoryTable'
 import StockAdjustmentModal from '../../components/inventory/StockAdjustmentModal'
+import OfflineAdjustmentBlockedModal from '../../components/inventory/OfflineAdjustmentBlockedModal'
+import DeferredNotesBadge from '../../components/inventory/DeferredNotesBadge'
+import OfflineStockBanner from '../../components/inventory/OfflineStockBanner'
+import StockAlertsPanel from '../../components/inventory/StockAlertsPanel'
+import StaleDataWarning from '../../components/inventory/StaleDataWarning'
 import { useInventoryItems, type TInventoryItem } from '@/hooks/inventory'
+import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'
+import { useStockLevelsOffline } from '@/hooks/offline/useStockLevelsOffline'
+import { isDataStale } from '@/types/offline'
 import type { Product } from '../../types/database'
 import './StockPage.css'
 
@@ -24,9 +32,34 @@ type InventoryItemWithCategory = Product & { category: { name: string } | null }
 export default function StockPage() {
     const { t } = useTranslation()
     const { data: items = [], isLoading } = useInventoryItems()
+    const { isOnline } = useNetworkStatus()
+    const { lastSyncAt, cacheCount } = useStockLevelsOffline()
     const [activeFilter, setActiveFilter] = useState<FilterType>('all')
     const [selectedProduct, setSelectedProduct] = useState<TInventoryItem | null>(null)
+    const [offlineBlockedProduct, setOfflineBlockedProduct] = useState<{ id: string; name: string } | null>(null)
+    const [showAlertsPanel, setShowAlertsPanel] = useState(false)
     const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
+
+    // Check for ?filter=alerts query param to show alerts panel
+    useEffect(() => {
+        const filterParam = searchParams.get('filter')
+        if (filterParam === 'alerts') {
+            setShowAlertsPanel(true)
+            setActiveFilter('low_stock')
+        }
+    }, [searchParams])
+
+    // Handle stock adjustment attempt - shows blocking modal if offline
+    const handleAdjustStock = (product: Product) => {
+        if (isOnline) {
+            // Online: open the regular adjustment modal
+            setSelectedProduct(product as unknown as TInventoryItem)
+        } else {
+            // Offline: open the blocking modal with note option
+            setOfflineBlockedProduct({ id: product.id, name: product.name })
+        }
+    }
 
     // Calculate stats
     const stats = useMemo(() => {
@@ -49,6 +82,31 @@ export default function StockPage() {
 
     return (
         <div className="stock-page">
+            {/* Offline Banner */}
+            {!isOnline && (
+                <OfflineStockBanner
+                    lastSyncAt={lastSyncAt}
+                    cacheCount={cacheCount}
+                    className="mb-4"
+                />
+            )}
+
+            {/* Stale Data Warning - shown when offline and data is old */}
+            {!isOnline && isDataStale(lastSyncAt) && (
+                <StaleDataWarning
+                    lastSyncAt={lastSyncAt}
+                    className="mb-4"
+                />
+            )}
+
+            {/* Stock Alerts Panel - shown when ?filter=alerts or low stock items exist */}
+            {(showAlertsPanel || stats.lowStockItems > 0) && (
+                <StockAlertsPanel
+                    className="mb-4"
+                    initialFilter={showAlertsPanel ? 'all' : 'critical'}
+                />
+            )}
+
             {/* Filter Tabs */}
             <div className="stock-filters">
                 <button
@@ -142,16 +200,24 @@ export default function StockPage() {
                 </div>
             </div>
 
+            {/* Deferred Notes Badge - shown when online and notes exist */}
+            {isOnline && (
+                <div className="mb-4 flex justify-end">
+                    <DeferredNotesBadge />
+                </div>
+            )}
+
             {/* Inventory Table */}
             <div className="stock-table-section">
                 <InventoryTable
                     items={filteredItems as unknown as InventoryItemWithCategory[]}
                     isLoading={isLoading}
-                    onAdjustStock={(product) => setSelectedProduct(product as unknown as TInventoryItem)}
+                    onAdjustStock={handleAdjustStock}
                     onViewDetails={(product) => navigate(`/inventory/product/${product.id}`)}
                 />
             </div>
 
+            {/* Stock Adjustment Modal - shown when online */}
             {selectedProduct && (
                 <StockAdjustmentModal
                     product={{
@@ -161,6 +227,15 @@ export default function StockPage() {
                         unit: selectedProduct.unit
                     }}
                     onClose={() => setSelectedProduct(null)}
+                />
+            )}
+
+            {/* Offline Adjustment Blocked Modal - shown when offline */}
+            {offlineBlockedProduct && (
+                <OfflineAdjustmentBlockedModal
+                    product={offlineBlockedProduct}
+                    onClose={() => setOfflineBlockedProduct(null)}
+                    onNoteSaved={() => setOfflineBlockedProduct(null)}
                 />
             )}
         </div>

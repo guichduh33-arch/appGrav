@@ -54,3 +54,13 @@ export type {
 export { useOfflineSession } from './useOfflineSession';
 
 export { useKitchenDispatch, useOrderDispatchStatus } from './useKitchenDispatch';
+
+export {
+  useStockLevelsOffline,
+  useProductStockOffline,
+  calculateStockStatus,
+} from './useStockLevelsOffline';
+export type {
+  TStockStatus,
+  IUseStockLevelsOfflineReturn,
+} from './useStockLevelsOffline';

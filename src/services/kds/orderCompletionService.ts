@@ -53,15 +53,20 @@ export async function completeOrder(
     // 2. Send ORDER_COMPLETE via LAN if connected
     let lanSent = false;
     if (lanClient.isActive()) {
-      const payload: IOrderCompletePayload = {
-        order_id: orderId,
-        order_number: orderNumber,
-        station,
-        completed_at: completedAt,
-        timestamp: completedAt,
-      };
-      await lanClient.send(LAN_MESSAGE_TYPES.ORDER_COMPLETE, payload);
-      lanSent = true;
+      try {
+        const payload: IOrderCompletePayload = {
+          order_id: orderId,
+          order_number: orderNumber,
+          station,
+          completed_at: completedAt,
+          timestamp: completedAt,
+        };
+        await lanClient.send(LAN_MESSAGE_TYPES.ORDER_COMPLETE, payload);
+        lanSent = true;
+      } catch (lanError) {
+        // Log but don't fail the operation - Supabase update succeeded
+        console.warn('[orderCompletionService] LAN notification failed:', lanError);
+      }
     }
 
     return { success: true, lanSent };

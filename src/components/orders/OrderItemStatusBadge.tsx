@@ -47,6 +47,10 @@ export function OrderItemStatusBadge({
   size = 'sm',
   animate = false,
 }: OrderItemStatusBadgeProps) {
+  // Warn if invalid status received - helps catch bugs early
+  if (!(status in STATUS_CONFIG)) {
+    console.warn(`[OrderItemStatusBadge] Invalid status "${status}", falling back to "new"`);
+  }
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.new;
 
   const classNames = [

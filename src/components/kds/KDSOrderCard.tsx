@@ -57,11 +57,13 @@ export default function KDSOrderCard({
 }: KDSOrderCardProps) {
     const [elapsedTime, setElapsedTime] = useState(0)
 
-    // Calculate elapsed time
+    // Calculate elapsed time with cleanup to prevent setState on unmounted component
     useEffect(() => {
+        let isMounted = true
         const startTime = new Date(createdAt).getTime()
 
         const updateElapsed = () => {
+            if (!isMounted) return
             const now = Date.now()
             setElapsedTime(Math.floor((now - startTime) / 1000))
         }
@@ -69,7 +71,10 @@ export default function KDSOrderCard({
         updateElapsed()
         const interval = setInterval(updateElapsed, 1000)
 
-        return () => clearInterval(interval)
+        return () => {
+            isMounted = false
+            clearInterval(interval)
+        }
     }, [createdAt])
 
     // Format elapsed time

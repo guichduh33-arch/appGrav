@@ -269,7 +269,137 @@
         "unit": "Satuan",
         "stock_movement": "Pergerakan Stok",
         "current_stock": "Stok Saat Ini",
-        "min_stock": "Stok Min"
+        "min_stock": "Stok Min",
+        "offline": {
+            "read_only_mode": "Mode baca saja",
+            "adjustments_disabled": "Penyesuaian stok dinonaktifkan saat offline",
+            "last_sync": "Sinkronisasi terakhir",
+            "never_synced": "tidak pernah",
+            "products": "produk",
+            "stock_synced": "{{count}} level stok tersinkronisasi",
+            "sync_error": "Kesalahan sinkronisasi stok"
+        },
+        "alerts": {
+            "title": "Peringatan Stok",
+            "badge": "{{count}} peringatan",
+            "badge_one": "{{count}} peringatan",
+            "badge_other": "{{count}} peringatan",
+            "critical": "Kritis",
+            "warning": "Perhatian",
+            "outOfStock": "Habis",
+            "noAlerts": "Tidak ada peringatan stok",
+            "staleWarning": "Data mungkin sudah usang - sinkronisasi terakhir: {{time}}",
+            "currentStock": "Stok saat ini",
+            "minStock": "Ambang minimum",
+            "viewAll": "Lihat semua peringatan",
+            "filterAll": "Semua",
+            "filterCritical": "Kritis",
+            "filterWarning": "Perhatian",
+            "productName": "Produk"
+        },
+        "adjustment": {
+            "offline": {
+                "title": "Mode Offline",
+                "message": "Penyesuaian stok memerlukan koneksi internet untuk memastikan keterlacakan.",
+                "product": "Produk",
+                "noteLabel": "Catatan untuk nanti (opsional)",
+                "notePlaceholder": "Contoh: Sesuaikan +5 pcs (kesalahan hitung)...",
+                "noteHint": "Catatan ini akan disimpan secara lokal. Anda dapat memprosesnya saat kembali online.",
+                "saveNote": "Simpan catatan",
+                "deferredNotes": "Catatan tertunda",
+                "deferredNotesCount": "{{count}} catatan penyesuaian tertunda",
+                "noNotes": "Tidak ada catatan tertunda",
+                "noProduct": "Penyesuaian umum",
+                "markAsProcessed": "Hapus",
+                "createAdjustment": "Buat penyesuaian",
+                "saveError": "Gagal menyimpan catatan. Silakan coba lagi."
+            }
+        },
+        "transfers": {
+            "title": "Transfer Internal",
+            "subtitle": "Kelola transfer antara gudang dan bagian",
+            "newTransfer": "Transfer Baru",
+            "editTransfer": "Edit Transfer",
+            "stats": {
+                "total": "Total Transfer",
+                "pending": "Dalam Proses",
+                "completed": "Selesai",
+                "totalValue": "Nilai Total"
+            },
+            "status": {
+                "all": "Semua status",
+                "draft": "Draft",
+                "pending": "Menunggu",
+                "in_transit": "Dalam Perjalanan",
+                "received": "Diterima",
+                "cancelled": "Dibatalkan"
+            },
+            "form": {
+                "from": "Dari (Asal)",
+                "to": "Ke (Tujuan)",
+                "responsible": "Penanggung Jawab Bagian",
+                "date": "Tanggal Transfer",
+                "notes": "Catatan",
+                "notesPlaceholder": "Catatan opsional...",
+                "items": "Barang yang Ditransfer",
+                "addItem": "Tambah Barang",
+                "noItems": "Tidak ada barang. Klik \"Tambah Barang\" untuk memulai.",
+                "product": "Produk",
+                "quantity": "Jumlah",
+                "unitCost": "Biaya Unit",
+                "lineTotal": "Total",
+                "totalItems": "Total Barang",
+                "totalValue": "Nilai Total",
+                "selectLocation": "Pilih...",
+                "selectProduct": "Pilih produk..."
+            },
+            "actions": {
+                "cancel": "Batal",
+                "saveDraft": "Simpan Draft",
+                "saveAndSend": "Simpan dan Kirim",
+                "viewDetails": "Lihat Detail"
+            },
+            "validation": {
+                "selectLocations": "Silakan pilih lokasi",
+                "responsibleRequired": "Silakan masukkan penanggung jawab",
+                "addItems": "Silakan tambahkan setidaknya satu barang",
+                "fillItems": "Silakan isi semua barang dengan benar"
+            },
+            "messages": {
+                "created": "Transfer dibuat",
+                "updated": "Transfer diperbarui",
+                "loadError": "Kesalahan saat memuat data"
+            },
+            "empty": {
+                "title": "Tidak ada transfer",
+                "description": "Mulai dengan membuat transfer pertama Anda"
+            },
+            "offline": {
+                "blocked": "Transfer memerlukan koneksi internet",
+                "connectionLost": "Koneksi terputus. Simpan dinonaktifkan."
+            },
+            "reception": {
+                "title": "Detail Transfer",
+                "receiveButton": "Validasi Penerimaan",
+                "quantityReceived": "Jml Diterima",
+                "quantityRequested": "Jml Diminta",
+                "variance": "Selisih",
+                "receptionNotes": "Catatan Penerimaan",
+                "receptionNotesPlaceholder": "Komentar penerimaan (selisih, masalah, dll.)",
+                "success": "Transfer berhasil diterima",
+                "error": "Kesalahan saat penerimaan",
+                "offlineBlocked": "Penerimaan transfer memerlukan koneksi internet",
+                "alreadyReceived": "Transfer ini sudah diterima",
+                "statusReceived": "Diterima pada",
+                "varianceWarning": "Perhatian: jumlah diterima berbeda dari jumlah diminta",
+                "notFound": "Transfer tidak ditemukan",
+                "validation": {
+                    "negativeQuantity": "Jumlah negatif tidak diperbolehkan",
+                    "overQuantityNeedsNote": "Catatan diperlukan untuk selisih positif",
+                    "fixErrors": "Silakan perbaiki kesalahan"
+                }
+            }
+        }
     },
     "inventory_page": {
         "title": "Manajemen Stok",

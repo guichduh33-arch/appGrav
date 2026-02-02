@@ -33,6 +33,7 @@ import {
 import { processSessionSync, updateOrdersWithSessionServerId } from './sessionSyncProcessor';
 import { processOrderSync } from './orderSyncProcessor';
 import { processPaymentSync } from './paymentSyncProcessor';
+import { syncStockLevelsToOffline } from './stockSync';
 
 // =====================================================
 // Constants
@@ -374,8 +375,31 @@ export async function initializeSyncEngine(): Promise<void> {
       // Coming back online
       console.log('[SyncEngineV2] Network restored - scheduling sync');
       startSyncWithDelay();
+
+      // Refresh read-only caches (stock levels per Story 5.1)
+      refreshReadOnlyCaches().catch((err) => {
+        console.error('[SyncEngineV2] Error refreshing caches:', err);
+      });
     }
   });
 
   console.log('[SyncEngineV2] Initialized');
+}
+
+/**
+ * Refresh read-only caches when coming back online
+ *
+ * Called after network reconnection to update cached data.
+ * Per Story 5.1: Stock levels auto-refresh on reconnect.
+ */
+async function refreshReadOnlyCaches(): Promise<void> {
+  console.log('[SyncEngineV2] Refreshing read-only caches...');
+
+  try {
+    // Stock levels (Story 5.1)
+    const stockCount = await syncStockLevelsToOffline();
+    console.log(`[SyncEngineV2] Stock levels refreshed: ${stockCount} items`);
+  } catch (error) {
+    console.error('[SyncEngineV2] Error refreshing stock levels:', error);
+  }
 }

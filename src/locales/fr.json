@@ -269,7 +269,137 @@
         "unit": "Unité",
         "stock_movement": "Mouvement de stock",
         "current_stock": "Stock actuel",
-        "min_stock": "Stock min"
+        "min_stock": "Stock min",
+        "offline": {
+            "read_only_mode": "Mode lecture seule",
+            "adjustments_disabled": "Les ajustements de stock sont désactivés hors ligne",
+            "last_sync": "Dernière sync",
+            "never_synced": "jamais",
+            "products": "produits",
+            "stock_synced": "{{count}} niveaux de stock synchronisés",
+            "sync_error": "Erreur de synchronisation des stocks"
+        },
+        "alerts": {
+            "title": "Alertes Stock",
+            "badge": "{{count}} alerte(s)",
+            "badge_one": "{{count}} alerte",
+            "badge_other": "{{count}} alertes",
+            "critical": "Critique",
+            "warning": "Attention",
+            "outOfStock": "Rupture",
+            "noAlerts": "Aucune alerte stock",
+            "staleWarning": "Données potentiellement obsolètes - dernière sync: {{time}}",
+            "currentStock": "Stock actuel",
+            "minStock": "Seuil minimum",
+            "viewAll": "Voir toutes les alertes",
+            "filterAll": "Toutes",
+            "filterCritical": "Critiques",
+            "filterWarning": "Attention",
+            "productName": "Produit"
+        },
+        "adjustment": {
+            "offline": {
+                "title": "Mode Hors-Ligne",
+                "message": "Les ajustements de stock nécessitent une connexion internet pour garantir la traçabilité.",
+                "product": "Produit",
+                "noteLabel": "Noter pour plus tard (optionnel)",
+                "notePlaceholder": "Ex: Ajuster +5 pcs (erreur de comptage)...",
+                "noteHint": "Cette note sera sauvegardée localement. Vous pourrez la traiter quand vous serez de nouveau en ligne.",
+                "saveNote": "Enregistrer la note",
+                "deferredNotes": "Notes en attente",
+                "deferredNotesCount": "{{count}} note(s) d'ajustement en attente",
+                "noNotes": "Aucune note en attente",
+                "noProduct": "Ajustement général",
+                "markAsProcessed": "Supprimer",
+                "createAdjustment": "Créer l'ajustement",
+                "saveError": "Erreur lors de la sauvegarde. Veuillez réessayer."
+            }
+        },
+        "transfers": {
+            "title": "Transferts Internes",
+            "subtitle": "Gérez les transferts entre le dépôt et les sections",
+            "newTransfer": "Nouveau Transfert",
+            "editTransfer": "Modifier Transfert",
+            "stats": {
+                "total": "Total Transferts",
+                "pending": "En Cours",
+                "completed": "Complétés",
+                "totalValue": "Valeur Totale"
+            },
+            "status": {
+                "all": "Tous les statuts",
+                "draft": "Brouillon",
+                "pending": "En Attente",
+                "in_transit": "En Transit",
+                "received": "Reçu",
+                "cancelled": "Annulé"
+            },
+            "form": {
+                "from": "De (Origine)",
+                "to": "Vers (Destination)",
+                "responsible": "Responsable Section",
+                "date": "Date de Transfert",
+                "notes": "Notes",
+                "notesPlaceholder": "Notes optionnelles...",
+                "items": "Articles à Transférer",
+                "addItem": "Ajouter Article",
+                "noItems": "Aucun article. Cliquez sur \"Ajouter Article\" pour commencer.",
+                "product": "Produit",
+                "quantity": "Quantité",
+                "unitCost": "Coût Unit.",
+                "lineTotal": "Total",
+                "totalItems": "Total Articles",
+                "totalValue": "Valeur Totale",
+                "selectLocation": "Sélectionner...",
+                "selectProduct": "Sélectionner produit..."
+            },
+            "actions": {
+                "cancel": "Annuler",
+                "saveDraft": "Enregistrer Brouillon",
+                "saveAndSend": "Enregistrer et Envoyer",
+                "viewDetails": "Voir Détails"
+            },
+            "validation": {
+                "selectLocations": "Veuillez sélectionner les emplacements",
+                "responsibleRequired": "Veuillez indiquer le responsable",
+                "addItems": "Veuillez ajouter au moins un article",
+                "fillItems": "Veuillez remplir tous les articles correctement"
+            },
+            "messages": {
+                "created": "Transfert créé",
+                "updated": "Transfert mis à jour",
+                "loadError": "Erreur lors du chargement"
+            },
+            "empty": {
+                "title": "Aucun transfert",
+                "description": "Commencez par créer votre premier transfert"
+            },
+            "offline": {
+                "blocked": "Les transferts nécessitent une connexion internet",
+                "connectionLost": "Connexion perdue. Sauvegarde désactivée."
+            },
+            "reception": {
+                "title": "Détails du Transfert",
+                "receiveButton": "Valider Réception",
+                "quantityReceived": "Qté Reçue",
+                "quantityRequested": "Qté Demandée",
+                "variance": "Écart",
+                "receptionNotes": "Notes de Réception",
+                "receptionNotesPlaceholder": "Commentaires sur la réception (écarts, problèmes, etc.)",
+                "success": "Transfert réceptionné avec succès",
+                "error": "Erreur lors de la réception",
+                "offlineBlocked": "La réception des transferts nécessite une connexion internet",
+                "alreadyReceived": "Ce transfert a déjà été réceptionné",
+                "statusReceived": "Réceptionné le",
+                "varianceWarning": "Attention : quantités reçues différentes des quantités demandées",
+                "notFound": "Transfert introuvable",
+                "validation": {
+                    "negativeQuantity": "Quantité négative non autorisée",
+                    "overQuantityNeedsNote": "Notes requises pour écart positif",
+                    "fixErrors": "Veuillez corriger les erreurs"
+                }
+            }
+        }
     },
     "inventory_page": {
         "title": "Gestion des Stocks",

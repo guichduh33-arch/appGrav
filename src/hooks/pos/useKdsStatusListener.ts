@@ -8,7 +8,7 @@
  * Integration deferred to a future story that defines the UX for order status display.
  */
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { lanClient } from '@/services/lan/lanClient';
 import {
   LAN_MESSAGE_TYPES,
@@ -46,6 +46,24 @@ export function useKdsStatusListener(
   options: IUseKdsStatusListenerOptions = {}
 ): IUseKdsStatusListenerResult {
   const { onItemPreparing, onItemReady, enabled = true } = options;
+
+  // Track LAN connection status dynamically
+  const [isActive, setIsActive] = useState(() => lanClient.isActive());
+
+  // Update isActive periodically to reflect connection changes
+  useEffect(() => {
+    if (!enabled) return;
+
+    const checkConnection = () => {
+      setIsActive(lanClient.isActive());
+    };
+
+    // Check every 2 seconds for connection status changes
+    const interval = setInterval(checkConnection, 2000);
+    checkConnection(); // Initial check
+
+    return () => clearInterval(interval);
+  }, [enabled]);
 
   const handlePreparing = useCallback(
     (message: ILanMessage<IKdsItemPreparingPayload>) => {
@@ -86,6 +104,6 @@ export function useKdsStatusListener(
   }, [enabled, handlePreparing, handleReady]);
 
   return {
-    isActive: lanClient.isActive(),
+    isActive,
   };
 }

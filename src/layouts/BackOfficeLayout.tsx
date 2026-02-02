@@ -12,6 +12,7 @@ import { NetworkIndicator } from '../components/ui/NetworkIndicator';
 import { SyncIndicator } from '../components/ui/SyncIndicator';
 import { PendingSyncCounter } from '../components/sync/PendingSyncCounter';
 import { PostOfflineSyncReport } from '../components/sync/PostOfflineSyncReport';
+import { StockAlertsBadge } from '../components/inventory/StockAlertsBadge';
 import { useNetworkAlerts } from '../hooks/useNetworkAlerts';
 import { useSyncReport } from '../hooks/useSyncReport';
 import './BackOfficeLayout.css';
@@ -85,6 +86,7 @@ const BackOfficeLayout: React.FC = () => {
                         <NavLink to="/inventory" className="nav-item" title={isCollapsed ? t('nav.stock_inventory') : ""}>
                             <Boxes size={22} strokeWidth={2} />
                             {!isCollapsed && <span className="fade-in">{t('nav.stock_inventory')}</span>}
+                            <StockAlertsBadge className={isCollapsed ? '' : 'ml-auto'} />
                         </NavLink>
                         <NavLink to="/orders" className="nav-item" title={isCollapsed ? t('nav.order_history') : ""}>
                             <FileText size={22} strokeWidth={2} />

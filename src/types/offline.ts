@@ -1118,3 +1118,126 @@ export const DISPATCH_MAX_ATTEMPTS = 3;
 
 /** Retry backoff base in ms (2s → 4s → 8s) */
 export const DISPATCH_RETRY_BACKOFF_MS = 2000;
+
+// =====================================================
+// Stock Levels Cache Types (Story 5.1)
+// =====================================================
+
+/**
+ * Cached stock level for offline inventory access
+ *
+ * Stored in Dexie table: offline_stock_levels
+ * TTL: 24 hours, refresh every hour when online
+ * Mode: READ-ONLY (modifications online-only per ADR-001)
+ *
+ * @see Epic 5: Stock & Approvisionnement
+ */
+export interface IOfflineStockLevel {
+  /** Primary key = product_id (single location for MVP) */
+  id: string;
+
+  /** FK to products.id */
+  product_id: string;
+
+  /** FK to locations.id - null for single location MVP */
+  location_id: string | null;
+
+  /** Current stock quantity */
+  quantity: number;
+
+  /** Minimum stock level for alerts */
+  min_stock_level: number;
+
+  /** ISO 8601 timestamp of last stock update */
+  last_updated: string;
+}
+
+/** Cache TTL for stock levels (24 hours in ms) */
+export const STOCK_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
+/** Refresh interval for stock when online (1 hour in ms) */
+export const STOCK_REFRESH_INTERVAL_MS = 60 * 60 * 1000;
+
+// =====================================================
+// Stock Alerts Types (Story 5.2)
+// =====================================================
+
+/**
+ * Stock alert level for display
+ * Note: TStockStatus is exported from useStockLevelsOffline hook
+ * This type alias ensures consistency
+ */
+export type TStockAlertLevel = 'ok' | 'warning' | 'critical' | 'out_of_stock';
+
+/** Threshold for considering stock data stale (1 hour in ms) */
+export const STALE_DATA_THRESHOLD_MS = 60 * 60 * 1000;
+
+/**
+ * Check if cached data is considered stale
+ * Data is stale if more than STALE_DATA_THRESHOLD_MS has elapsed since last sync
+ *
+ * @param lastSyncAt - ISO 8601 timestamp of last sync, or null if never synced
+ * @returns true if data is stale or never synced
+ *
+ * @example
+ * ```typescript
+ * const { lastSyncAt } = useStockLevelsOffline();
+ * if (isDataStale(lastSyncAt)) {
+ *   // Show stale data warning
+ * }
+ * ```
+ */
+export function isDataStale(lastSyncAt: string | null): boolean {
+  if (!lastSyncAt) return true;
+
+  const lastSyncTime = new Date(lastSyncAt).getTime();
+  const elapsed = Date.now() - lastSyncTime;
+
+  return elapsed > STALE_DATA_THRESHOLD_MS;
+}
+
+// =====================================================
+// Deferred Adjustment Notes Types (Story 5.3)
+// =====================================================
+
+/**
+ * Type of stock adjustment for deferred notes
+ * Matches the existing stock adjustment types
+ */
+export type TStockAdjustmentType = 'purchase' | 'waste' | 'adjustment_in' | 'adjustment_out';
+
+/**
+ * Deferred adjustment note for offline mode
+ *
+ * Stored in Dexie table: offline_adjustment_notes
+ * Used when user tries to make stock adjustment while offline
+ * Notes are persisted locally and can be processed when online
+ *
+ * @see Story 5.3: Stock Adjustment (Online-Only)
+ * @see ADR-001: Stock adjustments are online-only for traceability
+ */
+export interface IDeferredAdjustmentNote {
+  /** Auto-increment ID (Dexie) */
+  id?: number;
+
+  /** FK to products.id (optional - note may not be linked to specific product) */
+  product_id?: string;
+
+  /** Product name for display (denormalized for offline access) */
+  product_name?: string;
+
+  /** Free-form note text describing the intended adjustment */
+  note: string;
+
+  /** Suggested adjustment type (optional) */
+  adjustment_type?: TStockAdjustmentType;
+
+  /** Suggested quantity to adjust (optional) */
+  suggested_quantity?: number;
+
+  /** ISO 8601 timestamp when note was created */
+  created_at: string;
+
+  /** User ID who created the note (if available offline) */
+  created_by?: string;
+}

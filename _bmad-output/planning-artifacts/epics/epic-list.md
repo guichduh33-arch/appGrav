@@ -41,7 +41,8 @@ Les utilisateurs peuvent se connecter par PIN (online/offline), le système cont
 **Given** le PIN saisi est incorrect
 **When** l'utilisateur tente de se connecter offline
 **Then** un message d'erreur s'affiche sans révéler si le PIN existe
-**And** après 3 tentatives, un délai de 30 secondes est imposé
+**And** après 3 tentatives, un délai de 30 secondes (cooldown) est imposé
+**And** un rate limit global de 3 tentatives par 15 minutes prévient les attaques brute-force
 
 #### Story 1.3: Offline Permissions Cache
 
@@ -314,7 +315,8 @@ Les caissiers peuvent prendre des commandes, appliquer des remises, encaisser et
 
 **Given** une transaction échoue
 **When** le serveur retourne une erreur
-**Then** le compteur `attempts` est incrémenté
+**Then** le compteur `retries` est incrémenté
+**And** un backoff exponentiel est appliqué (5s → 10s → 30s → 60s → 300s)
 **And** après 3 échecs, l'item est marqué `failed` avec le message d'erreur
 
 #### Story 3.7: Kitchen Dispatch via LAN (Offline)
@@ -362,36 +364,40 @@ Les cuisiniers reçoivent les commandes (POS et Mobile), voient les priorités e
 
 **Offline Integration:** Communication LAN via Socket.IO (ADR-006)
 
-#### Story 4.1: Socket.IO Server on POS (LAN Hub)
+#### Story 4.1: LAN Hub Lifecycle Management
 
 **As a** Système,
-**I want** que le POS serve de hub Socket.IO sur le LAN,
+**I want** que le POS serve de hub de communication sur le LAN,
 **So that** les autres appareils peuvent communiquer sans internet.
+
+**Note technique:** L'implémentation utilise BroadcastChannel (same-origin) + Supabase Realtime (cross-origin) car les navigateurs ne peuvent pas créer de serveurs WebSocket natifs.
 
 **Acceptance Criteria:**
 
 **Given** le POS démarre
 **When** l'application s'initialise
-**Then** un serveur Socket.IO écoute sur le port 3001
-**And** les connexions LAN sont acceptées
+**Then** le hub LAN est démarré automatiquement
+**And** les connexions d'appareils sont acceptées via Supabase Realtime
 
 **Given** un appareil se connecte (KDS, Mobile, Display)
-**When** la connexion Socket.IO est établie
+**When** la connexion est établie
 **Then** l'appareil est enregistré avec son type et son ID
 **And** les events peuvent être échangés bidirectionnellement
 
-#### Story 4.2: KDS Socket.IO Client Connection
+#### Story 4.2: KDS LAN Client Connection
 
 **As a** KDS,
-**I want** me connecter au POS via Socket.IO LAN,
+**I want** me connecter au POS via le réseau local,
 **So that** je reçois les commandes même sans internet.
+
+**Note technique:** La connexion utilise Supabase Realtime comme canal de communication (pas de WebSocket direct).
 
 **Acceptance Criteria:**
 
 **Given** le KDS démarre
 **When** il détecte le réseau local
-**Then** il se connecte au POS sur `ws://{POS_IP}:3001`
-**And** l'IP est configurée ou découverte via QR code (ADR-008)
+**Then** il se connecte au canal Supabase Realtime 'lan-hub'
+**And** l'IP du hub est configurée ou découverte via QR code (ADR-008)
 
 **Given** la connexion est établie
 **When** le KDS s'identifie
@@ -466,6 +472,11 @@ Les cuisiniers reçoivent les commandes (POS et Mobile), voient les priorités e
 **When** elle disparaît
 **Then** l'event `order:completed` est envoyé au POS
 **And** le serveur (app mobile) est notifié si applicable
+
+**Given** la station est configurée comme "waiter"
+**When** tous les items de la commande sont prêts
+**Then** la commande NE disparaît PAS automatiquement
+**And** le serveur doit la marquer manuellement comme "servie"
 
 ---
 

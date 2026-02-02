@@ -39,6 +39,11 @@ export type Recipe = Tables<'recipes'>
 export type InventoryCount = Tables<'inventory_counts'>
 export type ProductUOM = Tables<'product_uoms'>
 
+// Internal Transfers & Stock Locations (Story 5.4)
+export type InternalTransfer = Tables<'internal_transfers'>
+export type TransferItem = Tables<'transfer_items'>
+export type StockLocation = Tables<'stock_locations'>
+
 // Product modifiers
 export type ProductModifier = Tables<'product_modifiers'>
 
@@ -115,6 +120,12 @@ export type DiscountType = Enums<'discount_type'>
 // PromotionType includes all promotion variations used in the UI
 export type PromotionType = 'percentage' | 'fixed_amount' | 'buy_x_get_y' | 'free_product' | 'fixed' | 'free'
 
+// Transfer status (Story 5.4)
+export type TTransferStatus = 'draft' | 'pending' | 'in_transit' | 'received' | 'cancelled'
+
+// Location type for stock_locations
+export type TLocationType = 'main_warehouse' | 'section' | 'kitchen' | 'storage'
+
 // ============================================================================
 // EXTENDED/JOINED TYPES
 // ============================================================================
@@ -130,6 +141,20 @@ export interface RecipeWithProduct extends Recipe {
 
 export interface OrderWithItems extends Order {
     order_items?: OrderItem[]
+}
+
+// Internal Transfer extended types (Story 5.4)
+export interface ITransferWithLocations extends InternalTransfer {
+    from_location?: StockLocation | null
+    to_location?: StockLocation | null
+}
+
+export interface ITransferItemWithProduct extends TransferItem {
+    product?: Pick<Product, 'id' | 'name' | 'sku' | 'cost_price'> | null
+}
+
+export interface ITransferWithDetails extends ITransferWithLocations {
+    items?: ITransferItemWithProduct[]
 }
 
 // ============================================================================

@@ -1,6 +1,6 @@
 # Story 4.6: Order Completion & Auto-Remove
 
-Status: in-progress
+Status: done
 
 ## Story
 
@@ -110,59 +110,59 @@ ORDER_COMPLETE: 'order_complete',
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1: Créer le hook useOrderAutoRemove** (AC: 1, 2, 3, 6)
-  - [ ] 1.1: Créer `src/hooks/kds/useOrderAutoRemove.ts`
-  - [ ] 1.2: Détecter quand tous les items sont 'ready'
-  - [ ] 1.3: Démarrer countdown de 5 secondes
-  - [ ] 1.4: Exposer `timeRemaining` et `cancelAutoRemove`
-  - [ ] 1.5: Ignorer si station === 'waiter'
+- [x] **Task 1: Créer le hook useOrderAutoRemove** (AC: 1, 2, 3, 6)
+  - [x] 1.1: Créer `src/hooks/kds/useOrderAutoRemove.ts`
+  - [x] 1.2: Détecter quand tous les items sont 'ready'
+  - [x] 1.3: Démarrer countdown de 5 secondes
+  - [x] 1.4: Exposer `timeRemaining` et `cancelAutoRemove`
+  - [x] 1.5: Ignorer si station === 'waiter'
 
-- [ ] **Task 2: Implémenter l'animation de sortie** (AC: 3)
-  - [ ] 2.1: Ajouter classe CSS `.kds-order-card--exiting`
-  - [ ] 2.2: Implémenter fade-out + slide-up animation
-  - [ ] 2.3: Durée animation: 300ms
-  - [ ] 2.4: Appeler onRemove après animation
+- [x] **Task 2: Implémenter l'animation de sortie** (AC: 3)
+  - [x] 2.1: Ajouter classe CSS `.kds-order-card--exiting`
+  - [x] 2.2: Implémenter fade-out + slide-up animation
+  - [x] 2.3: Durée animation: 300ms
+  - [x] 2.4: Appeler onRemove après animation
 
-- [ ] **Task 3: Ajouter l'indicateur de countdown** (AC: 2)
-  - [ ] 3.1: Créer composant `KDSCountdownBar`
-  - [ ] 3.2: Afficher barre de progression décroissante (5s → 0s)
-  - [ ] 3.3: Bouton "Annuler" intégré
-  - [ ] 3.4: Style distinctif (couleur verte/dorée)
+- [x] **Task 3: Ajouter l'indicateur de countdown** (AC: 2)
+  - [x] 3.1: Créer composant `KDSCountdownBar`
+  - [x] 3.2: Afficher barre de progression décroissante (5s → 0s)
+  - [x] 3.3: Bouton "Annuler" intégré
+  - [x] 3.4: Style distinctif (couleur verte/dorée)
 
-- [ ] **Task 4: Intégrer dans KDSOrderCard** (AC: 1, 2, 3)
-  - [ ] 4.1: Utiliser useOrderAutoRemove dans KDSOrderCard
-  - [ ] 4.2: Afficher KDSCountdownBar quand countdown actif
-  - [ ] 4.3: Appliquer classe --exiting à la fin du countdown
-  - [ ] 4.4: Appeler onOrderComplete après animation
+- [x] **Task 4: Intégrer dans KDSOrderCard** (AC: 1, 2, 3)
+  - [x] 4.1: Utiliser useOrderAutoRemove dans KDSOrderCard
+  - [x] 4.2: Afficher KDSCountdownBar quand countdown actif
+  - [x] 4.3: Appliquer classe --exiting à la fin du countdown
+  - [x] 4.4: Appeler onOrderComplete après animation
 
-- [ ] **Task 5: Créer le service orderCompletionService** (AC: 4, 5)
-  - [ ] 5.1: Créer `src/services/kds/orderCompletionService.ts`
-  - [ ] 5.2: Implémenter `completeOrder(orderId, orderNumber)`
-  - [ ] 5.3: Envoyer `ORDER_COMPLETE` via LAN
-  - [ ] 5.4: Mettre à jour Supabase (order.status, completed_at)
+- [x] **Task 5: Créer le service orderCompletionService** (AC: 4, 5)
+  - [x] 5.1: Créer `src/services/kds/orderCompletionService.ts`
+  - [x] 5.2: Implémenter `completeOrder(orderId, orderNumber)`
+  - [x] 5.3: Envoyer `ORDER_COMPLETE` via LAN
+  - [x] 5.4: Mettre à jour Supabase (order.status, completed_at)
 
-- [ ] **Task 6: Ajouter les types LAN** (AC: 4)
-  - [ ] 6.1: Créer interface `IOrderCompletePayload` dans lanProtocol.ts
-  - [ ] 6.2: Ajouter station et completed_at au payload
-  - [ ] 6.3: Documenter l'event pour les autres devices
+- [x] **Task 6: Ajouter les types LAN** (AC: 4)
+  - [x] 6.1: Créer interface `IOrderCompletePayload` dans lanProtocol.ts
+  - [x] 6.2: Ajouter station et completed_at au payload
+  - [x] 6.3: Documenter l'event pour les autres devices
 
-- [ ] **Task 7: Modifier KDSMainPage** (AC: 1, 2, 3, 6)
-  - [ ] 7.1: Ajouter callback `handleOrderComplete`
-  - [ ] 7.2: Retirer l'ordre de l'état local après animation
-  - [ ] 7.3: Ne pas appliquer auto-remove pour waiter station
-  - [ ] 7.4: Conserver le bouton "Served" pour waiter
+- [x] **Task 7: Modifier KDSMainPage** (AC: 1, 2, 3, 6)
+  - [x] 7.1: Ajouter callback `handleOrderComplete`
+  - [x] 7.2: Retirer l'ordre de l'état local après animation
+  - [x] 7.3: Ne pas appliquer auto-remove pour waiter station
+  - [x] 7.4: Conserver le bouton "Served" pour waiter
 
-- [ ] **Task 8: Tests unitaires** (AC: 1, 2, 3, 4, 5, 6)
-  - [ ] 8.1: Créer `src/hooks/kds/__tests__/useOrderAutoRemove.test.ts`
-  - [ ] 8.2: Tester déclenchement countdown quand tous ready
-  - [ ] 8.3: Tester cancelAutoRemove bloque la suppression
-  - [ ] 8.4: Tester non-déclenchement pour waiter station
-  - [ ] 8.5: Créer `src/services/kds/__tests__/orderCompletionService.test.ts`
+- [x] **Task 8: Tests unitaires** (AC: 1, 2, 3, 4, 5, 6)
+  - [x] 8.1: Créer `src/hooks/kds/__tests__/useOrderAutoRemove.test.ts`
+  - [x] 8.2: Tester déclenchement countdown quand tous ready
+  - [x] 8.3: Tester cancelAutoRemove bloque la suppression
+  - [x] 8.4: Tester non-déclenchement pour waiter station
+  - [x] 8.5: Créer `src/services/kds/__tests__/orderCompletionService.test.ts`
 
-- [ ] **Task 9: Traductions** (AC: 2)
-  - [ ] 9.1: Ajouter clés `kds.autoRemove.*` dans fr.json
-  - [ ] 9.2: Ajouter clés dans en.json
-  - [ ] 9.3: Ajouter clés dans id.json
+- [x] **Task 9: Traductions** (AC: 2)
+  - [x] 9.1: Ajouter clés `kds.autoRemove.*` dans fr.json
+  - [x] 9.2: Ajouter clés dans en.json
+  - [x] 9.3: Ajouter clés dans id.json
 
 ## Dev Notes
 
@@ -798,10 +798,60 @@ Cette story est la **6ème et dernière** de l'Epic 4 (Cuisine & Dispatch - Kitc
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude Opus 4.5 (claude-opus-4-5-20251101)
 
 ### Debug Log References
 
+- Tous les tests passent (14/14 tests)
+- Build TypeScript OK pour les fichiers Story 4-6
+
 ### Completion Notes List
 
+- ✅ Hook useOrderAutoRemove implémenté avec countdown 5s, cancel, et exception waiter station
+- ✅ KDSCountdownBar composant avec barre de progression et bouton "Garder"
+- ✅ Animations CSS pour countdown glow et exit fade-out/slide-up
+- ✅ orderCompletionService met à jour Supabase (status='ready', completed_at) et broadcast ORDER_COMPLETE via LAN
+- ✅ IOrderCompletePayload défini dans lanProtocol.ts
+- ✅ KDSMainPage intègre handleOrderComplete avec removeOrder
+- ✅ KDSOrderCard utilise le hook et affiche la countdown bar
+- ✅ 14 tests unitaires couvrent tous les cas (hook + service)
+- ✅ Traductions complètes en 3 langues (fr, en, id)
+
 ### File List
+
+**Créés:**
+- src/hooks/kds/useOrderAutoRemove.ts
+- src/hooks/kds/__tests__/useOrderAutoRemove.test.ts
+- src/components/kds/KDSCountdownBar.tsx
+- src/components/kds/KDSCountdownBar.css
+- src/services/kds/orderCompletionService.ts
+- src/services/kds/__tests__/orderCompletionService.test.ts
+- src/services/kds/index.ts
+
+**Modifiés:**
+- src/components/kds/KDSOrderCard.tsx (intégration hook + countdown bar)
+- src/components/kds/KDSOrderCard.css (animations --exiting, --countdown)
+- src/pages/kds/KDSMainPage.tsx (handleOrderComplete callback)
+- src/services/lan/lanProtocol.ts (IOrderCompletePayload interface)
+- src/locales/fr.json (kds.autoRemove.*)
+- src/locales/en.json (kds.autoRemove.*)
+- src/locales/id.json (kds.autoRemove.*)
+
+## Code Review Fixes (2026-02-02)
+
+### Issues Fixed
+
+| Issue | Sévérité | Fix |
+|-------|----------|-----|
+| lanClient.send() sans try/catch | MEDIUM | Ajouté try/catch dans orderCompletionService.ts:55-66 |
+| KDSOrderCard interval timer leak | MEDIUM | Ajouté isMounted flag dans useEffect cleanup |
+| KDSCountdownBar manque aria-live | LOW | Ajouté `role="alert" aria-live="polite"` |
+| playNotificationSound dupliqué | LOW | Extrait vers src/utils/audio.ts |
+
+### Files Modified in Code Review
+
+- `src/services/kds/orderCompletionService.ts` - try/catch pour LAN send
+- `src/components/kds/KDSOrderCard.tsx` - isMounted check pour interval
+- `src/components/kds/KDSCountdownBar.tsx` - aria-live pour accessibilité
+- `src/pages/kds/KDSMainPage.tsx` - utilise playNewOrderSound de utils/audio
+- `src/utils/audio.ts` - **nouveau** utilitaire audio partagé

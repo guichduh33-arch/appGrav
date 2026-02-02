@@ -24,6 +24,8 @@ import type {
   IOfflinePayment,
   IOfflineSession,
   IDispatchQueueItem,
+  IOfflineStockLevel,
+  IDeferredAdjustmentNote,
 } from '@/types/offline';
 
 /**
@@ -74,6 +76,12 @@ export class OfflineDatabase extends Dexie {
 
   // Dispatch queue for KDS (Story 3.7)
   offline_dispatch_queue!: Table<IDispatchQueueItem>;
+
+  // Stock levels cache (Story 5.1)
+  offline_stock_levels!: Table<IOfflineStockLevel>;
+
+  // Deferred adjustment notes (Story 5.3)
+  offline_adjustment_notes!: Table<IDeferredAdjustmentNote>;
 
   constructor() {
     super('appgrav-offline');
@@ -286,6 +294,59 @@ export class OfflineDatabase extends Dexie {
       // Compound index [status+station] for processing queue by station
       offline_dispatch_queue: '++id, order_id, station, status, created_at, [status+station]',
     });
+
+    // Version 11: Stock Levels Cache (Story 5.1)
+    this.version(11).stores({
+      // Preserve existing tables
+      offline_users: 'id, cached_at',
+      offline_sync_queue: '++id, entity, status, created_at',
+      offline_settings: 'key, category_id, updated_at',
+      offline_tax_rates: 'id, is_active, is_default, [is_active+is_default]',
+      offline_payment_methods: 'id, is_active, is_default, sort_order, [is_active+is_default]',
+      offline_business_hours: 'day_of_week',
+      offline_sync_meta: 'entity',
+      offline_products: 'id, category_id, sku, name, is_active, pos_visible, [is_active+pos_visible+available_for_sale]',
+      offline_categories: 'id, name, sort_order, is_active, dispatch_station, [is_active+is_raw_material]',
+      offline_modifiers: 'id, product_id, category_id, group_name, is_active, [is_active+product_id], [is_active+category_id]',
+      offline_recipes: 'id, product_id, material_id, is_active, [is_active+product_id]',
+      offline_orders: 'id, order_number, status, order_type, customer_id, session_id, created_at, sync_status, dispatch_status, [status+created_at]',
+      offline_order_items: 'id, order_id, product_id, item_status',
+      offline_payments: 'id, order_id, method, sync_status, created_at',
+      offline_sessions: 'id, user_id, status, opened_at, sync_status',
+      offline_dispatch_queue: '++id, order_id, station, status, created_at, [status+station]',
+
+      // NEW: Stock levels cache (Story 5.1)
+      // Indexes: id (primary = product_id), product_id, location_id, quantity
+      // Compound index [product_id+location_id] for multi-location queries (future)
+      offline_stock_levels: 'id, product_id, location_id, quantity, [product_id+location_id]',
+    });
+
+    // Version 12: Deferred Adjustment Notes (Story 5.3)
+    this.version(12).stores({
+      // Preserve existing tables
+      offline_users: 'id, cached_at',
+      offline_sync_queue: '++id, entity, status, created_at',
+      offline_settings: 'key, category_id, updated_at',
+      offline_tax_rates: 'id, is_active, is_default, [is_active+is_default]',
+      offline_payment_methods: 'id, is_active, is_default, sort_order, [is_active+is_default]',
+      offline_business_hours: 'day_of_week',
+      offline_sync_meta: 'entity',
+      offline_products: 'id, category_id, sku, name, is_active, pos_visible, [is_active+pos_visible+available_for_sale]',
+      offline_categories: 'id, name, sort_order, is_active, dispatch_station, [is_active+is_raw_material]',
+      offline_modifiers: 'id, product_id, category_id, group_name, is_active, [is_active+product_id], [is_active+category_id]',
+      offline_recipes: 'id, product_id, material_id, is_active, [is_active+product_id]',
+      offline_orders: 'id, order_number, status, order_type, customer_id, session_id, created_at, sync_status, dispatch_status, [status+created_at]',
+      offline_order_items: 'id, order_id, product_id, item_status',
+      offline_payments: 'id, order_id, method, sync_status, created_at',
+      offline_sessions: 'id, user_id, status, opened_at, sync_status',
+      offline_dispatch_queue: '++id, order_id, station, status, created_at, [status+station]',
+      offline_stock_levels: 'id, product_id, location_id, quantity, [product_id+location_id]',
+
+      // NEW: Deferred adjustment notes (Story 5.3)
+      // Indexes: ++id (auto-increment), product_id, created_at
+      // Used to store adjustment intentions when offline
+      offline_adjustment_notes: '++id, product_id, created_at',
+    });
   }
 }
 
@@ -310,4 +371,6 @@ export type {
   IOfflinePayment,
   IOfflineSession,
   IDispatchQueueItem,
+  IOfflineStockLevel,
+  IDeferredAdjustmentNote,
 };
