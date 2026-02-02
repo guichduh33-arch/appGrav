@@ -8,6 +8,7 @@
 
 import { supabase } from '@/lib/supabase';
 import type { ILanNode, TSyncDeviceType, TLanNodeStatus } from '@/types/database';
+import type { TKitchenStation } from '@/types/offline';
 
 // Re-export device type for consumers
 export type TDeviceType = TSyncDeviceType;
@@ -48,6 +49,10 @@ export const LAN_MESSAGE_TYPES = {
   KDS_ORDER_ACK: 'kds_order_ack',
   KDS_ORDER_READY: 'kds_order_ready',
   KDS_ORDER_BUMP: 'kds_order_bump',
+
+  // KDS Item Status (Story 4.5)
+  KDS_ITEM_PREPARING: 'kds_item_preparing',
+  KDS_ITEM_READY: 'kds_item_ready',
 
   // Inventory & Stock
   STOCK_UPDATE: 'stock_update',
@@ -115,6 +120,43 @@ export interface IOrderSyncPayload {
     name: string;
   }>;
   table_number?: number;
+}
+
+/**
+ * KDS Item Preparing payload (Story 4.5)
+ * Sent when KDS marks items as "preparing"
+ */
+export interface IKdsItemPreparingPayload {
+  order_id: string;
+  order_number: string;
+  item_ids: string[];
+  station: TKitchenStation;
+  timestamp: string;
+}
+
+/**
+ * KDS Item Ready payload (Story 4.5)
+ * Sent when KDS marks items as "ready"
+ */
+export interface IKdsItemReadyPayload {
+  order_id: string;
+  order_number: string;
+  item_ids: string[];
+  station: TKitchenStation;
+  prepared_at: string;
+  timestamp: string;
+}
+
+/**
+ * Order Complete payload (Story 4.6)
+ * Sent when all items in an order are ready and the order is auto-removed from KDS
+ */
+export interface IOrderCompletePayload {
+  order_id: string;
+  order_number: string;
+  station: TKitchenStation;
+  completed_at: string;
+  timestamp: string;
 }
 
 // ============================================

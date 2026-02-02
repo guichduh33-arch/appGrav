@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Clock, CheckCircle, ChefHat, AlertTriangle, Pause, Play, Smartphone, Wifi } from 'lucide-react'
+import { useOrderAutoRemove } from '@/hooks/kds/useOrderAutoRemove'
+import { KDSCountdownBar } from './KDSCountdownBar'
 import './KDSOrderCard.css'
 
 interface OrderItem {
@@ -27,6 +29,7 @@ interface KDSOrderCardProps {
     onMarkReady: (orderId: string, itemIds: string[]) => void
     onMarkServed: (orderId: string, itemIds: string[]) => void
     onToggleHold?: (itemId: string, currentHoldStatus: boolean) => void // Story 8.4
+    onOrderComplete?: (orderId: string) => void // Story 4.6
 }
 
 const ORDER_TYPE_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
@@ -49,7 +52,8 @@ export default function KDSOrderCard({
     onStartPreparing,
     onMarkReady,
     onMarkServed,
-    onToggleHold
+    onToggleHold,
+    onOrderComplete,
 }: KDSOrderCardProps) {
     const [elapsedTime, setElapsedTime] = useState(0)
 
@@ -99,6 +103,32 @@ export default function KDSOrderCard({
     const urgency = getUrgencyLevel()
     const orderConfig = ORDER_TYPE_CONFIG[orderType] || ORDER_TYPE_CONFIG.dine_in
 
+    // Story 4.6: Auto-remove when all items are ready (except waiter station)
+    const isWaiterStation = station === 'waiter'
+    const allItemsReady = stationItems.every(
+        item => item.item_status === 'ready' || item.item_status === 'served'
+    )
+
+    // Stable callback for auto-remove completion
+    const handleAutoRemoveComplete = useCallback(() => {
+        if (onOrderComplete) {
+            onOrderComplete(orderId)
+        }
+    }, [onOrderComplete, orderId])
+
+    const {
+        isCountingDown,
+        timeRemaining,
+        cancelAutoRemove,
+        isExiting,
+    } = useOrderAutoRemove({
+        orderId,
+        allItemsReady: allItemsReady && overallStatus === 'ready',
+        isWaiterStation,
+        autoRemoveDelay: 5000, // 5 seconds
+        onComplete: handleAutoRemoveComplete,
+    })
+
     const handleStartPreparing = () => {
         const itemIds = stationItems.filter(i => i.item_status === 'new').map(i => i.id)
         if (itemIds.length > 0) {
@@ -122,8 +152,17 @@ export default function KDSOrderCard({
 
     if (stationItems.length === 0) return null
 
+    // Build dynamic class names for card state
+    const cardClassNames = [
+        'kds-order-card',
+        `kds-order-card--${overallStatus}`,
+        `kds-order-card--${urgency}`,
+        isCountingDown && 'kds-order-card--countdown',
+        isExiting && 'kds-order-card--exiting',
+    ].filter(Boolean).join(' ')
+
     return (
-        <div className={`kds-order-card kds-order-card--${overallStatus} kds-order-card--${urgency}`}>
+        <div className={cardClassNames}>
             {/* Header */}
             <div className="kds-order-card__header">
                 <div className="kds-order-card__order-info">
@@ -240,6 +279,15 @@ export default function KDSOrderCard({
                     </button>
                 )}
             </div>
+
+            {/* Story 4.6: Auto-remove countdown bar */}
+            {isCountingDown && (
+                <KDSCountdownBar
+                    timeRemaining={timeRemaining}
+                    totalTime={5}
+                    onCancel={cancelAutoRemove}
+                />
+            )}
         </div>
     )
 }

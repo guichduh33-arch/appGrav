@@ -74,10 +74,11 @@ development_status:
   epic-4: in-progress
   4-1-socket-io-server-on-pos-lan-hub: done
   4-2-kds-socket-io-client-connection: done
-  4-3-order-dispatch-to-kds-via-lan: review
-  4-4-kds-order-queue-display: ready-for-dev
-  4-5-kds-item-status-update: ready-for-dev
-  4-6-order-completion-auto-remove: backlog
+  4-3-order-dispatch-to-kds-via-lan: done
+  4-4-kds-order-queue-display: done
+  4-5-kds-item-status-update: done
+  4-6-order-completion-auto-remove: in-progress
+  4-7-pos-kds-status-listener-integration: in-progress
   epic-4-retrospective: optional
 
   # Epic 5: Stock & Approvisionnement — Inventaire, Transferts & Achats

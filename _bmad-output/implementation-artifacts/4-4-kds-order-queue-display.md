@@ -1,6 +1,6 @@
 # Story 4.4: KDS Order Queue Display
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -123,44 +123,44 @@ const getUrgencyLevel = () => {
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1: Créer le hook useKdsOrderQueue pour gestion état local** (AC: 1, 5)
-  - [ ] 1.1: Créer `src/hooks/kds/useKdsOrderQueue.ts`
-  - [ ] 1.2: Gérer l'état local des ordres (ajout, mise à jour, suppression)
-  - [ ] 1.3: Implémenter tri FIFO automatique à chaque modification
-  - [ ] 1.4: Exposer méthodes `addOrder`, `updateOrder`, `removeOrder`
-  - [ ] 1.5: Intégrer avec `useKdsOrderReceiver` (Story 4.3)
+- [x] **Task 1: Créer le hook useKdsOrderQueue pour gestion état local** (AC: 1, 5)
+  - [x] 1.1: Créer `src/hooks/kds/useKdsOrderQueue.ts`
+  - [x] 1.2: Gérer l'état local des ordres (ajout, mise à jour, suppression)
+  - [x] 1.3: Implémenter tri FIFO automatique à chaque modification
+  - [x] 1.4: Exposer méthodes `addOrder`, `updateOrder`, `removeOrder`
+  - [x] 1.5: Intégrer avec `useKdsOrderReceiver` (Story 4.3)
 
-- [ ] **Task 2: Implémenter la section urgente en haut** (AC: 4)
-  - [ ] 2.1: Modifier KDSMainPage pour séparer ordres urgents vs normaux
-  - [ ] 2.2: Créer section visuelle distincte pour ordres > 10 min
-  - [ ] 2.3: Ajouter un titre "URGENT" avec compteur
-  - [ ] 2.4: Style distinct pour la section urgente
+- [x] **Task 2: Implémenter la section urgente en haut** (AC: 4)
+  - [x] 2.1: Modifier KDSMainPage pour séparer ordres urgents vs normaux
+  - [x] 2.2: Créer section visuelle distincte pour ordres > 10 min
+  - [x] 2.3: Ajouter un titre "URGENT" avec compteur
+  - [x] 2.4: Style distinct pour la section urgente
 
-- [ ] **Task 3: Ajouter compteur urgent dans le header** (AC: 3, 4)
-  - [ ] 3.1: Calculer le nombre d'ordres > 10 min
-  - [ ] 3.2: Afficher badge "X Urgent" dans le header
-  - [ ] 3.3: Animer le badge si ordres urgents
+- [x] **Task 3: Ajouter compteur urgent dans le header** (AC: 3, 4)
+  - [x] 3.1: Calculer le nombre d'ordres > 10 min
+  - [x] 3.2: Afficher badge "X Urgent" dans le header
+  - [x] 3.3: Animer le badge si ordres urgents
 
-- [ ] **Task 4: Améliorer la transition des ordres entre sections** (AC: 4)
-  - [ ] 4.1: Animation smooth quand un ordre devient urgent
-  - [ ] 4.2: Notification sonore optionnelle quand ordre devient urgent
-  - [ ] 4.3: Persist section dans localStorage pour éviter layout shift
+- [x] **Task 4: Améliorer la transition des ordres entre sections** (AC: 4)
+  - [x] 4.1: Animation smooth quand un ordre devient urgent (CSS pulse animation)
+  - [x] 4.2: Notification sonore optionnelle quand ordre devient urgent (onOrderBecameUrgent callback)
+  - [ ] 4.3: Persist section dans localStorage pour éviter layout shift (deferred - not critical)
 
-- [ ] **Task 5: Intégration avec ordres LAN (Story 4.3)** (AC: 5)
-  - [ ] 5.1: S'assurer que `handleLanOrder` de Story 4.3 fonctionne avec useKdsOrderQueue
-  - [ ] 5.2: Tester l'insertion correcte dans la file triée
-  - [ ] 5.3: Vérifier que le timer démarre immédiatement
+- [x] **Task 5: Intégration avec ordres LAN (Story 4.3)** (AC: 5)
+  - [x] 5.1: S'assurer que `handleLanOrder` de Story 4.3 fonctionne avec useKdsOrderQueue
+  - [x] 5.2: Tester l'insertion correcte dans la file triée
+  - [x] 5.3: Vérifier que le timer démarre immédiatement
 
-- [ ] **Task 6: Tests unitaires** (AC: 1, 4, 5)
-  - [ ] 6.1: Créer `src/hooks/kds/__tests__/useKdsOrderQueue.test.ts`
-  - [ ] 6.2: Tester tri FIFO
-  - [ ] 6.3: Tester séparation urgent/normal
-  - [ ] 6.4: Tester ajout d'ordre LAN
+- [x] **Task 6: Tests unitaires** (AC: 1, 4, 5)
+  - [x] 6.1: Créer `src/hooks/kds/__tests__/useKdsOrderQueue.test.ts`
+  - [x] 6.2: Tester tri FIFO
+  - [x] 6.3: Tester séparation urgent/normal
+  - [x] 6.4: Tester ajout d'ordre LAN
 
-- [ ] **Task 7: Traductions** (AC: 4)
-  - [ ] 7.1: Ajouter clés `kds.urgent.*` dans fr.json
-  - [ ] 7.2: Ajouter clés dans en.json
-  - [ ] 7.3: Ajouter clés dans id.json
+- [x] **Task 7: Traductions** (AC: 4)
+  - [x] 7.1: Ajouter clés `kds.urgent.*` dans fr.json
+  - [x] 7.2: Ajouter clés dans en.json
+  - [x] 7.3: Ajouter clés dans id.json
 
 ## Dev Notes
 
@@ -595,10 +595,58 @@ Cette story est la **4ème** de l'Epic 4 (Cuisine & Dispatch - Kitchen Display S
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude Opus 4.5 (claude-opus-4-5-20251101)
 
 ### Debug Log References
 
+- All 13 tests pass in `src/hooks/kds/__tests__/useKdsOrderQueue.test.ts`
+
+### Code Review Fixes Applied
+
+1. **H1 Fixed**: Type mismatch - Removed local `Order`/`OrderItem` interfaces, now using `IKdsOrder`/`IKdsOrderItem` from hook
+2. **M1 Fixed**: Dependency cycle - Replaced `lastOrderCount` state with `lastOrderCountRef` ref to avoid infinite loop in `fetchOrders`
+3. **M2 Fixed**: Added test for dynamic urgent transition (`should recalculate urgency when orders are updated`)
+4. **M3 Fixed**: Removed all `console.log` statements from production code
+
 ### Completion Notes List
 
+1. Created `useKdsOrderQueue` hook with:
+   - FIFO sorting by `created_at` (oldest first)
+   - Automatic separation of urgent (>10 min) vs normal orders
+   - Duplicate detection when adding orders
+   - Methods: `addOrder`, `updateOrder`, `updateOrderItem`, `removeOrder`, `setOrders`, `clearOrders`
+   - `onOrderBecameUrgent` callback for sound notification
+
+2. Integrated hook into `KDSMainPage.tsx`:
+   - Replaced `useState<Order[]>` with `useKdsOrderQueue` hook
+   - Modified `handleLanOrder` to use `addOrder` from hook
+   - Added urgent section at top with visual distinction
+   - Added normal section below
+   - Added urgent count badge in header stats
+
+3. Added CSS styles for urgent sections in `KDSMainPage.css`:
+   - `.kds-section`, `.kds-section--urgent`, `.kds-section--normal`
+   - `.kds-section__title` with animation
+   - `.kds-header__stat--urgent` badge with pulse animation
+
+4. Added translations to all 3 locale files:
+   - `kds.urgent.title`, `kds.urgent.badge`
+   - `kds.waiting.title`
+   - `kds.empty.title`, `kds.empty.subtitle`
+   - `kds.loading`
+
+5. Task 4.3 (localStorage persistence) deferred as non-critical enhancement
+
 ### File List
+
+**Created:**
+- `src/hooks/kds/useKdsOrderQueue.ts` - Order queue state management hook
+- `src/hooks/kds/__tests__/useKdsOrderQueue.test.ts` - 13 test cases
+
+**Modified:**
+- `src/hooks/kds/index.ts` - Added exports for new hook and types
+- `src/pages/kds/KDSMainPage.tsx` - Integrated useKdsOrderQueue, added urgent/normal sections
+- `src/pages/kds/KDSMainPage.css` - Added urgent section styles
+- `src/locales/en.json` - Added KDS translations
+- `src/locales/fr.json` - Added KDS translations
+- `src/locales/id.json` - Added KDS translations

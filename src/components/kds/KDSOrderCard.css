@@ -387,3 +387,45 @@
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
 }
+
+/* Story 4.6: Auto-remove countdown and exit animations */
+
+/* Countdown state - green glow when countdown is active */
+.kds-order-card--countdown {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+    border-color: #10B981;
+}
+
+/* Exit animation - fade out and slide up */
+.kds-order-card--exiting {
+    animation: card-exit 300ms ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes card-exit {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+}
+
+/* Position relative for countdown bar positioning */
+.kds-order-card {
+    position: relative;
+}
+
+/* Reduced motion: instant removal instead of animation */
+@media (prefers-reduced-motion: reduce) {
+    .kds-order-card--exiting {
+        animation: none;
+        opacity: 0;
+    }
+
+    .kds-order-card--countdown {
+        box-shadow: 0 0 5px rgba(16, 185, 129, 0.3);
+    }
+}

@@ -1115,7 +1115,37 @@
             "mobile": "Mobile"
         },
         "orderReceived": "Pesanan baru diterima",
-        "ackSent": "Pengakuan terkirim"
+        "ackSent": "Pengakuan terkirim",
+        "loading": "Memuat pesanan...",
+        "urgent": {
+            "title": "MENDESAK",
+            "badge": "Mendesak"
+        },
+        "waiting": {
+            "title": "Menunggu"
+        },
+        "empty": {
+            "title": "Tidak Ada Pesanan",
+            "subtitle": "Menunggu pesanan baru..."
+        },
+        "status": {
+            "preparing": "Sedang disiapkan",
+            "ready": "Siap",
+            "served": "Disajikan",
+            "updateSuccess": "Status diperbarui",
+            "updateError": "Gagal memperbarui status",
+            "lanSent": "Notifikasi terkirim",
+            "lanFailed": "Notifikasi LAN gagal"
+        },
+        "posNotification": {
+            "orderReady": "Pesanan #{{orderNumber}} siap!"
+        },
+        "itemStatus": {
+            "new": "Baru",
+            "preparing": "Disiapkan",
+            "ready": "Siap",
+            "served": "Disajikan"
+        }
     },
     "orders": {
         "local": "Lokal",

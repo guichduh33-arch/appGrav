@@ -1,6 +1,6 @@
 # Story 4.3: Order Dispatch to KDS via LAN
 
-Status: review
+Status: done
 
 ## Story
 
@@ -589,3 +589,4 @@ Claude Opus 4.5 (claude-opus-4-5-20251101)
 | 2026-02-01 | Ajout badge LAN dans KDSOrderCard avec icône Wifi | src/components/kds/KDSOrderCard.* |
 | 2026-02-01 | Ajout traductions KDS source dans 3 langues | src/locales/*.json |
 | 2026-02-01 | Tests unitaires complets (16 tests passants) | src/hooks/kds/__tests__/*.ts |
+| 2026-02-02 | Code review passé - Tous ACs validés, 0 issues critiques | - |

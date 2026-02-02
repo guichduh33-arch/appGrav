@@ -1,6 +1,7 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import {
     Search, Download, ChevronLeft, ChevronRight, Check, Clock,
     RefreshCw, X, ShoppingBag, User, Hash, CreditCard, Banknote, QrCode,
@@ -8,6 +9,9 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { formatCurrency } from '../../utils/helpers';
+import { useKdsStatusListener } from '../../hooks/pos/useKdsStatusListener';
+import { OrderItemStatusBadge, type TItemStatus } from '../../components/orders/OrderItemStatusBadge';
+import type { TKitchenStation } from '../../types/offline';
 import './OrdersPage.css';
 
 interface OrderItem {
@@ -18,6 +22,8 @@ interface OrderItem {
     total_price: number;
     modifiers: Record<string, any> | null;
     modifiers_total: number;
+    item_status: TItemStatus;
+    dispatch_station?: string;
 }
 
 interface Order {
@@ -47,7 +53,7 @@ type PaymentStatus = 'all' | 'paid' | 'unpaid';
 const ITEMS_PER_PAGE = 20;
 
 const OrdersPage = () => {
-    useTranslation(); // Translation hook available for future use
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
 
     const [statusFilter, setStatusFilter] = useState<OrderStatus>('all');
@@ -96,7 +102,9 @@ const OrdersPage = () => {
                         unit_price,
                         total_price,
                         modifiers,
-                        modifiers_total
+                        modifiers_total,
+                        item_status,
+                        dispatch_station
                     )
                 `)
                 .order('created_at', { ascending: false });
@@ -116,10 +124,17 @@ const OrdersPage = () => {
                 return [];
             }
 
-            const rawOrders = data as unknown as Array<Omit<Order, 'items'> & { order_items?: OrderItem[] }>;
+            // Type for raw Supabase response
+            type RawOrderItem = Omit<OrderItem, 'item_status'> & { item_status?: string };
+            type RawOrder = Omit<Order, 'items'> & { order_items?: RawOrderItem[] };
+
+            const rawOrders = data as unknown as RawOrder[];
             return rawOrders.map((order) => ({
                 ...order,
-                items: order.order_items || []
+                items: (order.order_items || []).map(item => ({
+                    ...item,
+                    item_status: (item.item_status || 'new') as TItemStatus,
+                })),
             })) as Order[];
         },
         refetchInterval: 30000 // Refresh every 30 seconds
@@ -149,6 +164,76 @@ const OrdersPage = () => {
             supabase.removeChannel(channel);
         };
     }, [queryClient]);
+
+    // Story 4.7: Track recently updated items for animation
+    const recentlyUpdatedItemsRef = useRef<Set<string>>(new Set());
+
+    // Story 4.7: Update local item status when KDS sends updates via LAN
+    const handleItemPreparing = useCallback((orderId: string, itemIds: string[], _station: TKitchenStation) => {
+        // Mark items as recently updated for animation
+        itemIds.forEach(id => recentlyUpdatedItemsRef.current.add(id));
+        setTimeout(() => {
+            itemIds.forEach(id => recentlyUpdatedItemsRef.current.delete(id));
+        }, 2000);
+
+        // Invalidate query to refetch with updated statuses
+        queryClient.invalidateQueries({ queryKey: ['orders-backoffice'] });
+    }, [queryClient]);
+
+    const handleItemReady = useCallback((orderId: string, itemIds: string[], _station: TKitchenStation, _preparedAt: string) => {
+        // Mark items as recently updated for animation
+        itemIds.forEach(id => recentlyUpdatedItemsRef.current.add(id));
+        setTimeout(() => {
+            itemIds.forEach(id => recentlyUpdatedItemsRef.current.delete(id));
+        }, 2000);
+
+        // Invalidate query to refetch with updated statuses
+        queryClient.invalidateQueries({ queryKey: ['orders-backoffice'] });
+
+        // Check if all items in order are now ready - show notification
+        const order = orders.find(o => o.id === orderId);
+        if (order) {
+            const allItemsReady = order.items.every(item =>
+                itemIds.includes(item.id) || item.item_status === 'ready' || item.item_status === 'served'
+            );
+            if (allItemsReady) {
+                // Play notification sound
+                try {
+                    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+                    const audioContext = new AudioContextClass();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.frequency.value = 880;
+                    oscillator.type = 'sine';
+
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                } catch {
+                    // Audio API not available
+                }
+
+                // Show toast notification
+                toast.success(`🍽️ ${t('kds.posNotification.orderReady', { orderNumber: order.order_number })}`, {
+                    duration: 5000,
+                    position: 'top-right',
+                });
+            }
+        }
+    }, [orders, queryClient, t]);
+
+    // Story 4.7: KDS Status Listener for real-time item updates via LAN
+    useKdsStatusListener({
+        onItemPreparing: handleItemPreparing,
+        onItemReady: handleItemReady,
+        enabled: true,
+    });
 
     // Filter orders
     const filteredOrders = useMemo(() => {
@@ -672,6 +757,12 @@ const OrdersPage = () => {
                                                     </span>
                                                 )}
                                             </div>
+                                            {/* Story 4.7: Item status badge with animation */}
+                                            <OrderItemStatusBadge
+                                                status={item.item_status}
+                                                animate={recentlyUpdatedItemsRef.current.has(item.id)}
+                                                size="sm"
+                                            />
                                             <span className="order-detail__item-price">
                                                 {formatCurrency(item.total_price + (item.modifiers_total || 0))}
                                             </span>

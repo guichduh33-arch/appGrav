@@ -1104,7 +1104,44 @@
             "mobile": "Mobile"
         },
         "orderReceived": "New order received",
-        "ackSent": "Acknowledgment sent"
+        "ackSent": "Acknowledgment sent",
+        "loading": "Loading orders...",
+        "urgent": {
+            "title": "URGENT",
+            "badge": "Urgent"
+        },
+        "waiting": {
+            "title": "Waiting"
+        },
+        "empty": {
+            "title": "No Orders",
+            "subtitle": "Waiting for new orders..."
+        },
+        "status": {
+            "preparing": "Preparing",
+            "ready": "Ready",
+            "served": "Served",
+            "updateSuccess": "Status updated",
+            "updateError": "Failed to update status",
+            "lanSent": "Notification sent",
+            "lanFailed": "LAN notification failed"
+        },
+        "posNotification": {
+            "orderReady": "Order #{{orderNumber}} ready!"
+        },
+        "itemStatus": {
+            "new": "New",
+            "preparing": "Preparing",
+            "ready": "Ready",
+            "served": "Served"
+        },
+        "autoRemove": {
+            "countdown": "Auto-remove in {{seconds}}s",
+            "cancel": "Keep",
+            "cancelled": "Auto-remove cancelled",
+            "completed": "Order completed",
+            "notification": "Order #{{orderNumber}} ready"
+        }
     },
     "orders": {
         "local": "Local",

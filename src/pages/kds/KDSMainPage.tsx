@@ -1,37 +1,20 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import KDSOrderCard from '../../components/kds/KDSOrderCard'
-import { ArrowLeft, Volume2, VolumeX, RefreshCw, ChefHat, Coffee, Store, Users } from 'lucide-react'
+import { ArrowLeft, Volume2, VolumeX, RefreshCw, ChefHat, Coffee, Store, Users, AlertTriangle } from 'lucide-react'
 import { broadcastOrderStatus } from '../../services/display/displayBroadcast'
+import { markItemsPreparing, markItemsReady, completeOrder } from '../../services/kds'
 import { useLanClient } from '../../hooks/lan/useLanClient'
 import { useKdsOrderReceiver } from '../../hooks/kds/useKdsOrderReceiver'
+import { useKdsOrderQueue, type IKdsOrder, type IKdsOrderItem } from '../../hooks/kds/useKdsOrderQueue'
 import { LanConnectionIndicator } from '../../components/lan/LanConnectionIndicator'
 import type { IKdsNewOrderPayload, TKitchenStation } from '../../types/offline'
 import './KDSMainPage.css'
 
-interface OrderItem {
-    id: string
-    product_name: string
-    quantity: number
-    modifiers?: string
-    notes?: string
-    item_status: 'new' | 'preparing' | 'ready' | 'served'
-    dispatch_station: string
-    is_held: boolean // Story 8.4: Item Hold Flag
-}
-
-interface Order {
-    id: string
-    order_number: string
-    order_type: 'dine_in' | 'takeaway' | 'delivery' | 'b2b'
-    table_name?: string
-    customer_name?: string
-    items: OrderItem[]
-    created_at: string
-    status: string
-    source?: 'pos' | 'mobile' | 'web' | 'lan' // Story 8.1 + Story 4.3: Order source indicator
-}
+// Story 4.4: Use IKdsOrder and IKdsOrderItem from hook for type consistency
 
 const STATION_CONFIG: Record<string, { name: string; icon: React.ReactNode; color: string; dbStation: string }> = {
     hot_kitchen: {
@@ -60,6 +43,10 @@ const STATION_CONFIG: Record<string, { name: string; icon: React.ReactNode; colo
     }
 }
 
+// KDS Configuration Constants
+// TODO: Make configurable via settings (Story 4.x)
+const KDS_URGENT_THRESHOLD_SECONDS = 600 // 10 minutes - orders older than this are marked urgent
+
 // Notification sound
 const playNotificationSound = () => {
     try {
@@ -87,14 +74,33 @@ const playNotificationSound = () => {
 export default function KDSMainPage() {
     const { station } = useParams<{ station: string }>()
     const navigate = useNavigate()
-    const [orders, setOrders] = useState<Order[]>([])
+    const { t } = useTranslation()
     const [loading, setLoading] = useState(true)
     const [currentTime, setCurrentTime] = useState(new Date())
     const [soundEnabled, setSoundEnabled] = useState(true)
-    const [lastOrderCount, setLastOrderCount] = useState(0)
     const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null)
+    // Story 4.4 Fix: Use ref instead of state to avoid dependency cycle in fetchOrders
+    const lastOrderCountRef = useRef(0)
 
     const stationConfig = station ? STATION_CONFIG[station] : null
+
+    // Story 4.4: Use KDS Order Queue hook for state management
+    const {
+        orders,
+        urgentOrders,
+        normalOrders,
+        urgentCount,
+        addOrder,
+        setOrders,
+        updateOrderItem,
+    } = useKdsOrderQueue({
+        urgentThresholdSeconds: KDS_URGENT_THRESHOLD_SECONDS,
+        onOrderBecameUrgent: () => {
+            if (soundEnabled) {
+                playNotificationSound()
+            }
+        },
+    })
 
     // Story 4.2: LAN Client Connection
     const {
@@ -111,9 +117,10 @@ export default function KDSMainPage() {
     const existingOrderIds = useMemo(() => new Set(orders.map(o => o.id)), [orders])
 
     // Story 4.3: Callback to handle orders received via LAN
+    // Story 4.4: Uses addOrder from useKdsOrderQueue for FIFO insertion
     const handleLanOrder = useCallback((payload: IKdsNewOrderPayload, source: 'lan') => {
-        // Convert LAN payload to Order format
-        const newOrder: Order = {
+        // Convert LAN payload to IKdsOrder format
+        const newOrder: IKdsOrder = {
             id: payload.order_id,
             order_number: payload.order_number,
             order_type: payload.order_type,
@@ -133,20 +140,12 @@ export default function KDSMainPage() {
             source: source, // Mark as LAN source
         }
 
-        setOrders(prev => {
-            // Extra duplicate check (also done in hook, but belt & suspenders)
-            if (prev.some(o => o.id === newOrder.id)) {
-                return prev
-            }
-            // Insert in FIFO order (oldest first)
-            return [...prev, newOrder].sort(
-                (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-            )
-        })
+        // Story 4.4: Use hook's addOrder which handles FIFO sorting and duplicate detection
+        addOrder(newOrder)
 
-        // Update order count for sound tracking
-        setLastOrderCount(prev => prev + 1)
-    }, [])
+        // Update order count for sound tracking (using ref)
+        lastOrderCountRef.current += 1
+    }, [addOrder])
 
     // Story 4.3: KDS Order Receiver via LAN
     useKdsOrderReceiver({
@@ -221,7 +220,7 @@ export default function KDSMainPage() {
 
             // Transform data with cast through unknown
             const rawOrders = data as unknown as RawOrder[];
-            const transformedOrders: Order[] = (rawOrders || [])
+            const transformedOrders: IKdsOrder[] = (rawOrders || [])
                 .map((order) => {
                     // Map items with modifiers
                     let items = (order.order_items || []).map((item) => {
@@ -246,7 +245,7 @@ export default function KDSMainPage() {
                             quantity: item.quantity,
                             modifiers: modifiersText,
                             notes: item.notes,
-                            item_status: (item.item_status || 'new') as OrderItem['item_status'],
+                            item_status: (item.item_status || 'new') as IKdsOrderItem['item_status'],
                             dispatch_station: item.dispatch_station || 'none',
                             is_held: item.is_held || false // Story 8.4
                         }
@@ -262,22 +261,22 @@ export default function KDSMainPage() {
                     return {
                         id: order.id,
                         order_number: order.order_number,
-                        order_type: order.order_type as Order['order_type'],
+                        order_type: order.order_type as IKdsOrder['order_type'],
                         table_name: order.table_number ? `Table ${order.table_number}` : undefined,
                         customer_name: order.customer_name ?? undefined,
                         items,
                         created_at: order.created_at,
                         status: order.status,
-                        source: (order.source || 'pos') as Order['source'] // Story 8.1
+                        source: (order.source || 'pos') as IKdsOrder['source'] // Story 8.1
                     }
                 })
                 .filter((order) => order.items.length > 0)
 
-            // Check for new orders and play sound
-            if (soundEnabled && transformedOrders.length > lastOrderCount && lastOrderCount > 0) {
+            // Check for new orders and play sound (using ref to avoid dependency cycle)
+            if (soundEnabled && transformedOrders.length > lastOrderCountRef.current && lastOrderCountRef.current > 0) {
                 playNotificationSound()
             }
-            setLastOrderCount(transformedOrders.length)
+            lastOrderCountRef.current = transformedOrders.length
 
             setOrders(transformedOrders)
         } catch (error) {
@@ -285,7 +284,7 @@ export default function KDSMainPage() {
         } finally {
             setLoading(false)
         }
-    }, [station, stationConfig, soundEnabled, lastOrderCount])
+    }, [station, stationConfig, soundEnabled, setOrders])
 
     // Initial fetch and set up polling
     useEffect(() => {
@@ -322,59 +321,77 @@ export default function KDSMainPage() {
     // which uses the payload directly instead of refetching from Supabase.
     // Supabase Realtime subscription above serves as fallback when LAN is unavailable.
 
-    // Handle item status updates
+    // Handle item status updates - Story 4.5: Optimistic updates + LAN notification
     const handleStartPreparing = async (orderId: string, itemIds: string[]) => {
-        try {
-            await supabase
-                .from('order_items')
-                .update({ item_status: 'preparing' })
-                .in('id', itemIds)
+        const order = orders.find(o => o.id === orderId)
+        if (!order) return
 
-            // Check if all items in order are preparing
-            const order = orders.find(o => o.id === orderId)
-            if (order) {
-                const allPreparing = order.items.every(item =>
-                    itemIds.includes(item.id) || item.item_status !== 'new'
-                )
-                if (allPreparing) {
-                    await supabase
-                        .from('orders')
-                        .update({ status: 'preparing' })
-                        .eq('id', orderId)
-                }
-            }
+        // Store previous statuses for potential rollback
+        const previousStatuses = new Map(
+            order.items.filter(item => itemIds.includes(item.id)).map(item => [item.id, item.item_status])
+        )
 
-            fetchOrders()
-        } catch (error) {
-            console.error('Error updating item status:', error)
+        // Optimistic update - instant UI feedback using hook's updateOrderItem
+        itemIds.forEach(itemId => {
+            updateOrderItem(orderId, itemId, { item_status: 'preparing' })
+        })
+
+        // Send to Supabase + LAN via service
+        const result = await markItemsPreparing(
+            orderId,
+            order.order_number,
+            itemIds,
+            (stationConfig?.dbStation || 'kitchen') as TKitchenStation
+        )
+
+        if (!result.success) {
+            console.error('Error updating item status:', result.error)
+            // Surgical rollback - restore only affected items' previous statuses
+            previousStatuses.forEach((status, itemId) => {
+                updateOrderItem(orderId, itemId, { item_status: status })
+            })
+            toast.error(result.error || t('kds.status.updateError'))
         }
     }
 
+    // Story 4.5: Mark items ready with optimistic update + LAN notification
     const handleMarkReady = async (orderId: string, itemIds: string[]) => {
-        try {
-            await supabase
-                .from('order_items')
-                .update({
-                    item_status: 'ready',
-                    prepared_at: new Date().toISOString()
-                })
-                .in('id', itemIds)
+        const order = orders.find(o => o.id === orderId)
+        if (!order) return
 
-            // Story 8.7: Broadcast order ready to Customer Display
-            const order = orders.find(o => o.id === orderId)
-            if (order) {
-                // Check if all items are now ready
-                const allReady = order.items.every(item =>
-                    itemIds.includes(item.id) || item.item_status === 'ready' || item.item_status === 'served'
-                )
-                if (allReady) {
-                    broadcastOrderStatus(orderId, order.order_number, 'ready')
-                }
+        // Store previous statuses for potential rollback
+        const previousStatuses = new Map(
+            order.items.filter(item => itemIds.includes(item.id)).map(item => [item.id, item.item_status])
+        )
+
+        // Optimistic update - instant UI feedback using hook's updateOrderItem
+        itemIds.forEach(itemId => {
+            updateOrderItem(orderId, itemId, { item_status: 'ready' })
+        })
+
+        // Send to Supabase + LAN via service
+        const result = await markItemsReady(
+            orderId,
+            order.order_number,
+            itemIds,
+            (stationConfig?.dbStation || 'kitchen') as TKitchenStation
+        )
+
+        if (!result.success) {
+            console.error('Error updating item status:', result.error)
+            // Surgical rollback - restore only affected items' previous statuses
+            previousStatuses.forEach((status, itemId) => {
+                updateOrderItem(orderId, itemId, { item_status: status })
+            })
+            toast.error(result.error || t('kds.status.updateError'))
+        } else {
+            // Story 8.7: Broadcast order ready to Customer Display if all items ready
+            const allReady = order.items.every(item =>
+                itemIds.includes(item.id) || item.item_status === 'ready' || item.item_status === 'served'
+            )
+            if (allReady) {
+                broadcastOrderStatus(orderId, order.order_number, 'ready')
             }
-
-            fetchOrders()
-        } catch (error) {
-            console.error('Error updating item status:', error)
         }
     }
 
@@ -422,6 +439,31 @@ export default function KDSMainPage() {
         }
     }
 
+    // Story 4.6: Handle order completion (auto-remove)
+    const handleOrderComplete = useCallback(async (orderId: string) => {
+        const order = orders.find(o => o.id === orderId)
+        if (!order) return
+
+        // Update Supabase and send LAN notification via service
+        const result = await completeOrder(
+            orderId,
+            order.order_number,
+            (stationConfig?.dbStation as TKitchenStation) || 'kitchen'
+        )
+
+        if (result.success) {
+            // Remove order from local state (already animated out)
+            setOrders(prev => prev.filter(o => o.id !== orderId))
+
+            // Broadcast order ready to Customer Display
+            broadcastOrderStatus(orderId, order.order_number, 'ready')
+        } else {
+            console.error('Failed to complete order:', result.error)
+            // Refetch in case of error to ensure state consistency
+            fetchOrders()
+        }
+    }, [orders, stationConfig, fetchOrders, setOrders])
+
     if (!station || !stationConfig) {
         navigate('/kds')
         return null
@@ -458,6 +500,13 @@ export default function KDSMainPage() {
 
                 <div className="kds-header__right">
                     <div className="kds-header__stats">
+                        {/* Story 4.4: Urgent orders badge */}
+                        {urgentCount > 0 && (
+                            <span className="kds-header__stat kds-header__stat--urgent">
+                                <AlertTriangle size={14} />
+                                {urgentCount} {t('kds.urgent.title', 'Urgent')}
+                            </span>
+                        )}
                         <span className="kds-header__stat kds-header__stat--new">{newOrders.length} New</span>
                         <span className="kds-header__stat kds-header__stat--preparing">{preparingOrders.length} Prep</span>
                         <span className="kds-header__stat kds-header__stat--ready">{readyOrders.length} Ready</span>
@@ -488,35 +537,77 @@ export default function KDSMainPage() {
                 {loading ? (
                     <div className="kds-loading">
                         <RefreshCw className="kds-loading__spinner" size={48} />
-                        <p>Loading orders...</p>
+                        <p>{t('kds.loading', 'Loading orders...')}</p>
                     </div>
                 ) : orders.length === 0 ? (
                     <div className="kds-empty">
                         <div className="kds-empty__icon">{stationConfig.icon}</div>
-                        <h2>No Orders</h2>
-                        <p>Waiting for new orders...</p>
+                        <h2>{t('kds.empty.title', 'No Orders')}</h2>
+                        <p>{t('kds.empty.subtitle', 'Waiting for new orders...')}</p>
                     </div>
                 ) : (
-                    <div className="kds-orders-grid">
-                        {orders.map((order) => (
-                            <KDSOrderCard
-                                key={order.id}
-                                orderId={order.id}
-                                orderNumber={order.order_number}
-                                orderType={order.order_type}
-                                tableName={order.table_name}
-                                customerName={order.customer_name}
-                                items={order.items}
-                                createdAt={order.created_at}
-                                station={station}
-                                source={order.source}
-                                onStartPreparing={handleStartPreparing}
-                                onMarkReady={handleMarkReady}
-                                onMarkServed={handleMarkServed}
-                                onToggleHold={handleToggleHold}
-                            />
-                        ))}
-                    </div>
+                    <>
+                        {/* Story 4.4: Urgent Orders Section */}
+                        {urgentOrders.length > 0 && (
+                            <div className="kds-section kds-section--urgent">
+                                <h2 className="kds-section__title">
+                                    <AlertTriangle size={20} />
+                                    {t('kds.urgent.title', 'URGENT')} ({urgentOrders.length})
+                                </h2>
+                                <div className="kds-orders-grid">
+                                    {urgentOrders.map((order) => (
+                                        <KDSOrderCard
+                                            key={order.id}
+                                            orderId={order.id}
+                                            orderNumber={order.order_number}
+                                            orderType={order.order_type}
+                                            tableName={order.table_name}
+                                            customerName={order.customer_name}
+                                            items={order.items}
+                                            createdAt={order.created_at}
+                                            station={station}
+                                            source={order.source}
+                                            onStartPreparing={handleStartPreparing}
+                                            onMarkReady={handleMarkReady}
+                                            onMarkServed={handleMarkServed}
+                                            onToggleHold={handleToggleHold}
+                                            onOrderComplete={handleOrderComplete}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Story 4.4: Normal Orders Section */}
+                        <div className="kds-section kds-section--normal">
+                            {urgentOrders.length > 0 && (
+                                <h2 className="kds-section__title">
+                                    {t('kds.waiting.title', 'Waiting')} ({normalOrders.length})
+                                </h2>
+                            )}
+                            <div className="kds-orders-grid">
+                                {normalOrders.map((order) => (
+                                    <KDSOrderCard
+                                        key={order.id}
+                                        orderId={order.id}
+                                        orderNumber={order.order_number}
+                                        orderType={order.order_type}
+                                        tableName={order.table_name}
+                                        customerName={order.customer_name}
+                                        items={order.items}
+                                        createdAt={order.created_at}
+                                        station={station}
+                                        source={order.source}
+                                        onStartPreparing={handleStartPreparing}
+                                        onMarkReady={handleMarkReady}
+                                        onMarkServed={handleMarkServed}
+                                        onToggleHold={handleToggleHold}
+                                        onOrderComplete={handleOrderComplete}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </>
                 )}
             </main>
         </div>

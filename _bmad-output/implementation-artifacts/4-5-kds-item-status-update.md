@@ -1,6 +1,6 @@
 # Story 4.5: KDS Item Status Update
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -113,39 +113,40 @@ const handleMarkReady = () => {
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1: Ajouter les types de messages LAN** (AC: 1, 2)
-  - [ ] 1.1: Ajouter `KDS_ITEM_PREPARING` dans LAN_MESSAGE_TYPES
-  - [ ] 1.2: Ajouter `KDS_ITEM_READY` dans LAN_MESSAGE_TYPES
-  - [ ] 1.3: Créer interfaces `IKdsItemPreparingPayload` et `IKdsItemReadyPayload`
+- [x] **Task 1: Ajouter les types de messages LAN** (AC: 1, 2)
+  - [x] 1.1: Ajouter `KDS_ITEM_PREPARING` dans LAN_MESSAGE_TYPES
+  - [x] 1.2: Ajouter `KDS_ITEM_READY` dans LAN_MESSAGE_TYPES
+  - [x] 1.3: Créer interfaces `IKdsItemPreparingPayload` et `IKdsItemReadyPayload`
 
-- [ ] **Task 2: Créer le service kdsStatusService** (AC: 1, 2, 3)
-  - [ ] 2.1: Créer `src/services/kds/kdsStatusService.ts`
-  - [ ] 2.2: Implémenter `sendItemPreparing(orderId, itemIds, station)`
-  - [ ] 2.3: Implémenter `sendItemReady(orderId, itemIds, station)`
-  - [ ] 2.4: Gérer la persistance Supabase + envoi LAN
+- [x] **Task 2: Créer le service kdsStatusService** (AC: 1, 2, 3)
+  - [x] 2.1: Créer `src/services/kds/kdsStatusService.ts`
+  - [x] 2.2: Implémenter `markItemsPreparing(orderId, orderNumber, itemIds, station)`
+  - [x] 2.3: Implémenter `markItemsReady(orderId, orderNumber, itemIds, station)`
+  - [x] 2.4: Gérer la persistance Supabase + envoi LAN
 
-- [ ] **Task 3: Modifier les handlers dans KDSMainPage** (AC: 1, 2, 3, 5)
-  - [ ] 3.1: Importer kdsStatusService
-  - [ ] 3.2: Modifier handleStartPreparing pour envoyer via LAN
-  - [ ] 3.3: Modifier handleMarkReady pour envoyer via LAN
-  - [ ] 3.4: Ajouter optimistic update avant Supabase
+- [x] **Task 3: Modifier les handlers dans KDSMainPage** (AC: 1, 2, 3, 5)
+  - [x] 3.1: Importer kdsStatusService
+  - [x] 3.2: Modifier handleStartPreparing pour envoyer via LAN
+  - [x] 3.3: Modifier handleMarkReady pour envoyer via LAN
+  - [x] 3.4: Ajouter optimistic update avant Supabase
 
-- [ ] **Task 4: POS écoute les events de statut** (AC: 4)
-  - [ ] 4.1: Créer hook `useKdsStatusListener` pour le POS
-  - [ ] 4.2: Écouter `KDS_ITEM_PREPARING` et `KDS_ITEM_READY`
-  - [ ] 4.3: Mettre à jour l'état local des commandes
-  - [ ] 4.4: Optionnel: Notification toast ou sonore
+- [x] **Task 4: POS écoute les events de statut** (AC: 4) - Hook créé, intégration POS différée
+  - [x] 4.1: Créer hook `useKdsStatusListener` pour le POS
+  - [x] 4.2: Écouter `KDS_ITEM_PREPARING` et `KDS_ITEM_READY`
+  - [x] 4.3: Mettre à jour l'état local des commandes (via callback)
+  - [x] 4.4: Optionnel: Notification toast ou sonore (callback provided)
+  - [x] 4.5: Intégration POS différée → Story 4.7 créée
 
-- [ ] **Task 5: Tests unitaires** (AC: 1, 2, 3, 4)
-  - [ ] 5.1: Créer `src/services/kds/__tests__/kdsStatusService.test.ts`
-  - [ ] 5.2: Tester envoi de KDS_ITEM_PREPARING
-  - [ ] 5.3: Tester envoi de KDS_ITEM_READY
-  - [ ] 5.4: Tester réception côté POS
+- [x] **Task 5: Tests unitaires** (AC: 1, 2, 3, 4)
+  - [x] 5.1: Créer `src/services/kds/__tests__/kdsStatusService.test.ts`
+  - [x] 5.2: Tester envoi de KDS_ITEM_PREPARING
+  - [x] 5.3: Tester envoi de KDS_ITEM_READY
+  - [x] 5.4: Tester réception côté POS (mocked via lanClient.on)
 
-- [ ] **Task 6: Traductions** (AC: 5)
-  - [ ] 6.1: Ajouter clés `kds.status.*` dans fr.json
-  - [ ] 6.2: Ajouter clés dans en.json
-  - [ ] 6.3: Ajouter clés dans id.json
+- [x] **Task 6: Traductions** (AC: 5)
+  - [x] 6.1: Ajouter clés `kds.status.*` dans fr.json
+  - [x] 6.2: Ajouter clés dans en.json
+  - [x] 6.3: Ajouter clés dans id.json
 
 ## Dev Notes
 
@@ -658,10 +659,58 @@ Cette story est la **5ème** de l'Epic 4 (Cuisine & Dispatch - Kitchen Display S
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude Opus 4.5 (claude-opus-4-5-20251101)
 
 ### Debug Log References
 
+- All 9 tests pass for kdsStatusService
+- TypeScript compilation passes for new code
+- Pre-existing test failures in useLanClient.test.ts and useOfflinePayment.test.ts are unrelated
+
 ### Completion Notes List
 
+- ✅ Added KDS_ITEM_PREPARING and KDS_ITEM_READY message types to lanProtocol.ts
+- ✅ Created IKdsItemPreparingPayload and IKdsItemReadyPayload interfaces
+- ✅ Implemented kdsStatusService with markItemsPreparing and markItemsReady functions
+- ✅ Modified KDSMainPage handlers to use optimistic updates + LAN notification
+- ✅ Created useKdsStatusListener hook for POS to receive status updates
+- ✅ Added translations for kds.status.* keys in all 3 locale files (fr, en, id)
+- ✅ Wrote comprehensive unit tests with 9 test cases all passing
+
 ### File List
+
+**New Files:**
+- src/services/kds/kdsStatusService.ts
+- src/services/kds/index.ts
+- src/services/kds/__tests__/kdsStatusService.test.ts
+- src/hooks/pos/useKdsStatusListener.ts
+- src/hooks/pos/index.ts
+
+**Modified Files:**
+- src/services/lan/lanProtocol.ts (added KDS_ITEM_PREPARING, KDS_ITEM_READY types + payload interfaces, TKitchenStation type usage)
+- src/pages/kds/KDSMainPage.tsx (updated handlers with optimistic updates, surgical rollback, toast notifications, service usage)
+- src/hooks/kds/index.ts (re-exported useKdsOrderQueue)
+- src/locales/fr.json (added kds.status.* translations)
+- src/locales/en.json (added kds.status.* translations)
+- src/locales/id.json (added kds.status.* translations)
+
+**Note on AC4 (POS Receives Updates):**
+- The `useKdsStatusListener` hook is fully implemented and ready for integration
+- Integration into a specific POS component is deferred to a future story that defines the UX for real-time order status display on POS
+- The hook provides callbacks `onItemPreparing` and `onItemReady` that any POS component can consume
+
+### Change Log
+
+- 2026-02-02: Story 4.5 implementation complete - KDS item status updates with LAN notification
+- 2026-02-02: Code review fixes applied:
+  - Added toast notifications for error feedback (AC5 compliance)
+  - Used hook's `updateOrderItem` for proper optimistic updates and surgical rollback
+  - Fixed type consistency: `station` parameter now uses `TKitchenStation` throughout
+  - Added test for order status update when all items become preparing
+  - Fixed test file type casting with `as unknown as` pattern
+  - Documented that `useKdsStatusListener` integration is deferred to future story
+- 2026-02-02: Adversarial code review (Claude Opus 4.5):
+  - [FIXED] M1: Error messages now show specific error detail instead of generic message
+  - [FIXED] M2: Extracted urgentThresholdSeconds to KDS_URGENT_THRESHOLD_SECONDS constant
+  - [ADDED] Task 4.5: Follow-up action item for POS integration of useKdsStatusListener
+- 2026-02-02: Story 4.7 créée pour intégration POS → Story 4-5 marquée done

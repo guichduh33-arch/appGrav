@@ -96,6 +96,24 @@
     color: #34D399;
 }
 
+/* Story 4.4: Urgent orders badge */
+.kds-header__stat--urgent {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #EF4444;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    animation: pulse-urgent 1s infinite;
+}
+
+@keyframes pulse-urgent {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(1.02); }
+}
+
 .kds-header__lan-indicator {
     margin-right: 8px;
     padding: 8px;
@@ -200,6 +218,40 @@
     font-size: 1.1rem;
     color: #888;
     margin: 0;
+}
+
+/* Story 4.4: Section layout for urgent/normal separation */
+.kds-section {
+    margin-bottom: 24px;
+}
+
+.kds-section__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: #2a2a2a;
+}
+
+.kds-section--urgent {
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+}
+
+.kds-section--urgent .kds-section__title {
+    background: #EF4444;
+    color: white;
+    animation: pulse-urgent 1s infinite;
+}
+
+.kds-section--normal .kds-section__title {
+    color: #888;
 }
 
 /* Orders Grid */

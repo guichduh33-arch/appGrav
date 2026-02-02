@@ -630,6 +630,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: var(--space-sm);
     padding: var(--space-sm) 0;
     border-bottom: 1px dashed var(--color-border);
 }
@@ -642,6 +643,8 @@
     display: flex;
     align-items: center;
     gap: var(--space-sm);
+    flex: 1;
+    min-width: 0;
 }
 
 .order-detail__item-qty {
