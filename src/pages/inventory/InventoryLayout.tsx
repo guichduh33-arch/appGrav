@@ -6,7 +6,8 @@ import {
     Trash2,
     Factory,
     ClipboardCheck,
-    ArrowLeftRight
+    ArrowLeftRight,
+    ArrowRightLeft
 } from 'lucide-react'
 import './InventoryLayout.css'
 
@@ -29,6 +30,12 @@ const TABS: Tab[] = [
         labelKey: 'inventory.tabs.incoming',
         icon: <TruckIcon size={18} />,
         path: '/inventory/incoming'
+    },
+    {
+        id: 'transfers',
+        labelKey: 'inventory.tabs.transfers',
+        icon: <ArrowRightLeft size={18} />,
+        path: '/inventory/transfers'
     },
     {
         id: 'wasted',
@@ -64,10 +71,11 @@ export default function InventoryLayout() {
     const getActiveTab = (): string => {
         const path = location.pathname
         if (path.startsWith('/inventory/incoming')) return 'incoming'
+        if (path.startsWith('/inventory/transfers')) return 'transfers'
         if (path.startsWith('/inventory/wasted')) return 'wasted'
         if (path.startsWith('/inventory/production')) return 'production'
         if (path.startsWith('/inventory/opname') || path.startsWith('/inventory/stock-opname')) return 'opname'
-        if (path.startsWith('/inventory/movements') || path.startsWith('/inventory/transfers')) return 'movements'
+        if (path.startsWith('/inventory/movements')) return 'movements'
         return 'stock'
     }
 

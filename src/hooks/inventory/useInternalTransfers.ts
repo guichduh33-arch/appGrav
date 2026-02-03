@@ -22,8 +22,10 @@ export interface ITransferFilters {
 }
 
 export interface ICreateTransferParams {
-  fromLocationId: string
-  toLocationId: string
+  fromLocationId?: string
+  toLocationId?: string
+  fromSectionId?: string
+  toSectionId?: string
   items: Array<{ productId: string; quantity: number }>
   responsiblePerson: string
   transferDate?: string
@@ -57,7 +59,9 @@ export function useInternalTransfers(filters?: ITransferFilters) {
         .select(`
           *,
           from_location:stock_locations!internal_transfers_from_location_id_fkey(id, name, code, location_type),
-          to_location:stock_locations!internal_transfers_to_location_id_fkey(id, name, code, location_type)
+          to_location:stock_locations!internal_transfers_to_location_id_fkey(id, name, code, location_type),
+          from_section:sections!internal_transfers_from_section_id_fkey(id, name, code, section_type, icon),
+          to_section:sections!internal_transfers_to_section_id_fkey(id, name, code, section_type, icon)
         `)
         .order('created_at', { ascending: false })
 
@@ -107,13 +111,15 @@ export function useTransfer(transferId: string | null) {
     queryFn: async () => {
       if (!transferId) return null
 
-      // Fetch transfer with locations
+      // Fetch transfer with locations and sections
       const { data: transfer, error: transferError } = await supabase
         .from('internal_transfers')
         .select(`
           *,
           from_location:stock_locations!internal_transfers_from_location_id_fkey(id, name, code, location_type),
-          to_location:stock_locations!internal_transfers_to_location_id_fkey(id, name, code, location_type)
+          to_location:stock_locations!internal_transfers_to_location_id_fkey(id, name, code, location_type),
+          from_section:sections!internal_transfers_from_section_id_fkey(id, name, code, section_type, icon),
+          to_section:sections!internal_transfers_to_section_id_fkey(id, name, code, section_type, icon)
         `)
         .eq('id', transferId)
         .single()
@@ -164,18 +170,35 @@ export function useCreateTransfer() {
     mutationFn: async (params: ICreateTransferParams) => {
       const transferNumber = generateTransferNumber()
 
+      // Build insert object - support both location-based and section-based transfers
+      const insertData: Record<string, unknown> = {
+        transfer_number: transferNumber,
+        responsible_person: params.responsiblePerson,
+        transfer_date: params.transferDate || new Date().toISOString().slice(0, 10),
+        status: params.sendDirectly ? 'pending' : 'draft',
+        notes: params.notes || null,
+      }
+
+      // Add location IDs if provided (legacy support)
+      if (params.fromLocationId) {
+        insertData.from_location_id = params.fromLocationId
+      }
+      if (params.toLocationId) {
+        insertData.to_location_id = params.toLocationId
+      }
+
+      // Add section IDs if provided (new section-based model)
+      if (params.fromSectionId) {
+        insertData.from_section_id = params.fromSectionId
+      }
+      if (params.toSectionId) {
+        insertData.to_section_id = params.toSectionId
+      }
+
       // Create transfer header
       const { data: transfer, error: transferError } = await supabase
         .from('internal_transfers')
-        .insert({
-          transfer_number: transferNumber,
-          from_location_id: params.fromLocationId,
-          to_location_id: params.toLocationId,
-          responsible_person: params.responsiblePerson,
-          transfer_date: params.transferDate || new Date().toISOString().slice(0, 10),
-          status: params.sendDirectly ? 'pending' : 'draft',
-          notes: params.notes || null,
-        })
+        .insert(insertData)
         .select()
         .single()
 

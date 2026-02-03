@@ -73,8 +73,9 @@ export function useProduction() {
             const { data, error } = await supabase
                 .from('sections')
                 .select('*')
-                .eq('is_production_point', true)
-                .order('name')
+                .eq('is_active', true)
+                .eq('section_type', 'production')
+                .order('sort_order')
 
             if (error) throw error
             setSections(data || [])

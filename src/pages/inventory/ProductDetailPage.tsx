@@ -77,7 +77,7 @@ export default function ProductDetailPage() {
                         is_active: true,
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString(),
-                        deduct_ingredients_on_sale: null,
+                        deduct_ingredients: null,
                         default_producing_section_id: null,
                         preferred_purchase_unit_id: null,
                         preferred_recipe_unit_id: null,
@@ -103,7 +103,7 @@ export default function ProductDetailPage() {
                         is_active: true,
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString(),
-                        deduct_ingredients_on_sale: null,
+                        deduct_ingredients: null,
                         default_producing_section_id: null,
                         preferred_purchase_unit_id: null,
                         preferred_recipe_unit_id: null,
@@ -121,8 +121,12 @@ export default function ProductDetailPage() {
             const { data: cats } = await supabase.from('categories').select('*').order('name')
             if (cats) setCategories(cats)
 
-            // 3. Fetch Sections
-            const { data: sects } = await supabase.from('sections').select('*').order('name')
+            // 3. Fetch Sections (only active ones)
+            const { data: sects } = await supabase
+                .from('sections')
+                .select('*')
+                .eq('is_active', true)
+                .order('sort_order')
             if (sects) setSections(sects)
 
             // 3b. Fetch Product Sections (many-to-many)
@@ -193,7 +197,7 @@ export default function ProductDetailPage() {
                     description: product.description,
                     pos_visible: product.pos_visible,
                     is_active: product.is_active,
-                    deduct_ingredients_on_sale: product.deduct_ingredients_on_sale,
+                    deduct_ingredients: product.deduct_ingredients,
                     unit: product.unit
                 })
                 .eq('id', product.id)

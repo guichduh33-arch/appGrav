@@ -243,6 +243,7 @@
         "tabs": {
             "stock": "Stok",
             "incoming": "Masuk",
+            "transfers": "Transfer",
             "wasted": "Pemborosan",
             "production": "Produksi",
             "opname": "Opname",

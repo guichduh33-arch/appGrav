@@ -36,7 +36,7 @@ interface ProductForm {
     stock_quantity: number
     pos_visible: boolean
     is_active: boolean
-    deduct_ingredients_on_sale: boolean
+    deduct_ingredients: boolean
     image_url: string
 }
 
@@ -74,7 +74,7 @@ export default function ProductFormPage() {
         stock_quantity: 0,
         pos_visible: true,
         is_active: true,
-        deduct_ingredients_on_sale: false,
+        deduct_ingredients: false,
         image_url: ''
     })
 
@@ -119,7 +119,7 @@ export default function ProductFormPage() {
                         stock_quantity: product.current_stock || 0,
                         pos_visible: product.pos_visible !== false,
                         is_active: product.is_active !== false,
-                        deduct_ingredients_on_sale: product.deduct_ingredients_on_sale === true,
+                        deduct_ingredients: product.deduct_ingredients === true,
                         image_url: product.image_url || ''
                     })
                 }
@@ -201,7 +201,7 @@ export default function ProductFormPage() {
                 stock_quantity: form.stock_quantity,
                 pos_visible: form.pos_visible,
                 is_active: form.is_active,
-                deduct_ingredients_on_sale: form.deduct_ingredients_on_sale,
+                deduct_ingredients: form.deduct_ingredients,
                 image_url: form.image_url || null,
                 updated_at: new Date().toISOString()
             }
@@ -496,8 +496,8 @@ export default function ProductFormPage() {
                         <label className="checkbox-option">
                             <input
                                 type="checkbox"
-                                checked={form.deduct_ingredients_on_sale}
-                                onChange={e => setForm({ ...form, deduct_ingredients_on_sale: e.target.checked })}
+                                checked={form.deduct_ingredients}
+                                onChange={e => setForm({ ...form, deduct_ingredients: e.target.checked })}
                             />
                             <span>Déduire les ingrédients à la vente</span>
                             <small style={{ display: 'block', marginTop: '4px', color: '#6b7280' }}>

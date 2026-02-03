@@ -44,6 +44,10 @@ export type InternalTransfer = Tables<'internal_transfers'>
 export type TransferItem = Tables<'transfer_items'>
 export type StockLocation = Tables<'stock_locations'>
 
+// Section Stock (tracks inventory per section)
+// Note: SectionStock will be available after running migration and regenerating types
+// For now, we define a manual interface
+
 // Product modifiers
 export type ProductModifier = Tables<'product_modifiers'>
 
@@ -126,6 +130,12 @@ export type TTransferStatus = 'draft' | 'pending' | 'in_transit' | 'received' | 
 // Location type for stock_locations
 export type TLocationType = 'main_warehouse' | 'section' | 'kitchen' | 'storage'
 
+// Section type (warehouse, production, sales)
+export type TSectionType = 'warehouse' | 'production' | 'sales'
+
+// Stock status for section inventory
+export type TStockStatus = 'in_stock' | 'low_stock' | 'out_of_stock'
+
 // ============================================================================
 // EXTENDED/JOINED TYPES
 // ============================================================================
@@ -147,6 +157,16 @@ export interface OrderWithItems extends Order {
 export interface ITransferWithLocations extends InternalTransfer {
     from_location?: StockLocation | null
     to_location?: StockLocation | null
+    // Section-based transfer support (new model)
+    from_section?: ISection | null
+    to_section?: ISection | null
+    from_section_id?: string | null
+    to_section_id?: string | null
+    // Additional columns from migration
+    responsible_person?: string | null
+    total_items?: number | null
+    total_value?: number | null
+    approved_at?: string | null
 }
 
 export interface ITransferItemWithProduct extends TransferItem {
@@ -155,6 +175,117 @@ export interface ITransferItemWithProduct extends TransferItem {
 
 export interface ITransferWithDetails extends ITransferWithLocations {
     items?: ITransferItemWithProduct[]
+}
+
+// ============================================================================
+// SECTION STOCK TYPES (Manual types until migration is applied)
+// ============================================================================
+
+/**
+ * Enhanced Section interface with new columns from migration
+ */
+export interface ISection {
+    id: string
+    name: string
+    code: string
+    description: string | null
+    section_type: TSectionType | null
+    manager_id: string | null
+    icon: string | null
+    is_active: boolean
+    sort_order: number
+    created_at: string
+    updated_at: string
+}
+
+/**
+ * Section with manager details
+ */
+export interface ISectionWithManager extends ISection {
+    manager?: Pick<UserProfile, 'id' | 'full_name' | 'email'> | null
+}
+
+/**
+ * Section stock - tracks inventory quantity per section per product
+ */
+export interface ISectionStock {
+    id: string
+    section_id: string
+    product_id: string
+    quantity: number
+    min_quantity: number | null
+    max_quantity: number | null
+    last_counted_at: string | null
+    last_counted_by: string | null
+    created_at: string
+    updated_at: string
+}
+
+/**
+ * Section stock with full product and section details
+ * Matches view_section_stock_details
+ */
+export interface ISectionStockDetails {
+    id: string
+    section_id: string
+    section_name: string
+    section_code: string
+    section_type: TSectionType | null
+    product_id: string
+    product_name: string
+    sku: string
+    product_type: ProductType
+    unit: string
+    quantity: number
+    min_quantity: number | null
+    max_quantity: number | null
+    stock_status: TStockStatus
+    last_counted_at: string | null
+    updated_at: string
+}
+
+/**
+ * Section stock insert type
+ */
+export interface ISectionStockInsert {
+    section_id: string
+    product_id: string
+    quantity?: number
+    min_quantity?: number
+    max_quantity?: number
+}
+
+/**
+ * Section stock update type
+ */
+export interface ISectionStockUpdate {
+    quantity?: number
+    min_quantity?: number
+    max_quantity?: number
+    last_counted_at?: string
+    last_counted_by?: string
+}
+
+/**
+ * Stock movement with section tracking (enhanced)
+ */
+export interface IStockMovementWithSections extends StockMovement {
+    from_section_id?: string | null
+    to_section_id?: string | null
+    from_section?: ISection | null
+    to_section?: ISection | null
+}
+
+/**
+ * Recipe deduction info - used when consuming ingredients
+ */
+export interface IRecipeDeduction {
+    ingredient_id: string
+    ingredient_name: string
+    ingredient_type: ProductType
+    quantity: number
+    deduction_section_id: string
+    deduction_section_name: string
 }
 
 // ============================================================================

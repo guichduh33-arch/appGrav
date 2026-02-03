@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Plus, Save, Trash2, Send, WifiOff } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { useLocations, useCreateTransfer, useTransfer } from '@/hooks/inventory'
+import { useSectionsByType, useCreateTransfer, useTransfer } from '@/hooks/inventory'
 import { useProducts } from '@/hooks/products'
 import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'
 import './TransferFormPage.css'
@@ -26,17 +26,20 @@ export default function TransferFormPage() {
   const isEditing = Boolean(id)
 
   // Hooks for data
-  const { data: locations = [] } = useLocations({ isActive: true })
+  const { warehouses, productionSections, salesSections } = useSectionsByType()
   const { data: products = [] } = useProducts()
   const { data: existingTransfer } = useTransfer(id ?? null)
   const createTransferMutation = useCreateTransfer()
 
+  // Combine production and sales sections as destination options
+  const destinationSections = [...productionSections, ...salesSections]
+
   // Track if initial mount check has been done
   const hasCheckedInitialOnlineStatus = useRef(false)
 
-  // Form state
-  const [fromLocationId, setFromLocationId] = useState('')
-  const [toLocationId, setToLocationId] = useState('')
+  // Form state - using section IDs for the new section-based model
+  const [fromSectionId, setFromSectionId] = useState('')
+  const [toSectionId, setToSectionId] = useState('')
   const [responsiblePerson, setResponsiblePerson] = useState('')
   const [transferDate, setTransferDate] = useState(new Date().toISOString().split('T')[0])
   const [notes, setNotes] = useState('')
@@ -56,8 +59,9 @@ export default function TransferFormPage() {
   // Load existing transfer data
   useEffect(() => {
     if (existingTransfer && isEditing) {
-      setFromLocationId(existingTransfer.from_location_id)
-      setToLocationId(existingTransfer.to_location_id)
+      // Support both old location-based and new section-based transfers
+      setFromSectionId(existingTransfer.from_section_id || '')
+      setToSectionId(existingTransfer.to_section_id || '')
       setResponsiblePerson(existingTransfer.responsible_person || '')
       setTransferDate(existingTransfer.transfer_date || new Date().toISOString().split('T')[0])
       setNotes(existingTransfer.notes || '')
@@ -75,16 +79,6 @@ export default function TransferFormPage() {
       }
     }
   }, [existingTransfer, isEditing])
-
-  // Filter locations by type
-  const warehouses = useMemo(() =>
-    locations.filter(l => l.location_type === 'main_warehouse'),
-    [locations]
-  )
-  const sections = useMemo(() =>
-    locations.filter(l => l.location_type === 'section'),
-    [locations]
-  )
 
   const addItem = () => {
     setItems([...items, {
@@ -134,7 +128,7 @@ export default function TransferFormPage() {
     }
 
     // Validation
-    if (!fromLocationId || !toLocationId) {
+    if (!fromSectionId || !toSectionId) {
       toast.error(t('inventory.transfers.validation.selectLocations'))
       return
     }
@@ -156,8 +150,8 @@ export default function TransferFormPage() {
 
     try {
       await createTransferMutation.mutateAsync({
-        fromLocationId,
-        toLocationId,
+        fromSectionId,
+        toSectionId,
         responsiblePerson: responsiblePerson.trim(),
         transferDate,
         notes: notes.trim() || undefined,
@@ -221,26 +215,30 @@ export default function TransferFormPage() {
             <div className="form-group">
               <label>{t('inventory.transfers.form.from')} *</label>
               <select
-                value={fromLocationId}
-                onChange={(e) => setFromLocationId(e.target.value)}
+                value={fromSectionId}
+                onChange={(e) => setFromSectionId(e.target.value)}
                 disabled={!isOnline}
               >
                 <option value="">{t('inventory.transfers.form.selectLocation')}</option>
-                {warehouses.map(loc => (
-                  <option key={loc.id} value={loc.id}>{loc.name}</option>
+                {warehouses.map(section => (
+                  <option key={section.id} value={section.id}>
+                    {section.icon} {section.name}
+                  </option>
                 ))}
               </select>
             </div>
             <div className="form-group">
               <label>{t('inventory.transfers.form.to')} *</label>
               <select
-                value={toLocationId}
-                onChange={(e) => setToLocationId(e.target.value)}
+                value={toSectionId}
+                onChange={(e) => setToSectionId(e.target.value)}
                 disabled={!isOnline}
               >
                 <option value="">{t('inventory.transfers.form.selectLocation')}</option>
-                {sections.map(loc => (
-                  <option key={loc.id} value={loc.id}>{loc.name}</option>
+                {destinationSections.map(section => (
+                  <option key={section.id} value={section.id}>
+                    {section.icon} {section.name}
+                  </option>
                 ))}
               </select>
             </div>

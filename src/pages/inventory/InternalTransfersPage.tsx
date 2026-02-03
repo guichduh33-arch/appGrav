@@ -194,7 +194,7 @@ export default function InternalTransfersPage() {
       ) : (
         <div className="transfers-grid">
           {transfers.map(transfer => {
-            const statusConfig = getStatusConfig(transfer.status)
+            const statusConfig = getStatusConfig(transfer.status ?? 'draft')
             const StatusIcon = statusConfig.icon
 
             return (
@@ -218,11 +218,12 @@ export default function InternalTransfersPage() {
 
                 <div className="transfer-card__route">
                   <div className="transfer-card__location from">
-                    {transfer.from_location?.name ?? t('common.unknown')}
+                    {/* Support both section-based and location-based transfers */}
+                    {(transfer as any).from_section?.icon} {(transfer as any).from_section?.name ?? transfer.from_location?.name ?? t('common.unknown')}
                   </div>
                   <ArrowRightLeft size={20} className="transfer-card__arrow" />
                   <div className="transfer-card__location to">
-                    {transfer.to_location?.name ?? t('common.unknown')}
+                    {(transfer as any).to_section?.icon} {(transfer as any).to_section?.name ?? transfer.to_location?.name ?? t('common.unknown')}
                   </div>
                 </div>
 
@@ -230,7 +231,7 @@ export default function InternalTransfersPage() {
                   <div className="transfer-card__info-item">
                     <span className="label">{t('inventory.transfers.form.date')}:</span>
                     <span className="value">
-                      {new Date(transfer.transfer_date).toLocaleDateString('fr-FR')}
+                      {transfer.transfer_date ? new Date(transfer.transfer_date).toLocaleDateString('fr-FR') : '-'}
                     </span>
                   </div>
                   <div className="transfer-card__info-item">
@@ -249,6 +250,7 @@ export default function InternalTransfersPage() {
 
                 <div className="transfer-card__actions">
                   <button
+                    type="button"
                     className="btn btn-secondary btn-sm"
                     onClick={() => navigate(`/inventory/transfers/${transfer.id}`)}
                   >

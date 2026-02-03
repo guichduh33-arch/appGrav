@@ -210,10 +210,11 @@ export async function importProducts(
         categoryMap.set(cat.name.toLowerCase(), cat.id)
     }
 
-    // Get section mapping
+    // Get section mapping (only active sections)
     const { data: sections } = await supabase
         .from('sections')
         .select('id, slug, name')
+        .eq('is_active', true)
 
     const sectionMap = new Map<string, string>()
     for (const sec of sections || []) {

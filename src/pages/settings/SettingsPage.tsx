@@ -13,13 +13,17 @@ import './SettingsPage.css';
 
 type SettingsTab = 'general' | 'terminal' | 'pos_advanced' | 'modules' | 'printers' | 'notifications' | 'security' | 'sections' | 'kds' | 'floorplan';
 
+type TSectionType = 'warehouse' | 'production' | 'sales';
+
 interface Section {
     id: string;
     name: string;
-    slug: string;
-    is_sales_point: boolean;
-    is_production_point: boolean;
-    is_warehouse: boolean;
+    code: string;
+    description: string | null;
+    section_type: TSectionType | null;
+    icon: string | null;
+    is_active: boolean;
+    sort_order: number;
     created_at: string;
 }
 
@@ -54,12 +58,19 @@ const SettingsPage = () => {
     const [editingSection, setEditingSection] = useState<Section | null>(null);
     const [sectionForm, setSectionForm] = useState({
         name: '',
-        slug: '',
-        is_sales_point: false,
-        is_production_point: false,
-        is_warehouse: false
+        code: '',
+        description: '',
+        section_type: 'production' as TSectionType,
+        icon: ''
     });
     const [savingSection, setSavingSection] = useState(false);
+
+    // Section type options for the form
+    const SECTION_TYPES = [
+        { value: 'warehouse' as const, label: 'Entrepôt / Stockage', icon: <Warehouse size={20} />, color: '#3B82F6' },
+        { value: 'production' as const, label: 'Production', icon: <Factory size={20} />, color: '#10B981' },
+        { value: 'sales' as const, label: 'Point de Vente', icon: <ShoppingCart size={20} />, color: '#F59E0B' }
+    ];
 
     const [settings, setSettings] = useState({
         storeName: 'The Breakery',
@@ -89,17 +100,20 @@ const SettingsPage = () => {
             const { data, error } = await supabase
                 .from('sections')
                 .select('*')
-                .order('name');
+                .eq('is_active', true)
+                .order('sort_order');
             if (error) throw error;
             if (data) {
                 // Map database fields to interface
                 const mapped = data.map((s) => ({
                     id: s.id,
                     name: s.name,
-                    slug: s.slug || '',
-                    is_sales_point: s.is_sales_point ?? false,
-                    is_production_point: s.is_production_point ?? false,
-                    is_warehouse: s.is_warehouse ?? false,
+                    code: s.code || '',
+                    description: s.description || null,
+                    section_type: s.section_type as TSectionType | null,
+                    icon: s.icon || null,
+                    is_active: s.is_active ?? true,
+                    sort_order: s.sort_order ?? 0,
                     created_at: s.created_at,
                 }));
                 setSections(mapped);
@@ -159,23 +173,23 @@ const SettingsPage = () => {
         }
     };
 
-    const generateSlug = (name: string) => {
+    const generateCode = (name: string) => {
         return name
             .toLowerCase()
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '') // Remove accents
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)/g, '');
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/(^_|_$)/g, '');
     };
 
     const openCreateModal = () => {
         setEditingSection(null);
         setSectionForm({
             name: '',
-            slug: '',
-            is_sales_point: false,
-            is_production_point: false,
-            is_warehouse: false
+            code: '',
+            description: '',
+            section_type: 'production',
+            icon: ''
         });
         setShowSectionModal(true);
     };
@@ -184,10 +198,10 @@ const SettingsPage = () => {
         setEditingSection(section);
         setSectionForm({
             name: section.name,
-            slug: section.slug,
-            is_sales_point: section.is_sales_point,
-            is_production_point: section.is_production_point,
-            is_warehouse: section.is_warehouse
+            code: section.code,
+            description: section.description || '',
+            section_type: section.section_type || 'production',
+            icon: section.icon || ''
         });
         setShowSectionModal(true);
     };
@@ -196,7 +210,7 @@ const SettingsPage = () => {
         setSectionForm(prev => ({
             ...prev,
             name,
-            slug: editingSection ? prev.slug : generateSlug(name)
+            code: editingSection ? prev.code : generateCode(name)
         }));
     };
 
@@ -211,10 +225,11 @@ const SettingsPage = () => {
             // Map interface fields to database schema
             const sectionData = {
                 name: sectionForm.name,
-                slug: sectionForm.slug || generateSlug(sectionForm.name),
-                is_sales_point: sectionForm.is_sales_point,
-                is_production_point: sectionForm.is_production_point,
-                is_warehouse: sectionForm.is_warehouse,
+                code: sectionForm.code || generateCode(sectionForm.name),
+                description: sectionForm.description || null,
+                section_type: sectionForm.section_type,
+                icon: sectionForm.icon || null,
+                is_active: true,
             };
 
             if (editingSection) {
@@ -225,9 +240,18 @@ const SettingsPage = () => {
 
                 if (error) throw error;
             } else {
+                // Get max sort_order for new sections
+                const { data: maxSortData } = await supabase
+                    .from('sections')
+                    .select('sort_order')
+                    .order('sort_order', { ascending: false })
+                    .limit(1);
+
+                const nextSortOrder = (maxSortData?.[0]?.sort_order ?? 0) + 1;
+
                 const { error } = await supabase
                     .from('sections')
-                    .insert(sectionData);
+                    .insert({ ...sectionData, sort_order: nextSortOrder });
 
                 if (error) throw error;
             }
@@ -423,54 +447,63 @@ const SettingsPage = () => {
                                     </div>
                                 ) : (
                                     <div className="sections-list">
-                                        {sections.map(section => (
-                                            <div key={section.id} className="section-item">
-                                                <div className="section-item__info">
-                                                    <h3 className="section-item__name">{section.name}</h3>
-                                                    <div className="section-item__badges">
-                                                        {section.is_sales_point && (
-                                                            <span className="section-badge section-badge--sales">
-                                                                <ShoppingCart size={12} />
-                                                                Point de Vente
-                                                            </span>
-                                                        )}
-                                                        {section.is_production_point && (
-                                                            <span className="section-badge section-badge--production">
-                                                                <Factory size={12} />
-                                                                Production
-                                                            </span>
-                                                        )}
-                                                        {section.is_warehouse && (
-                                                            <span className="section-badge section-badge--warehouse">
-                                                                <Warehouse size={12} />
-                                                                Entrepôt
-                                                            </span>
+                                        {sections.map(section => {
+                                            const sectionTypeInfo = SECTION_TYPES.find(t => t.value === section.section_type);
+                                            return (
+                                                <div key={section.id} className="section-item">
+                                                    <div className="section-item__icon-wrapper" style={{ color: sectionTypeInfo?.color }}>
+                                                        {section.icon || sectionTypeInfo?.icon || <Layers size={20} />}
+                                                    </div>
+                                                    <div className="section-item__info">
+                                                        <h3 className="section-item__name">{section.name}</h3>
+                                                        <div className="section-item__badges">
+                                                            {section.section_type === 'sales' && (
+                                                                <span className="section-badge section-badge--sales">
+                                                                    <ShoppingCart size={12} />
+                                                                    Point de Vente
+                                                                </span>
+                                                            )}
+                                                            {section.section_type === 'production' && (
+                                                                <span className="section-badge section-badge--production">
+                                                                    <Factory size={12} />
+                                                                    Production
+                                                                </span>
+                                                            )}
+                                                            {section.section_type === 'warehouse' && (
+                                                                <span className="section-badge section-badge--warehouse">
+                                                                    <Warehouse size={12} />
+                                                                    Entrepôt
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        {section.description && (
+                                                            <p className="section-item__description">{section.description}</p>
                                                         )}
                                                     </div>
+                                                    <div className="section-item__code">
+                                                        {section.code}
+                                                    </div>
+                                                    <div className="section-item__actions">
+                                                        <button
+                                                            className="btn-icon"
+                                                            onClick={() => openEditModal(section)}
+                                                            title="Modifier"
+                                                            aria-label="Modifier"
+                                                        >
+                                                            <Edit2 size={16} />
+                                                        </button>
+                                                        <button
+                                                            className="btn-icon btn-icon--danger"
+                                                            onClick={() => handleDeleteSection(section)}
+                                                            title="Supprimer"
+                                                            aria-label="Supprimer"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <div className="section-item__slug">
-                                                    {section.slug}
-                                                </div>
-                                                <div className="section-item__actions">
-                                                    <button
-                                                        className="btn-icon"
-                                                        onClick={() => openEditModal(section)}
-                                                        title="Modifier"
-                                                        aria-label="Modifier"
-                                                    >
-                                                        <Edit2 size={16} />
-                                                    </button>
-                                                    <button
-                                                        className="btn-icon btn-icon--danger"
-                                                        onClick={() => handleDeleteSection(section)}
-                                                        title="Supprimer"
-                                                        aria-label="Supprimer"
-                                                    >
-                                                        <Trash2 size={16} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>
@@ -765,76 +798,78 @@ const SettingsPage = () => {
                                 />
                             </div>
 
-                            <div className="section-form__group">
-                                <label className="section-form__label">
-                                    Identifiant (slug)
-                                </label>
-                                <input
-                                    type="text"
-                                    className="section-form__input section-form__input--mono"
-                                    value={sectionForm.slug}
-                                    onChange={(e) => setSectionForm({ ...sectionForm, slug: e.target.value })}
-                                    placeholder="cuisine"
-                                    aria-label="Identifiant slug"
-                                />
-                                <p className="section-form__hint">
-                                    Identifiant unique utilisé en interne. Auto-généré à partir du nom.
-                                </p>
+                            <div className="section-form__row">
+                                <div className="section-form__group">
+                                    <label className="section-form__label">
+                                        Code
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="section-form__input section-form__input--mono"
+                                        value={sectionForm.code}
+                                        onChange={(e) => setSectionForm({ ...sectionForm, code: e.target.value })}
+                                        placeholder="cuisine"
+                                        aria-label="Code de la section"
+                                    />
+                                    <p className="section-form__hint">
+                                        Identifiant unique. Auto-généré.
+                                    </p>
+                                </div>
+                                <div className="section-form__group">
+                                    <label className="section-form__label">
+                                        Icône (emoji)
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="section-form__input section-form__input--icon"
+                                        value={sectionForm.icon}
+                                        onChange={(e) => setSectionForm({ ...sectionForm, icon: e.target.value })}
+                                        placeholder="🍳"
+                                        maxLength={4}
+                                        aria-label="Icône de la section"
+                                    />
+                                </div>
                             </div>
 
                             <div className="section-form__group">
-                                <label className="section-form__label">Type de section</label>
+                                <label className="section-form__label">
+                                    Description
+                                </label>
+                                <input
+                                    type="text"
+                                    className="section-form__input"
+                                    value={sectionForm.description}
+                                    onChange={(e) => setSectionForm({ ...sectionForm, description: e.target.value })}
+                                    placeholder="Description de la section..."
+                                    aria-label="Description de la section"
+                                />
+                            </div>
+
+                            <div className="section-form__group">
+                                <label className="section-form__label">Type de section *</label>
                                 <div className="section-form__types">
-                                    <label className={`section-type-card ${sectionForm.is_sales_point ? 'is-selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            checked={sectionForm.is_sales_point}
-                                            onChange={(e) => setSectionForm({ ...sectionForm, is_sales_point: e.target.checked })}
-                                        />
-                                        <div className="section-type-card__icon section-type-card__icon--sales">
-                                            <ShoppingCart size={20} />
-                                        </div>
-                                        <div className="section-type-card__content">
-                                            <span className="section-type-card__title">Point de Vente</span>
-                                            <span className="section-type-card__desc">
-                                                Cette section peut vendre des produits directement aux clients
-                                            </span>
-                                        </div>
-                                    </label>
-
-                                    <label className={`section-type-card ${sectionForm.is_production_point ? 'is-selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            checked={sectionForm.is_production_point}
-                                            onChange={(e) => setSectionForm({ ...sectionForm, is_production_point: e.target.checked })}
-                                        />
-                                        <div className="section-type-card__icon section-type-card__icon--production">
-                                            <Factory size={20} />
-                                        </div>
-                                        <div className="section-type-card__content">
-                                            <span className="section-type-card__title">Point de Production</span>
-                                            <span className="section-type-card__desc">
-                                                Cette section fabrique ou prépare des produits
-                                            </span>
-                                        </div>
-                                    </label>
-
-                                    <label className={`section-type-card ${sectionForm.is_warehouse ? 'is-selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            checked={sectionForm.is_warehouse}
-                                            onChange={(e) => setSectionForm({ ...sectionForm, is_warehouse: e.target.checked })}
-                                        />
-                                        <div className="section-type-card__icon section-type-card__icon--warehouse">
-                                            <Warehouse size={20} />
-                                        </div>
-                                        <div className="section-type-card__content">
-                                            <span className="section-type-card__title">Entrepôt / Stockage</span>
-                                            <span className="section-type-card__desc">
-                                                Cette section sert principalement au stockage de marchandises
-                                            </span>
-                                        </div>
-                                    </label>
+                                    {SECTION_TYPES.map(type => (
+                                        <label
+                                            key={type.value}
+                                            className={`section-type-card ${sectionForm.section_type === type.value ? 'is-selected' : ''}`}
+                                        >
+                                            <input
+                                                type="radio"
+                                                name="section_type"
+                                                value={type.value}
+                                                checked={sectionForm.section_type === type.value}
+                                                onChange={() => setSectionForm({ ...sectionForm, section_type: type.value })}
+                                            />
+                                            <div
+                                                className={`section-type-card__icon section-type-card__icon--${type.value}`}
+                                            >
+                                                {type.icon}
+                                            </div>
+                                            <div className="section-type-card__content">
+                                                <span className="section-type-card__title">{type.label}</span>
+                                            </div>
+                                        </label>
+                                    ))}
                                 </div>
                             </div>
                         </div>

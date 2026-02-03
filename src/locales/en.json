@@ -238,6 +238,17 @@
         "placeholder_hint": "This page will display orders in real-time for the selected station."
     },
     "inventory": {
+        "title": "Stock & Inventory",
+        "subtitle": "Manage stock, track movements, and monitor inventory",
+        "tabs": {
+            "stock": "Stock",
+            "incoming": "Incoming",
+            "transfers": "Transfers",
+            "wasted": "Wastage",
+            "production": "Production",
+            "opname": "Inventory Count",
+            "movements": "Movements"
+        },
         "wastage": "Wastage",
         "restock": "Restock",
         "procurement": "Procurement",

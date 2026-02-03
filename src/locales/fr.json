@@ -243,6 +243,7 @@
         "tabs": {
             "stock": "Stock",
             "incoming": "Entrees",
+            "transfers": "Transferts",
             "wasted": "Pertes",
             "production": "Production",
             "opname": "Inventaire",
