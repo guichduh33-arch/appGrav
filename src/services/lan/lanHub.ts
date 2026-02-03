@@ -64,10 +64,14 @@ class LanHub {
 
     try {
       // 1. Register as hub in database
+      // Convert 'localhost' to '127.0.0.1' for PostgreSQL INET type compatibility
+      const hostname = window.location.hostname;
+      const ipAddress = hostname === 'localhost' ? '127.0.0.1' : hostname;
+
       const result = await registerLanNode(
         config.deviceId,
         'pos',
-        window.location.hostname,
+        ipAddress,
         8080, // Virtual port
         config.deviceName,
         true // is_hub

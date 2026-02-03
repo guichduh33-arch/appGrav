@@ -30,7 +30,8 @@
         "requiredFields": "Required fields missing",
         "days": "days",
         "seconds": "sec",
-        "units": "units"
+        "units": "units",
+        "unit": "Unit"
     },
     "pos": {
         "header": {
@@ -1195,7 +1196,7 @@
         "title": "Import Recipes",
         "subtitle": "Import product compositions from a CSV file",
         "download_template": "Download Template",
-        "template_hint": "Format: product_sku, material_sku, quantity, unit",
+        "template_hint": "Format: product_name, material_name, quantity, unit",
         "drag_drop": "Drag and drop a CSV file here",
         "or_click": "or click to select",
         "invalid_format": "Please select a CSV file",

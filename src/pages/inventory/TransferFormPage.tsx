@@ -299,6 +299,7 @@ export default function TransferFormPage() {
                   <tr>
                     <th>{t('inventory.transfers.form.product')}</th>
                     <th style={{ width: '120px' }}>{t('inventory.transfers.form.quantity')}</th>
+                    <th style={{ width: '80px' }}>{t('common.unit')}</th>
                     <th style={{ width: '120px' }}>{t('inventory.transfers.form.unitCost')}</th>
                     <th style={{ width: '120px' }}>{t('inventory.transfers.form.lineTotal')}</th>
                     <th style={{ width: '60px' }}></th>
@@ -330,6 +331,9 @@ export default function TransferFormPage() {
                           onChange={(e) => updateItem(index, 'quantity_requested', Number(e.target.value))}
                           disabled={!isOnline}
                         />
+                      </td>
+                      <td>
+                        <span className="unit-display">{item.unit || '-'}</span>
                       </td>
                       <td>
                         <input

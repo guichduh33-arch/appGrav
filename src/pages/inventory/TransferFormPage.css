@@ -134,6 +134,12 @@
     color: var(--color-white);
 }
 
+.unit-display {
+    font-size: var(--text-sm);
+    color: var(--color-gray-300);
+    font-weight: 500;
+}
+
 .no-items {
     padding: var(--space-xl);
     text-align: center;

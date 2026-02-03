@@ -111,7 +111,7 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                 success: false,
                 created: 0,
                 updated: 0,
-                errors: [{ row: 0, product_sku: '', material_sku: '', error: String(error) }]
+                errors: [{ row: 0, product: '', material: '', error: String(error) }]
             })
         } finally {
             setImporting(false)
@@ -162,7 +162,7 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                             {t('recipe_import.download_template', 'Télécharger le template')}
                         </button>
                         <span className="import-template-hint">
-                            {t('recipe_import.template_hint', 'Format: product_sku, material_sku, quantity, unit')}
+                            {t('recipe_import.template_hint', 'Format: product_name, material_name, quantity, unit')}
                         </span>
                     </div>
 
@@ -308,9 +308,9 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                                                 <span className="import-error-row">
                                                     {t('recipe_import.error_row', 'Ligne')} {err.row}
                                                 </span>
-                                                {err.product_sku && (
+                                                {err.product && (
                                                     <span className="import-error-sku">
-                                                        ({err.product_sku} → {err.material_sku})
+                                                        ({err.product} → {err.material})
                                                     </span>
                                                 )}
                                                 <span className="import-error-message">{err.error}</span>

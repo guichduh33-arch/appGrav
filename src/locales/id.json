@@ -30,7 +30,8 @@
         "requiredFields": "Kolom wajib tidak lengkap",
         "days": "hari",
         "seconds": "det",
-        "units": "unit"
+        "units": "unit",
+        "unit": "Satuan"
     },
     "pos": {
         "header": {
@@ -1196,7 +1197,7 @@
         "title": "Impor Resep",
         "subtitle": "Impor komposisi produk dari file CSV",
         "download_template": "Unduh Template",
-        "template_hint": "Format: product_sku, material_sku, quantity, unit",
+        "template_hint": "Format: product_name, material_name, quantity, unit",
         "drag_drop": "Seret dan lepas file CSV di sini",
         "or_click": "atau klik untuk memilih",
         "invalid_format": "Silakan pilih file CSV",

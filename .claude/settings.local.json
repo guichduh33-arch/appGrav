@@ -95,7 +95,9 @@
       "mcp__plugin_playwright_playwright__browser_console_messages",
       "mcp__plugin_playwright_playwright__browser_take_screenshot",
       "mcp__plugin_playwright_playwright__browser_navigate",
-      "mcp__plugin_supabase_supabase__generate_typescript_types"
+      "mcp__plugin_supabase_supabase__generate_typescript_types",
+      "mcp__supabase__get_publishable_keys",
+      "Bash(netstat:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
