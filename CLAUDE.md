@@ -26,7 +26,7 @@ npm run test:claude      # Test Claude API integration
 
 ### Tech Stack
 - **Frontend**: React 18 + TypeScript + Vite
-- **State**: Zustand (12 stores) + @tanstack/react-query
+- **State**: Zustand (10 stores) + @tanstack/react-query
 - **Styling**: Tailwind CSS + shadcn/ui + Lucide React icons
 - **Backend**: Supabase (PostgreSQL + Auth + Realtime + Edge Functions)
 - **Offline**: Dexie (IndexedDB) + vite-plugin-pwa
@@ -40,7 +40,9 @@ src/
 │   ├── auth/        # Authentication components
 │   ├── inventory/   # Stock management UI
 │   ├── kds/         # Kitchen Display System
+│   ├── lan/         # LAN device management UI
 │   ├── mobile/      # Mobile-specific components
+│   ├── orders/      # Order management components
 │   ├── pos/         # Point of Sale UI (Cart, ProductGrid, etc.)
 │   ├── products/    # Product management
 │   ├── reports/     # Analytics & reports
@@ -77,7 +79,7 @@ src/
 └── locales/         # Translation files (fr.json, en.json, id.json)
 
 supabase/
-├── migrations/      # SQL migrations (113)
+├── migrations/      # SQL migrations (21)
 └── functions/       # Edge Functions (Deno)
 ```
 
@@ -362,10 +364,10 @@ Key test files:
 
 ## Project Statistics
 
-- **Components**: 56 React components across 10 feature directories
-- **Pages**: 95+ route-based pages
-- **Hooks**: 49 custom hooks
-- **Services**: 40+ business logic services
-- **Stores**: 12 Zustand stores
-- **Migrations**: 113 SQL migrations
-- **Codebase**: ~84,500 lines of TypeScript/React
+- **Components**: 78 React components across 12 feature directories
+- **Pages**: 95 route-based pages
+- **Hooks**: 69 custom hooks
+- **Services**: 55 business logic services
+- **Stores**: 10 Zustand stores
+- **Migrations**: 21 SQL migrations
+- **Codebase**: ~114,750 lines of TypeScript/React
