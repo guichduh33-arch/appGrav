@@ -545,7 +545,7 @@ const UsersPage = () => {
                 {t('common.cancel') || 'Annuler'}
               </Button>
               <Button
-                variant="primary"
+                variant="destructive"
                 onClick={() => handleDelete(showDeleteConfirm)}
               >
                 {t('common.delete') || 'Supprimer'}

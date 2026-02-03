@@ -1359,5 +1359,104 @@
             "error": "Erreur de connexion LAN",
             "reconnectAttempt": "Tentative {{count}}/{{max}}"
         }
+    },
+    "purchasing": {
+        "orders": {
+            "title": "Bons de Commande",
+            "subtitle": "Gérez vos commandes fournisseurs et suivez leur statut",
+            "newOrder": "Nouveau Bon de Commande",
+            "editOrder": "Modifier le Bon de Commande",
+            "orderDetails": "Détails du Bon de Commande",
+            "offlineWarning": "La gestion des bons de commande nécessite une connexion internet",
+            "loadError": "Erreur lors du chargement des bons de commande",
+            "createError": "Erreur lors de la création du bon de commande",
+            "updateError": "Erreur lors de la mise à jour du bon de commande",
+            "deleteError": "Erreur lors de la suppression du bon de commande",
+            "createSuccess": "Bon de commande créé avec succès",
+            "updateSuccess": "Bon de commande mis à jour avec succès",
+            "deleteSuccess": "Bon de commande supprimé avec succès",
+            "deleteOnlyDraft": "Seuls les bons de commande en brouillon peuvent être supprimés",
+            "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce bon de commande ?",
+            "noOrders": "Aucun bon de commande",
+            "noOrdersDescription": "Commencez par créer votre premier bon de commande",
+            "searchPlaceholder": "Rechercher un bon de commande...",
+            "status": {
+                "label": "Statut",
+                "all": "Tous les statuts",
+                "draft": "Brouillon",
+                "sent": "Envoyé",
+                "confirmed": "Confirmé",
+                "partially_received": "Partiellement Reçu",
+                "received": "Reçu",
+                "cancelled": "Annulé",
+                "modified": "Modifié"
+            },
+            "payment": {
+                "label": "Paiement",
+                "all": "Tous les paiements",
+                "unpaid": "Non Payé",
+                "partially_paid": "Partiellement Payé",
+                "paid": "Payé"
+            },
+            "stats": {
+                "total": "Total Commandes",
+                "pending": "En Attente",
+                "completed": "Complétées",
+                "totalValue": "Valeur Totale"
+            },
+            "table": {
+                "poNumber": "N° BC",
+                "supplier": "Fournisseur",
+                "date": "Date",
+                "expectedDelivery": "Livraison Prévue",
+                "actualDelivery": "Livraison Réelle",
+                "status": "Statut",
+                "payment": "Paiement",
+                "total": "Total",
+                "actions": "Actions"
+            },
+            "form": {
+                "supplier": "Fournisseur",
+                "selectSupplier": "Sélectionner un fournisseur",
+                "orderDate": "Date de commande",
+                "expectedDelivery": "Date de livraison prévue",
+                "notes": "Notes",
+                "notesPlaceholder": "Notes additionnelles...",
+                "items": "Articles",
+                "addItem": "Ajouter un article",
+                "product": "Produit",
+                "selectProduct": "Sélectionner un produit",
+                "quantity": "Quantité",
+                "unitPrice": "Prix unitaire",
+                "discount": "Remise",
+                "tax": "Taxe",
+                "lineTotal": "Total ligne",
+                "subtotal": "Sous-total",
+                "discountAmount": "Remise totale",
+                "taxAmount": "Taxes",
+                "totalAmount": "Total",
+                "noItems": "Aucun article ajouté",
+                "requiredFields": "Veuillez remplir tous les champs obligatoires"
+            },
+            "actions": {
+                "view": "Voir",
+                "edit": "Modifier",
+                "delete": "Supprimer",
+                "confirm": "Confirmer",
+                "markReceived": "Marquer comme reçu",
+                "send": "Envoyer",
+                "cancel": "Annuler",
+                "save": "Enregistrer",
+                "saveDraft": "Enregistrer comme brouillon",
+                "saveAndSend": "Enregistrer et envoyer"
+            }
+        },
+        "suppliers": {
+            "title": "Fournisseurs",
+            "subtitle": "Gérez vos fournisseurs",
+            "newSupplier": "Nouveau Fournisseur",
+            "noSuppliers": "Aucun fournisseur",
+            "searchPlaceholder": "Rechercher un fournisseur..."
+        }
     }
 }

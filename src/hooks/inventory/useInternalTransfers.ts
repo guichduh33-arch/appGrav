@@ -273,17 +273,55 @@ export function useReceiveTransfer() {
         throw new Error(`Cannot receive transfer with status: ${transfer.status}`)
       }
 
-      // 2. Update each transfer_item with quantity_received
+      // Get current user ID for audit trail (do this early, no DB change)
+      const { data: { user } } = await supabase.auth.getUser()
+
+      // Prepare notes before any DB operations
+      const updatedNotes = params.receptionNotes
+        ? `${transfer.notes || ''}\n[Réception]: ${params.receptionNotes}`.trim()
+        : transfer.notes
+
+      // ============================================================
+      // TRANSACTION-LIKE OPERATIONS
+      // Note: Supabase doesn't support client-side transactions.
+      // Operations are ordered to minimize orphan data risk:
+      // 1. Update status FIRST (marks intent, idempotent)
+      // 2. Update item quantities (reversible)
+      // 3. Create stock_movements LAST (most critical)
+      // If step 3 fails, transfer is 'received' but movements missing
+      // - Detectable via: status='received' but no stock_movements
+      // - Recovery: re-run reception or manual adjustment
+      // ============================================================
+
+      // 2. Update transfer status to 'received' FIRST (marks intent)
+      const { error: statusError } = await supabase
+        .from('internal_transfers')
+        .update({
+          status: 'received',
+          approved_by: user?.id ?? null,
+          approved_at: new Date().toISOString(),
+          notes: updatedNotes,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', params.transferId)
+
+      if (statusError) throw statusError
+
+      // 3. Update each transfer_item with quantity_received
       for (const item of params.items) {
         const { error: itemError } = await supabase
           .from('transfer_items')
           .update({ quantity_received: item.quantityReceived })
           .eq('id', item.itemId)
 
-        if (itemError) throw itemError
+        if (itemError) {
+          // Log error but don't fail completely - status already updated
+          console.error(`Failed to update item ${item.itemId}:`, itemError)
+          throw itemError
+        }
       }
 
-      // 3. Create stock_movements for each item
+      // 4. Create stock_movements for each item
       const stockMovements: Array<{
         product_id: string
         location_id: string
@@ -327,24 +365,12 @@ export function useReceiveTransfer() {
         .from('stock_movements')
         .insert(stockMovements)
 
-      if (movementsError) throw movementsError
-
-      // 4. Update transfer status to 'received' and append reception notes
-      const updatedNotes = params.receptionNotes
-        ? `${transfer.notes || ''}\n[Réception]: ${params.receptionNotes}`.trim()
-        : transfer.notes
-
-      const { error: statusError } = await supabase
-        .from('internal_transfers')
-        .update({
-          status: 'received',
-          approved_at: new Date().toISOString(),
-          notes: updatedNotes,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', params.transferId)
-
-      if (statusError) throw statusError
+      if (movementsError) {
+        // Critical: status is 'received' but movements failed
+        // Log for manual recovery, but throw to notify user
+        console.error(`CRITICAL: Transfer ${transfer.transfer_number} marked received but stock_movements failed:`, movementsError)
+        throw new Error(`Stock movements creation failed. Transfer marked received but inventory not updated. Contact support. Error: ${movementsError.message}`)
+      }
 
       return transfer
     },

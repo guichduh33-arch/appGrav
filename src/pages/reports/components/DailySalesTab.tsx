@@ -41,7 +41,30 @@ export const DailySalesTab = () => {
     };
 
     const handleDownload = () => {
-        // TODO: Implement CSV export
+        if (data.length === 0) return;
+
+        const headers = ['Date', 'Orders', 'Revenue', 'Net Revenue', 'Avg Basket'];
+        const csvRows = [
+            headers.join(','),
+            ...data.map(row => [
+                new Date(row.date).toLocaleDateString(),
+                row.total_orders,
+                row.total_sales.toFixed(2),
+                row.net_revenue.toFixed(2),
+                row.avg_basket.toFixed(2)
+            ].join(','))
+        ];
+
+        const csvContent = csvRows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `daily-sales-${dateRange.start.toISOString().split('T')[0]}-to-${dateRange.end.toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     };
 
     if (loading) return <div className="p-8 text-center text-gray-500">{t('common.loading', 'Loading data...')}</div>;

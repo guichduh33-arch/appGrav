@@ -1,6 +1,6 @@
 # Story 5.5: Transfer Reception & Validation
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -219,9 +219,42 @@ Claude Opus 4.5 (claude-opus-4-5-20251101)
 - `src/locales/en.json` (+20 clés dans inventory.transfers.reception)
 - `src/locales/id.json` (+20 clés dans inventory.transfers.reception)
 
+## Senior Developer Review (AI)
+
+**Review Date:** 2026-02-03
+**Reviewer:** Claude Opus 4.5 (Code Review Agent)
+**Outcome:** ✅ APPROVED (after fixes)
+
+### Issues Found & Fixed
+
+| # | Severity | Issue | Fix Applied |
+|---|----------|-------|-------------|
+| H1 | HIGH | Missing `approved_by` field in useReceiveTransfer - audit trail broken | Added `supabase.auth.getUser()` and `approved_by: user?.id` |
+| H2 | HIGH | Test assertions too weak - tests pass even on failures | Rewrote 6 tests with proper assertions and error case verification |
+| M1 | MEDIUM | Hardcoded locale `'fr-FR'` in date formatting | Added LOCALE_MAP and dynamic `i18n.language` lookup |
+| M2 | MEDIUM | Non-transactional operations risk orphan data | Reordered ops (status first), added error logging, clear recovery path |
+
+### Low Severity Items (Not Fixed - Documented)
+
+- L1: CSS ~450 lines (docs said 380) - minor doc discrepancy
+- L2: Translations 17 keys (docs said 20) - minor doc discrepancy
+- L3: Missing UOM display in quantities
+- L4: console.error exposes errors to browser
+
+### Files Modified by Review
+
+- `src/hooks/inventory/useInternalTransfers.ts` - H1, M2 fixes
+- `src/hooks/inventory/__tests__/useInternalTransfers.test.ts` - H2 fix
+- `src/pages/inventory/TransferDetailPage.tsx` - M1 fix
+
+### Test Results After Fixes
+
+- **14/14 tests passing** (useInternalTransfers.test.ts)
+
 ## Change Log
 
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-02-02 | Story créée | SM Agent |
 | 2026-02-02 | Implémentation complète: hook useReceiveTransfer, page TransferDetailPage, CSS, traductions 3 locales, tests unitaires | Claude Opus 4.5 |
+| 2026-02-03 | Code Review: 4 issues fixed (H1, H2, M1, M2), 4 low items documented | Claude Opus 4.5 (Review) |

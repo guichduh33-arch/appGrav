@@ -1,35 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
-import type { Database } from '../types/database.generated'
+﻿import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-// Debug logging
-console.log('[Supabase] URL:', supabaseUrl ? 'Set' : 'MISSING')
-console.log('[Supabase] Key:', supabaseAnonKey ? 'Set (length: ' + supabaseAnonKey.length + ')' : 'MISSING')
-
-if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing Supabase environment variables')
-}
-
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-    auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-    },
-    realtime: {
-        params: {
-            eventsPerSecond: 10,
-        },
-    },
-})
-
-// Helper to check connection
-export async function checkConnection(): Promise<boolean> {
-    try {
-        const { error } = await supabase.from('categories').select('count').limit(1)
-        return !error
-    } catch {
-        return false
-    }
-}
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)

@@ -1359,5 +1359,104 @@
             "error": "Kesalahan koneksi LAN",
             "reconnectAttempt": "Percobaan {{count}}/{{max}}"
         }
+    },
+    "purchasing": {
+        "orders": {
+            "title": "Pesanan Pembelian",
+            "subtitle": "Kelola pesanan pemasok Anda dan lacak statusnya",
+            "newOrder": "Pesanan Pembelian Baru",
+            "editOrder": "Edit Pesanan Pembelian",
+            "orderDetails": "Detail Pesanan Pembelian",
+            "offlineWarning": "Manajemen pesanan pembelian memerlukan koneksi internet",
+            "loadError": "Kesalahan memuat pesanan pembelian",
+            "createError": "Kesalahan membuat pesanan pembelian",
+            "updateError": "Kesalahan memperbarui pesanan pembelian",
+            "deleteError": "Kesalahan menghapus pesanan pembelian",
+            "createSuccess": "Pesanan pembelian berhasil dibuat",
+            "updateSuccess": "Pesanan pembelian berhasil diperbarui",
+            "deleteSuccess": "Pesanan pembelian berhasil dihapus",
+            "deleteOnlyDraft": "Hanya pesanan pembelian draf yang dapat dihapus",
+            "deleteConfirm": "Apakah Anda yakin ingin menghapus pesanan pembelian ini?",
+            "noOrders": "Tidak ada pesanan pembelian",
+            "noOrdersDescription": "Mulai dengan membuat pesanan pembelian pertama Anda",
+            "searchPlaceholder": "Cari pesanan pembelian...",
+            "status": {
+                "label": "Status",
+                "all": "Semua status",
+                "draft": "Draf",
+                "sent": "Terkirim",
+                "confirmed": "Dikonfirmasi",
+                "partially_received": "Diterima Sebagian",
+                "received": "Diterima",
+                "cancelled": "Dibatalkan",
+                "modified": "Dimodifikasi"
+            },
+            "payment": {
+                "label": "Pembayaran",
+                "all": "Semua pembayaran",
+                "unpaid": "Belum Dibayar",
+                "partially_paid": "Dibayar Sebagian",
+                "paid": "Lunas"
+            },
+            "stats": {
+                "total": "Total Pesanan",
+                "pending": "Tertunda",
+                "completed": "Selesai",
+                "totalValue": "Total Nilai"
+            },
+            "table": {
+                "poNumber": "No. PO",
+                "supplier": "Pemasok",
+                "date": "Tanggal",
+                "expectedDelivery": "Pengiriman Diharapkan",
+                "actualDelivery": "Pengiriman Aktual",
+                "status": "Status",
+                "payment": "Pembayaran",
+                "total": "Total",
+                "actions": "Tindakan"
+            },
+            "form": {
+                "supplier": "Pemasok",
+                "selectSupplier": "Pilih pemasok",
+                "orderDate": "Tanggal pesanan",
+                "expectedDelivery": "Tanggal pengiriman diharapkan",
+                "notes": "Catatan",
+                "notesPlaceholder": "Catatan tambahan...",
+                "items": "Item",
+                "addItem": "Tambah item",
+                "product": "Produk",
+                "selectProduct": "Pilih produk",
+                "quantity": "Kuantitas",
+                "unitPrice": "Harga satuan",
+                "discount": "Diskon",
+                "tax": "Pajak",
+                "lineTotal": "Total baris",
+                "subtotal": "Subtotal",
+                "discountAmount": "Total diskon",
+                "taxAmount": "Pajak",
+                "totalAmount": "Total",
+                "noItems": "Tidak ada item ditambahkan",
+                "requiredFields": "Harap isi semua bidang yang diperlukan"
+            },
+            "actions": {
+                "view": "Lihat",
+                "edit": "Edit",
+                "delete": "Hapus",
+                "confirm": "Konfirmasi",
+                "markReceived": "Tandai sebagai diterima",
+                "send": "Kirim",
+                "cancel": "Batal",
+                "save": "Simpan",
+                "saveDraft": "Simpan sebagai draf",
+                "saveAndSend": "Simpan dan kirim"
+            }
+        },
+        "suppliers": {
+            "title": "Pemasok",
+            "subtitle": "Kelola pemasok Anda",
+            "newSupplier": "Pemasok Baru",
+            "noSuppliers": "Tidak ada pemasok",
+            "searchPlaceholder": "Cari pemasok..."
+        }
     }
 }

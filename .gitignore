@@ -48,6 +48,10 @@ typings/
 # TypeScript cache
 *.tsbuildinfo
 
+# Vite generated files
+vite.config.js
+vite.config.d.ts
+
 # Optional npm cache directory
 .npm
 
@@ -136,11 +140,13 @@ __pycache__/
 *.swo
 
 # Development tools and configurations
-# .agent/
-# .antigravity/
-# .claude/
-# _bmad/
-# _bmad-output/
+.agent/
+.antigravity/
+.claude/
+_bmad/
+.playwright-mcp/
+
+# Keep _bmad-output/ tracked - contains essential project documentation
 
 # Scripts and data
 scripts/agents/

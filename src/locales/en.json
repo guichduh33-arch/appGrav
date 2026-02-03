@@ -1348,5 +1348,104 @@
             "error": "LAN connection error",
             "reconnectAttempt": "Attempt {{count}}/{{max}}"
         }
+    },
+    "purchasing": {
+        "orders": {
+            "title": "Purchase Orders",
+            "subtitle": "Manage your supplier orders and track their status",
+            "newOrder": "New Purchase Order",
+            "editOrder": "Edit Purchase Order",
+            "orderDetails": "Purchase Order Details",
+            "offlineWarning": "Purchase order management requires an internet connection",
+            "loadError": "Error loading purchase orders",
+            "createError": "Error creating purchase order",
+            "updateError": "Error updating purchase order",
+            "deleteError": "Error deleting purchase order",
+            "createSuccess": "Purchase order created successfully",
+            "updateSuccess": "Purchase order updated successfully",
+            "deleteSuccess": "Purchase order deleted successfully",
+            "deleteOnlyDraft": "Only draft purchase orders can be deleted",
+            "deleteConfirm": "Are you sure you want to delete this purchase order?",
+            "noOrders": "No purchase orders",
+            "noOrdersDescription": "Start by creating your first purchase order",
+            "searchPlaceholder": "Search purchase orders...",
+            "status": {
+                "label": "Status",
+                "all": "All statuses",
+                "draft": "Draft",
+                "sent": "Sent",
+                "confirmed": "Confirmed",
+                "partially_received": "Partially Received",
+                "received": "Received",
+                "cancelled": "Cancelled",
+                "modified": "Modified"
+            },
+            "payment": {
+                "label": "Payment",
+                "all": "All payments",
+                "unpaid": "Unpaid",
+                "partially_paid": "Partially Paid",
+                "paid": "Paid"
+            },
+            "stats": {
+                "total": "Total Orders",
+                "pending": "Pending",
+                "completed": "Completed",
+                "totalValue": "Total Value"
+            },
+            "table": {
+                "poNumber": "PO #",
+                "supplier": "Supplier",
+                "date": "Date",
+                "expectedDelivery": "Expected Delivery",
+                "actualDelivery": "Actual Delivery",
+                "status": "Status",
+                "payment": "Payment",
+                "total": "Total",
+                "actions": "Actions"
+            },
+            "form": {
+                "supplier": "Supplier",
+                "selectSupplier": "Select a supplier",
+                "orderDate": "Order date",
+                "expectedDelivery": "Expected delivery date",
+                "notes": "Notes",
+                "notesPlaceholder": "Additional notes...",
+                "items": "Items",
+                "addItem": "Add item",
+                "product": "Product",
+                "selectProduct": "Select a product",
+                "quantity": "Quantity",
+                "unitPrice": "Unit price",
+                "discount": "Discount",
+                "tax": "Tax",
+                "lineTotal": "Line total",
+                "subtotal": "Subtotal",
+                "discountAmount": "Total discount",
+                "taxAmount": "Taxes",
+                "totalAmount": "Total",
+                "noItems": "No items added",
+                "requiredFields": "Please fill in all required fields"
+            },
+            "actions": {
+                "view": "View",
+                "edit": "Edit",
+                "delete": "Delete",
+                "confirm": "Confirm",
+                "markReceived": "Mark as received",
+                "send": "Send",
+                "cancel": "Cancel",
+                "save": "Save",
+                "saveDraft": "Save as draft",
+                "saveAndSend": "Save and send"
+            }
+        },
+        "suppliers": {
+            "title": "Suppliers",
+            "subtitle": "Manage your suppliers",
+            "newSupplier": "New Supplier",
+            "noSuppliers": "No suppliers",
+            "searchPlaceholder": "Search suppliers..."
+        }
     }
 }

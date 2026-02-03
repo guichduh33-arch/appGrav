@@ -5,6 +5,20 @@
     margin: 0 auto;
 }
 
+/* Offline Banner */
+.purchase-orders-page__offline-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    margin-bottom: var(--space-lg);
+    background: var(--color-warning-bg, rgba(251, 191, 36, 0.1));
+    border: 1px solid var(--color-warning, #fbbf24);
+    border-radius: var(--radius-md);
+    color: var(--color-warning, #fbbf24);
+    font-weight: 500;
+}
+
 /* Header */
 .purchase-orders-page__header {
     display: flex;

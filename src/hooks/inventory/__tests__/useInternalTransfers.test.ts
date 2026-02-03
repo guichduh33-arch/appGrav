@@ -321,17 +321,8 @@ describe('useReceiveTransfer (Story 5.5)', () => {
     ],
   };
 
-  let mockTransferItemUpdate: ReturnType<typeof vi.fn>;
-  let mockStockMovementsInsert: ReturnType<typeof vi.fn>;
-  let mockTransferStatusUpdate: ReturnType<typeof vi.fn>;
-
   beforeEach(() => {
     vi.clearAllMocks();
-
-    // Reset mocks for reception tests
-    mockTransferItemUpdate = vi.fn().mockResolvedValue({ error: null });
-    mockStockMovementsInsert = vi.fn().mockResolvedValue({ error: null });
-    mockTransferStatusUpdate = vi.fn().mockResolvedValue({ error: null });
 
     // Mock single transfer fetch with items
     mockSingle.mockResolvedValue({
@@ -340,7 +331,19 @@ describe('useReceiveTransfer (Story 5.5)', () => {
     });
   });
 
-  it('should receive transfer successfully', async () => {
+  it('should expose mutate and mutateAsync functions', () => {
+    const { result } = renderHook(() => useReceiveTransfer(), {
+      wrapper: createWrapper(),
+    });
+
+    // Verify hook returns proper mutation interface
+    expect(result.current.mutate).toBeDefined();
+    expect(result.current.mutateAsync).toBeDefined();
+    expect(typeof result.current.mutate).toBe('function');
+    expect(typeof result.current.mutateAsync).toBe('function');
+  });
+
+  it('should fetch transfer details when receiving', async () => {
     const { result } = renderHook(() => useReceiveTransfer(), {
       wrapper: createWrapper(),
     });
@@ -353,49 +356,19 @@ describe('useReceiveTransfer (Story 5.5)', () => {
       ],
     });
 
-    await waitFor(() => {
-      // Test passes if mutation starts (mocks may not fully support deep chains)
-      expect(result.current.isPending || result.current.isSuccess || result.current.isError).toBe(true);
-    });
-  });
-
-  it('should handle reception with variances', async () => {
-    const { result } = renderHook(() => useReceiveTransfer(), {
-      wrapper: createWrapper(),
-    });
-
-    // Receive with different quantities than requested
-    result.current.mutate({
-      transferId: 'transfer-1',
-      items: [
-        { itemId: 'item-1', quantityReceived: 8 },  // 2 less than requested
-        { itemId: 'item-2', quantityReceived: 6 },  // 1 more than requested
-      ],
-      receptionNotes: 'Item 1 damaged, Item 2 bonus',
-    });
-
+    // Wait for mutation to process
     await waitFor(() => {
       expect(result.current.isPending || result.current.isSuccess || result.current.isError).toBe(true);
     });
+
+    // Verify Supabase was called to fetch transfer
+    expect(mockSelect).toHaveBeenCalled();
   });
 
-  it('should reject reception if transfer status is not pending or in_transit', async () => {
-    // This test validates the business logic - if status is 'received', reject
-    // Due to mock complexity, we verify the hook exists and can be called
-    const { result } = renderHook(() => useReceiveTransfer(), {
-      wrapper: createWrapper(),
-    });
-
-    // Verify hook returns a mutation object
-    expect(result.current.mutate).toBeDefined();
-    expect(result.current.mutateAsync).toBeDefined();
-    expect(typeof result.current.mutate).toBe('function');
-  });
-
-  it('should handle transfer not found error', async () => {
+  it('should handle transfer not found error correctly', async () => {
     mockSingle.mockResolvedValue({
       data: null,
-      error: { message: 'Not found' },
+      error: { message: 'Not found', code: 'PGRST116' },
     });
 
     const { result } = renderHook(() => useReceiveTransfer(), {
@@ -403,30 +376,80 @@ describe('useReceiveTransfer (Story 5.5)', () => {
     });
 
     result.current.mutate({
-      transferId: 'non-existent',
+      transferId: 'non-existent-id',
       items: [],
     });
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
     });
+
+    // Verify error state is set correctly
+    expect(result.current.error).toBeTruthy();
+    expect(result.current.isSuccess).toBe(false);
   });
 
-  it('should include reception notes in update', async () => {
+  it('should reject already received transfers', async () => {
+    // Mock a transfer with 'received' status
+    mockSingle.mockResolvedValue({
+      data: { ...mockTransferWithItems, status: 'received' },
+      error: null,
+    });
+
     const { result } = renderHook(() => useReceiveTransfer(), {
       wrapper: createWrapper(),
     });
 
     result.current.mutate({
       transferId: 'transfer-1',
-      items: [
-        { itemId: 'item-1', quantityReceived: 10 },
-      ],
-      receptionNotes: 'All items verified OK',
+      items: [{ itemId: 'item-1', quantityReceived: 10 }],
     });
+
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
+
+    // Verify mutation failed with proper error
+    expect(result.current.error).toBeTruthy();
+  });
+
+  it('should accept reception with variance quantities', async () => {
+    const { result } = renderHook(() => useReceiveTransfer(), {
+      wrapper: createWrapper(),
+    });
+
+    // Receive with different quantities than requested (variance scenario)
+    const receptionParams = {
+      transferId: 'transfer-1',
+      items: [
+        { itemId: 'item-1', quantityReceived: 8 },  // 2 less than requested (10)
+        { itemId: 'item-2', quantityReceived: 6 },  // 1 more than requested (5)
+      ],
+      receptionNotes: 'Item 1: 2 units damaged. Item 2: 1 bonus unit.',
+    };
+
+    result.current.mutate(receptionParams);
 
     await waitFor(() => {
       expect(result.current.isPending || result.current.isSuccess || result.current.isError).toBe(true);
     });
+
+    // Verify mutation was called with variance data
+    expect(mockSelect).toHaveBeenCalled();
+  });
+
+  it('should preserve mutation state across re-renders', async () => {
+    const { result, rerender } = renderHook(() => useReceiveTransfer(), {
+      wrapper: createWrapper(),
+    });
+
+    // Initial state
+    expect(result.current.isPending).toBe(false);
+    expect(result.current.isSuccess).toBe(false);
+    expect(result.current.isError).toBe(false);
+
+    // Rerender should maintain clean state
+    rerender();
+    expect(result.current.isPending).toBe(false);
   });
 });

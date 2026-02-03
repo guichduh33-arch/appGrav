@@ -47,10 +47,12 @@ export default function SalesReportsPage() {
 
                     <div className="h-6 w-px bg-gray-200 mx-1"></div>
 
-                    <Button variant="secondary" leftIcon={<Download className="w-4 h-4" />}>
+                    <Button variant="secondary">
+                        <Download className="w-4 h-4" />
                         Export PDF
                     </Button>
-                    <Button variant="secondary" leftIcon={<Download className="w-4 h-4" />}>
+                    <Button variant="secondary">
+                        <Download className="w-4 h-4" />
                         Export CSV
                     </Button>
                 </div>
@@ -177,8 +179,9 @@ export default function SalesReportsPage() {
                     </table>
                 </div>
                 <div className="border-t border-gray-100 p-4 flex justify-center">
-                    <Button variant="ghost" size="sm" rightIcon={<ArrowUpRight className="w-4 h-4" />}>
+                    <Button variant="ghost" size="sm">
                         View All Transactions
+                        <ArrowUpRight className="w-4 h-4" />
                     </Button>
                 </div>
             </Card>

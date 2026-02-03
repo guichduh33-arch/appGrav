@@ -16,10 +16,17 @@ const STATUS_COLORS = {
   cancelled: '#ef4444'
 } as const
 
+// Locale mapping for date formatting
+const LOCALE_MAP: Record<string, string> = {
+  fr: 'fr-FR',
+  en: 'en-US',
+  id: 'id-ID'
+}
+
 export default function TransferDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { isOnline } = useNetworkStatus()
 
   const { data: transfer, isLoading, error } = useTransfer(id ?? null)
@@ -211,7 +218,7 @@ export default function TransferDetailPage() {
         <div className="info-item">
           <span className="info-label">{t('inventory.transfers.form.date')}</span>
           <span className="info-value">
-            {new Date(transfer.transfer_date).toLocaleDateString('fr-FR')}
+            {new Date(transfer.transfer_date).toLocaleDateString(LOCALE_MAP[i18n.language] || 'fr-FR')}
           </span>
         </div>
         <div className="info-item">
@@ -222,7 +229,7 @@ export default function TransferDetailPage() {
           <div className="info-item">
             <span className="info-label">{t('inventory.transfers.reception.statusReceived')}</span>
             <span className="info-value">
-              {new Date(transfer.approved_at).toLocaleDateString('fr-FR')}
+              {new Date(transfer.approved_at).toLocaleDateString(LOCALE_MAP[i18n.language] || 'fr-FR')}
             </span>
           </div>
         )}

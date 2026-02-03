@@ -1,139 +1,118 @@
-import { useState, useEffect } from 'react'
-import { Plus, Search, FileText, DollarSign, Package, Trash2, Eye, Edit2, Check, Clock } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
+import { useState, useMemo, useEffect, useRef } from 'react'
+import { Plus, Search, FileText, DollarSign, Package, Trash2, Eye, Edit2, Check, Clock, WifiOff } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { formatCurrency } from '@/utils/helpers'
+import { useNetworkStatus } from '@/hooks/useNetworkStatus'
+import {
+    usePurchaseOrders,
+    useDeletePurchaseOrder,
+    useUpdatePurchaseOrderStatus,
+    type TPOStatus,
+    type TPaymentStatus
+} from '@/hooks/purchasing/usePurchaseOrders'
+import { toast } from 'sonner'
 import './PurchaseOrdersPage.css'
 
-interface PurchaseOrder {
-    id: string
-    po_number: string
-    supplier_id: string
-    supplier?: {
-        name: string
-    }
-    status: 'draft' | 'sent' | 'confirmed' | 'partially_received' | 'received' | 'cancelled' | 'modified'
-    order_date: string
-    expected_delivery_date: string | null
-    actual_delivery_date: string | null
-    subtotal: number
-    discount_amount: number
-    tax_amount: number
-    total_amount: number
-    payment_status: 'unpaid' | 'partially_paid' | 'paid'
-    payment_date: string | null
-    notes: string | null
-    created_at: string
-}
-
-const STATUS_LABELS = {
-    draft: 'Brouillon',
-    sent: 'Envoyé',
-    confirmed: 'Confirmé',
-    partially_received: 'Partiellement Reçu',
-    received: 'Reçu',
-    cancelled: 'Annulé',
-    modified: 'Modifié'
-}
-
-const PAYMENT_STATUS_LABELS = {
-    unpaid: 'Non Payé',
-    partially_paid: 'Partiellement Payé',
-    paid: 'Payé'
-}
-
 export default function PurchaseOrdersPage() {
+    const { t } = useTranslation()
     const navigate = useNavigate()
-    const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>([])
-    const [loading, setLoading] = useState(true)
+    const { isOnline } = useNetworkStatus()
+    const hasCheckedInitialOnlineStatus = useRef(false)
+
+    // Filters
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState<string>('all')
     const [paymentFilter, setPaymentFilter] = useState<string>('all')
 
+    // React Query hooks
+    const { data: purchaseOrders = [], isLoading, error } = usePurchaseOrders()
+    const deleteMutation = useDeletePurchaseOrder()
+    const updateStatusMutation = useUpdatePurchaseOrderStatus()
+
+    // Check online status on mount
     useEffect(() => {
-        fetchPurchaseOrders()
-    }, [])
-
-    const fetchPurchaseOrders = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('purchase_orders')
-                .select(`
-                    *,
-                    supplier:suppliers(name)
-                `)
-                .order('order_date', { ascending: false })
-
-            if (error) throw error
-            if (data) {
-                setPurchaseOrders(data as PurchaseOrder[])
+        if (!hasCheckedInitialOnlineStatus.current) {
+            hasCheckedInitialOnlineStatus.current = true
+            if (!isOnline) {
+                toast.error(t('purchasing.orders.offlineWarning'))
             }
-        } catch (error) {
-            console.error('Error fetching purchase orders:', error)
-        } finally {
-            setLoading(false)
         }
-    }
+    }, [isOnline, t])
+
+    // Show error toast
+    useEffect(() => {
+        if (error) {
+            toast.error(t('purchasing.orders.loadError'))
+        }
+    }, [error, t])
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer ce bon de commande ?')) {
+        if (!isOnline) {
+            toast.error(t('purchasing.orders.offlineWarning'))
+            return
+        }
+
+        if (!confirm(t('purchasing.orders.deleteConfirm'))) {
             return
         }
 
         try {
-            const { error } = await supabase
-                .from('purchase_orders')
-                .delete()
-                .eq('id', id)
-
-            if (error) throw error
-            await fetchPurchaseOrders()
+            await deleteMutation.mutateAsync(id)
+            toast.success(t('purchasing.orders.deleteSuccess'))
         } catch (error) {
             console.error('Error deleting purchase order:', error)
-            alert('Erreur lors de la suppression du bon de commande')
+            // Handle specific validation error for non-draft PO deletion
+            if (error instanceof Error && error.message === 'DELETE_NOT_DRAFT') {
+                toast.error(t('purchasing.orders.deleteOnlyDraft'))
+            } else {
+                toast.error(t('purchasing.orders.deleteError'))
+            }
         }
     }
 
-    const handleUpdateStatus = async (id: string, status: string) => {
+    const handleUpdateStatus = async (id: string, status: TPOStatus) => {
+        if (!isOnline) {
+            toast.error(t('purchasing.orders.offlineWarning'))
+            return
+        }
+
         try {
-            const updateData: any = { status }
-
-            if (status === 'received') {
-                updateData.actual_delivery_date = new Date().toISOString()
-            }
-
-            const { error } = await supabase
-                .from('purchase_orders')
-                .update(updateData)
-                .eq('id', id)
-
-            if (error) throw error
-            await fetchPurchaseOrders()
+            await updateStatusMutation.mutateAsync({
+                purchaseOrderId: id,
+                status
+            })
+            toast.success(t('purchasing.orders.updateSuccess'))
         } catch (error) {
             console.error('Error updating purchase order status:', error)
+            toast.error(t('purchasing.orders.updateError'))
         }
     }
 
-    const filteredOrders = purchaseOrders.filter(po => {
-        const matchesSearch =
-            po.po_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            po.supplier?.name.toLowerCase().includes(searchTerm.toLowerCase())
+    // Memoized filtered orders
+    const filteredOrders = useMemo(() => {
+        return purchaseOrders.filter(po => {
+            const matchesSearch =
+                po.po_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                po.supplier?.name?.toLowerCase().includes(searchTerm.toLowerCase())
 
-        const matchesStatus = statusFilter === 'all' || po.status === statusFilter
-        const matchesPayment = paymentFilter === 'all' || po.payment_status === paymentFilter
+            const matchesStatus = statusFilter === 'all' || po.status === statusFilter
+            const matchesPayment = paymentFilter === 'all' || po.payment_status === paymentFilter
 
-        return matchesSearch && matchesStatus && matchesPayment
-    })
+            return matchesSearch && matchesStatus && matchesPayment
+        })
+    }, [purchaseOrders, searchTerm, statusFilter, paymentFilter])
 
-    const stats = {
+    // Memoized stats
+    const stats = useMemo(() => ({
         total: purchaseOrders.length,
         draft: purchaseOrders.filter(po => po.status === 'draft').length,
         pending: purchaseOrders.filter(po => ['sent', 'confirmed', 'partially_received'].includes(po.status)).length,
         completed: purchaseOrders.filter(po => po.status === 'received').length,
         totalValue: purchaseOrders.reduce((sum, po) => sum + (parseFloat(po.total_amount?.toString() ?? '0') || 0), 0)
-    }
+    }), [purchaseOrders])
 
-    const getStatusBadgeClass = (status: string) => {
+    const getStatusBadgeClass = (status: TPOStatus) => {
         switch (status) {
             case 'draft': return 'status-badge--gray'
             case 'sent': return 'status-badge--blue'
@@ -146,7 +125,7 @@ export default function PurchaseOrdersPage() {
         }
     }
 
-    const getPaymentBadgeClass = (status: string) => {
+    const getPaymentBadgeClass = (status: TPaymentStatus) => {
         switch (status) {
             case 'paid': return 'status-badge--success'
             case 'partially_paid': return 'status-badge--orange'
@@ -157,23 +136,32 @@ export default function PurchaseOrdersPage() {
 
     return (
         <div className="purchase-orders-page">
+            {/* Offline Warning Banner */}
+            {!isOnline && (
+                <div className="purchase-orders-page__offline-banner">
+                    <WifiOff size={20} />
+                    <span>{t('purchasing.orders.offlineWarning')}</span>
+                </div>
+            )}
+
             {/* Header */}
             <div className="purchase-orders-page__header">
                 <div>
                     <h1 className="purchase-orders-page__title">
                         <FileText size={32} />
-                        Bons de Commande
+                        {t('purchasing.orders.title')}
                     </h1>
                     <p className="purchase-orders-page__subtitle">
-                        Gérez vos commandes fournisseurs et suivez leur statut
+                        {t('purchasing.orders.subtitle')}
                     </p>
                 </div>
                 <button
                     className="btn btn-primary"
                     onClick={() => navigate('/purchasing/purchase-orders/new')}
+                    disabled={!isOnline}
                 >
                     <Plus size={20} />
-                    Nouveau Bon de Commande
+                    {t('purchasing.orders.newOrder')}
                 </button>
             </div>
 
@@ -185,7 +173,7 @@ export default function PurchaseOrdersPage() {
                     </div>
                     <div className="purchase-orders-stat__content">
                         <div className="purchase-orders-stat__value">{stats.total}</div>
-                        <div className="purchase-orders-stat__label">Total Commandes</div>
+                        <div className="purchase-orders-stat__label">{t('purchasing.orders.stats.total')}</div>
                     </div>
                 </div>
                 <div className="purchase-orders-stat">
@@ -194,7 +182,7 @@ export default function PurchaseOrdersPage() {
                     </div>
                     <div className="purchase-orders-stat__content">
                         <div className="purchase-orders-stat__value">{stats.pending}</div>
-                        <div className="purchase-orders-stat__label">En Attente</div>
+                        <div className="purchase-orders-stat__label">{t('purchasing.orders.stats.pending')}</div>
                     </div>
                 </div>
                 <div className="purchase-orders-stat">
@@ -203,7 +191,7 @@ export default function PurchaseOrdersPage() {
                     </div>
                     <div className="purchase-orders-stat__content">
                         <div className="purchase-orders-stat__value">{stats.completed}</div>
-                        <div className="purchase-orders-stat__label">Complétées</div>
+                        <div className="purchase-orders-stat__label">{t('purchasing.orders.stats.completed')}</div>
                     </div>
                 </div>
                 <div className="purchase-orders-stat">
@@ -212,7 +200,7 @@ export default function PurchaseOrdersPage() {
                     </div>
                     <div className="purchase-orders-stat__content">
                         <div className="purchase-orders-stat__value">{formatCurrency(stats.totalValue)}</div>
-                        <div className="purchase-orders-stat__label">Valeur Totale</div>
+                        <div className="purchase-orders-stat__label">{t('purchasing.orders.stats.totalValue')}</div>
                     </div>
                 </div>
             </div>
@@ -223,7 +211,7 @@ export default function PurchaseOrdersPage() {
                     <Search size={20} />
                     <input
                         type="text"
-                        placeholder="Rechercher un bon de commande..."
+                        placeholder={t('purchasing.orders.searchPlaceholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -232,41 +220,44 @@ export default function PurchaseOrdersPage() {
                     className="purchase-orders-filter"
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
+                    aria-label={t('purchasing.orders.status.label')}
                 >
-                    <option value="all">Tous les statuts</option>
-                    <option value="draft">Brouillon</option>
-                    <option value="sent">Envoyé</option>
-                    <option value="confirmed">Confirmé</option>
-                    <option value="partially_received">Partiellement Reçu</option>
-                    <option value="received">Reçu</option>
-                    <option value="cancelled">Annulé</option>
+                    <option value="all">{t('purchasing.orders.status.all')}</option>
+                    <option value="draft">{t('purchasing.orders.status.draft')}</option>
+                    <option value="sent">{t('purchasing.orders.status.sent')}</option>
+                    <option value="confirmed">{t('purchasing.orders.status.confirmed')}</option>
+                    <option value="partially_received">{t('purchasing.orders.status.partially_received')}</option>
+                    <option value="received">{t('purchasing.orders.status.received')}</option>
+                    <option value="cancelled">{t('purchasing.orders.status.cancelled')}</option>
                 </select>
                 <select
                     className="purchase-orders-filter"
                     value={paymentFilter}
                     onChange={(e) => setPaymentFilter(e.target.value)}
+                    aria-label={t('purchasing.orders.payment.label')}
                 >
-                    <option value="all">Tous les paiements</option>
-                    <option value="unpaid">Non Payé</option>
-                    <option value="partially_paid">Partiellement Payé</option>
-                    <option value="paid">Payé</option>
+                    <option value="all">{t('purchasing.orders.payment.all')}</option>
+                    <option value="unpaid">{t('purchasing.orders.payment.unpaid')}</option>
+                    <option value="partially_paid">{t('purchasing.orders.payment.partially_paid')}</option>
+                    <option value="paid">{t('purchasing.orders.payment.paid')}</option>
                 </select>
             </div>
 
             {/* Orders List */}
-            {loading ? (
-                <div className="purchase-orders-loading">Chargement...</div>
+            {isLoading ? (
+                <div className="purchase-orders-loading">{t('common.loading')}</div>
             ) : filteredOrders.length === 0 ? (
                 <div className="purchase-orders-empty">
                     <FileText size={48} />
-                    <h3>Aucun bon de commande</h3>
-                    <p>Commencez par créer votre premier bon de commande</p>
+                    <h3>{t('purchasing.orders.noOrders')}</h3>
+                    <p>{t('purchasing.orders.noOrdersDescription')}</p>
                     <button
                         className="btn btn-primary"
                         onClick={() => navigate('/purchasing/purchase-orders/new')}
+                        disabled={!isOnline}
                     >
                         <Plus size={20} />
-                        Nouveau Bon de Commande
+                        {t('purchasing.orders.newOrder')}
                     </button>
                 </div>
             ) : (
@@ -274,14 +265,14 @@ export default function PurchaseOrdersPage() {
                     <table>
                         <thead>
                             <tr>
-                                <th>N° BC</th>
-                                <th>Fournisseur</th>
-                                <th>Date</th>
-                                <th>Livraison Prévue</th>
-                                <th>Statut</th>
-                                <th>Paiement</th>
-                                <th>Total</th>
-                                <th>Actions</th>
+                                <th>{t('purchasing.orders.table.poNumber')}</th>
+                                <th>{t('purchasing.orders.table.supplier')}</th>
+                                <th>{t('purchasing.orders.table.date')}</th>
+                                <th>{t('purchasing.orders.table.expectedDelivery')}</th>
+                                <th>{t('purchasing.orders.table.status')}</th>
+                                <th>{t('purchasing.orders.table.payment')}</th>
+                                <th>{t('purchasing.orders.table.total')}</th>
+                                <th>{t('purchasing.orders.table.actions')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -300,12 +291,12 @@ export default function PurchaseOrdersPage() {
                                     </td>
                                     <td>
                                         <span className={`status-badge ${getStatusBadgeClass(po.status)}`}>
-                                            {STATUS_LABELS[po.status]}
+                                            {t(`purchasing.orders.status.${po.status}`)}
                                         </span>
                                     </td>
                                     <td>
                                         <span className={`status-badge ${getPaymentBadgeClass(po.payment_status)}`}>
-                                            {PAYMENT_STATUS_LABELS[po.payment_status]}
+                                            {t(`purchasing.orders.payment.${po.payment_status}`)}
                                         </span>
                                     </td>
                                     <td>
@@ -316,14 +307,15 @@ export default function PurchaseOrdersPage() {
                                             <button
                                                 className="btn-icon"
                                                 onClick={() => navigate(`/purchasing/purchase-orders/${po.id}`)}
-                                                title="Voir"
+                                                title={t('purchasing.orders.actions.view')}
                                             >
                                                 <Eye size={18} />
                                             </button>
                                             <button
                                                 className="btn-icon"
                                                 onClick={() => navigate(`/purchasing/purchase-orders/${po.id}/edit`)}
-                                                title="Modifier"
+                                                title={t('purchasing.orders.actions.edit')}
+                                                disabled={!isOnline}
                                             >
                                                 <Edit2 size={18} />
                                             </button>
@@ -331,7 +323,8 @@ export default function PurchaseOrdersPage() {
                                                 <button
                                                     className="btn-icon"
                                                     onClick={() => handleUpdateStatus(po.id, 'confirmed')}
-                                                    title="Confirmer"
+                                                    title={t('purchasing.orders.actions.confirm')}
+                                                    disabled={!isOnline}
                                                 >
                                                     <Check size={18} />
                                                 </button>
@@ -340,7 +333,8 @@ export default function PurchaseOrdersPage() {
                                                 <button
                                                     className="btn-icon"
                                                     onClick={() => handleUpdateStatus(po.id, 'received')}
-                                                    title="Marquer comme reçu"
+                                                    title={t('purchasing.orders.actions.markReceived')}
+                                                    disabled={!isOnline}
                                                 >
                                                     <Package size={18} />
                                                 </button>
@@ -349,7 +343,8 @@ export default function PurchaseOrdersPage() {
                                                 <button
                                                     className="btn-icon btn-icon--danger"
                                                     onClick={() => handleDelete(po.id)}
-                                                    title="Supprimer"
+                                                    title={t('purchasing.orders.actions.delete')}
+                                                    disabled={!isOnline}
                                                 >
                                                     <Trash2 size={18} />
                                                 </button>
