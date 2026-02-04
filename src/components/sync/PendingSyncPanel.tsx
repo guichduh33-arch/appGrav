@@ -5,7 +5,6 @@
  * Allows retry and delete actions on failed items.
  */
 
-import { useTranslation } from 'react-i18next';
 import { RefreshCw, Loader2, Cloud, CheckCircle } from 'lucide-react';
 import {
   Sheet,
@@ -40,14 +39,22 @@ const ENTITY_ORDER: TSyncEntity[] = [
 ];
 
 /**
- * Get entity label translation key
+ * Get entity label
  */
-function getEntityLabelKey(entity: TSyncEntity): string {
-  return `sync.entity.${entity}`;
+function getEntityLabel(entity: TSyncEntity): string {
+  const labels: Record<TSyncEntity, string> = {
+    pos_sessions: 'POS Sessions',
+    orders: 'Orders',
+    order_items: 'Order Items',
+    payments: 'Payments',
+    customers: 'Customers',
+    products: 'Products',
+    categories: 'Categories',
+  };
+  return labels[entity] || entity;
 }
 
 export function PendingSyncPanel({ open, onOpenChange }: PendingSyncPanelProps) {
-  const { t } = useTranslation();
   const {
     groupedItems,
     totalCount,
@@ -72,7 +79,7 @@ export function PendingSyncPanel({ open, onOpenChange }: PendingSyncPanelProps) 
           <div className="flex items-center justify-between">
             <SheetTitle className="flex items-center gap-2">
               <Cloud className="h-5 w-5 text-blue-600" />
-              {t('sync.panel.title')}
+              Pending Sync
             </SheetTitle>
             <Button
               variant="ghost"
@@ -86,16 +93,16 @@ export function PendingSyncPanel({ open, onOpenChange }: PendingSyncPanelProps) 
               ) : (
                 <RefreshCw className="h-4 w-4" />
               )}
-              <span className="ml-1.5">{t('sync.panel.refresh')}</span>
+              <span className="ml-1.5">Refresh</span>
             </Button>
           </div>
           <SheetDescription>
             {pendingTotal > 0
-              ? t('sync.panel.subtitle', { count: pendingTotal })
-              : t('sync.panel.noItems')}
+              ? `${pendingTotal} items pending`
+              : 'No items pending'}
             {statusCounts.syncing > 0 && (
               <span className="ml-2 text-yellow-600">
-                ({statusCounts.syncing} {t('sync.status.syncing').toLowerCase()})
+                ({statusCounts.syncing} syncing)
               </span>
             )}
           </SheetDescription>
@@ -107,7 +114,7 @@ export function PendingSyncPanel({ open, onOpenChange }: PendingSyncPanelProps) 
           {totalCount === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <CheckCircle className="h-12 w-12 text-green-500 mb-4" />
-              <p className="text-muted-foreground">{t('sync.panel.noItems')}</p>
+              <p className="text-muted-foreground">No items pending</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -118,7 +125,7 @@ export function PendingSyncPanel({ open, onOpenChange }: PendingSyncPanelProps) 
                 return (
                   <div key={entity}>
                     <h3 className="text-sm font-semibold text-muted-foreground mb-2 px-1">
-                      {t(getEntityLabelKey(entity))} ({items.length})
+                      {getEntityLabel(entity)} ({items.length})
                     </h3>
                     <div className="space-y-1">
                       {items.map((item) => (

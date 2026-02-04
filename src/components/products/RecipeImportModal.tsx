@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback } from 'react'
-import { useTranslation } from 'react-i18next'
 import { X, Upload, Download, FileSpreadsheet, CheckCircle, AlertCircle, Loader2, ChefHat } from 'lucide-react'
 import { importRecipes, downloadRecipeImportTemplate, IRecipeImportResult } from '@/services/products/recipeImportExport'
 import './ProductImportModal.css' // Reuse the same styles
@@ -10,7 +9,6 @@ interface RecipeImportModalProps {
 }
 
 export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportModalProps) {
-    const { t } = useTranslation()
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const [file, setFile] = useState<File | null>(null)
@@ -55,7 +53,7 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
 
     const handleFileSelect = useCallback((selectedFile: File) => {
         if (!selectedFile.name.endsWith('.csv')) {
-            alert(t('recipe_import.invalid_format', 'Veuillez sélectionner un fichier CSV'))
+            alert('Please select a CSV file')
             return
         }
 
@@ -68,7 +66,7 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
             parsePreview(content)
         }
         reader.readAsText(selectedFile)
-    }, [t, parsePreview])
+    }, [parsePreview])
 
     const handleDrop = useCallback((e: React.DragEvent) => {
         e.preventDefault()
@@ -134,17 +132,17 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                     <div>
                         <h3 className="modal__title">
                             <ChefHat size={24} />
-                            {t('recipe_import.title', 'Importer des recettes')}
+                            Import Recipes
                         </h3>
                         <p className="modal__subtitle">
-                            {t('recipe_import.subtitle', 'Importez les compositions de produits depuis un fichier CSV')}
+                            Import product compositions from a CSV file
                         </p>
                     </div>
                     <button
                         className="modal__close"
                         onClick={onClose}
-                        title={t('common.close', 'Fermer')}
-                        aria-label={t('common.close', 'Fermer')}
+                        title="Close"
+                        aria-label="Close"
                     >
                         <X size={24} />
                     </button>
@@ -159,10 +157,10 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                             onClick={downloadRecipeImportTemplate}
                         >
                             <Download size={18} />
-                            {t('recipe_import.download_template', 'Télécharger le template')}
+                            Download Template
                         </button>
                         <span className="import-template-hint">
-                            {t('recipe_import.template_hint', 'Format: product_name, material_name, quantity, unit')}
+                            Format: product_name, material_name, quantity, unit
                         </span>
                     </div>
 
@@ -195,10 +193,10 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                                     <>
                                         <Upload size={48} />
                                         <p className="import-dropzone-text">
-                                            {t('recipe_import.drag_drop', 'Glissez-déposez un fichier CSV ici')}
+                                            Drag and drop a CSV file here
                                         </p>
                                         <p className="import-dropzone-hint">
-                                            {t('recipe_import.or_click', 'ou cliquez pour sélectionner')}
+                                            or click to select
                                         </p>
                                     </>
                                 )}
@@ -208,9 +206,9 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                             {preview.length > 0 && (
                                 <div className="import-preview">
                                     <h4 className="import-preview-title">
-                                        {t('recipe_import.preview', 'Aperçu')}
+                                        Preview
                                         <span className="import-preview-count">
-                                            ({preview.length - 1} {t('recipe_import.rows_shown', 'lignes affichées')})
+                                            ({preview.length - 1} rows shown)
                                         </span>
                                     </h4>
                                     <div className="import-preview-table-wrapper">
@@ -248,7 +246,7 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                                                 updateExisting: e.target.checked
                                             }))}
                                         />
-                                        <span>{t('recipe_import.options.update_existing', 'Mettre à jour les recettes existantes')}</span>
+                                        <span>Update existing recipes</span>
                                     </label>
                                     <label className="import-option">
                                         <input
@@ -259,7 +257,7 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                                                 skipErrors: e.target.checked
                                             }))}
                                         />
-                                        <span>{t('recipe_import.options.skip_errors', 'Ignorer les erreurs et continuer')}</span>
+                                        <span>Skip errors and continue</span>
                                     </label>
                                 </div>
                             )}
@@ -275,38 +273,38 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                                 ) : (
                                     <AlertCircle size={24} className="text-warning" />
                                 )}
-                                {t('recipe_import.results.title', 'Résultats de l\'import')}
+                                Import Results
                             </h4>
 
                             <div className="import-results-stats">
                                 <div className="import-stat created">
                                     <span className="import-stat-value">{result.created}</span>
                                     <span className="import-stat-label">
-                                        {t('recipe_import.results.created', 'recettes créées')}
+                                        recipes created
                                     </span>
                                 </div>
                                 <div className="import-stat updated">
                                     <span className="import-stat-value">{result.updated}</span>
                                     <span className="import-stat-label">
-                                        {t('recipe_import.results.updated', 'recettes mises à jour')}
+                                        recipes updated
                                     </span>
                                 </div>
                                 <div className="import-stat errors">
                                     <span className="import-stat-value">{result.errors.length}</span>
                                     <span className="import-stat-label">
-                                        {t('recipe_import.results.errors', 'erreurs')}
+                                        errors
                                     </span>
                                 </div>
                             </div>
 
                             {result.errors.length > 0 && (
                                 <div className="import-errors">
-                                    <h5>{t('recipe_import.error_details', 'Détails des erreurs')}</h5>
+                                    <h5>Error Details</h5>
                                     <ul className="import-errors-list">
                                         {result.errors.slice(0, 10).map((err, i) => (
                                             <li key={i} className="import-error-item">
                                                 <span className="import-error-row">
-                                                    {t('recipe_import.error_row', 'Ligne')} {err.row}
+                                                    Row {err.row}
                                                 </span>
                                                 {err.product && (
                                                     <span className="import-error-sku">
@@ -318,7 +316,7 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                                         ))}
                                         {result.errors.length > 10 && (
                                             <li className="import-error-more">
-                                                ... {t('recipe_import.and_more', 'et')} {result.errors.length - 10} {t('recipe_import.more_errors', 'autres erreurs')}
+                                                ... and {result.errors.length - 10} more errors
                                             </li>
                                         )}
                                     </ul>
@@ -336,14 +334,14 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                                 className="btn btn-outline"
                                 onClick={handleReset}
                             >
-                                {t('recipe_import.import_another', 'Importer un autre fichier')}
+                                Import another file
                             </button>
                             <button
                                 type="button"
                                 className="btn btn-primary"
                                 onClick={onClose}
                             >
-                                {t('common.close', 'Fermer')}
+                                Close
                             </button>
                         </>
                     ) : (
@@ -353,7 +351,7 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                                 className="btn btn-outline"
                                 onClick={onClose}
                             >
-                                {t('common.cancel', 'Annuler')}
+                                Cancel
                             </button>
                             <button
                                 type="button"
@@ -364,12 +362,12 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                                 {importing ? (
                                     <>
                                         <Loader2 size={18} className="spin" />
-                                        {t('recipe_import.importing', 'Importation en cours...')}
+                                        Importing...
                                     </>
                                 ) : (
                                     <>
                                         <Upload size={18} />
-                                        {t('recipe_import.import', 'Importer')}
+                                        Import
                                     </>
                                 )}
                             </button>

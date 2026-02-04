@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { ChevronRight, ArrowLeft, Download } from 'lucide-react';
 import { OverviewTab } from './components/OverviewTab';
 import { SalesTab } from './components/SalesTab';
@@ -34,7 +33,6 @@ import { REPORT_CATEGORIES } from './ReportsConfig';
 import './ReportsPage.css';
 
 const ReportsPage = () => {
-    const { t } = useTranslation();
     const [activeCategoryId, setActiveCategoryId] = useState<string>('sales');
     const [activeReportId, setActiveReportId] = useState<string | null>(null);
 
@@ -117,7 +115,7 @@ const ReportsPage = () => {
             {/* Sidebar */}
             <aside className="reports-sidebar">
                 <div className="reports-sidebar__header">
-                    <h1 className="reports-sidebar__title">{t('reporting.title')}</h1>
+                    <h1 className="reports-sidebar__title">Reports & Analytics</h1>
                     <p className="reports-sidebar__subtitle">Analytics & Logs</p>
                 </div>
                 <nav className="reports-sidebar__nav">
@@ -131,7 +129,7 @@ const ReportsPage = () => {
                             className={`reports-nav-item ${activeCategoryId === category.id ? 'active' : ''}`}
                         >
                             <category.icon size={18} className="reports-nav-item__icon" />
-                            <span className="reports-nav-item__label">{t(category.title, category.title)}</span>
+                            <span className="reports-nav-item__label">{category.title}</span>
                             {activeCategoryId === category.id && <ChevronRight size={14} className="reports-nav-item__arrow" />}
                         </button>
                     ))}
@@ -160,7 +158,7 @@ const ReportsPage = () => {
                             </>
                         ) : (
                             <div>
-                                <h2 className="reports-header__title">{t(activeCategory.title, activeCategory.title)}</h2>
+                                <h2 className="reports-header__title">{activeCategory.title}</h2>
                                 <p className="reports-header__subtitle">Select a report to view details</p>
                             </div>
                         )}

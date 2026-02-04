@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import {
   Package,
   Factory,
@@ -78,7 +77,6 @@ function NumberInput({ label, value, onChange, min, max, step = 1, suffix }: Num
 }
 
 export default function ModuleSettingsSection() {
-  const { t } = useTranslation();
   const { data: settings, isLoading } = useModuleSettings();
   const updateSetting = useUpdateModuleSetting();
 
@@ -92,12 +90,12 @@ export default function ModuleSettingsSection() {
         <div className="settings-section__header">
           <h2 className="settings-section__title">
             <Package size={20} />
-            {t('settings.modules.title', 'Modules')}
+            Modules
           </h2>
         </div>
         <div className="settings-section__body" style={{ textAlign: 'center', padding: '2rem' }}>
           <RefreshCw size={24} className="spinning" />
-          <p>{t('common.loading', 'Chargement...')}</p>
+          <p>Loading...</p>
         </div>
       </div>
     );
@@ -108,10 +106,10 @@ export default function ModuleSettingsSection() {
       <div className="settings-section__header">
         <h2 className="settings-section__title">
           <Package size={20} />
-          {t('settings.modules.title', 'Modules')}
+          Modules
         </h2>
         <p className="settings-section__description">
-          {t('settings.modules.description', 'Activez ou désactivez les modules de l\'application')}
+          Enable or disable application modules
         </p>
       </div>
       <div className="settings-section__body">
@@ -119,15 +117,15 @@ export default function ModuleSettingsSection() {
           {/* Production Module */}
           <ModuleCard
             icon={<Factory size={24} />}
-            title={t('settings.modules.production.title', 'Production')}
-            description={t('settings.modules.production.description', 'Gestion de la production et des recettes')}
+            title="Production"
+            description="Production and recipe management"
             enabled={settings.production.enabled}
             onToggle={(v) => handleUpdate('production', 'enabled', v)}
           >
             <div className="toggle-group toggle-group--compact">
               <div className="toggle-group__info">
                 <span className="toggle-group__label">
-                  {t('settings.modules.production.autoConsumeStock', 'Consommation auto du stock')}
+                  Auto consume stock
                 </span>
               </div>
               <div
@@ -140,13 +138,13 @@ export default function ModuleSettingsSection() {
           {/* B2B Module */}
           <ModuleCard
             icon={<Users size={24} />}
-            title={t('settings.modules.b2b.title', 'B2B / Wholesale')}
-            description={t('settings.modules.b2b.description', 'Commandes en gros et clients professionnels')}
+            title="B2B / Wholesale"
+            description="Wholesale orders and business customers"
             enabled={settings.b2b.enabled}
             onToggle={(v) => handleUpdate('b2b', 'enabled', v)}
           >
             <NumberInput
-              label={t('settings.modules.b2b.minOrderAmount', 'Commande minimum')}
+              label="Minimum order"
               value={settings.b2b.min_order_amount}
               onChange={(v) => handleUpdate('b2b', 'min_order_amount', v)}
               min={0}
@@ -154,42 +152,42 @@ export default function ModuleSettingsSection() {
               suffix="Rp"
             />
             <NumberInput
-              label={t('settings.modules.b2b.defaultPaymentTerms', 'Délai de paiement')}
+              label="Payment terms"
               value={settings.b2b.default_payment_terms}
               onChange={(v) => handleUpdate('b2b', 'default_payment_terms', v)}
               min={0}
               max={90}
-              suffix={t('common.days', 'jours')}
+              suffix="days"
             />
           </ModuleCard>
 
           {/* Purchasing Module */}
           <ModuleCard
             icon={<ShoppingBag size={24} />}
-            title={t('settings.modules.purchasing.title', 'Achats')}
-            description={t('settings.modules.purchasing.description', 'Bons de commande et gestion des fournisseurs')}
+            title="Purchasing"
+            description="Purchase orders and supplier management"
             enabled={settings.purchasing.enabled}
             onToggle={(v) => handleUpdate('purchasing', 'enabled', v)}
           >
             <NumberInput
-              label={t('settings.modules.purchasing.autoReorderThreshold', 'Seuil de réapprovisionnement auto')}
+              label="Auto reorder threshold"
               value={settings.purchasing.auto_reorder_threshold}
               onChange={(v) => handleUpdate('purchasing', 'auto_reorder_threshold', v)}
               min={0}
-              suffix={t('common.units', 'unités')}
+              suffix="units"
             />
           </ModuleCard>
 
           {/* Loyalty Module */}
           <ModuleCard
             icon={<Gift size={24} />}
-            title={t('settings.modules.loyalty.title', 'Fidélité')}
-            description={t('settings.modules.loyalty.description', 'Programme de points et récompenses')}
+            title="Loyalty"
+            description="Points program and rewards"
             enabled={settings.loyalty.enabled}
             onToggle={(v) => handleUpdate('loyalty', 'enabled', v)}
           >
             <NumberInput
-              label={t('settings.modules.loyalty.pointsPerIdr', 'Points par Rp')}
+              label="Points per Rp"
               value={settings.loyalty.points_per_idr}
               onChange={(v) => handleUpdate('loyalty', 'points_per_idr', v)}
               min={100}
@@ -197,35 +195,35 @@ export default function ModuleSettingsSection() {
               suffix="Rp"
             />
             <NumberInput
-              label={t('settings.modules.loyalty.pointsExpiryDays', 'Expiration des points')}
+              label="Points expiry"
               value={settings.loyalty.points_expiry_days}
               onChange={(v) => handleUpdate('loyalty', 'points_expiry_days', v)}
               min={30}
               max={730}
-              suffix={t('common.days', 'jours')}
+              suffix="days"
             />
           </ModuleCard>
 
           {/* KDS Module */}
           <ModuleCard
             icon={<ChefHat size={24} />}
-            title={t('settings.modules.kds.title', 'KDS')}
-            description={t('settings.modules.kds.description', 'Affichage cuisine et gestion des commandes')}
+            title="KDS"
+            description="Kitchen display and order management"
             enabled={settings.kds.enabled}
             onToggle={(v) => handleUpdate('kds', 'enabled', v)}
           >
             <NumberInput
-              label={t('settings.modules.kds.autoAcknowledgeDelay', 'Délai accusé auto')}
+              label="Auto acknowledge delay"
               value={settings.kds.auto_acknowledge_delay}
               onChange={(v) => handleUpdate('kds', 'auto_acknowledge_delay', v)}
               min={0}
               max={60}
-              suffix={t('common.seconds', 'sec')}
+              suffix="sec"
             />
             <div className="toggle-group toggle-group--compact">
               <div className="toggle-group__info">
                 <span className="toggle-group__label">
-                  {t('settings.modules.kds.soundNewOrder', 'Son nouvelle commande')}
+                  New order sound
                 </span>
               </div>
               <div

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { Save, RotateCcw, AlertCircle } from 'lucide-react';
 import { useSettingsByCategory, useUpdateSetting, useResetSetting } from '../../hooks/settings';
 import { useSettingsStore } from '../../stores/settingsStore';
@@ -9,7 +8,6 @@ import toast from 'react-hot-toast';
 
 const CategorySettingsPage = () => {
   const location = useLocation();
-  const { i18n } = useTranslation();
 
   // Extract category from URL path (e.g., /settings/company -> company)
   // Default to 'company' when at /settings root
@@ -29,10 +27,9 @@ const CategorySettingsPage = () => {
   // Get category info
   const categoryInfo = categories.find((c) => c.code === category);
 
-  // Language
-  const lang = i18n.language?.substring(0, 2) || 'fr';
-  const nameKey = `name_${lang}` as 'name_fr' | 'name_en' | 'name_id';
-  const descKey = `description_${lang}` as 'description_fr' | 'description_en' | 'description_id';
+  // Use English
+  const nameKey = 'name_en' as const;
+  const descKey = 'description_en' as const;
 
   // Initialize form values from settings
   useEffect(() => {

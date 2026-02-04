@@ -9,7 +9,6 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import { useNetworkStore } from '../stores/networkStore';
 import { startSyncWithDelay } from '../services/sync/syncEngine';
@@ -33,7 +32,6 @@ import { startOfflinePeriod, endOfflinePeriod } from '../services/sync/offlinePe
  * ```
  */
 export function useNetworkAlerts(): void {
-  const { t } = useTranslation();
   const isOnline = useNetworkStore((state) => state.isOnline);
 
   // Track previous online state to detect transitions
@@ -67,7 +65,7 @@ export function useNetworkAlerts(): void {
 
     if (!isOnline) {
       // Going offline
-      toast.error(t('network.alerts.connectionLost', 'Connexion perdue - Mode hors-ligne activé'), {
+      toast.error('Connection lost - Offline mode activated', {
         id: 'network-offline',
         duration: 5000,
         icon: '📴',
@@ -83,7 +81,7 @@ export function useNetworkAlerts(): void {
         });
     } else {
       // Coming back online
-      toast.success(t('network.alerts.connectionRestored', 'Connexion rétablie - Synchronisation en cours...'), {
+      toast.success('Connection restored - Syncing...', {
         id: 'network-online',
         duration: 4000,
         icon: '📶',
@@ -106,5 +104,5 @@ export function useNetworkAlerts(): void {
       // Trigger automatic sync after coming back online
       startSyncWithDelay();
     }
-  }, [isOnline, t]);
+  }, [isOnline]);
 }

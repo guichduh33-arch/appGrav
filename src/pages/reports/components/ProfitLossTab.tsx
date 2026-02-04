@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 import {
   BarChart,
   Bar,
@@ -22,7 +21,6 @@ import { formatCurrency as formatCurrencyPdf } from '@/services/reports/pdfExpor
 import type { IProfitLossReport } from '@/types/reporting';
 
 export function ProfitLossTab() {
-  const { t } = useTranslation();
   const { dateRange } = useDateRange({ defaultPreset: 'last30days' });
   const [chartView, setChartView] = useState<'bar' | 'line'>('bar');
 
@@ -98,7 +96,7 @@ export function ProfitLossTab() {
   if (error) {
     return (
       <div className="p-8 text-center text-red-600">
-        {t('common.error', 'Erreur lors du chargement des données')}
+        Error loading data
       </div>
     );
   }

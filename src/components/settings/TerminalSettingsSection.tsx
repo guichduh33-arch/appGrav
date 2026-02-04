@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { Monitor, Wifi, MapPin, Server, Edit2, Check, X, RefreshCw } from 'lucide-react';
 import { useTerminal } from '../../hooks/useTerminal';
-import { useTranslation } from 'react-i18next';
 import TerminalRegistrationModal from './TerminalRegistrationModal';
 
 export default function TerminalSettingsSection() {
-  const { t } = useTranslation();
   const {
     deviceId,
     terminalName,
@@ -43,7 +41,7 @@ export default function TerminalSettingsSection() {
         <div className="settings-section__header">
           <h3 className="settings-section__title">
             <Monitor size={20} />
-            {t('settings.terminal.title', 'POS Terminal')}
+            POS Terminal
           </h3>
         </div>
         <div className="settings-section__content">
@@ -58,17 +56,17 @@ export default function TerminalSettingsSection() {
           >
             <Monitor size={48} style={{ color: '#9ca3af', marginBottom: '1rem' }} />
             <h4 style={{ marginBottom: '0.5rem' }}>
-              {t('settings.terminal.notRegistered', 'Terminal Not Registered')}
+              Terminal not registered
             </h4>
             <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
-              {t('settings.terminal.notRegisteredHelp', 'Register this device to enable LAN communication and offline sync')}
+              Register this device to enable LAN communication and offline sync
             </p>
             <button
               className="btn btn-primary"
               onClick={() => setShowRegistrationModal(true)}
             >
               <Monitor size={18} />
-              {t('settings.terminal.registerNow', 'Register Terminal')}
+              Register Terminal
             </button>
           </div>
         </div>
@@ -89,7 +87,7 @@ export default function TerminalSettingsSection() {
       <div className="settings-section__header">
         <h3 className="settings-section__title">
           <Monitor size={20} />
-          {t('settings.terminal.title', 'POS Terminal')}
+          POS Terminal
         </h3>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           {/* Sync Status Badge */}
@@ -103,16 +101,14 @@ export default function TerminalSettingsSection() {
               color: serverSynced ? '#166534' : '#92400e',
             }}
           >
-            {serverSynced
-              ? t('settings.terminal.synced', 'Synced')
-              : t('settings.terminal.pendingSync', 'Pending Sync')}
+            {serverSynced ? 'Synced' : 'Pending Sync'}
           </span>
           {!serverSynced && (
             <button
               className="btn btn-sm btn-secondary"
               onClick={syncPendingChanges}
               disabled={isLoading}
-              title={t('settings.terminal.syncNow', 'Sync Now')}
+              title="Sync Now"
             >
               <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
             </button>
@@ -126,7 +122,7 @@ export default function TerminalSettingsSection() {
           <div className="settings-item">
             <div className="settings-item__label">
               <Wifi size={16} />
-              {t('settings.terminal.deviceId', 'Device ID')}
+              Device ID
             </div>
             <div className="settings-item__value" style={{ fontFamily: 'monospace', fontSize: '0.875rem' }}>
               {deviceId}
@@ -137,7 +133,7 @@ export default function TerminalSettingsSection() {
           <div className="settings-item">
             <div className="settings-item__label">
               <Monitor size={16} />
-              {t('settings.terminal.name', 'Terminal Name')}
+              Terminal Name
             </div>
             <div className="settings-item__value" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               {isEditing ? (
@@ -179,7 +175,7 @@ export default function TerminalSettingsSection() {
             <div className="settings-item">
               <div className="settings-item__label">
                 <MapPin size={16} />
-                {t('settings.terminal.location', 'Location')}
+                Location
               </div>
               <div className="settings-item__value">{location}</div>
             </div>
@@ -189,7 +185,7 @@ export default function TerminalSettingsSection() {
           <div className="settings-item">
             <div className="settings-item__label">
               <Server size={16} />
-              {t('settings.terminal.hubStatus', 'Hub Status')}
+              Hub Status
             </div>
             <div className="settings-item__value">
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
@@ -200,9 +196,7 @@ export default function TerminalSettingsSection() {
                   style={{ width: '1rem', height: '1rem' }}
                 />
                 <span>
-                  {isHub
-                    ? t('settings.terminal.isHubYes', 'This is the main hub')
-                    : t('settings.terminal.isHubNo', 'Not a hub')}
+                  {isHub ? 'This is the main hub' : 'Not a hub'}
                 </span>
               </label>
             </div>
@@ -211,7 +205,7 @@ export default function TerminalSettingsSection() {
           {/* Status */}
           <div className="settings-item">
             <div className="settings-item__label">
-              {t('settings.terminal.status', 'Status')}
+              Status
             </div>
             <div className="settings-item__value">
               <span

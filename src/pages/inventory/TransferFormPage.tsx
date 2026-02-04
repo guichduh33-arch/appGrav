@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Plus, Save, Trash2, Send, WifiOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useSectionsByType, useCreateTransfer, useTransfer } from '@/hooks/inventory'
@@ -21,7 +20,6 @@ interface TransferItemForm {
 export default function TransferFormPage() {
   const navigate = useNavigate()
   const { id } = useParams()
-  const { t } = useTranslation()
   const { isOnline } = useNetworkStatus()
   const isEditing = Boolean(id)
 
@@ -50,11 +48,11 @@ export default function TransferFormPage() {
     if (!hasCheckedInitialOnlineStatus.current) {
       hasCheckedInitialOnlineStatus.current = true
       if (!isOnline) {
-        toast.error(t('inventory.transfers.offline.blocked'))
+        toast.error('Transfers are not available offline')
         navigate('/inventory/transfers')
       }
     }
-  }, [isOnline, t, navigate])
+  }, [isOnline, navigate])
 
   // Load existing transfer data
   useEffect(() => {
@@ -123,28 +121,28 @@ export default function TransferFormPage() {
   const handleSubmit = async (sendDirectly: boolean = false) => {
     // Check online status
     if (!isOnline) {
-      toast.error(t('inventory.transfers.offline.blocked'))
+      toast.error('Transfers are not available offline')
       return
     }
 
     // Validation
     if (!fromSectionId || !toSectionId) {
-      toast.error(t('inventory.transfers.validation.selectLocations'))
+      toast.error('Please select source and destination locations')
       return
     }
 
     if (!responsiblePerson.trim()) {
-      toast.error(t('inventory.transfers.validation.responsibleRequired'))
+      toast.error('Responsible person is required')
       return
     }
 
     if (items.length === 0) {
-      toast.error(t('inventory.transfers.validation.addItems'))
+      toast.error('Please add at least one item')
       return
     }
 
     if (items.some(item => !item.product_id || item.quantity_requested <= 0)) {
-      toast.error(t('inventory.transfers.validation.fillItems'))
+      toast.error('Please fill in all item details')
       return
     }
 
@@ -162,11 +160,11 @@ export default function TransferFormPage() {
         }))
       })
 
-      toast.success(t('inventory.transfers.messages.created'))
+      toast.success('Transfer created successfully')
       navigate('/inventory/transfers')
     } catch (error) {
       console.error('Error saving transfer:', error)
-      toast.error(error instanceof Error ? error.message : t('inventory.transfers.messages.loadError'))
+      toast.error(error instanceof Error ? error.message : 'Error loading transfers')
     }
   }
 
@@ -189,7 +187,7 @@ export default function TransferFormPage() {
           color: '#b91c1c'
         }}>
           <WifiOff size={18} />
-          <span>{t('inventory.transfers.offline.connectionLost')}</span>
+          <span>Connection lost. Please reconnect to save changes.</span>
         </div>
       )}
 
@@ -199,10 +197,10 @@ export default function TransferFormPage() {
         </button>
         <div>
           <h1 className="transfer-form-title">
-            {isEditing ? t('inventory.transfers.editTransfer') : t('inventory.transfers.newTransfer')}
+            {isEditing ? 'Edit Transfer' : 'New Transfer'}
           </h1>
           <p className="transfer-form-subtitle">
-            {t('inventory.transfers.subtitle')}
+            Manage transfers between warehouse and sections
           </p>
         </div>
       </header>
@@ -210,16 +208,16 @@ export default function TransferFormPage() {
       <div className="transfer-form-container">
         {/* General Info */}
         <div className="transfer-form-section">
-          <h2>{t('common.settings')}</h2>
+          <h2>Settings</h2>
           <div className="form-grid">
             <div className="form-group">
-              <label>{t('inventory.transfers.form.from')} *</label>
+              <label>From *</label>
               <select
                 value={fromSectionId}
                 onChange={(e) => setFromSectionId(e.target.value)}
                 disabled={!isOnline}
               >
-                <option value="">{t('inventory.transfers.form.selectLocation')}</option>
+                <option value="">Select location</option>
                 {warehouses.map(section => (
                   <option key={section.id} value={section.id}>
                     {section.icon} {section.name}
@@ -228,13 +226,13 @@ export default function TransferFormPage() {
               </select>
             </div>
             <div className="form-group">
-              <label>{t('inventory.transfers.form.to')} *</label>
+              <label>To *</label>
               <select
                 value={toSectionId}
                 onChange={(e) => setToSectionId(e.target.value)}
                 disabled={!isOnline}
               >
-                <option value="">{t('inventory.transfers.form.selectLocation')}</option>
+                <option value="">Select location</option>
                 {destinationSections.map(section => (
                   <option key={section.id} value={section.id}>
                     {section.icon} {section.name}
@@ -243,17 +241,17 @@ export default function TransferFormPage() {
               </select>
             </div>
             <div className="form-group">
-              <label>{t('inventory.transfers.form.responsible')} *</label>
+              <label>Responsible *</label>
               <input
                 type="text"
                 value={responsiblePerson}
                 onChange={(e) => setResponsiblePerson(e.target.value)}
-                placeholder={t('inventory.transfers.form.responsible')}
+                placeholder="Responsible person"
                 disabled={!isOnline}
               />
             </div>
             <div className="form-group">
-              <label>{t('inventory.transfers.form.date')} *</label>
+              <label>Date *</label>
               <input
                 type="date"
                 value={transferDate}
@@ -263,12 +261,12 @@ export default function TransferFormPage() {
             </div>
           </div>
           <div className="form-group">
-            <label>{t('inventory.transfers.form.notes')}</label>
+            <label>Notes</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              placeholder={t('inventory.transfers.form.notesPlaceholder')}
+              placeholder="Additional notes..."
               disabled={!isOnline}
             />
           </div>
@@ -277,31 +275,31 @@ export default function TransferFormPage() {
         {/* Items */}
         <div className="transfer-form-section">
           <div className="section-header">
-            <h2>{t('inventory.transfers.form.items')}</h2>
+            <h2>Items</h2>
             <button
               className="btn btn-secondary btn-sm"
               onClick={addItem}
               disabled={!isOnline}
             >
               <Plus size={16} />
-              {t('inventory.transfers.form.addItem')}
+              Add Item
             </button>
           </div>
 
           {items.length === 0 ? (
             <div className="no-items">
-              <p>{t('inventory.transfers.form.noItems')}</p>
+              <p>No items added yet</p>
             </div>
           ) : (
             <div className="items-table">
               <table>
                 <thead>
                   <tr>
-                    <th>{t('inventory.transfers.form.product')}</th>
-                    <th style={{ width: '120px' }}>{t('inventory.transfers.form.quantity')}</th>
-                    <th style={{ width: '80px' }}>{t('common.unit')}</th>
-                    <th style={{ width: '120px' }}>{t('inventory.transfers.form.unitCost')}</th>
-                    <th style={{ width: '120px' }}>{t('inventory.transfers.form.lineTotal')}</th>
+                    <th>Product</th>
+                    <th style={{ width: '120px' }}>Quantity</th>
+                    <th style={{ width: '80px' }}>Unit</th>
+                    <th style={{ width: '120px' }}>Unit Cost</th>
+                    <th style={{ width: '120px' }}>Line Total</th>
                     <th style={{ width: '60px' }}></th>
                   </tr>
                 </thead>
@@ -314,7 +312,7 @@ export default function TransferFormPage() {
                           onChange={(e) => updateItem(index, 'product_id', e.target.value)}
                           disabled={!isOnline}
                         >
-                          <option value="">{t('inventory.transfers.form.selectProduct')}</option>
+                          <option value="">Select product</option>
                           {products.map(p => (
                             <option key={p.id} value={p.id}>
                               {p.name} {p.sku && `(${p.sku})`}
@@ -365,11 +363,11 @@ export default function TransferFormPage() {
           {items.length > 0 && (
             <div className="transfer-summary">
               <div className="summary-row">
-                <span className="summary-label">{t('inventory.transfers.form.totalItems')}:</span>
+                <span className="summary-label">Total Items:</span>
                 <span className="summary-value">{items.length}</span>
               </div>
               <div className="summary-row total">
-                <span className="summary-label">{t('inventory.transfers.form.totalValue')}:</span>
+                <span className="summary-label">Total Value:</span>
                 <span className="summary-value">Rp{getTotalValue().toLocaleString('id-ID')}</span>
               </div>
             </div>
@@ -382,26 +380,26 @@ export default function TransferFormPage() {
             className="btn btn-secondary"
             onClick={() => navigate('/inventory/transfers')}
           >
-            {t('inventory.transfers.actions.cancel')}
+            Cancel
           </button>
           <div className="action-group">
             <button
               className="btn btn-outline"
               onClick={() => handleSubmit(false)}
               disabled={!canSave}
-              title={!isOnline ? t('inventory.transfers.offline.connectionLost') : undefined}
+              title={!isOnline ? 'Connection lost. Please reconnect to save changes.' : undefined}
             >
               <Save size={18} />
-              {t('inventory.transfers.actions.saveDraft')}
+              Save as Draft
             </button>
             <button
               className="btn btn-primary"
               onClick={() => handleSubmit(true)}
               disabled={!canSave}
-              title={!isOnline ? t('inventory.transfers.offline.connectionLost') : undefined}
+              title={!isOnline ? 'Connection lost. Please reconnect to save changes.' : undefined}
             >
               <Send size={18} />
-              {isSubmitting ? t('common.saving') : t('inventory.transfers.actions.saveAndSend')}
+              {isSubmitting ? 'Saving...' : 'Save & Send'}
             </button>
           </div>
         </div>

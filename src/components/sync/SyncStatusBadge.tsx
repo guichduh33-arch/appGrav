@@ -6,7 +6,6 @@
  */
 
 import { Cloud, CloudOff, Check, AlertTriangle, RefreshCw } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import type { TOfflineOrderSyncStatus } from '@/types/offline';
 
@@ -43,8 +42,6 @@ export function SyncStatusBadge({
   showLabel = true,
   size = 'md',
 }: SyncStatusBadgeProps) {
-  const { t } = useTranslation();
-
   const sizeClasses = {
     sm: 'text-xs',
     md: 'text-sm',
@@ -63,7 +60,7 @@ export function SyncStatusBadge({
       icon: typeof Cloud;
       color: string;
       bgColor: string;
-      labelKey: string;
+      label: string;
       animate?: boolean;
     }
   > = {
@@ -71,31 +68,30 @@ export function SyncStatusBadge({
       icon: CloudOff,
       color: 'text-gray-500',
       bgColor: 'bg-gray-100',
-      labelKey: 'orders.local',
+      label: 'Local',
     },
     pending_sync: {
       icon: RefreshCw,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
-      labelKey: 'orders.pendingSync',
+      label: 'Pending Sync',
       animate: true,
     },
     synced: {
       icon: Check,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
-      labelKey: 'orders.synced',
+      label: 'Synced',
     },
     conflict: {
       icon: AlertTriangle,
       color: 'text-orange-600',
       bgColor: 'bg-orange-50',
-      labelKey: 'orders.conflict',
+      label: 'Conflict',
     },
   };
 
-  const { icon: Icon, color, bgColor, labelKey, animate } = config[status];
-  const label = t(labelKey);
+  const { icon: Icon, color, bgColor, label, animate } = config[status];
 
   return (
     <span

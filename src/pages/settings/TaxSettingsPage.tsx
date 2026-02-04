@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   Plus,
   Edit2,
@@ -44,7 +43,6 @@ const emptyForm: TaxRateFormData = {
 };
 
 const TaxSettingsPage = () => {
-  const { i18n } = useTranslation();
   const { data: taxRates, isLoading: loadingRates } = useTaxRates();
   const { data: settings, isLoading: loadingSettings } = useSettingsByCategory('tax');
   const createTaxRate = useCreateTaxRate();
@@ -57,9 +55,8 @@ const TaxSettingsPage = () => {
   const [formData, setFormData] = useState<TaxRateFormData>(emptyForm);
   const [settingValues, setSettingValues] = useState<Record<string, unknown>>({});
 
-  // Language
-  const lang = i18n.language?.substring(0, 2) || 'fr';
-  const nameKey = `name_${lang}` as 'name_fr' | 'name_en' | 'name_id';
+  // Use English
+  const nameKey = 'name_en' as const;
 
   // Open create modal
   const openCreateModal = () => {

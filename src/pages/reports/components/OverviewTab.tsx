@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { TrendingUp, TrendingDown, DollarSign, ShoppingBag, BarChart3 } from 'lucide-react';
 import { ReportingService } from '../../../services/ReportingService';
 import { SalesComparison } from '../../../types/reporting';
 import { formatCurrency } from '../../../utils/helpers';
 
 export const OverviewTab = () => {
-    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<{ current: SalesComparison | null; previous: SalesComparison | null }>({
         current: null,
@@ -45,8 +43,8 @@ export const OverviewTab = () => {
         return ((curr - prev) / prev) * 100;
     };
 
-    if (loading) return <div>{t('common.loading')}</div>;
-    if (!data.current) return <div>{t('common.no_data')}</div>;
+    if (loading) return <div>Loading...</div>;
+    if (!data.current) return <div>No data available.</div>;
 
     const revenueTrend = calculateTrend(data.current.total_revenue, data.previous?.total_revenue || 0);
     const ordersTrend = calculateTrend(data.current.transaction_count, data.previous?.transaction_count || 0);
@@ -65,7 +63,7 @@ export const OverviewTab = () => {
                         </div>
                     </div>
                     <div className="kpi-card__value">{formatCurrency(data.current.total_revenue)}</div>
-                    <div className="kpi-card__label">{t('reporting.overview.revenue_7d')}</div>
+                    <div className="kpi-card__label">Revenue (7d)</div>
                 </div>
 
                 {/* Orders */}
@@ -78,7 +76,7 @@ export const OverviewTab = () => {
                         </div>
                     </div>
                     <div className="kpi-card__value">{data.current.transaction_count}</div>
-                    <div className="kpi-card__label">{t('reporting.overview.orders')}</div>
+                    <div className="kpi-card__label">Orders</div>
                 </div>
 
                 {/* Avg Basket */}
@@ -91,7 +89,7 @@ export const OverviewTab = () => {
                         </div>
                     </div>
                     <div className="kpi-card__value">{formatCurrency(data.current.avg_basket)}</div>
-                    <div className="kpi-card__label">{t('reporting.overview.avg_basket')}</div>
+                    <div className="kpi-card__label">Average Transaction Value (ATV)</div>
                 </div>
             </div>
         </div>

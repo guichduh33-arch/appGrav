@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { X, Clock, RotateCcw, Trash2 } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 import { useOrderStore } from '../../../stores/orderStore'
 import { formatPrice } from '../../../utils/helpers'
 import PinVerificationModal from './PinVerificationModal'
@@ -12,14 +11,13 @@ interface HeldOrdersModalProps {
 }
 
 export default function HeldOrdersModal({ onClose, onRestore }: HeldOrdersModalProps) {
-    const { t, i18n } = useTranslation()
     const { heldOrders, removeHeldOrder } = useOrderStore()
     const [showPinModal, setShowPinModal] = useState(false)
     const [pendingDeleteOrderId, setPendingDeleteOrderId] = useState<string | null>(null)
 
     const formatHeldTime = (date: Date) => {
         const d = new Date(date)
-        return d.toLocaleTimeString(i18n.language === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit' })
+        return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
     }
 
     const handleDeleteClick = (orderId: string) => {
@@ -41,9 +39,9 @@ export default function HeldOrdersModal({ onClose, onRestore }: HeldOrdersModalP
                 <div className="modal__header">
                     <h3 className="modal__title">
                         <Clock size={20} />
-                        {t('pos.held_orders.title', { count: heldOrders.length })}
+                        Held Orders ({heldOrders.length})
                     </h3>
-                    <button className="modal__close" onClick={onClose} title={t('common.close')} aria-label={t('common.close')}>
+                    <button className="modal__close" onClick={onClose} title="Close" aria-label="Close">
                         <X size={24} />
                     </button>
                 </div>
@@ -52,7 +50,7 @@ export default function HeldOrdersModal({ onClose, onRestore }: HeldOrdersModalP
                     {heldOrders.length === 0 ? (
                         <div className="held-orders-empty">
                             <Clock size={48} opacity={0.3} />
-                            <p>{t('pos.held_orders.empty')}</p>
+                            <p>No orders on hold</p>
                         </div>
                     ) : (
                         <div className="held-orders-list">
@@ -62,9 +60,9 @@ export default function HeldOrdersModal({ onClose, onRestore }: HeldOrdersModalP
                                         <div className="held-order-card__info">
                                             <span className="held-order-card__number">{order.orderNumber}</span>
                                             <span className="held-order-card__type">
-                                                {order.orderType === 'dine_in' ? t('pos.header.dine_in') :
-                                                    order.orderType === 'takeaway' ? t('pos.header.takeaway') : t('pos.header.delivery')}
-                                                {order.tableNumber && ` - ${t('cart.table')} ${order.tableNumber}`}
+                                                {order.orderType === 'dine_in' ? 'Dine In' :
+                                                    order.orderType === 'takeaway' ? 'Takeaway' : 'Delivery'}
+                                                {order.tableNumber && ` - Table ${order.tableNumber}`}
                                             </span>
                                         </div>
                                         <span className="held-order-card__time">
@@ -76,7 +74,7 @@ export default function HeldOrdersModal({ onClose, onRestore }: HeldOrdersModalP
                                     <div className="held-order-card__items">
                                         {order.items.slice(0, 3).map((item, idx) => (
                                             <div key={idx} className="held-order-item">
-                                                <span className="held-order-item__qty">{item.quantity}×</span>
+                                                <span className="held-order-item__qty">{item.quantity}x</span>
                                                 <span className="held-order-item__name">
                                                     {item.type === 'combo' ? item.combo?.name : item.product?.name}
                                                 </span>
@@ -84,7 +82,7 @@ export default function HeldOrdersModal({ onClose, onRestore }: HeldOrdersModalP
                                         ))}
                                         {order.items.length > 3 && (
                                             <div className="held-order-item more">
-                                                {t('pos.held_orders.more_items', { count: order.items.length - 3 })}
+                                                +{order.items.length - 3} more items
                                             </div>
                                         )}
                                     </div>
@@ -97,7 +95,7 @@ export default function HeldOrdersModal({ onClose, onRestore }: HeldOrdersModalP
                                             <button
                                                 className="btn btn-danger btn-sm"
                                                 onClick={() => handleDeleteClick(order.id)}
-                                                title={t('common.delete')}
+                                                title="Delete"
                                             >
                                                 <Trash2 size={16} />
                                             </button>
@@ -106,7 +104,7 @@ export default function HeldOrdersModal({ onClose, onRestore }: HeldOrdersModalP
                                                 onClick={() => onRestore(order.id)}
                                             >
                                                 <RotateCcw size={16} />
-                                                {t('pos.held_orders.resume')}
+                                                Resume
                                             </button>
                                         </div>
                                     </div>

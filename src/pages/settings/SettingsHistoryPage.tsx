@@ -1,21 +1,16 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { History, User, Clock, ArrowRight, Search } from 'lucide-react';
 import { useSettingsHistory } from '../../hooks/settings';
 import { formatDistanceToNow } from 'date-fns';
-import { fr, enUS, id } from 'date-fns/locale';
-
-const LOCALES = { fr, en: enUS, id };
+import { enUS } from 'date-fns/locale';
 
 const SettingsHistoryPage = () => {
-  const { i18n } = useTranslation();
   const { data: history, isLoading } = useSettingsHistory();
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Language
-  const lang = (i18n.language?.substring(0, 2) || 'fr') as 'fr' | 'en' | 'id';
-  const locale = LOCALES[lang] || LOCALES.fr;
-  const nameKey = `name_${lang}` as 'name_fr' | 'name_en' | 'name_id';
+  // Use English
+  const locale = enUS;
+  const nameKey = 'name_en' as const;
 
   // Format value for display
   const formatValue = (value: unknown): string => {

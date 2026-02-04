@@ -12,11 +12,9 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import {
   useStockLevelsOffline,
   calculateStockStatus,
-  type TStockStatus,
 } from '@/hooks/offline/useStockLevelsOffline';
 
 interface IStockAlertsBadgeProps {
@@ -43,7 +41,6 @@ export const StockAlertsBadge: React.FC<IStockAlertsBadgeProps> = ({
   className = '',
   showLabel = false,
 }) => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const { stockLevels, hasData } = useStockLevelsOffline();
 
@@ -96,8 +93,8 @@ export const StockAlertsBadge: React.FC<IStockAlertsBadgeProps> = ({
         hover:opacity-80 transition-opacity cursor-pointer
         ${className}
       `.trim()}
-      title={t('inventory.alerts.viewAll')}
-      aria-label={t('inventory.alerts.badge', { count: alertCounts.total })}
+      title="View all alerts"
+      aria-label={`${alertCounts.total} stock alerts`}
     >
       <AlertTriangle
         className={`w-4 h-4 ${hasCritical ? 'text-red-500' : 'text-amber-500'}`}
@@ -105,7 +102,7 @@ export const StockAlertsBadge: React.FC<IStockAlertsBadgeProps> = ({
       />
       {showLabel && (
         <span className="text-sm text-gray-600">
-          {t('inventory.alerts.title')}
+          Stock Alerts
         </span>
       )}
       <span

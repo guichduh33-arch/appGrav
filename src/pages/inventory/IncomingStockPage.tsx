@@ -1,5 +1,4 @@
 import { useState, useEffect, Fragment } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
     TruckIcon,
@@ -40,7 +39,6 @@ interface PurchaseOrderWithItems {
 type FilterStatus = 'all' | 'pending' | 'partial' | 'received'
 
 export default function IncomingStockPage() {
-    const { t } = useTranslation()
     const navigate = useNavigate()
     const [orders, setOrders] = useState<PurchaseOrderWithItems[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -158,7 +156,7 @@ export default function IncomingStockPage() {
                     </div>
                     <div className="incoming-stat__info">
                         <span className="incoming-stat__value">{stats.total}</span>
-                        <span className="incoming-stat__label">{t('inventory.incoming.total_orders', 'Total Orders')}</span>
+                        <span className="incoming-stat__label">Total Orders</span>
                     </div>
                 </div>
                 <div className="incoming-stat">
@@ -167,7 +165,7 @@ export default function IncomingStockPage() {
                     </div>
                     <div className="incoming-stat__info">
                         <span className="incoming-stat__value">{stats.pending}</span>
-                        <span className="incoming-stat__label">{t('inventory.incoming.pending', 'Pending')}</span>
+                        <span className="incoming-stat__label">Pending</span>
                     </div>
                 </div>
                 <div className="incoming-stat">
@@ -176,7 +174,7 @@ export default function IncomingStockPage() {
                     </div>
                     <div className="incoming-stat__info">
                         <span className="incoming-stat__value">{stats.partial}</span>
-                        <span className="incoming-stat__label">{t('inventory.incoming.partial', 'Partial')}</span>
+                        <span className="incoming-stat__label">Partial</span>
                     </div>
                 </div>
                 <div className="incoming-stat">
@@ -185,7 +183,7 @@ export default function IncomingStockPage() {
                     </div>
                     <div className="incoming-stat__info">
                         <span className="incoming-stat__value">{stats.received}</span>
-                        <span className="incoming-stat__label">{t('inventory.incoming.received', 'Received')}</span>
+                        <span className="incoming-stat__label">Received</span>
                     </div>
                 </div>
             </div>
@@ -196,7 +194,7 @@ export default function IncomingStockPage() {
                     <Search size={18} />
                     <input
                         type="text"
-                        placeholder={t('inventory.incoming.search_placeholder', 'Search by order, supplier, product...')}
+                        placeholder="Search by order, supplier, product..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -206,25 +204,25 @@ export default function IncomingStockPage() {
                         className={`filter-btn ${filterStatus === 'all' ? 'active' : ''}`}
                         onClick={() => setFilterStatus('all')}
                     >
-                        {t('common.all', 'All')}
+                        All
                     </button>
                     <button
                         className={`filter-btn ${filterStatus === 'pending' ? 'active' : ''}`}
                         onClick={() => setFilterStatus('pending')}
                     >
-                        {t('inventory.incoming.pending', 'Pending')}
+                        Pending
                     </button>
                     <button
                         className={`filter-btn ${filterStatus === 'partial' ? 'active' : ''}`}
                         onClick={() => setFilterStatus('partial')}
                     >
-                        {t('inventory.incoming.partial', 'Partial')}
+                        Partial
                     </button>
                     <button
                         className={`filter-btn ${filterStatus === 'received' ? 'active' : ''}`}
                         onClick={() => setFilterStatus('received')}
                     >
-                        {t('inventory.incoming.received', 'Received')}
+                        Received
                     </button>
                 </div>
             </div>
@@ -234,33 +232,33 @@ export default function IncomingStockPage() {
                 {isLoading ? (
                     <div className="incoming-loading">
                         <div className="spinner" />
-                        <span>{t('common.loading', 'Loading...')}</span>
+                        <span>Loading...</span>
                     </div>
                 ) : filteredOrders.length === 0 ? (
                     <div className="incoming-empty">
                         <TruckIcon size={48} />
-                        <h3>{t('inventory.incoming.no_orders', 'No purchase orders found')}</h3>
-                        <p>{t('inventory.incoming.no_orders_desc', 'Purchase orders will appear here when created')}</p>
+                        <h3>No purchase orders found</h3>
+                        <p>Purchase orders will appear here when created</p>
                         <button
                             className="btn-primary"
                             onClick={() => navigate('/purchasing/purchase-orders/new')}
                         >
-                            {t('inventory.incoming.create_order', 'Create Purchase Order')}
+                            Create Purchase Order
                         </button>
                     </div>
                 ) : (
                     <table className="incoming-table">
                         <thead>
                             <tr>
-                                <th className="th-expand"><span className="sr-only">Détails</span></th>
-                                <th>{t('inventory.incoming.order_number', 'Order #')}</th>
-                                <th>{t('inventory.incoming.supplier', 'Supplier')}</th>
-                                <th>{t('inventory.incoming.order_date', 'Order Date')}</th>
-                                <th>{t('inventory.incoming.expected_date', 'Expected')}</th>
-                                <th>{t('inventory.incoming.items', 'Items')}</th>
-                                <th>{t('inventory.incoming.total', 'Total')}</th>
-                                <th>{t('inventory.incoming.status', 'Status')}</th>
-                                <th>{t('common.actions', 'Actions')}</th>
+                                <th className="th-expand"><span className="sr-only">Details</span></th>
+                                <th>Order #</th>
+                                <th>Supplier</th>
+                                <th>Order Date</th>
+                                <th>Expected</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -299,7 +297,7 @@ export default function IncomingStockPage() {
                                             </td>
                                             <td className="cell-items">
                                                 <Package size={14} />
-                                                {order.purchase_order_items.length} {t('inventory.incoming.products', 'products')}
+                                                {order.purchase_order_items.length} products
                                             </td>
                                             <td className="cell-total">
                                                 {formatCurrency(order.total_amount)}
@@ -315,7 +313,7 @@ export default function IncomingStockPage() {
                                                     type="button"
                                                     className="btn-icon-sm"
                                                     onClick={() => navigate(`/purchasing/purchase-orders/${order.id}`)}
-                                                    title={t('common.view', 'View')}
+                                                    title="View"
                                                 >
                                                     <Eye size={16} />
                                                 </button>
@@ -327,18 +325,18 @@ export default function IncomingStockPage() {
                                                     <div className="order-products-detail">
                                                         <div className="products-detail-header">
                                                             <Package size={16} />
-                                                            <span>{t('inventory.incoming.products_in_order', 'Produits de la commande')}</span>
+                                                            <span>Products in Order</span>
                                                         </div>
                                                         <table className="products-detail-table">
                                                             <thead>
                                                                 <tr>
-                                                                    <th>{t('inventory.incoming.product_name', 'Produit')}</th>
-                                                                    <th>{t('inventory.incoming.sku', 'SKU')}</th>
-                                                                    <th className="text-right">{t('inventory.incoming.qty_ordered', 'Qté Commandée')}</th>
-                                                                    <th className="text-right">{t('inventory.incoming.qty_received', 'Qté Reçue')}</th>
-                                                                    <th className="text-right">{t('inventory.incoming.unit_price', 'Prix Unit.')}</th>
-                                                                    <th className="text-right">{t('inventory.incoming.line_total', 'Total')}</th>
-                                                                    <th>{t('inventory.incoming.reception_status', 'Statut')}</th>
+                                                                    <th>Product</th>
+                                                                    <th>SKU</th>
+                                                                    <th className="text-right">Qty Ordered</th>
+                                                                    <th className="text-right">Qty Received</th>
+                                                                    <th className="text-right">Unit Price</th>
+                                                                    <th className="text-right">Total</th>
+                                                                    <th>Status</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>

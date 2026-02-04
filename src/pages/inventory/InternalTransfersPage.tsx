@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import { Plus, ArrowRightLeft, Clock, CheckCircle, XCircle, Eye, Filter, WifiOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useInternalTransfers } from '@/hooks/inventory'
@@ -28,7 +27,6 @@ const STATUS_COLORS = {
 
 export default function InternalTransfersPage() {
   const navigate = useNavigate()
-  const { t } = useTranslation()
   const { isOnline } = useNetworkStatus()
   const [statusFilter, setStatusFilter] = useState<TTransferStatus | 'all'>('all')
 
@@ -40,7 +38,7 @@ export default function InternalTransfersPage() {
   // Handle new transfer button click
   const handleNewTransfer = () => {
     if (!isOnline) {
-      toast.error(t('inventory.transfers.offline.blocked'))
+      toast.error('Transfers are not available offline')
       return
     }
     navigate('/inventory/transfers/new')
@@ -54,9 +52,17 @@ export default function InternalTransfersPage() {
     totalValue: transfers.reduce((sum, t) => sum + (t.total_value ?? 0), 0)
   }), [transfers])
 
-  // Get status label from translations
+  // Get status label
   const getStatusLabel = (status: string): string => {
-    return t(`inventory.transfers.status.${status}`, status)
+    const statusLabels: Record<string, string> = {
+      all: 'All statuses',
+      draft: 'Draft',
+      pending: 'Pending',
+      in_transit: 'In Transit',
+      received: 'Received',
+      cancelled: 'Cancelled'
+    }
+    return statusLabels[status] || status
   }
 
   // Get status config for display
@@ -72,9 +78,9 @@ export default function InternalTransfersPage() {
   // Show error toast only once when error occurs
   useEffect(() => {
     if (error) {
-      toast.error(t('inventory.transfers.messages.loadError'))
+      toast.error('Error loading transfers')
     }
-  }, [error, t])
+  }, [error])
 
   return (
     <div className="internal-transfers-page">
@@ -92,7 +98,7 @@ export default function InternalTransfersPage() {
           color: '#b45309'
         }}>
           <WifiOff size={18} />
-          <span>{t('inventory.transfers.offline.blocked')}</span>
+          <span>Transfers are not available offline</span>
         </div>
       )}
 
@@ -101,20 +107,20 @@ export default function InternalTransfersPage() {
         <div>
           <h1 className="transfers-title">
             <ArrowRightLeft size={28} />
-            {t('inventory.transfers.title')}
+            Internal Transfers
           </h1>
           <p className="transfers-subtitle">
-            {t('inventory.transfers.subtitle')}
+            Manage transfers between warehouse and sections
           </p>
         </div>
         <button
           className="btn btn-primary"
           onClick={handleNewTransfer}
           disabled={!isOnline}
-          title={!isOnline ? t('inventory.transfers.offline.blocked') : undefined}
+          title={!isOnline ? 'Transfers are not available offline' : undefined}
         >
           <Plus size={18} />
-          {t('inventory.transfers.newTransfer')}
+          New Transfer
         </button>
       </header>
 
@@ -126,7 +132,7 @@ export default function InternalTransfersPage() {
           </div>
           <div className="transfer-stat__content">
             <div className="transfer-stat__value">{stats.total}</div>
-            <div className="transfer-stat__label">{t('inventory.transfers.stats.total')}</div>
+            <div className="transfer-stat__label">Total</div>
           </div>
         </div>
         <div className="transfer-stat">
@@ -135,7 +141,7 @@ export default function InternalTransfersPage() {
           </div>
           <div className="transfer-stat__content">
             <div className="transfer-stat__value">{stats.pending}</div>
-            <div className="transfer-stat__label">{t('inventory.transfers.stats.pending')}</div>
+            <div className="transfer-stat__label">Pending</div>
           </div>
         </div>
         <div className="transfer-stat">
@@ -144,7 +150,7 @@ export default function InternalTransfersPage() {
           </div>
           <div className="transfer-stat__content">
             <div className="transfer-stat__value">{stats.received}</div>
-            <div className="transfer-stat__label">{t('inventory.transfers.stats.completed')}</div>
+            <div className="transfer-stat__label">Completed</div>
           </div>
         </div>
         <div className="transfer-stat">
@@ -153,7 +159,7 @@ export default function InternalTransfersPage() {
           </div>
           <div className="transfer-stat__content">
             <div className="transfer-stat__value">Rp{stats.totalValue.toLocaleString('id-ID')}</div>
-            <div className="transfer-stat__label">{t('inventory.transfers.stats.totalValue')}</div>
+            <div className="transfer-stat__label">Total Value</div>
           </div>
         </div>
       </div>
@@ -165,30 +171,30 @@ export default function InternalTransfersPage() {
           onChange={(e) => setStatusFilter(e.target.value as TTransferStatus | 'all')}
           className="status-filter"
         >
-          <option value="all">{t('inventory.transfers.status.all')}</option>
-          <option value="draft">{t('inventory.transfers.status.draft')}</option>
-          <option value="pending">{t('inventory.transfers.status.pending')}</option>
-          <option value="in_transit">{t('inventory.transfers.status.in_transit')}</option>
-          <option value="received">{t('inventory.transfers.status.received')}</option>
-          <option value="cancelled">{t('inventory.transfers.status.cancelled')}</option>
+          <option value="all">All statuses</option>
+          <option value="draft">Draft</option>
+          <option value="pending">Pending</option>
+          <option value="in_transit">In Transit</option>
+          <option value="received">Received</option>
+          <option value="cancelled">Cancelled</option>
         </select>
       </div>
 
       {/* Transfers List */}
       {isLoading ? (
-        <div className="transfers-loading">{t('common.loading')}</div>
+        <div className="transfers-loading">Loading...</div>
       ) : transfers.length === 0 ? (
         <div className="transfers-empty">
           <ArrowRightLeft size={64} />
-          <h3>{t('inventory.transfers.empty.title')}</h3>
-          <p>{t('inventory.transfers.empty.description')}</p>
+          <h3>No transfers yet</h3>
+          <p>Create your first internal transfer to move stock between locations</p>
           <button
             className="btn btn-primary"
             onClick={handleNewTransfer}
             disabled={!isOnline}
           >
             <Plus size={18} />
-            {t('inventory.transfers.newTransfer')}
+            New Transfer
           </button>
         </div>
       ) : (
@@ -219,31 +225,31 @@ export default function InternalTransfersPage() {
                 <div className="transfer-card__route">
                   <div className="transfer-card__location from">
                     {/* Support both section-based and location-based transfers */}
-                    {(transfer as any).from_section?.icon} {(transfer as any).from_section?.name ?? transfer.from_location?.name ?? t('common.unknown')}
+                    {(transfer as any).from_section?.icon} {(transfer as any).from_section?.name ?? transfer.from_location?.name ?? 'Unknown'}
                   </div>
                   <ArrowRightLeft size={20} className="transfer-card__arrow" />
                   <div className="transfer-card__location to">
-                    {(transfer as any).to_section?.icon} {(transfer as any).to_section?.name ?? transfer.to_location?.name ?? t('common.unknown')}
+                    {(transfer as any).to_section?.icon} {(transfer as any).to_section?.name ?? transfer.to_location?.name ?? 'Unknown'}
                   </div>
                 </div>
 
                 <div className="transfer-card__info">
                   <div className="transfer-card__info-item">
-                    <span className="label">{t('inventory.transfers.form.date')}:</span>
+                    <span className="label">Date:</span>
                     <span className="value">
-                      {transfer.transfer_date ? new Date(transfer.transfer_date).toLocaleDateString('fr-FR') : '-'}
+                      {transfer.transfer_date ? new Date(transfer.transfer_date).toLocaleDateString('en-US') : '-'}
                     </span>
                   </div>
                   <div className="transfer-card__info-item">
-                    <span className="label">{t('inventory.transfers.form.responsible')}:</span>
+                    <span className="label">Responsible:</span>
                     <span className="value">{transfer.responsible_person}</span>
                   </div>
                   <div className="transfer-card__info-item">
-                    <span className="label">{t('inventory.transfers.form.totalItems')}:</span>
+                    <span className="label">Total Items:</span>
                     <span className="value">{transfer.total_items ?? 0}</span>
                   </div>
                   <div className="transfer-card__info-item">
-                    <span className="label">{t('inventory.transfers.stats.totalValue')}:</span>
+                    <span className="label">Total Value:</span>
                     <span className="value">Rp{(transfer.total_value ?? 0).toLocaleString('id-ID')}</span>
                   </div>
                 </div>
@@ -255,7 +261,7 @@ export default function InternalTransfersPage() {
                     onClick={() => navigate(`/inventory/transfers/${transfer.id}`)}
                   >
                     <Eye size={16} />
-                    {t('inventory.transfers.actions.viewDetails')}
+                    View Details
                   </button>
                 </div>
               </div>

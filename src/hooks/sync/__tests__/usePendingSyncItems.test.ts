@@ -12,13 +12,6 @@ import { db } from '@/lib/db';
 import type { TSyncEntity } from '@/types/offline';
 import { usePendingSyncItems } from '../usePendingSyncItems';
 
-// Mock i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
-
 describe('usePendingSyncItems', () => {
   beforeEach(async () => {
     // Clear all tables to ensure clean state

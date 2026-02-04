@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Users, DollarSign, ShoppingCart, Calendar, Loader2 } from 'lucide-react';
 import { ReportingService } from '@/services/ReportingService';
@@ -13,7 +12,6 @@ import type { ISalesByCustomerReport } from '@/types/reporting';
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'];
 
 export function SalesByCustomerTab() {
-  const { t } = useTranslation();
   const { dateRange } = useDateRange({ defaultPreset: 'last30days' });
 
   const { data, isLoading, error } = useQuery({
@@ -78,7 +76,7 @@ export function SalesByCustomerTab() {
   if (error) {
     return (
       <div className="p-8 text-center text-red-600">
-        {t('common.error', 'Erreur lors du chargement des données')}
+        Error loading data
       </div>
     );
   }

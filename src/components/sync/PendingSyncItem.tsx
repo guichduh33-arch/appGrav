@@ -6,7 +6,6 @@
  */
 
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { RefreshCw, Trash2, Clock, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import {
@@ -66,7 +65,6 @@ function truncateId(entityId: string): string {
 }
 
 export function PendingSyncItem({ item, onRetry, onDelete }: PendingSyncItemProps) {
-  const { t } = useTranslation();
   const [isRetrying, setIsRetrying] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -143,7 +141,7 @@ export function PendingSyncItem({ item, onRetry, onDelete }: PendingSyncItemProp
               ) : (
                 <RefreshCw className="h-3.5 w-3.5" />
               )}
-              <span className="ml-1 text-xs">{t('sync.panel.retry')}</span>
+              <span className="ml-1 text-xs">Retry</span>
             </Button>
 
             <AlertDialog>
@@ -163,18 +161,18 @@ export function PendingSyncItem({ item, onRetry, onDelete }: PendingSyncItemProp
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>{t('sync.panel.deleteConfirm')}</AlertDialogTitle>
+                  <AlertDialogTitle>Confirm Delete</AlertDialogTitle>
                   <AlertDialogDescription>
-                    {t('sync.panel.deleteWarning')}
+                    This will permanently delete this sync item. The data will not be synced to the server.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDelete}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    {t('sync.panel.delete')}
+                    Delete
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -187,7 +185,7 @@ export function PendingSyncItem({ item, onRetry, onDelete }: PendingSyncItemProp
       {isFailed && item.lastError && (
         <div className="mt-1.5 ml-8 p-2 rounded bg-red-50 border border-red-100">
           <p className="text-xs text-red-700">
-            <span className="font-medium">{t('sync.panel.error')}:</span>{' '}
+            <span className="font-medium">Error:</span>{' '}
             {item.lastError}
           </p>
         </div>

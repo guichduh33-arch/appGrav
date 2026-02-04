@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
     Plus, Trash2, ChevronDown, ChevronRight, GripVertical,
     Save, AlertCircle, Check, Info, Copy
@@ -19,7 +18,6 @@ interface ModifiersTabProps {
 }
 
 export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
-    const { t } = useTranslation()
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
     const [showAddGroup, setShowAddGroup] = useState(false)
     const [newGroupName, setNewGroupName] = useState('')
@@ -110,7 +108,7 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
             <div className="modifiers-tab">
                 <div className="modifiers-loading">
                     <div className="spinner" />
-                    <p>{t('common.loading')}</p>
+                    <p>Loading...</p>
                 </div>
             </div>
         )
@@ -121,7 +119,7 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
             <div className="modifiers-tab">
                 <div className="modifiers-error">
                     <AlertCircle size={48} />
-                    <p>{t('modifiers_admin.load_error')}</p>
+                    <p>Error loading modifiers</p>
                 </div>
             </div>
         )
@@ -132,9 +130,9 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
             {/* Header */}
             <div className="modifiers-header">
                 <div>
-                    <h3 className="modifiers-title">{t('modifiers_admin.title')}</h3>
+                    <h3 className="modifiers-title">Product Modifiers</h3>
                     <p className="modifiers-subtitle">
-                        {t('modifiers_admin.subtitle')}
+                        Configure modifier groups and options for this product
                     </p>
                 </div>
                 <div className="modifiers-actions">
@@ -144,7 +142,7 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
                             onClick={editor.resetChanges}
                             disabled={isSaving}
                         >
-                            {t('common.cancel')}
+                            Cancel
                         </button>
                     )}
                     <button
@@ -153,11 +151,11 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
                         disabled={!editor.hasChanges || isSaving}
                     >
                         {isSaving ? (
-                            <><span className="spinner-sm" /> {t('common.saving')}</>
+                            <><span className="spinner-sm" /> Saving...</>
                         ) : saveSuccess ? (
-                            <><Check size={18} /> {t('modifiers_admin.save_success')}</>
+                            <><Check size={18} /> Saved!</>
                         ) : (
-                            <><Save size={18} /> {t('common.save')}</>
+                            <><Save size={18} /> Save</>
                         )}
                     </button>
                 </div>
@@ -166,7 +164,7 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
             {saveError && (
                 <div className="modifiers-alert error">
                     <AlertCircle size={18} />
-                    <span>{t('modifiers_admin.save_error')}: {(saveError as Error).message}</span>
+                    <span>Error saving modifiers: {(saveError as Error).message}</span>
                 </div>
             )}
 
@@ -175,10 +173,7 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
                 <div className="modifiers-info">
                     <Info size={18} />
                     <span>
-                        {t('modifiers_admin.category_info', {
-                            count: categoryGroups.length,
-                            defaultValue: `${categoryGroups.length} groupe(s) hérité(s) de la catégorie. Ajoutez des groupes spécifiques pour ce produit ou personnalisez les groupes hérités.`
-                        })}
+                        {`${categoryGroups.length} group(s) inherited from category. Add product-specific groups or customize inherited groups.`}
                     </span>
                 </div>
             )}
@@ -186,13 +181,13 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
             {/* Product-Specific Groups */}
             <div className="modifiers-section">
                 <div className="modifiers-section-header">
-                    <h4>{t('modifiers_admin.product_groups')}</h4>
+                    <h4>Product Groups</h4>
                     <button
                         className="btn-add-group"
                         onClick={() => setShowAddGroup(true)}
                     >
                         <Plus size={18} />
-                        {t('modifiers_admin.add_group')}
+                        Add Group
                     </button>
                 </div>
 
@@ -203,7 +198,7 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
                             <input
                                 type="text"
                                 className="form-input"
-                                placeholder={t('modifiers_admin.group_name_placeholder')}
+                                placeholder="Group name"
                                 value={newGroupName}
                                 onChange={e => setNewGroupName(e.target.value)}
                                 autoFocus
@@ -213,8 +208,8 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
                                 value={newGroupType}
                                 onChange={e => setNewGroupType(e.target.value as 'single' | 'multiple')}
                             >
-                                <option value="single">{t('modifiers_admin.type_single')}</option>
-                                <option value="multiple">{t('modifiers_admin.type_multiple')}</option>
+                                <option value="single">Single choice</option>
+                                <option value="multiple">Multiple choice</option>
                             </select>
                             <label className="checkbox-label">
                                 <input
@@ -222,12 +217,12 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
                                     checked={newGroupRequired}
                                     onChange={e => setNewGroupRequired(e.target.checked)}
                                 />
-                                {t('modifiers_admin.required')}
+                                Required
                             </label>
                         </div>
                         <div className="add-group-actions">
                             <button className="btn-secondary" onClick={() => setShowAddGroup(false)}>
-                                {t('common.cancel')}
+                                Cancel
                             </button>
                             <button
                                 className="btn-primary"
@@ -235,7 +230,7 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
                                 disabled={!newGroupName.trim()}
                             >
                                 <Plus size={16} />
-                                {t('modifiers_admin.add')}
+                                Add
                             </button>
                         </div>
                     </div>
@@ -244,7 +239,7 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
                 {/* Product Groups List */}
                 {editor.groups.length === 0 && !showAddGroup ? (
                     <div className="modifiers-empty">
-                        <p>{t('modifiers_admin.no_product_groups')}</p>
+                        <p>No product-specific groups defined</p>
                     </div>
                 ) : (
                     <div className="modifier-groups">
@@ -271,7 +266,7 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
             {inheritedCategoryGroups.length > 0 && (
                 <div className="modifiers-section inherited">
                     <div className="modifiers-section-header">
-                        <h4>{t('modifiers_admin.inherited_groups')}</h4>
+                        <h4>Inherited Groups</h4>
                     </div>
                     <div className="modifier-groups">
                         {inheritedCategoryGroups.map((group, idx) => (
@@ -279,21 +274,21 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
                                 <div className="modifier-group-header">
                                     <div className="modifier-group-info">
                                         <span className="inherited-badge">
-                                            {t('modifiers_admin.inherited')}
+                                            Inherited
                                         </span>
                                         <h5 className="modifier-group-name">{group.name}</h5>
                                         <span className="modifier-group-type">
-                                            {group.type === 'single' ? t('modifiers_admin.type_single') : t('modifiers_admin.type_multiple')}
+                                            {group.type === 'single' ? 'Single choice' : 'Multiple choice'}
                                             {group.required && <span className="required-indicator">*</span>}
                                         </span>
                                     </div>
                                     <button
                                         className="btn-copy"
                                         onClick={() => handleCopyFromCategory(group)}
-                                        title={t('modifiers_admin.customize')}
+                                        title="Customize"
                                     >
                                         <Copy size={16} />
-                                        {t('modifiers_admin.customize')}
+                                        Customize
                                     </button>
                                 </div>
                                 <div className="modifier-options-preview">
@@ -319,11 +314,11 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
                     <div className="empty-icon">
                         <Plus size={48} />
                     </div>
-                    <h4>{t('modifiers_admin.no_modifiers')}</h4>
-                    <p>{t('modifiers_admin.no_modifiers_hint')}</p>
+                    <h4>No modifiers</h4>
+                    <p>Add modifier groups to allow customers to customize this product</p>
                     <button className="btn-primary" onClick={() => setShowAddGroup(true)}>
                         <Plus size={18} />
-                        {t('modifiers_admin.add_first_group')}
+                        Add first group
                     </button>
                 </div>
             )}
@@ -360,7 +355,6 @@ const ModifierGroupCard: React.FC<ModifierGroupCardProps> = ({
     onDeleteOption,
     onSetDefault
 }) => {
-    const { t } = useTranslation()
     const [isEditingName, setIsEditingName] = useState(false)
     const [editedName, setEditedName] = useState(group.name)
 
@@ -410,8 +404,8 @@ const ModifierGroupCard: React.FC<ModifierGroupCardProps> = ({
                             onChange={e => onUpdateGroup({ type: e.target.value as 'single' | 'multiple' })}
                             onClick={e => e.stopPropagation()}
                         >
-                            <option value="single">{t('modifiers_admin.type_single')}</option>
-                            <option value="multiple">{t('modifiers_admin.type_multiple')}</option>
+                            <option value="single">Single choice</option>
+                            <option value="multiple">Multiple choice</option>
                         </select>
                         <label className="checkbox-inline" onClick={e => e.stopPropagation()}>
                             <input
@@ -419,24 +413,24 @@ const ModifierGroupCard: React.FC<ModifierGroupCardProps> = ({
                                 checked={group.required}
                                 onChange={e => onUpdateGroup({ required: e.target.checked })}
                             />
-                            {t('modifiers_admin.required')}
+                            Required
                         </label>
                     </div>
                 </div>
                 <div className="modifier-group-stats">
                     <span className="options-count">
-                        {group.options.length} {t('modifiers_admin.options')}
+                        {group.options.length} options
                     </span>
                 </div>
                 <button
                     className="btn-delete"
                     onClick={(e) => {
                         e.stopPropagation()
-                        if (confirm(t('modifiers_admin.delete_group_confirm'))) {
+                        if (confirm('Are you sure you want to delete this group?')) {
                             onDeleteGroup()
                         }
                     }}
-                    title={t('modifiers_admin.delete_group')}
+                    title="Delete group"
                 >
                     <Trash2 size={16} />
                 </button>
@@ -446,17 +440,17 @@ const ModifierGroupCard: React.FC<ModifierGroupCardProps> = ({
                 <div className="modifier-options">
                     {group.options.length === 0 ? (
                         <div className="options-empty">
-                            <p>{t('modifiers_admin.no_options')}</p>
+                            <p>No options defined for this group</p>
                         </div>
                     ) : (
                         <>
                             {/* Column Headers */}
                             <div className="options-header">
                                 <span></span>
-                                <span>{t('modifiers_admin.option_label')}</span>
-                                <span className="center">{t('modifiers_admin.option_icon')}</span>
-                                <span>{t('modifiers_admin.price_adjustment')}</span>
-                                <span className="center">{t('modifiers_admin.is_default')}</span>
+                                <span>Label</span>
+                                <span className="center">Icon</span>
+                                <span>Price Adjustment</span>
+                                <span className="center">Default</span>
                                 <span></span>
                             </div>
                             {/* Option Cards */}
@@ -471,7 +465,7 @@ const ModifierGroupCard: React.FC<ModifierGroupCardProps> = ({
                                             className="form-input"
                                             value={option.label}
                                             onChange={e => onUpdateOption(optIndex, { label: e.target.value })}
-                                            placeholder={t('modifiers_admin.option_label_placeholder')}
+                                            placeholder="Option label"
                                         />
                                         <input
                                             type="text"
@@ -493,7 +487,7 @@ const ModifierGroupCard: React.FC<ModifierGroupCardProps> = ({
                                                 min={0}
                                                 step={1000}
                                                 placeholder="0"
-                                                title={t('modifiers_admin.price_adjustment')}
+                                                title="Price adjustment"
                                             />
                                         </div>
                                         <div className="default-cell">
@@ -518,7 +512,7 @@ const ModifierGroupCard: React.FC<ModifierGroupCardProps> = ({
                                             type="button"
                                             className="btn-delete-option"
                                             onClick={() => onDeleteOption(optIndex)}
-                                            title={t('modifiers_admin.delete_option')}
+                                            title="Delete option"
                                         >
                                             <Trash2 size={14} />
                                         </button>
@@ -529,7 +523,7 @@ const ModifierGroupCard: React.FC<ModifierGroupCardProps> = ({
                     )}
                     <button type="button" className="btn-add-option" onClick={onAddOption}>
                         <Plus size={16} />
-                        {t('modifiers_admin.add_option')}
+                        Add option
                     </button>
                 </div>
             )}

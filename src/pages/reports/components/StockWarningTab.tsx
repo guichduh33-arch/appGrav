@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 import { AlertTriangle, AlertCircle, XCircle, Package, Loader2, TrendingDown } from 'lucide-react';
 import { ReportingService } from '@/services/ReportingService';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -8,8 +7,6 @@ import { formatCurrency as formatCurrencyPdf } from '@/services/reports/pdfExpor
 import type { IStockWarningReport } from '@/types/reporting';
 
 export function StockWarningTab() {
-  const { t } = useTranslation();
-
   const { data, isLoading, error } = useQuery({
     queryKey: ['stock-warning'],
     queryFn: () => ReportingService.getStockWarning(),
@@ -94,7 +91,7 @@ export function StockWarningTab() {
   if (error) {
     return (
       <div className="p-8 text-center text-red-600">
-        {t('common.error', 'Erreur lors du chargement des données')}
+        Error loading data
       </div>
     );
   }

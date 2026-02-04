@@ -6,20 +6,6 @@ import { useNetworkStore } from '../../stores/networkStore';
 // Store original navigator.onLine
 const originalOnLine = navigator.onLine;
 
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => {
-      const translations: Record<string, string> = {
-        'network.online': 'Online',
-        'network.offline': 'Offline',
-        'network.lanOnly': 'LAN Mode',
-      };
-      return translations[key] || key;
-    },
-  }),
-}));
-
 describe('NetworkIndicator', () => {
   beforeEach(() => {
     // Reset store state

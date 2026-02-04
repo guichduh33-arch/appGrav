@@ -8,7 +8,6 @@
  * @see AC4: Liste des Notes d'Ajustement Différées
  */
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { X, CheckCircle, StickyNote, Trash2, Package } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
@@ -26,7 +25,6 @@ export default function DeferredNotesPanel({
   onClose,
   onCreateAdjustment,
 }: DeferredNotesPanelProps) {
-  const { t } = useTranslation();
   const { isOnline } = useNetworkStatus();
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
@@ -72,15 +70,15 @@ export default function DeferredNotesPanel({
           <div className="flex items-center gap-2">
             <StickyNote className="h-5 w-5 text-amber-500" />
             <h3 className="modal__title">
-              {t('inventory.adjustment.offline.deferredNotes', 'Notes en attente')}
+              Pending Notes
             </h3>
             <span className="badge badge-amber">{notes.length}</span>
           </div>
           <button
             className="modal__close"
             onClick={onClose}
-            title={t('common.close', 'Fermer')}
-            aria-label={t('common.close', 'Fermer')}
+            title="Close"
+            aria-label="Close"
           >
             <X size={24} />
           </button>
@@ -90,7 +88,7 @@ export default function DeferredNotesPanel({
           {notes.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <StickyNote className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>{t('inventory.adjustment.offline.noNotes', 'Aucune note en attente')}</p>
+              <p>No pending notes</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -109,7 +107,7 @@ export default function DeferredNotesPanel({
                         </>
                       ) : (
                         <span className="text-muted-foreground italic">
-                          {t('inventory.adjustment.offline.noProduct', 'Ajustement général')}
+                          General adjustment
                         </span>
                       )}
                     </div>
@@ -126,11 +124,11 @@ export default function DeferredNotesPanel({
                     <div className="text-xs text-muted-foreground mb-3">
                       {note.adjustment_type && (
                         <span className="mr-3">
-                          Type: {t(`stock_adjustment.types.${note.adjustment_type}`, note.adjustment_type)}
+                          Type: {note.adjustment_type}
                         </span>
                       )}
                       {note.suggested_quantity && (
-                        <span>Qté: {note.suggested_quantity}</span>
+                        <span>Qty: {note.suggested_quantity}</span>
                       )}
                     </div>
                   )}
@@ -141,14 +139,14 @@ export default function DeferredNotesPanel({
                       className="btn btn-sm btn-ghost text-red-500"
                       onClick={() => note.id !== undefined && handleMarkAsProcessed(note.id)}
                       disabled={deletingId === note.id || note.id === undefined}
-                      title={t('inventory.adjustment.offline.markAsProcessed', 'Marquer comme traité')}
+                      title="Delete"
                     >
                       {deletingId === note.id ? (
                         <span className="animate-spin">...</span>
                       ) : (
                         <>
                           <Trash2 className="h-4 w-4 mr-1" />
-                          {t('inventory.adjustment.offline.markAsProcessed', 'Supprimer')}
+                          Delete
                         </>
                       )}
                     </button>
@@ -159,7 +157,7 @@ export default function DeferredNotesPanel({
                         onClick={() => handleCreateAdjustment(note)}
                       >
                         <CheckCircle className="h-4 w-4 mr-1" />
-                        {t('inventory.adjustment.offline.createAdjustment', "Créer l'ajustement")}
+                        Create adjustment
                       </button>
                     )}
                   </div>
@@ -171,7 +169,7 @@ export default function DeferredNotesPanel({
 
         <div className="modal__footer">
           <button className="btn btn-ghost" onClick={onClose}>
-            {t('common.close', 'Fermer')}
+            Close
           </button>
         </div>
       </div>

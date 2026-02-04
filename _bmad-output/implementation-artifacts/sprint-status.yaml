@@ -92,7 +92,7 @@ development_status:
   5-6-purchase-order-creation: done
   5-7-purchase-order-workflow: done
   5-8-purchase-reception-stock-update: done
-  epic-5-retrospective: optional
+  epic-5-retrospective: done  # 2026-02-04
 
   # Epic 6: Clients & Marketing — Fidélité, B2B, Combos & Promotions
   epic-6: backlog

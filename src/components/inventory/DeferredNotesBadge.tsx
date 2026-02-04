@@ -8,7 +8,6 @@
  * @see AC4: Liste des Notes d'Ajustement Différées
  */
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { StickyNote } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
@@ -19,7 +18,6 @@ interface DeferredNotesBadgeProps {
 }
 
 export default function DeferredNotesBadge({ className = '' }: DeferredNotesBadgeProps) {
-  const { t } = useTranslation();
   const [showPanel, setShowPanel] = useState(false);
 
   // Live query to get count of deferred notes
@@ -39,10 +37,7 @@ export default function DeferredNotesBadge({ className = '' }: DeferredNotesBadg
       <button
         className={`btn btn-ghost btn-sm flex items-center gap-2 ${className}`}
         onClick={() => setShowPanel(true)}
-        title={t('inventory.adjustment.offline.deferredNotesCount', {
-          count: notesCount,
-          defaultValue: '{{count}} note(s) d\'ajustement en attente',
-        })}
+        title={`${notesCount} pending adjustment note(s)`}
       >
         <div className="relative">
           <StickyNote className="h-5 w-5 text-amber-500" />
@@ -51,7 +46,7 @@ export default function DeferredNotesBadge({ className = '' }: DeferredNotesBadg
           </span>
         </div>
         <span className="hidden sm:inline text-sm">
-          {t('inventory.adjustment.offline.deferredNotes', 'Notes en attente')}
+          Pending Notes
         </span>
       </button>
 

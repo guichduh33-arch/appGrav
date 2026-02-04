@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   Plus,
   Edit2,
@@ -75,7 +74,6 @@ const getPaymentIcon = (iconName: string) => {
 };
 
 const PaymentMethodsPage = () => {
-  const { i18n } = useTranslation();
   const { data: methods, isLoading } = usePaymentMethods();
   const createMethod = useCreatePaymentMethod();
   const updateMethod = useUpdatePaymentMethod();
@@ -85,9 +83,8 @@ const PaymentMethodsPage = () => {
   const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
   const [formData, setFormData] = useState<PaymentMethodFormData>(emptyForm);
 
-  // Language
-  const lang = i18n.language?.substring(0, 2) || 'fr';
-  const nameKey = `name_${lang}` as 'name_fr' | 'name_en' | 'name_id';
+  // Use English
+  const nameKey = 'name_en' as const;
 
   // Open create modal
   const openCreateModal = () => {

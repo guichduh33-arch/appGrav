@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import {
@@ -55,7 +54,6 @@ type PaymentStatus = 'all' | 'paid' | 'unpaid';
 const ITEMS_PER_PAGE = 20;
 
 const OrdersPage = () => {
-    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const { data: moduleSettings } = useModuleSettings();
 
@@ -218,13 +216,13 @@ const OrdersPage = () => {
                 }
 
                 // Show toast notification
-                toast.success(`🍽️ ${t('kds.posNotification.orderReady', { orderNumber: order.order_number })}`, {
+                toast.success(`Order #${order.order_number} is ready!`, {
                     duration: 5000,
                     position: 'top-right',
                 });
             }
         }
-    }, [orders, queryClient, t, moduleSettings]);
+    }, [orders, queryClient, moduleSettings]);
 
     // Story 4.7: KDS Status Listener for real-time item updates via LAN
     useKdsStatusListener({

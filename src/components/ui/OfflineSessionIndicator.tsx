@@ -1,6 +1,5 @@
 import React from 'react';
 import { UserX } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/authStore';
 
 /**
@@ -44,13 +43,14 @@ export const OfflineSessionIndicator: React.FC<IOfflineSessionIndicatorProps> = 
   compact = false,
   className = '',
 }) => {
-  const { t } = useTranslation();
   const { isOfflineSession } = useAuthStore();
 
   // Only show when session was authenticated offline
   if (!isOfflineSession) {
     return null;
   }
+
+  const label = 'Offline Session';
 
   return (
     <div
@@ -63,8 +63,8 @@ export const OfflineSessionIndicator: React.FC<IOfflineSessionIndicatorProps> = 
       `.trim()}
       role="status"
       aria-live="polite"
-      aria-label={t('auth.offline.sessionIndicator')}
-      title={t('auth.offline.sessionIndicator')}
+      aria-label={label}
+      title={label}
     >
       <UserX
         className="w-5 h-5 text-amber-600"
@@ -72,7 +72,7 @@ export const OfflineSessionIndicator: React.FC<IOfflineSessionIndicatorProps> = 
       />
       {!compact && (
         <span className="text-sm font-medium text-amber-600 whitespace-nowrap">
-          {t('auth.offline.sessionIndicator')}
+          {label}
         </span>
       )}
     </div>

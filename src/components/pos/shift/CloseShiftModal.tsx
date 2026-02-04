@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { X, Banknote, QrCode, CreditCard, Clock, AlertTriangle, Lock } from 'lucide-react'
 import { formatPrice } from '../../../utils/helpers'
 import './ShiftModals.css'
@@ -23,7 +22,6 @@ export default function CloseShiftModal({
     onConfirm,
     isLoading
 }: CloseShiftModalProps) {
-    const { t } = useTranslation()
     const [actualCash, setActualCash] = useState<string>('')
     const [actualQris, setActualQris] = useState<string>('')
     const [actualEdc, setActualEdc] = useState<string>('')
@@ -65,8 +63,8 @@ export default function CloseShiftModal({
                         <Lock size={24} />
                     </div>
                     <div>
-                        <h2 className="shift-modal__title">{t('shift.close_title', 'Fermer le Shift')}</h2>
-                        <p className="shift-modal__subtitle">{t('shift.close_subtitle', 'Comptez et saisissez les montants réels')}</p>
+                        <h2 className="shift-modal__title">Close Shift</h2>
+                        <p className="shift-modal__subtitle">Count and enter the actual amounts</p>
                     </div>
                     <button className="shift-modal__close" onClick={onClose}>
                         <X size={24} />
@@ -76,20 +74,20 @@ export default function CloseShiftModal({
                 <form onSubmit={handleSubmit} className="shift-modal__content">
                     {/* Session Summary */}
                     <div className="shift-summary">
-                        <h3 className="shift-summary__title">{t('shift.summary', 'Résumé du Shift')}</h3>
+                        <h3 className="shift-summary__title">Shift Summary</h3>
                         <div className="shift-summary__grid">
                             <div className="shift-summary__item">
                                 <Clock size={16} />
-                                <span className="shift-summary__label">{t('shift.duration', 'Durée')}</span>
+                                <span className="shift-summary__label">Duration</span>
                                 <span className="shift-summary__value">{formatDuration(sessionStats.duration)}</span>
                             </div>
                             <div className="shift-summary__item">
-                                <span className="shift-summary__label">{t('shift.transactions', 'Transactions')}</span>
+                                <span className="shift-summary__label">Transactions</span>
                                 <span className="shift-summary__value">{sessionStats.transactionCount}</span>
                             </div>
                             <div className="shift-summary__item">
                                 <Banknote size={16} />
-                                <span className="shift-summary__label">{t('shift.opening_cash', 'Cash initial')}</span>
+                                <span className="shift-summary__label">Opening cash</span>
                                 <span className="shift-summary__value">{formatPrice(openingCash)}</span>
                             </div>
                         </div>
@@ -97,20 +95,20 @@ export default function CloseShiftModal({
                         {/* Anti-fraud notice */}
                         <div className="shift-summary__notice">
                             <AlertTriangle size={16} />
-                            <span>{t('shift.anti_fraud_notice', 'Les montants attendus seront révélés après la fermeture')}</span>
+                            <span>Expected amounts will be revealed after closing</span>
                         </div>
                     </div>
 
                     {/* Actual Amounts Section */}
                     <div className="shift-amounts">
-                        <h3 className="shift-amounts__title">{t('shift.counted_amounts', 'Montants Comptés')}</h3>
+                        <h3 className="shift-amounts__title">Counted Amounts</h3>
 
                         <div className="shift-amounts__grid">
                             {/* Cash */}
                             <div className="shift-amount-field">
                                 <label className="shift-amount-field__label">
                                     <Banknote size={18} className="shift-amount-field__icon shift-amount-field__icon--cash" />
-                                    {t('shift.cash_in_drawer', 'Cash en caisse')}
+                                    Cash in drawer
                                 </label>
                                 <div className="shift-form__input-wrapper">
                                     <span className="shift-form__currency">Rp</span>
@@ -132,7 +130,7 @@ export default function CloseShiftModal({
                             <div className="shift-amount-field">
                                 <label className="shift-amount-field__label">
                                     <QrCode size={18} className="shift-amount-field__icon shift-amount-field__icon--qris" />
-                                    {t('shift.total_qris', 'Total QRIS')}
+                                    Total QRIS
                                 </label>
                                 <div className="shift-form__input-wrapper">
                                     <span className="shift-form__currency">Rp</span>
@@ -153,7 +151,7 @@ export default function CloseShiftModal({
                             <div className="shift-amount-field">
                                 <label className="shift-amount-field__label">
                                     <CreditCard size={18} className="shift-amount-field__icon shift-amount-field__icon--edc" />
-                                    {t('shift.total_edc', 'Total EDC/Carte')}
+                                    Total EDC/Card
                                 </label>
                                 <div className="shift-form__input-wrapper">
                                     <span className="shift-form__currency">Rp</span>
@@ -175,13 +173,13 @@ export default function CloseShiftModal({
                     {/* Notes */}
                     <div className="shift-form__group">
                         <label className="shift-form__label">
-                            {t('shift.closing_notes', 'Notes de clôture (optionnel)')}
+                            Closing notes (optional)
                         </label>
                         <textarea
                             className="shift-form__textarea"
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
-                            placeholder={t('shift.closing_notes_placeholder', 'Observations, anomalies...')}
+                            placeholder="Observations, anomalies..."
                             rows={2}
                         />
                     </div>
@@ -193,7 +191,7 @@ export default function CloseShiftModal({
                             onClick={onClose}
                             disabled={isLoading}
                         >
-                            {t('common.cancel', 'Annuler')}
+                            Cancel
                         </button>
                         <button
                             type="submit"
@@ -205,7 +203,7 @@ export default function CloseShiftModal({
                             ) : (
                                 <>
                                     <Lock size={18} />
-                                    {t('shift.close_button', 'Fermer le Shift')}
+                                    Close Shift
                                 </>
                             )}
                         </button>

@@ -15,7 +15,6 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/authStore';
 import { offlineAuthService, rateLimitService } from '@/services/offline';
 import type { TOfflineAuthError } from '@/types/offline';
@@ -66,7 +65,6 @@ export interface IUseOfflineAuthReturn {
  * ```
  */
 export function useOfflineAuth(): IUseOfflineAuthReturn {
-  const { t } = useTranslation();
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<IOfflineAuthError | null>(null);
@@ -105,7 +103,7 @@ export function useOfflineAuth(): IUseOfflineAuthReturn {
         setCooldownSeconds(rateLimitCheck.waitSeconds ?? 30);
         const authError: IOfflineAuthError = {
           code: 'RATE_LIMITED',
-          message: t('auth.offline.rateLimited', { seconds: rateLimitCheck.waitSeconds }),
+          message: `Too many attempts. Please wait ${rateLimitCheck.waitSeconds} seconds`,
         };
         setError(authError);
         throw new Error('RATE_LIMITED');
@@ -132,7 +130,7 @@ export function useOfflineAuth(): IUseOfflineAuthReturn {
           const errorCode = result.error ?? 'INVALID_PIN';
           const authError: IOfflineAuthError = {
             code: errorCode,
-            message: getErrorMessage(errorCode, t),
+            message: getErrorMessage(errorCode),
           };
           setError(authError);
           throw new Error(errorCode);
@@ -176,22 +174,21 @@ export function useOfflineAuth(): IUseOfflineAuthReturn {
 }
 
 /**
- * Get user-friendly error message for auth error codes using i18n
+ * Get user-friendly error message for auth error codes
  *
  * @param code - Error code from offline authentication
- * @param t - Translation function from useTranslation
- * @returns Localized error message
+ * @returns Error message string
  */
-function getErrorMessage(code: TOfflineAuthError, t: (key: string) => string): string {
+function getErrorMessage(code: TOfflineAuthError): string {
   switch (code) {
     case 'INVALID_PIN':
-      return t('auth.offline.pinIncorrect');
+      return 'Incorrect PIN';
     case 'CACHE_EXPIRED':
-      return t('auth.offline.sessionExpiredOnlineRequired');
+      return 'Session expired. Online login required.';
     case 'RATE_LIMITED':
-      return t('auth.offline.rateLimitedWait');
+      return 'Please wait...';
     default:
-      return t('common.error');
+      return 'Error';
   }
 }
 

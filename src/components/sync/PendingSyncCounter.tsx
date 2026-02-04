@@ -11,7 +11,6 @@
  */
 
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Cloud, CloudOff, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -24,7 +23,6 @@ interface PendingSyncCounterProps {
 }
 
 export function PendingSyncCounter({ className }: PendingSyncCounterProps) {
-  const { t } = useTranslation();
   const [panelOpen, setPanelOpen] = useState(false);
   const { pendingTotal, counts, isSyncing } = useSyncQueue();
 
@@ -47,7 +45,7 @@ export function PendingSyncCounter({ className }: PendingSyncCounterProps) {
           'relative h-9 px-2 gap-1.5',
           className
         )}
-        title={t('sync.counter.pending', { count: pendingTotal })}
+        title={`${pendingTotal} pending`}
       >
         {isSyncing ? (
           <Loader2 className="h-4 w-4 animate-spin text-blue-600" />

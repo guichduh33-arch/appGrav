@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import {
     X, Receipt, Clock, CreditCard, Banknote, QrCode,
@@ -48,7 +47,6 @@ export default function TransactionHistoryModal({
     sessionOpenedAt,
     onClose
 }: TransactionHistoryModalProps) {
-    const { t } = useTranslation()
     const [expandedOrder, setExpandedOrder] = useState<string | null>(null)
 
     // Fetch orders for current shift
@@ -180,10 +178,10 @@ export default function TransactionHistoryModal({
                     </div>
                     <div>
                         <h2 className="transaction-history__title">
-                            {t('shift.transaction_history', 'Historique des Transactions')}
+                            Transaction History
                         </h2>
                         <p className="transaction-history__subtitle">
-                            {orders.length} transaction{orders.length > 1 ? 's' : ''} ce shift
+                            {orders.length} transaction{orders.length > 1 ? 's' : ''} this shift
                         </p>
                     </div>
                     <button className="transaction-history__close" onClick={onClose}>

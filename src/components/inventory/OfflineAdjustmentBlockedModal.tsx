@@ -10,7 +10,6 @@
  * @see AC3: Note d'Ajustement pour Plus Tard
  */
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { X, WifiOff, StickyNote } from 'lucide-react';
 import { addDeferredNote } from '@/services/inventory/deferredAdjustmentService';
 import './StockAdjustmentModal.css';
@@ -32,7 +31,6 @@ export default function OfflineAdjustmentBlockedModal({
   onClose,
   onNoteSaved,
 }: OfflineAdjustmentBlockedModalProps) {
-  const { t } = useTranslation();
   const [note, setNote] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -53,9 +51,7 @@ export default function OfflineAdjustmentBlockedModal({
     } catch (error) {
       console.error('Failed to save deferred note:', error);
       // Show error to user and keep modal open so they can retry or copy their note
-      setSaveError(
-        t('inventory.adjustment.offline.saveError', 'Erreur lors de la sauvegarde. Veuillez réessayer.')
-      );
+      setSaveError('Error saving. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -71,14 +67,14 @@ export default function OfflineAdjustmentBlockedModal({
           <div className="flex items-center gap-2">
             <WifiOff className="h-5 w-5 text-amber-500" />
             <h3 className="modal__title">
-              {t('inventory.adjustment.offline.title', 'Mode Hors-Ligne')}
+              Offline Mode
             </h3>
           </div>
           <button
             className="modal__close"
             onClick={onClose}
-            title={t('common.close', 'Fermer')}
-            aria-label={t('common.close', 'Fermer')}
+            title="Close"
+            aria-label="Close"
           >
             <X size={24} />
           </button>
@@ -87,17 +83,14 @@ export default function OfflineAdjustmentBlockedModal({
         <div className="modal__body">
           {/* Explanation message */}
           <p className="text-muted-foreground mb-4">
-            {t(
-              'inventory.adjustment.offline.message',
-              'Les ajustements de stock nécessitent une connexion internet pour garantir la traçabilité.'
-            )}
+            Stock adjustments require an internet connection to ensure traceability.
           </p>
 
           {/* Product context */}
           {product && (
             <div className="bg-muted/50 rounded-md p-3 mb-4">
               <p className="text-sm font-medium">
-                {t('inventory.adjustment.offline.product', 'Produit')}: {product.name}
+                Product: {product.name}
               </p>
             </div>
           )}
@@ -106,23 +99,17 @@ export default function OfflineAdjustmentBlockedModal({
           <div className="form-group">
             <label className="form-label flex items-center gap-2">
               <StickyNote size={16} />
-              {t('inventory.adjustment.offline.noteLabel', 'Noter pour plus tard (optionnel)')}
+              Note for later (optional)
             </label>
             <textarea
               className="form-textarea"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder={t(
-                'inventory.adjustment.offline.notePlaceholder',
-                'Ex: Ajuster +5 pcs (erreur de comptage)...'
-              )}
+              placeholder="E.g.: Adjust +5 pcs (count error)..."
               rows={3}
             />
             <p className="text-xs text-muted-foreground mt-1">
-              {t(
-                'inventory.adjustment.offline.noteHint',
-                'Cette note sera sauvegardée localement. Vous pourrez la traiter quand vous serez de nouveau en ligne.'
-              )}
+              This note will be saved locally. You can process it when you are back online.
             </p>
           </div>
 
@@ -136,7 +123,7 @@ export default function OfflineAdjustmentBlockedModal({
 
         <div className="modal__footer">
           <button className="btn btn-ghost" onClick={onClose}>
-            {t('common.close', 'Fermer')}
+            Close
           </button>
           {note.trim() && (
             <button
@@ -145,8 +132,8 @@ export default function OfflineAdjustmentBlockedModal({
               disabled={isSaving}
             >
               {isSaving
-                ? t('common.saving', 'Enregistrement...')
-                : t('inventory.adjustment.offline.saveNote', 'Enregistrer la note')}
+                ? 'Saving...'
+                : 'Save note'}
             </button>
           )}
         </div>

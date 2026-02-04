@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import {
   ShoppingCart,
   Lock,
@@ -67,7 +66,6 @@ function Select({ label, value, options, onChange, disabled }: SelectProps) {
 }
 
 export default function POSAdvancedSettingsSection() {
-  const { t } = useTranslation();
   const { data: settings, isLoading } = usePOSAdvancedSettings();
   const updateSetting = useUpdatePOSAdvancedSetting();
 
@@ -84,12 +82,12 @@ export default function POSAdvancedSettingsSection() {
       <div className="settings-section">
         <div className="settings-section__header">
           <h2 className="settings-section__title">
-            {t('settings.posAdvanced.title', 'Paramètres POS Avancés')}
+            Advanced POS Settings
           </h2>
         </div>
         <div className="settings-section__body" style={{ textAlign: 'center', padding: '2rem' }}>
           <RefreshCw size={24} className="spinning" />
-          <p>{t('common.loading', 'Chargement...')}</p>
+          <p>Loading...</p>
         </div>
       </div>
     );
@@ -99,10 +97,10 @@ export default function POSAdvancedSettingsSection() {
     <div className="settings-section">
       <div className="settings-section__header">
         <h2 className="settings-section__title">
-          {t('settings.posAdvanced.title', 'Paramètres POS Avancés')}
+          Advanced POS Settings
         </h2>
         <p className="settings-section__description">
-          {t('settings.posAdvanced.description', 'Configuration avancée du point de vente')}
+          Advanced point of sale configuration
         </p>
       </div>
       <div className="settings-section__body">
@@ -110,17 +108,17 @@ export default function POSAdvancedSettingsSection() {
         <div className="settings-group">
           <h3 className="settings-group__title">
             <ShoppingCart size={18} />
-            {t('settings.posAdvanced.cart.title', 'Panier')}
+            Cart
           </h3>
           <Toggle
-            label={t('settings.posAdvanced.cart.lockOnKitchenSend', 'Verrouiller après envoi cuisine')}
-            description={t('settings.posAdvanced.cart.lockOnKitchenSendDesc', 'Les articles envoyés en cuisine ne peuvent plus être modifiés sans PIN')}
+            label="Lock after kitchen send"
+            description="Items sent to kitchen cannot be modified without PIN"
             checked={settings.cart.lock_on_kitchen_send}
             onChange={(v) => handleUpdate('cart', 'lock_on_kitchen_send', v)}
           />
           <Toggle
-            label={t('settings.posAdvanced.cart.requirePinLockedRemove', 'PIN requis pour supprimer')}
-            description={t('settings.posAdvanced.cart.requirePinLockedRemoveDesc', 'Demander le PIN pour supprimer un article verrouillé')}
+            label="PIN required for removal"
+            description="Require PIN to remove a locked item"
             checked={settings.cart.require_pin_locked_remove}
             onChange={(v) => handleUpdate('cart', 'require_pin_locked_remove', v)}
           />
@@ -130,10 +128,10 @@ export default function POSAdvancedSettingsSection() {
         <div className="settings-group">
           <h3 className="settings-group__title">
             <DollarSign size={18} />
-            {t('settings.posAdvanced.rounding.title', 'Arrondi IDR')}
+            IDR Rounding
           </h3>
           <Select
-            label={t('settings.posAdvanced.rounding.amount', 'Arrondi au')}
+            label="Round to"
             value={settings.rounding.amount}
             options={[
               { value: 100, label: 'Rp 100' },
@@ -143,12 +141,12 @@ export default function POSAdvancedSettingsSection() {
             onChange={(v) => handleUpdate('rounding', 'amount', Number(v))}
           />
           <Select
-            label={t('settings.posAdvanced.rounding.method', 'Méthode')}
+            label="Method"
             value={settings.rounding.method}
             options={[
-              { value: 'round' as RoundingMethod, label: t('settings.posAdvanced.rounding.round', 'Arrondi standard') },
-              { value: 'floor' as RoundingMethod, label: t('settings.posAdvanced.rounding.floor', 'Arrondi inférieur') },
-              { value: 'ceil' as RoundingMethod, label: t('settings.posAdvanced.rounding.ceil', 'Arrondi supérieur') },
+              { value: 'round' as RoundingMethod, label: 'Standard rounding' },
+              { value: 'floor' as RoundingMethod, label: 'Round down' },
+              { value: 'ceil' as RoundingMethod, label: 'Round up' },
             ]}
             onChange={(v) => handleUpdate('rounding', 'method', v)}
           />
@@ -158,17 +156,17 @@ export default function POSAdvancedSettingsSection() {
         <div className="settings-group">
           <h3 className="settings-group__title">
             <CreditCard size={18} />
-            {t('settings.posAdvanced.payment.title', 'Paiement')}
+            Payment
           </h3>
           <Toggle
-            label={t('settings.posAdvanced.payment.allowSplit', 'Paiement fractionné')}
-            description={t('settings.posAdvanced.payment.allowSplitDesc', 'Permettre de diviser le paiement en plusieurs parties')}
+            label="Split payment"
+            description="Allow dividing payment into multiple parts"
             checked={settings.payment.allow_split}
             onChange={(v) => handleUpdate('payment', 'allow_split', v)}
           />
           {settings.payment.allow_split && (
             <Select
-              label={t('settings.posAdvanced.payment.maxSplitCount', 'Nombre max de fractions')}
+              label="Max split count"
               value={settings.payment.max_split_count}
               options={[
                 { value: 2, label: '2' },
@@ -185,35 +183,35 @@ export default function POSAdvancedSettingsSection() {
         <div className="settings-group">
           <h3 className="settings-group__title">
             <Volume2 size={18} />
-            {t('settings.posAdvanced.sound.title', 'Sons')}
+            Sounds
           </h3>
           <Toggle
-            label={t('settings.posAdvanced.sound.enabled', 'Sons activés')}
-            description={t('settings.posAdvanced.sound.enabledDesc', 'Activer les notifications sonores')}
+            label="Sounds enabled"
+            description="Enable sound notifications"
             checked={settings.sound.enabled}
             onChange={(v) => handleUpdate('sound', 'enabled', v)}
           />
           {settings.sound.enabled && (
             <>
               <Select
-                label={t('settings.posAdvanced.sound.newOrder', 'Nouvelle commande')}
+                label="New order"
                 value={settings.sound.new_order}
                 options={[
-                  { value: 'none' as SoundType, label: t('settings.posAdvanced.sound.none', 'Aucun') },
-                  { value: 'chime' as SoundType, label: t('settings.posAdvanced.sound.chime', 'Carillon') },
-                  { value: 'bell' as SoundType, label: t('settings.posAdvanced.sound.bell', 'Cloche') },
-                  { value: 'beep' as SoundType, label: t('settings.posAdvanced.sound.beep', 'Bip') },
+                  { value: 'none' as SoundType, label: 'None' },
+                  { value: 'chime' as SoundType, label: 'Chime' },
+                  { value: 'bell' as SoundType, label: 'Bell' },
+                  { value: 'beep' as SoundType, label: 'Beep' },
                 ]}
                 onChange={(v) => handleUpdate('sound', 'new_order', v)}
               />
               <Select
-                label={t('settings.posAdvanced.sound.paymentSuccess', 'Paiement réussi')}
+                label="Payment success"
                 value={settings.sound.payment_success}
                 options={[
-                  { value: 'none' as SoundType, label: t('settings.posAdvanced.sound.none', 'Aucun') },
-                  { value: 'cash' as SoundType, label: t('settings.posAdvanced.sound.cash', 'Caisse') },
-                  { value: 'success' as SoundType, label: t('settings.posAdvanced.sound.success', 'Succès') },
-                  { value: 'chime' as SoundType, label: t('settings.posAdvanced.sound.chime', 'Carillon') },
+                  { value: 'none' as SoundType, label: 'None' },
+                  { value: 'cash' as SoundType, label: 'Cash register' },
+                  { value: 'success' as SoundType, label: 'Success' },
+                  { value: 'chime' as SoundType, label: 'Chime' },
                 ]}
                 onChange={(v) => handleUpdate('sound', 'payment_success', v)}
               />
@@ -225,18 +223,18 @@ export default function POSAdvancedSettingsSection() {
         <div className="settings-group">
           <h3 className="settings-group__title">
             <Lock size={18} />
-            {t('settings.posAdvanced.screensaver.title', 'Économiseur d\'écran')}
+            Screensaver
           </h3>
           <Toggle
-            label={t('settings.posAdvanced.screensaver.enabled', 'Activer l\'économiseur')}
-            description={t('settings.posAdvanced.screensaver.enabledDesc', 'Afficher un économiseur d\'écran après inactivité')}
+            label="Enable screensaver"
+            description="Show screensaver after inactivity"
             checked={settings.screensaver.enabled}
             onChange={(v) => handleUpdate('screensaver', 'enabled', v)}
           />
           {settings.screensaver.enabled && (
             <>
               <Select
-                label={t('settings.posAdvanced.screensaver.timeout', 'Délai (secondes)')}
+                label="Timeout (seconds)"
                 value={settings.screensaver.timeout}
                 options={[
                   { value: 60, label: '1 minute' },
@@ -247,7 +245,7 @@ export default function POSAdvancedSettingsSection() {
                 onChange={(v) => handleUpdate('screensaver', 'timeout', Number(v))}
               />
               <Toggle
-                label={t('settings.posAdvanced.screensaver.showClock', 'Afficher l\'horloge')}
+                label="Show clock"
                 checked={settings.screensaver.show_clock}
                 onChange={(v) => handleUpdate('screensaver', 'show_clock', v)}
               />
@@ -259,35 +257,35 @@ export default function POSAdvancedSettingsSection() {
         <div className="settings-group">
           <h3 className="settings-group__title">
             <WifiOff size={18} />
-            {t('settings.posAdvanced.offline.title', 'Mode Hors-ligne')}
+            Offline Mode
           </h3>
           <Toggle
-            label={t('settings.posAdvanced.offline.enabled', 'Mode hors-ligne activé')}
-            description={t('settings.posAdvanced.offline.enabledDesc', 'Permettre les ventes sans connexion internet')}
+            label="Offline mode enabled"
+            description="Allow sales without internet connection"
             checked={settings.offline.enabled}
             onChange={(v) => handleUpdate('offline', 'enabled', v)}
           />
           {settings.offline.enabled && (
             <>
               <Toggle
-                label={t('settings.posAdvanced.offline.autoSwitch', 'Basculement automatique')}
-                description={t('settings.posAdvanced.offline.autoSwitchDesc', 'Passer automatiquement en mode hors-ligne si la connexion est perdue')}
+                label="Auto switch"
+                description="Automatically switch to offline mode when connection is lost"
                 checked={settings.offline.auto_switch}
                 onChange={(v) => handleUpdate('offline', 'auto_switch', v)}
               />
               <Select
-                label={t('settings.posAdvanced.offline.syncInterval', 'Intervalle de sync (sec)')}
+                label="Sync interval (sec)"
                 value={settings.offline.sync_interval}
                 options={[
-                  { value: 15, label: '15 secondes' },
-                  { value: 30, label: '30 secondes' },
+                  { value: 15, label: '15 seconds' },
+                  { value: 30, label: '30 seconds' },
                   { value: 60, label: '1 minute' },
                   { value: 120, label: '2 minutes' },
                 ]}
                 onChange={(v) => handleUpdate('offline', 'sync_interval', Number(v))}
               />
               <Select
-                label={t('settings.posAdvanced.offline.maxOfflineOrders', 'Max commandes hors-ligne')}
+                label="Max offline orders"
                 value={settings.offline.max_offline_orders}
                 options={[
                   { value: 50, label: '50' },
@@ -305,28 +303,28 @@ export default function POSAdvancedSettingsSection() {
         <div className="settings-group">
           <h3 className="settings-group__title">
             <Monitor size={18} />
-            {t('settings.posAdvanced.customerDisplay.title', 'Affichage Client')}
+            Customer Display
           </h3>
           <Toggle
-            label={t('settings.posAdvanced.customerDisplay.enabled', 'Activer l\'affichage client')}
-            description={t('settings.posAdvanced.customerDisplay.enabledDesc', 'Afficher les informations sur un second écran')}
+            label="Enable customer display"
+            description="Show information on a second screen"
             checked={settings.customer_display.enabled}
             onChange={(v) => handleUpdate('customer_display', 'enabled', v)}
           />
           {settings.customer_display.enabled && (
             <>
               <Toggle
-                label={t('settings.posAdvanced.customerDisplay.showItems', 'Afficher les articles')}
+                label="Show items"
                 checked={settings.customer_display.show_items}
                 onChange={(v) => handleUpdate('customer_display', 'show_items', v)}
               />
               <Toggle
-                label={t('settings.posAdvanced.customerDisplay.showPromotions', 'Afficher les promotions')}
+                label="Show promotions"
                 checked={settings.customer_display.show_promotions}
                 onChange={(v) => handleUpdate('customer_display', 'show_promotions', v)}
               />
               <Toggle
-                label={t('settings.posAdvanced.customerDisplay.showLogo', 'Afficher le logo')}
+                label="Show logo"
                 checked={settings.customer_display.show_logo}
                 onChange={(v) => handleUpdate('customer_display', 'show_logo', v)}
               />

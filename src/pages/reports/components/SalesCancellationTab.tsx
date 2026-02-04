@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { XCircle, DollarSign, AlertTriangle, Loader2, Calendar } from 'lucide-react';
 import { ReportingService } from '@/services/ReportingService';
@@ -13,7 +12,6 @@ import type { ICancellationsReport } from '@/types/reporting';
 const COLORS = ['#EF4444', '#F97316', '#EAB308', '#22C55E', '#3B82F6', '#8B5CF6', '#EC4899', '#6B7280'];
 
 export function SalesCancellationTab() {
-  const { t } = useTranslation();
   const { dateRange } = useDateRange({ defaultPreset: 'last7days' });
 
   const { data, isLoading, error } = useQuery({
@@ -88,7 +86,7 @@ export function SalesCancellationTab() {
   if (error) {
     return (
       <div className="p-8 text-center text-red-600">
-        {t('common.error', 'Erreur lors du chargement des données')}
+        Error loading data
       </div>
     );
   }

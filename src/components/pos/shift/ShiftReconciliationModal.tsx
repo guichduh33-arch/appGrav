@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import { X, CheckCircle, AlertTriangle, TrendingUp, TrendingDown, Minus, Banknote, QrCode, CreditCard } from 'lucide-react'
 import { formatPrice } from '../../../utils/helpers'
 import { ReconciliationData } from '../../../hooks/useShift'
@@ -17,8 +16,6 @@ export default function ShiftReconciliationModal({
     transactionCount,
     onClose
 }: ShiftReconciliationModalProps) {
-    const { t } = useTranslation()
-
     const getDifferenceClass = (diff: number) => {
         if (diff > 0) return 'positive'
         if (diff < 0) return 'negative'
@@ -46,12 +43,12 @@ export default function ShiftReconciliationModal({
                     </div>
                     <div>
                         <h2 className="shift-modal__title">
-                            {t('shift.reconciliation_title', 'Réconciliation du Shift')}
+                            Shift Reconciliation
                         </h2>
                         <p className="shift-modal__subtitle">
                             {hasDiscrepancy
-                                ? t('shift.reconciliation_discrepancy', 'Des écarts ont été détectés')
-                                : t('shift.reconciliation_success', 'Tous les montants correspondent')
+                                ? 'Discrepancies have been detected'
+                                : 'All amounts match'
                             }
                         </p>
                     </div>
@@ -64,11 +61,11 @@ export default function ShiftReconciliationModal({
                     {/* Summary Stats */}
                     <div className="reconciliation-stats">
                         <div className="reconciliation-stats__item">
-                            <span className="reconciliation-stats__label">{t('shift.total_sales', 'Ventes totales')}</span>
+                            <span className="reconciliation-stats__label">Total sales</span>
                             <span className="reconciliation-stats__value">{formatPrice(totalSales)}</span>
                         </div>
                         <div className="reconciliation-stats__item">
-                            <span className="reconciliation-stats__label">{t('shift.transactions', 'Transactions')}</span>
+                            <span className="reconciliation-stats__label">Transactions</span>
                             <span className="reconciliation-stats__value">{transactionCount}</span>
                         </div>
                     </div>
@@ -76,10 +73,10 @@ export default function ShiftReconciliationModal({
                     {/* Reconciliation Table */}
                     <div className="reconciliation-table">
                         <div className="reconciliation-table__header">
-                            <span>{t('shift.payment_type', 'Type')}</span>
-                            <span>{t('shift.expected', 'Attendu')}</span>
-                            <span>{t('shift.actual', 'Réel')}</span>
-                            <span>{t('shift.difference', 'Écart')}</span>
+                            <span>Type</span>
+                            <span>Expected</span>
+                            <span>Actual</span>
+                            <span>Variance</span>
                         </div>
 
                         {/* Cash Row */}
@@ -127,7 +124,7 @@ export default function ShiftReconciliationModal({
                         {/* Total Row */}
                         <div className="reconciliation-table__row reconciliation-table__row--total">
                             <div className="reconciliation-table__type">
-                                <span className="reconciliation-table__total-label">{t('shift.total', 'TOTAL')}</span>
+                                <span className="reconciliation-table__total-label">TOTAL</span>
                             </div>
                             <span className="reconciliation-table__amount reconciliation-table__amount--total">{formatPrice(totalExpected)}</span>
                             <span className="reconciliation-table__amount reconciliation-table__amount--total">{formatPrice(totalActual)}</span>
@@ -145,14 +142,14 @@ export default function ShiftReconciliationModal({
                             <div>
                                 <strong>
                                     {totalDifference > 0
-                                        ? t('shift.surplus_detected', 'Surplus détecté')
-                                        : t('shift.shortage_detected', 'Manque détecté')
+                                        ? 'Surplus detected'
+                                        : 'Shortage detected'
                                     }
                                 </strong>
                                 <p>
                                     {totalDifference > 0
-                                        ? t('shift.surplus_message', 'Le montant réel est supérieur au montant attendu.')
-                                        : t('shift.shortage_message', 'Le montant réel est inférieur au montant attendu.')
+                                        ? 'The actual amount is higher than expected.'
+                                        : 'The actual amount is lower than expected.'
                                     }
                                 </p>
                             </div>
@@ -166,7 +163,7 @@ export default function ShiftReconciliationModal({
                             onClick={onClose}
                         >
                             <CheckCircle size={18} />
-                            {t('shift.understood', 'Compris')}
+                            Understood
                         </button>
                     </div>
                 </div>

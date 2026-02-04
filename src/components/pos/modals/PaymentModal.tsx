@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
 import { X, Check, CreditCard, Banknote, QrCode, Printer, RotateCcw, WifiOff, Clock } from 'lucide-react'
 import { useCartStore } from '../../../stores/cartStore'
 import { formatPrice } from '../../../utils/helpers'
@@ -17,7 +16,6 @@ type PaymentMethod = 'cash' | 'card' | 'qris'
 const QUICK_AMOUNTS = [100000, 150000, 200000, 250000, 500000]
 
 export default function PaymentModal({ onClose }: PaymentModalProps) {
-    const { t } = useTranslation()
     const { total } = useCartStore()
     const isOnline = useNetworkStore((state) => state.isOnline)
 
@@ -35,12 +33,12 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
     // Show error toast when error changes
     useEffect(() => {
         if (error && !errorShownRef.current) {
-            toast.error(`${t('payment.toast_error')}: ${error}`)
+            toast.error(`Payment error: ${error}`)
             errorShownRef.current = true
         } else if (!error) {
             errorShownRef.current = false
         }
-    }, [error, t])
+    }, [error])
 
     // Clear error on unmount
     useEffect(() => {
@@ -94,7 +92,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
 
                 // Show appropriate toast based on online/offline status
                 if (!isOnline && paymentMethod !== 'cash') {
-                    toast.success(t('payment.offlinePaymentSaved'))
+                    toast.success('Payment saved offline')
                 }
             }
         } catch (err: unknown) {
@@ -107,7 +105,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
     const handleNewOrder = () => {
         // Cart is already cleared by processPayment
         onClose()
-        toast.success(t('payment.toast_new_ready'))
+        toast.success('Ready for new order')
     }
 
     // Success screen
@@ -119,12 +117,12 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                         <div className="success-icon">
                             <Check size={64} className="text-success" />
                         </div>
-                        <h2>{t('payment.success_title')}</h2>
-                        <p className="success-subtitle">{t('payment.success_subtitle')}</p>
+                        <h2>Payment successful!</h2>
+                        <p className="success-subtitle">Order completed</p>
 
                         {paymentMethod === 'cash' && successChange > 0 && (
                             <div className="success-change">
-                                <span className="success-change__label">{t('payment.change_given')}</span>
+                                <span className="success-change__label">Change given</span>
                                 <span className="success-change__value">{formatPrice(successChange)}</span>
                             </div>
                         )}
@@ -142,18 +140,18 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                                 color: '#92400e'
                             }}>
                                 <Clock size={20} />
-                                <span>{t('payment.willValidateOnline')}</span>
+                                <span>Will validate when online</span>
                             </div>
                         )}
 
                         <div className="success-actions">
-                            <button className="btn btn-secondary" onClick={() => toast(t('payment.print_toast'))}>
+                            <button className="btn btn-secondary" onClick={() => toast('Printing receipt...')}>
                                 <Printer size={18} className="mr-2" />
-                                {t('payment.print')}
+                                Print
                             </button>
                             <button className="btn btn-primary" onClick={handleNewOrder}>
                                 <RotateCcw size={18} className="mr-2" />
-                                {t('payment.new_order')}
+                                New Order
                             </button>
                         </div>
                     </div>
@@ -169,11 +167,11 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                     <div>
                         <h3 className="modal__title">
                             <CreditCard size={24} />
-                            {t('payment.title')}
+                            Checkout
                         </h3>
-                        <p className="modal__subtitle">{t('payment.subtitle')}</p>
+                        <p className="modal__subtitle">Ongoing order</p>
                     </div>
-                    <button className="modal__close" onClick={onClose} aria-label={t('common.close')} title={t('common.close')}>
+                    <button className="modal__close" onClick={onClose} aria-label="Close" title="Close">
                         <X size={24} />
                     </button>
                 </div>
@@ -182,11 +180,11 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                     {/* Top: Payment Methods */}
                     <div className="payment-methods-container">
                         <label className="section-label">
-                            {t('payment.method_title')}
+                            PAYMENT METHOD
                             {!isOnline && (
                                 <span className="offline-badge" style={{ marginLeft: '8px', fontSize: '12px', color: '#f59e0b' }}>
                                     <WifiOff size={14} style={{ display: 'inline', marginRight: '4px' }} />
-                                    {t('payment.offline_mode')}
+                                    Offline Mode
                                 </span>
                             )}
                         </label>
@@ -202,7 +200,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                                 />
                                 <label htmlFor="payCash" className="payment-method__label">
                                     <Banknote size={24} className="payment-method__icon" />
-                                    <span className="payment-method__name">{t('payment.cash')}</span>
+                                    <span className="payment-method__name">Cash</span>
                                 </label>
                             </div>
 
@@ -217,11 +215,11 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                                 />
                                 <label htmlFor="payCard" className="payment-method__label">
                                     <CreditCard size={24} className="payment-method__icon" />
-                                    <span className="payment-method__name">{t('payment.card')}</span>
+                                    <span className="payment-method__name">Card</span>
                                     {!isOnline && (
                                         <span className="payment-method__offline" style={{ color: '#f59e0b', fontSize: '11px' }}>
                                             <Clock size={12} style={{ display: 'inline', marginRight: '2px' }} />
-                                            {t('payment.pendingValidation')}
+                                            Pending validation
                                         </span>
                                     )}
                                 </label>
@@ -238,11 +236,11 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                                 />
                                 <label htmlFor="payQris" className="payment-method__label">
                                     <QrCode size={24} className="payment-method__icon" />
-                                    <span className="payment-method__name">{t('payment.qris')}</span>
+                                    <span className="payment-method__name">QRIS</span>
                                     {!isOnline && (
                                         <span className="payment-method__offline" style={{ color: '#f59e0b', fontSize: '11px' }}>
                                             <Clock size={12} style={{ display: 'inline', marginRight: '2px' }} />
-                                            {t('payment.pendingValidation')}
+                                            Pending validation
                                         </span>
                                     )}
                                 </label>
@@ -255,7 +253,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                         <div className="payment-left">
                             {/* Amount Display */}
                             <div className="payment-amount-display">
-                                <p className="payment-amount-display__label">{t('payment.amount_to_pay')}</p>
+                                <p className="payment-amount-display__label">Amount to pay</p>
                                 <p className="payment-amount-display__value">{formatPrice(total)}</p>
                             </div>
 
@@ -263,13 +261,13 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                             {paymentMethod === 'cash' && (
                                 <>
                                     <div className="quick-amounts-section">
-                                        <p className="section-label">{t('payment.amount_received')}</p>
+                                        <p className="section-label">AMOUNT RECEIVED</p>
                                         <div className="quick-amounts">
                                             <button
                                                 className="quick-amount-btn is-exact"
                                                 onClick={() => handleQuickAmount('exact')}
                                             >
-                                                {t('payment.exact_amount')}
+                                                Exact amount
                                             </button>
                                             {QUICK_AMOUNTS.map(amount => (
                                                 <button
@@ -286,7 +284,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                                     {/* Change Display */}
                                     {amountReceived >= total && (
                                         <div className="payment-change">
-                                            <span className="payment-change__label">{t('payment.change_given')}</span>
+                                            <span className="payment-change__label">Change given</span>
                                             <span className="payment-change__value">{formatPrice(change)}</span>
                                         </div>
                                     )}
@@ -298,15 +296,15 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                         {paymentMethod === 'cash' && (
                             <div className="payment-right">
                                 <div className="amount-input-container">
-                                    <label className="section-label">{t('payment.manual_input')}</label>
+                                    <label className="section-label">Manual input</label>
                                     <div className="amount-input">
                                         <span className="currency-prefix">Rp</span>
                                         <input
                                             type="text"
                                             value={amountReceived.toLocaleString('id-ID')}
                                             readOnly
-                                            aria-label={t('payment.amount_received')}
-                                            title={t('payment.amount_received')}
+                                            aria-label="Amount received"
+                                            title="Amount received"
                                         />
                                     </div>
                                 </div>
@@ -328,7 +326,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
 
                 <div className="modal__footer payment-footer">
                     <button className="btn btn-secondary" onClick={onClose}>
-                        {t('payment.cancel')}
+                        Cancel
                     </button>
                     <button
                         className="btn btn-primary-lg"
@@ -336,11 +334,11 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                         disabled={!canComplete || isProcessing}
                     >
                         {isProcessing ? (
-                            t('payment.processing')
+                            'Processing...'
                         ) : (
                             <>
                                 <Check size={20} />
-                                {t('payment.complete')}
+                                Complete Payment
                             </>
                         )}
                     </button>

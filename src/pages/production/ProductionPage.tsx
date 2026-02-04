@@ -3,7 +3,6 @@ import {
     Factory, Calendar, ChevronLeft, ChevronRight, Search, Plus, Minus,
     Trash2, Save, Clock, Package, Lock, Eye, Layers, WifiOff, Bookmark, Bell, X
 } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 import { useProduction, ProductWithSection, ProductionRecordWithProduct, ProductionItem } from '../../hooks/useProduction'
 import { useNetworkStatus } from '../../hooks/offline/useNetworkStatus'
@@ -17,7 +16,6 @@ import {
 import type { IProductionReminder } from '../../types/offline'
 
 const ProductionPage = () => {
-    const { t } = useTranslation()
     const { isOnline } = useNetworkStatus()
     const {
         selectedDate,
@@ -64,7 +62,7 @@ const ProductionPage = () => {
                     <div className="flex items-center gap-3">
                         <Bell size={20} className="text-amber-500" />
                         <div>
-                            <p className="font-medium">{t('production.offline.pendingReminders', { count })}</p>
+                            <p className="font-medium">{count} pending reminder(s)</p>
                             <button
                                 onClick={() => {
                                     setShowRemindersPanel(true)
@@ -72,7 +70,7 @@ const ProductionPage = () => {
                                 }}
                                 className="text-sm text-amber-600 hover:underline"
                             >
-                                {t('production.offline.viewReminders')}
+                                View reminders
                             </button>
                         </div>
                     </div>
@@ -80,7 +78,7 @@ const ProductionPage = () => {
                 { duration: 8000 }
             )
         }
-    }, [isOnline, t])
+    }, [isOnline])
 
     // Load reminders when panel opens
     useEffect(() => {
@@ -100,7 +98,7 @@ const ProductionPage = () => {
             reminderNote || undefined
         )
 
-        toast.success(t('production.offline.reminderSaved'))
+        toast.success('Reminder saved')
         setRemindersCount(getRemindersCount())
         setReminderNote('')
         clearItems()
@@ -118,7 +116,7 @@ const ProductionPage = () => {
         // Restore items via hook
         restoreFromReminder(reminder.items as ProductionItem[])
         setShowRemindersPanel(false)
-        toast.success(t('production.offline.restoreReminder'))
+        toast.success('Reminder restored')
     }
 
     const formatDate = (date: Date) => {
@@ -165,7 +163,7 @@ const ProductionPage = () => {
                             className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors"
                         >
                             <Bell size={18} />
-                            <span className="font-medium">{t('production.offline.pendingReminders', { count: remindersCount })}</span>
+                            <span className="font-medium">{remindersCount} pending reminder(s)</span>
                         </button>
                     )}
                 </div>
@@ -179,7 +177,6 @@ const ProductionPage = () => {
                     onRestore={handleRestoreReminder}
                     onDelete={handleDeleteReminder}
                     isOnline={isOnline}
-                    t={t}
                 />
             )}
 
@@ -220,7 +217,6 @@ const ProductionPage = () => {
                         onClear={clearItems}
                         onSave={handleSave}
                         onSaveReminder={handleSaveReminder}
-                        t={t}
                     />
                     <div className="flex flex-col gap-4">
                         <SummaryCard totalProduced={totalProduced} totalWaste={totalWaste} />
@@ -322,7 +318,7 @@ function EmptyState() {
 function ProductionEntry({
     sectionName, searchQuery, setSearchQuery, filteredProducts, productionItems,
     isSaving, isOnline, reminderNote, setReminderNote, onAddProduct, onUpdateQuantity,
-    onUpdateReason, onRemoveItem, onClear, onSave, onSaveReminder, t
+    onUpdateReason, onRemoveItem, onClear, onSave, onSaveReminder
 }: {
     sectionName: string
     searchQuery: string
@@ -340,7 +336,6 @@ function ProductionEntry({
     onClear: () => void
     onSave: () => void
     onSaveReminder: () => void
-    t: (key: string, options?: Record<string, unknown>) => string
 }) {
     return (
         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
@@ -351,7 +346,7 @@ function ProductionEntry({
                 <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2">
                     <WifiOff size={18} className="text-amber-600 flex-shrink-0" />
                     <span className="text-sm text-amber-800 font-medium">
-                        {t('production.offline.requiresConnection')}
+                        Production requires an internet connection
                     </span>
                 </div>
             )}
@@ -409,7 +404,7 @@ function ProductionEntry({
                         <div>
                             <input
                                 type="text"
-                                placeholder={t('production.offline.addNote')}
+                                placeholder="Add a note..."
                                 value={reminderNote}
                                 onChange={(e) => setReminderNote(e.target.value)}
                                 className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:border-amber-500 focus:outline-none"
@@ -427,7 +422,7 @@ function ProductionEntry({
                                 className="px-6 py-3 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold shadow-md hover:shadow-lg transition-all disabled:opacity-70 flex items-center gap-2"
                             >
                                 <Save size={18} />
-                                {isSaving ? 'Enregistrement...' : 'Enregistrer'}
+                                {isSaving ? 'Saving...' : 'Save'}
                             </button>
                         ) : (
                             <button
@@ -435,7 +430,7 @@ function ProductionEntry({
                                 className="px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold shadow-md hover:shadow-lg transition-all flex items-center gap-2"
                             >
                                 <Bookmark size={18} />
-                                {t('production.offline.saveReminder')}
+                                Save Reminder
                             </button>
                         )}
                     </div>
@@ -614,15 +609,13 @@ function RemindersPanel({
     onClose,
     onRestore,
     onDelete,
-    isOnline,
-    t
+    isOnline
 }: {
     reminders: IProductionReminder[]
     onClose: () => void
     onRestore: (reminder: IProductionReminder) => void
     onDelete: (id: string) => void
     isOnline: boolean
-    t: (key: string, options?: Record<string, unknown>) => string
 }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -631,7 +624,7 @@ function RemindersPanel({
                 <div className="flex items-center justify-between p-4 border-b border-gray-200">
                     <div className="flex items-center gap-2">
                         <Bell size={20} className="text-amber-500" />
-                        <h2 className="text-lg font-semibold text-gray-800">{t('production.offline.remindersTitle')}</h2>
+                        <h2 className="text-lg font-semibold text-gray-800">Production Reminders</h2>
                     </div>
                     <button
                         onClick={onClose}
@@ -646,7 +639,7 @@ function RemindersPanel({
                     {reminders.length === 0 ? (
                         <div className="text-center py-8 text-gray-400">
                             <Bookmark size={40} className="mx-auto mb-2 opacity-50" />
-                            <p className="m-0">{t('production.offline.noReminders')}</p>
+                            <p className="m-0">No reminders</p>
                         </div>
                     ) : (
                         <div className="space-y-3">
@@ -659,11 +652,11 @@ function RemindersPanel({
                                         <div>
                                             <div className="font-semibold text-gray-800">{reminder.sectionName}</div>
                                             <div className="text-xs text-gray-500">
-                                                {t('production.offline.createdAt')}: {new Date(reminder.createdAt).toLocaleString()}
+                                                Created at: {new Date(reminder.createdAt).toLocaleString()}
                                             </div>
                                         </div>
                                         <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-medium">
-                                            {reminder.items.length} {t('production.offline.items')}
+                                            {reminder.items.length} items
                                         </span>
                                     </div>
 
@@ -680,7 +673,7 @@ function RemindersPanel({
 
                                     {reminder.note && (
                                         <div className="mb-3 p-2 bg-white rounded border border-gray-100 text-sm text-gray-600">
-                                            <span className="font-medium text-gray-700">{t('production.offline.reminderNote')}:</span> {reminder.note}
+                                            <span className="font-medium text-gray-700">Note:</span> {reminder.note}
                                         </div>
                                     )}
 
@@ -690,17 +683,17 @@ function RemindersPanel({
                                             onClick={() => onRestore(reminder)}
                                             disabled={!isOnline}
                                             className="flex-1 px-3 py-2 bg-amber-500 text-white rounded-lg text-sm font-medium hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
-                                            title={!isOnline ? t('production.offline.requiresConnection') : ''}
+                                            title={!isOnline ? 'Production requires an internet connection' : ''}
                                         >
                                             <Save size={14} />
-                                            {t('production.offline.restoreReminder')}
+                                            Restore
                                         </button>
                                         <button
                                             onClick={() => onDelete(reminder.id)}
                                             className="px-3 py-2 border border-gray-200 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors flex items-center gap-1"
                                         >
                                             <Trash2 size={14} />
-                                            {t('production.offline.deleteReminder')}
+                                            Delete
                                         </button>
                                     </div>
                                 </div>

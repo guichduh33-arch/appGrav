@@ -2,7 +2,6 @@
 // Conditionally renders children based on user permissions
 
 import { ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
 import { ShieldAlert, Lock } from 'lucide-react';
 import { usePermissions } from '@/hooks/usePermissions';
 import type { PermissionCode, RoleCode } from '@/types/auth';
@@ -138,12 +137,10 @@ export function RouteGuard({
  * Small inline "Access Denied" message
  */
 function AccessDeniedMessage() {
-  const { t } = useTranslation();
-
   return (
     <div className="inline-flex items-center gap-2 px-3 py-2 text-sm text-red-600 bg-red-50 rounded-lg">
       <Lock className="w-4 h-4" />
-      <span>{t('auth.errors.noPermission')}</span>
+      <span>You do not have permission</span>
     </div>
   );
 }
@@ -152,8 +149,6 @@ function AccessDeniedMessage() {
  * Full-page "Access Denied" component
  */
 function AccessDeniedPage() {
-  const { t } = useTranslation();
-
   return (
     <div className="flex items-center justify-center min-h-[400px] p-8">
       <div className="text-center max-w-md">
@@ -161,17 +156,17 @@ function AccessDeniedPage() {
           <ShieldAlert className="w-8 h-8 text-red-600" />
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          {t('auth.errors.accessDenied')}
+          Access Denied
         </h2>
         <p className="text-gray-600 mb-6">
-          {t('auth.errors.noPermission')}
+          You do not have permission to access this page
         </p>
         <button
           type="button"
           onClick={() => window.history.back()}
           className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-colors"
         >
-          {t('common.back') || 'Go Back'}
+          Go Back
         </button>
       </div>
     </div>

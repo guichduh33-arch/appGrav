@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Receipt, Calendar, Loader2, DollarSign, TrendingDown } from 'lucide-react';
 // import { supabase } from '@/lib/supabase'; // TODO: uncomment when expenses table is created
@@ -41,7 +40,6 @@ async function getExpenses(_from: Date, _to: Date): Promise<Expense[]> {
 }
 
 export function ExpensesTab() {
-  const { t } = useTranslation();
   const { dateRange } = useDateRange({ defaultPreset: 'thisMonth' });
 
   // Feature not yet available - expenses table doesn't exist
@@ -138,7 +136,7 @@ export function ExpensesTab() {
   if (error) {
     return (
       <div className="p-8 text-center text-red-600">
-        {t('common.error', 'Erreur lors du chargement des données')}
+        Error loading data
       </div>
     );
   }
@@ -154,10 +152,10 @@ export function ExpensesTab() {
             </div>
           </div>
           <h3 className="text-lg font-semibold text-amber-800 mb-2">
-            {t('reports.expenses.notAvailable', 'Module de Dépenses - Bientôt disponible')}
+            Expenses Module - Coming Soon
           </h3>
           <p className="text-amber-700">
-            {t('reports.expenses.notAvailableDesc', 'Le suivi des dépenses sera disponible dans une prochaine version. Cette fonctionnalité permettra de gérer et suivre toutes les dépenses opérationnelles.')}
+            Expense tracking will be available in an upcoming version. This feature will allow you to manage and track all operational expenses.
           </p>
         </div>
       </div>

@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   UserPlus,
   Edit2,
@@ -45,7 +44,6 @@ interface UserWithRoles {
 }
 
 const UsersPage = () => {
-  const { t, i18n } = useTranslation();
   const { user: currentUser } = useAuthStore();
   const { isAdmin } = usePermissions();
   void isAdmin; // Suppress unused variable warning
@@ -115,7 +113,7 @@ const UsersPage = () => {
       setUsers((data as unknown as UserWithRoles[]) || []);
     } catch (error) {
       console.error('Error loading users:', error);
-      toast.error(t('common.error') || 'Erreur de chargement');
+      toast.error('Loading error');
     } finally {
       setIsLoading(false);
     }
@@ -165,12 +163,9 @@ const UsersPage = () => {
     return { total, active, admins, recentlyActive };
   }, [users]);
 
-  // Get role name based on current language
+  // Get role name - use English
   const getRoleName = (role: Role | undefined) => {
     if (!role) return '-';
-    const lang = i18n.language;
-    if (lang === 'fr') return role.name_fr;
-    if (lang === 'id') return role.name_id;
     return role.name_en;
   };
 
@@ -182,7 +177,7 @@ const UsersPage = () => {
 
   // Format last active
   const formatLastActive = (dateString: string | null) => {
-    if (!dateString) return t('auth.users.neverLoggedIn') || 'Jamais connecté';
+    if (!dateString) return 'Never logged in';
 
     const date = new Date(dateString);
     const now = new Date();
@@ -191,10 +186,10 @@ const UsersPage = () => {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffHours / 24);
 
-    if (diffMins < 5) return t('common.online') || 'En ligne';
+    if (diffMins < 5) return 'Online';
     if (diffMins < 60) return `${diffMins}m`;
     if (diffHours < 24) return `${diffHours}h`;
-    if (diffDays < 7) return `${diffDays}j`;
+    if (diffDays < 7) return `${diffDays}d`;
     return date.toLocaleDateString();
   };
 
@@ -233,8 +228,8 @@ const UsersPage = () => {
       if (result.success) {
         toast.success(
           currentStatus
-            ? (t('auth.users.deactivated') || 'Utilisateur désactivé')
-            : (t('auth.users.activated') || 'Utilisateur activé')
+            ? 'User deactivated'
+            : 'User activated'
         );
         loadData();
       } else {
@@ -242,7 +237,7 @@ const UsersPage = () => {
       }
     } catch (error) {
       console.error('Toggle active error:', error);
-      toast.error(t('common.error') || 'Erreur');
+      toast.error('Error');
     }
   };
 
@@ -252,15 +247,15 @@ const UsersPage = () => {
       const result = await authService.deleteUserDirect(userId);
 
       if (result.success) {
-        toast.success(t('auth.users.deleted') || 'Utilisateur supprimé');
+        toast.success('User deleted');
         setShowDeleteConfirm(null);
         loadData();
       } else {
-        toast.error(result.error || 'Erreur');
+        toast.error(result.error || 'Error');
       }
     } catch (error) {
       console.error('Delete error:', error);
-      toast.error(t('common.error') || 'Erreur');
+      toast.error('Error');
     }
   };
 
@@ -282,16 +277,16 @@ const UsersPage = () => {
       <header className="users-page__header">
         <div>
           <h1 className="users-page__title">
-            {t('auth.users.title') || 'Gestion des Utilisateurs'}
+            User Management
           </h1>
           <p className="users-page__subtitle">
-            {t('auth.users.subtitle') || 'Gérez les utilisateurs et leurs accès'}
+            Manage users and their access
           </p>
         </div>
         <PermissionGuard permission="users.create">
           <Button onClick={handleCreate}>
             <UserPlus size={18} />
-            {t('auth.users.createUser') || 'Nouvel Utilisateur'}
+            New User
           </Button>
         </PermissionGuard>
       </header>
@@ -299,25 +294,25 @@ const UsersPage = () => {
       {/* Stats Cards */}
       <div className="users-stats-grid">
         <StatCard
-          label={t('auth.users.totalMembers') || 'Total Membres'}
+          label="Total Members"
           value={stats.total}
           icon={<Users size={24} />}
           variant="blue"
         />
         <StatCard
-          label={t('auth.users.active') || 'Actifs'}
+          label="Active"
           value={stats.active}
           icon={<CheckCircle2 size={24} />}
           variant="green"
         />
         <StatCard
-          label={t('auth.users.adminsManagers') || 'Admins/Managers'}
+          label="Admins/Managers"
           value={stats.admins}
           icon={<Shield size={24} />}
           variant="orange"
         />
         <StatCard
-          label={t('auth.users.recentlyActive') || 'Actifs 24h'}
+          label="Active 24h"
           value={stats.recentlyActive}
           icon={<Clock size={24} />}
           variant="purple"
@@ -331,7 +326,7 @@ const UsersPage = () => {
           <Search className="users-filters__search-icon" size={16} />
           <input
             type="text"
-            placeholder={t('common.search') || 'Rechercher...'}
+            placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="users-filters__search-input"
@@ -343,10 +338,10 @@ const UsersPage = () => {
           value={filterRole}
           onChange={(e) => setFilterRole(e.target.value)}
           className="users-filters__select"
-          title={t('common.filterByRole') || 'Filtrer par rôle'}
-          aria-label={t('common.filterByRole') || 'Filtrer par rôle'}
+          title="Filter by role"
+          aria-label="Filter by role"
         >
-          <option value="all">{t('common.allRoles') || 'Tous les rôles'}</option>
+          <option value="all">All roles</option>
           {roles.map(role => (
             <option key={role.id} value={role.code}>
               {getRoleName(role)}
@@ -359,12 +354,12 @@ const UsersPage = () => {
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
           className="users-filters__select"
-          title={t('common.filterByStatus') || 'Filtrer par statut'}
-          aria-label={t('common.filterByStatus') || 'Filtrer par statut'}
+          title="Filter by status"
+          aria-label="Filter by status"
         >
-          <option value="all">{t('common.allStatus') || 'Tous les statuts'}</option>
-          <option value="active">{t('auth.users.active') || 'Actif'}</option>
-          <option value="inactive">{t('auth.users.inactive') || 'Inactif'}</option>
+          <option value="all">All statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
         </select>
 
         {/* Show inactive toggle */}
@@ -374,7 +369,7 @@ const UsersPage = () => {
             checked={showInactive}
             onChange={(e) => setShowInactive(e.target.checked)}
           />
-          {t('auth.users.showInactive') || 'Afficher inactifs'}
+          Show inactive
         </label>
 
         {/* Refresh */}
@@ -394,12 +389,12 @@ const UsersPage = () => {
         <table className="users-table">
           <thead>
             <tr>
-              <th>{t('table.user') || 'Utilisateur'}</th>
-              <th>{t('auth.users.employeeCode') || 'Code'}</th>
-              <th>{t('auth.users.primaryRole') || 'Rôle'}</th>
-              <th>{t('auth.users.status') || 'Statut'}</th>
-              <th>{t('auth.users.lastLogin') || 'Dernière connexion'}</th>
-              <th>{t('common.actions') || 'Actions'}</th>
+              <th>User</th>
+              <th>Code</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Last login</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -407,14 +402,14 @@ const UsersPage = () => {
               <tr>
                 <td colSpan={6} className="users-empty">
                   <RefreshCw className="users-empty__icon animate-spin" />
-                  {t('common.loading') || 'Chargement...'}
+                  Loading...
                 </td>
               </tr>
             ) : filteredUsers.length === 0 ? (
               <tr>
                 <td colSpan={6} className="users-empty">
                   <Users className="users-empty__icon" />
-                  {t('common.noResults') || 'Aucun résultat'}
+                  No results
                 </td>
               </tr>
             ) : (
@@ -442,7 +437,7 @@ const UsersPage = () => {
                             {user.display_name || user.name}
                             {isSelf && (
                               <span className="user-cell__badge">
-                                {t('common.you') || 'Vous'}
+                                You
                               </span>
                             )}
                           </div>
@@ -472,8 +467,8 @@ const UsersPage = () => {
                         <span className={`status-cell__dot ${user.is_active ? 'status-cell__dot--active' : 'status-cell__dot--inactive'}`} />
                         <span className="status-cell__text">
                           {user.is_active
-                            ? (t('auth.users.active') || 'Actif')
-                            : (t('auth.users.inactive') || 'Inactif')}
+                            ? 'Active'
+                            : 'Inactive'}
                         </span>
                       </div>
                     </td>
@@ -487,7 +482,7 @@ const UsersPage = () => {
                             type="button"
                             className="action-btn"
                             onClick={() => handleEdit(user)}
-                            title={t('common.edit') || 'Modifier'}
+                            title="Edit"
                           >
                             <Edit2 size={16} />
                           </button>
@@ -499,7 +494,7 @@ const UsersPage = () => {
                             className={`action-btn ${user.is_active ? 'action-btn--deactivate' : 'action-btn--activate'}`}
                             onClick={() => handleToggleActive(user.id, user.is_active)}
                             disabled={isSelf}
-                            title={user.is_active ? 'Désactiver' : 'Activer'}
+                            title={user.is_active ? 'Deactivate' : 'Activate'}
                           >
                             {user.is_active ? (
                               <XCircle size={16} />
@@ -515,7 +510,7 @@ const UsersPage = () => {
                             className="action-btn action-btn--danger"
                             onClick={() => setShowDeleteConfirm(user.id)}
                             disabled={isSelf || primaryRole?.code === 'SUPER_ADMIN'}
-                            title={t('common.delete') || 'Supprimer'}
+                            title="Delete"
                           >
                             <Trash2 size={16} />
                           </button>
@@ -535,20 +530,20 @@ const UsersPage = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {t('auth.users.deleteUser') || 'Supprimer l\'utilisateur'}
+              Delete user
             </h3>
             <p className="text-gray-600 mb-6">
-              {t('auth.users.deleteConfirm') || 'Êtes-vous sûr de vouloir supprimer cet utilisateur ?'}
+              Are you sure you want to delete this user?
             </p>
             <div className="flex justify-end gap-3">
               <Button variant="ghost" onClick={() => setShowDeleteConfirm(null)}>
-                {t('common.cancel') || 'Annuler'}
+                Cancel
               </Button>
               <Button
                 variant="destructive"
                 onClick={() => handleDelete(showDeleteConfirm)}
               >
-                {t('common.delete') || 'Supprimer'}
+                Delete
               </Button>
             </div>
           </div>
@@ -610,7 +605,6 @@ function UserFormModal({
   onClose: () => void;
   onSave: () => void;
 }) {
-  const { t, i18n } = useTranslation();
   const { user: currentUser } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -643,17 +637,17 @@ function UserFormModal({
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Chargement des rôles...
+            Loading roles...
           </h2>
           <p className="text-gray-600 mb-4">
-            Les rôles ne sont pas encore disponibles. Veuillez patienter ou rafraîchir la page.
+            Roles are not yet available. Please wait or refresh the page.
           </p>
           <button
             type="button"
             className="btn btn-secondary"
             onClick={onClose}
           >
-            Fermer
+            Close
           </button>
         </div>
       </div>
@@ -661,9 +655,6 @@ function UserFormModal({
   }
 
   const getRoleName = (role: Role) => {
-    const lang = i18n.language;
-    if (lang === 'fr') return role.name_fr;
-    if (lang === 'id') return role.name_id;
     return role.name_en;
   };
 
@@ -671,7 +662,7 @@ function UserFormModal({
     e.preventDefault();
 
     if (!currentUser?.id) {
-      toast.error('Utilisateur non connecté');
+      toast.error('User not logged in');
       return;
     }
 
@@ -694,15 +685,15 @@ function UserFormModal({
         );
 
         if (result.success) {
-          toast.success(t('common.saved') || 'Enregistré');
+          toast.success('Saved');
           onSave();
         } else {
-          toast.error(result.error || 'Erreur');
+          toast.error(result.error || 'Error');
         }
       } else {
         // Create new user
         if (!formData.first_name || !formData.last_name || !formData.primary_role_id) {
-          toast.error(t('common.requiredFields') || 'Champs requis manquants');
+          toast.error('Missing required fields');
           setIsLoading(false);
           return;
         }
@@ -720,15 +711,15 @@ function UserFormModal({
         });
 
         if (result.success) {
-          toast.success(t('auth.users.created') || 'Utilisateur créé');
+          toast.success('User created');
           onSave();
         } else {
-          toast.error(result.error || 'Erreur');
+          toast.error(result.error || 'Error');
         }
       }
     } catch (error) {
       console.error('Save error:', error);
-      toast.error(t('common.error') || 'Erreur');
+      toast.error('Error');
     } finally {
       setIsLoading(false);
     }
@@ -755,8 +746,8 @@ function UserFormModal({
         <div className="p-6 border-b border-gray-100">
           <h2 className="text-xl font-semibold text-gray-900">
             {user
-              ? (t('auth.users.editUser') || 'Modifier l\'utilisateur')
-              : (t('auth.users.createUser') || 'Nouvel utilisateur')}
+              ? 'Edit user'
+              : 'New user'}
           </h2>
         </div>
 
@@ -765,27 +756,27 @@ function UserFormModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('auth.profile.firstName') || 'Prénom'} *
+                First name *
               </label>
               <input
                 type="text"
                 value={formData.first_name}
                 onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder={t('auth.profile.firstName') || 'Prénom'}
+                placeholder="First name"
                 required
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('auth.profile.lastName') || 'Nom'} *
+                Last name *
               </label>
               <input
                 type="text"
                 value={formData.last_name}
                 onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder={t('auth.profile.lastName') || 'Nom'}
+                placeholder="Last name"
                 required
               />
             </div>
@@ -794,7 +785,7 @@ function UserFormModal({
           {/* Display name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('auth.profile.displayName') || 'Nom d\'affichage'}
+              Display name
             </label>
             <input
               type="text"
@@ -809,7 +800,7 @@ function UserFormModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('auth.users.employeeCode') || 'Code Employé'}
+                Employee Code
               </label>
               <input
                 type="text"
@@ -821,7 +812,7 @@ function UserFormModal({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('auth.profile.phone') || 'Téléphone'}
+                Phone
               </label>
               <input
                 type="tel"
@@ -837,7 +828,7 @@ function UserFormModal({
           {!user && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('auth.login.pin') || 'Code PIN'} (4-6 chiffres)
+                PIN Code (4-6 digits)
               </label>
               <input
                 type="password"
@@ -853,7 +844,7 @@ function UserFormModal({
           {/* Roles */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('auth.users.primaryRole') || 'Rôle(s)'} *
+              Role(s) *
             </label>
             <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3">
               {roles.map(role => (
@@ -888,12 +879,12 @@ function UserFormModal({
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
             <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading}>
-              {t('common.cancel') || 'Annuler'}
+              Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading
-                ? (t('common.saving') || 'Enregistrement...')
-                : (t('common.save') || 'Enregistrer')}
+                ? 'Saving...'
+                : 'Save'}
             </Button>
           </div>
         </form>

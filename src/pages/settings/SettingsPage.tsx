@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
     Store, Printer, Bell, Shield, Save, Plus, Settings, RefreshCw, Layers,
     Edit2, Trash2, X, ShoppingCart, Factory, Warehouse, ChefHat, Coffee, Monitor, Grid, Wifi, Sliders, Package
@@ -43,7 +42,6 @@ const DISPATCH_STATIONS = [
 ];
 
 const SettingsPage = () => {
-    useTranslation();
     const [activeTab, setActiveTab] = useState<SettingsTab>('general');
     const [sections, setSections] = useState<Section[]>([]);
     const [loadingSections, setLoadingSections] = useState(false);

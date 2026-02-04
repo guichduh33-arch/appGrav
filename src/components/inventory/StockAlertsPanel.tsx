@@ -10,7 +10,6 @@
 
 import React, { useState, useMemo } from 'react';
 import { AlertTriangle, AlertCircle, XCircle, Filter } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import {
@@ -104,7 +103,6 @@ export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
   className = '',
   maxItems = 0,
 }) => {
-  const { t } = useTranslation();
   const { stockLevels, hasData } = useStockLevelsOffline();
   const [filter, setFilter] = useState<TAlertFilter>(initialFilter);
 
@@ -183,14 +181,14 @@ export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
     <div
       className={`bg-white rounded-lg border border-gray-200 shadow-sm ${className}`}
       role="region"
-      aria-label={t('inventory.alerts.title')}
+      aria-label="Stock Alerts"
     >
       {/* Header with filter tabs */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
         <div className="flex items-center gap-2">
           <AlertTriangle className="w-5 h-5 text-amber-500" aria-hidden="true" />
           <h3 className="text-sm font-semibold text-gray-900">
-            {t('inventory.alerts.title')}
+            Stock Alerts
           </h3>
           <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">
             {counts.all}
@@ -209,7 +207,7 @@ export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
                 : 'text-gray-500 hover:bg-gray-100'
             }`}
           >
-            {t('inventory.alerts.filterAll')} ({counts.all})
+            All ({counts.all})
           </button>
           <button
             type="button"
@@ -220,7 +218,7 @@ export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
                 : 'text-gray-500 hover:bg-gray-100'
             }`}
           >
-            {t('inventory.alerts.filterCritical')} ({counts.critical})
+            Critical ({counts.critical})
           </button>
           <button
             type="button"
@@ -231,7 +229,7 @@ export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
                 : 'text-gray-500 hover:bg-gray-100'
             }`}
           >
-            {t('inventory.alerts.filterWarning')} ({counts.warning})
+            Warning ({counts.warning})
           </button>
         </div>
       </div>
@@ -240,7 +238,7 @@ export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
       <div className="divide-y divide-gray-100">
         {filteredItems.length === 0 ? (
           <div className="px-4 py-6 text-center text-sm text-gray-500">
-            {t('inventory.alerts.noAlerts')}
+            No alerts
           </div>
         ) : (
           filteredItems.map((item) => (
@@ -255,7 +253,7 @@ export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
                     {item.productName}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {t('inventory.alerts.minStock')}: {item.minStockLevel}
+                    Min stock: {item.minStockLevel}
                   </p>
                 </div>
               </div>
@@ -266,7 +264,7 @@ export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
                     {item.quantity}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {t('inventory.alerts.currentStock')}
+                    Current stock
                   </p>
                 </div>
                 <span
@@ -275,10 +273,10 @@ export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
                   )}`}
                 >
                   {item.status === 'out_of_stock'
-                    ? t('inventory.alerts.outOfStock')
+                    ? 'Out of Stock'
                     : item.status === 'critical'
-                    ? t('inventory.alerts.critical')
-                    : t('inventory.alerts.warning')}
+                    ? 'Critical'
+                    : 'Warning'}
                 </span>
               </div>
             </div>

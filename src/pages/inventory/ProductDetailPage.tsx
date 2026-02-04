@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
     ArrowLeft, Save, DollarSign,
@@ -22,7 +21,6 @@ import { VariantsTab } from './tabs/VariantsTab'
 type Tab = 'general' | 'units' | 'recipe' | 'costing' | 'prices' | 'variants'
 
 export default function ProductDetailPage() {
-    const { t } = useTranslation()
     const { id } = useParams<{ id: string }>()
     const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState<Tab>('general')
@@ -224,9 +222,9 @@ export default function ProductDetailPage() {
                 if (sectError) throw sectError
             }
 
-            alert(t('product_detail.messages.product_updated'))
+            alert('Product updated successfully')
         } catch (error: any) {
-            alert(t('product_detail.messages.save_error') + ' ' + error.message)
+            alert('Error saving product: ' + error.message)
         } finally {
             setSaving(false)
         }
@@ -255,18 +253,18 @@ export default function ProductDetailPage() {
             if (error) throw error
             if (data) setUoms([...uoms, data])
         } catch (error: any) {
-            alert(t('product_detail.messages.uom_add_error') + ' ' + error.message)
+            alert('Error adding unit: ' + error.message)
         }
     }
 
     async function deleteUOM(uomId: string) {
-        if (!confirm(t('product_detail.messages.delete_uom_confirm'))) return
+        if (!confirm('Are you sure you want to delete this unit?')) return
         try {
             const { error } = await supabase.from('product_uoms').delete().eq('id', uomId)
             if (error) throw error
             setUoms(uoms.filter(u => u.id !== uomId))
         } catch (error: any) {
-            alert(t('product_detail.messages.uom_delete_error') + ' ' + error.message)
+            alert('Error deleting unit: ' + error.message)
         }
     }
 
@@ -325,13 +323,13 @@ export default function ProductDetailPage() {
         }
     }
 
-    if (loading) return <div className="product-detail-page flex items-center justify-center text-gray-500 h-screen">{t('common.loading')}</div>
+    if (loading) return <div className="product-detail-page flex items-center justify-center text-gray-500 h-screen">Loading...</div>
 
     if (!product) return (
         <div className="product-detail-page flex items-center justify-center p-8">
             <div className="card max-w-md w-full flex flex-col items-center p-8">
                 <AlertTriangle size={64} className="mb-6 text-orange-500 opacity-80" />
-                <h2 className="text-2xl font-bold mb-2 text-gray-800 text-center">{t('product_detail.messages.not_found')}</h2>
+                <h2 className="text-2xl font-bold mb-2 text-gray-800 text-center">Product not found</h2>
                 <p className="mb-8 text-center text-gray-500 font-mono text-sm bg-gray-50 px-4 py-2 rounded">
                     ID: {id}
                 </p>
@@ -340,7 +338,7 @@ export default function ProductDetailPage() {
                     className="btn-secondary flex items-center gap-2"
                 >
                     <ArrowLeft size={18} />
-                    {t('product_detail.messages.back_to_list')}
+                    Back to list
                 </button>
             </div>
         </div>
@@ -351,7 +349,7 @@ export default function ProductDetailPage() {
             {/* Header */}
             <header className="detail-header">
                 <div className="flex items-center gap-4">
-                    <button onClick={() => navigate('/inventory')} className="btn-icon" title={t('product_detail.back')}>
+                    <button onClick={() => navigate('/inventory')} className="btn-icon" title="Back">
                         <ArrowLeft />
                     </button>
                     <div>
@@ -363,32 +361,32 @@ export default function ProductDetailPage() {
                     onClick={handleSave}
                     disabled={saving}
                     className="btn-primary"
-                    title={t('product_detail.save_changes')}
+                    title="Save changes"
                 >
                     <Save size={18} />
-                    {saving ? t('product_detail.saving') : t('common.save')}
+                    {saving ? 'Saving...' : 'Save'}
                 </button>
             </header>
 
             {/* Tabs */}
             <div className="detail-tabs">
                 <button className={`tab-btn ${activeTab === 'general' ? 'active' : ''}`} onClick={() => setActiveTab('general')}>
-                    <Settings size={16} /> {t('product_detail.tabs.general')}
+                    <Settings size={16} /> General
                 </button>
                 <button className={`tab-btn ${activeTab === 'units' ? 'active' : ''}`} onClick={() => setActiveTab('units')}>
-                    <Scale size={16} /> {t('product_detail.tabs.units')}
+                    <Scale size={16} /> Units
                 </button>
                 <button className={`tab-btn ${activeTab === 'recipe' ? 'active' : ''}`} onClick={() => setActiveTab('recipe')}>
-                    <Layers size={16} /> {t('product_detail.tabs.recipe')}
+                    <Layers size={16} /> Recipe
                 </button>
                 <button className={`tab-btn ${activeTab === 'variants' ? 'active' : ''}`} onClick={() => setActiveTab('variants')}>
                     <Layers size={16} /> Variants
                 </button>
                 <button className={`tab-btn ${activeTab === 'costing' ? 'active' : ''}`} onClick={() => setActiveTab('costing')}>
-                    <DollarSign size={16} /> {t('product_detail.tabs.costing')}
+                    <DollarSign size={16} /> Costing
                 </button>
                 <button className={`tab-btn ${activeTab === 'prices' ? 'active' : ''}`} onClick={() => setActiveTab('prices')}>
-                    <DollarSign size={16} /> {t('product_detail.tabs.prices')}
+                    <DollarSign size={16} /> Prices
                 </button>
             </div>
 

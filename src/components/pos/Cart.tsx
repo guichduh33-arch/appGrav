@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { Trash2, Tag, CreditCard, Plus, Minus, SendHorizontal, Lock, List, User, QrCode, Star, Crown } from 'lucide-react'
 import { useCartStore } from '../../stores/cartStore'
 import { formatPrice } from '../../utils/helpers'
@@ -34,7 +33,6 @@ interface CartProps {
 }
 
 export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }: CartProps) {
-    const { t } = useTranslation()
     const {
         items,
         orderType,
@@ -182,7 +180,7 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                                 className={`order-type-btn ${orderType === type ? 'is-active' : ''}`}
                                 onClick={() => handleOrderTypeChange(type)}
                             >
-                                {t(`pos.header.${type}`)}
+                                {type === 'dine_in' ? 'Dine In' : 'Takeaway'}
                             </button>
                         ))}
                     </div>
@@ -197,7 +195,7 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                     <button
                         type="button"
                         className="btn-icon btn-icon-sm"
-                        title={t('cart.clear_title')}
+                        title="Clear cart"
                         onClick={clearCart}
                         disabled={items.length === 0}
                     >
@@ -276,7 +274,7 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                     <div className="pos-cart__empty">
                         <span className="pos-cart__empty-icon">🛒</span>
                         <p className="pos-cart__empty-text">
-                            {t('cart.empty_text')}
+                            Your cart is empty. Select products.
                         </p>
                     </div>
                 ) : (
@@ -291,7 +289,7 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                                 <div className="cart-item__info">
                                     <div className="cart-item__name">
                                         {isLocked && <Lock size={12} className="cart-item__lock-icon" />}
-                                        <span className="cart-item__qty">{item.quantity}{t('cart.qty_prefix')}</span>
+                                        <span className="cart-item__qty">{item.quantity}x</span>
                                         {item.type === 'combo' ? item.combo?.name : item.product?.name}
                                     </div>
                                     {item.modifiers.length > 0 && (
@@ -314,8 +312,8 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                                                 handleQuantityChange(item.id, item.quantity - 1)
                                             }}
                                             disabled={isLocked}
-                                            title={isLocked ? t('cart.qty_pin_required') : t('cart.qty_decrease')}
-                                            aria-label={t('cart.qty_decrease')}
+                                            title={isLocked ? 'PIN required' : 'Decrease quantity'}
+                                            aria-label="Decrease quantity"
                                         >
                                             <Minus size={14} />
                                         </button>
@@ -327,8 +325,8 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                                                 e.stopPropagation()
                                                 handleQuantityChange(item.id, item.quantity + 1)
                                             }}
-                                            title={t('cart.qty_increase')}
-                                            aria-label={t('cart.qty_increase')}
+                                            title="Increase quantity"
+                                            aria-label="Increase quantity"
                                         >
                                             <Plus size={14} />
                                         </button>
@@ -359,7 +357,7 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                                                 e.stopPropagation()
                                                 handleDeleteClick(item.id)
                                             }}
-                                            title={isLocked ? t('cart.remove_pin_required') : t('cart.remove')}
+                                            title={isLocked ? 'PIN required to remove' : 'Remove'}
                                         >
                                             {isLocked ? <Lock size={16} /> : <Trash2 size={16} />}
                                         </button>
@@ -375,7 +373,7 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
             {items.length > 0 && (
                 <div className="pos-cart__totals">
                     <div className="cart-total-row">
-                        <span className="cart-total-row__label">{t('cart.subtotal')}</span>
+                        <span className="cart-total-row__label">Subtotal</span>
                         <span className="cart-total-row__value">{formatPrice(subtotal)}</span>
                     </div>
                     <div className="cart-total-row">
@@ -385,14 +383,14 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                             onClick={() => setShowDiscountModal(true)}
                         >
                             <Tag size={14} />
-                            {t('cart.discount')}
+                            Discount
                         </button>
                         <span className="cart-total-row__value text-urgent">
                             {discountAmount > 0 ? `-${formatPrice(discountAmount)}` : formatPrice(0)}
                         </span>
                     </div>
                     <div className="cart-total-row is-grand-total">
-                        <span className="cart-total-row__label">{t('cart.total')}</span>
+                        <span className="cart-total-row__label">TOTAL</span>
                         <span className="cart-total-row__value">{formatPrice(total)}</span>
                     </div>
                 </div>
@@ -407,7 +405,7 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                     disabled={!hasUnlockedItems && !items.length}
                 >
                     <SendHorizontal size={18} />
-                    {hasLockedItems ? t('cart.add_to_order') : t('cart.send_to_kitchen')}
+                    {hasLockedItems ? 'Add to Order' : 'Send to Kitchen'}
                 </button>
 
                 <button
@@ -417,15 +415,15 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                     disabled={items.length === 0}
                 >
                     <CreditCard size={18} />
-                    {t('cart.checkout')}
+                    CHECKOUT
                 </button>
             </div>
 
             {/* Modals */}
             {showPinModal && (
                 <PinVerificationModal
-                    title={t('cart.pin_modal_title')}
-                    message={t('cart.pin_modal_message')}
+                    title="Item removal"
+                    message="This item is in the kitchen. Manager PIN required."
                     onVerify={handlePinVerify}
                     onClose={() => {
                         setShowPinModal(false)

@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { X, Banknote, Clock } from 'lucide-react'
 import { formatPrice } from '../../../utils/helpers'
 import './ShiftModals.css'
@@ -13,7 +12,6 @@ interface OpenShiftModalProps {
 const QUICK_AMOUNTS = [100000, 200000, 300000, 500000, 1000000]
 
 export default function OpenShiftModal({ onOpen, onClose, isLoading }: OpenShiftModalProps) {
-    const { t } = useTranslation()
     const [openingCash, setOpeningCash] = useState<number>(0)
     const [notes, setNotes] = useState('')
     const [inputValue, setInputValue] = useState('')
@@ -46,8 +44,8 @@ export default function OpenShiftModal({ onOpen, onClose, isLoading }: OpenShift
                         <Clock size={24} />
                     </div>
                     <div>
-                        <h2 className="shift-modal__title">{t('shift.open_title', 'Ouvrir un Shift')}</h2>
-                        <p className="shift-modal__subtitle">{t('shift.open_subtitle', 'Saisissez le montant cash initial en caisse')}</p>
+                        <h2 className="shift-modal__title">Open a Shift</h2>
+                        <p className="shift-modal__subtitle">Enter the initial cash amount in drawer</p>
                     </div>
                     <button className="shift-modal__close" onClick={onClose}>
                         <X size={24} />
@@ -58,7 +56,7 @@ export default function OpenShiftModal({ onOpen, onClose, isLoading }: OpenShift
                     <div className="shift-form__group">
                         <label className="shift-form__label">
                             <Banknote size={18} />
-                            {t('shift.opening_cash', 'Montant Cash Initial')}
+                            Opening Cash
                         </label>
                         <div className="shift-form__input-wrapper">
                             <span className="shift-form__currency">Rp</span>
@@ -77,7 +75,7 @@ export default function OpenShiftModal({ onOpen, onClose, isLoading }: OpenShift
                     </div>
 
                     <div className="shift-form__quick-amounts">
-                        <p className="shift-form__quick-label">{t('shift.quick_amounts', 'Montants rapides')}</p>
+                        <p className="shift-form__quick-label">Quick amounts</p>
                         <div className="shift-form__quick-grid">
                             {QUICK_AMOUNTS.map((amount) => (
                                 <button
@@ -94,13 +92,13 @@ export default function OpenShiftModal({ onOpen, onClose, isLoading }: OpenShift
 
                     <div className="shift-form__group">
                         <label className="shift-form__label">
-                            {t('shift.notes', 'Notes (optionnel)')}
+                            Notes (optional)
                         </label>
                         <textarea
                             className="shift-form__textarea"
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
-                            placeholder={t('shift.notes_placeholder', 'Ajouter des notes...')}
+                            placeholder="Add notes..."
                             rows={2}
                         />
                     </div>
@@ -112,7 +110,7 @@ export default function OpenShiftModal({ onOpen, onClose, isLoading }: OpenShift
                             onClick={onClose}
                             disabled={isLoading}
                         >
-                            {t('common.cancel', 'Annuler')}
+                            Cancel
                         </button>
                         <button
                             type="submit"
@@ -124,7 +122,7 @@ export default function OpenShiftModal({ onOpen, onClose, isLoading }: OpenShift
                             ) : (
                                 <>
                                     <Clock size={18} />
-                                    {t('shift.open_button', 'Ouvrir le Shift')}
+                                    Open Shift
                                 </>
                             )}
                         </button>

@@ -1,5 +1,4 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import { Search, PauseCircle, CheckCircle, AlertCircle, Clock, Users } from 'lucide-react'
 
@@ -38,8 +37,6 @@ import type { Product } from '../../types/database'
 import './POSMainPage.css'
 
 export default function POSMainPage() {
-    const { t } = useTranslation()
-
     // Enable network status alerts (Story 3.2)
     useNetworkAlerts()
 
@@ -170,7 +167,7 @@ export default function POSMainPage() {
             return
         }
         if (itemCount === 0) {
-            showToast(t('pos.toasts.no_items_send'), 'error')
+            showToast('No items to send', 'error')
             return
         }
 
@@ -183,7 +180,7 @@ export default function POSMainPage() {
                 discountAmount,
                 total
             )
-            showToast(t('pos.toasts.order_updated'), 'success')
+            showToast('Order updated successfully!', 'success')
         } else {
             // Create new kitchen order
             const heldOrder = sendToKitchenAsHeldOrder(
@@ -196,7 +193,7 @@ export default function POSMainPage() {
                 discountAmount,
                 total
             )
-            showToast(t('pos.toasts.order_sent', { number: heldOrder.orderNumber }), 'success')
+            showToast(`Order ${heldOrder.orderNumber} sent to kitchen!`, 'success')
         }
 
         // Clear the cart after sending
@@ -227,7 +224,7 @@ export default function POSMainPage() {
                 lockedItemIds // lockedItemIds
             )
             clearCart()
-            showToast(t('pos.toasts.order_held', { number: heldOrder.orderNumber }), 'info')
+            showToast(`Order ${heldOrder.orderNumber} put on hold`, 'info')
         }
     }
     void _handleHoldOrder
@@ -245,9 +242,9 @@ export default function POSMainPage() {
             )
 
             setShowHeldOrdersModal(false)
-            showToast(t('pos.toasts.order_restored', { number: heldOrder.orderNumber }), 'success')
+            showToast(`Order ${heldOrder.orderNumber} restored`, 'success')
         }
-    }, [restoreHeldOrder, restoreCartState, showToast, t])
+    }, [restoreHeldOrder, restoreCartState, showToast])
 
     // Handle checkout - block if no shift open
     const handleCheckout = useCallback(() => {
@@ -333,15 +330,15 @@ export default function POSMainPage() {
                     <div className="pos-products__header">
                         <h2 className="pos-products__title">
                             {selectedCategory
-                                ? categories.find(c => c.id === selectedCategory)?.name || t('pos.products.title_all')
-                                : t('pos.products.title_all')
+                                ? categories.find(c => c.id === selectedCategory)?.name || 'All Products'
+                                : 'All Products'
                             }
                         </h2>
                         <div className="pos-products__search search-input">
                             <Search className="search-input__icon" size={20} />
                             <input
                                 type="text"
-                                placeholder={t('pos.products.search_placeholder')}
+                                placeholder="Search a product..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -427,12 +424,12 @@ export default function POSMainPage() {
             {showPinModal && (
                 <PinVerificationModal
                     title={pinModalAction === 'open'
-                        ? t('shift.pin_open_title', 'Ouvrir un Shift')
-                        : t('shift.pin_close_title', 'Fermer le Shift')
+                        ? 'Open a Shift'
+                        : 'Close Shift'
                     }
                     message={pinModalAction === 'open'
-                        ? t('shift.pin_open_message', 'Entrez votre code PIN pour ouvrir votre shift')
-                        : t('shift.pin_close_message', 'Entrez votre code PIN pour fermer le shift')
+                        ? 'Enter your PIN to open your shift'
+                        : 'Enter your PIN to close the shift'
                     }
                     allowedRoles={['cashier', 'manager', 'admin', 'barista']}
                     onVerify={handlePinVerified}
@@ -562,10 +559,10 @@ export default function POSMainPage() {
                             <Clock size={48} />
                         </div>
                         <h3 className="pos-no-shift-modal__title">
-                            {t('shift.no_shift_open', 'Aucun shift ouvert')}
+                            No shift open
                         </h3>
                         <p className="pos-no-shift-modal__message">
-                            {t('shift.must_open_shift_message', 'Vous devez ouvrir un shift pour effectuer cette action.')}
+                            You must open a shift to perform this action.
                         </p>
                         <div className="pos-no-shift-modal__actions">
                             <button
@@ -573,7 +570,7 @@ export default function POSMainPage() {
                                 className="pos-no-shift-modal__btn pos-no-shift-modal__btn--secondary"
                                 onClick={() => setShowNoShiftModal(false)}
                             >
-                                {t('common.cancel', 'Annuler')}
+                                Cancel
                             </button>
                             {user?.id && (
                                 <button
@@ -589,7 +586,7 @@ export default function POSMainPage() {
                                         }
                                     }}
                                 >
-                                    {isRecoveringShift ? 'Recherche...' : 'Récupérer mon shift'}
+                                    {isRecoveringShift ? 'Searching...' : 'Recover my shift'}
                                 </button>
                             )}
                             <button
@@ -600,7 +597,7 @@ export default function POSMainPage() {
                                     handleOpenShiftRequest()
                                 }}
                             >
-                                {t('shift.open_title', 'Ouvrir un Shift')}
+                                Open a Shift
                             </button>
                         </div>
                     </div>

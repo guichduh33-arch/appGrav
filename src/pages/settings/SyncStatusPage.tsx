@@ -7,13 +7,12 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   RefreshCw, CloudOff, Cloud, CheckCircle, AlertCircle,
   Trash2, RotateCcw, Clock, Activity, History, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { fr, enUS, id } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { useSyncQueue } from '../../hooks/useSyncQueue';
 import { useSyncStore } from '../../stores/syncStore';
 import { useNetworkStore } from '../../stores/networkStore';
@@ -67,7 +66,6 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 export default function SyncStatusPage() {
-  const { t, i18n } = useTranslation();
   const { counts, pendingTotal, refreshCounts } = useSyncQueue();
   const { syncStatus, lastSyncAt, isSyncing } = useSyncStore();
   const isOnline = useNetworkStore((state) => state.isOnline);
@@ -90,14 +88,8 @@ export default function SyncStatusPage() {
   const [isLoadingPeriods, setIsLoadingPeriods] = useState(true);
   const [showHistorySection, setShowHistorySection] = useState(true);
 
-  // Get locale for date formatting
-  const getLocale = () => {
-    switch (i18n.language) {
-      case 'fr': return fr;
-      case 'id': return id;
-      default: return enUS;
-    }
-  };
+  // Use English locale for date formatting
+  const getLocale = () => enUS;
 
   /**
    * Load queue items from IndexedDB
@@ -229,10 +221,10 @@ export default function SyncStatusPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <Activity className="w-7 h-7 text-blue-600" />
-            {t('sync.dashboard.title', 'Statut de Synchronisation')}
+            Sync Status
           </h1>
           <p className="text-gray-500 mt-1">
-            {t('sync.dashboard.description', 'Surveillance des transactions offline')}
+            Offline transaction monitoring
           </p>
         </div>
 
@@ -242,10 +234,10 @@ export default function SyncStatusPage() {
             onClick={handleCleanup}
             disabled={counts.synced === 0}
             className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            title={t('sync.dashboard.cleanup', 'Nettoyer les éléments synchronisés')}
+            title="Cleanup synced items"
           >
             <Trash2 className="w-5 h-5" />
-            {t('sync.dashboard.cleanup', 'Nettoyer')}
+            Cleanup
           </button>
 
           <button
@@ -253,10 +245,10 @@ export default function SyncStatusPage() {
             onClick={handleManualSync}
             disabled={!isOnline || isSyncing || pendingTotal === 0}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            title={t('sync.dashboard.syncNow', 'Synchroniser maintenant')}
+            title="Sync now"
           >
             <RefreshCw className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`} />
-            {t('sync.dashboard.syncNow', 'Synchroniser')}
+            Sync Now
           </button>
         </div>
       </div>
@@ -268,11 +260,11 @@ export default function SyncStatusPage() {
           <div className="flex items-center gap-2 mb-2">
             <StatusIcon className={`w-5 h-5 ${statusConfig.text} ${isSyncing ? 'animate-spin' : ''}`} />
             <p className={`text-sm font-medium ${statusConfig.text}`}>
-              {t('sync.dashboard.status', 'Statut')}
+              Status
             </p>
           </div>
           <p className={`text-lg font-bold ${statusConfig.text}`}>
-            {t(`sync.${syncStatus}`, syncStatus)}
+            {syncStatus}
           </p>
         </div>
 
@@ -281,7 +273,7 @@ export default function SyncStatusPage() {
           <div className="flex items-center gap-2 mb-2">
             <CloudOff className="w-5 h-5 text-orange-600" />
             <p className="text-sm font-medium text-orange-600">
-              {t('sync.dashboard.pending', 'En attente')}
+              Pending
             </p>
           </div>
           <p className="text-2xl font-bold text-orange-700">{counts.pending}</p>
@@ -292,7 +284,7 @@ export default function SyncStatusPage() {
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle className="w-5 h-5 text-red-600" />
             <p className="text-sm font-medium text-red-600">
-              {t('sync.dashboard.failed', 'Échoué')}
+              Failed
             </p>
           </div>
           <p className="text-2xl font-bold text-red-700">{counts.failed}</p>
@@ -303,13 +295,13 @@ export default function SyncStatusPage() {
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-5 h-5 text-gray-600" />
             <p className="text-sm font-medium text-gray-600">
-              {t('sync.dashboard.lastSync', 'Dernière sync')}
+              Last sync
             </p>
           </div>
           <p className="text-sm font-bold text-gray-700">
             {lastSyncAt
               ? format(new Date(lastSyncAt), 'dd/MM HH:mm', { locale: getLocale() })
-              : t('sync.dashboard.never', 'Jamais')}
+              : 'Never'}
           </p>
         </div>
       </div>
@@ -320,10 +312,10 @@ export default function SyncStatusPage() {
           <CloudOff className="w-6 h-6 text-amber-600" />
           <div>
             <p className="font-medium text-amber-800">
-              {t('sync.dashboard.offlineWarning', 'Mode hors-ligne')}
+              Offline Mode
             </p>
             <p className="text-sm text-amber-600">
-              {t('sync.dashboard.offlineWarningDesc', 'La synchronisation reprendra automatiquement lorsque la connexion sera rétablie.')}
+              Synchronization will resume automatically when connection is restored.
             </p>
           </div>
         </div>
@@ -340,7 +332,7 @@ export default function SyncStatusPage() {
               : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
-          {t('sync.dashboard.tabPending', 'En attente')} ({counts.pending + counts.syncing})
+          Pending ({counts.pending + counts.syncing})
         </button>
         <button
           type="button"
@@ -351,7 +343,7 @@ export default function SyncStatusPage() {
               : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
-          {t('sync.dashboard.tabFailed', 'Échoué')} ({counts.failed})
+          Failed ({counts.failed})
         </button>
         <button
           type="button"
@@ -362,7 +354,7 @@ export default function SyncStatusPage() {
               : 'border-transparent text-gray-500 hover:text-gray-700'
           }`}
         >
-          {t('sync.dashboard.tabAll', 'Tous')} ({counts.total})
+          All ({counts.total})
         </button>
       </div>
 
@@ -373,22 +365,22 @@ export default function SyncStatusPage() {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {t('sync.dashboard.type', 'Type')}
+                  Type
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {t('sync.dashboard.createdAt', 'Créé le')}
+                  Created At
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {t('sync.dashboard.statusColumn', 'Statut')}
+                  Status
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {t('sync.dashboard.attempts', 'Tentatives')}
+                  Attempts
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {t('sync.dashboard.error', 'Erreur')}
+                  Error
                 </th>
                 <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                  {t('common.actions', 'Actions')}
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -397,7 +389,7 @@ export default function SyncStatusPage() {
                 <tr>
                   <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                     <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
-                    {t('common.loading', 'Chargement...')}
+                    Loading...
                   </td>
                 </tr>
               ) : filteredItems.length === 0 ? (
@@ -405,8 +397,8 @@ export default function SyncStatusPage() {
                   <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                     <CheckCircle className="w-8 h-8 mx-auto mb-2 text-green-500" />
                     {selectedTab === 'failed'
-                      ? t('sync.dashboard.noFailed', 'Aucun élément en erreur')
-                      : t('sync.dashboard.noItems', 'Aucun élément en attente')}
+                      ? 'No failed items'
+                      : 'No pending items'}
                   </td>
                 </tr>
               ) : (
@@ -443,7 +435,7 @@ export default function SyncStatusPage() {
                             type="button"
                             onClick={() => handleRetryItem(item.id)}
                             className="p-1 hover:bg-blue-100 rounded transition-colors"
-                            title={t('sync.dashboard.retry', 'Réessayer')}
+                            title="Retry"
                           >
                             <RotateCcw className="w-4 h-4 text-blue-600" />
                           </button>
@@ -451,7 +443,7 @@ export default function SyncStatusPage() {
                             type="button"
                             onClick={() => handleRemoveItem(item.id)}
                             className="p-1 hover:bg-red-100 rounded transition-colors"
-                            title={t('sync.dashboard.remove', 'Supprimer')}
+                            title="Remove"
                           >
                             <Trash2 className="w-4 h-4 text-red-600" />
                           </button>
@@ -469,10 +461,10 @@ export default function SyncStatusPage() {
       {/* Queue Info */}
       <div className="mt-4 text-sm text-gray-500 flex items-center justify-between">
         <p>
-          {t('sync.dashboard.queueInfo', 'File d\'attente:')} {counts.total} / 500 {t('sync.dashboard.items', 'éléments')}
+          Queue: {counts.total} / 500 items
         </p>
         <p>
-          {t('sync.dashboard.syncedCount', 'Synchronisés:')} {counts.synced}
+          Synced: {counts.synced}
         </p>
       </div>
 
@@ -486,11 +478,11 @@ export default function SyncStatusPage() {
           <div className="flex items-center gap-2">
             <History className="w-5 h-5 text-gray-600" />
             <h2 className="text-lg font-semibold text-gray-900">
-              {t('sync.history.title', 'Historique Hors-Ligne')}
+              Offline History
             </h2>
             {periodStats && (
               <span className="text-sm text-gray-500">
-                ({periodStats.totalPeriods} {periodStats.totalPeriods === 1 ? 'période' : 'périodes'})
+                ({periodStats.totalPeriods} {periodStats.totalPeriods === 1 ? 'period' : 'periods'})
               </span>
             )}
           </div>
@@ -507,25 +499,25 @@ export default function SyncStatusPage() {
             {periodStats && periodStats.totalPeriods > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                 <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-xs text-gray-500 mb-1">Total durée offline</p>
+                  <p className="text-xs text-gray-500 mb-1">Total offline duration</p>
                   <p className="text-lg font-semibold text-gray-900">
                     {formatDurationMs(periodStats.totalDurationMs)}
                   </p>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-xs text-gray-500 mb-1">Durée moyenne</p>
+                  <p className="text-xs text-gray-500 mb-1">Average duration</p>
                   <p className="text-lg font-semibold text-gray-900">
                     {formatDurationMs(periodStats.averageDurationMs)}
                   </p>
                 </div>
                 <div className="bg-green-50 rounded-lg p-3">
-                  <p className="text-xs text-green-600 mb-1">Transactions sync</p>
+                  <p className="text-xs text-green-600 mb-1">Transactions synced</p>
                   <p className="text-lg font-semibold text-green-700">
                     {periodStats.totalSynced}
                   </p>
                 </div>
                 <div className="bg-red-50 rounded-lg p-3">
-                  <p className="text-xs text-red-600 mb-1">Échecs</p>
+                  <p className="text-xs text-red-600 mb-1">Failed</p>
                   <p className="text-lg font-semibold text-red-700">
                     {periodStats.totalFailed}
                   </p>
@@ -540,19 +532,19 @@ export default function SyncStatusPage() {
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        {t('sync.history.period', 'Période')}
+                        Period
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        {t('sync.history.duration', 'Durée')}
+                        Duration
                       </th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                        {t('sync.history.transactions', 'Trans.')}
+                        Trans.
                       </th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                        {t('sync.history.synced', 'Sync')}
+                        Synced
                       </th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                        {t('sync.history.failed', 'Échecs')}
+                        Failed
                       </th>
                     </tr>
                   </thead>
@@ -561,14 +553,14 @@ export default function SyncStatusPage() {
                       <tr>
                         <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
                           <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
-                          {t('common.loading', 'Chargement...')}
+                          Loading...
                         </td>
                       </tr>
                     ) : offlinePeriods.length === 0 ? (
                       <tr>
                         <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
                           <Cloud className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                          {t('sync.history.no_periods', 'Aucune période hors-ligne enregistrée')}
+                          No offline periods recorded
                         </td>
                       </tr>
                     ) : (
@@ -585,7 +577,7 @@ export default function SyncStatusPage() {
                             )}
                             {!period.end_time && (
                               <div className="text-xs text-orange-600 font-medium">
-                                En cours...
+                                In progress...
                               </div>
                             )}
                           </td>

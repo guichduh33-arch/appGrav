@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 import { DollarSign, AlertTriangle, Clock, Loader2, Building2, Calendar, FileText } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -77,8 +76,6 @@ async function getOutstandingPayments(): Promise<OutstandingPayment[]> {
 }
 
 export function OutstandingPurchasePaymentTab() {
-  const { t } = useTranslation();
-
   const { data, isLoading, error } = useQuery({
     queryKey: ['outstanding-purchase-payments'],
     queryFn: () => getOutstandingPayments(),
@@ -160,7 +157,7 @@ export function OutstandingPurchasePaymentTab() {
   if (error) {
     return (
       <div className="p-8 text-center text-red-600">
-        {t('common.error', 'Erreur lors du chargement des données')}
+        Error loading data
       </div>
     );
   }

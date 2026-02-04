@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ShoppingCart, Calendar, Loader2, DollarSign, Package } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -82,7 +81,6 @@ async function getPurchasesByDate(from: Date, to: Date): Promise<PurchaseByDate[
 }
 
 export function PurchaseByDateTab() {
-  const { t } = useTranslation();
   const { dateRange } = useDateRange({ defaultPreset: 'thisMonth' });
 
   const { data, isLoading, error } = useQuery({
@@ -139,7 +137,7 @@ export function PurchaseByDateTab() {
   if (error) {
     return (
       <div className="p-8 text-center text-red-600">
-        {t('common.error', 'Erreur lors du chargement des données')}
+        Error loading data
       </div>
     );
   }

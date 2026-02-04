@@ -1,6 +1,5 @@
 import React from 'react';
 import { Wifi, WifiOff, Radio } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import type { TNetworkMode } from '../../stores/networkStore';
 
@@ -11,7 +10,7 @@ interface IStatusConfig {
   icon: typeof Wifi;
   color: string;
   bgColor: string;
-  labelKey: string;
+  label: string;
 }
 
 /**
@@ -25,19 +24,19 @@ const STATUS_CONFIG: Record<TNetworkMode, IStatusConfig> = {
     icon: Wifi,
     color: 'text-green-600',
     bgColor: 'bg-green-100',
-    labelKey: 'network.online',
+    label: 'Online',
   },
   'lan-only': {
     icon: Radio,
     color: 'text-yellow-600',
     bgColor: 'bg-yellow-100',
-    labelKey: 'network.lanOnly',
+    label: 'LAN Mode',
   },
   offline: {
     icon: WifiOff,
     color: 'text-gray-500',
     bgColor: 'bg-gray-100',
-    labelKey: 'network.offline',
+    label: 'Offline',
   },
 } as const;
 
@@ -84,7 +83,6 @@ export const NetworkIndicator: React.FC<INetworkIndicatorProps> = ({
   compact = false,
   className = '',
 }) => {
-  const { t } = useTranslation();
   const { networkMode } = useNetworkStatus();
 
   const config = STATUS_CONFIG[networkMode];
@@ -101,7 +99,7 @@ export const NetworkIndicator: React.FC<INetworkIndicatorProps> = ({
       `.trim()}
       role="status"
       aria-live="polite"
-      aria-label={t(config.labelKey)}
+      aria-label={config.label}
     >
       <Icon
         className={`w-5 h-5 ${config.color}`}
@@ -109,7 +107,7 @@ export const NetworkIndicator: React.FC<INetworkIndicatorProps> = ({
       />
       {!compact && (
         <span className={`text-sm font-medium ${config.color} whitespace-nowrap`}>
-          {t(config.labelKey)}
+          {config.label}
         </span>
       )}
     </div>

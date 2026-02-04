@@ -1,5 +1,4 @@
 import { useRef, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
     X, PieChart, Banknote, CreditCard, Smartphone,
     TrendingUp, ShoppingBag, Timer, Wallet
@@ -25,7 +24,6 @@ interface ShiftStatsModalProps {
 }
 
 export default function ShiftStatsModal({ session, transactions, stats, onClose }: ShiftStatsModalProps) {
-    const { t } = useTranslation()
     const modalRef = useRef<HTMLDivElement>(null)
 
     // Close on backdrop click
@@ -83,9 +81,9 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                     <div className="shift-stats__title-group">
                         <PieChart className="shift-stats__icon" />
                         <div>
-                            <h2>{t('shift.stats_title', 'Statistiques du Shift')}</h2>
+                            <h2>Shift Statistics</h2>
                             <p className="shift-stats__session">
-                                #{session.session_number} • {t('shift.started', 'Ouvert')} {formatTime(session.opened_at)}
+                                #{session.session_number} - Started {formatTime(session.opened_at)}
                             </p>
                         </div>
                     </div>
@@ -104,7 +102,7 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                             </div>
                             <div className="shift-stats__hero-content">
                                 <span className="shift-stats__hero-label">
-                                    {t('shift.total_sales', 'Ventes Totales')}
+                                    Total Sales
                                 </span>
                                 <span className="shift-stats__hero-value">
                                     {formatCurrency(stats.totalSales)}
@@ -117,7 +115,7 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                                 <ShoppingBag size={20} />
                                 <div className="shift-stats__hero-content">
                                     <span className="shift-stats__hero-value">{stats.transactionCount}</span>
-                                    <span className="shift-stats__hero-label">{t('shift.transactions', 'Transactions')}</span>
+                                    <span className="shift-stats__hero-label">Transactions</span>
                                 </div>
                             </div>
 
@@ -125,7 +123,7 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                                 <TrendingUp size={20} />
                                 <div className="shift-stats__hero-content">
                                     <span className="shift-stats__hero-value">{formatCurrency(avgTransaction)}</span>
-                                    <span className="shift-stats__hero-label">{t('shift.avg_ticket', 'Ticket Moyen')}</span>
+                                    <span className="shift-stats__hero-label">Average Ticket</span>
                                 </div>
                             </div>
 
@@ -133,7 +131,7 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                                 <Timer size={20} />
                                 <div className="shift-stats__hero-content">
                                     <span className="shift-stats__hero-value">{formatDuration(stats.duration)}</span>
-                                    <span className="shift-stats__hero-label">{t('shift.duration', 'Durée')}</span>
+                                    <span className="shift-stats__hero-label">Duration</span>
                                 </div>
                             </div>
 
@@ -141,7 +139,7 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                                 <Wallet size={20} />
                                 <div className="shift-stats__hero-content">
                                     <span className="shift-stats__hero-value">{formatCurrency(session.opening_cash)}</span>
-                                    <span className="shift-stats__hero-label">{t('shift.opening_cash', 'Fond de caisse')}</span>
+                                    <span className="shift-stats__hero-label">Opening cash</span>
                                 </div>
                             </div>
                         </div>
@@ -150,7 +148,7 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                     {/* Payment Methods */}
                     <section className="shift-stats__section">
                         <h3 className="shift-stats__section-title">
-                            {t('shift.payment_methods', 'Répartition des Paiements')}
+                            Payment Breakdown
                         </h3>
 
                         <div className="shift-stats__payments">
@@ -159,7 +157,7 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                                     <Banknote size={20} />
                                 </div>
                                 <div className="shift-stats__payment-info">
-                                    <span className="shift-stats__payment-method">{t('payment.cash', 'Espèces')}</span>
+                                    <span className="shift-stats__payment-method">Cash</span>
                                     <span className="shift-stats__payment-amount">{formatCurrency(stats.cashTotal)}</span>
                                 </div>
                                 <span className="shift-stats__payment-percent">{cashPercent.toFixed(0)}%</span>
@@ -205,7 +203,7 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                     {hourlyData.size > 0 && (
                         <section className="shift-stats__section">
                             <h3 className="shift-stats__section-title">
-                                {t('shift.hourly_sales', 'Ventes par Heure')}
+                                Hourly Sales
                             </h3>
                             <div className="shift-stats__chart">
                                 {Array.from(hourlyData.entries())
@@ -227,7 +225,7 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                     {recentTransactions.length > 0 && (
                         <section className="shift-stats__section">
                             <h3 className="shift-stats__section-title">
-                                {t('shift.recent_transactions', 'Dernières Transactions')}
+                                Recent Transactions
                             </h3>
                             <div className="shift-stats__transactions">
                                 {recentTransactions.map((tx) => (

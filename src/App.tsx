@@ -1,6 +1,5 @@
 import { useEffect, Suspense, lazy, useRef } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import { useAuthStore } from './stores/authStore'
 import { useCartStore, initCartPersistence } from './stores/cartStore'
 import { supabase } from './lib/supabase'
@@ -22,7 +21,7 @@ const PageLoader = () => (
     <div className="flex items-center justify-center h-screen bg-[var(--color-blanc-creme)]">
         <div className="text-center">
             <div className="spinner mb-4" />
-            <p className="text-[var(--color-gris-chaud)]">Chargement...</p>
+            <p className="text-[var(--color-gris-chaud)]">Loading...</p>
         </div>
     </div>
 )
@@ -151,7 +150,6 @@ function App() {
 
     // Initialize cart persistence and restore cart on startup (Story 3.2)
     const cartPersistenceInitialized = useRef(false)
-    const { t } = useTranslation()
 
     useEffect(() => {
         // Only initialize once
@@ -201,17 +199,17 @@ function App() {
 
             // Notify user about cart restoration
             if (validItems.length > 0) {
-                toast.success(t('cart.restored'))
+                toast.success('Cart restored')
             }
 
             // Notify if items were removed due to unavailable products
             if (removedNames.length > 0) {
-                toast(t('cart.itemsRemoved', { count: removedNames.length }), { icon: 'ℹ️' })
+                toast(`${removedNames.length} items removed (unavailable)`, { icon: 'ℹ️' })
             }
         }
 
         restorePersistedCart()
-    }, [t])
+    }, [])
 
     return (
         <ErrorBoundary>

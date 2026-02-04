@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { ReportingService } from '../../../services/ReportingService';
 
 export const StockMovementTab = () => {
-    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<any[]>([]);
     const [dateRange] = useState({
@@ -26,7 +24,7 @@ export const StockMovementTab = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-gray-500">{t('common.loading')}</div>;
+    if (loading) return <div className="p-8 text-center text-gray-500">Loading...</div>;
 
     return (
         <div className="space-y-6">
@@ -40,11 +38,11 @@ export const StockMovementTab = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reporting.kpi.date', 'Date')}</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('common.product', 'Product')}</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reporting.kpi.type', 'Type')}</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('inventory.quantity', 'Quantity')}</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('common.reason', 'Reason/Ref')}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason/Ref</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -83,7 +81,7 @@ export const StockMovementTab = () => {
                         {data.length === 0 && (
                             <tr>
                                 <td colSpan={5} className="px-6 py-12 text-center text-gray-400">
-                                    {t('common.no_data')}
+                                    No data available.
                                 </td>
                             </tr>
                         )}

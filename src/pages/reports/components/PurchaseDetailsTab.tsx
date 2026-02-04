@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 import { ReportingService } from '../../../services/ReportingService';
 import { formatCurrency } from '../../../utils/helpers';
 
 export const PurchaseDetailsTab = () => {
-    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -40,7 +38,7 @@ export const PurchaseDetailsTab = () => {
         return acc + (cost * curr.quantity);
     }, 0);
 
-    if (loading) return <div className="p-8 text-center text-gray-500">{t('common.loading')}</div>;
+    if (loading) return <div className="p-8 text-center text-gray-500">Loading...</div>;
 
     return (
         <div className="space-y-6">
@@ -76,11 +74,11 @@ export const PurchaseDetailsTab = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reporting.kpi.date', 'Date')}</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('common.product', 'Product')}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplier</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reference (PO#)</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('inventory.quantity', 'Quantity')}</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Cost (Est.)</th>
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Value</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Staff</th>
@@ -132,7 +130,7 @@ export const PurchaseDetailsTab = () => {
                         {filteredData.length === 0 && (
                             <tr>
                                 <td colSpan={8} className="px-6 py-12 text-center text-gray-400">
-                                    {t('common.no_data')}
+                                    No data available.
                                 </td>
                             </tr>
                         )}

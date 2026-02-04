@@ -10,9 +10,8 @@
 
 import React, { useMemo } from 'react';
 import { Clock } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
-import { fr, enUS, id } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { isDataStale } from '@/types/offline';
 
 interface IStaleDataWarningProps {
@@ -22,19 +21,6 @@ interface IStaleDataWarningProps {
   className?: string;
 }
 
-/**
- * Get date-fns locale based on i18n language
- */
-function getLocale(language: string) {
-  switch (language) {
-    case 'fr':
-      return fr;
-    case 'id':
-      return id;
-    default:
-      return enUS;
-  }
-}
 
 /**
  * Warning banner for potentially stale cached data
@@ -53,8 +39,6 @@ export const StaleDataWarning: React.FC<IStaleDataWarningProps> = ({
   lastSyncAt,
   className = '',
 }) => {
-  const { t, i18n } = useTranslation();
-
   // Check if data is stale
   const stale = useMemo(() => isDataStale(lastSyncAt), [lastSyncAt]);
 
@@ -67,9 +51,9 @@ export const StaleDataWarning: React.FC<IStaleDataWarningProps> = ({
   const timeAgo = lastSyncAt
     ? formatDistanceToNow(new Date(lastSyncAt), {
         addSuffix: true,
-        locale: getLocale(i18n.language),
+        locale: enUS,
       })
-    : t('inventory.offline.never_synced', 'jamais');
+    : 'never';
 
   return (
     <div
@@ -86,7 +70,7 @@ export const StaleDataWarning: React.FC<IStaleDataWarningProps> = ({
         aria-hidden="true"
       />
       <p className="text-sm text-orange-800">
-        {t('inventory.alerts.staleWarning', { time: timeAgo })}
+        {`Warning: Data may be outdated (last synced ${timeAgo})`}
       </p>
     </div>
   );

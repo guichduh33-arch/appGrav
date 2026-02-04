@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { AlertTriangle, Scale, Calculator, TrendingUp } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 import { Product, Recipe } from '../../../types/database'
 
 interface CostingTabProps {
@@ -9,7 +8,6 @@ interface CostingTabProps {
 }
 
 export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) => {
-    const { t } = useTranslation()
     const [targetQuantity, setTargetQuantity] = useState<number>(1)
 
     const formattedPrice = (amount: number) => {
@@ -62,11 +60,11 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
                     </div>
                     <div style={{ flex: 1 }}>
                         <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#92400E' }}>
-                            Coût de revient par kilogramme
+                            Cost per kilogram
                         </h3>
                         <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: '#B45309' }}>
-                            Les coûts ci-dessous sont calculés pour <strong>1 kg</strong> de ce semi-produit.
-                            Utilisez le calculateur pour estimer le coût d'une quantité différente.
+                            The costs below are calculated for <strong>1 kg</strong> of this semi-finished product.
+                            Use the calculator to estimate the cost of a different quantity.
                         </p>
                     </div>
                     <div style={{
@@ -76,7 +74,7 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
                         borderRadius: '0.75rem',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                     }}>
-                        <div style={{ fontSize: '0.75rem', color: '#92400E', fontWeight: 500 }}>COÛT / KG</div>
+                        <div style={{ fontSize: '0.75rem', color: '#92400E', fontWeight: 500 }}>COST / KG</div>
                         <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#D97706' }}>
                             {formattedPrice(costPerKg)}
                         </div>
@@ -89,9 +87,9 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
                 <div className="lg:col-span-2 card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                         <Calculator size={20} style={{ color: '#16A34A' }} />
-                        <span style={{ fontWeight: 600, color: '#166534' }}>Calculateur de coût :</span>
+                        <span style={{ fontWeight: 600, color: '#166534' }}>Cost calculator:</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <span style={{ color: '#166534' }}>Pour</span>
+                            <span style={{ color: '#166534' }}>For</span>
                             <input
                                 type="number"
                                 value={targetQuantity}
@@ -143,19 +141,19 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
 
             <div className="card lg:col-span-2">
                 <h3 className="card-title">
-                    {t('product_detail.costing.detail_title')}
-                    {isSemiFinished && <span style={{ fontWeight: 400, color: '#8B7355', marginLeft: '0.5rem' }}>(pour 1 kg)</span>}
+                    Cost Breakdown
+                    {isSemiFinished && <span style={{ fontWeight: 400, color: '#8B7355', marginLeft: '0.5rem' }}>(for 1 kg)</span>}
                 </h3>
                 <div className="overflow-x-auto mt-4 rounded-lg border border-gray-200">
                     <table className="detail-table">
                         <thead>
                             <tr>
-                                <th>{t('product_detail.costing.ingredient')}</th>
-                                <th className="text-right">{t('product_detail.costing.qty_used')}</th>
-                                <th>{t('product_detail.recipe.unit')}</th>
-                                <th className="text-right">{t('product_detail.costing.unit_cost')}</th>
-                                <th className="text-right">{t('product_detail.costing.subtotal')}</th>
-                                <th className="text-right">{t('product_detail.costing.pct_of_cost')}</th>
+                                <th>Ingredient</th>
+                                <th className="text-right">Qty Used</th>
+                                <th>Unit</th>
+                                <th className="text-right">Unit Cost</th>
+                                <th className="text-right">Subtotal</th>
+                                <th className="text-right">% of Cost</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -190,7 +188,7 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
                             {recipeItems.length === 0 && (
                                 <tr>
                                     <td colSpan={6} className="p-8 text-center text-gray-400 italic">
-                                        {t('product_detail.costing.no_ingredients_costing')}
+                                        No ingredients defined. Add ingredients to the recipe to see cost breakdown.
                                     </td>
                                 </tr>
                             )}
@@ -199,7 +197,7 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
                             <tfoot className="bg-gray-50 font-semibold">
                                 <tr>
                                     <td colSpan={4} className="text-right py-3 pr-4">
-                                        {t('product_detail.costing.total_material_cost')}
+                                        Total Material Cost
                                         {isSemiFinished && <span style={{ fontWeight: 400, color: '#8B7355' }}> (1 kg)</span>}
                                     </td>
                                     <td className="text-right py-3 pr-4 text-lg">{formattedPrice(costPerKg)}</td>
@@ -212,11 +210,11 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
             </div>
 
             <div className="card">
-                <h3 className="card-title">{t('product_detail.costing.financial_summary')}</h3>
+                <h3 className="card-title">Financial Summary</h3>
                 <div className="my-4 space-y-3">
                     <div className="flex justify-between py-2 border-b border-dashed border-gray-200">
                         <span className="text-gray-600">
-                            {t('product_detail.costing.material_cost')}
+                            Material Cost
                             {isSemiFinished && <span style={{ fontSize: '0.75rem', color: '#9CA3AF' }}> / kg</span>}
                         </span>
                         <span className="font-bold">{formattedPrice(costPerKg)}</span>
@@ -224,17 +222,17 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
                     {!isSemiFinished && (
                         <>
                             <div className="flex justify-between py-2 border-b border-dashed border-gray-200">
-                                <span className="text-gray-600">{t('product_detail.costing.selling_price')}</span>
+                                <span className="text-gray-600">Selling Price</span>
                                 <span className="font-bold">{formattedPrice(product.retail_price || 0)}</span>
                             </div>
                             <div className="flex justify-between py-2 border-b border-dashed border-gray-200">
-                                <span className="text-gray-600">{t('product_detail.costing.gross_profit')}</span>
+                                <span className="text-gray-600">Gross Profit</span>
                                 <span className={`font-bold ${(product.retail_price || 0) - costPerKg < 0 ? 'text-red-500' : 'text-green-600'}`}>
                                     {formattedPrice((product.retail_price || 0) - costPerKg)}
                                 </span>
                             </div>
                             <div className="flex justify-between py-4 bg-gray-50 px-4 rounded-lg mt-4">
-                                <span className="font-medium">{t('product_detail.costing.gross_margin')}</span>
+                                <span className="font-medium">Gross Margin</span>
                                 <span className={`font-bold text-lg ${margin < 30 ? 'text-red-500' : 'text-green-600'}`}>
                                     {margin.toFixed(2)} %
                                 </span>
@@ -250,26 +248,26 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
                             border: '1px solid #BFDBFE'
                         }}>
                             <p style={{ margin: 0, fontSize: '0.8125rem', color: '#1E40AF' }}>
-                                <strong>Note :</strong> Les semi-produits ne sont généralement pas vendus directement.
-                                Le coût de revient est utilisé pour calculer le coût des produits finis qui l'utilisent.
+                                <strong>Note:</strong> Semi-finished products are generally not sold directly.
+                                The cost is used to calculate the cost of finished products that use it.
                             </p>
                         </div>
                     )}
                 </div>
                 {!isSemiFinished && margin < 0 && (
                     <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex gap-2">
-                        <AlertTriangle size={16} /> <strong>{t('product_detail.costing.warning_loss')}</strong>
+                        <AlertTriangle size={16} /> <strong>Warning: This product is sold at a loss!</strong>
                     </div>
                 )}
                 {!isSemiFinished && margin >= 0 && margin < 30 && (
                     <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 text-sm flex gap-2">
-                        <AlertTriangle size={16} /> <strong>{t('product_detail.costing.warning_low_margin')}</strong>
+                        <AlertTriangle size={16} /> <strong>Warning: Low margin! Consider adjusting the selling price.</strong>
                     </div>
                 )}
             </div>
 
             <div className="card">
-                <h3 className="card-title">{isSemiFinished ? 'Analyse du coût' : t('product_detail.costing.margin_analysis')}</h3>
+                <h3 className="card-title">{isSemiFinished ? 'Cost Analysis' : 'Margin Analysis'}</h3>
                 {!isSemiFinished && (
                     <div className="mt-4">
                         <div className="progress-bar-container h-8">
@@ -280,7 +278,7 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
                         </div>
                         <div className="flex justify-between text-xs text-gray-500 mt-2">
                             <span>0%</span>
-                            <span className="text-yellow-600 font-medium">30% ({t('product_detail.costing.threshold')})</span>
+                            <span className="text-yellow-600 font-medium">30% (threshold)</span>
                             <span>100%</span>
                         </div>
                         <div className="text-center mt-2 font-bold text-lg">
@@ -291,24 +289,24 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
                 <div className={`${isSemiFinished ? 'mt-4' : 'mt-6'} grid grid-cols-2 gap-4 text-center`}>
                     <div className="p-4 bg-blue-50 rounded-lg">
                         <div className="text-2xl font-bold text-blue-600">{recipeItems.length}</div>
-                        <div className="text-xs text-blue-500 font-medium">{t('product_detail.costing.ingredients_count')}</div>
+                        <div className="text-xs text-blue-500 font-medium">Ingredients</div>
                     </div>
                     <div className="p-4 bg-purple-50 rounded-lg">
                         <div className="text-xl font-bold text-purple-600">
                             {recipeItems.length > 0 ? formattedPrice(costPerKg / recipeItems.length) : '-'}
                         </div>
-                        <div className="text-xs text-purple-500 font-medium">{t('product_detail.costing.avg_cost_per_ingredient')}</div>
+                        <div className="text-xs text-purple-500 font-medium">Avg. Cost per Ingredient</div>
                     </div>
                 </div>
                 {isSemiFinished && (
                     <div className="mt-4 grid grid-cols-2 gap-4 text-center">
                         <div className="p-4 bg-amber-50 rounded-lg">
                             <div className="text-xl font-bold text-amber-600">{formattedPrice(costPerKg / 10)}</div>
-                            <div className="text-xs text-amber-500 font-medium">Coût / 100g</div>
+                            <div className="text-xs text-amber-500 font-medium">Cost / 100g</div>
                         </div>
                         <div className="p-4 bg-green-50 rounded-lg">
                             <div className="text-xl font-bold text-green-600">{formattedPrice(costPerKg * targetQuantity)}</div>
-                            <div className="text-xs text-green-500 font-medium">Coût pour {targetQuantity} kg</div>
+                            <div className="text-xs text-green-500 font-medium">Cost for {targetQuantity} kg</div>
                         </div>
                     </div>
                 )}

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   User, Key, Shield, Clock, LogOut, Save,
   RefreshCw, Check, X, Camera, Smartphone, Monitor
@@ -9,7 +8,7 @@ import { usePermissions } from '../../hooks/usePermissions';
 import { authService } from '../../services/authService';
 import { supabase } from '../../lib/supabase';
 import { format } from 'date-fns';
-import { fr, enUS, id } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 
 interface UserSession {
@@ -23,7 +22,6 @@ interface UserSession {
 }
 
 export default function ProfilePage() {
-  const { t, i18n } = useTranslation();
   const { user, roles, permissions, logout, sessionId } = useAuthStore();
   const { primaryRole, isAdmin, isSuperAdmin } = usePermissions();
 
@@ -37,7 +35,6 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState({
     display_name: '',
     phone: '',
-    preferred_language: 'fr',
   });
 
   // PIN change state
@@ -48,20 +45,13 @@ export default function ProfilePage() {
   });
   const [changingPin, setChangingPin] = useState(false);
 
-  const getLocale = () => {
-    switch (i18n.language) {
-      case 'fr': return fr;
-      case 'id': return id;
-      default: return enUS;
-    }
-  };
+  const getLocale = () => enUS;
 
   useEffect(() => {
     if (user) {
       setFormData({
         display_name: user.display_name || '',
         phone: user.phone || '',
-        preferred_language: user.preferred_language || 'fr',
       });
       loadSessions();
     }
@@ -114,22 +104,16 @@ export default function ProfilePage() {
         .update({
           display_name: formData.display_name,
           phone: formData.phone,
-          language: formData.preferred_language,
         } as never)
         .eq('id', user.id);
 
       if (error) throw error;
 
-      // Update language
-      if (formData.preferred_language !== i18n.language) {
-        await i18n.changeLanguage(formData.preferred_language);
-      }
-
-      toast.success(t('auth.profile.updated') || 'Profil mis à jour');
+      toast.success('Profile updated');
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error(error instanceof Error ? error.message : t('common.error'));
+      toast.error(error instanceof Error ? error.message : 'Error');
     } finally {
       setIsSaving(false);
     }
@@ -139,12 +123,12 @@ export default function ProfilePage() {
     if (!user) return;
 
     if (pinForm.new_pin.length < 4) {
-      toast.error(t('auth.errors.pinTooShort') || 'Le PIN doit contenir au moins 4 chiffres');
+      toast.error('PIN must be at least 4 digits');
       return;
     }
 
     if (pinForm.new_pin !== pinForm.confirm_pin) {
-      toast.error(t('auth.profile.pinMismatch') || 'Les codes PIN ne correspondent pas');
+      toast.error('PINs do not match');
       return;
     }
 
@@ -153,15 +137,15 @@ export default function ProfilePage() {
       const result = await authService.changePin(user.id, pinForm.current_pin, pinForm.new_pin);
 
       if (result.success) {
-        toast.success(t('auth.profile.pinChanged') || 'Code PIN modifié');
+        toast.success('PIN changed');
         setShowPinModal(false);
         setPinForm({ current_pin: '', new_pin: '', confirm_pin: '' });
       } else {
-        toast.error(result.error || t('common.error'));
+        toast.error(result.error || 'Error');
       }
     } catch (error) {
       console.error('Error changing PIN:', error);
-      toast.error(error instanceof Error ? error.message : t('common.error'));
+      toast.error(error instanceof Error ? error.message : 'Error');
     } finally {
       setChangingPin(false);
     }
@@ -170,7 +154,7 @@ export default function ProfilePage() {
   const handleTerminateSession = async (sessionIdToTerminate: string) => {
     if (!user) return;
     if (sessionIdToTerminate === sessionId) {
-      toast.error(t('auth.profile.cannotTerminateCurrent') || 'Impossible de terminer la session actuelle');
+      toast.error('Cannot terminate current session');
       return;
     }
 
@@ -182,11 +166,11 @@ export default function ProfilePage() {
 
       if (error) throw error;
 
-      toast.success(t('auth.profile.sessionTerminated') || 'Session terminée');
+      toast.success('Session terminated');
       loadSessions();
     } catch (error) {
       console.error('Error terminating session:', error);
-      toast.error(error instanceof Error ? error.message : t('common.error'));
+      toast.error(error instanceof Error ? error.message : 'Error');
     }
   };
 
@@ -197,10 +181,8 @@ export default function ProfilePage() {
 
   const getRoleName = () => {
     if (!primaryRole) return '-';
-    const lang = i18n.language || 'fr';
     const role = primaryRole as { name_fr?: string; name_en?: string; name_id?: string; code: string };
-    const nameKey = `name_${lang}` as keyof typeof role;
-    return role[nameKey] || role.name_fr || role.code;
+    return role.name_en || role.name_fr || role.code;
   };
 
   const getDeviceIcon = (deviceType: string) => {
@@ -223,10 +205,10 @@ export default function ProfilePage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <User className="w-7 h-7 text-blue-600" />
-            {t('auth.profile.title') || 'Mon Profil'}
+            My Profile
           </h1>
           <p className="text-gray-500 mt-1">
-            {t('auth.profile.description') || 'Gérez vos informations personnelles'}
+            Manage your personal information
           </p>
         </div>
 
@@ -236,7 +218,7 @@ export default function ProfilePage() {
           className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
         >
           <LogOut className="w-5 h-5" />
-          {t('auth.logout') || 'Déconnexion'}
+          Logout
         </button>
       </div>
 
@@ -247,7 +229,7 @@ export default function ProfilePage() {
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">
-                {t('auth.profile.personalInfo') || 'Informations personnelles'}
+                Personal Information
               </h2>
               {!isEditing && (
                 <button
@@ -255,7 +237,7 @@ export default function ProfilePage() {
                   onClick={() => setIsEditing(true)}
                   className="text-sm text-blue-600 hover:text-blue-700"
                 >
-                  {t('common.edit') || 'Modifier'}
+                  Edit
                 </button>
               )}
             </div>
@@ -278,7 +260,7 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
-                    title={t('auth.profile.changeAvatar') || 'Changer la photo'}
+                    title="Change avatar"
                   >
                     <Camera className="w-4 h-4 text-gray-600" />
                   </button>
@@ -295,7 +277,7 @@ export default function ProfilePage() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('auth.profile.displayName') || 'Nom d\'affichage'}
+                      Display Name
                     </label>
                     <input
                       type="text"
@@ -308,7 +290,7 @@ export default function ProfilePage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('auth.profile.phone') || 'Téléphone'}
+                      Phone
                     </label>
                     <input
                       type="tel"
@@ -319,29 +301,13 @@ export default function ProfilePage() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('auth.profile.language') || 'Langue préférée'}
-                    </label>
-                    <select
-                      value={formData.preferred_language}
-                      onChange={(e) => setFormData({ ...formData, preferred_language: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      title={t('auth.profile.language') || 'Langue préférée'}
-                    >
-                      <option value="fr">Français</option>
-                      <option value="en">English</option>
-                      <option value="id">Bahasa Indonesia</option>
-                    </select>
-                  </div>
-
                   <div className="flex items-center justify-end gap-3 pt-4">
                     <button
                       type="button"
                       onClick={() => setIsEditing(false)}
                       className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                     >
-                      {t('common.cancel') || 'Annuler'}
+                      Cancel
                     </button>
                     <button
                       type="button"
@@ -354,7 +320,7 @@ export default function ProfilePage() {
                       ) : (
                         <Save className="w-4 h-4" />
                       )}
-                      {t('common.save') || 'Enregistrer'}
+                      Save
                     </button>
                   </div>
                 </div>
@@ -362,24 +328,16 @@ export default function ProfilePage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm text-gray-500">{t('auth.profile.name') || 'Nom'}</label>
+                      <label className="text-sm text-gray-500">Name</label>
                       <p className="font-medium">{`${user.first_name || ''} ${user.last_name || ''}`.trim() || '-'}</p>
                     </div>
                     <div>
-                      <label className="text-sm text-gray-500">{t('auth.profile.displayName') || 'Nom affiché'}</label>
+                      <label className="text-sm text-gray-500">Display Name</label>
                       <p className="font-medium">{user.display_name || '-'}</p>
                     </div>
                     <div>
-                      <label className="text-sm text-gray-500">{t('auth.profile.phone') || 'Téléphone'}</label>
+                      <label className="text-sm text-gray-500">Phone</label>
                       <p className="font-medium">{user.phone || '-'}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-500">{t('auth.profile.language') || 'Langue'}</label>
-                      <p className="font-medium">
-                        {user.preferred_language === 'fr' ? 'Français' :
-                          user.preferred_language === 'en' ? 'English' :
-                            user.preferred_language === 'id' ? 'Bahasa Indonesia' : '-'}
-                      </p>
                     </div>
                   </div>
                 </div>
@@ -392,16 +350,16 @@ export default function ProfilePage() {
             <div className="p-6 border-b border-gray-100">
               <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <Key className="w-5 h-5 text-gray-400" />
-                {t('auth.profile.security') || 'Sécurité'}
+                Security
               </h2>
             </div>
 
             <div className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900">{t('auth.profile.pinCode') || 'Code PIN'}</p>
+                  <p className="font-medium text-gray-900">PIN Code</p>
                   <p className="text-sm text-gray-500">
-                    {t('auth.profile.pinDescription') || 'Utilisé pour vous connecter à la caisse'}
+                    Used to log in to the POS
                   </p>
                 </div>
                 <button
@@ -409,7 +367,7 @@ export default function ProfilePage() {
                   onClick={() => setShowPinModal(true)}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                 >
-                  {t('auth.profile.changePin') || 'Modifier le PIN'}
+                  Change PIN
                 </button>
               </div>
             </div>
@@ -420,13 +378,13 @@ export default function ProfilePage() {
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-gray-400" />
-                {t('auth.profile.activeSessions') || 'Sessions actives'}
+                Active Sessions
               </h2>
               <button
                 type="button"
                 onClick={loadSessions}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title={t('common.refresh') || 'Actualiser'}
+                title="Refresh"
               >
                 <RefreshCw className={`w-4 h-4 text-gray-600 ${loadingSessions ? 'animate-spin' : ''}`} />
               </button>
@@ -435,7 +393,7 @@ export default function ProfilePage() {
             <div className="divide-y divide-gray-100">
               {sessions.length === 0 ? (
                 <div className="p-6 text-center text-gray-500">
-                  {t('auth.profile.noSessions') || 'Aucune session active'}
+                  No active sessions
                 </div>
               ) : (
                 sessions.map(session => (
@@ -449,7 +407,7 @@ export default function ProfilePage() {
                           {session.device_name || session.device_type || 'Unknown'}
                           {session.id === sessionId && (
                             <span className="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">
-                              {t('auth.profile.currentSession') || 'Session actuelle'}
+                              Current session
                             </span>
                           )}
                         </p>
@@ -463,7 +421,7 @@ export default function ProfilePage() {
                         type="button"
                         onClick={() => handleTerminateSession(session.id)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title={t('auth.profile.terminateSession') || 'Terminer cette session'}
+                        title="Terminate this session"
                       >
                         <X className="w-5 h-5" />
                       </button>
@@ -481,7 +439,7 @@ export default function ProfilePage() {
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h3 className="text-sm font-medium text-gray-500 mb-4 flex items-center gap-2">
               <Shield className="w-4 h-4" />
-              {t('auth.profile.roleAndPermissions') || 'Rôle et permissions'}
+              Role and Permissions
             </h3>
 
             <div className="mb-4">
@@ -493,17 +451,16 @@ export default function ProfilePage() {
 
             {roles.length > 1 && (
               <div className="mb-4">
-                <p className="text-sm text-gray-500 mb-2">{t('auth.profile.allRoles') || 'Tous les rôles'}</p>
+                <p className="text-sm text-gray-500 mb-2">All roles</p>
                 <div className="flex flex-wrap gap-2">
                   {roles.map(role => {
                     const r = role as { id: string; name_fr?: string; name_en?: string; name_id?: string; code: string };
-                    const nameKey = `name_${i18n.language}` as keyof typeof r;
                     return (
                       <span
                         key={r.id}
                         className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full"
                       >
-                        {r[nameKey] || r.name_fr || r.code}
+                        {r.name_en || r.name_fr || r.code}
                       </span>
                     );
                   })}
@@ -513,7 +470,7 @@ export default function ProfilePage() {
 
             <div>
               <p className="text-sm text-gray-500 mb-2">
-                {t('auth.profile.permissionCount', { count: permissions.length }) || `${permissions.length} permissions`}
+                {permissions.length} permissions
               </p>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 {isAdmin && (
@@ -535,30 +492,30 @@ export default function ProfilePage() {
           {/* Account Info */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h3 className="text-sm font-medium text-gray-500 mb-4">
-              {t('auth.profile.accountInfo') || 'Informations du compte'}
+              Account Information
             </h3>
 
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">{t('auth.profile.employeeCode') || 'Code employé'}</span>
+                <span className="text-gray-500">Employee Code</span>
                 <span className="font-mono">{(user as any).employee_code || '-'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">{t('auth.profile.createdAt') || 'Créé le'}</span>
+                <span className="text-gray-500">Created</span>
                 <span>{user.created_at ? format(new Date(user.created_at), 'P', { locale: getLocale() }) : '-'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">{t('auth.profile.status') || 'Statut'}</span>
+                <span className="text-gray-500">Status</span>
                 <span className={`flex items-center gap-1 ${user.is_active ? 'text-green-600' : 'text-red-600'}`}>
                   {user.is_active ? (
                     <>
                       <Check className="w-4 h-4" />
-                      {t('common.active') || 'Actif'}
+                      Active
                     </>
                   ) : (
                     <>
                       <X className="w-4 h-4" />
-                      {t('common.inactive') || 'Inactif'}
+                      Inactive
                     </>
                   )}
                 </span>
@@ -574,14 +531,14 @@ export default function ProfilePage() {
           <div className="bg-white rounded-xl max-w-md w-full shadow-xl">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-gray-900">
-                {t('auth.profile.changePin') || 'Modifier le code PIN'}
+                Change PIN
               </h2>
               <button
                 type="button"
                 onClick={() => setShowPinModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title={t('common.close', 'Fermer')}
-                aria-label={t('common.close', 'Fermer')}
+                title="Close"
+                aria-label="Close"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -590,7 +547,7 @@ export default function ProfilePage() {
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('auth.profile.currentPin') || 'PIN actuel'}
+                  Current PIN
                 </label>
                 <input
                   type="password"
@@ -604,7 +561,7 @@ export default function ProfilePage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('auth.profile.newPin') || 'Nouveau PIN'}
+                  New PIN
                 </label>
                 <input
                   type="password"
@@ -618,7 +575,7 @@ export default function ProfilePage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('auth.profile.confirmPin') || 'Confirmer le PIN'}
+                  Confirm PIN
                 </label>
                 <input
                   type="password"
@@ -630,7 +587,7 @@ export default function ProfilePage() {
                 />
                 {pinForm.new_pin && pinForm.confirm_pin && pinForm.new_pin !== pinForm.confirm_pin && (
                   <p className="text-sm text-red-600 mt-1">
-                    {t('auth.profile.pinMismatch') || 'Les codes ne correspondent pas'}
+                    PINs do not match
                   </p>
                 )}
               </div>
@@ -642,7 +599,7 @@ export default function ProfilePage() {
                 onClick={() => setShowPinModal(false)}
                 className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                {t('common.cancel') || 'Annuler'}
+                Cancel
               </button>
               <button
                 type="button"
@@ -655,7 +612,7 @@ export default function ProfilePage() {
                 ) : (
                   <Key className="w-4 h-4" />
                 )}
-                {t('auth.profile.changePin') || 'Modifier le PIN'}
+                Change PIN
               </button>
             </div>
           </div>

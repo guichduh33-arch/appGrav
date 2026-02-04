@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import { Menu } from 'lucide-react'
 import type { Category } from '../../types/database'
 import { NetworkIndicator } from '../ui/NetworkIndicator'
@@ -22,7 +21,6 @@ export default function CategoryNav({
     isLoading,
     onOpenMenu
 }: CategoryNavProps) {
-    const { t } = useTranslation()
     if (isLoading) {
         return (
             <aside className="pos-categories">
@@ -52,7 +50,7 @@ export default function CategoryNav({
                 className={`pos-categories__item is-all ${selectedCategory === null ? 'is-active' : ''}`}
                 onClick={() => onSelectCategory(null)}
             >
-                <span className="pos-categories__label">{t('inventory_page.all')}</span>
+                <span className="pos-categories__label">All</span>
             </button>
 
             {/* Category buttons */}

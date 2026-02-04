@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { X, Calendar, Clock, Banknote, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
 import { formatCurrency, formatDateTime } from '../../../utils/helpers'
@@ -30,7 +29,6 @@ interface ShiftHistoryModalProps {
 }
 
 export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
-    const { t } = useTranslation()
     const modalRef = useRef<HTMLDivElement>(null)
     const [sessions, setSessions] = useState<ShiftSession[]>([])
     const [loading, setLoading] = useState(true)
@@ -117,7 +115,7 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
                 <header className="shift-history__header">
                     <div className="shift-history__title-group">
                         <Calendar className="shift-history__icon" />
-                        <h2>{t('shift.history_title', 'Historique des Shifts')}</h2>
+                        <h2>Shift History</h2>
                     </div>
                     <button className="shift-history__close" onClick={onClose}>
                         <X size={24} />
@@ -129,12 +127,12 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
                     {loading ? (
                         <div className="shift-history__loading">
                             <div className="shift-history__spinner" />
-                            <span>{t('common.loading', 'Chargement...')}</span>
+                            <span>Loading...</span>
                         </div>
                     ) : sessions.length === 0 ? (
                         <div className="shift-history__empty">
                             <Calendar size={48} />
-                            <p>{t('shift.no_history', 'Aucun historique de shift')}</p>
+                            <p>No shift history</p>
                         </div>
                     ) : (
                         <div className="shift-history__list">
@@ -180,7 +178,7 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
                                             </div>
                                             <div className="shift-history__stat">
                                                 <TrendingUp size={16} />
-                                                <span>{session.transaction_count} {t('shift.transactions', 'trans.')}</span>
+                                                <span>{session.transaction_count} trans.</span>
                                             </div>
                                             <div className="shift-history__stat">
                                                 <Clock size={16} />
@@ -194,7 +192,7 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
                                                 <div className="shift-history__detail-grid">
                                                     <div className="shift-history__detail-item">
                                                         <span className="shift-history__detail-label">
-                                                            {t('shift.opening_cash', 'Fond de caisse')}
+                                                            Opening cash
                                                         </span>
                                                         <span className="shift-history__detail-value">
                                                             {formatCurrency(session.opening_cash)}
@@ -203,7 +201,7 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
 
                                                     <div className="shift-history__detail-item">
                                                         <span className="shift-history__detail-label">
-                                                            {t('shift.cash_collected', 'Espèces')}
+                                                            Cash collected
                                                         </span>
                                                         <span className="shift-history__detail-value">
                                                             {formatCurrency(session.actual_cash || 0)}
@@ -242,7 +240,7 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
 
                                                 {session.notes && (
                                                     <div className="shift-history__notes">
-                                                        <strong>{t('common.notes', 'Notes')}:</strong> {session.notes}
+                                                        <strong>Notes:</strong> {session.notes}
                                                     </div>
                                                 )}
                                             </div>

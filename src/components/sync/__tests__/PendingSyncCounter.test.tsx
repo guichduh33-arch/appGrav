@@ -15,14 +15,6 @@ vi.mock('@/hooks/useSyncQueue', () => ({
   useSyncQueue: () => mockUseSyncQueue(),
 }));
 
-// Mock i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string, options?: { count?: number }) =>
-      options?.count !== undefined ? `${options.count} pending` : key,
-  }),
-}));
-
 // Mock PendingSyncPanel
 vi.mock('../PendingSyncPanel', () => ({
   PendingSyncPanel: ({ open }: { open: boolean }) => (

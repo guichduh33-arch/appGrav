@@ -6,7 +6,6 @@
  */
 
 import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
     Shield, ChevronDown, ChevronRight, Check, X,
     Save, RefreshCw, Search, Info
@@ -61,7 +60,6 @@ const MODULE_LABELS: Record<string, { fr: string; en: string; id: string }> = {
 }
 
 export default function PermissionsPage() {
-    const { i18n } = useTranslation()
     const [roles, setRoles] = useState<Role[]>([])
     const [permissions, setPermissions] = useState<Permission[]>([])
     const [rolePermissions, setRolePermissions] = useState<Map<string, Set<string>>>(new Map())
@@ -100,25 +98,19 @@ export default function PermissionsPage() {
             }
         } catch (error) {
             console.error('Error loading permissions:', error)
-            toast.error('Erreur de chargement')
+            toast.error('Loading error')
         } finally {
             setLoading(false)
         }
     }
 
     const getLocalizedName = (item: { name_fr: string; name_en: string; name_id: string }) => {
-        const lang = i18n.language
-        if (lang === 'fr') return item.name_fr
-        if (lang === 'id') return item.name_id
         return item.name_en
     }
 
     const getModuleLabel = (module: string) => {
         const labels = MODULE_LABELS[module]
         if (!labels) return module
-        const lang = i18n.language
-        if (lang === 'fr') return labels.fr
-        if (lang === 'id') return labels.id
         return labels.en
     }
 
@@ -215,10 +207,10 @@ export default function PermissionsPage() {
 
             setOriginalRolePermissions(new Map([...rolePermissions].map(([k, v]) => [k, new Set(v)])))
             setHasChanges(false)
-            toast.success('Permissions enregistrées')
+            toast.success('Permissions saved')
         } catch (error) {
             console.error('Error saving permissions:', error)
-            toast.error('Erreur lors de l\'enregistrement')
+            toast.error('Error saving')
         } finally {
             setSaving(false)
         }
@@ -249,7 +241,7 @@ export default function PermissionsPage() {
         return (
             <div className="permissions-page loading">
                 <RefreshCw className="spin" size={32} />
-                <span>Chargement des permissions...</span>
+                <span>Loading permissions...</span>
             </div>
         )
     }
@@ -258,14 +250,14 @@ export default function PermissionsPage() {
         <div className="permissions-page">
             <header className="permissions-page__header">
                 <div>
-                    <h1><Shield size={24} /> Gestion des Permissions</h1>
-                    <p>Configurez les accès pour chaque rôle</p>
+                    <h1><Shield size={24} /> Permissions Management</h1>
+                    <p>Configure access for each role</p>
                 </div>
                 <div className="permissions-page__actions">
                     {hasChanges && (
                         <button className="btn btn-secondary" onClick={handleReset}>
                             <X size={18} />
-                            Annuler
+                            Cancel
                         </button>
                     )}
                     <button
@@ -274,7 +266,7 @@ export default function PermissionsPage() {
                         disabled={!hasChanges || saving}
                     >
                         <Save size={18} />
-                        {saving ? 'Enregistrement...' : 'Enregistrer'}
+                        {saving ? 'Saving...' : 'Save'}
                     </button>
                 </div>
             </header>
@@ -283,7 +275,7 @@ export default function PermissionsPage() {
                 <Search size={18} />
                 <input
                     type="text"
-                    placeholder="Rechercher une permission..."
+                    placeholder="Search for a permission..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                 />
@@ -334,7 +326,7 @@ export default function PermissionsPage() {
                                                 <button
                                                     className={`module-toggle ${allGranted ? 'all' : noneGranted ? 'none' : 'partial'}`}
                                                     onClick={() => toggleAllForRole(role.id, module, !allGranted)}
-                                                    title={allGranted ? 'Retirer tout' : 'Accorder tout'}
+                                                    title={allGranted ? 'Remove all' : 'Grant all'}
                                                 >
                                                     {allGranted ? (
                                                         <Check size={16} />

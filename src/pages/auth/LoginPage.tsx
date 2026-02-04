@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../stores/authStore';
 import { supabase } from '../../lib/supabase';
 import toast from 'react-hot-toast';
@@ -12,7 +11,6 @@ import { useNetworkStatus, useOfflineAuth } from '../../hooks/offline';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
   const { loginWithPin, isLoading: authLoading, isAuthenticated } = useAuthStore();
 
   // Offline authentication hooks (Story 1.2)
@@ -72,11 +70,11 @@ export default function LoginPage() {
         console.error('Error loading users:', err);
         // Fallback to demo users on error
         setUsers(DEMO_USERS);
-        toast.error(t('auth.errors.demoMode') || 'Mode demo activ (base de donnes inaccessible)');
+        toast.error('Demo mode activated (database inaccessible)');
       }
     }
     loadUsers();
-  }, [t]);
+  }, []);
 
   const handleNumpadKey = (key: string) => {
     setError('');
@@ -93,17 +91,17 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     if (!selectedUser) {
-      setError(t('auth.login.selectUser') || 'Veuillez slectionner un utilisateur');
+      setError('Select a user');
       return;
     }
     if (pin.length < 4) {
-      setError(t('auth.errors.pinTooShort') || 'Code PIN trop court');
+      setError('PIN too short');
       return;
     }
 
     // Check rate limiting for offline auth (Story 1.2)
     if (isRateLimited) {
-      setError(t('auth.offline.rateLimited', { seconds: cooldownSeconds }));
+      setError(`Too many attempts. Please wait ${cooldownSeconds} seconds`);
       return;
     }
 
@@ -118,18 +116,18 @@ export default function LoginPage() {
       try {
         await loginOffline(selectedUser, pin);
         const user = users.find(u => u.id === selectedUser);
-        toast.success(`${t('common.welcome')}, ${user?.display_name || user?.name}! (${t('auth.offline.mode')})`);
+        toast.success(`Welcome, ${user?.display_name || user?.name}! (Offline Mode)`);
         navigate('/pos');
         return;
       } catch (offlineErr) {
         const errCode = (offlineErr as Error).message;
         if (errCode === 'CACHE_EXPIRED') {
-          setError(t('auth.offline.sessionExpiredOnlineRequired'));
+          setError('Session expired. Online login required.');
         } else if (errCode === 'RATE_LIMITED') {
-          setError(t('auth.offline.rateLimited', { seconds: cooldownSeconds }));
+          setError(`Too many attempts. Please wait ${cooldownSeconds} seconds`);
         } else {
           // Generic error for security (don't reveal cache state)
-          setError(t('auth.offline.pinIncorrect'));
+          setError('Incorrect PIN');
         }
         setIsLoading(false);
         return;
@@ -145,7 +143,7 @@ export default function LoginPage() {
 
       if (result.success) {
         const user = users.find(u => u.id === selectedUser);
-        toast.success(`${t('common.welcome') || 'Bienvenue'}, ${user?.display_name || user?.name}!`);
+        toast.success(`Welcome, ${user?.display_name || user?.name}!`);
         navigate('/pos');
         return;
       }
@@ -153,7 +151,7 @@ export default function LoginPage() {
       // Handle specific errors
       if (result.error === 'account_locked') {
         setLockedUntil(result.error);
-        setError(t('auth.errors.accountLocked', { minutes: 15 }) || 'Compte verrouill. Ressayez dans 15 minutes.');
+        setError('Account locked. Try again in 15 minutes.');
       } else {
         // Fallback to legacy login for all other errors (demo mode)
         await handleLegacyLogin();
@@ -176,19 +174,19 @@ export default function LoginPage() {
     );
 
     if (!demoUser?.pin_code) {
-      setError(t('auth.errors.noPinSet') || 'Aucun code PIN défini (mode demo)');
+      setError('No PIN set (demo mode)');
       return;
     }
 
     if (demoUser.pin_code !== pin) {
-      setError(t('auth.errors.invalidPin') || 'Code PIN incorrect');
+      setError('Invalid PIN');
       return;
     }
 
     // Demo login successful - load basic permissions
     const { login } = useAuthStore.getState();
     login(user);
-    toast.success(`${t('common.welcome') || 'Bienvenue'}, ${user.display_name || user.name}! (Demo)`);
+    toast.success(`Welcome, ${user.display_name || user.name}! (Demo)`);
     navigate('/pos');
   };
 
@@ -198,7 +196,7 @@ export default function LoginPage() {
     let user = users.find(u => u.id === selectedUser);
 
     if (!user) {
-      setError(t('auth.errors.userNotFound') || 'Utilisateur non trouvé');
+      setError('User not found');
       return;
     }
 
@@ -217,7 +215,7 @@ export default function LoginPage() {
       }
 
       if (!isValid) {
-        setError(t('auth.errors.invalidPin') || 'Code PIN incorrect');
+        setError('Invalid PIN');
         return;
       }
     } catch (rpcError) {
@@ -283,14 +281,14 @@ export default function LoginPage() {
         isLoading: false,
       });
 
-      toast.success(`${t('common.welcome') || 'Bienvenue'}, ${user.display_name || user.name}!`);
+      toast.success(`Welcome, ${user.display_name || user.name}!`);
       navigate('/pos');
     } catch (err) {
       console.error('Error loading permissions:', err);
       // Fallback to basic login without permissions
       const { login } = useAuthStore.getState();
       login(user);
-      toast.success(`${t('common.welcome') || 'Bienvenue'}, ${user.display_name || user.name}!`);
+      toast.success(`Welcome, ${user.display_name || user.name}!`);
       navigate('/pos');
     }
   };
@@ -304,54 +302,29 @@ export default function LoginPage() {
         <div className="login-logo">
           <span className="login-logo__icon">🥐</span>
           <h1 className="login-logo__text">The Breakery</h1>
-          <p className="login-logo__subtitle">{t('auth.login.title') || 'Point de Vente'}</p>
+          <p className="login-logo__subtitle">Login</p>
         </div>
 
         {/* Offline Mode Indicator (Story 1.2) */}
         {isOffline && (
           <div className="login-offline-indicator">
             <span>📶</span>
-            <span>{t('auth.offline.mode')}</span>
+            <span>Offline Mode</span>
           </div>
         )}
 
         {/* Rate Limit Cooldown Display (Story 1.2) */}
         {isRateLimited && (
           <div className="login-cooldown">
-            <span>{t('auth.offline.rateLimitedWait')}</span>
+            <span>Please wait...</span>
             <span className="login-cooldown__timer">{cooldownSeconds}s</span>
           </div>
         )}
 
-        {/* Language selector */}
-        <div className="login-language">
-          <button
-            type="button"
-            className={`lang-btn ${i18n.language === 'fr' ? 'active' : ''}`}
-            onClick={() => i18n.changeLanguage('fr')}
-          >
-            FR
-          </button>
-          <button
-            type="button"
-            className={`lang-btn ${i18n.language === 'en' ? 'active' : ''}`}
-            onClick={() => i18n.changeLanguage('en')}
-          >
-            EN
-          </button>
-          <button
-            type="button"
-            className={`lang-btn ${i18n.language === 'id' ? 'active' : ''}`}
-            onClick={() => i18n.changeLanguage('id')}
-          >
-            ID
-          </button>
-        </div>
-
         {/* User Selection */}
         <div className="login-section">
           <label className="login-label">
-            {t('auth.login.selectUser') || 'Slectionnez votre profil'}
+            Select a user
           </label>
           <select
             className="login-select"
@@ -363,10 +336,10 @@ export default function LoginPage() {
               setAttemptsRemaining(null);
               setLockedUntil(null);
             }}
-            title={t('auth.login.selectUser') || 'Slectionnez votre profil'}
-            aria-label={t('auth.login.selectUser') || 'Slection du profil utilisateur'}
+            title="Select a user"
+            aria-label="User profile selection"
           >
-            <option value="">-- {t('common.choose') || 'Choisir'} --</option>
+            <option value="">-- Choose --</option>
             {users.map(user => (
               <option key={user.id} value={user.id}>
                 {user.display_name || user.name}
@@ -400,7 +373,7 @@ export default function LoginPage() {
         {selectedUser && (
           <div className="login-section">
             <label className="login-label">
-              {t('auth.login.pin') || 'Code PIN'}
+              PIN Code
             </label>
             <div className="pin-display">
               {[...Array(6)].map((_, i) => (
@@ -430,7 +403,7 @@ export default function LoginPage() {
             {error}
             {attemptsRemaining !== null && attemptsRemaining > 0 && (
               <span className="login-error__attempts">
-                {' '}({attemptsRemaining} {t('auth.errors.attemptsRemaining') || 'tentatives restantes'})
+                {' '}({attemptsRemaining} attempts remaining)
               </span>
             )}
           </div>
@@ -439,7 +412,7 @@ export default function LoginPage() {
         {/* Locked Message */}
         {lockedUntil && (
           <div className="login-locked">
-            🔒 {t('auth.errors.accountLocked', { minutes: 15 }) || 'Compte verrouill temporairement'}
+            Account temporarily locked
           </div>
         )}
 
@@ -450,15 +423,13 @@ export default function LoginPage() {
           onClick={handleLogin}
           disabled={!selectedUser || pin.length < 4 || isLoading || authLoading}
         >
-          {isLoading || authLoading
-            ? (t('common.loading') || 'Connexion...')
-            : (t('auth.login.submit') || 'Se connecter')}
+          {isLoading || authLoading ? 'Loading...' : 'Sign in'}
         </button>
 
         {/* Demo hint - only shown in development */}
         {isDevelopment && import.meta.env.VITE_SHOW_DEMO_HINT === 'true' && (
           <p className="login-hint">
-            💡 {t('auth.login.demoMode') || 'Demo mode - check .env for PINs'}
+            Demo mode - check .env for PINs
           </p>
         )}
       </div>

@@ -67,3 +67,6 @@ export type {
   IReceivePOItemParams,
   IReceivePOItemResult,
 } from './usePurchaseOrderReception'
+
+// Purchase Order Detail hook
+export { usePurchaseOrderDetail } from './usePurchaseOrderDetail'

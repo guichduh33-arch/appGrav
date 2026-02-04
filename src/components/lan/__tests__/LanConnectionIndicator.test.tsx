@@ -3,26 +3,9 @@
  * Story 4.2 - KDS Socket.IO Client Connection
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { LanConnectionIndicator } from '../LanConnectionIndicator';
-
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string, params?: Record<string, unknown>) => {
-      const translations: Record<string, string> = {
-        'lan.client.connected': 'Connected to LAN hub',
-        'lan.client.connecting': 'Connecting to LAN hub...',
-        'lan.client.disconnected': 'Disconnected from LAN hub',
-        'lan.client.error': 'LAN connection error',
-        'lan.client.reconnecting': 'Reconnecting...',
-        'lan.client.reconnectAttempt': `Attempt ${params?.count}/${params?.max}`,
-      };
-      return translations[key] || key;
-    },
-  }),
-}));
 
 describe('LanConnectionIndicator', () => {
   describe('status rendering', () => {

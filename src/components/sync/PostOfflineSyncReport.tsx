@@ -8,7 +8,6 @@
 
 import React from 'react';
 import { X, CheckCircle, AlertCircle, Clock, ShoppingCart, Upload, XCircle } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { IOfflinePeriod } from '../../services/sync/offlineDb';
 
 interface IPostOfflineSyncReportProps {
@@ -52,8 +51,6 @@ export const PostOfflineSyncReport: React.FC<IPostOfflineSyncReportProps> = ({
   onClose,
   onRetryFailed,
 }) => {
-  const { t } = useTranslation();
-
   const hasFailures = period.transactions_failed > 0;
   const allSynced = period.transactions_synced === period.transactions_created && !hasFailures;
 
@@ -74,13 +71,13 @@ export const PostOfflineSyncReport: React.FC<IPostOfflineSyncReportProps> = ({
               <CheckCircle className="w-6 h-6 text-blue-600" />
             )}
             <h2 className="text-lg font-semibold text-gray-900">
-              {t('sync.report.title', 'Rapport de Synchronisation')}
+              Sync Report
             </h2>
           </div>
           <button
             onClick={onClose}
             className="p-1 rounded-full hover:bg-black/10 transition-colors"
-            aria-label={t('common.close', 'Fermer')}
+            aria-label="Close"
           >
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -91,10 +88,10 @@ export const PostOfflineSyncReport: React.FC<IPostOfflineSyncReportProps> = ({
           {/* Status message */}
           <p className="text-gray-600">
             {allSynced
-              ? t('sync.report.all_synced', 'Toutes les transactions ont été synchronisées avec succès.')
+              ? 'All transactions have been synced successfully.'
               : hasFailures
-              ? t('sync.report.some_failed', 'Certaines transactions n\'ont pas pu être synchronisées.')
-              : t('sync.report.sync_complete', 'Synchronisation terminée.')}
+              ? 'Some transactions could not be synced.'
+              : 'Sync complete.'}
           </p>
 
           {/* Stats grid */}
@@ -103,7 +100,7 @@ export const PostOfflineSyncReport: React.FC<IPostOfflineSyncReportProps> = ({
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center gap-2 text-gray-500 mb-1">
                 <Clock className="w-4 h-4" />
-                <span className="text-sm">{t('sync.report.duration', 'Durée hors-ligne')}</span>
+                <span className="text-sm">Offline Duration</span>
               </div>
               <p className="text-2xl font-bold text-gray-900">
                 {formatDuration(period.duration_ms)}
@@ -114,7 +111,7 @@ export const PostOfflineSyncReport: React.FC<IPostOfflineSyncReportProps> = ({
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center gap-2 text-gray-500 mb-1">
                 <ShoppingCart className="w-4 h-4" />
-                <span className="text-sm">{t('sync.report.created', 'Créées')}</span>
+                <span className="text-sm">Created</span>
               </div>
               <p className="text-2xl font-bold text-gray-900">
                 {period.transactions_created}
@@ -125,7 +122,7 @@ export const PostOfflineSyncReport: React.FC<IPostOfflineSyncReportProps> = ({
             <div className="bg-green-50 rounded-lg p-4">
               <div className="flex items-center gap-2 text-green-600 mb-1">
                 <Upload className="w-4 h-4" />
-                <span className="text-sm">{t('sync.report.synced', 'Synchronisées')}</span>
+                <span className="text-sm">Synced</span>
               </div>
               <p className="text-2xl font-bold text-green-600">
                 {period.transactions_synced}
@@ -136,7 +133,7 @@ export const PostOfflineSyncReport: React.FC<IPostOfflineSyncReportProps> = ({
             <div className={`rounded-lg p-4 ${hasFailures ? 'bg-red-50' : 'bg-gray-50'}`}>
               <div className={`flex items-center gap-2 mb-1 ${hasFailures ? 'text-red-600' : 'text-gray-500'}`}>
                 <XCircle className="w-4 h-4" />
-                <span className="text-sm">{t('sync.report.failed', 'Échouées')}</span>
+                <span className="text-sm">Failed</span>
               </div>
               <p className={`text-2xl font-bold ${hasFailures ? 'text-red-600' : 'text-gray-900'}`}>
                 {period.transactions_failed}
@@ -148,9 +145,7 @@ export const PostOfflineSyncReport: React.FC<IPostOfflineSyncReportProps> = ({
           {hasFailures && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-sm text-red-700">
-                {t('sync.report.failure_warning',
-                  'Les transactions échouées seront réessayées automatiquement. Vous pouvez également les réessayer manuellement depuis le tableau de bord de synchronisation.'
-                )}
+                Failed transactions will be retried automatically. You can also retry them manually from the sync dashboard.
               </p>
             </div>
           )}
@@ -163,14 +158,14 @@ export const PostOfflineSyncReport: React.FC<IPostOfflineSyncReportProps> = ({
               onClick={onRetryFailed}
               className="px-4 py-2 text-sm font-medium text-red-600 bg-red-100 rounded-lg hover:bg-red-200 transition-colors"
             >
-              {t('sync.report.retry_failed', 'Réessayer les échecs')}
+              Retry Failed
             </button>
           )}
           <button
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
           >
-            {t('common.close', 'Fermer')}
+            Close
           </button>
         </div>
       </div>

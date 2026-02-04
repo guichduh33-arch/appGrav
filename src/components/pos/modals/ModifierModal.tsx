@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { X, Check, Plus, Minus } from 'lucide-react'
 import type { Product } from '../../../types/database'
 import { useCartStore, type CartModifier, type CartItem } from '../../../stores/cartStore'
@@ -94,7 +93,6 @@ interface ModifierOption {
 }
 
 export default function ModifierModal({ product, onClose, editItem }: ModifierModalProps) {
-    const { t } = useTranslation()
     const { addItem, updateItem } = useCartStore()
 
     // Get modifiers for this product's category
@@ -185,7 +183,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                     modifiers.push({
                         groupName: group.name,
                         optionId: selectedOption.id,
-                        optionLabel: t(`modifiers.options.${selectedOption.id.replace(/-/g, '_')}`),
+                        optionLabel: selectedOption.label,
                         priceAdjustment: selectedOption.price,
                     })
                 }
@@ -197,7 +195,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                         modifiers.push({
                             groupName: group.name,
                             optionId: option.id,
-                            optionLabel: t(`modifiers.options.${option.id.replace(/-/g, '_')}`),
+                            optionLabel: option.label,
                             priceAdjustment: option.price,
                         })
                     }
@@ -232,9 +230,9 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                         <h3 className="modal__title">
                             {product.name}
                         </h3>
-                        <p className="modal__subtitle">{t('modifiers.subtitle')}</p>
+                        <p className="modal__subtitle">Customize your order</p>
                     </div>
-                    <button className="modal__close" onClick={onClose} title={t('common.close')} aria-label={t('common.close')}>
+                    <button className="modal__close" onClick={onClose} title="Close" aria-label="Close">
                         <X size={24} />
                     </button>
                 </div>
@@ -244,7 +242,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                     {modifierGroups.map(group => (
                         <div key={group.name} className="modifier-section">
                             <h4 className="modifier-section__title">
-                                {t(`modifiers.groups.${group.name}`)}
+                                {group.label}
                                 {group.required && <span className="required">*</span>}
                             </h4>
 
@@ -260,7 +258,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                                                 onChange={() => handleSingleSelect(group.name, option.id)}
                                             />
                                             <label htmlFor={`${group.name}-${option.id}`} className="modifier-option__label">
-                                                <span className="modifier-option__text">{t(`modifiers.options.${option.id.replace(/-/g, '_')}`)}</span>
+                                                <span className="modifier-option__text">{option.label}</span>
                                                 {option.price > 0 && (
                                                     <span className="modifier-option__price">+{formatPrice(option.price)}</span>
                                                 )}
@@ -277,7 +275,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                                                 checked={(selections[group.name] as string[]).includes(option.id)}
                                                 onChange={() => handleMultiSelect(group.name, option.id)}
                                             />
-                                            <span className="modifier-checkbox__label">{t(`modifiers.options.${option.id.replace(/-/g, '_')}`)}</span>
+                                            <span className="modifier-checkbox__label">{option.label}</span>
                                             <span className="modifier-checkbox__price">+{formatPrice(option.price)}</span>
                                         </label>
                                     ))}
@@ -288,10 +286,10 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
 
                     {/* Notes */}
                     <div className="modifier-section">
-                        <h4 className="modifier-section__title">{t('modifiers.notes_label')}</h4>
+                        <h4 className="modifier-section__title">Kitchen notes</h4>
                         <textarea
                             className="form-textarea"
-                            placeholder={t('modifiers.notes_placeholder')}
+                            placeholder="Special instructions..."
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
                         />
@@ -299,13 +297,13 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
 
                     {/* Quantity */}
                     <div className="modifier-section">
-                        <h4 className="modifier-section__title">{t('modifiers.quantity_label')}</h4>
+                        <h4 className="modifier-section__title">Quantity</h4>
                         <div className="qty-selector">
                             <button
                                 className="qty-selector__btn"
                                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                title={t('cart.qty_decrease')}
-                                aria-label={t('cart.qty_decrease')}
+                                title="Decrease quantity"
+                                aria-label="Decrease quantity"
                             >
                                 <Minus size={18} />
                             </button>
@@ -313,8 +311,8 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                             <button
                                 className="qty-selector__btn"
                                 onClick={() => setQuantity(quantity + 1)}
-                                title={t('cart.qty_increase')}
-                                aria-label={t('cart.qty_increase')}
+                                title="Increase quantity"
+                                aria-label="Increase quantity"
                             >
                                 <Plus size={18} />
                             </button>
@@ -325,7 +323,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                 <div className="modal__footer">
                     <button className="btn btn-primary btn-block" onClick={handleConfirm}>
                         <Check size={18} />
-                        {editItem ? t('modifiers.update_item') : t('modifiers.add_to_cart')} • {formatPrice(totalPrice)}
+                        {editItem ? 'Update item' : 'Add to cart'} - {formatPrice(totalPrice)}
                     </button>
                 </div>
             </div>

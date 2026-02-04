@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 import { Trash2, Calendar, Loader2, User, Package, DollarSign } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
@@ -77,7 +76,6 @@ async function getDeletedProducts(from: Date, to: Date): Promise<DeletedProduct[
 }
 
 export function DeletedProductsTab() {
-  const { t } = useTranslation();
   const { dateRange } = useDateRange({ defaultPreset: 'last30days' });
 
   const { data, isLoading, error } = useQuery({
@@ -125,7 +123,7 @@ export function DeletedProductsTab() {
   if (error) {
     return (
       <div className="p-8 text-center text-red-600">
-        {t('common.error', 'Erreur lors du chargement des données')}
+        Error loading data
       </div>
     );
   }

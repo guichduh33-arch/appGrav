@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
     Factory, ShoppingCart, Package, Trash2, ArrowUpCircle,
     Filter, TrendingUp, TrendingDown, Clock, AlertTriangle, Truck, ArrowRight
@@ -42,7 +41,6 @@ interface MovementWithBalance extends StockMovement {
 }
 
 export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => {
-    const { t, i18n } = useTranslation()
     const [filterType, setFilterType] = useState<MovementFilterType>('all')
 
     // Calculate running balance for each movement (oldest to newest, then reverse for display)
@@ -97,10 +95,9 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
     const formatDate = (dateStr: string | null) => {
         if (!dateStr) return { date: '-', time: '-' }
         const date = new Date(dateStr)
-        const locale = i18n.language === 'fr' ? 'fr-FR' : i18n.language === 'id' ? 'id-ID' : 'en-US'
         return {
-            date: date.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' }),
-            time: date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
+            date: date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }),
+            time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
         }
     }
 
@@ -125,7 +122,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
             <div className="grid grid-cols-5 gap-4">
                 {/* Current Stock */}
                 <div className="rounded-2xl p-5 text-white bg-gradient-to-br from-blue-500 to-blue-700">
-                    <div className="text-xs opacity-90 mb-1">{t('stock_movements.stats.current_stock', 'Current Stock')}</div>
+                    <div className="text-xs opacity-90 mb-1">Current Stock</div>
                     <div className="text-2xl font-bold">{product.current_stock} {product.unit}</div>
                     <div className="text-xs opacity-90 mt-1">{formatIDR(stats.currentStockValue)}</div>
                 </div>
@@ -134,7 +131,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 <div className="bg-white rounded-2xl p-5 border border-gray-200">
                     <div className="flex items-center gap-2 mb-2">
                         <TrendingUp size={18} className="text-emerald-500" />
-                        <span className="text-xs text-gray-500">{t('stock_movements.stats.total_in', 'Total In')}</span>
+                        <span className="text-xs text-gray-500">Total In</span>
                     </div>
                     <div className="text-2xl font-bold text-emerald-500">+{stats.totalIn}</div>
                     <div className="text-xs text-emerald-600 font-medium">+{formatIDR(stats.totalInValue)}</div>
@@ -144,7 +141,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 <div className="bg-white rounded-2xl p-5 border border-gray-200">
                     <div className="flex items-center gap-2 mb-2">
                         <TrendingDown size={18} className="text-red-500" />
-                        <span className="text-xs text-gray-500">{t('stock_movements.stats.total_out', 'Total Out')}</span>
+                        <span className="text-xs text-gray-500">Total Out</span>
                     </div>
                     <div className="text-2xl font-bold text-red-500">-{stats.totalOut}</div>
                     <div className="text-xs text-red-600 font-medium">-{formatIDR(stats.totalOutValue)}</div>
@@ -154,7 +151,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 <div className="bg-white rounded-2xl p-5 border border-gray-200">
                     <div className="flex items-center gap-2 mb-2">
                         <Factory size={18} className="text-amber-500" />
-                        <span className="text-xs text-gray-500">{t('stock_movements.stats.production_in', 'Production In')}</span>
+                        <span className="text-xs text-gray-500">Production In</span>
                     </div>
                     <div className="text-2xl font-bold text-amber-700">+{stats.productionIn}</div>
                     <div className="text-xs text-amber-800 font-medium">+{formatIDR(stats.productionIn * costPrice)}</div>
@@ -164,7 +161,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 <div className="bg-white rounded-2xl p-5 border border-gray-200">
                     <div className="flex items-center gap-2 mb-2">
                         <Package size={18} className="text-pink-600" />
-                        <span className="text-xs text-gray-500">{t('stock_movements.stats.production_out', 'Production Out')}</span>
+                        <span className="text-xs text-gray-500">Production Out</span>
                     </div>
                     <div className="text-2xl font-bold text-pink-600">-{stats.productionOut}</div>
                     <div className="text-xs text-pink-800 font-medium">-{formatIDR(stats.productionOut * costPrice)}</div>
@@ -176,7 +173,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 <div className="flex items-center gap-3 flex-wrap">
                     <div className="flex items-center gap-2 text-gray-500">
                         <Filter size={18} />
-                        <span className="font-medium text-sm">{t('stock_movements.filter', 'Filter')}:</span>
+                        <span className="font-medium text-sm">Filter:</span>
                     </div>
 
                     <button
@@ -186,7 +183,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                                 : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
                             }`}
                     >
-                        {t('stock_movements.all', 'All')} ({stockHistory.length})
+                        All ({stockHistory.length})
                     </button>
 
                     {Object.entries(MOVEMENT_STYLES).map(([type, style]) => {
@@ -206,7 +203,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                                 } : {}}
                             >
                                 {getMovementIcon(type)}
-                                {t(style.labelKey, style.label)} ({count})
+                                {style.label} ({count})
                             </button>
                         )
                     })}
@@ -217,7 +214,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
             <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
                 <div className="px-5 py-4 border-b border-gray-200 bg-gray-50">
                     <h3 className="m-0 text-base font-semibold text-gray-800">
-                        {t('stock_movements.history', 'Movement History')} ({filteredHistory.length})
+                        Movement History ({filteredHistory.length})
                     </h3>
                 </div>
 
@@ -256,10 +253,10 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                                                     color: style.textColor
                                                 }}
                                             >
-                                                {t(style.labelKey, style.label)}
+                                                {style.label}
                                             </span>
                                             <span className="text-xs text-gray-400">
-                                                {t(style.descriptionKey, style.description)}
+                                                {style.description}
                                             </span>
                                         </div>
                                         {movement.reason && (
@@ -275,12 +272,12 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                                     {/* Stock Before → After */}
                                     <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg shrink-0">
                                         <div className="text-center">
-                                            <div className="text-xs text-gray-400 uppercase">{t('stock_movements.before', 'Before')}</div>
+                                            <div className="text-xs text-gray-400 uppercase">Before</div>
                                             <div className="text-base font-semibold text-gray-600">{movement.stockBefore}</div>
                                         </div>
                                         <ArrowRight size={16} className="text-gray-400" />
                                         <div className="text-center">
-                                            <div className="text-xs text-gray-400 uppercase">{t('stock_movements.after', 'After')}</div>
+                                            <div className="text-xs text-gray-400 uppercase">After</div>
                                             <div className={`text-base font-bold ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
                                                 {movement.stockAfter}
                                             </div>
@@ -314,11 +311,11 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 ) : (
                     <div className="py-16 px-8 text-center text-gray-400">
                         <Package size={48} className="mx-auto mb-4 opacity-50" />
-                        <p className="m-0 font-medium">{t('stock_movements.empty.title', 'No stock movements')}</p>
+                        <p className="m-0 font-medium">No stock movements</p>
                         <p className="mt-2 text-sm">
                             {filterType !== 'all'
-                                ? t('stock_movements.empty.filtered', 'No movements of this type found')
-                                : t('stock_movements.empty.default', 'Stock movements will appear here')}
+                                ? 'No movements of this type found'
+                                : 'Stock movements will appear here'}
                         </p>
                     </div>
                 )}
@@ -329,13 +326,9 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                 <div className="bg-amber-100 rounded-2xl p-5 border border-amber-300 flex items-center gap-3">
                     <AlertTriangle size={20} className="text-amber-600" />
                     <div>
-                        <div className="font-semibold text-amber-800">{t('stock_movements.low_stock.title', 'Low Stock')}</div>
+                        <div className="font-semibold text-amber-800">Low Stock</div>
                         <div className="text-sm text-amber-700">
-                            {t('stock_movements.low_stock.message', 'Current stock ({{current}} {{unit}}) is below minimum threshold ({{min}} {{unit}})', {
-                                current: product.current_stock,
-                                unit: product.unit,
-                                min: product.min_stock_level
-                            })}
+                            {`Current stock (${product.current_stock} ${product.unit}) is below minimum threshold (${product.min_stock_level} ${product.unit})`}
                         </div>
                     </div>
                 </div>

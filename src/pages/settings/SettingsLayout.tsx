@@ -1,5 +1,4 @@
 import { Outlet, NavLink } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import {
   Building2,
   ShoppingCart,
@@ -59,15 +58,14 @@ const EXTRA_TAB_NAMES: Record<string, { fr: string; en: string; id: string }> = 
 };
 
 const SettingsLayout = () => {
-  const { t, i18n } = useTranslation();
   const { data: categories, isLoading } = useSettingsCategories();
+  // Default to English
+  const lang = 'en';
 
   // Initialize settings store
   useInitializeSettings();
 
-  // Get current language
-  const lang = i18n.language?.substring(0, 2) || 'fr';
-  const nameKey = `name_${lang}` as 'name_fr' | 'name_en' | 'name_id';
+  const nameKey = 'name_en' as const;
 
   // Get category name based on language
   const getCategoryName = (category: { name_fr: string; name_en: string; name_id: string }) => {
@@ -78,13 +76,13 @@ const SettingsLayout = () => {
   const getExtraTabName = (code: string) => {
     const names = EXTRA_TAB_NAMES[code];
     if (!names) return code;
-    return names[lang as keyof typeof names] || names.en;
+    return names.en;
   };
 
   return (
     <div className="settings-page">
       <header className="settings-page__header">
-        <h1 className="settings-page__title">{t('nav.settings', 'Paramètres')}</h1>
+        <h1 className="settings-page__title">Settings</h1>
       </header>
 
       <div className="settings-grid">

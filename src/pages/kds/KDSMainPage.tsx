@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import toast from 'react-hot-toast'
 import { supabase } from '../../lib/supabase'
 import KDSOrderCard from '../../components/kds/KDSOrderCard'
@@ -51,7 +50,6 @@ const KDS_URGENT_THRESHOLD_SECONDS = 600 // 10 minutes - orders older than this 
 export default function KDSMainPage() {
     const { station } = useParams<{ station: string }>()
     const navigate = useNavigate()
-    const { t } = useTranslation()
     const [loading, setLoading] = useState(true)
     const [currentTime, setCurrentTime] = useState(new Date())
     const [soundEnabled, setSoundEnabled] = useState(true)
@@ -328,7 +326,7 @@ export default function KDSMainPage() {
             previousStatuses.forEach((status, itemId) => {
                 updateOrderItem(orderId, itemId, { item_status: status })
             })
-            toast.error(result.error || t('kds.status.updateError'))
+            toast.error(result.error || 'Error updating status')
         }
     }
 
@@ -361,7 +359,7 @@ export default function KDSMainPage() {
             previousStatuses.forEach((status, itemId) => {
                 updateOrderItem(orderId, itemId, { item_status: status })
             })
-            toast.error(result.error || t('kds.status.updateError'))
+            toast.error(result.error || 'Error updating status')
         } else {
             // Story 8.7: Broadcast order ready to Customer Display if all items ready
             const allReady = order.items.every(item =>
@@ -482,7 +480,7 @@ export default function KDSMainPage() {
                         {urgentCount > 0 && (
                             <span className="kds-header__stat kds-header__stat--urgent">
                                 <AlertTriangle size={14} />
-                                {urgentCount} {t('kds.urgent.title', 'Urgent')}
+                                {urgentCount} Urgent
                             </span>
                         )}
                         <span className="kds-header__stat kds-header__stat--new">{newOrders.length} New</span>
@@ -515,13 +513,13 @@ export default function KDSMainPage() {
                 {loading ? (
                     <div className="kds-loading">
                         <RefreshCw className="kds-loading__spinner" size={48} />
-                        <p>{t('kds.loading', 'Loading orders...')}</p>
+                        <p>Loading orders...</p>
                     </div>
                 ) : orders.length === 0 ? (
                     <div className="kds-empty">
                         <div className="kds-empty__icon">{stationConfig.icon}</div>
-                        <h2>{t('kds.empty.title', 'No Orders')}</h2>
-                        <p>{t('kds.empty.subtitle', 'Waiting for new orders...')}</p>
+                        <h2>No Orders</h2>
+                        <p>Waiting for new orders...</p>
                     </div>
                 ) : (
                     <>
@@ -530,7 +528,7 @@ export default function KDSMainPage() {
                             <div className="kds-section kds-section--urgent">
                                 <h2 className="kds-section__title">
                                     <AlertTriangle size={20} />
-                                    {t('kds.urgent.title', 'URGENT')} ({urgentOrders.length})
+                                    URGENT ({urgentOrders.length})
                                 </h2>
                                 <div className="kds-orders-grid">
                                     {urgentOrders.map((order) => (
@@ -560,7 +558,7 @@ export default function KDSMainPage() {
                         <div className="kds-section kds-section--normal">
                             {urgentOrders.length > 0 && (
                                 <h2 className="kds-section__title">
-                                    {t('kds.waiting.title', 'Waiting')} ({normalOrders.length})
+                                    Waiting ({normalOrders.length})
                                 </h2>
                             )}
                             <div className="kds-orders-grid">

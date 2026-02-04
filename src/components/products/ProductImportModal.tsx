@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback } from 'react'
-import { useTranslation } from 'react-i18next'
 import { X, Upload, Download, FileSpreadsheet, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 import { importProducts, downloadImportTemplate, IImportResult } from '@/services/products/productImportExport'
 import './ProductImportModal.css'
@@ -10,7 +9,6 @@ interface ProductImportModalProps {
 }
 
 export default function ProductImportModal({ onClose, onSuccess }: ProductImportModalProps) {
-    const { t } = useTranslation()
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const [file, setFile] = useState<File | null>(null)
@@ -55,7 +53,7 @@ export default function ProductImportModal({ onClose, onSuccess }: ProductImport
 
     const handleFileSelect = useCallback((selectedFile: File) => {
         if (!selectedFile.name.endsWith('.csv')) {
-            alert(t('product_import.invalid_format', 'Veuillez sélectionner un fichier CSV'))
+            alert('Please select a CSV file')
             return
         }
 
@@ -68,7 +66,7 @@ export default function ProductImportModal({ onClose, onSuccess }: ProductImport
             parsePreview(content)
         }
         reader.readAsText(selectedFile)
-    }, [t, parsePreview])
+    }, [parsePreview])
 
     const handleDrop = useCallback((e: React.DragEvent) => {
         e.preventDefault()
@@ -134,17 +132,17 @@ export default function ProductImportModal({ onClose, onSuccess }: ProductImport
                     <div>
                         <h3 className="modal__title">
                             <FileSpreadsheet size={24} />
-                            {t('product_import.title', 'Importer des produits')}
+                            Import Products
                         </h3>
                         <p className="modal__subtitle">
-                            {t('product_import.subtitle', 'Importez des produits depuis un fichier CSV')}
+                            Import products from a CSV file
                         </p>
                     </div>
                     <button
                         className="modal__close"
                         onClick={onClose}
-                        title={t('common.close', 'Fermer')}
-                        aria-label={t('common.close', 'Fermer')}
+                        title="Close"
+                        aria-label="Close"
                     >
                         <X size={24} />
                     </button>
@@ -159,10 +157,10 @@ export default function ProductImportModal({ onClose, onSuccess }: ProductImport
                             onClick={downloadImportTemplate}
                         >
                             <Download size={18} />
-                            {t('product_import.download_template', 'Télécharger le template')}
+                            Download Template
                         </button>
                         <span className="import-template-hint">
-                            {t('product_import.template_hint', 'Utilisez ce fichier comme modèle pour vos imports')}
+                            Use this file as a template for your imports
                         </span>
                     </div>
 
@@ -195,10 +193,10 @@ export default function ProductImportModal({ onClose, onSuccess }: ProductImport
                                     <>
                                         <Upload size={48} />
                                         <p className="import-dropzone-text">
-                                            {t('product_import.drag_drop', 'Glissez-déposez un fichier CSV ici')}
+                                            Drag and drop a CSV file here
                                         </p>
                                         <p className="import-dropzone-hint">
-                                            {t('product_import.or_click', 'ou cliquez pour sélectionner')}
+                                            or click to select
                                         </p>
                                     </>
                                 )}
@@ -208,9 +206,9 @@ export default function ProductImportModal({ onClose, onSuccess }: ProductImport
                             {preview.length > 0 && (
                                 <div className="import-preview">
                                     <h4 className="import-preview-title">
-                                        {t('product_import.preview', 'Aperçu')}
+                                        Preview
                                         <span className="import-preview-count">
-                                            ({preview.length - 1} {t('product_import.rows_shown', 'lignes affichées')})
+                                            ({preview.length - 1} rows shown)
                                         </span>
                                     </h4>
                                     <div className="import-preview-table-wrapper">
@@ -248,7 +246,7 @@ export default function ProductImportModal({ onClose, onSuccess }: ProductImport
                                                 updateExisting: e.target.checked
                                             }))}
                                         />
-                                        <span>{t('product_import.options.update_existing', 'Mettre à jour les produits existants')}</span>
+                                        <span>Update existing products</span>
                                     </label>
                                     <label className="import-option">
                                         <input
@@ -259,7 +257,7 @@ export default function ProductImportModal({ onClose, onSuccess }: ProductImport
                                                 skipErrors: e.target.checked
                                             }))}
                                         />
-                                        <span>{t('product_import.options.skip_errors', 'Ignorer les erreurs et continuer')}</span>
+                                        <span>Skip errors and continue</span>
                                     </label>
                                 </div>
                             )}
@@ -275,38 +273,38 @@ export default function ProductImportModal({ onClose, onSuccess }: ProductImport
                                 ) : (
                                     <AlertCircle size={24} className="text-warning" />
                                 )}
-                                {t('product_import.results.title', 'Résultats de l\'import')}
+                                Import Results
                             </h4>
 
                             <div className="import-results-stats">
                                 <div className="import-stat created">
                                     <span className="import-stat-value">{result.created}</span>
                                     <span className="import-stat-label">
-                                        {t('product_import.results.created', 'produits créés')}
+                                        products created
                                     </span>
                                 </div>
                                 <div className="import-stat updated">
                                     <span className="import-stat-value">{result.updated}</span>
                                     <span className="import-stat-label">
-                                        {t('product_import.results.updated', 'produits mis à jour')}
+                                        products updated
                                     </span>
                                 </div>
                                 <div className="import-stat errors">
                                     <span className="import-stat-value">{result.errors.length}</span>
                                     <span className="import-stat-label">
-                                        {t('product_import.results.errors', 'erreurs')}
+                                        errors
                                     </span>
                                 </div>
                             </div>
 
                             {result.errors.length > 0 && (
                                 <div className="import-errors">
-                                    <h5>{t('product_import.error_details', 'Détails des erreurs')}</h5>
+                                    <h5>Error Details</h5>
                                     <ul className="import-errors-list">
                                         {result.errors.slice(0, 10).map((err, i) => (
                                             <li key={i} className="import-error-item">
                                                 <span className="import-error-row">
-                                                    {t('product_import.error_row', 'Ligne')} {err.row}
+                                                    Row {err.row}
                                                 </span>
                                                 {err.sku && (
                                                     <span className="import-error-sku">({err.sku})</span>
@@ -316,7 +314,7 @@ export default function ProductImportModal({ onClose, onSuccess }: ProductImport
                                         ))}
                                         {result.errors.length > 10 && (
                                             <li className="import-error-more">
-                                                ... {t('product_import.and_more', 'et')} {result.errors.length - 10} {t('product_import.more_errors', 'autres erreurs')}
+                                                ... and {result.errors.length - 10} more errors
                                             </li>
                                         )}
                                     </ul>
@@ -334,14 +332,14 @@ export default function ProductImportModal({ onClose, onSuccess }: ProductImport
                                 className="btn btn-outline"
                                 onClick={handleReset}
                             >
-                                {t('product_import.import_another', 'Importer un autre fichier')}
+                                Import another file
                             </button>
                             <button
                                 type="button"
                                 className="btn btn-primary"
                                 onClick={onClose}
                             >
-                                {t('common.close', 'Fermer')}
+                                Close
                             </button>
                         </>
                     ) : (
@@ -351,7 +349,7 @@ export default function ProductImportModal({ onClose, onSuccess }: ProductImport
                                 className="btn btn-outline"
                                 onClick={onClose}
                             >
-                                {t('common.cancel', 'Annuler')}
+                                Cancel
                             </button>
                             <button
                                 type="button"
@@ -362,12 +360,12 @@ export default function ProductImportModal({ onClose, onSuccess }: ProductImport
                                 {importing ? (
                                     <>
                                         <Loader2 size={18} className="spin" />
-                                        {t('product_import.importing', 'Importation en cours...')}
+                                        Importing...
                                     </>
                                 ) : (
                                     <>
                                         <Upload size={18} />
-                                        {t('product_import.import', 'Importer')}
+                                        Import
                                     </>
                                 )}
                             </button>

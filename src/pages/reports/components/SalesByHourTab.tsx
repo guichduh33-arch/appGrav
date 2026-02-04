@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Clock, DollarSign, ShoppingCart, TrendingUp, Loader2 } from 'lucide-react';
 import { ReportingService } from '@/services/ReportingService';
@@ -10,7 +9,6 @@ import { useDateRange } from '@/hooks/reports/useDateRange';
 import { formatCurrency as formatCurrencyPdf } from '@/services/reports/pdfExport';
 
 export function SalesByHourTab() {
-  const { t } = useTranslation();
   const { dateRange } = useDateRange({ defaultPreset: 'last7days' });
 
   const { data, isLoading, error } = useQuery({
@@ -108,7 +106,7 @@ export function SalesByHourTab() {
   if (error) {
     return (
       <div className="p-8 text-center text-red-600">
-        {t('common.error', 'Erreur lors du chargement des données')}
+        Error loading data
       </div>
     );
   }

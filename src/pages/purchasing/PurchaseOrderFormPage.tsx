@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Plus, Trash2, Save, Send, Percent, WifiOff } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
 import { formatCurrency } from '@/utils/helpers'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
@@ -38,7 +37,6 @@ const DEFAULT_ITEM: IPOItem = {
 }
 
 export default function PurchaseOrderFormPage() {
-    const { t } = useTranslation()
     const navigate = useNavigate()
     const { id } = useParams()
     const isEditing = !!id
@@ -72,10 +70,10 @@ export default function PurchaseOrderFormPage() {
         if (!hasCheckedInitialOnlineStatus.current) {
             hasCheckedInitialOnlineStatus.current = true
             if (!isOnline) {
-                toast.error(t('purchasing.orders.offlineWarning'))
+                toast.error('This feature requires an internet connection')
             }
         }
-    }, [isOnline, t])
+    }, [isOnline])
 
     // Load products (raw materials only)
     useEffect(() => {
@@ -180,17 +178,17 @@ export default function PurchaseOrderFormPage() {
 
     const handleSubmit = async (sendToSupplier: boolean = false) => {
         if (!isOnline) {
-            toast.error(t('purchasing.orders.offlineWarning'))
+            toast.error('This feature requires an internet connection')
             return
         }
 
         if (!formData.supplier_id) {
-            toast.error(t('purchasing.orders.form.requiredFields'))
+            toast.error('Please fill in all required fields')
             return
         }
 
         if (items.some(item => !item.product_name || item.quantity <= 0 || item.unit_price < 0)) {
-            toast.error(t('purchasing.orders.form.requiredFields'))
+            toast.error('Please fill in all required fields')
             return
         }
 
@@ -212,7 +210,7 @@ export default function PurchaseOrderFormPage() {
                     items: preparedItems,
                     status: sendToSupplier ? 'sent' : formData.status
                 })
-                toast.success(t('purchasing.orders.updateSuccess'))
+                toast.success('Purchase order updated successfully')
             } else {
                 await createMutation.mutateAsync({
                     supplier_id: formData.supplier_id,
@@ -223,14 +221,13 @@ export default function PurchaseOrderFormPage() {
                     items: preparedItems,
                     sendToSupplier
                 })
-                toast.success(t('purchasing.orders.createSuccess'))
+                toast.success('Purchase order created successfully')
             }
 
             navigate('/purchasing/purchase-orders')
         } catch (error: any) {
             console.error('Error saving purchase order:', error)
-            const errorKey = isEditing ? 'purchasing.orders.updateError' : 'purchasing.orders.createError'
-            toast.error(t(errorKey))
+            toast.error(isEditing ? 'Failed to update purchase order' : 'Failed to create purchase order')
         }
     }
 
@@ -250,7 +247,7 @@ export default function PurchaseOrderFormPage() {
     if (isLoading) {
         return (
             <div className="po-form-page">
-                <div className="po-form-page__loading">{t('common.loading')}</div>
+                <div className="po-form-page__loading">Loading...</div>
             </div>
         )
     }
@@ -261,7 +258,7 @@ export default function PurchaseOrderFormPage() {
             {!isOnline && (
                 <div className="po-form-page__offline-banner">
                     <WifiOff size={20} />
-                    <span>{t('purchasing.orders.offlineWarning')}</span>
+                    <span>This feature requires an internet connection</span>
                 </div>
             )}
 
@@ -269,10 +266,10 @@ export default function PurchaseOrderFormPage() {
             <div className="po-form-page__header">
                 <button className="btn btn-secondary" onClick={() => navigate('/purchasing/purchase-orders')}>
                     <ArrowLeft size={20} />
-                    {t('common.cancel')}
+                    Cancel
                 </button>
                 <h1 className="po-form-page__title">
-                    {isEditing ? t('purchasing.orders.editOrder') : t('purchasing.orders.newOrder')}
+                    {isEditing ? 'Edit Purchase Order' : 'New Purchase Order'}
                 </h1>
             </div>
 
@@ -281,18 +278,18 @@ export default function PurchaseOrderFormPage() {
                 <div className="po-form-page__main">
                     {/* Supplier & Dates */}
                     <div className="po-form-section">
-                        <h2>{t('purchasing.orders.form.supplier')}</h2>
+                        <h2>Supplier</h2>
                         <div className="po-form-grid">
                             <div className="form-group">
-                                <label>{t('purchasing.orders.form.supplier')} *</label>
+                                <label>Supplier *</label>
                                 <select
                                     required
                                     value={formData.supplier_id}
                                     onChange={e => setFormData({ ...formData, supplier_id: e.target.value })}
                                     disabled={!isOnline}
-                                    aria-label={t('purchasing.orders.form.selectSupplier')}
+                                    aria-label="Select supplier"
                                 >
-                                    <option value="">{t('purchasing.orders.form.selectSupplier')}</option>
+                                    <option value="">Select a supplier</option>
                                     {suppliers.map(supplier => (
                                         <option key={supplier.id} value={supplier.id}>
                                             {supplier.name}
@@ -301,22 +298,22 @@ export default function PurchaseOrderFormPage() {
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label>{t('purchasing.orders.form.expectedDelivery')}</label>
+                                <label>Expected Delivery</label>
                                 <input
                                     type="date"
                                     value={formData.expected_delivery_date}
                                     onChange={e => setFormData({ ...formData, expected_delivery_date: e.target.value })}
                                     disabled={!isOnline}
-                                    aria-label={t('purchasing.orders.form.expectedDelivery')}
+                                    aria-label="Expected delivery date"
                                 />
                             </div>
                             <div className="form-group form-group--full">
-                                <label>{t('purchasing.orders.form.notes')}</label>
+                                <label>Notes</label>
                                 <textarea
                                     rows={2}
                                     value={formData.notes}
                                     onChange={e => setFormData({ ...formData, notes: e.target.value })}
-                                    placeholder={t('purchasing.orders.form.notesPlaceholder')}
+                                    placeholder="Add any notes..."
                                     disabled={!isOnline}
                                 />
                             </div>
@@ -326,14 +323,14 @@ export default function PurchaseOrderFormPage() {
                     {/* Items */}
                     <div className="po-form-section">
                         <div className="po-form-section__header">
-                            <h2>{t('purchasing.orders.form.items')}</h2>
+                            <h2>Items</h2>
                             <button
                                 className="btn btn-secondary btn-sm"
                                 onClick={handleAddItem}
                                 disabled={!isOnline}
                             >
                                 <Plus size={16} />
-                                {t('purchasing.orders.form.addItem')}
+                                Add Item
                             </button>
                         </div>
 
@@ -341,14 +338,14 @@ export default function PurchaseOrderFormPage() {
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>{t('purchasing.orders.form.product')}</th>
+                                        <th>Product</th>
                                         <th>Description</th>
-                                        <th style={{ width: '100px' }}>{t('purchasing.orders.form.quantity')}</th>
-                                        <th style={{ width: '80px' }}>Unité</th>
-                                        <th style={{ width: '120px' }}>{t('purchasing.orders.form.unitPrice')}</th>
-                                        <th style={{ width: '100px' }}>{t('purchasing.orders.form.discount')}</th>
-                                        <th style={{ width: '80px' }}>{t('purchasing.orders.form.tax')} %</th>
-                                        <th style={{ width: '120px' }}>{t('purchasing.orders.form.lineTotal')}</th>
+                                        <th style={{ width: '100px' }}>Quantity</th>
+                                        <th style={{ width: '80px' }}>Unit</th>
+                                        <th style={{ width: '120px' }}>Unit Price</th>
+                                        <th style={{ width: '100px' }}>Discount</th>
+                                        <th style={{ width: '80px' }}>Tax %</th>
+                                        <th style={{ width: '120px' }}>Line Total</th>
                                         <th style={{ width: '50px' }}></th>
                                     </tr>
                                 </thead>
@@ -360,7 +357,7 @@ export default function PurchaseOrderFormPage() {
                                                     value={item.product_id || ''}
                                                     onChange={e => handleItemChange(index, 'product_id', e.target.value || null)}
                                                     disabled={!isOnline}
-                                                    aria-label={t('purchasing.orders.form.selectProduct')}
+                                                    aria-label="Select product"
                                                 >
                                                     <option value="">Produit personnalisé</option>
                                                     {products.map(product => (
@@ -397,7 +394,7 @@ export default function PurchaseOrderFormPage() {
                                                     step="0.01"
                                                     value={item.quantity}
                                                     onChange={e => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
-                                                    aria-label={t('purchasing.orders.form.quantity')}
+                                                    aria-label="Quantity"
                                                     disabled={!isOnline}
                                                 />
                                             </td>
@@ -424,7 +421,7 @@ export default function PurchaseOrderFormPage() {
                                                     step="100"
                                                     value={item.unit_price}
                                                     onChange={e => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                                                    aria-label={t('purchasing.orders.form.unitPrice')}
+                                                    aria-label="Unit price"
                                                     disabled={!isOnline}
                                                 />
                                             </td>
@@ -435,7 +432,7 @@ export default function PurchaseOrderFormPage() {
                                                     step="0.01"
                                                     value={item.discount_amount}
                                                     onChange={e => handleItemChange(index, 'discount_amount', parseFloat(e.target.value) || 0)}
-                                                    aria-label={t('purchasing.orders.form.discount')}
+                                                    aria-label="Discount"
                                                     disabled={!isOnline}
                                                 />
                                             </td>
@@ -447,7 +444,7 @@ export default function PurchaseOrderFormPage() {
                                                     step="0.01"
                                                     value={item.tax_rate}
                                                     onChange={e => handleItemChange(index, 'tax_rate', parseFloat(e.target.value) || 0)}
-                                                    aria-label={t('purchasing.orders.form.tax')}
+                                                    aria-label="Tax rate"
                                                     disabled={!isOnline}
                                                 />
                                             </td>
@@ -459,8 +456,8 @@ export default function PurchaseOrderFormPage() {
                                                     className="btn-icon btn-icon--danger"
                                                     onClick={() => handleRemoveItem(index)}
                                                     disabled={items.length === 1 || !isOnline}
-                                                    aria-label={t('common.delete')}
-                                                    title={t('common.delete')}
+                                                    aria-label="Delete"
+                                                    title="Delete"
                                                 >
                                                     <Trash2 size={16} />
                                                 </button>
@@ -476,10 +473,10 @@ export default function PurchaseOrderFormPage() {
                 {/* Summary Sidebar */}
                 <div className="po-form-page__sidebar">
                     <div className="po-summary">
-                        <h3>Résumé</h3>
+                        <h3>Summary</h3>
 
                         <div className="po-summary__line">
-                            <span>{t('purchasing.orders.form.subtotal')}</span>
+                            <span>Subtotal</span>
                             <span>{formatCurrency(totals.subtotal)}</span>
                         </div>
 
@@ -489,25 +486,25 @@ export default function PurchaseOrderFormPage() {
                             disabled={!isOnline}
                         >
                             <Percent size={16} />
-                            {t('purchasing.orders.form.discount')}
+                            Discount
                         </button>
 
                         {totals.orderDiscount > 0 && (
                             <div className="po-summary__line po-summary__line--discount">
-                                <span>{t('purchasing.orders.form.discountAmount')}</span>
+                                <span>Discount Amount</span>
                                 <span>-{formatCurrency(totals.orderDiscount)}</span>
                             </div>
                         )}
 
                         <div className="po-summary__line">
-                            <span>{t('purchasing.orders.form.taxAmount')}</span>
+                            <span>Tax Amount</span>
                             <span>{formatCurrency(totals.tax)}</span>
                         </div>
 
                         <div className="po-summary__divider"></div>
 
                         <div className="po-summary__total">
-                            <span>{t('purchasing.orders.form.totalAmount')}</span>
+                            <span>Total Amount</span>
                             <span>{formatCurrency(totals.total)}</span>
                         </div>
 
@@ -518,7 +515,7 @@ export default function PurchaseOrderFormPage() {
                                 disabled={isSaving || !isOnline}
                             >
                                 <Save size={18} />
-                                {t('purchasing.orders.actions.saveDraft')}
+                                Save as Draft
                             </button>
                             <button
                                 className="btn btn-primary btn-block"
@@ -526,7 +523,7 @@ export default function PurchaseOrderFormPage() {
                                 disabled={isSaving || !isOnline}
                             >
                                 <Send size={18} />
-                                {t('purchasing.orders.actions.saveAndSend')}
+                                Save & Send
                             </button>
                         </div>
                     </div>
@@ -538,11 +535,11 @@ export default function PurchaseOrderFormPage() {
                 <div className="modal-backdrop is-active" onClick={() => setShowDiscountModal(false)}>
                     <div className="modal is-active" onClick={e => e.stopPropagation()}>
                         <div className="modal__header">
-                            <h2 className="modal__title">{t('purchasing.orders.form.discount')}</h2>
+                            <h2 className="modal__title">Discount</h2>
                         </div>
                         <div className="modal__body">
                             <div className="form-group">
-                                <label>Montant fixe (IDR)</label>
+                                <label>Fixed Amount (IDR)</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -553,11 +550,11 @@ export default function PurchaseOrderFormPage() {
                                         discount_amount: parseFloat(e.target.value) || 0,
                                         discount_percentage: null
                                     })}
-                                    aria-label="Montant fixe de remise"
+                                    aria-label="Fixed discount amount"
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Pourcentage (%)</label>
+                                <label>Percentage (%)</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -569,16 +566,16 @@ export default function PurchaseOrderFormPage() {
                                         discount_percentage: parseFloat(e.target.value) || null,
                                         discount_amount: 0
                                     })}
-                                    aria-label="Pourcentage de remise"
+                                    aria-label="Discount percentage"
                                 />
                             </div>
                         </div>
                         <div className="modal__footer">
                             <button className="btn btn-secondary" onClick={() => setShowDiscountModal(false)}>
-                                {t('common.cancel')}
+                                Cancel
                             </button>
                             <button className="btn btn-primary" onClick={applyGlobalDiscount}>
-                                {t('common.confirm')}
+                                Apply
                             </button>
                         </div>
                     </div>

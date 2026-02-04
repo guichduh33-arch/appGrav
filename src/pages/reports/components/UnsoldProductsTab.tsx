@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 import { PackageX, Calendar, DollarSign, Package, Loader2 } from 'lucide-react';
 import { ReportingService } from '@/services/ReportingService';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -8,7 +7,6 @@ import { formatCurrency as formatCurrencyPdf } from '@/services/reports/pdfExpor
 import type { IUnsoldProductsReport } from '@/types/reporting';
 
 export function UnsoldProductsTab() {
-  const { t } = useTranslation();
   const [minDays, setMinDays] = useState(30);
 
   const { data, isLoading, error } = useQuery({
@@ -93,7 +91,7 @@ export function UnsoldProductsTab() {
   if (error) {
     return (
       <div className="p-8 text-center text-red-600">
-        {t('common.error', 'Erreur lors du chargement des données')}
+        Error loading data
       </div>
     );
   }

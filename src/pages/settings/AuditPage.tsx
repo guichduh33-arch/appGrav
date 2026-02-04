@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   FileText, Search, RefreshCw, Calendar, User,
   ChevronLeft, ChevronRight, Eye, X, Download
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
-import { fr, enUS, id } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import type { AuditLog } from '../../types/auth';
 
 interface AuditLogWithUser extends AuditLog {
@@ -43,7 +42,6 @@ const TABLE_LABELS: Record<string, string> = {
 };
 
 export default function AuditPage() {
-  const { t, i18n } = useTranslation();
   const [logs, setLogs] = useState<AuditLogWithUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,14 +63,8 @@ export default function AuditPage() {
   // Users for filter
   const [users, setUsers] = useState<{ id: string; name: string }[]>([]);
 
-  // Get locale for date formatting
-  const getLocale = () => {
-    switch (i18n.language) {
-      case 'fr': return fr;
-      case 'id': return id;
-      default: return enUS;
-    }
-  };
+  // Use English locale for date formatting
+  const getLocale = () => enUS;
 
   useEffect(() => {
     loadUsers();
@@ -200,10 +192,10 @@ export default function AuditPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <FileText className="w-7 h-7 text-blue-600" />
-            {t('auth.audit.title') || 'Journal d\'Audit'}
+            Audit Log
           </h1>
           <p className="text-gray-500 mt-1">
-            {t('auth.audit.description') || 'Historique des actions utilisateurs'}
+            User action history
           </p>
         </div>
 
@@ -213,7 +205,7 @@ export default function AuditPage() {
           className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
         >
           <Download className="w-5 h-5" />
-          {t('common.export') || 'Exporter'}
+          Export
         </button>
       </div>
 
@@ -227,9 +219,9 @@ export default function AuditPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t('common.search') || 'Rechercher...'}
+              placeholder="Search..."
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
-              aria-label={t('common.search') || 'Rechercher'}
+              aria-label="Search"
             />
           </div>
 
@@ -240,13 +232,13 @@ export default function AuditPage() {
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value as 'today' | '7days' | '30days' | 'custom')}
               className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
-              title={t('auth.audit.dateRange') || 'Période'}
-              aria-label={t('auth.audit.dateRange') || 'Période'}
+              title="Date Range"
+              aria-label="Date Range"
             >
-              <option value="today">{t('auth.audit.today') || 'Aujourd\'hui'}</option>
-              <option value="7days">{t('auth.audit.last7Days') || '7 derniers jours'}</option>
-              <option value="30days">{t('auth.audit.last30Days') || '30 derniers jours'}</option>
-              <option value="custom">{t('auth.audit.custom') || 'Personnalisé'}</option>
+              <option value="today">Today</option>
+              <option value="7days">Last 7 days</option>
+              <option value="30days">Last 30 days</option>
+              <option value="custom">Custom</option>
             </select>
           </div>
 
@@ -257,8 +249,8 @@ export default function AuditPage() {
                 value={customStart}
                 onChange={(e) => setCustomStart(e.target.value)}
                 className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
-                title={t('auth.audit.startDate') || 'Date de début'}
-                aria-label={t('auth.audit.startDate') || 'Date de début'}
+                title="Start Date"
+                aria-label="Start Date"
               />
               <span className="text-gray-400">→</span>
               <input
@@ -266,8 +258,8 @@ export default function AuditPage() {
                 value={customEnd}
                 onChange={(e) => setCustomEnd(e.target.value)}
                 className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
-                title={t('auth.audit.endDate') || 'Date de fin'}
-                aria-label={t('auth.audit.endDate') || 'Date de fin'}
+                title="End Date"
+                aria-label="End Date"
               />
             </>
           )}
@@ -277,16 +269,16 @@ export default function AuditPage() {
             value={filterAction}
             onChange={(e) => { setFilterAction(e.target.value); setPage(1); }}
             className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
-            title={t('auth.audit.filterAction') || 'Filtrer par action'}
-            aria-label={t('auth.audit.filterAction') || 'Filtrer par action'}
+            title="Filter by action"
+            aria-label="Filter by action"
           >
-            <option value="">{t('auth.audit.allActions') || 'Toutes les actions'}</option>
+            <option value="">All actions</option>
             <option value="login">Login</option>
             <option value="logout">Logout</option>
-            <option value="create">Création</option>
-            <option value="update">Modification</option>
-            <option value="delete">Suppression</option>
-            <option value="view">Consultation</option>
+            <option value="create">Create</option>
+            <option value="update">Update</option>
+            <option value="delete">Delete</option>
+            <option value="view">View</option>
           </select>
 
           {/* User Filter */}
@@ -296,10 +288,10 @@ export default function AuditPage() {
               value={filterUser}
               onChange={(e) => { setFilterUser(e.target.value); setPage(1); }}
               className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
-              title={t('auth.audit.filterUser') || 'Filtrer par utilisateur'}
-              aria-label={t('auth.audit.filterUser') || 'Filtrer par utilisateur'}
+              title="Filter by user"
+              aria-label="Filter by user"
             >
-              <option value="">{t('auth.audit.allUsers') || 'Tous les utilisateurs'}</option>
+              <option value="">All users</option>
               {users.map(user => (
                 <option key={user.id} value={user.id}>{user.name}</option>
               ))}
@@ -311,8 +303,8 @@ export default function AuditPage() {
             type="button"
             onClick={loadLogs}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            title={t('common.refresh') || 'Actualiser'}
-            aria-label={t('common.refresh') || 'Actualiser'}
+            title="Refresh"
+            aria-label="Refresh"
           >
             <RefreshCw className={`w-5 h-5 text-gray-600 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
@@ -322,23 +314,23 @@ export default function AuditPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-sm text-gray-500">{t('auth.audit.totalLogs') || 'Total'}</p>
+          <p className="text-sm text-gray-500">Total</p>
           <p className="text-2xl font-bold text-gray-900">{totalCount}</p>
         </div>
         <div className="bg-green-50 rounded-xl border border-green-200 p-4">
-          <p className="text-sm text-green-600">{t('auth.audit.logins') || 'Connexions'}</p>
+          <p className="text-sm text-green-600">Logins</p>
           <p className="text-2xl font-bold text-green-700">
             {logs.filter(l => l.action === 'login').length}
           </p>
         </div>
         <div className="bg-blue-50 rounded-xl border border-blue-200 p-4">
-          <p className="text-sm text-blue-600">{t('auth.audit.creates') || 'Créations'}</p>
+          <p className="text-sm text-blue-600">Creates</p>
           <p className="text-2xl font-bold text-blue-700">
             {logs.filter(l => l.action === 'create').length}
           </p>
         </div>
         <div className="bg-amber-50 rounded-xl border border-amber-200 p-4">
-          <p className="text-sm text-amber-600">{t('auth.audit.updates') || 'Modifications'}</p>
+          <p className="text-sm text-amber-600">Updates</p>
           <p className="text-2xl font-bold text-amber-700">
             {logs.filter(l => l.action === 'update').length}
           </p>
@@ -352,25 +344,25 @@ export default function AuditPage() {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {t('auth.audit.date') || 'Date'}
+                  Date
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {t('auth.audit.user') || 'Utilisateur'}
+                  User
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {t('auth.audit.action') || 'Action'}
+                  Action
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {t('auth.audit.table') || 'Table'}
+                  Module
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {t('auth.audit.recordId') || 'ID Enregistrement'}
+                  Record ID
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {t('auth.audit.ip') || 'IP'}
+                  IP
                 </th>
                 <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                  {t('common.actions') || 'Actions'}
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -379,13 +371,13 @@ export default function AuditPage() {
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
                     <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
-                    {t('common.loading') || 'Chargement...'}
+                    Loading...
                   </td>
                 </tr>
               ) : filteredLogs.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                    {t('auth.audit.noLogs') || 'Aucun log trouvé'}
+                    No logs found
                   </td>
                 </tr>
               ) : (
@@ -431,8 +423,8 @@ export default function AuditPage() {
                         type="button"
                         onClick={() => setSelectedLog(log)}
                         className="p-1 hover:bg-gray-100 rounded transition-colors"
-                        title={t('common.details') || 'Détails'}
-                        aria-label={t('common.details') || 'Détails'}
+                        title="Details"
+                        aria-label="Details"
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
                       </button>
@@ -448,7 +440,7 @@ export default function AuditPage() {
         {totalPages > 1 && (
           <div className="px-4 py-3 border-t border-gray-200 flex items-center justify-between">
             <p className="text-sm text-gray-500">
-              {t('common.showing') || 'Affichage'} {(page - 1) * perPage + 1}-{Math.min(page * perPage, totalCount)} {t('common.of') || 'sur'} {totalCount}
+              Showing {(page - 1) * perPage + 1}-{Math.min(page * perPage, totalCount)} of {totalCount}
             </p>
             <div className="flex items-center gap-2">
               <button
@@ -483,13 +475,13 @@ export default function AuditPage() {
           <div className="bg-white rounded-xl max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-xl">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-gray-900">
-                {t('auth.audit.logDetails') || 'Détails du log'}
+                Log Details
               </h2>
               <button
                 type="button"
                 onClick={() => setSelectedLog(null)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label={t('common.close', 'Fermer')}
+                aria-label="Close"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -499,33 +491,33 @@ export default function AuditPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm text-gray-500">{t('auth.audit.date') || 'Date'}</label>
+                    <label className="text-sm text-gray-500">Date</label>
                     <p className="font-medium">
                       {format(new Date(selectedLog.created_at), 'PPpp', { locale: getLocale() })}
                     </p>
                   </div>
                   <div>
-                    <label className="text-sm text-gray-500">{t('auth.audit.user') || 'Utilisateur'}</label>
+                    <label className="text-sm text-gray-500">User</label>
                     <p className="font-medium">
                       {selectedLog.user_profiles?.display_name || selectedLog.user_profiles?.name || '-'}
                     </p>
                   </div>
                   <div>
-                    <label className="text-sm text-gray-500">{t('auth.audit.action') || 'Action'}</label>
+                    <label className="text-sm text-gray-500">Action</label>
                     <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getActionColor(selectedLog.action)}`}>
                       {selectedLog.action}
                     </span>
                   </div>
                   <div>
-                    <label className="text-sm text-gray-500">{t('auth.audit.table') || 'Table'}</label>
+                    <label className="text-sm text-gray-500">Module</label>
                     <p className="font-medium">{selectedLog.table_name || '-'}</p>
                   </div>
                   <div>
-                    <label className="text-sm text-gray-500">{t('auth.audit.recordId') || 'ID Enregistrement'}</label>
+                    <label className="text-sm text-gray-500">Record ID</label>
                     <p className="font-mono text-sm">{selectedLog.record_id || '-'}</p>
                   </div>
                   <div>
-                    <label className="text-sm text-gray-500">{t('auth.audit.ip') || 'Adresse IP'}</label>
+                    <label className="text-sm text-gray-500">IP Address</label>
                     <p className="font-mono text-sm">{selectedLog.ip_address || '-'}</p>
                   </div>
                 </div>
@@ -540,7 +532,7 @@ export default function AuditPage() {
                 {selectedLog.old_values && Object.keys(selectedLog.old_values).length > 0 && (
                   <div>
                     <label className="text-sm text-gray-500 mb-2 block">
-                      {t('auth.audit.oldValues') || 'Anciennes valeurs'}
+                      Old Values
                     </label>
                     <pre className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm overflow-x-auto">
                       {JSON.stringify(selectedLog.old_values, null, 2)}
@@ -551,7 +543,7 @@ export default function AuditPage() {
                 {selectedLog.new_values && Object.keys(selectedLog.new_values).length > 0 && (
                   <div>
                     <label className="text-sm text-gray-500 mb-2 block">
-                      {t('auth.audit.newValues') || 'Nouvelles valeurs'}
+                      New Values
                     </label>
                     <pre className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm overflow-x-auto">
                       {JSON.stringify(selectedLog.new_values, null, 2)}

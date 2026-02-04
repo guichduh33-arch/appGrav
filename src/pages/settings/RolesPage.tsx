@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import {
   Shield, Plus, Edit2, Trash2, X, Save, Users, Key,
@@ -61,8 +60,8 @@ const MODULE_LABELS: Record<string, { fr: string; en: string; id: string }> = {
 };
 
 export default function RolesPage() {
-  const { i18n } = useTranslation();
-  const lang = (i18n.language?.substring(0, 2) || 'fr') as 'fr' | 'en' | 'id';
+  // Use English
+  const lang = 'en' as const;
 
   const [roles, setRoles] = useState<RoleWithPermissions[]>([]);
   const [permissions, setPermissions] = useState<Permission[]>([]);

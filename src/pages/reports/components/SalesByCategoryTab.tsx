@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
     PieChart,
     Pie,
@@ -15,7 +14,6 @@ import { formatCurrency } from '../../../utils/helpers';
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#8dd1e1'];
 
 export const SalesByCategoryTab = () => {
-    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<CategorySalesStat[]>([]);
     const [dateRange] = useState({
@@ -38,14 +36,14 @@ export const SalesByCategoryTab = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-gray-500">{t('common.loading')}</div>;
+    if (loading) return <div className="p-8 text-center text-gray-500">Loading...</div>;
 
     const totalRevenue = data.reduce((acc, curr) => acc + curr.total_revenue, 0);
 
     return (
         <div className="space-y-6">
             <h3 className="text-lg font-medium text-gray-900">
-                {t('reporting.reports.sales_by_category', 'Sales By Category')}
+                Sales By Category
             </h3>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -98,9 +96,9 @@ export const SalesByCategoryTab = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('common.category', 'Category')}</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reporting.kpi.orders', 'Qty Sold')}</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reporting.kpi.revenue', 'Revenue')}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Qty Sold</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">% Total</th>
                         </tr>
                     </thead>
@@ -124,7 +122,7 @@ export const SalesByCategoryTab = () => {
                         {data.length === 0 && (
                             <tr>
                                 <td colSpan={4} className="px-6 py-12 text-center text-gray-400">
-                                    {t('common.no_data')}
+                                    No data available.
                                 </td>
                             </tr>
                         )}

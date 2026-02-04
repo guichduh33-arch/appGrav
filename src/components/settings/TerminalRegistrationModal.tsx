@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { X, Monitor, Wifi, MapPin, Check } from 'lucide-react';
 import { useTerminal } from '../../hooks/useTerminal';
-import { useTranslation } from 'react-i18next';
 
 interface TerminalRegistrationModalProps {
   onClose: () => void;
@@ -12,7 +11,6 @@ export default function TerminalRegistrationModal({
   onClose,
   onRegistered,
 }: TerminalRegistrationModalProps) {
-  const { t } = useTranslation();
   const { registerTerminal, isLoading, error, deviceId } = useTerminal();
 
   const [terminalName, setTerminalName] = useState('');
@@ -25,11 +23,11 @@ export default function TerminalRegistrationModal({
 
   const validateForm = (): boolean => {
     if (!terminalName.trim()) {
-      setValidationError(t('settings.terminal.nameRequired', 'Terminal name is required'));
+      setValidationError('Terminal name is required');
       return false;
     }
     if (terminalName.trim().length < 3) {
-      setValidationError(t('settings.terminal.nameMinLength', 'Terminal name must be at least 3 characters'));
+      setValidationError('Terminal name must be at least 3 characters');
       return false;
     }
     setValidationError(null);
@@ -61,10 +59,10 @@ export default function TerminalRegistrationModal({
           <div>
             <h2 className="modal__title">
               <Monitor size={24} />
-              {t('settings.terminal.registerTitle', 'Register POS Terminal')}
+              Register POS Terminal
             </h2>
             <p className="modal__subtitle">
-              {t('settings.terminal.registerSubtitle', 'Configure this device as a POS terminal')}
+              Configure this device as a POS terminal
             </p>
           </div>
           <button className="modal__close" onClick={onClose}>
@@ -79,7 +77,7 @@ export default function TerminalRegistrationModal({
             <div className="form-group">
               <label className="form-label">
                 <Wifi size={16} style={{ marginRight: '0.5rem' }} />
-                {t('settings.terminal.deviceId', 'Device ID')}
+                Device ID
               </label>
               <input
                 type="text"
@@ -89,7 +87,7 @@ export default function TerminalRegistrationModal({
                 style={{ fontFamily: 'monospace', fontSize: '0.875rem', backgroundColor: '#f3f4f6' }}
               />
               <small style={{ color: '#6b7280', marginTop: '0.25rem', display: 'block' }}>
-                {t('settings.terminal.deviceIdHelp', 'Auto-generated unique identifier for this device')}
+                Auto-generated unique identifier for this device
               </small>
             </div>
 
@@ -97,14 +95,14 @@ export default function TerminalRegistrationModal({
             <div className="form-group">
               <label className="form-label">
                 <Monitor size={16} style={{ marginRight: '0.5rem' }} />
-                {t('settings.terminal.name', 'Terminal Name')} *
+                Terminal Name *
               </label>
               <input
                 type="text"
                 className="form-input"
                 value={terminalName}
                 onChange={(e) => setTerminalName(e.target.value)}
-                placeholder={t('settings.terminal.namePlaceholder', 'e.g., POS Counter 1')}
+                placeholder="e.g., Cashier 1"
                 autoFocus
                 required
                 minLength={3}
@@ -116,14 +114,14 @@ export default function TerminalRegistrationModal({
             <div className="form-group">
               <label className="form-label">
                 <MapPin size={16} style={{ marginRight: '0.5rem' }} />
-                {t('settings.terminal.location', 'Location')}
+                Location
               </label>
               <input
                 type="text"
                 className="form-input"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder={t('settings.terminal.locationPlaceholder', 'e.g., Main Floor, Near Entrance')}
+                placeholder="e.g., Main Floor, Near Entrance"
                 maxLength={200}
               />
             </div>
@@ -142,10 +140,10 @@ export default function TerminalRegistrationModal({
                 />
                 <div>
                   <span style={{ fontWeight: 500 }}>
-                    {t('settings.terminal.isHub', 'This is the main hub terminal')}
+                    This terminal is the main hub
                   </span>
                   <small style={{ display: 'block', color: '#6b7280', marginTop: '0.25rem' }}>
-                    {t('settings.terminal.isHubHelp', 'The hub coordinates LAN communication between devices')}
+                    The hub coordinates LAN communication between devices
                   </small>
                 </div>
               </label>
@@ -171,7 +169,7 @@ export default function TerminalRegistrationModal({
           {/* Footer */}
           <div className="modal__footer">
             <button type="button" className="btn btn-secondary" onClick={onClose}>
-              {t('common.cancel', 'Cancel')}
+              Cancel
             </button>
             <button
               type="submit"
@@ -181,12 +179,12 @@ export default function TerminalRegistrationModal({
               {isLoading ? (
                 <>
                   <span className="spinner" style={{ marginRight: '0.5rem' }} />
-                  {t('common.registering', 'Registering...')}
+                  Registering...
                 </>
               ) : (
                 <>
                   <Check size={18} />
-                  {t('settings.terminal.register', 'Register Terminal')}
+                  Register Terminal
                 </>
               )}
             </button>

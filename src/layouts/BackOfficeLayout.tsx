@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import {
@@ -18,7 +17,6 @@ import { useSyncReport } from '../hooks/useSyncReport';
 import './BackOfficeLayout.css';
 
 const BackOfficeLayout: React.FC = () => {
-    const { t } = useTranslation();
     const { user, logout } = useAuthStore();
     const navigate = useNavigate();
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -66,75 +64,75 @@ const BackOfficeLayout: React.FC = () => {
                 {/* Navigation */}
                 <nav className="sidebar-nav custom-scrollbar">
                     <div className="nav-section">
-                        {!isCollapsed && <h3 className="section-title fade-in">{t('nav.operations')}</h3>}
-                        <NavLink to="/pos" className="nav-item" title={isCollapsed ? t('nav.pos_terminal') : ""}>
+                        {!isCollapsed && <h3 className="section-title fade-in">Operations</h3>}
+                        <NavLink to="/pos" className="nav-item" title={isCollapsed ? "POS Terminal" : ""}>
                             <Store size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">{t('nav.pos_terminal')}</span>}
+                            {!isCollapsed && <span className="fade-in">POS Terminal</span>}
                         </NavLink>
-                        <NavLink to="/kds" className="nav-item" title={isCollapsed ? t('nav.kitchen_display') : ""}>
+                        <NavLink to="/kds" className="nav-item" title={isCollapsed ? "Kitchen Display" : ""}>
                             <Utensils size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">{t('nav.kitchen_display')}</span>}
+                            {!isCollapsed && <span className="fade-in">Kitchen Display</span>}
                         </NavLink>
                     </div>
 
                     <div className="nav-section">
-                        {!isCollapsed && <h3 className="section-title fade-in">{t('nav.management')}</h3>}
-                        <NavLink to="/products" className="nav-item" title={isCollapsed ? "Produits" : ""}>
+                        {!isCollapsed && <h3 className="section-title fade-in">Management</h3>}
+                        <NavLink to="/products" className="nav-item" title={isCollapsed ? "Products" : ""}>
                             <Coffee size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">Produits</span>}
+                            {!isCollapsed && <span className="fade-in">Products</span>}
                         </NavLink>
-                        <NavLink to="/inventory" className="nav-item" title={isCollapsed ? t('nav.stock_inventory') : ""}>
+                        <NavLink to="/inventory" className="nav-item" title={isCollapsed ? "Stock & Inventory" : ""}>
                             <Boxes size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">{t('nav.stock_inventory')}</span>}
+                            {!isCollapsed && <span className="fade-in">Stock & Inventory</span>}
                             <StockAlertsBadge className={isCollapsed ? '' : 'ml-auto'} />
                         </NavLink>
-                        <NavLink to="/orders" className="nav-item" title={isCollapsed ? t('nav.order_history') : ""}>
+                        <NavLink to="/orders" className="nav-item" title={isCollapsed ? "Order History" : ""}>
                             <FileText size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">{t('nav.order_history')}</span>}
+                            {!isCollapsed && <span className="fade-in">Order History</span>}
                         </NavLink>
-                        <NavLink to="/b2b" className="nav-item" title={isCollapsed ? t('nav.b2b_wholesale') : ""}>
+                        <NavLink to="/b2b" className="nav-item" title={isCollapsed ? "B2B Wholesale" : ""}>
                             <Building2 size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">{t('nav.b2b_wholesale')}</span>}
+                            {!isCollapsed && <span className="fade-in">B2B Wholesale</span>}
                         </NavLink>
-                        <NavLink to="/purchasing/purchase-orders" className="nav-item" title={isCollapsed ? t('nav.purchases') : ""}>
+                        <NavLink to="/purchasing/purchase-orders" className="nav-item" title={isCollapsed ? "Purchases" : ""}>
                             <ShoppingCart size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">{t('nav.purchases')}</span>}
+                            {!isCollapsed && <span className="fade-in">Purchases</span>}
                         </NavLink>
-                        <NavLink to="/purchasing/suppliers" className="nav-item" title={isCollapsed ? "Fournisseurs" : ""}>
+                        <NavLink to="/purchasing/suppliers" className="nav-item" title={isCollapsed ? "Suppliers" : ""}>
                             <Truck size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">Fournisseurs</span>}
+                            {!isCollapsed && <span className="fade-in">Suppliers</span>}
                         </NavLink>
-                        <NavLink to="/customers" className="nav-item" title={isCollapsed ? "Clients" : ""}>
+                        <NavLink to="/customers" className="nav-item" title={isCollapsed ? "Customers" : ""}>
                             <UserCircle size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">Clients</span>}
+                            {!isCollapsed && <span className="fade-in">Customers</span>}
                         </NavLink>
                     </div>
 
                     <div className="nav-section">
-                        {!isCollapsed && <h3 className="section-title fade-in">{t('nav.admin')}</h3>}
-                        <NavLink to="/reports" className="nav-item" title={isCollapsed ? t('nav.reports') : ""}>
+                        {!isCollapsed && <h3 className="section-title fade-in">Admin</h3>}
+                        <NavLink to="/reports" className="nav-item" title={isCollapsed ? "Reports" : ""}>
                             <BarChart3 size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">{t('nav.reports')}</span>}
+                            {!isCollapsed && <span className="fade-in">Reports</span>}
                         </NavLink>
-                        <NavLink to="/users" className="nav-item" title={isCollapsed ? t('nav.team') : ""}>
+                        <NavLink to="/users" className="nav-item" title={isCollapsed ? "Users" : ""}>
                             <Users size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">{t('nav.team')}</span>}
+                            {!isCollapsed && <span className="fade-in">Users</span>}
                         </NavLink>
-                        <NavLink to="/settings" className="nav-item" title={isCollapsed ? t('nav.settings') : ""}>
+                        <NavLink to="/settings" className="nav-item" title={isCollapsed ? "Settings" : ""}>
                             <Settings size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">{t('nav.settings')}</span>}
+                            {!isCollapsed && <span className="fade-in">Settings</span>}
                         </NavLink>
-                        <NavLink to="/settings/roles" className="nav-item" title={isCollapsed ? t('nav.roles') : ""}>
+                        <NavLink to="/settings/roles" className="nav-item" title={isCollapsed ? "Roles" : ""}>
                             <Shield size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">{t('nav.roles') || 'Rôles'}</span>}
+                            {!isCollapsed && <span className="fade-in">Roles</span>}
                         </NavLink>
-                        <NavLink to="/settings/audit" className="nav-item" title={isCollapsed ? t('nav.audit') : ""}>
+                        <NavLink to="/settings/audit" className="nav-item" title={isCollapsed ? "Audit" : ""}>
                             <ScrollText size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">{t('nav.audit') || 'Audit'}</span>}
+                            {!isCollapsed && <span className="fade-in">Audit</span>}
                         </NavLink>
-                        <NavLink to="/settings/sync" className="nav-item" title={isCollapsed ? t('nav.sync') : ""}>
+                        <NavLink to="/settings/sync" className="nav-item" title={isCollapsed ? "Sync" : ""}>
                             <CloudCog size={22} strokeWidth={2} />
-                            {!isCollapsed && <span className="fade-in">{t('nav.sync') || 'Sync'}</span>}
+                            {!isCollapsed && <span className="fade-in">Sync</span>}
                         </NavLink>
                     </div>
                 </nav>
@@ -144,7 +142,7 @@ const BackOfficeLayout: React.FC = () => {
                     <button
                         onClick={toggleSidebar}
                         className="toggle-btn"
-                        title={isCollapsed ? t('nav.expand_menu') : t('nav.collapse_menu')}
+                        title={isCollapsed ? "Expand menu" : "Collapse menu"}
                     >
                         {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
                     </button>
@@ -152,19 +150,19 @@ const BackOfficeLayout: React.FC = () => {
                     <div className="user-section">
                         {!isCollapsed ? (
                             <div className="user-info fade-in">
-                                <NavLink to="/profile" className="user-avatar-sm" title={t('nav.profile') || 'Mon profil'}>
+                                <NavLink to="/profile" className="user-avatar-sm" title="My Profile">
                                     {user?.name?.charAt(0) || 'U'}
                                 </NavLink>
-                                <NavLink to="/profile" className="user-details" title={t('nav.profile') || 'Mon profil'}>
+                                <NavLink to="/profile" className="user-details" title="My Profile">
                                     <span className="user-name">{user?.display_name || user?.name}</span>
                                     <span className="user-role">{user?.role}</span>
                                 </NavLink>
-                                <button onClick={handleLogout} className="logout-btn-mini" title={t('common.logout')}>
+                                <button onClick={handleLogout} className="logout-btn-mini" title="Logout">
                                     <LogOut size={16} />
                                 </button>
                             </div>
                         ) : (
-                            <button onClick={handleLogout} className="logout-btn-icon" title={t('common.logout')}>
+                            <button onClick={handleLogout} className="logout-btn-icon" title="Logout">
                                 <LogOut size={20} />
                             </button>
                         )}

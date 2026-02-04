@@ -1,5 +1,4 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import {
     Boxes,
     TruckIcon,
@@ -13,7 +12,7 @@ import './InventoryLayout.css'
 
 type Tab = {
     id: string
-    labelKey: string
+    label: string
     icon: React.ReactNode
     path: string
 }
@@ -21,50 +20,49 @@ type Tab = {
 const TABS: Tab[] = [
     {
         id: 'stock',
-        labelKey: 'inventory.tabs.stock',
+        label: 'Stock',
         icon: <Boxes size={18} />,
         path: '/inventory'
     },
     {
         id: 'incoming',
-        labelKey: 'inventory.tabs.incoming',
+        label: 'Incoming',
         icon: <TruckIcon size={18} />,
         path: '/inventory/incoming'
     },
     {
         id: 'transfers',
-        labelKey: 'inventory.tabs.transfers',
+        label: 'Transfers',
         icon: <ArrowRightLeft size={18} />,
         path: '/inventory/transfers'
     },
     {
         id: 'wasted',
-        labelKey: 'inventory.tabs.wasted',
+        label: 'Wastage',
         icon: <Trash2 size={18} />,
         path: '/inventory/wasted'
     },
     {
         id: 'production',
-        labelKey: 'inventory.tabs.production',
+        label: 'Production',
         icon: <Factory size={18} />,
         path: '/inventory/production'
     },
     {
         id: 'opname',
-        labelKey: 'inventory.tabs.opname',
+        label: 'Opname',
         icon: <ClipboardCheck size={18} />,
         path: '/inventory/opname'
     },
     {
         id: 'movements',
-        labelKey: 'inventory.tabs.movements',
+        label: 'Movements',
         icon: <ArrowLeftRight size={18} />,
         path: '/inventory/movements'
     }
 ]
 
 export default function InventoryLayout() {
-    const { t } = useTranslation()
     const location = useLocation()
     const navigate = useNavigate()
 
@@ -84,8 +82,8 @@ export default function InventoryLayout() {
     return (
         <div className="inventory-layout">
             <div className="inventory-layout__header">
-                <h1 className="inventory-layout__title">{t('inventory.title', 'Stock & Inventory')}</h1>
-                <p className="inventory-layout__subtitle">{t('inventory.subtitle', 'Manage stock, track movements, and monitor inventory')}</p>
+                <h1 className="inventory-layout__title">Stock & Inventory</h1>
+                <p className="inventory-layout__subtitle">Manage stock, track movements, and monitor inventory</p>
             </div>
             <div className="inventory-layout__tabs">
                 {TABS.map(tab => (
@@ -95,7 +93,7 @@ export default function InventoryLayout() {
                         onClick={() => navigate(tab.path)}
                     >
                         {tab.icon}
-                        <span>{t(tab.labelKey, tab.id)}</span>
+                        <span>{tab.label}</span>
                     </button>
                 ))}
             </div>

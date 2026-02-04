@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
     LayoutDashboard,
@@ -30,7 +29,6 @@ type FilterType = 'all' | 'raw_material' | 'finished' | 'low_stock'
 type InventoryItemWithCategory = Product & { category: { name: string } | null }
 
 export default function StockPage() {
-    const { t } = useTranslation()
     const { data: items = [], isLoading } = useInventoryItems()
     const { isOnline } = useNetworkStatus()
     const { lastSyncAt, cacheCount } = useStockLevelsOffline()
@@ -114,28 +112,28 @@ export default function StockPage() {
                     onClick={() => setActiveFilter('all')}
                 >
                     <LayoutDashboard size={18} />
-                    {t('inventory_page.all', 'All')}
+                    All
                 </button>
                 <button
                     className={`filter-btn ${activeFilter === 'raw_material' ? 'is-active' : ''}`}
                     onClick={() => setActiveFilter('raw_material')}
                 >
                     <Package size={18} />
-                    {t('inventory_page.raw_materials', 'Raw Materials')}
+                    Raw Materials
                 </button>
                 <button
                     className={`filter-btn ${activeFilter === 'finished' ? 'is-active' : ''}`}
                     onClick={() => setActiveFilter('finished')}
                 >
                     <Coffee size={18} />
-                    {t('inventory_page.finished_products', 'Finished Products')}
+                    Finished Products
                 </button>
                 <button
                     className={`filter-btn ${activeFilter === 'low_stock' ? 'is-active' : ''}`}
                     onClick={() => setActiveFilter('low_stock')}
                 >
                     <AlertCircle size={18} />
-                    {t('inventory_page.low_stock', 'Low Stock')}
+                    Low Stock
                     {stats.lowStockItems > 0 && (
                         <span className="filter-badge">{stats.lowStockItems}</span>
                     )}
@@ -149,11 +147,11 @@ export default function StockPage() {
                         <Boxes size={24} />
                     </div>
                     <div className="stat-info">
-                        <div className="stat-label">{t('inventory_page.stats.total_products', 'Total Products')}</div>
+                        <div className="stat-label">Total Products</div>
                         <div className="stat-value">{stats.totalItems}</div>
                         <div className="stat-trend up">
                             <TrendingUp size={12} />
-                            {t('inventory_page.stats.in_stock', 'In stock')}
+                            In stock
                         </div>
                     </div>
                 </div>
@@ -163,10 +161,10 @@ export default function StockPage() {
                         <Package size={24} />
                     </div>
                     <div className="stat-info">
-                        <div className="stat-label">{t('inventory_page.stats.raw_materials', 'Raw Materials')}</div>
+                        <div className="stat-label">Raw Materials</div>
                         <div className="stat-value">{stats.rawMaterials}</div>
                         <div className="stat-trend up">
-                            {t('inventory_page.stats.ingredients', 'Ingredients')}
+                            Ingredients
                         </div>
                     </div>
                 </div>
@@ -176,10 +174,10 @@ export default function StockPage() {
                         <Coffee size={24} />
                     </div>
                     <div className="stat-info">
-                        <div className="stat-label">{t('inventory_page.stats.finished_products', 'Finished Products')}</div>
+                        <div className="stat-label">Finished Products</div>
                         <div className="stat-value">{stats.finishedProducts}</div>
                         <div className="stat-trend up">
-                            {t('inventory_page.stats.ready_to_sell', 'Ready to sell')}
+                            Ready to sell
                         </div>
                     </div>
                 </div>
@@ -189,12 +187,12 @@ export default function StockPage() {
                         <AlertTriangle size={24} />
                     </div>
                     <div className="stat-info">
-                        <div className="stat-label">{t('inventory_page.stats.low_stock_alerts', 'Low Stock Alerts')}</div>
+                        <div className="stat-label">Low Stock Alerts</div>
                         <div className="stat-value">{stats.lowStockItems}</div>
                         <div className={`stat-trend ${stats.lowStockItems > 0 ? 'down' : 'up'}`}>
                             {stats.lowStockItems > 0
-                                ? t('inventory_page.stats.needs_attention', 'Needs attention')
-                                : t('inventory_page.stats.all_ok', 'All OK')}
+                                ? 'Needs attention'
+                                : 'All OK'}
                         </div>
                     </div>
                 </div>

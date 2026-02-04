@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Save, Clock, AlertCircle } from 'lucide-react';
 import { useBusinessHours, useUpdateBusinessHours } from '../../hooks/settings';
 import type { BusinessHours } from '../../types/settings';
@@ -12,7 +11,6 @@ const DAY_NAMES: Record<string, string[]> = {
 };
 
 const BusinessHoursPage = () => {
-  const { i18n } = useTranslation();
   const { data: businessHours, isLoading } = useBusinessHours();
   const updateHours = useUpdateBusinessHours();
 
@@ -20,9 +18,8 @@ const BusinessHoursPage = () => {
   const [pendingChanges, setPendingChanges] = useState<Set<number>>(new Set());
   const [isSaving, setIsSaving] = useState(false);
 
-  // Language
-  const lang = i18n.language?.substring(0, 2) || 'fr';
-  const dayNames = DAY_NAMES[lang] || DAY_NAMES.fr;
+  // Use English day names
+  const dayNames = DAY_NAMES.en;
 
   // Initialize local state
   useEffect(() => {

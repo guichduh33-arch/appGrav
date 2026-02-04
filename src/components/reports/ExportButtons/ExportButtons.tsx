@@ -13,7 +13,6 @@ import {
   type PdfExportOptions,
   type PdfSummary,
 } from '@/services/reports/pdfExport';
-import { useTranslation } from 'react-i18next';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ExportConfig<T extends Record<string, any>> {
@@ -51,7 +50,6 @@ export function ExportButtons<T extends Record<string, any>>({
   onExportStart,
   onExportComplete,
 }: ExportButtonsProps<T>) {
-  const { t } = useTranslation();
   const { canExport } = useReportPermissions();
   const { user } = useAuthStore();
   const [isExportingCsv, setIsExportingCsv] = useState(false);
@@ -148,7 +146,7 @@ export function ExportButtons<T extends Record<string, any>>({
               : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
           }
         `}
-        title={t('reports.exportCsv', 'Exporter en CSV')}
+        title="Export to CSV"
       >
         {isExportingCsv ? (
           <Loader2 className="w-4 h-4 animate-spin" />
@@ -173,7 +171,7 @@ export function ExportButtons<T extends Record<string, any>>({
               : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
           }
         `}
-        title={t('reports.exportPdf', 'Exporter en PDF')}
+        title="Export to PDF"
       >
         {isExportingPdf ? (
           <Loader2 className="w-4 h-4 animate-spin" />
@@ -200,7 +198,6 @@ export function ExportDropdown<T extends Record<string, any>>({
   disabled = false,
   className = '',
 }: ExportDropdownProps<T>) {
-  const { t } = useTranslation();
   const { canExport } = useReportPermissions();
   const { user } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
@@ -280,7 +277,7 @@ export function ExportDropdown<T extends Record<string, any>>({
         ) : (
           <Download className="w-4 h-4" />
         )}
-        <span>{t('reports.export', 'Exporter')}</span>
+        <span>Export</span>
       </button>
 
       {isOpen && (

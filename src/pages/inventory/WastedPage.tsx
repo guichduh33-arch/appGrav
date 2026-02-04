@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
     Trash2,
     Plus,
@@ -39,16 +38,15 @@ interface Product {
 }
 
 const WASTE_REASONS = [
-    { value: 'expired', labelKey: 'inventory.wasted.reason_expired' },
-    { value: 'damaged', labelKey: 'inventory.wasted.reason_damaged' },
-    { value: 'quality', labelKey: 'inventory.wasted.reason_quality' },
-    { value: 'spillage', labelKey: 'inventory.wasted.reason_spillage' },
-    { value: 'theft', labelKey: 'inventory.wasted.reason_theft' },
-    { value: 'other', labelKey: 'inventory.wasted.reason_other' }
+    { value: 'expired', label: 'Expired' },
+    { value: 'damaged', label: 'Damaged' },
+    { value: 'quality', label: 'Quality Issue' },
+    { value: 'spillage', label: 'Spillage' },
+    { value: 'theft', label: 'Theft' },
+    { value: 'other', label: 'Other' }
 ]
 
 export default function WastedPage() {
-    const { t } = useTranslation()
     const { user } = useAuthStore()
     const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>([])
     const [products, setProducts] = useState<Product[]>([])
@@ -142,7 +140,7 @@ export default function WastedPage() {
             setProducts(productsData || [])
         } catch (err) {
             console.error('Error loading data:', err)
-            toast.error(t('common.error', 'Error loading data'))
+            toast.error('Error loading data')
         } finally {
             setIsLoading(false)
         }
@@ -180,14 +178,14 @@ export default function WastedPage() {
 
     const handleSave = async () => {
         if (!selectedProduct || !quantity || parseFloat(quantity) <= 0) {
-            toast.error(t('inventory.wasted.error_required', 'Please select a product and enter a quantity'))
+            toast.error('Please select a product and enter a quantity')
             return
         }
 
         const qty = parseFloat(quantity)
         const currentStock = selectedProduct.current_stock ?? 0
         if (qty > currentStock) {
-            toast.error(t('inventory.wasted.error_insufficient', 'Quantity exceeds current stock'))
+            toast.error('Quantity exceeds current stock')
             return
         }
 
@@ -218,13 +216,13 @@ export default function WastedPage() {
 
             if (updateError) throw updateError
 
-            toast.success(t('inventory.wasted.success', 'Waste recorded successfully'))
+            toast.success('Waste recorded successfully')
             setShowModal(false)
             resetForm()
             loadData()
         } catch (err) {
             console.error('Error saving waste:', err)
-            toast.error(t('common.error', 'Error saving waste record'))
+            toast.error('Error saving waste record')
         } finally {
             setIsSaving(false)
         }
@@ -240,7 +238,7 @@ export default function WastedPage() {
 
     const getReasonLabel = (reasonValue: string) => {
         const found = WASTE_REASONS.find(r => r.value === reasonValue)
-        return found ? t(found.labelKey, reasonValue) : reasonValue
+        return found ? found.label : reasonValue
     }
 
     return (
@@ -253,7 +251,7 @@ export default function WastedPage() {
                     </div>
                     <div className="wasted-stat__info">
                         <span className="wasted-stat__value">{stats.totalRecords}</span>
-                        <span className="wasted-stat__label">{t('inventory.wasted.total_records', 'Total Records')}</span>
+                        <span className="wasted-stat__label">Total Records</span>
                     </div>
                 </div>
                 <div className="wasted-stat">
@@ -262,7 +260,7 @@ export default function WastedPage() {
                     </div>
                     <div className="wasted-stat__info">
                         <span className="wasted-stat__value">{stats.totalQuantity.toFixed(0)}</span>
-                        <span className="wasted-stat__label">{t('inventory.wasted.total_quantity', 'Total Units Lost')}</span>
+                        <span className="wasted-stat__label">Total Units Lost</span>
                     </div>
                 </div>
                 <div className="wasted-stat">
@@ -271,7 +269,7 @@ export default function WastedPage() {
                     </div>
                     <div className="wasted-stat__info">
                         <span className="wasted-stat__value">{formatCurrency(stats.totalCost)}</span>
-                        <span className="wasted-stat__label">{t('inventory.wasted.total_cost', 'Total Cost Lost')}</span>
+                        <span className="wasted-stat__label">Total Cost Lost</span>
                     </div>
                 </div>
             </div>
@@ -282,7 +280,7 @@ export default function WastedPage() {
                     <Search size={18} />
                     <input
                         type="text"
-                        placeholder={t('inventory.wasted.search_placeholder', 'Search by product, reason...')}
+                        placeholder="Search by product, reason..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -292,30 +290,30 @@ export default function WastedPage() {
                         className={`filter-btn ${dateFilter === 'today' ? 'active' : ''}`}
                         onClick={() => setDateFilter('today')}
                     >
-                        {t('inventory.wasted.today', 'Today')}
+                        Today
                     </button>
                     <button
                         className={`filter-btn ${dateFilter === 'week' ? 'active' : ''}`}
                         onClick={() => setDateFilter('week')}
                     >
-                        {t('inventory.wasted.week', '7 Days')}
+                        7 Days
                     </button>
                     <button
                         className={`filter-btn ${dateFilter === 'month' ? 'active' : ''}`}
                         onClick={() => setDateFilter('month')}
                     >
-                        {t('inventory.wasted.month', '30 Days')}
+                        30 Days
                     </button>
                     <button
                         className={`filter-btn ${dateFilter === 'all' ? 'active' : ''}`}
                         onClick={() => setDateFilter('all')}
                     >
-                        {t('common.all', 'All')}
+                        All
                     </button>
                 </div>
                 <button className="btn-primary" onClick={() => setShowModal(true)}>
                     <Plus size={18} />
-                    {t('inventory.wasted.add_waste', 'Record Waste')}
+                    Record Waste
                 </button>
             </div>
 
@@ -324,25 +322,25 @@ export default function WastedPage() {
                 {isLoading ? (
                     <div className="wasted-loading">
                         <div className="spinner" />
-                        <span>{t('common.loading', 'Loading...')}</span>
+                        <span>Loading...</span>
                     </div>
                 ) : filteredRecords.length === 0 ? (
                     <div className="wasted-empty">
                         <Trash2 size={48} />
-                        <h3>{t('inventory.wasted.no_records', 'No waste records found')}</h3>
-                        <p>{t('inventory.wasted.no_records_desc', 'Click "Record Waste" to add a new entry')}</p>
+                        <h3>No waste records found</h3>
+                        <p>Click "Record Waste" to add a new entry</p>
                     </div>
                 ) : (
                     <table className="wasted-table">
                         <thead>
                             <tr>
-                                <th>{t('inventory.wasted.date', 'Date')}</th>
-                                <th>{t('inventory.wasted.product', 'Product')}</th>
-                                <th>{t('inventory.wasted.quantity', 'Quantity')}</th>
-                                <th>{t('inventory.wasted.reason', 'Reason')}</th>
-                                <th>{t('inventory.wasted.cost', 'Cost')}</th>
-                                <th>{t('inventory.wasted.recorded_by', 'Recorded By')}</th>
-                                <th>{t('inventory.wasted.notes', 'Notes')}</th>
+                                <th>Date</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Reason</th>
+                                <th>Cost</th>
+                                <th>Recorded By</th>
+                                <th>Notes</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -389,19 +387,19 @@ export default function WastedPage() {
                 <div className="wasted-modal-overlay">
                     <div className="wasted-modal">
                         <div className="wasted-modal__header">
-                            <h3>{t('inventory.wasted.add_waste', 'Record Waste')}</h3>
-                            <button className="btn-close" onClick={() => { setShowModal(false); resetForm(); }} title={t('common.close', 'Fermer')} aria-label={t('common.close', 'Fermer')}>
+                            <h3>Record Waste</h3>
+                            <button className="btn-close" onClick={() => { setShowModal(false); resetForm(); }} title="Close" aria-label="Close">
                                 <X size={20} />
                             </button>
                         </div>
                         <div className="wasted-modal__body">
                             {/* Product Selection */}
                             <div className="form-group">
-                                <label>{t('inventory.wasted.select_product', 'Product')} *</label>
+                                <label>Product *</label>
                                 <div className="product-selector">
                                     <input
                                         type="text"
-                                        placeholder={t('inventory.wasted.search_product', 'Search product...')}
+                                        placeholder="Search product..."
                                         value={productSearch}
                                         onChange={(e) => setProductSearch(e.target.value)}
                                     />
@@ -429,9 +427,9 @@ export default function WastedPage() {
                                     <div className="selected-product">
                                         <span>{selectedProduct.name}</span>
                                         <span className="stock-info">
-                                            {t('inventory.wasted.current_stock', 'Current stock')}: {selectedProduct.current_stock} {selectedProduct.unit}
+                                            Current stock: {selectedProduct.current_stock} {selectedProduct.unit}
                                         </span>
-                                        <button onClick={() => { setSelectedProduct(null); setProductSearch(''); }} title={t('common.clear', 'Effacer')} aria-label={t('common.clear', 'Effacer')}>
+                                        <button onClick={() => { setSelectedProduct(null); setProductSearch(''); }} title="Clear" aria-label="Clear">
                                             <X size={16} />
                                         </button>
                                     </div>
@@ -440,7 +438,7 @@ export default function WastedPage() {
 
                             {/* Quantity */}
                             <div className="form-group">
-                                <label>{t('inventory.wasted.quantity', 'Quantity')} *</label>
+                                <label>Quantity *</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -454,11 +452,11 @@ export default function WastedPage() {
 
                             {/* Reason */}
                             <div className="form-group">
-                                <label>{t('inventory.wasted.reason', 'Reason')} *</label>
-                                <select value={reason} onChange={(e) => setReason(e.target.value)} aria-label={t('inventory.wasted.select_reason', 'Sélectionner une raison')}>
+                                <label>Reason *</label>
+                                <select value={reason} onChange={(e) => setReason(e.target.value)} aria-label="Select reason">
                                     {WASTE_REASONS.map(r => (
                                         <option key={r.value} value={r.value}>
-                                            {t(r.labelKey, r.value)}
+                                            {r.label}
                                         </option>
                                     ))}
                                 </select>
@@ -466,22 +464,22 @@ export default function WastedPage() {
 
                             {/* Notes */}
                             <div className="form-group">
-                                <label>{t('inventory.wasted.notes', 'Notes')}</label>
+                                <label>Notes</label>
                                 <textarea
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
-                                    placeholder={t('inventory.wasted.notes_placeholder', 'Additional details...')}
+                                    placeholder="Additional details..."
                                     rows={3}
                                 />
                             </div>
                         </div>
                         <div className="wasted-modal__footer">
                             <button className="btn-secondary" onClick={() => { setShowModal(false); resetForm(); }}>
-                                {t('common.cancel', 'Cancel')}
+                                Cancel
                             </button>
                             <button className="btn-primary" onClick={handleSave} disabled={isSaving}>
                                 <Save size={18} />
-                                {isSaving ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
+                                {isSaving ? 'Saving...' : 'Save'}
                             </button>
                         </div>
                     </div>

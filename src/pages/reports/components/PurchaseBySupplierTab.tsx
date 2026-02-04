@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
     BarChart,
     Bar,
@@ -17,7 +16,6 @@ import { formatCurrency } from '../../../utils/helpers';
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 export const PurchaseBySupplierTab = () => {
-    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<any[]>([]);
     const [dateRange] = useState({
@@ -40,7 +38,7 @@ export const PurchaseBySupplierTab = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-gray-500">{t('common.loading')}</div>;
+    if (loading) return <div className="p-8 text-center text-gray-500">Loading...</div>;
 
     const totalValue = data.reduce((acc, curr) => acc + curr.total_value, 0);
 
@@ -131,7 +129,7 @@ export const PurchaseBySupplierTab = () => {
                         {data.length === 0 && (
                             <tr>
                                 <td colSpan={5} className="px-6 py-12 text-center text-gray-400">
-                                    {t('common.no_data')}
+                                    No data available.
                                 </td>
                             </tr>
                         )}

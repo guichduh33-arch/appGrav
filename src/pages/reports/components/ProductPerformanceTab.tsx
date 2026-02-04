@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Package } from 'lucide-react';
 import {
     BarChart,
@@ -15,7 +14,6 @@ import { ProductPerformanceStat } from '../../../types/reporting';
 import { formatCurrency } from '../../../utils/helpers';
 
 export const ProductPerformanceTab = () => {
-    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<ProductPerformanceStat[]>([]);
     const [dateRange] = useState({
@@ -38,7 +36,7 @@ export const ProductPerformanceTab = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-gray-500">{t('common.loading')}</div>;
+    if (loading) return <div className="p-8 text-center text-gray-500">Loading...</div>;
 
     const top5 = data.slice(0, 5);
 
@@ -46,7 +44,7 @@ export const ProductPerformanceTab = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h3 className="text-lg font-medium text-gray-900">
-                    {t('reporting.reports.product_performance_title', 'Top Products by Revenue')}
+                    Top Products by Revenue
                 </h3>
             </div>
 
@@ -77,10 +75,10 @@ export const ProductPerformanceTab = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('common.product', 'Product')}</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('inventory.quantity', 'Qty Sold')}</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reporting.kpi.revenue', 'Revenue')}</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reporting.kpi.avg_price', 'Avg Price')}</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Qty Sold</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Price</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -106,7 +104,7 @@ export const ProductPerformanceTab = () => {
                         {data.length === 0 && (
                             <tr>
                                 <td colSpan={4} className="px-6 py-12 text-center text-gray-400">
-                                    {t('common.no_data')}
+                                    No data available.
                                 </td>
                             </tr>
                         )}

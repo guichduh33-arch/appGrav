@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
 import { DollarSign, AlertTriangle, CheckCircle, Clock, Loader2, User } from 'lucide-react';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
@@ -10,7 +9,6 @@ import { formatCurrency as formatCurrencyPdf } from '@/services/reports/pdfExpor
 import type { ISessionCashBalanceReport } from '@/types/reporting';
 
 export function SessionCashBalanceTab() {
-  const { t } = useTranslation();
   const { dateRange } = useDateRange({ defaultPreset: 'last7days' });
 
   const { data, isLoading, error } = useQuery({
@@ -108,7 +106,7 @@ export function SessionCashBalanceTab() {
   if (error) {
     return (
       <div className="p-8 text-center text-red-600">
-        {t('common.error', 'Erreur lors du chargement des données')}
+        Error loading data
       </div>
     );
   }

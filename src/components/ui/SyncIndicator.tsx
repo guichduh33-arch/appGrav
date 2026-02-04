@@ -11,7 +11,6 @@
 
 import React from 'react';
 import { RefreshCw, AlertCircle, CloudOff } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { useSyncQueue } from '../../hooks/useSyncQueue';
 
 /**
@@ -57,7 +56,6 @@ export const SyncIndicator: React.FC<ISyncIndicatorProps> = ({
   compact = false,
   className = '',
 }) => {
-  const { t } = useTranslation();
   const { pendingTotal, isSyncing, counts } = useSyncQueue();
 
   // Don't show anything if no pending items and not syncing (all synced)
@@ -85,7 +83,7 @@ export const SyncIndicator: React.FC<ISyncIndicatorProps> = ({
         `.trim()}
         role="status"
         aria-live="polite"
-        aria-label={t('sync.syncing')}
+        aria-label="Syncing..."
       >
         <RefreshCw
           className="w-5 h-5 text-blue-600 animate-spin"
@@ -93,7 +91,7 @@ export const SyncIndicator: React.FC<ISyncIndicatorProps> = ({
         />
         {!compact && (
           <span className="text-sm font-medium text-blue-600 whitespace-nowrap">
-            {t('sync.syncing')}
+            Syncing...
           </span>
         )}
       </div>
@@ -102,6 +100,7 @@ export const SyncIndicator: React.FC<ISyncIndicatorProps> = ({
 
   // Has failed items - show error state
   if (counts.failed > 0) {
+    const failedLabel = `${counts.failed} failed`;
     return (
       <div
         className={`
@@ -113,7 +112,7 @@ export const SyncIndicator: React.FC<ISyncIndicatorProps> = ({
         `.trim()}
         role="status"
         aria-live="polite"
-        aria-label={t('sync.failed_count', { count: counts.failed })}
+        aria-label={failedLabel}
       >
         <div className="relative">
           <AlertCircle
@@ -128,7 +127,7 @@ export const SyncIndicator: React.FC<ISyncIndicatorProps> = ({
         </div>
         {!compact && (
           <span className="text-sm font-medium text-red-600 whitespace-nowrap">
-            {t('sync.failed_count', { count: counts.failed })}
+            {failedLabel}
           </span>
         )}
       </div>
@@ -136,6 +135,7 @@ export const SyncIndicator: React.FC<ISyncIndicatorProps> = ({
   }
 
   // Pending items - show pending state
+  const pendingLabel = `${pendingTotal} pending`;
   return (
     <div
       className={`
@@ -147,7 +147,7 @@ export const SyncIndicator: React.FC<ISyncIndicatorProps> = ({
       `.trim()}
       role="status"
       aria-live="polite"
-      aria-label={t('sync.pending_count', { count: pendingTotal })}
+      aria-label={pendingLabel}
     >
       <div className="relative">
         <CloudOff
@@ -162,7 +162,7 @@ export const SyncIndicator: React.FC<ISyncIndicatorProps> = ({
       </div>
       {!compact && (
         <span className="text-sm font-medium text-orange-600 whitespace-nowrap">
-          {t('sync.pending_count', { count: pendingTotal })}
+          {pendingLabel}
         </span>
       )}
     </div>

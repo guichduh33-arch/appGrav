@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next'
 import type { Product } from '../../types/database'
 import { formatPrice } from '../../utils/helpers'
 import './ProductGrid.css'
@@ -13,7 +12,6 @@ interface ProductGridProps {
 
 
 export default function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) {
-    const { t } = useTranslation()
     if (isLoading) {
         return (
             <div className="products-grid">
@@ -28,7 +26,7 @@ export default function ProductGrid({ products, onProductClick, isLoading }: Pro
         return (
             <div className="products-empty">
                 <span className="products-empty__icon">🔍</span>
-                <p>{t('inventory_table.no_items')}</p>
+                <p>No items found</p>
             </div>
         )
     }

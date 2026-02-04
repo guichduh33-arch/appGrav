@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import { ArrowLeft, ArrowRightLeft, CheckCircle, Clock, Package, AlertTriangle, WifiOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useTransfer, useReceiveTransfer } from '@/hooks/inventory'
@@ -26,7 +25,6 @@ const LOCALE_MAP: Record<string, string> = {
 export default function TransferDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { t, i18n } = useTranslation()
   const { isOnline } = useNetworkStatus()
 
   const { data: transfer, isLoading, error } = useTransfer(id ?? null)
@@ -80,11 +78,11 @@ export default function TransferDetailPage() {
       const quantity = itemQuantities.get(item.id) ?? 0
 
       if (quantity < 0) {
-        errors.set(item.id, t('inventory.transfers.reception.validation.negativeQuantity'))
+        errors.set(item.id, 'Quantity cannot be negative')
       }
 
       if (quantity > item.quantity_requested && !receptionNotes.trim()) {
-        errors.set(item.id, t('inventory.transfers.reception.validation.overQuantityNeedsNote'))
+        errors.set(item.id, 'Receiving more than requested requires a note')
       }
     }
 
@@ -109,7 +107,7 @@ export default function TransferDetailPage() {
     if (!canReceive || !transfer) return
 
     if (!validateForm()) {
-      toast.error(t('inventory.transfers.reception.validation.fixErrors'))
+      toast.error('Please fix the errors before proceeding')
       return
     }
 
@@ -124,26 +122,26 @@ export default function TransferDetailPage() {
         items,
         receptionNotes: receptionNotes.trim() || undefined
       })
-      toast.success(t('inventory.transfers.reception.success'))
+      toast.success('Transfer received successfully')
       navigate('/inventory/transfers')
     } catch (err) {
       console.error('Reception error:', err)
-      toast.error(t('inventory.transfers.reception.error'))
+      toast.error('Error receiving transfer')
     }
   }
 
   // Show error toast
   useEffect(() => {
     if (error) {
-      toast.error(t('inventory.transfers.messages.loadError'))
+      toast.error('Error loading transfer')
     }
-  }, [error, t])
+  }, [error])
 
   // Loading state
   if (isLoading) {
     return (
       <div className="transfer-detail-page">
-        <div className="transfer-detail-loading">{t('common.loading')}</div>
+        <div className="transfer-detail-loading">Loading...</div>
       </div>
     )
   }
@@ -154,10 +152,10 @@ export default function TransferDetailPage() {
       <div className="transfer-detail-page">
         <div className="transfer-detail-error">
           <AlertTriangle size={48} />
-          <h3>{t('common.error')}</h3>
-          <p>{t('inventory.transfers.reception.notFound')}</p>
+          <h3>Error</h3>
+          <p>Transfer not found</p>
           <button className="btn btn-primary" onClick={() => navigate('/inventory/transfers')}>
-            {t('common.back')}
+            Back
           </button>
         </div>
       </div>
@@ -167,13 +165,25 @@ export default function TransferDetailPage() {
   const statusColor = STATUS_COLORS[transfer.status as keyof typeof STATUS_COLORS] ?? '#6b7280'
   const isReceived = transfer.status === 'received'
 
+  // Get status label
+  const getStatusLabel = (status: string): string => {
+    const statusLabels: Record<string, string> = {
+      draft: 'Draft',
+      pending: 'Pending',
+      in_transit: 'In Transit',
+      received: 'Received',
+      cancelled: 'Cancelled'
+    }
+    return statusLabels[status] || status
+  }
+
   return (
     <div className="transfer-detail-page">
       {/* Offline Banner */}
       {!isOnline && (
         <div className="offline-banner">
           <WifiOff size={18} />
-          <span>{t('inventory.transfers.reception.offlineBlocked')}</span>
+          <span>Reception is blocked while offline</span>
         </div>
       )}
 
@@ -182,7 +192,7 @@ export default function TransferDetailPage() {
         <div className="transfer-detail-header__left">
           <button className="btn btn-ghost" onClick={() => navigate('/inventory/transfers')}>
             <ArrowLeft size={20} />
-            {t('common.back')}
+            Back
           </button>
           <div className="transfer-detail-header__info">
             <h1 className="transfer-detail-title">
@@ -194,7 +204,7 @@ export default function TransferDetailPage() {
               style={{ background: `${statusColor}20`, color: statusColor }}
             >
               {isReceived ? <CheckCircle size={14} /> : <Clock size={14} />}
-              {t(`inventory.transfers.status.${transfer.status}`)}
+              {getStatusLabel(transfer.status ?? 'draft')}
             </span>
           </div>
         </div>
@@ -203,33 +213,33 @@ export default function TransferDetailPage() {
       {/* Route Information */}
       <div className="transfer-detail-route">
         <div className="route-location from">
-          <span className="route-label">{t('inventory.transfers.form.from')}</span>
-          <span className="route-name">{transfer.from_location?.name ?? t('common.unknown')}</span>
+          <span className="route-label">From</span>
+          <span className="route-name">{transfer.from_location?.name ?? 'Unknown'}</span>
         </div>
         <ArrowRightLeft size={32} className="route-arrow" />
         <div className="route-location to">
-          <span className="route-label">{t('inventory.transfers.form.to')}</span>
-          <span className="route-name">{transfer.to_location?.name ?? t('common.unknown')}</span>
+          <span className="route-label">To</span>
+          <span className="route-name">{transfer.to_location?.name ?? 'Unknown'}</span>
         </div>
       </div>
 
       {/* Transfer Info */}
       <div className="transfer-detail-info">
         <div className="info-item">
-          <span className="info-label">{t('inventory.transfers.form.date')}</span>
+          <span className="info-label">Date</span>
           <span className="info-value">
-            {new Date(transfer.transfer_date).toLocaleDateString(LOCALE_MAP[i18n.language] || 'fr-FR')}
+            {new Date(transfer.transfer_date).toLocaleDateString('en-US')}
           </span>
         </div>
         <div className="info-item">
-          <span className="info-label">{t('inventory.transfers.form.responsible')}</span>
+          <span className="info-label">Responsible</span>
           <span className="info-value">{transfer.responsible_person}</span>
         </div>
         {isReceived && transfer.approved_at && (
           <div className="info-item">
-            <span className="info-label">{t('inventory.transfers.reception.statusReceived')}</span>
+            <span className="info-label">Received On</span>
             <span className="info-value">
-              {new Date(transfer.approved_at).toLocaleDateString(LOCALE_MAP[i18n.language] || 'fr-FR')}
+              {new Date(transfer.approved_at).toLocaleDateString('en-US')}
             </span>
           </div>
         )}
@@ -239,7 +249,7 @@ export default function TransferDetailPage() {
       {isReceived && (
         <div className="already-received-notice">
           <CheckCircle size={20} />
-          <span>{t('inventory.transfers.reception.alreadyReceived')}</span>
+          <span>This transfer has already been received</span>
         </div>
       )}
 
@@ -247,7 +257,7 @@ export default function TransferDetailPage() {
       {hasVariances && !isReceived && (
         <div className="variance-warning">
           <AlertTriangle size={20} />
-          <span>{t('inventory.transfers.reception.varianceWarning')}</span>
+          <span>There are variances between requested and received quantities</span>
         </div>
       )}
 
@@ -255,17 +265,17 @@ export default function TransferDetailPage() {
       <div className="transfer-detail-items">
         <h2 className="items-title">
           <Package size={20} />
-          {t('inventory.transfers.form.items')} ({transfer.items.length})
+          Items ({transfer.items.length})
         </h2>
 
         <div className="items-table-wrapper">
           <table className="items-table">
             <thead>
               <tr>
-                <th>{t('inventory.transfers.form.product')}</th>
-                <th className="text-center">{t('inventory.transfers.reception.quantityRequested')}</th>
-                <th className="text-center">{t('inventory.transfers.reception.quantityReceived')}</th>
-                <th className="text-center">{t('inventory.transfers.reception.variance')}</th>
+                <th>Product</th>
+                <th className="text-center">Qty Requested</th>
+                <th className="text-center">Qty Received</th>
+                <th className="text-center">Variance</th>
               </tr>
             </thead>
             <tbody>
@@ -282,7 +292,7 @@ export default function TransferDetailPage() {
                   <tr key={item.id} className={hasError ? 'has-error' : ''}>
                     <td>
                       <div className="product-cell">
-                        <span className="product-name">{item.product?.name ?? t('common.unknown')}</span>
+                        <span className="product-name">{item.product?.name ?? 'Unknown'}</span>
                         {item.product?.sku && (
                           <span className="product-sku">{item.product.sku}</span>
                         )}
@@ -328,14 +338,14 @@ export default function TransferDetailPage() {
       {!isReceived && (
         <div className="reception-notes-section">
           <label className="notes-label">
-            {t('inventory.transfers.reception.receptionNotes')}
+            Reception Notes
             {hasVariances && <span className="required">*</span>}
           </label>
           <textarea
             className="reception-notes-input"
             value={receptionNotes}
             onChange={(e) => setReceptionNotes(e.target.value)}
-            placeholder={t('inventory.transfers.reception.receptionNotesPlaceholder')}
+            placeholder="Add any notes about the reception..."
             rows={3}
             disabled={!canReceive}
           />
@@ -345,7 +355,7 @@ export default function TransferDetailPage() {
       {/* Existing Notes */}
       {transfer.notes && (
         <div className="existing-notes-section">
-          <label className="notes-label">{t('inventory.transfers.form.notes')}</label>
+          <label className="notes-label">Notes</label>
           <div className="existing-notes">{transfer.notes}</div>
         </div>
       )}
@@ -357,7 +367,7 @@ export default function TransferDetailPage() {
             className="btn btn-secondary"
             onClick={() => navigate('/inventory/transfers')}
           >
-            {t('common.cancel')}
+            Cancel
           </button>
           <button
             className="btn btn-primary"
@@ -366,8 +376,8 @@ export default function TransferDetailPage() {
           >
             <CheckCircle size={18} />
             {receiveTransferMutation.isPending
-              ? t('common.loading')
-              : t('inventory.transfers.reception.receiveButton')
+              ? 'Loading...'
+              : 'Receive Transfer'
             }
           </button>
         </div>

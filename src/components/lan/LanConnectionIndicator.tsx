@@ -6,7 +6,6 @@
  */
 
 import { Wifi, WifiOff, Loader2 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import type { TLanConnectionStatus } from '@/stores/lanStore';
 
 interface ILanConnectionIndicatorProps {
@@ -24,8 +23,6 @@ export function LanConnectionIndicator({
   className = '',
   showLabel = false,
 }: ILanConnectionIndicatorProps) {
-  const { t } = useTranslation();
-
   const getIcon = () => {
     switch (status) {
       case 'connected':
@@ -42,32 +39,32 @@ export function LanConnectionIndicator({
   const getLabel = () => {
     switch (status) {
       case 'connected':
-        return t('lan.client.connected');
+        return 'Connected to LAN hub';
       case 'connecting':
         if (reconnectAttempts > 0) {
-          return t('lan.client.reconnectAttempt', { count: reconnectAttempts, max: maxReconnectAttempts });
+          return `Reconnecting (${reconnectAttempts}/${maxReconnectAttempts})`;
         }
-        return t('lan.client.connecting');
+        return 'Connecting to LAN hub...';
       case 'error':
-        return t('lan.client.error');
+        return 'Connection error';
       default:
-        return t('lan.client.disconnected');
+        return 'Disconnected from LAN hub';
     }
   };
 
   const getTooltip = () => {
     switch (status) {
       case 'connected':
-        return t('lan.client.connected');
+        return 'Connected to LAN hub';
       case 'connecting':
         if (reconnectAttempts > 0) {
-          return `${t('lan.client.reconnecting')} (${reconnectAttempts}/${maxReconnectAttempts})`;
+          return `Reconnecting (${reconnectAttempts}/${maxReconnectAttempts})`;
         }
-        return t('lan.client.connecting');
+        return 'Connecting to LAN hub...';
       case 'error':
-        return `${t('lan.client.error')} - ${t('lan.client.reconnectAttempt', { count: reconnectAttempts, max: maxReconnectAttempts })}`;
+        return `Connection error - Reconnecting (${reconnectAttempts}/${maxReconnectAttempts})`;
       default:
-        return t('lan.client.disconnected');
+        return 'Disconnected from LAN hub';
     }
   };
 

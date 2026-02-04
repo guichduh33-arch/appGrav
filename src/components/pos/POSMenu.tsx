@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
     Settings, LogOut, FileText, History, Receipt,
@@ -34,7 +33,6 @@ export default function POSMenu({
     onOpenShift,
     onCloseShift
 }: POSMenuProps) {
-    const { t } = useTranslation()
     const navigate = useNavigate()
     const { user, logout } = useAuthStore()
     const menuRef = useRef<HTMLDivElement>(null)
@@ -94,14 +92,14 @@ export default function POSMenu({
                 <div className="pos-menu__items">
                     <button className="pos-menu__item" onClick={() => navigate('/inventory')}>
                         <LayoutGrid size={20} />
-                        <span>{t('nav.back_office')}</span>
+                        <span>Back Office</span>
                     </button>
 
                     <div className="pos-menu__divider">Operations</div>
 
                     <button className="pos-menu__item" onClick={() => { onClose(); onShowHeldOrders(); }}>
                         <History size={20} />
-                        <span>{t('pos.menu.held_orders')}</span>
+                        <span>Held Orders</span>
                     </button>
 
                     {/* Transaction history - Manager/Admin only */}
@@ -112,13 +110,13 @@ export default function POSMenu({
                             disabled={!hasOpenShift}
                         >
                             <Receipt size={20} />
-                            <span>{t('pos.menu.transactions', 'Historique Transactions')}</span>
+                            <span>Transaction History</span>
                         </button>
                     )}
 
                     <button className="pos-menu__item" onClick={() => navigate('/reports')}>
                         <FileText size={20} />
-                        <span>{t('pos.menu.reports')}</span>
+                        <span>Reports</span>
                     </button>
 
                     <button
@@ -126,7 +124,7 @@ export default function POSMenu({
                         onClick={() => { onClose(); onShowAnalytics(); }}
                     >
                         <BarChart3 size={20} />
-                        <span>{t('pos.menu.analytics', "Aujourd'hui")}</span>
+                        <span>Today</span>
                     </button>
 
                     {/* Shift Section - Collapsible */}
@@ -143,7 +141,7 @@ export default function POSMenu({
                                 onClick={() => { onClose(); onCloseShift(); }}
                             >
                                 <Lock size={18} />
-                                <span>{t('shift.close_title', 'Fermer le Shift')}</span>
+                                <span>Close Shift</span>
                             </button>
                         ) : (
                             <button
@@ -151,7 +149,7 @@ export default function POSMenu({
                                 onClick={() => { onClose(); onOpenShift(); }}
                             >
                                 <Clock size={18} />
-                                <span>{t('shift.open_title', 'Ouvrir un Shift')}</span>
+                                <span>Open a Shift</span>
                             </button>
                         )}
 
@@ -162,7 +160,7 @@ export default function POSMenu({
                             disabled={!hasOpenShift}
                         >
                             <PieChart size={18} />
-                            <span>{t('shift.stats', 'Statistiques')}</span>
+                            <span>Statistics</span>
                         </button>
 
                         {/* Shift History */}
@@ -171,27 +169,27 @@ export default function POSMenu({
                             onClick={() => { onClose(); onShowShiftHistory(); }}
                         >
                             <Calendar size={18} />
-                            <span>{t('shift.history', 'Historique')}</span>
+                            <span>History</span>
                         </button>
                     </div>
 
                     <button className="pos-menu__item" onClick={() => window.open('/kds', '_blank')}>
                         <Monitor size={20} />
-                        <span>{t('pos.footer.kds')}</span>
+                        <span>KDS</span>
                     </button>
 
                     <div className="pos-menu__divider">System</div>
 
                     <button className="pos-menu__item" onClick={() => navigate('/settings')}>
                         <Settings size={20} />
-                        <span>{t('nav.settings')}</span>
+                        <span>Settings</span>
                     </button>
                 </div>
 
                 <div className="pos-menu__footer">
                     <button className="pos-menu__item is-danger" onClick={handleLogout}>
                         <LogOut size={20} />
-                        <span>{t('auth.logout')}</span>
+                        <span>Logout</span>
                     </button>
                 </div>
             </div>

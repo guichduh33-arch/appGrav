@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
     Factory, ShoppingCart, Package, Trash2, ArrowUpCircle,
     Filter, TrendingUp, TrendingDown, Clock, Truck, ArrowRight,
@@ -41,7 +40,6 @@ function getMovementIcon(type: string): React.ReactNode {
 }
 
 export default function StockMovementsPage() {
-    const { t, i18n } = useTranslation()
     const [searchTerm, setSearchTerm] = useState('')
     const [filterType, setFilterType] = useState<TMovementFilterType>('all')
     const [dateFrom, setDateFrom] = useState('')
@@ -117,10 +115,9 @@ export default function StockMovementsPage() {
 
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr)
-        const locale = i18n.language === 'fr' ? 'fr-FR' : i18n.language === 'id' ? 'id-ID' : 'en-US'
         return {
-            date: date.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' }),
-            time: date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
+            date: date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }),
+            time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
         }
     }
 
@@ -136,7 +133,7 @@ export default function StockMovementsPage() {
                     'Heure': time,
                     'Produit': m.product_name,
                     'SKU': m.product_sku,
-                    'Type': t(style.labelKey, style.label),
+                    'Type': style.label,
                     'Quantité': m.quantity,
                     'Unité': m.product_unit,
                     'Prix Unitaire': m.product_cost,
@@ -181,7 +178,7 @@ export default function StockMovementsPage() {
         return (
             <div className="movements-loading">
                 <div className="spinner" />
-                <p>{t('stock_movements.loading', 'Loading movements...')}</p>
+                <p>Loading movements...</p>
             </div>
         )
     }
@@ -192,9 +189,9 @@ export default function StockMovementsPage() {
             <div className="movements-stats">
                 {/* Total Movements */}
                 <div className="stat-card stat-primary">
-                    <div className="stat-label">{t('stock_movements.stats.total_movements', 'Total Movements')}</div>
+                    <div className="stat-label">Total Movements</div>
                     <div className="stat-value">{filteredMovements.length}</div>
-                    <div className="stat-sub">{t('stock_movements.stats.records', 'records')}</div>
+                    <div className="stat-sub">records</div>
                 </div>
 
                 {/* Total In */}
@@ -203,7 +200,7 @@ export default function StockMovementsPage() {
                         <TrendingUp size={18} />
                     </div>
                     <div className="stat-content">
-                        <div className="stat-label">{t('stock_movements.stats.total_in', 'Total In')}</div>
+                        <div className="stat-label">Total In</div>
                         <div className="stat-value text-green">+{formatNumber(stats.totalIn)}</div>
                         <div className="stat-sub text-green">+{formatCurrency(stats.totalInValue)}</div>
                     </div>
@@ -215,7 +212,7 @@ export default function StockMovementsPage() {
                         <TrendingDown size={18} />
                     </div>
                     <div className="stat-content">
-                        <div className="stat-label">{t('stock_movements.stats.total_out', 'Total Out')}</div>
+                        <div className="stat-label">Total Out</div>
                         <div className="stat-value text-red">-{formatNumber(stats.totalOut)}</div>
                         <div className="stat-sub text-red">-{formatCurrency(stats.totalOutValue)}</div>
                     </div>
@@ -227,7 +224,7 @@ export default function StockMovementsPage() {
                         <Factory size={18} />
                     </div>
                     <div className="stat-content">
-                        <div className="stat-label">{t('stock_movements.stats.production_in', 'Production In')}</div>
+                        <div className="stat-label">Production In</div>
                         <div className="stat-value text-amber">+{formatNumber(stats.productionIn)}</div>
                     </div>
                 </div>
@@ -238,7 +235,7 @@ export default function StockMovementsPage() {
                         <Package size={18} />
                     </div>
                     <div className="stat-content">
-                        <div className="stat-label">{t('stock_movements.stats.production_out', 'Production Out')}</div>
+                        <div className="stat-label">Production Out</div>
                         <div className="stat-value text-pink">-{formatNumber(stats.productionOut)}</div>
                     </div>
                 </div>
@@ -250,7 +247,7 @@ export default function StockMovementsPage() {
                     <Search size={18} />
                     <input
                         type="text"
-                        placeholder={t('stock_movements.search_placeholder', 'Search by product, SKU, reason...')}
+                        placeholder="Search by product, SKU, reason..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -342,7 +339,7 @@ export default function StockMovementsPage() {
                             onChange={(e) => setDateFrom(e.target.value)}
                         />
                     </div>
-                    <span className="date-separator">{t('stock_movements.to', 'to')}</span>
+                    <span className="date-separator">to</span>
                     <div className="date-input-wrapper">
                         <Calendar size={16} />
                         <input
@@ -382,14 +379,14 @@ export default function StockMovementsPage() {
             <div className="movements-filters">
                 <div className="filter-label">
                     <Filter size={18} />
-                    <span>{t('stock_movements.filter', 'Filter')}:</span>
+                    <span>Filter:</span>
                 </div>
 
                 <button
                     onClick={() => setFilterType('all')}
                     className={`filter-btn ${filterType === 'all' ? 'active' : ''}`}
                 >
-                    {t('stock_movements.all', 'All')} ({movements.length})
+                    All ({movements.length})
                 </button>
 
                 {Object.entries(MOVEMENT_STYLES).map(([type, style]) => {
@@ -407,7 +404,7 @@ export default function StockMovementsPage() {
                             } as React.CSSProperties}
                         >
                             {getMovementIcon(type)}
-                            {t(style.labelKey, style.label)} ({count})
+                            {style.label} ({count})
                         </button>
                     )
                 })}
@@ -416,7 +413,7 @@ export default function StockMovementsPage() {
             {/* Movements List */}
             <div className="movements-list-card">
                 <div className="movements-list-header">
-                    <h3>{t('stock_movements.history', 'Movement History')} ({filteredMovements.length})</h3>
+                    <h3>Movement History ({filteredMovements.length})</h3>
                 </div>
 
                 {filteredMovements.length > 0 ? (
@@ -457,9 +454,9 @@ export default function StockMovementsPage() {
                                                     color: style.textColor
                                                 }}
                                             >
-                                                {t(style.labelKey, style.label)}
+                                                {style.label}
                                             </span>
-                                            <span className="movement-desc">{t(style.descriptionKey, style.description)}</span>
+                                            <span className="movement-desc">{style.description}</span>
                                         </div>
                                         {movement.reason && (
                                             <div className="movement-reason" title={movement.reason}>
@@ -539,11 +536,11 @@ export default function StockMovementsPage() {
                 ) : (
                     <div className="movements-empty">
                         <Package size={48} />
-                        <p className="empty-title">{t('stock_movements.empty.title', 'No movements')}</p>
+                        <p className="empty-title">No movements</p>
                         <p className="empty-desc">
                             {filterType !== 'all'
-                                ? t('stock_movements.empty.filtered', 'No movements of this type found')
-                                : t('stock_movements.empty.default', 'Stock movements will appear here')}
+                                ? 'No movements of this type found'
+                                : 'Stock movements will appear here'}
                         </p>
                     </div>
                 )}

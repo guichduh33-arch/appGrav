@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { ReportingService } from '../../../services/ReportingService';
 import { AuditLogEntry } from '../../../types/reporting';
 import { AlertCircle } from 'lucide-react';
 
 export const AuditTab = () => {
-    const { t } = useTranslation();
     const [logs, setLogs] = useState<AuditLogEntry[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -16,7 +14,7 @@ export const AuditTab = () => {
             .finally(() => setLoading(false));
     }, []);
 
-    if (loading) return <div>{t('common.loading')}</div>;
+    if (loading) return <div>Loading...</div>;
 
 
 
@@ -24,12 +22,12 @@ export const AuditTab = () => {
         <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
             <div className="p-4 border-b border-gray-100 bg-gray-50">
                 <h3 className="font-semibold text-gray-700 flex items-center gap-2">
-                    <AlertCircle size={18} /> {t('reporting.audit.title')}
+                    <AlertCircle size={18} /> Audit Logs (Last 50 entries)
                 </h3>
             </div>
             <div className="divide-y divide-gray-100">
                 {logs.length === 0 ? (
-                    <div className="p-8 text-center text-gray-400">{t('reporting.audit.no_suspicious_activity')}</div>
+                    <div className="p-8 text-center text-gray-400">No suspicious activity detected.</div>
                 ) : (
                     logs.map((log) => (
                         <div key={log.id} className="p-4 hover:bg-gray-50 transition-colors">

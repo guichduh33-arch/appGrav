@@ -1,5 +1,4 @@
 import React from 'react'
-import { useTranslation } from 'react-i18next'
 import { Product } from '../../../types/database'
 
 interface PricesTabProps {
@@ -8,8 +7,6 @@ interface PricesTabProps {
 }
 
 export const PricesTab: React.FC<PricesTabProps> = ({ product, priceHistory }) => {
-    const { t } = useTranslation()
-
     const formattedPrice = (amount: number) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -21,9 +18,9 @@ export const PricesTab: React.FC<PricesTabProps> = ({ product, priceHistory }) =
     return (
         <div className="card">
             <div className="flex justify-between items-center mb-6">
-                <h3 className="card-title">{t('product_detail.prices.title')}</h3>
+                <h3 className="card-title">Price History</h3>
                 <div className="bg-green-50 px-4 py-2 rounded-lg border border-green-100">
-                    <span className="text-green-700 text-sm">{t('product_detail.prices.current_price_est')}: </span>
+                    <span className="text-green-700 text-sm">Estimated current price: </span>
                     <span className="font-bold text-lg text-green-900 ml-2">{formattedPrice(product.cost_price || 0)}</span>
                 </div>
             </div>
@@ -31,11 +28,11 @@ export const PricesTab: React.FC<PricesTabProps> = ({ product, priceHistory }) =
                 <table className="detail-table">
                     <thead>
                         <tr>
-                            <th>{t('product_detail.prices.order_date')}</th>
-                            <th>{t('product_detail.prices.supplier')}</th>
-                            <th className="text-right">{t('inventory.quantity')}</th>
-                            <th className="text-right">{t('product_detail.prices.unit_price')}</th>
-                            <th className="text-right">{t('product_detail.prices.total_line')}</th>
+                            <th>Order Date</th>
+                            <th>Supplier</th>
+                            <th className="text-right">Quantity</th>
+                            <th className="text-right">Unit Price</th>
+                            <th className="text-right">Line Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -49,7 +46,7 @@ export const PricesTab: React.FC<PricesTabProps> = ({ product, priceHistory }) =
                                         {new Date(item.purchase_order?.order_date || item.created_at).toLocaleDateString()}
                                     </td>
                                     <td className="font-medium text-gray-800">
-                                        {item.purchase_order?.supplier?.name || 'Fournisseur Inconnu'}
+                                        {item.purchase_order?.supplier?.name || 'Unknown Supplier'}
                                     </td>
                                     <td className="text-right font-mono">
                                         {item.quantity_ordered} {product.unit}
@@ -73,7 +70,7 @@ export const PricesTab: React.FC<PricesTabProps> = ({ product, priceHistory }) =
                         {priceHistory.length === 0 && (
                             <tr>
                                 <td colSpan={5} className="p-8 text-center text-gray-400">
-                                    Aucun historique d'achat trouvé.
+                                    No purchase history found.
                                 </td>
                             </tr>
                         )}

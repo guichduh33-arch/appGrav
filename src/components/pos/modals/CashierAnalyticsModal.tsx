@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
 import {
     X, TrendingUp, TrendingDown, ShoppingBag,
     CreditCard, Banknote, Smartphone, Coffee, Award
@@ -63,7 +62,6 @@ function AnimatedNumber({ value, prefix = '', suffix = '', duration = 1200 }: {
 }
 
 export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModalProps) {
-    const { t } = useTranslation()
     const [loading, setLoading] = useState(true)
     const [stats, setStats] = useState<TodayStats | null>(null)
     const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'payments'>('overview')
@@ -202,10 +200,10 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
                         <Coffee className="analytics-header__icon" />
                         <div>
                             <h2 className="analytics-header__title">
-                                {t('pos.analytics.title', "Aujourd'hui")}
+                                Today
                             </h2>
                             <p className="analytics-header__date">
-                                {new Date().toLocaleDateString('fr-FR', {
+                                {new Date().toLocaleDateString('en-US', {
                                     weekday: 'long',
                                     day: 'numeric',
                                     month: 'long'
@@ -221,7 +219,7 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
                 {loading ? (
                     <div className="analytics-loading">
                         <div className="analytics-loading__spinner" />
-                        <span>{t('common.loading', 'Chargement...')}</span>
+                        <span>Loading...</span>
                     </div>
                 ) : stats && (
                     <>
@@ -229,7 +227,7 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
                         <div className="analytics-hero">
                             <div className="analytics-kpi analytics-kpi--primary">
                                 <div className="analytics-kpi__label">
-                                    {t('pos.analytics.total_sales', 'Ventes')}
+                                    Sales
                                 </div>
                                 <div className="analytics-kpi__value">
                                     <span className="analytics-kpi__currency">Rp</span>
@@ -237,7 +235,7 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
                                 </div>
                                 <div className={`analytics-kpi__trend ${stats.comparison.salesChange >= 0 ? 'up' : 'down'}`}>
                                     {stats.comparison.salesChange >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                                    <span>{Math.abs(stats.comparison.salesChange).toFixed(1)}% vs hier</span>
+                                    <span>{Math.abs(stats.comparison.salesChange).toFixed(1)}% vs yesterday</span>
                                 </div>
                             </div>
 
@@ -251,7 +249,7 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
                                             <AnimatedNumber value={stats.orderCount} />
                                         </div>
                                         <div className="analytics-kpi__label">
-                                            {t('pos.analytics.orders', 'Commandes')}
+                                            Orders
                                         </div>
                                     </div>
                                 </div>
@@ -265,7 +263,7 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
                                             {formatCurrency(stats.avgBasket)}
                                         </div>
                                         <div className="analytics-kpi__label">
-                                            {t('pos.analytics.avg_basket', 'Panier moyen')}
+                                            Average basket
                                         </div>
                                     </div>
                                 </div>
@@ -278,19 +276,19 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
                                 className={`analytics-tab ${activeTab === 'overview' ? 'active' : ''}`}
                                 onClick={() => setActiveTab('overview')}
                             >
-                                {t('pos.analytics.tab_overview', 'Aperçu')}
+                                Overview
                             </button>
                             <button
                                 className={`analytics-tab ${activeTab === 'products' ? 'active' : ''}`}
                                 onClick={() => setActiveTab('products')}
                             >
-                                {t('pos.analytics.tab_products', 'Produits')}
+                                Products
                             </button>
                             <button
                                 className={`analytics-tab ${activeTab === 'payments' ? 'active' : ''}`}
                                 onClick={() => setActiveTab('payments')}
                             >
-                                {t('pos.analytics.tab_payments', 'Paiements')}
+                                Payments
                             </button>
                         </nav>
 
@@ -299,7 +297,7 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
                             {activeTab === 'overview' && (
                                 <div className="analytics-panel" style={{ animationDelay: '0ms' }}>
                                     <h3 className="analytics-section__title">
-                                        {t('pos.analytics.hourly_sales', 'Ventes par heure')}
+                                        Hourly sales
                                     </h3>
                                     <div className="analytics-chart">
                                         {stats.hourlyData.map((data, i) => (
@@ -333,12 +331,12 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
                             {activeTab === 'products' && (
                                 <div className="analytics-panel" style={{ animationDelay: '0ms' }}>
                                     <h3 className="analytics-section__title">
-                                        {t('pos.analytics.top_products', 'Top 5 Produits')}
+                                        Top 5 Products
                                     </h3>
                                     <div className="analytics-products">
                                         {stats.topProducts.length === 0 ? (
                                             <div className="analytics-empty">
-                                                {t('pos.analytics.no_sales', 'Aucune vente pour le moment')}
+                                                No sales yet
                                             </div>
                                         ) : (
                                             stats.topProducts.map((product, i) => (
@@ -355,7 +353,7 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
                                                             {product.name}
                                                         </span>
                                                         <span className="analytics-product__qty">
-                                                            {product.qty} {t('pos.analytics.sold', 'vendus')}
+                                                            {product.qty} sold
                                                         </span>
                                                     </div>
                                                     <div className="analytics-product__revenue">
@@ -378,12 +376,12 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
                             {activeTab === 'payments' && (
                                 <div className="analytics-panel" style={{ animationDelay: '0ms' }}>
                                     <h3 className="analytics-section__title">
-                                        {t('pos.analytics.payment_breakdown', 'Répartition des paiements')}
+                                        Payment breakdown
                                     </h3>
                                     <div className="analytics-payments">
                                         {stats.paymentMethods.length === 0 ? (
                                             <div className="analytics-empty">
-                                                {t('pos.analytics.no_payments', 'Aucun paiement pour le moment')}
+                                                No payments yet
                                             </div>
                                         ) : (
                                             stats.paymentMethods.map((payment, i) => {
@@ -408,7 +406,7 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
                                                                 {payment.method}
                                                             </span>
                                                             <span className="analytics-payment__count">
-                                                                {payment.count} {t('pos.analytics.transactions', 'transactions')}
+                                                                {payment.count} transactions
                                                             </span>
                                                         </div>
                                                         <div className="analytics-payment__amount">

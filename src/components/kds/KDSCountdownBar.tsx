@@ -7,7 +7,6 @@
  */
 
 import { X, Clock } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import './KDSCountdownBar.css';
 
 interface IKDSCountdownBarProps {
@@ -24,7 +23,6 @@ export function KDSCountdownBar({
   totalTime,
   onCancel,
 }: IKDSCountdownBarProps) {
-  const { t } = useTranslation();
   const progressPercent = (timeRemaining / totalTime) * 100;
 
   return (
@@ -32,15 +30,15 @@ export function KDSCountdownBar({
       <div className="kds-countdown-bar__content">
         <Clock size={16} className="kds-countdown-bar__icon" aria-hidden="true" />
         <span className="kds-countdown-bar__text">
-          {t('kds.autoRemove.countdown', { seconds: timeRemaining })}
+          Auto-remove in {timeRemaining}s
         </span>
         <button
           className="kds-countdown-bar__cancel"
           onClick={onCancel}
-          aria-label={t('kds.autoRemove.cancel')}
+          aria-label="Keep"
         >
           <X size={16} />
-          {t('kds.autoRemove.cancel')}
+          Keep
         </button>
       </div>
       <div className="kds-countdown-bar__progress">

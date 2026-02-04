@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { RotateCcw, Eye, EyeOff } from 'lucide-react';
 import type { Setting, ValidationRules } from '../../types/settings';
 import './SettingField.css';
@@ -21,17 +20,12 @@ const SettingField: React.FC<SettingFieldProps> = ({
   disabled = false,
   showReset = true,
 }) => {
-  const { i18n } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [localValue, setLocalValue] = useState(value);
 
-  // Get language-specific text
-  const lang = i18n.language?.substring(0, 2) || 'fr';
-  const nameKey = `name_${lang}` as 'name_fr' | 'name_en' | 'name_id';
-  const descKey = `description_${lang}` as 'description_fr' | 'description_en' | 'description_id';
-
-  const name = setting[nameKey] || setting.name_en;
-  const description = setting[descKey] || setting.description_en;
+  // Use English
+  const name = setting.name_en;
+  const description = setting.description_en;
 
   // Parse value from JSONB
   const parseValue = (val: unknown): unknown => {
