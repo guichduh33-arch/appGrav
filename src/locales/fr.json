@@ -1459,6 +1459,116 @@
             "newSupplier": "Nouveau Fournisseur",
             "noSuppliers": "Aucun fournisseur",
             "searchPlaceholder": "Rechercher un fournisseur..."
+        },
+        "workflow": {
+            "sendToSupplier": "Envoyer au fournisseur",
+            "confirmOrder": "Confirmer la commande",
+            "cancelOrder": "Annuler la commande",
+            "cancelConfirmTitle": "Confirmer l'annulation",
+            "cancelConfirmMessage": "Êtes-vous sûr de vouloir annuler ce bon de commande ?",
+            "cancelReasonLabel": "Raison (optionnel)",
+            "cancelReasonPlaceholder": "Indiquez la raison de l'annulation...",
+            "offlineWarning": "Les actions sur les bons de commande nécessitent une connexion internet",
+            "invalidTransition": "Cette action n'est pas autorisée pour le statut actuel",
+            "success": {
+                "sent": "Bon de commande envoyé au fournisseur",
+                "confirmed": "Commande confirmée avec succès",
+                "cancelled": "Bon de commande annulé"
+            },
+            "error": {
+                "sent": "Erreur lors de l'envoi du bon de commande",
+                "confirmed": "Erreur lors de la confirmation",
+                "cancelled": "Erreur lors de l'annulation"
+            },
+            "history": {
+                "sent": "Envoi au fournisseur",
+                "confirmed": "Confirmation",
+                "cancelled": "Annulation",
+                "sentDescription": "Bon de commande envoyé au fournisseur",
+                "confirmedDescription": "Commande confirmée par le fournisseur",
+                "cancelledDescription": "Bon de commande annulé"
+            }
+        },
+        "reception": {
+            "success": "Réception enregistrée avec succès",
+            "error": "Erreur lors de l'enregistrement de la réception",
+            "invalidStatus": "La réception n'est possible que pour les commandes confirmées",
+            "quantityExceedsOrdered": "Attention: la quantité reçue dépasse la quantité commandée",
+            "allReceived": "Réception complète - Bon de commande clôturé",
+            "partialReceived": "Réception partielle enregistrée"
+        },
+        "detail": {
+            "title": "Détails du Bon de Commande",
+            "back": "Retour",
+            "edit": "Modifier",
+            "orderInfo": "Informations de commande",
+            "supplier": "Fournisseur",
+            "orderDate": "Date de commande",
+            "expectedDelivery": "Livraison prévue",
+            "actualDelivery": "Livraison effective",
+            "notes": "Notes",
+            "items": "Articles commandés",
+            "product": "Produit",
+            "quantity": "Quantité",
+            "unitPrice": "Prix Unit.",
+            "discount": "Remise",
+            "tax": "TVA",
+            "total": "Total",
+            "received": "Reçu",
+            "returned": "Retourné",
+            "actions": "Actions",
+            "returnItem": "Retour",
+            "returnsTitle": "Retours",
+            "historyTitle": "Historique",
+            "summaryTitle": "Résumé financier",
+            "subtotal": "Sous-total",
+            "discountAmount": "Remise",
+            "taxAmount": "TVA",
+            "totalAmount": "Total",
+            "paymentStatusTitle": "Statut de paiement",
+            "markAsPaid": "Marquer comme payé",
+            "paidOn": "Payé le",
+            "loading": "Chargement...",
+            "notFound": "Bon de commande non trouvé",
+            "returnModal": {
+                "title": "Retour d'article",
+                "quantityLabel": "Quantité à retourner",
+                "quantityMax": "Maximum",
+                "reasonLabel": "Raison",
+                "reasonDamaged": "Endommagé",
+                "reasonWrongItem": "Mauvais article",
+                "reasonQualityIssue": "Problème de qualité",
+                "reasonExcessQuantity": "Quantité excessive",
+                "reasonOther": "Autre",
+                "detailsLabel": "Détails",
+                "detailsPlaceholder": "Décrivez le problème...",
+                "refundLabel": "Montant du remboursement",
+                "cancel": "Annuler",
+                "submit": "Enregistrer le retour",
+                "invalidQuantity": "Veuillez entrer une quantité valide"
+            },
+            "pinModal": {
+                "title": "Autorisation requise",
+                "message": "Ce bon de commande a déjà été reçu. Entrez un PIN manager pour modifier."
+            },
+            "history": {
+                "created": "Création",
+                "sent": "Envoi",
+                "confirmed": "Confirmation",
+                "received": "Réception complète",
+                "partiallyReceived": "Réception partielle",
+                "cancelled": "Annulation",
+                "paymentMade": "Paiement",
+                "itemReturned": "Retour",
+                "modified": "Modification",
+                "itemsAdded": "Articles ajoutés",
+                "itemsRemoved": "Articles retirés",
+                "modifications": "Modifications",
+                "reception": "Réception",
+                "return": "Retour",
+                "amount": "Montant",
+                "totalChange": "Total"
+            }
         }
     }
 }

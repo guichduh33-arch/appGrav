@@ -1459,6 +1459,116 @@
             "newSupplier": "Pemasok Baru",
             "noSuppliers": "Tidak ada pemasok",
             "searchPlaceholder": "Cari pemasok..."
+        },
+        "workflow": {
+            "sendToSupplier": "Kirim ke pemasok",
+            "confirmOrder": "Konfirmasi pesanan",
+            "cancelOrder": "Batalkan pesanan",
+            "cancelConfirmTitle": "Konfirmasi pembatalan",
+            "cancelConfirmMessage": "Apakah Anda yakin ingin membatalkan pesanan pembelian ini?",
+            "cancelReasonLabel": "Alasan (opsional)",
+            "cancelReasonPlaceholder": "Masukkan alasan pembatalan...",
+            "offlineWarning": "Tindakan pesanan pembelian memerlukan koneksi internet",
+            "invalidTransition": "Tindakan ini tidak diperbolehkan untuk status saat ini",
+            "success": {
+                "sent": "Pesanan pembelian dikirim ke pemasok",
+                "confirmed": "Pesanan berhasil dikonfirmasi",
+                "cancelled": "Pesanan pembelian dibatalkan"
+            },
+            "error": {
+                "sent": "Gagal mengirim pesanan pembelian",
+                "confirmed": "Gagal mengkonfirmasi pesanan",
+                "cancelled": "Gagal membatalkan pesanan"
+            },
+            "history": {
+                "sent": "Dikirim ke pemasok",
+                "confirmed": "Konfirmasi",
+                "cancelled": "Pembatalan",
+                "sentDescription": "Pesanan pembelian dikirim ke pemasok",
+                "confirmedDescription": "Pesanan dikonfirmasi oleh pemasok",
+                "cancelledDescription": "Pesanan pembelian dibatalkan"
+            }
+        },
+        "reception": {
+            "success": "Penerimaan berhasil dicatat",
+            "error": "Gagal mencatat penerimaan",
+            "invalidStatus": "Penerimaan hanya diizinkan untuk pesanan yang dikonfirmasi",
+            "quantityExceedsOrdered": "Perhatian: jumlah yang diterima melebihi jumlah yang dipesan",
+            "allReceived": "Penerimaan lengkap - Pesanan pembelian ditutup",
+            "partialReceived": "Penerimaan sebagian dicatat"
+        },
+        "detail": {
+            "title": "Detail Pesanan Pembelian",
+            "back": "Kembali",
+            "edit": "Ubah",
+            "orderInfo": "Informasi pesanan",
+            "supplier": "Pemasok",
+            "orderDate": "Tanggal pesanan",
+            "expectedDelivery": "Pengiriman yang diharapkan",
+            "actualDelivery": "Pengiriman aktual",
+            "notes": "Catatan",
+            "items": "Barang yang dipesan",
+            "product": "Produk",
+            "quantity": "Kuantitas",
+            "unitPrice": "Harga Satuan",
+            "discount": "Diskon",
+            "tax": "Pajak",
+            "total": "Total",
+            "received": "Diterima",
+            "returned": "Dikembalikan",
+            "actions": "Tindakan",
+            "returnItem": "Retur",
+            "returnsTitle": "Retur",
+            "historyTitle": "Riwayat",
+            "summaryTitle": "Ringkasan keuangan",
+            "subtotal": "Subtotal",
+            "discountAmount": "Diskon",
+            "taxAmount": "Pajak",
+            "totalAmount": "Total",
+            "paymentStatusTitle": "Status pembayaran",
+            "markAsPaid": "Tandai sebagai dibayar",
+            "paidOn": "Dibayar pada",
+            "loading": "Memuat...",
+            "notFound": "Pesanan pembelian tidak ditemukan",
+            "returnModal": {
+                "title": "Retur barang",
+                "quantityLabel": "Jumlah yang dikembalikan",
+                "quantityMax": "Maksimum",
+                "reasonLabel": "Alasan",
+                "reasonDamaged": "Rusak",
+                "reasonWrongItem": "Barang salah",
+                "reasonQualityIssue": "Masalah kualitas",
+                "reasonExcessQuantity": "Jumlah berlebih",
+                "reasonOther": "Lainnya",
+                "detailsLabel": "Detail",
+                "detailsPlaceholder": "Jelaskan masalahnya...",
+                "refundLabel": "Jumlah pengembalian dana",
+                "cancel": "Batal",
+                "submit": "Kirim retur",
+                "invalidQuantity": "Masukkan jumlah yang valid"
+            },
+            "pinModal": {
+                "title": "Otorisasi diperlukan",
+                "message": "Pesanan pembelian ini telah diterima. Masukkan PIN manajer untuk mengubah."
+            },
+            "history": {
+                "created": "Dibuat",
+                "sent": "Dikirim",
+                "confirmed": "Dikonfirmasi",
+                "received": "Diterima sepenuhnya",
+                "partiallyReceived": "Diterima sebagian",
+                "cancelled": "Dibatalkan",
+                "paymentMade": "Pembayaran dilakukan",
+                "itemReturned": "Barang dikembalikan",
+                "modified": "Diubah",
+                "itemsAdded": "Barang ditambahkan",
+                "itemsRemoved": "Barang dihapus",
+                "modifications": "Perubahan",
+                "reception": "Penerimaan",
+                "return": "Retur",
+                "amount": "Jumlah",
+                "totalChange": "Total"
+            }
         }
     }
 }

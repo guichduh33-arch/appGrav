@@ -679,3 +679,55 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Offline Banner */
+.po-offline-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    margin-bottom: var(--space-lg);
+    background: var(--color-warning-bg);
+    border: 1px solid var(--color-warning);
+    border-radius: var(--radius-md);
+    color: var(--color-warning);
+    font-weight: 500;
+}
+
+/* Header Actions */
+.po-detail-page__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* Danger Button */
+.btn-danger {
+    background: var(--color-urgent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: all 0.15s ease;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #dc2626;
+}
+
+.btn-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Workflow buttons disabled state */
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Receive input disabled state */
+.po-receive-input:disabled {
+    background: var(--color-blanc-creme);
+    cursor: not-allowed;
+}

@@ -1458,6 +1458,116 @@
             "newSupplier": "New Supplier",
             "noSuppliers": "No suppliers",
             "searchPlaceholder": "Search suppliers..."
+        },
+        "workflow": {
+            "sendToSupplier": "Send to supplier",
+            "confirmOrder": "Confirm order",
+            "cancelOrder": "Cancel order",
+            "cancelConfirmTitle": "Confirm cancellation",
+            "cancelConfirmMessage": "Are you sure you want to cancel this purchase order?",
+            "cancelReasonLabel": "Reason (optional)",
+            "cancelReasonPlaceholder": "Enter the cancellation reason...",
+            "offlineWarning": "Purchase order actions require an internet connection",
+            "invalidTransition": "This action is not allowed for the current status",
+            "success": {
+                "sent": "Purchase order sent to supplier",
+                "confirmed": "Order confirmed successfully",
+                "cancelled": "Purchase order cancelled"
+            },
+            "error": {
+                "sent": "Error sending purchase order",
+                "confirmed": "Error confirming order",
+                "cancelled": "Error cancelling order"
+            },
+            "history": {
+                "sent": "Sent to supplier",
+                "confirmed": "Confirmation",
+                "cancelled": "Cancellation",
+                "sentDescription": "Purchase order sent to supplier",
+                "confirmedDescription": "Order confirmed by supplier",
+                "cancelledDescription": "Purchase order cancelled"
+            }
+        },
+        "reception": {
+            "success": "Reception recorded successfully",
+            "error": "Error recording reception",
+            "invalidStatus": "Reception is only allowed for confirmed orders",
+            "quantityExceedsOrdered": "Warning: received quantity exceeds ordered quantity",
+            "allReceived": "Full reception complete - Purchase order closed",
+            "partialReceived": "Partial reception recorded"
+        },
+        "detail": {
+            "title": "Purchase Order Details",
+            "back": "Back",
+            "edit": "Edit",
+            "orderInfo": "Order information",
+            "supplier": "Supplier",
+            "orderDate": "Order date",
+            "expectedDelivery": "Expected delivery",
+            "actualDelivery": "Actual delivery",
+            "notes": "Notes",
+            "items": "Ordered items",
+            "product": "Product",
+            "quantity": "Quantity",
+            "unitPrice": "Unit Price",
+            "discount": "Discount",
+            "tax": "Tax",
+            "total": "Total",
+            "received": "Received",
+            "returned": "Returned",
+            "actions": "Actions",
+            "returnItem": "Return",
+            "returnsTitle": "Returns",
+            "historyTitle": "History",
+            "summaryTitle": "Financial summary",
+            "subtotal": "Subtotal",
+            "discountAmount": "Discount",
+            "taxAmount": "Tax",
+            "totalAmount": "Total",
+            "paymentStatusTitle": "Payment status",
+            "markAsPaid": "Mark as paid",
+            "paidOn": "Paid on",
+            "loading": "Loading...",
+            "notFound": "Purchase order not found",
+            "returnModal": {
+                "title": "Item return",
+                "quantityLabel": "Quantity to return",
+                "quantityMax": "Maximum",
+                "reasonLabel": "Reason",
+                "reasonDamaged": "Damaged",
+                "reasonWrongItem": "Wrong item",
+                "reasonQualityIssue": "Quality issue",
+                "reasonExcessQuantity": "Excess quantity",
+                "reasonOther": "Other",
+                "detailsLabel": "Details",
+                "detailsPlaceholder": "Describe the issue...",
+                "refundLabel": "Refund amount",
+                "cancel": "Cancel",
+                "submit": "Submit return",
+                "invalidQuantity": "Please enter a valid quantity"
+            },
+            "pinModal": {
+                "title": "Authorization required",
+                "message": "This purchase order has been received. Enter manager PIN to edit."
+            },
+            "history": {
+                "created": "Created",
+                "sent": "Sent",
+                "confirmed": "Confirmed",
+                "received": "Fully received",
+                "partiallyReceived": "Partially received",
+                "cancelled": "Cancelled",
+                "paymentMade": "Payment made",
+                "itemReturned": "Item returned",
+                "modified": "Modified",
+                "itemsAdded": "Items added",
+                "itemsRemoved": "Items removed",
+                "modifications": "Modifications",
+                "reception": "Reception",
+                "return": "Return",
+                "amount": "Amount",
+                "totalChange": "Total"
+            }
         }
     }
 }

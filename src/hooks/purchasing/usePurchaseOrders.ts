@@ -486,32 +486,87 @@ export function useDeletePurchaseOrder() {
 }
 
 // ============================================================================
-// useUpdatePurchaseOrderStatus - Update status mutation
+// useUpdatePurchaseOrderStatus - Update status mutation with history logging
 // ============================================================================
 
 export interface IUpdatePOStatusParams {
   purchaseOrderId: string
   status: TPOStatus
+  previousStatus?: TPOStatus | null
+  description?: string
+  metadata?: Record<string, unknown>
+}
+
+/**
+ * Map status to action_type for history logging
+ */
+function getActionTypeFromStatus(status: TPOStatus): string {
+  switch (status) {
+    case 'sent': return 'sent'
+    case 'confirmed': return 'confirmed'
+    case 'partially_received': return 'partially_received'
+    case 'received': return 'received'
+    case 'cancelled': return 'cancelled'
+    case 'modified': return 'modified'
+    default: return 'modified'
+  }
+}
+
+/**
+ * Get default description for status change
+ */
+function getDefaultDescription(status: TPOStatus): string {
+  switch (status) {
+    case 'sent': return 'Bon de commande envoyé au fournisseur'
+    case 'confirmed': return 'Commande confirmée par le fournisseur'
+    case 'partially_received': return 'Réception partielle enregistrée'
+    case 'received': return 'Réception complète enregistrée'
+    case 'cancelled': return 'Bon de commande annulé'
+    case 'modified': return 'Bon de commande modifié'
+    default: return `Statut modifié vers ${status}`
+  }
 }
 
 /**
  * Hook to update purchase order status
+ * Now automatically logs status change to purchase_order_history
  */
 export function useUpdatePurchaseOrderStatus() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ purchaseOrderId, status }: IUpdatePOStatusParams) => {
+    mutationFn: async ({
+      purchaseOrderId,
+      status,
+      previousStatus,
+      description,
+      metadata,
+    }: IUpdatePOStatusParams) => {
+      const now = new Date().toISOString()
       const updateData: Record<string, unknown> = {
         status,
-        updated_at: new Date().toISOString()
+        updated_at: now,
       }
 
       // Set actual_delivery_date when status is received
       if (status === 'received') {
-        updateData.actual_delivery_date = new Date().toISOString().slice(0, 10)
+        updateData.actual_delivery_date = now.slice(0, 10)
       }
 
+      // 1. If previousStatus not provided, fetch current status
+      let prevStatus = previousStatus
+      if (prevStatus === undefined) {
+        const { data: currentPO, error: fetchError } = await supabase
+          .from('purchase_orders')
+          .select('status')
+          .eq('id', purchaseOrderId)
+          .single()
+
+        if (fetchError) throw fetchError
+        prevStatus = currentPO?.status as TPOStatus
+      }
+
+      // 2. Update status
       const { data, error } = await supabase
         .from('purchase_orders')
         .update(updateData)
@@ -520,6 +575,28 @@ export function useUpdatePurchaseOrderStatus() {
         .single()
 
       if (error) throw error
+
+      // 3. Log to history
+      const historyError = await supabase
+        .from('purchase_order_history')
+        .insert({
+          purchase_order_id: purchaseOrderId,
+          action_type: getActionTypeFromStatus(status),
+          previous_status: prevStatus ?? null,
+          new_status: status,
+          description: description || getDefaultDescription(status),
+          metadata: {
+            ...metadata,
+            updated_at: now,
+          },
+          created_at: now,
+        })
+
+      if (historyError.error) {
+        console.error('Failed to log PO history:', historyError.error)
+        // Don't throw - history logging is secondary to status update
+      }
+
       return data as IPurchaseOrder
     },
     onSuccess: (_, { purchaseOrderId }) => {
