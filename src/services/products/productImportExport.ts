@@ -67,16 +67,19 @@ export async function exportProducts(): Promise<{ success: boolean; error?: stri
         // Build a map of product_id -> primary section slug
         const sectionMap = new Map<string, string>()
         for (const ps of productSections || []) {
-            const section = ps.section as { slug: string; name: string } | null
+            // Handle Supabase relation which may return array or object
+            const sectionRaw = ps.section as unknown
+            const section = Array.isArray(sectionRaw) ? sectionRaw[0] : sectionRaw
             if (ps.is_primary && section) {
-                sectionMap.set(ps.product_id, section.slug)
+                sectionMap.set(ps.product_id, (section as { slug: string }).slug)
             }
         }
         // If no primary, use first section found
         for (const ps of productSections || []) {
-            const section = ps.section as { slug: string; name: string } | null
+            const sectionRaw = ps.section as unknown
+            const section = Array.isArray(sectionRaw) ? sectionRaw[0] : sectionRaw
             if (!sectionMap.has(ps.product_id) && section) {
-                sectionMap.set(ps.product_id, section.slug)
+                sectionMap.set(ps.product_id, (section as { slug: string }).slug)
             }
         }
 
@@ -250,7 +253,7 @@ export async function importProducts(
                         .single()
                     if (newCat) {
                         categoryId = newCat.id
-                        categoryMap.set(row.category.toLowerCase(), categoryId)
+                        categoryMap.set(row.category.toLowerCase(), newCat.id)
                     }
                 }
             }

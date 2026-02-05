@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Box, Plus, X, Save, ArrowLeft, Search, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { Product } from '../../types/database'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import './ComboFormPage.css'
 
 interface GroupItem {

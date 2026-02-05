@@ -127,21 +127,22 @@ export default function FloorPlanEditor() {
             return
         }
 
-        const newTable: Omit<FloorPlanItem, 'id'> = {
-            type: 'table',
-            number: tableForm.number,
+        const newTable = {
+            item_type: 'table',
+            name: `Table ${tableForm.number}`,
+            table_number: tableForm.number,
             capacity: tableForm.capacity,
-            section: tableForm.section,
-            status: 'available',
+            zone: tableForm.section,
+            is_available: true,
             shape: tableForm.shape,
-            x: 50,
-            y: 50,
+            x_position: 50,
+            y_position: 50,
             width: tableForm.shape === 'rectangle' ? 120 : 80,
             height: 80
         }
 
         try {
-            const tableData: Insertable<'floor_plan_items'> = newTable
+            const tableData = newTable as Insertable<'floor_plan_items'>
             const { data, error } = await supabase
                 .from('floor_plan_items')
                 .insert(tableData)
@@ -161,18 +162,19 @@ export default function FloorPlanEditor() {
     }
 
     const handleAddDecoration = async () => {
-        const newDecoration: Omit<FloorPlanItem, 'id'> = {
-            type: 'decoration',
-            decoration_type: decorationForm.decoration_type,
+        const newDecoration = {
+            item_type: 'decoration',
+            name: `Decoration ${decorationForm.decoration_type}`,
             shape: decorationForm.shape,
-            x: 50,
-            y: 50,
+            x_position: 50,
+            y_position: 50,
             width: decorationForm.decoration_type === 'wall' ? 150 : 60,
-            height: decorationForm.decoration_type === 'wall' ? 20 : 60
+            height: decorationForm.decoration_type === 'wall' ? 20 : 60,
+            metadata: { decoration_type: decorationForm.decoration_type }
         }
 
         try {
-            const decorationData: Insertable<'floor_plan_items'> = newDecoration
+            const decorationData = newDecoration as Insertable<'floor_plan_items'>
             const { data, error } = await supabase
                 .from('floor_plan_items')
                 .insert(decorationData)

@@ -18,7 +18,7 @@ import {
 } from '../../hooks/settings';
 import SettingField from '../../components/settings/SettingField';
 import type { TaxRate } from '../../types/settings';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 interface TaxRateFormData {
   code: string;

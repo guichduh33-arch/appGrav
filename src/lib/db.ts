@@ -26,6 +26,12 @@ import type {
   IDispatchQueueItem,
   IOfflineStockLevel,
   IDeferredAdjustmentNote,
+  IOfflineCustomer,
+  IOfflineCustomerCategory,
+  IOfflineProductCategoryPrice,
+  IOfflinePromotion,
+  IOfflinePromotionProduct,
+  IOfflinePromotionFreeProduct,
 } from '@/types/offline';
 
 /**
@@ -82,6 +88,24 @@ export class OfflineDatabase extends Dexie {
 
   // Deferred adjustment notes (Story 5.3)
   offline_adjustment_notes!: Table<IDeferredAdjustmentNote>;
+
+  // Customers cache (Story 6.1)
+  offline_customers!: Table<IOfflineCustomer>;
+
+  // Customer categories cache (Story 6.2)
+  offline_customer_categories!: Table<IOfflineCustomerCategory>;
+
+  // Product category prices cache (Story 6.2)
+  offline_product_category_prices!: Table<IOfflineProductCategoryPrice>;
+
+  // Promotions cache (Story 6.4)
+  offline_promotions!: Table<IOfflinePromotion>;
+
+  // Promotion products cache (Story 6.4)
+  offline_promotion_products!: Table<IOfflinePromotionProduct>;
+
+  // Promotion free products cache (Story 6.4)
+  offline_promotion_free_products!: Table<IOfflinePromotionFreeProduct>;
 
   constructor() {
     super('appgrav-offline');
@@ -347,6 +371,106 @@ export class OfflineDatabase extends Dexie {
       // Used to store adjustment intentions when offline
       offline_adjustment_notes: '++id, product_id, created_at',
     });
+
+    // Version 13: Customers cache (Story 6.1)
+    this.version(13).stores({
+      // Preserve existing tables
+      offline_users: 'id, cached_at',
+      offline_sync_queue: '++id, entity, status, created_at',
+      offline_settings: 'key, category_id, updated_at',
+      offline_tax_rates: 'id, is_active, is_default, [is_active+is_default]',
+      offline_payment_methods: 'id, is_active, is_default, sort_order, [is_active+is_default]',
+      offline_business_hours: 'day_of_week',
+      offline_sync_meta: 'entity',
+      offline_products: 'id, category_id, sku, name, is_active, pos_visible, [is_active+pos_visible+available_for_sale]',
+      offline_categories: 'id, name, sort_order, is_active, dispatch_station, [is_active+is_raw_material]',
+      offline_modifiers: 'id, product_id, category_id, group_name, is_active, [is_active+product_id], [is_active+category_id]',
+      offline_recipes: 'id, product_id, material_id, is_active, [is_active+product_id]',
+      offline_orders: 'id, order_number, status, order_type, customer_id, session_id, created_at, sync_status, dispatch_status, [status+created_at]',
+      offline_order_items: 'id, order_id, product_id, item_status',
+      offline_payments: 'id, order_id, method, sync_status, created_at',
+      offline_sessions: 'id, user_id, status, opened_at, sync_status',
+      offline_dispatch_queue: '++id, order_id, station, status, created_at, [status+station]',
+      offline_stock_levels: 'id, product_id, location_id, quantity, [product_id+location_id]',
+      offline_adjustment_notes: '++id, product_id, created_at',
+
+      // NEW: Customers cache (Story 6.1)
+      // Indexes: id (primary), phone, email, name for search
+      // category_slug and loyalty_tier for filtering
+      offline_customers: 'id, phone, email, name, category_slug, loyalty_tier, updated_at',
+    });
+
+    // Version 14: Customer Category Pricing (Story 6.2)
+    this.version(14).stores({
+      // Preserve existing tables
+      offline_users: 'id, cached_at',
+      offline_sync_queue: '++id, entity, status, created_at',
+      offline_settings: 'key, category_id, updated_at',
+      offline_tax_rates: 'id, is_active, is_default, [is_active+is_default]',
+      offline_payment_methods: 'id, is_active, is_default, sort_order, [is_active+is_default]',
+      offline_business_hours: 'day_of_week',
+      offline_sync_meta: 'entity',
+      offline_products: 'id, category_id, sku, name, is_active, pos_visible, [is_active+pos_visible+available_for_sale]',
+      offline_categories: 'id, name, sort_order, is_active, dispatch_station, [is_active+is_raw_material]',
+      offline_modifiers: 'id, product_id, category_id, group_name, is_active, [is_active+product_id], [is_active+category_id]',
+      offline_recipes: 'id, product_id, material_id, is_active, [is_active+product_id]',
+      offline_orders: 'id, order_number, status, order_type, customer_id, session_id, created_at, sync_status, dispatch_status, [status+created_at]',
+      offline_order_items: 'id, order_id, product_id, item_status',
+      offline_payments: 'id, order_id, method, sync_status, created_at',
+      offline_sessions: 'id, user_id, status, opened_at, sync_status',
+      offline_dispatch_queue: '++id, order_id, station, status, created_at, [status+station]',
+      offline_stock_levels: 'id, product_id, location_id, quantity, [product_id+location_id]',
+      offline_adjustment_notes: '++id, product_id, created_at',
+      offline_customers: 'id, phone, email, name, category_slug, loyalty_tier, updated_at',
+
+      // NEW: Customer categories cache (Story 6.2)
+      // Indexes: id (primary), slug (for lookups), is_active
+      offline_customer_categories: 'id, slug, is_active',
+
+      // NEW: Product category prices cache (Story 6.2)
+      // Compound index [product_id+customer_category_id] for fast price lookup
+      // Individual indexes for batch operations
+      offline_product_category_prices: '[product_id+customer_category_id], product_id, customer_category_id, is_active',
+    });
+
+    // Version 15: Promotions cache (Story 6.4)
+    this.version(15).stores({
+      // Preserve existing tables
+      offline_users: 'id, cached_at',
+      offline_sync_queue: '++id, entity, status, created_at',
+      offline_settings: 'key, category_id, updated_at',
+      offline_tax_rates: 'id, is_active, is_default, [is_active+is_default]',
+      offline_payment_methods: 'id, is_active, is_default, sort_order, [is_active+is_default]',
+      offline_business_hours: 'day_of_week',
+      offline_sync_meta: 'entity',
+      offline_products: 'id, category_id, sku, name, is_active, pos_visible, [is_active+pos_visible+available_for_sale]',
+      offline_categories: 'id, name, sort_order, is_active, dispatch_station, [is_active+is_raw_material]',
+      offline_modifiers: 'id, product_id, category_id, group_name, is_active, [is_active+product_id], [is_active+category_id]',
+      offline_recipes: 'id, product_id, material_id, is_active, [is_active+product_id]',
+      offline_orders: 'id, order_number, status, order_type, customer_id, session_id, created_at, sync_status, dispatch_status, [status+created_at]',
+      offline_order_items: 'id, order_id, product_id, item_status',
+      offline_payments: 'id, order_id, method, sync_status, created_at',
+      offline_sessions: 'id, user_id, status, opened_at, sync_status',
+      offline_dispatch_queue: '++id, order_id, station, status, created_at, [status+station]',
+      offline_stock_levels: 'id, product_id, location_id, quantity, [product_id+location_id]',
+      offline_adjustment_notes: '++id, product_id, created_at',
+      offline_customers: 'id, phone, email, name, category_slug, loyalty_tier, updated_at',
+      offline_customer_categories: 'id, slug, is_active',
+      offline_product_category_prices: '[product_id+customer_category_id], product_id, customer_category_id, is_active',
+
+      // NEW: Promotions cache (Story 6.4)
+      // Indexes: id (primary), code (unique), is_active, start_date, end_date, priority
+      // Compound index [is_active+start_date+end_date] for validity queries
+      offline_promotions: 'id, code, is_active, start_date, end_date, priority, [is_active+start_date+end_date]',
+
+      // NEW: Promotion target products/categories (Story 6.4)
+      // Compound indexes for looking up promotions by product or category
+      offline_promotion_products: 'id, promotion_id, product_id, category_id, [promotion_id+product_id], [promotion_id+category_id]',
+
+      // NEW: Promotion free products for buy_x_get_y (Story 6.4)
+      // Index by promotion_id for fetching free products for a promotion
+      offline_promotion_free_products: 'id, promotion_id, free_product_id',
+    });
   }
 }
 
@@ -373,4 +497,10 @@ export type {
   IDispatchQueueItem,
   IOfflineStockLevel,
   IDeferredAdjustmentNote,
+  IOfflineCustomer,
+  IOfflineCustomerCategory,
+  IOfflineProductCategoryPrice,
+  IOfflinePromotion,
+  IOfflinePromotionProduct,
+  IOfflinePromotionFreeProduct,
 };

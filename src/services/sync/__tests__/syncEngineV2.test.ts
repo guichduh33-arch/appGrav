@@ -8,7 +8,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import 'fake-indexeddb/auto';
 import { db } from '@/lib/db';
-import type { ISyncQueueItem, IOfflineSession, IOfflineOrder } from '@/types/offline';
+import type { IOfflineSession, IOfflineOrder } from '@/types/offline';
 
 // Mock Supabase
 const mockInsert = vi.fn();

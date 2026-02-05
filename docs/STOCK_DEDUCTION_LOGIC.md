@@ -1,5 +1,9 @@
 # Logique de Déduction de Stock lors des Ventes
 
+> ✅ **Status: IMPLÉMENTÉ** (Story 5.9 - 2026-02-05)
+>
+> Migration: `supabase/migrations/20260205100000_add_deduct_stock_on_sale_trigger.sql`
+
 ## Vue d'ensemble
 
 Le système gère deux types de produits avec des comportements de déduction différents :
@@ -240,7 +244,13 @@ Raison: Variant ingredient for made-to-order sale
 
 ## Trigger SQL
 
-**Fichier** : `supabase/migrations/092_fix_made_to_order_stock_deduction.sql`
+> ✅ **Implémenté** - Story 5.9 (2026-02-05)
+
+**Fichier** : `supabase/migrations/20260205100000_add_deduct_stock_on_sale_trigger.sql`
+
+**Trigger** : `tr_deduct_stock_on_sale` (AFTER UPDATE ON orders)
+- Se déclenche quand `status` passe à `completed` ou `paid`
+- Utilise le trigger existant `tr_update_product_stock` pour la mise à jour du stock
 
 **Logique** :
 ```sql

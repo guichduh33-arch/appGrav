@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { MapPin, Search, Package, AlertTriangle } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import './StockByLocationPage.css'
 
 interface StockBalance {

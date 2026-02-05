@@ -46,6 +46,8 @@ describe('offlineDb', () => {
         'categories',
         'customers',
         'floor_plan_items',
+        'offline_orders',
+        'offline_periods',
         'product_modifiers',
         'products',
         'sync_queue'
@@ -304,8 +306,8 @@ describe('offlineDb', () => {
   });
 
   describe('Schema versioning', () => {
-    it('should have version 1', () => {
-      expect(offlineDb.verno).toBe(1);
+    it('should have version 3', () => {
+      expect(offlineDb.verno).toBe(3);
     });
 
     it('should be ready for future migrations', async () => {

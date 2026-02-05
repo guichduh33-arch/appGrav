@@ -6,7 +6,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import './SettingsPage.css';
 
 interface Role {

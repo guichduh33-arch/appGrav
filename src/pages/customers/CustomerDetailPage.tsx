@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { formatCurrency } from '../../utils/helpers'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import './CustomerDetailPage.css'
 
 interface Customer {

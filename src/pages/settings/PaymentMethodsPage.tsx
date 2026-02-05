@@ -20,7 +20,7 @@ import {
   useDeletePaymentMethod,
 } from '../../hooks/settings';
 import type { PaymentMethod, PaymentType } from '../../types/settings';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 interface PaymentMethodFormData {
   code: string;

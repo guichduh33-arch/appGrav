@@ -9,7 +9,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useNetworkStore } from '../stores/networkStore';
 import { startSyncWithDelay } from '../services/sync/syncEngine';
 import { startOfflinePeriod, endOfflinePeriod } from '../services/sync/offlinePeriod';

@@ -17,7 +17,7 @@ Développer un ERP/POS complet pour **The Breakery Lombok**, une boulangerie fra
 | Chiffre d'affaires annuel | ~6 milliards IDR |
 | Devise | IDR (Rupiah indonésienne) |
 | TVA | 10% (incluse dans les prix) |
-| Langues | Français, English, Bahasa Indonesia |
+| Langue | English (module multilingue suspendu) |
 
 ### Plateformes Cibles
 - 🖥️ Desktop Windows (application principale)
@@ -37,7 +37,7 @@ Styling:      Tailwind CSS + Lucide React icons
 Backend:      Supabase (PostgreSQL + Auth + Realtime + Edge Functions + Storage)
 Routing:      React Router DOM 6.x
 Data:         @tanstack/react-query
-i18n:         i18next (FR défaut, EN, ID)
+i18n:         [SUSPENDU] i18next installé mais non utilisé - English hardcodé
 Charts:       Recharts
 Mobile:       Capacitor (Android/iOS)
 ```
@@ -62,7 +62,7 @@ src/
 ├── services/         # Intégrations API externes
 ├── types/            # TypeScript types (database.ts = schéma complet)
 ├── lib/              # Utilitaires (supabase.ts client)
-├── locales/          # Fichiers i18n (fr.json, en.json, id.json)
+├── locales/          # [SUSPENDU] Fichiers i18n existent mais non utilisés
 └── styles/           # CSS global
 
 supabase/
@@ -310,49 +310,36 @@ const channel = supabase
 
 ---
 
-## 🌐 INTERNATIONALISATION (i18n)
+## 🌐 INTERNATIONALISATION (i18n) - ⚠️ SUSPENDU
 
-### Structure des Traductions
-```
-src/locales/
-├── fr.json  # Français (défaut)
-├── en.json  # English
-└── id.json  # Bahasa Indonesia
-```
+> **IMPORTANT**: Le module multilingue est actuellement **suspendu**. L'anglais est utilisé comme langue principale avec des strings hardcodées.
 
-### Pattern d'Utilisation
+### État Actuel
+- L'infrastructure i18next existe mais n'est **pas activement utilisée**
+- Les fichiers de traduction (`fr.json`, `en.json`, `id.json`) existent mais sont **obsolètes**
+- **NE PAS** utiliser `useTranslation()` ou `t()` dans le nouveau code
+
+### Pattern Actuel (English Hardcoded)
 ```typescript
-import { useTranslation } from 'react-i18next';
-
+// ✅ CORRECT - Utiliser des strings anglaises directement
 const MyComponent = () => {
-  const { t, i18n } = useTranslation();
-  
   return (
     <div>
-      <h1>{t('products.title')}</h1>
-      <p>{t('products.count', { count: 10 })}</p>
-      <button onClick={() => i18n.changeLanguage('id')}>
-        {t('common.changeLanguage')}
-      </button>
+      <h1>Products</h1>
+      <Button>Save</Button>
+      <Button>Cancel</Button>
     </div>
   );
 };
+
+// ❌ NE PAS FAIRE - i18n suspendu
+import { useTranslation } from 'react-i18next';
+const { t } = useTranslation();
+<h1>{t('products.title')}</h1>
 ```
 
-### Clés de Traduction Standard
-```json
-{
-  "common": {
-    "save": "Enregistrer / Save / Simpan",
-    "cancel": "Annuler / Cancel / Batal",
-    "delete": "Supprimer / Delete / Hapus",
-    "edit": "Modifier / Edit / Edit",
-    "loading": "Chargement... / Loading... / Memuat...",
-    "error": "Erreur / Error / Kesalahan",
-    "success": "Succès / Success / Berhasil"
-  }
-}
-```
+### Note de Réactivation Future
+Si le multilingue doit être réactivé à l'avenir, les fichiers de traduction devront être mis à jour pour refléter toutes les nouvelles fonctionnalités ajoutées pendant la suspension.
 
 ---
 
@@ -421,7 +408,7 @@ npm run test:claude  # Tester intégration Claude API
 1. ✅ `npm run lint` - Zéro erreur
 2. ✅ `npm run build` - Build réussi
 3. ✅ Tester manuellement les changements
-4. ✅ Vérifier les traductions (FR/EN/ID)
+4. ✅ Vérifier que les strings sont en anglais (i18n suspendu)
 
 ---
 
@@ -487,15 +474,14 @@ export function useNewFeature() {
 // src/pages/feature/FeaturePage.tsx
 ```
 
-#### 5. Traductions
-```json
-// Ajouter dans fr.json, en.json, id.json
-{
-  "newFeature": {
-    "title": "...",
-    "description": "..."
-  }
-}
+#### 5. Strings UI (English)
+```typescript
+// ⚠️ i18n SUSPENDU - Utiliser des strings anglaises directement
+// NE PAS ajouter de clés de traduction
+
+// Dans le composant:
+<h1>New Feature Title</h1>
+<p>Description of the feature</p>
 ```
 
 #### 6. Route
@@ -586,8 +572,8 @@ CREATE POLICY "..." ON public.sensitive_data ...
 ### 4. Types Database Non Synchronisés
 Après modification du schéma SQL, **toujours mettre à jour** `src/types/database.ts`
 
-### 5. Traductions Manquantes
-Toujours ajouter les traductions dans les **3 fichiers**: `fr.json`, `en.json`, `id.json`
+### 5. Module i18n Suspendu
+**NE PAS** utiliser `useTranslation()` ou `t()` - utiliser des strings anglaises directement
 
 ---
 

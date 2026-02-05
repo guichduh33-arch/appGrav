@@ -4,6 +4,9 @@ import type { Product } from '../../../types/database'
 import { useCartStore } from '../../../stores/cartStore'
 import { formatPrice } from '../../../utils/helpers'
 import { useProductVariants, type IVariantGroup } from '../../../hooks/products/useProductVariants'
+import { calculateCustomerPrice } from '@/services/sync/customerPricingService'
+import type { IOfflineProduct } from '@/lib/db'
+import type { ICustomerPriceResult } from '@/types/offline'
 import './VariantModal.css'
 
 interface VariantModalProps {
@@ -23,18 +26,70 @@ interface SelectedVariant {
 }
 
 export default function VariantModal({ baseProduct, onClose }: VariantModalProps) {
-    const addItem = useCartStore(state => state.addItem)
+    const { addItem, addItemWithPricing, customerCategorySlug } = useCartStore()
     const { data: variantGroups = [], isLoading } = useProductVariants(baseProduct.id)
     const [hasCheckedVariants, setHasCheckedVariants] = useState(false)
 
+    // Story 6.2: Customer pricing state
+    const [customerPriceResult, setCustomerPriceResult] = useState<ICustomerPriceResult | null>(null)
+
+    // Story 6.2: Calculate customer-specific price on mount or when category changes
+    useEffect(() => {
+        const fetchCustomerPrice = async () => {
+            const offlineProduct: IOfflineProduct = {
+                id: baseProduct.id,
+                category_id: baseProduct.category_id || null,
+                sku: baseProduct.sku || null,
+                name: baseProduct.name,
+                product_type: baseProduct.product_type || null,
+                retail_price: baseProduct.retail_price || 0,
+                wholesale_price: baseProduct.wholesale_price || null,
+                cost_price: baseProduct.cost_price || null,
+                image_url: baseProduct.image_url || null,
+                is_active: baseProduct.is_active ?? true,
+                updated_at: baseProduct.updated_at || new Date().toISOString(),
+                pos_visible: baseProduct.pos_visible ?? true,
+                available_for_sale: baseProduct.available_for_sale ?? true,
+            }
+
+            try {
+                const result = await calculateCustomerPrice(offlineProduct, customerCategorySlug)
+                setCustomerPriceResult(result)
+            } catch (error) {
+                console.error('[VariantModal] Error calculating customer price:', error)
+                setCustomerPriceResult({
+                    price: baseProduct.retail_price || 0,
+                    priceType: 'retail',
+                    savings: 0,
+                    categoryName: null,
+                })
+            }
+        }
+
+        fetchCustomerPrice()
+    }, [baseProduct, customerCategorySlug])
+
     // Si pas de variants, ajouter directement au panier et fermer
     useEffect(() => {
-        if (!isLoading && !hasCheckedVariants && variantGroups.length === 0) {
+        if (!isLoading && !hasCheckedVariants && variantGroups.length === 0 && customerPriceResult) {
             setHasCheckedVariants(true)
-            addItem(baseProduct, 1, [], '', undefined)
+            // Story 6.2: Use customer pricing if available
+            if (customerPriceResult.priceType !== 'retail') {
+                addItemWithPricing(
+                    baseProduct,
+                    1,
+                    [],
+                    '',
+                    customerPriceResult.price,
+                    customerPriceResult.priceType,
+                    customerPriceResult.savings
+                )
+            } else {
+                addItem(baseProduct, 1, [], '', undefined)
+            }
             onClose()
         }
-    }, [isLoading, hasCheckedVariants, variantGroups.length, baseProduct, addItem, onClose])
+    }, [isLoading, hasCheckedVariants, variantGroups.length, baseProduct, addItem, addItemWithPricing, customerPriceResult, onClose])
 
     // État pour stocker les sélections pour chaque groupe
     const [selections, setSelections] = useState<Record<string, string[]>>(() => {
@@ -76,9 +131,10 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
         })
     }
 
-    // Calculer le prix total avec les ajustements
+    // Calculer le prix total avec les ajustements - Story 6.2: Use customer price as base
     const totalPrice = useMemo(() => {
-        let price = baseProduct.retail_price || 0
+        // Use customer-specific price if available, otherwise retail price
+        let price = customerPriceResult?.price ?? (baseProduct.retail_price || 0)
 
         variantGroups.forEach(group => {
             const selectedIds = selections[group.group_name] || []
@@ -91,7 +147,7 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
         })
 
         return price
-    }, [baseProduct.retail_price, variantGroups, selections])
+    }, [customerPriceResult, baseProduct.retail_price, variantGroups, selections])
 
     // Vérifier si toutes les sélections requises sont faites
     const isValidSelection = useMemo(() => {
@@ -131,14 +187,27 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
             .map(v => `${v.groupName}: ${v.optionLabels.join(', ')}`)
             .join(' | ')
 
-        // Ajouter au panier avec le prix ajusté et les variants
-        const productWithAdjustedPrice = {
-            ...baseProduct,
-            retail_price: totalPrice
+        // Story 6.2: Use customer pricing if available
+        if (customerPriceResult && customerPriceResult.priceType !== 'retail') {
+            addItemWithPricing(
+                baseProduct,
+                1,
+                [], // No modifiers for variants, adjustments are in totalPrice
+                variantNote,
+                totalPrice, // Total includes base customer price + variant adjustments
+                customerPriceResult.priceType,
+                customerPriceResult.savings,
+                selectedVariants
+            )
+        } else {
+            // Ajouter au panier avec le prix ajusté et les variants
+            const productWithAdjustedPrice = {
+                ...baseProduct,
+                retail_price: totalPrice
+            }
+            // Passer les selectedVariants pour le tracking des ingrédients
+            addItem(productWithAdjustedPrice, 1, [], variantNote, selectedVariants)
         }
-
-        // Passer les selectedVariants pour le tracking des ingrédients
-        addItem(productWithAdjustedPrice, 1, [], variantNote, selectedVariants)
         onClose()
     }
 

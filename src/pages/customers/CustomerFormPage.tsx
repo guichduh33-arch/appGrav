@@ -5,7 +5,7 @@ import {
     QrCode, Calendar, Star, Crown, Tag, Percent, Trash2
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import './CustomerFormPage.css'
 
 interface CustomerCategory {

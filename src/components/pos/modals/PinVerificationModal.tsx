@@ -68,8 +68,9 @@ export default function PinVerificationModal({
                 // Build a map of user_id -> role codes
                 const userRoleMap = new Map<string, string[]>()
                 if (userRoles) {
-                    for (const ur of userRoles) {
-                        const roleCode = (ur.roles as { code: string } | null)?.code
+                    for (const ur of userRoles as any[]) {
+                        const roles = ur.roles
+                        const roleCode = Array.isArray(roles) ? roles[0]?.code : roles?.code
                         if (roleCode) {
                             const existing = userRoleMap.get(ur.user_id) || []
                             existing.push(roleCode)

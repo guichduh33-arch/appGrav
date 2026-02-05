@@ -61,7 +61,7 @@ export default function ProductDetailPage() {
                 const mockRaw = MOCK_PRODUCTS.find(p => p.id === id)
                 if (mockRaw) {
                     const mockIndex = MOCK_PRODUCTS.findIndex(p => p.id === id)
-                    const mockProduct: Product = {
+                    const mockProduct = {
                         ...mockRaw,
                         description: 'Mock Product Description',
                         product_type: mockIndex % 3 === 0 ? 'raw_material' : (mockIndex % 3 === 1 ? 'finished' : 'semi_finished'),
@@ -76,12 +76,10 @@ export default function ProductDetailPage() {
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString(),
                         deduct_ingredients: null,
-                        default_producing_section_id: null,
-                        preferred_purchase_unit_id: null,
-                        preferred_recipe_unit_id: null,
-                        preferred_stock_unit_id: null,
-                        shelf_life_days: null,
-                    }
+                        deleted_at: null,
+                        is_made_to_order: false,
+                        section_id: null,
+                    } as unknown as Product
                     setProduct(mockProduct)
                     setCategories(MOCK_CATEGORIES)
                     setSections([])
@@ -90,7 +88,7 @@ export default function ProductDetailPage() {
                     setAllIngredients(MOCK_PRODUCTS.filter((_, i) => i % 3 === 0).map((p) => ({
                         ...p,
                         description: '',
-                        product_type: 'raw_material',
+                        product_type: 'raw_material' as const,
                         cost_price: 0,
                         wholesale_price: 0,
                         current_stock: 50,
@@ -102,12 +100,7 @@ export default function ProductDetailPage() {
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString(),
                         deduct_ingredients: null,
-                        default_producing_section_id: null,
-                        preferred_purchase_unit_id: null,
-                        preferred_recipe_unit_id: null,
-                        preferred_stock_unit_id: null,
-                        shelf_life_days: null,
-                    } as Product)))
+                    } as unknown as Product)))
                     return
                 }
                 if (pError) throw pError
@@ -152,7 +145,7 @@ export default function ProductDetailPage() {
                 .from('product_uoms')
                 .select('*')
                 .eq('product_id', id)
-            if (uomData) setUoms(uomData)
+            if (uomData) setUoms(uomData as ProductUOM[])
 
             // 7. Fetch Potential Ingredients
             const { data: ingredients } = await supabase

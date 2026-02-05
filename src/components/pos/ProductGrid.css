@@ -127,6 +127,28 @@
     pointer-events: none;
 }
 
+/* Stock Badge */
+.pos-product-card__stock-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Out of Stock State */
+.pos-product-card--out-of-stock {
+    opacity: 0.6;
+}
+
+.pos-product-card--out-of-stock .pos-product-card__image {
+    filter: grayscale(50%);
+}
+
+.pos-product-card--out-of-stock:hover {
+    opacity: 0.8;
+}
+
 /* Skeleton */
 .pos-product-card-skeleton {
     height: 200px;

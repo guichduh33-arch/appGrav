@@ -51,8 +51,7 @@ export function useStockMovements(filters: IStockMovementsFilter = {}) {
 
       // Apply filters
       if (type && type !== 'all') {
-        // @ts-expect-error - Filter type is validated at runtime, Supabase types are overly strict
-        query = query.eq('movement_type', type)
+        query = query.eq('movement_type', type as string)
       }
 
       if (dateFrom) {

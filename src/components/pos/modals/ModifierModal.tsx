@@ -1,8 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X, Check, Plus, Minus } from 'lucide-react'
 import type { Product } from '../../../types/database'
 import { useCartStore, type CartModifier, type CartItem } from '../../../stores/cartStore'
 import { formatPrice } from '../../../utils/helpers'
+import { calculateCustomerPrice } from '@/services/sync/customerPricingService'
+import type { IOfflineProduct } from '@/lib/db'
+import type { ICustomerPriceResult } from '@/types/offline'
 import './ModifierModal.css'
 
 interface ModifierModalProps {
@@ -93,7 +96,10 @@ interface ModifierOption {
 }
 
 export default function ModifierModal({ product, onClose, editItem }: ModifierModalProps) {
-    const { addItem, updateItem } = useCartStore()
+    const { addItem, addItemWithPricing, updateItem, customerCategorySlug } = useCartStore()
+
+    // Story 6.2: Customer pricing state
+    const [customerPriceResult, setCustomerPriceResult] = useState<ICustomerPriceResult | null>(null)
 
     // Get modifiers for this product's category
     const categoryName = (product.category as { name?: string } | null)?.name || 'default'
@@ -136,8 +142,46 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
     const [quantity, setQuantity] = useState(editItem?.quantity || 1)
     const [notes, setNotes] = useState(editItem?.notes || '')
 
-    // Calculate total price
-    const basePrice = product.retail_price || 0
+    // Story 6.2: Calculate customer-specific price on mount or when category changes
+    useEffect(() => {
+        const fetchCustomerPrice = async () => {
+            // Convert Product to IOfflineProduct-like structure for pricing service
+            const offlineProduct: IOfflineProduct = {
+                id: product.id,
+                category_id: product.category_id || null,
+                sku: product.sku || null,
+                name: product.name,
+                product_type: product.product_type || null,
+                retail_price: product.retail_price || 0,
+                wholesale_price: product.wholesale_price || null,
+                cost_price: product.cost_price || null,
+                image_url: product.image_url || null,
+                is_active: product.is_active ?? true,
+                updated_at: product.updated_at || new Date().toISOString(),
+                pos_visible: product.pos_visible ?? true,
+                available_for_sale: product.available_for_sale ?? true,
+            }
+
+            try {
+                const result = await calculateCustomerPrice(offlineProduct, customerCategorySlug)
+                setCustomerPriceResult(result)
+            } catch (error) {
+                console.error('[ModifierModal] Error calculating customer price:', error)
+                // Fallback to retail price
+                setCustomerPriceResult({
+                    price: product.retail_price || 0,
+                    priceType: 'retail',
+                    savings: 0,
+                    categoryName: null,
+                })
+            }
+        }
+
+        fetchCustomerPrice()
+    }, [product, customerCategorySlug])
+
+    // Calculate total price - use customer price if available
+    const basePrice = customerPriceResult?.price ?? (product.retail_price || 0)
     let modifiersTotal = 0
 
     modifierGroups.forEach(group => {
@@ -205,19 +249,35 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
 
         if (editItem) {
             updateItem(editItem.id, modifiers, notes)
-            // Quantity update handled separately if needed, but for now we might focus on modifiers/notes
-            // If quantity logic needs to be unified, updateItem could accept quantity too.
-            // Based on cartStore updateItem signature: (itemId, modifiers, notes).
-            // Let's assume quantity change is done via main cart buttons, OR we should update store to accept quantity in updateItem.
-            // *Correction*: Store `updateItem` currently doesn't take quantity.
-            // *Decision*: I will stick to modifiers/notes update here. If user changes quantity in modal, we should probably call `updateItemQuantity` too.
-            // Let's check `updateItem` signature again in my previous turn... yes it's (itemId, modifiers, notes).
-            // I'll add `updateItemQuantity` call if quantity changed.
+            // Update quantity if changed
             if (quantity !== editItem.quantity) {
                 useCartStore.getState().updateItemQuantity(editItem.id, quantity)
             }
+            // Story 6.2: Update pricing if customer category changed
+            if (customerPriceResult && customerPriceResult.priceType !== 'retail') {
+                useCartStore.getState().updateItemPricing(
+                    editItem.id,
+                    customerPriceResult.price,
+                    customerPriceResult.priceType,
+                    customerPriceResult.savings
+                )
+            }
         } else {
-            addItem(product, quantity, modifiers, notes)
+            // Story 6.2: Use addItemWithPricing if we have customer-specific pricing
+            if (customerPriceResult && customerPriceResult.priceType !== 'retail') {
+                addItemWithPricing(
+                    product,
+                    quantity,
+                    modifiers,
+                    notes,
+                    customerPriceResult.price,
+                    customerPriceResult.priceType,
+                    customerPriceResult.savings
+                )
+            } else {
+                // Fallback to standard addItem for retail customers
+                addItem(product, quantity, modifiers, notes)
+            }
         }
         onClose()
     }

@@ -80,7 +80,6 @@ export function useStockAdjustment() {
 
       const { data, error } = await supabase
         .from('stock_movements')
-        // @ts-expect-error - Supabase types are stricter than runtime allows
         .insert(movementData)
         .select()
         .single()

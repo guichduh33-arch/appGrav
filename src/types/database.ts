@@ -202,7 +202,7 @@ export interface ISection {
  * Section with manager details
  */
 export interface ISectionWithManager extends ISection {
-    manager?: Pick<UserProfile, 'id' | 'full_name' | 'email'> | null
+    manager?: Pick<UserProfile, 'id' | 'name' | 'email'> | null
 }
 
 /**
@@ -268,10 +268,9 @@ export interface ISectionStockUpdate {
 
 /**
  * Stock movement with section tracking (enhanced)
+ * Note: from_section_id and to_section_id already exist in StockMovement
  */
 export interface IStockMovementWithSections extends StockMovement {
-    from_section_id?: string | null
-    to_section_id?: string | null
     from_section?: ISection | null
     to_section?: ISection | null
 }
@@ -391,7 +390,7 @@ export interface ILanNode {
     device_id: string
     device_name: string | null
     device_type: string
-    ip_address: unknown
+    ip_address: string | null
     port: number
     status: string | null
     is_hub: boolean | null

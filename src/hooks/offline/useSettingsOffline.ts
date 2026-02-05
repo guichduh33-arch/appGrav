@@ -16,11 +16,12 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { db } from '@/lib/db';
 import type { ISyncMeta } from '@/types/offline';
 import type {
-  IOfflineSetting,
+  IOfflineSetting as _IOfflineSetting,
   IOfflineTaxRate,
   IOfflinePaymentMethod,
   IOfflineBusinessHours,
 } from '@/types/offline';
+// IOfflineSetting unused but kept for documentation
 import type { TaxRate, PaymentMethod, BusinessHours } from '@/types/settings';
 
 // =====================================================
@@ -52,19 +53,23 @@ function parseSettingValue<T>(value: unknown): T {
  * may be numbers when read back. We coerce them to booleans here.
  */
 function toTaxRate(offline: IOfflineTaxRate): TaxRate {
-  const taxRate: TaxRate = {
+  // Use type assertion since offline cache has simplified schema
+  return {
     id: offline.id,
-    name: offline.name,
+    name_en: offline.name,
+    name_fr: offline.name,
+    name_id: offline.name,
     rate: offline.rate,
     is_default: Boolean(offline.is_default),
     is_active: Boolean(offline.is_active),
     created_at: offline.created_at,
     updated_at: offline.updated_at,
-    // Fill in required fields with defaults (not stored in offline cache)
-    description: null,
-    code: null,
-  };
-  return taxRate;
+    code: offline.id.substring(0, 10), // Use ID prefix as fallback code
+    applies_to: null,
+    is_inclusive: true,
+    valid_from: null,
+    valid_until: null,
+  } as TaxRate;
 }
 
 /**
@@ -74,22 +79,23 @@ function toTaxRate(offline: IOfflineTaxRate): TaxRate {
  * may be numbers when read back. We coerce them to booleans here.
  */
 function toPaymentMethod(offline: IOfflinePaymentMethod): PaymentMethod {
-  const paymentMethod: PaymentMethod = {
+  // Use type assertion since offline cache has simplified schema
+  return {
     id: offline.id,
-    name: offline.name,
-    type: offline.type,
+    name_en: offline.name,
+    name_fr: offline.name,
+    name_id: offline.name,
+    code: offline.type, // Use type as code fallback
+    payment_type: offline.type,
     is_default: Boolean(offline.is_default),
     is_active: Boolean(offline.is_active),
     sort_order: offline.sort_order,
     created_at: offline.created_at,
     updated_at: offline.updated_at,
-    // Fill in required fields with defaults (not stored in offline cache)
-    description: null,
     icon: null,
     requires_reference: false,
-    reference_label: null,
-  };
-  return paymentMethod;
+    settings: null,
+  } as PaymentMethod;
 }
 
 /**
@@ -100,18 +106,19 @@ function toPaymentMethod(offline: IOfflinePaymentMethod): PaymentMethod {
  * Dexie stores booleans as 0/1, so we coerce is_open to boolean.
  */
 function toBusinessHours(offline: IOfflineBusinessHours): BusinessHours {
-  const businessHours: BusinessHours = {
+  // Use type assertion since offline cache has simplified schema
+  // Note: Database uses is_closed (negated from is_open)
+  return {
+    id: `day-${offline.day_of_week}`,
     day_of_week: offline.day_of_week,
     open_time: offline.open_time,
     close_time: offline.close_time,
-    is_open: Boolean(offline.is_open),
-    // Fill in required fields with static placeholders
-    // (business_hours table doesn't have these in offline cache)
-    id: `day-${offline.day_of_week}`,
+    is_closed: !Boolean(offline.is_open), // Negate is_open to is_closed
+    break_start: null,
+    break_end: null,
     created_at: '1970-01-01T00:00:00.000Z',
     updated_at: '1970-01-01T00:00:00.000Z',
-  };
-  return businessHours;
+  } as BusinessHours;
 }
 
 // =====================================================

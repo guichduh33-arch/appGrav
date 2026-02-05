@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { supabase } from '../../lib/supabase'
 import KDSOrderCard from '../../components/kds/KDSOrderCard'
 import { ArrowLeft, Volume2, VolumeX, RefreshCw, ChefHat, Coffee, Store, Users, AlertTriangle } from 'lucide-react'

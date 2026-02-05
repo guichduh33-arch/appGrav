@@ -19,7 +19,7 @@ interface OutstandingPayment {
   is_estimated: boolean; // True when amount_paid is estimated (partial payments)
 }
 
-// Type for Supabase query result
+// Type for Supabase query result (supplier can be array or object due to relation)
 interface PurchaseOrderQueryResult {
   id: string;
   po_number: string | null;
@@ -27,7 +27,7 @@ interface PurchaseOrderQueryResult {
   total_amount: number | null;
   payment_status: string;
   status: string;
-  supplier: { name: string } | null;
+  supplier: { name: string } | { name: string }[] | null;
 }
 
 async function getOutstandingPayments(): Promise<OutstandingPayment[]> {
@@ -61,7 +61,7 @@ async function getOutstandingPayments(): Promise<OutstandingPayment[]> {
       return {
         id: po.id,
         po_number: po.po_number || '-',
-        supplier_name: po.supplier?.name || 'Inconnu',
+        supplier_name: (Array.isArray(po.supplier) ? po.supplier[0]?.name : po.supplier?.name) || 'Inconnu',
         order_date: po.order_date,
         total: po.total_amount || 0,
         amount_paid: amountPaid,

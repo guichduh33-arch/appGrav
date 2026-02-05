@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Plus, X, Trash2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 interface VariantMaterial {
     material_id: string

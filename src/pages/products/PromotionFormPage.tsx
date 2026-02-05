@@ -7,7 +7,7 @@ import {
 import { supabase } from '../../lib/supabase'
 import { Product, PromotionType } from '../../types/database'
 import { formatCurrency } from '../../utils/helpers'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import './PromotionFormPage.css'
 
 interface PromotionFormData {

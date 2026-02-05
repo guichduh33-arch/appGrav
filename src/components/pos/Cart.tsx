@@ -1,15 +1,13 @@
 import { useState } from 'react'
-import { Trash2, Tag, CreditCard, Plus, Minus, SendHorizontal, Lock, List, User, QrCode, Star, Crown } from 'lucide-react'
+import { toast } from 'sonner'
+import { Trash2, Tag, Lock, List, User, QrCode, Star } from 'lucide-react'
 import { useCartStore } from '../../stores/cartStore'
-import { formatPrice } from '../../utils/helpers'
-import {
-    PinVerificationModal,
-    TableSelectionModal,
-    DiscountModal,
-    CustomerSearchModal,
-} from './modals'
+import { PinVerificationModal, TableSelectionModal, DiscountModal, CustomerSearchModal } from './modals'
+import { LoyaltyBadge } from './LoyaltyBadge'
+import { CartItemRow, CartTotals, CartActions } from './cart-components'
+import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'
+import { getTierColor } from '@/constants/loyalty'
 import './Cart.css'
-
 import type { CartItem } from '../../stores/cartStore'
 
 interface SelectedCustomer {
@@ -18,11 +16,7 @@ interface SelectedCustomer {
     company_name: string | null
     loyalty_points: number
     loyalty_tier: string
-    category?: {
-        name: string
-        color: string
-        discount_percentage: number | null
-    }
+    category?: { name: string; slug: string; color: string; discount_percentage: number | null }
 }
 
 interface CartProps {
@@ -33,31 +27,14 @@ interface CartProps {
 }
 
 export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }: CartProps) {
+    const { isOffline } = useNetworkStatus()
     const {
-        items,
-        orderType,
-        setOrderType,
-        tableNumber,
-        setTableNumber,
-        subtotal,
-        discountAmount,
-        total,
-        updateItemQuantity,
-        removeItem,
-        clearCart,
-        setDiscount,
-        // Locked items state
-        lockedItemIds,
-        activeOrderNumber,
-        isItemLocked,
-        removeLockedItem,
-        // Customer state
-        customerId,
-        customerName,
-        setCustomer,
+        items, orderType, setOrderType, tableNumber, setTableNumber,
+        subtotal, discountAmount, total, updateItemQuantity, removeItem, clearCart, setDiscount,
+        lockedItemIds, activeOrderNumber, isItemLocked, removeLockedItem,
+        customerId, customerName, setCustomerWithCategorySlug,
     } = useCartStore()
 
-    // Modal states
     const [showPinModal, setShowPinModal] = useState(false)
     const [showTableModal, setShowTableModal] = useState(false)
     const [showDiscountModal, setShowDiscountModal] = useState(false)
@@ -66,65 +43,38 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
     const [pendingDeleteItemId, setPendingDeleteItemId] = useState<string | null>(null)
     const [selectedCustomer, setSelectedCustomer] = useState<SelectedCustomer | null>(null)
 
-    // Use active order number if available, otherwise generate temp number
     const displayOrderNumber = activeOrderNumber || `#${String(Date.now()).slice(-4)}`
-
-    // Check if there are any locked items (sent to kitchen)
     const hasLockedItems = lockedItemIds.length > 0
     const hasUnlockedItems = items.some(item => !lockedItemIds.includes(item.id))
 
-    // Handle order type change - show table modal if dine_in selected
     const handleOrderTypeChange = (type: 'dine_in' | 'takeaway' | 'delivery') => {
         if (type === 'dine_in') {
-            // For dine_in, ALWAYS show table modal to force selection
             setShowTableModal(true)
             setOrderType(type)
         } else {
-            // For takeaway/delivery, no table needed
             setTableNumber(null)
             setOrderType(type)
         }
     }
 
-    // Handle table selection
-    const handleTableSelect = (table: string) => {
-        setTableNumber(table)
-        setShowTableModal(false)
-    }
-
-    // Handle discount apply
-    const handleApplyDiscount = (_amount: number, type: 'percentage' | 'fixed', value: number) => {
-        setDiscount(type === 'percentage' ? 'percent' : 'amount', value, null)
-    }
-
-    // Handle delete click - check if item is locked
     const handleDeleteClick = (itemId: string) => {
         if (isItemLocked(itemId)) {
-            // Item is locked, show PIN modal
             setPendingDeleteItemId(itemId)
             setShowPinModal(true)
         } else {
-            // Item is not locked, delete normally
             removeItem(itemId)
         }
     }
 
-    // Handle PIN verification result
     const handlePinVerify = (verified: boolean) => {
-        if (verified && pendingDeleteItemId) {
-            removeLockedItem(pendingDeleteItemId)
-        }
+        if (verified && pendingDeleteItemId) removeLockedItem(pendingDeleteItemId)
         setPendingDeleteItemId(null)
     }
 
-    // Handle quantity change - only allow decrease on unlocked items
-    // Note: We get current quantity from item state, not as parameter, to avoid stale closure
     const handleQuantityChange = (itemId: string, newQuantity: number) => {
         const item = items.find(i => i.id === itemId)
         if (!item) return
-
         if (isItemLocked(itemId) && newQuantity < item.quantity) {
-            // Trying to reduce locked item quantity - show PIN modal
             setPendingDeleteItemId(itemId)
             setShowPinModal(true)
             return
@@ -132,333 +82,125 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
         updateItemQuantity(itemId, newQuantity)
     }
 
-    // Handle customer selection
     const handleSelectCustomer = (customer: SelectedCustomer | null) => {
         if (customer) {
             setSelectedCustomer(customer)
-            setCustomer(customer.id, customer.company_name || customer.name)
+            setCustomerWithCategorySlug(customer.id, customer.company_name || customer.name, customer.category?.slug ?? null)
         } else {
             setSelectedCustomer(null)
-            setCustomer(null, null)
+            setCustomerWithCategorySlug(null, null, null)
         }
     }
 
-    // Get tier color
-    const getTierColor = (tier: string) => {
-        const colors: Record<string, string> = {
-            bronze: '#cd7f32',
-            silver: '#c0c0c0',
-            gold: '#ffd700',
-            platinum: '#e5e4e2'
+    const handleRedeemPointsClick = () => {
+        if (isOffline) {
+            toast.warning('Points redemption requires online connection', { description: 'Please connect to the internet to use loyalty points', duration: 3000 })
+        } else {
+            toast.info('Points redemption coming soon', { description: 'This feature will be available in a future update', duration: 2000 })
         }
-        return colors[tier] || '#6366f1'
     }
 
     return (
         <aside className="pos-cart">
-            {/* Pending Orders Button - Above Cart */}
             <div className="pos-cart__pending-button">
-                <button
-                    type="button"
-                    className="btn btn-pending-orders"
-                    onClick={onShowPendingOrders}
-                >
-                    <List size={18} />
-                    Pending Orders
+                <button type="button" className="btn btn-pending-orders" onClick={onShowPendingOrders}>
+                    <List size={18} /> Pending Orders
                 </button>
             </div>
 
-            {/* Header */}
             <div className="pos-cart__header">
                 <div className="pos-cart__header-row">
-                    {/* Order Type Selector */}
                     <div className="pos-cart__types">
                         {(['dine_in', 'takeaway'] as const).map((type) => (
-                            <button
-                                key={type}
-                                type="button"
-                                className={`order-type-btn ${orderType === type ? 'is-active' : ''}`}
-                                onClick={() => handleOrderTypeChange(type)}
-                            >
+                            <button key={type} type="button" className={`order-type-btn ${orderType === type ? 'is-active' : ''}`} onClick={() => handleOrderTypeChange(type)}>
                                 {type === 'dine_in' ? 'Dine In' : 'Takeaway'}
                             </button>
                         ))}
                     </div>
-
-                    {/* Order Number */}
                     <span className="pos-cart__order-number">
                         {displayOrderNumber}
                         {hasLockedItems && <Lock size={14} className="order-lock-icon" />}
                     </span>
-
-                    {/* Clear Cart Button */}
-                    <button
-                        type="button"
-                        className="btn-icon btn-icon-sm"
-                        title="Clear cart"
-                        onClick={clearCart}
-                        disabled={items.length === 0}
-                    >
+                    <button type="button" className="btn-icon btn-icon-sm" title="Clear cart" onClick={clearCart} disabled={items.length === 0}>
                         <Trash2 size={18} />
                     </button>
                 </div>
 
-                {/* Show table number if dine_in and table selected */}
                 {orderType === 'dine_in' && tableNumber && (
                     <div className="pos-cart__table-info">
                         <span>Table: {tableNumber}</span>
-                        <button
-                            type="button"
-                            className="btn-change-table"
-                            onClick={() => setShowTableModal(true)}
-                        >
-                            Changer
-                        </button>
+                        <button type="button" className="btn-change-table" onClick={() => setShowTableModal(true)}>Changer</button>
                     </div>
                 )}
 
-                {/* Customer Selection */}
                 <div className="pos-cart__customer">
                     {selectedCustomer || customerId ? (
-                        <button
-                            type="button"
-                            className="customer-badge"
-                            onClick={() => setShowCustomerModal(true)}
-                            style={{
-                                borderColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze')
-                            }}
-                        >
-                            <div
-                                className="customer-badge__avatar"
-                                style={{
-                                    backgroundColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze')
-                                }}
-                            >
+                        <button type="button" className="customer-badge" onClick={() => setShowCustomerModal(true)} style={{ borderColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze') }}>
+                            <div className="customer-badge__avatar" style={{ backgroundColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze') }}>
                                 {(selectedCustomer?.company_name || selectedCustomer?.name || customerName || '?')[0].toUpperCase()}
                             </div>
                             <div className="customer-badge__info">
-                                <span className="customer-badge__name">
-                                    {selectedCustomer?.company_name || selectedCustomer?.name || customerName}
-                                </span>
-                                <span className="customer-badge__points">
-                                    <Star size={10} />
-                                    {selectedCustomer?.loyalty_points?.toLocaleString() || 0} pts
-                                    {selectedCustomer?.loyalty_tier && selectedCustomer.loyalty_tier !== 'bronze' && (
-                                        <Crown size={10} style={{ color: getTierColor(selectedCustomer.loyalty_tier) }} />
-                                    )}
-                                </span>
+                                <span className="customer-badge__name">{selectedCustomer?.company_name || selectedCustomer?.name || customerName}</span>
+                                {selectedCustomer && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <LoyaltyBadge tier={selectedCustomer.loyalty_tier || 'bronze'} points={selectedCustomer.loyalty_points || 0} isOffline={isOffline} compact={true} />
+                                        <button type="button" onClick={(e) => { e.stopPropagation(); handleRedeemPointsClick() }} className="customer-badge__use-points" style={{ fontSize: '10px', color: isOffline ? '#9ca3af' : '#3b82f6', background: 'none', border: 'none', cursor: isOffline ? 'not-allowed' : 'pointer', textDecoration: 'underline', padding: '2px 4px' }} title={isOffline ? 'Requires online connection' : 'Use loyalty points'}>
+                                            <Star size={10} style={{ marginRight: '2px' }} />Use pts
+                                        </button>
+                                    </div>
+                                )}
                             </div>
-                            {selectedCustomer?.category?.discount_percentage && selectedCustomer.category.discount_percentage > 0 && (
-                                <span className="customer-badge__discount">
-                                    -{selectedCustomer.category.discount_percentage}%
-                                </span>
-                            )}
+                            <div className="customer-badge__discounts">
+                                {selectedCustomer?.category?.discount_percentage && selectedCustomer.category.discount_percentage > 0 && (
+                                    <span className="customer-badge__discount customer-badge__discount--category" title={`Category: ${selectedCustomer.category.name}`} style={{ backgroundColor: '#3b82f6' }}>
+                                        <Tag size={10} />-{selectedCustomer.category.discount_percentage}%
+                                    </span>
+                                )}
+                            </div>
                         </button>
                     ) : (
-                        <button
-                            type="button"
-                            className="btn-add-customer"
-                            onClick={() => setShowCustomerModal(true)}
-                        >
-                            <QrCode size={16} />
-                            <User size={16} />
-                            <span>Client</span>
+                        <button type="button" className="btn-add-customer" onClick={() => setShowCustomerModal(true)}>
+                            <QrCode size={16} /><User size={16} /><span>Client</span>
                         </button>
                     )}
                 </div>
             </div>
 
-            {/* Cart Items */}
             <div className="pos-cart__items">
                 {items.length === 0 ? (
                     <div className="pos-cart__empty">
                         <span className="pos-cart__empty-icon">🛒</span>
-                        <p className="pos-cart__empty-text">
-                            Your cart is empty. Select products.
-                        </p>
+                        <p className="pos-cart__empty-text">Your cart is empty. Select products.</p>
                     </div>
                 ) : (
-                    items.map(item => {
-                        const isLocked = isItemLocked(item.id)
-                        return (
-                            <div
-                                key={item.id}
-                                className={`cart-item ${isLocked ? 'is-locked' : ''}`}
-                                onClick={() => !isLocked && onItemClick?.(item)}
-                            >
-                                <div className="cart-item__info">
-                                    <div className="cart-item__name">
-                                        {isLocked && <Lock size={12} className="cart-item__lock-icon" />}
-                                        <span className="cart-item__qty">{item.quantity}x</span>
-                                        {item.type === 'combo' ? item.combo?.name : item.product?.name}
-                                    </div>
-                                    {item.modifiers.length > 0 && (
-                                        <div className="cart-item__mods">
-                                            {item.modifiers.map(m => m.optionLabel).join(', ')}
-                                        </div>
-                                    )}
-                                    {item.notes && (
-                                        <div className="cart-item__notes">{item.notes}</div>
-                                    )}
-                                </div>
-
-                                <div className="cart-item__controls">
-                                    <div className="cart-item__quantity">
-                                        <button
-                                            type="button"
-                                            className="qty-btn"
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                handleQuantityChange(item.id, item.quantity - 1)
-                                            }}
-                                            disabled={isLocked}
-                                            title={isLocked ? 'PIN required' : 'Decrease quantity'}
-                                            aria-label="Decrease quantity"
-                                        >
-                                            <Minus size={14} />
-                                        </button>
-                                        <span>{item.quantity}</span>
-                                        <button
-                                            type="button"
-                                            className="qty-btn"
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                handleQuantityChange(item.id, item.quantity + 1)
-                                            }}
-                                            title="Increase quantity"
-                                            aria-label="Increase quantity"
-                                        >
-                                            <Plus size={14} />
-                                        </button>
-                                    </div>
-
-                                    <div className="cart-item__actions">
-                                        <button
-                                            type="button"
-                                            className="cart-item__discount-btn"
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                setSelectedItemForDiscount(item)
-                                                setShowDiscountModal(true)
-                                            }}
-                                            title="Ajouter une remise"
-                                        >
-                                            <Tag size={14} />
-                                        </button>
-
-                                        <div className="cart-item__price">
-                                            {formatPrice(item.totalPrice)}
-                                        </div>
-
-                                        <button
-                                            type="button"
-                                            className={`cart-item__remove ${isLocked ? 'requires-pin' : ''}`}
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                handleDeleteClick(item.id)
-                                            }}
-                                            title={isLocked ? 'PIN required to remove' : 'Remove'}
-                                        >
-                                            {isLocked ? <Lock size={16} /> : <Trash2 size={16} />}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )
-                    })
+                    items.map(item => (
+                        <CartItemRow
+                            key={item.id}
+                            item={item}
+                            isLocked={isItemLocked(item.id)}
+                            onItemClick={onItemClick}
+                            onQuantityChange={handleQuantityChange}
+                            onDeleteClick={handleDeleteClick}
+                            onDiscountClick={(item: CartItem) => { setSelectedItemForDiscount(item); setShowDiscountModal(true) }}
+                        />
+                    ))
                 )}
             </div>
 
-            {/* Totals */}
             {items.length > 0 && (
-                <div className="pos-cart__totals">
-                    <div className="cart-total-row">
-                        <span className="cart-total-row__label">Subtotal</span>
-                        <span className="cart-total-row__value">{formatPrice(subtotal)}</span>
-                    </div>
-                    <div className="cart-total-row">
-                        <button
-                            type="button"
-                            className="btn-discount-link"
-                            onClick={() => setShowDiscountModal(true)}
-                        >
-                            <Tag size={14} />
-                            Discount
-                        </button>
-                        <span className="cart-total-row__value text-urgent">
-                            {discountAmount > 0 ? `-${formatPrice(discountAmount)}` : formatPrice(0)}
-                        </span>
-                    </div>
-                    <div className="cart-total-row is-grand-total">
-                        <span className="cart-total-row__label">TOTAL</span>
-                        <span className="cart-total-row__value">{formatPrice(total)}</span>
-                    </div>
-                </div>
+                <CartTotals subtotal={subtotal} discountAmount={discountAmount} total={total} onDiscountClick={() => setShowDiscountModal(true)} />
             )}
 
-            {/* Action Buttons - Simplified */}
-            <div className="pos-cart__buttons">
-                <button
-                    type="button"
-                    className={`btn ${hasLockedItems ? 'btn-kitchen-add' : 'btn-kitchen'}`}
-                    onClick={onSendToKitchen}
-                    disabled={!hasUnlockedItems && !items.length}
-                >
-                    <SendHorizontal size={18} />
-                    {hasLockedItems ? 'Add to Order' : 'Send to Kitchen'}
-                </button>
+            <CartActions hasLockedItems={hasLockedItems} hasUnlockedItems={hasUnlockedItems} itemCount={items.length} onSendToKitchen={onSendToKitchen} onCheckout={onCheckout} />
 
-                <button
-                    type="button"
-                    className="btn-checkout"
-                    onClick={onCheckout}
-                    disabled={items.length === 0}
-                >
-                    <CreditCard size={18} />
-                    CHECKOUT
-                </button>
-            </div>
-
-            {/* Modals */}
             {showPinModal && (
-                <PinVerificationModal
-                    title="Item removal"
-                    message="This item is in the kitchen. Manager PIN required."
-                    onVerify={handlePinVerify}
-                    onClose={() => {
-                        setShowPinModal(false)
-                        setPendingDeleteItemId(null)
-                    }}
-                />
+                <PinVerificationModal title="Item removal" message="This item is in the kitchen. Manager PIN required." onVerify={handlePinVerify} onClose={() => { setShowPinModal(false); setPendingDeleteItemId(null) }} />
             )}
-
-            {showTableModal && (
-                <TableSelectionModal
-                    onSelectTable={handleTableSelect}
-                    onClose={() => setShowTableModal(false)}
-                />
-            )}
-
+            {showTableModal && <TableSelectionModal onSelectTable={(t) => { setTableNumber(t); setShowTableModal(false) }} onClose={() => setShowTableModal(false)} />}
             {showDiscountModal && (
-                <DiscountModal
-                    itemName={selectedItemForDiscount?.type === 'combo' ? selectedItemForDiscount?.combo?.name : selectedItemForDiscount?.product?.name}
-                    itemPrice={selectedItemForDiscount?.totalPrice}
-                    totalPrice={selectedItemForDiscount ? selectedItemForDiscount.totalPrice : total}
-                    onApplyDiscount={handleApplyDiscount}
-                    onClose={() => {
-                        setShowDiscountModal(false)
-                        setSelectedItemForDiscount(null)
-                    }}
-                />
+                <DiscountModal itemName={selectedItemForDiscount?.type === 'combo' ? selectedItemForDiscount?.combo?.name : selectedItemForDiscount?.product?.name} itemPrice={selectedItemForDiscount?.totalPrice} totalPrice={selectedItemForDiscount ? selectedItemForDiscount.totalPrice : total} onApplyDiscount={(_, type, value) => setDiscount(type === 'percentage' ? 'percent' : 'amount', value, null)} onClose={() => { setShowDiscountModal(false); setSelectedItemForDiscount(null) }} />
             )}
-
-            {showCustomerModal && (
-                <CustomerSearchModal
-                    selectedCustomerId={customerId}
-                    onSelectCustomer={handleSelectCustomer}
-                    onClose={() => setShowCustomerModal(false)}
-                />
-            )}
+            {showCustomerModal && <CustomerSearchModal selectedCustomerId={customerId} onSelectCustomer={handleSelectCustomer} onClose={() => setShowCustomerModal(false)} />}
         </aside>
     )
 }

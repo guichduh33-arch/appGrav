@@ -3,6 +3,12 @@ import { Plus, Trash2, Package, Scale, ClipboardList, ShoppingCart } from 'lucid
 import { Product, ProductUOM } from '../../../types/database'
 import { supabase } from '../../../lib/supabase'
 
+// Extended UOM type with UI-specific fields
+interface ExtendedUOM extends ProductUOM {
+    is_stock_opname_unit?: boolean
+    is_consumption_unit?: boolean
+}
+
 interface UnitsTabProps {
     product: Product
     uoms: ProductUOM[]
@@ -15,15 +21,18 @@ type UOMContext = 'stock_opname' | 'recipe' | 'purchase'
 
 export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChange, onDeleteUOM }) => {
     const [showAddModal, setShowAddModal] = useState(false)
-    const [newUOM, setNewUOM] = useState({ unit_name: '', conversion_factor: 1 })
+    const [newUOM, setNewUOM] = useState({ uom_name: '', uom_code: '', conversion_factor: 1 })
     const [saving, setSaving] = useState(false)
 
+    // Cast uoms to extended type for UI fields that may not exist yet in DB
+    const extendedUoms = uoms as ExtendedUOM[]
+
     // Get currently selected unit for each context
-    const getContextUnit = (context: UOMContext): ProductUOM | null => {
-        return uoms.find(u => {
+    const getContextUnit = (context: UOMContext): ExtendedUOM | null => {
+        return extendedUoms.find(u => {
             if (context === 'stock_opname') return u.is_stock_opname_unit
             if (context === 'recipe') return u.is_consumption_unit
-            if (context === 'purchase') return u.is_purchase_unit
+            if (context === 'purchase') return u.is_purchase_uom
             return false
         }) || null
     }
@@ -35,7 +44,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
             // First, unset all units for this context
             const field = context === 'stock_opname' ? 'is_stock_opname_unit'
                 : context === 'recipe' ? 'is_consumption_unit'
-                : 'is_purchase_unit'
+                : 'is_purchase_uom'
 
             // Unset all
             await supabase
@@ -61,20 +70,21 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
     }
 
     const handleAddUOM = async () => {
-        if (!newUOM.unit_name || newUOM.conversion_factor <= 0) return
+        if (!newUOM.uom_name || newUOM.conversion_factor <= 0) return
         setSaving(true)
         try {
             const { error } = await supabase
                 .from('product_uoms')
                 .insert({
                     product_id: product.id,
-                    unit_name: newUOM.unit_name,
+                    uom_name: newUOM.uom_name,
+                    uom_code: newUOM.uom_code || newUOM.uom_name.substring(0, 10).toUpperCase(),
                     conversion_factor: newUOM.conversion_factor
                 })
 
             if (error) throw error
             setShowAddModal(false)
-            setNewUOM({ unit_name: '', conversion_factor: 1 })
+            setNewUOM({ uom_name: '', uom_code: '', conversion_factor: 1 })
             window.location.reload()
         } catch (error: any) {
             alert('Erreur: ' + error.message)
@@ -85,7 +95,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
 
     // All available units (base + UOMs) - kept for future use
     const _allUnits = [
-        { id: 'base', unit_name: product.unit, conversion_factor: 1, isBase: true },
+        { id: 'base', uom_name: product.unit, conversion_factor: 1, isBase: true },
         ...uoms.map(u => ({ ...u, isBase: false }))
     ]
     void _allUnits // Prevent unused variable warning
@@ -204,7 +214,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                     </div>
                 ) : (
                     <div style={{ display: 'grid', gap: '0.75rem' }}>
-                        {uoms.map(uom => (
+                        {extendedUoms.map(uom => (
                             <div
                                 key={uom.id}
                                 style={{
@@ -229,12 +239,12 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                                     color: '#4B5563',
                                     fontSize: '0.75rem'
                                 }}>
-                                    {uom.unit_name.substring(0, 3).toUpperCase()}
+                                    {uom.uom_name.substring(0, 3).toUpperCase()}
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                    <div style={{ fontWeight: 600, color: '#1F2937' }}>{uom.unit_name}</div>
+                                    <div style={{ fontWeight: 600, color: '#1F2937' }}>{uom.uom_name}</div>
                                     <div style={{ fontSize: '0.8125rem', color: '#6B7280' }}>
-                                        1 {uom.unit_name} = <strong>{uom.conversion_factor}</strong> {product.unit}
+                                        1 {uom.uom_name} = <strong>{uom.conversion_factor}</strong> {product.unit}
                                     </div>
                                 </div>
                                 <div style={{ display: 'flex', gap: '0.375rem' }}>
@@ -244,7 +254,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                                     {uom.is_consumption_unit && (
                                         <span style={{ padding: '0.25rem 0.5rem', background: '#FEF3C7', color: '#B45309', borderRadius: '0.25rem', fontSize: '0.625rem', fontWeight: 600 }}>RECETTE</span>
                                     )}
-                                    {uom.is_purchase_unit && (
+                                    {uom.is_purchase_uom && (
                                         <span style={{ padding: '0.25rem 0.5rem', background: '#D1FAE5', color: '#047857', borderRadius: '0.25rem', fontSize: '0.625rem', fontWeight: 600 }}>ACHAT</span>
                                     )}
                                 </div>
@@ -328,7 +338,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                                             <option value="base">{product.unit} (Unité de base)</option>
                                             {uoms.map(uom => (
                                                 <option key={uom.id} value={uom.id}>
-                                                    {uom.unit_name} (1 = {uom.conversion_factor} {product.unit})
+                                                    {uom.uom_name} (1 = {uom.conversion_factor} {product.unit})
                                                 </option>
                                             ))}
                                         </select>
@@ -368,8 +378,8 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                             </label>
                             <input
                                 type="text"
-                                value={newUOM.unit_name}
-                                onChange={e => setNewUOM({ ...newUOM, unit_name: e.target.value })}
+                                value={newUOM.uom_name}
+                                onChange={e => setNewUOM({ ...newUOM, uom_name: e.target.value })}
                                 placeholder="Ex: Sac 5kg, Carton, Pack"
                                 style={{
                                     width: '100%',
@@ -386,7 +396,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                                 Facteur de conversion
                             </label>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <span style={{ color: '#6B7280' }}>1 {newUOM.unit_name || 'unité'} =</span>
+                                <span style={{ color: '#6B7280' }}>1 {newUOM.uom_name || 'unité'} =</span>
                                 <input
                                     type="number"
                                     value={newUOM.conversion_factor}
@@ -426,7 +436,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                             </button>
                             <button
                                 onClick={handleAddUOM}
-                                disabled={saving || !newUOM.unit_name}
+                                disabled={saving || !newUOM.uom_name}
                                 style={{
                                     flex: 1,
                                     padding: '0.75rem',
@@ -436,7 +446,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                                     color: 'white',
                                     fontWeight: 600,
                                     cursor: 'pointer',
-                                    opacity: saving || !newUOM.unit_name ? 0.5 : 1
+                                    opacity: saving || !newUOM.uom_name ? 0.5 : 1
                                 }}
                             >
                                 {saving ? 'Enregistrement...' : 'Ajouter'}

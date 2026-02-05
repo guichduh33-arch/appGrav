@@ -96,6 +96,75 @@ Les utilisateurs peuvent se connecter par PIN (online/offline), le système cont
 **When** un composant demande un setting
 **Then** la valeur est retournée depuis le cache local
 
+#### Story 1.6: Company Settings UI
+
+**As a** Admin,
+**I want** configurer les informations de l'entreprise,
+**So that** elles apparaissent sur les tickets et rapports.
+
+**Acceptance Criteria:**
+
+**Given** j'ouvre la page `/settings/company`
+**When** le formulaire s'affiche
+**Then** je vois les champs : nom, raison sociale, NPWP, adresse, téléphone, email, logo
+
+**Given** je modifie les informations
+**When** je sauvegarde
+**Then** les données sont enregistrées dans la table `settings`
+**And** le logo est uploadé vers Supabase Storage si modifié
+
+#### Story 1.7: Printer Configuration UI
+
+**As a** Admin,
+**I want** configurer les imprimantes depuis l'interface,
+**So that** je peux ajouter/modifier les imprimantes sans code.
+
+**Acceptance Criteria:**
+
+**Given** j'ouvre la page `/settings/printing`
+**When** la liste s'affiche
+**Then** je vois toutes les imprimantes configurées avec leur statut
+
+**Given** je crée une nouvelle imprimante
+**When** je remplis le formulaire (nom, type receipt/kitchen/barista, connexion USB/network, IP/port)
+**Then** elle est ajoutée à la table `printer_configurations`
+**And** un bouton "Test d'impression" permet de vérifier la connexion
+
+#### Story 1.8: Notification Settings UI
+
+**As a** Admin,
+**I want** configurer les notifications email,
+**So that** les alertes sont envoyées automatiquement.
+
+**Acceptance Criteria:**
+
+**Given** j'ouvre la page `/settings/notifications`
+**When** le formulaire s'affiche
+**Then** je peux configurer le serveur SMTP (host, port, user, password)
+**And** activer/désactiver les alertes (stock bas, rapport quotidien)
+
+**Given** je clique sur "Envoyer email test"
+**When** les paramètres SMTP sont valides
+**Then** un email de test est envoyé à l'adresse configurée
+**And** un message de confirmation s'affiche
+
+#### Story 1.9: Audit Log Viewer
+
+**As a** Manager,
+**I want** consulter l'historique des actions système,
+**So that** je peux auditer les modifications.
+
+**Acceptance Criteria:**
+
+**Given** j'ouvre la page `/settings/audit`
+**When** la liste s'affiche
+**Then** je vois un tableau avec : timestamp, utilisateur, action, table, anciennes valeurs, nouvelles valeurs
+
+**Given** je filtre par utilisateur, action ou date
+**When** j'applique les filtres
+**Then** le tableau se met à jour
+**And** je peux exporter les résultats en CSV
+
 ---
 
 ### Epic 2: Catalogue & Costing — Produits, Recettes & Production
@@ -627,6 +696,57 @@ Les managers peuvent voir le stock par emplacement, faire des transferts, des aj
 **Then** le PO reste "partially_received"
 **And** je peux faire des réceptions additionnelles
 
+#### Story 5.9: Stock Deduction on Sale (Auto)
+
+**As a** Système,
+**I want** déduire automatiquement le stock lors d'une vente POS,
+**So that** l'inventaire reste à jour sans intervention manuelle.
+
+**Acceptance Criteria:**
+
+**Given** un produit avec `deduct_ingredients = false` (pré-fabriqué)
+**When** l'item est ajouté à une commande finalisée
+**Then** le stock du produit fini est diminué de la quantité vendue
+**And** un `stock_movement` de type `sale_pos` est créé
+
+**Given** un produit avec `deduct_ingredients = true` (made-to-order)
+**When** l'item est ajouté à une commande finalisée
+**Then** SEULEMENT les ingrédients de la recette sont déduits
+**And** le stock du produit fini N'EST PAS modifié
+**And** des `stock_movements` de type `production_out` sont créés pour chaque ingrédient
+
+**Given** une vente de quantité > 1
+**When** le stock est déduit
+**Then** les quantités d'ingrédients sont multipliées (qty × recette)
+
+**Given** un produit made-to-order sans recette
+**When** l'item est vendu
+**Then** aucune déduction n'est effectuée (comportement graceful)
+
+#### Story 5.10: Variant Ingredient Deduction
+
+**As a** Système,
+**I want** déduire les ingrédients des variants sélectionnés,
+**So that** les substitutions (lait d'avoine vs lait normal) déduisent le bon stock.
+
+**Acceptance Criteria:**
+
+**Given** un produit made-to-order avec variant ayant `material_id`
+**When** le variant est sélectionné dans la commande
+**Then** l'ingrédient du variant est déduit (pas celui de la recette de base)
+
+**Given** un produit made-to-order avec multiple toppings
+**When** plusieurs variants-toppings sont sélectionnés
+**Then** TOUS les ingrédients des toppings sont déduits
+
+**Given** un variant de type "niveau de sucre" (50%)
+**When** ce variant est sélectionné
+**Then** la quantité d'ingrédient est ajustée selon la proportion
+
+**Given** un produit avec recette ET variants
+**When** certains ingrédients de recette sont remplacés par variants
+**Then** les ingrédients recette NON remplacés sont toujours déduits
+
 ---
 
 ### Epic 6: Clients & Marketing — Fidélité, B2B, Combos & Promotions
@@ -953,6 +1073,90 @@ Les clients voient leur commande en temps réel, les serveurs prennent les comma
 **Given** je consulte l'historique
 **When** j'ouvre le rapport
 **Then** je vois les périodes offline avec les stats de sync
+
+#### Story 7.11: Print Server Deployment
+
+**As a** Admin,
+**I want** déployer le serveur d'impression local,
+**So that** les appareils peuvent imprimer sans internet.
+
+**Acceptance Criteria:**
+
+**Given** j'installe le print-server sur le PC caisse
+**When** le serveur démarre
+**Then** il écoute sur le port 3001 (localhost + LAN)
+**And** l'endpoint `/health` retourne le statut du serveur
+
+**Given** le serveur fonctionne
+**When** des requêtes sont traitées
+**Then** les logs sont enregistrés avec rotation quotidienne
+
+#### Story 7.12: Receipt Printing Integration
+
+**As a** Caissier,
+**I want** imprimer automatiquement les tickets de caisse,
+**So that** les clients reçoivent leur reçu.
+
+**Acceptance Criteria:**
+
+**Given** une commande est payée
+**When** l'impression automatique est activée dans les settings
+**Then** POST `/print/receipt` est appelé avec les données de commande
+**And** le ticket est formaté ESC/POS avec logo, items, TVA, total
+
+**Given** le ticket est imprimé
+**When** je vérifie le format
+**Then** il supporte le papier 80mm avec mise en page correcte
+
+#### Story 7.13: Kitchen Ticket Printing
+
+**As a** Cuisinier,
+**I want** recevoir un ticket papier pour chaque commande,
+**So that** j'ai une trace physique des préparations.
+
+**Acceptance Criteria:**
+
+**Given** une commande avec items kitchen est créée
+**When** la commande est envoyée en cuisine
+**Then** POST `/print/kitchen` est appelé avec les items de la station
+
+**Given** le ticket kitchen est imprimé
+**When** je le lis
+**Then** je vois le numéro de commande, table, items avec modifiers
+**And** la police est en grande taille pour lisibilité
+**And** le timestamp et statut urgent sont affichés si applicable
+
+#### Story 7.14: Cash Drawer Control
+
+**As a** Caissier,
+**I want** ouvrir le tiroir-caisse depuis l'application,
+**So that** je peux encaisser rapidement.
+
+**Acceptance Criteria:**
+
+**Given** un paiement cash est effectué
+**When** le paiement est validé
+**Then** POST `/drawer/open` envoie la commande ESC/POS au tiroir
+
+**Given** le tiroir s'ouvre
+**When** l'action est complétée
+**Then** un log est créé (user_id, timestamp, reason)
+
+#### Story 7.15: Barista Ticket Printing (Optionnel)
+
+**As a** Barista,
+**I want** recevoir mes tickets boissons séparément,
+**So that** je travaille indépendamment de la cuisine.
+
+**Acceptance Criteria:**
+
+**Given** une commande avec items barista est créée
+**When** la commande est envoyée
+**Then** POST `/print/barista` est appelé avec les items station barista
+
+**Given** l'imprimante barista est configurée
+**When** je vérifie les settings
+**Then** l'IP réseau est configurable séparément de l'imprimante kitchen
 
 ---
 

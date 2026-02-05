@@ -6,7 +6,7 @@ import {
 import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../stores/authStore'
 import { Product, Section, ProductionRecord } from '../../types/database'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import './StockProductionPage.css'
 
 // Format number with thousand separators (French locale uses spaces)

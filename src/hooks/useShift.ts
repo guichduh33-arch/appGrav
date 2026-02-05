@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/authStore'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 export interface PosSession {
     id: string

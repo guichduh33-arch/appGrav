@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
-import { X, Search, QrCode, User, Crown, Star, Building2, UserCheck, Check, UserPlus, Phone, Mail, Save, WifiOff, Heart, History, ShoppingBag, RotateCcw, ChevronLeft, Package } from 'lucide-react'
+import { X, Search, QrCode, User, Crown, Star, Building2, UserCheck, Check, UserPlus, Phone, Mail, Save, WifiOff, Heart, History, ShoppingBag, RotateCcw, ChevronLeft, Package, AlertTriangle, Clock } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
 import { useNetworkStore } from '../../../stores/networkStore'
 import { searchCustomersOffline, syncCustomersToOffline, IOfflineCustomer } from '../../../services/sync/customerSync'
+import { useCustomersLastSync } from '@/hooks/customers/useCustomersOffline'
 import { formatPrice } from '../../../utils/helpers'
+import { TIER_COLORS, TIER_DISCOUNTS } from '@/constants/loyalty'
 import './CustomerSearchModal.css'
 
 interface CustomerCategory {
@@ -64,19 +66,7 @@ interface CustomerSearchModalProps {
     selectedCustomerId?: string | null
 }
 
-const TIER_COLORS: Record<string, string> = {
-    bronze: '#cd7f32',
-    silver: '#c0c0c0',
-    gold: '#ffd700',
-    platinum: '#e5e4e2'
-}
-
-const TIER_DISCOUNTS: Record<string, number> = {
-    bronze: 0,
-    silver: 5,
-    gold: 8,
-    platinum: 10
-}
+// TIER_COLORS and TIER_DISCOUNTS imported from @/constants/loyalty
 
 // LocalStorage key for favorites
 const FAVORITES_KEY = 'appgrav_favorite_customers'
@@ -102,6 +92,8 @@ export default function CustomerSearchModal({
     selectedCustomerId
 }: CustomerSearchModalProps) {
     const isOnline = useNetworkStore((state) => state.isOnline)
+    // Story 6.1: Track cache freshness for stale data indicator
+    const { lastSyncAt: _lastSyncAt, isStale, ageDisplay } = useCustomersLastSync()
     const [searchTerm, setSearchTerm] = useState('')
     const [customers, setCustomers] = useState<Customer[]>([])
     const [loading, setLoading] = useState(false)
@@ -204,18 +196,25 @@ export default function CustomerSearchModal({
     }, [selectedDetailCustomer, isOnline])
 
     // Transform offline customer to Customer type for display
+    // Story 6.1: Uses new fields (points_balance, category_slug, loyalty_tier)
     const transformOfflineCustomer = (c: IOfflineCustomer): Customer => ({
         id: c.id,
         name: c.name,
         company_name: null,
         phone: c.phone,
         email: c.email,
-        customer_type: 'retail',
+        customer_type: c.category_slug === 'wholesale' ? 'b2b' : 'retail',
         category_id: null,
-        loyalty_points: c.loyalty_points,
-        loyalty_tier: c.loyalty_points >= 5000 ? 'platinum' :
-            c.loyalty_points >= 2000 ? 'gold' :
-            c.loyalty_points >= 500 ? 'silver' : 'bronze',
+        category: c.category_slug ? {
+            name: c.category_slug.charAt(0).toUpperCase() + c.category_slug.slice(1),
+            slug: c.category_slug,
+            color: c.category_slug === 'wholesale' ? '#3b82f6' :
+                   c.category_slug === 'vip' ? '#f59e0b' : '#6366f1',
+            price_modifier_type: c.category_slug === 'wholesale' ? 'wholesale_price' : 'none',
+            discount_percentage: null,
+        } : undefined,
+        loyalty_points: c.points_balance,
+        loyalty_tier: c.loyalty_tier?.toLowerCase() || 'bronze',
         total_spent: 0,
         membership_number: null,
         loyalty_qr_slug: null,
@@ -367,10 +366,10 @@ export default function CustomerSearchModal({
                     order_number: order.order_number,
                     created_at: order.created_at ?? new Date().toISOString(),
                     total: order.total ?? 0,
-                    items: (order.order_items || []).map((item: { id: string; product_id: string | null; quantity: number; unit_price: number; products: { name: string } | null }) => ({
+                    items: (order.order_items || []).map((item: any) => ({
                         id: item.id,
                         product_id: item.product_id ?? '',
-                        product_name: item.products?.name || 'Unknown',
+                        product_name: Array.isArray(item.products) ? item.products[0]?.name : item.products?.name || 'Unknown',
                         quantity: item.quantity,
                         unit_price: item.unit_price
                     }))
@@ -393,16 +392,18 @@ export default function CustomerSearchModal({
 
             if (frequentData) {
                 const productMap = new Map<string, { name: string; count: number; lastOrdered: string }>()
-                frequentData.forEach((item: { product_id: string | null; quantity: number; orders: { created_at: string | null }; products: { name: string } | null }) => {
+                frequentData.forEach((item: any) => {
                     if (!item.product_id) return
                     const existing = productMap.get(item.product_id)
+                    const productName = Array.isArray(item.products) ? item.products[0]?.name : item.products?.name || 'Unknown'
+                    const orderDate = Array.isArray(item.orders) ? item.orders[0]?.created_at : item.orders?.created_at
                     if (existing) {
                         existing.count += item.quantity
                     } else {
                         productMap.set(item.product_id, {
-                            name: item.products?.name || 'Unknown',
+                            name: productName,
                             count: item.quantity,
-                            lastOrdered: item.orders.created_at ?? new Date().toISOString()
+                            lastOrdered: orderDate ?? new Date().toISOString()
                         })
                     }
                 })
@@ -808,10 +809,18 @@ export default function CustomerSearchModal({
                                 {mode === 'scan' && 'Scanner Code QR Client'}
                                 {mode === 'create' && 'Nouveau Client'}
                                 {mode === 'favorites' && 'Clients Favoris'}
+                                {/* Story 6.1 AC4: Offline indicator with data age */}
                                 {!isOnline && (
-                                    <span style={{ marginLeft: '10px', fontSize: '12px', color: '#f59e0b', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                    <span style={{ marginLeft: '10px', fontSize: '12px', color: isStale ? '#ef4444' : '#f59e0b', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                                         <WifiOff size={14} />
                                         Hors-ligne
+                                        {ageDisplay && (
+                                            <span title={isStale ? 'Données de plus de 24h' : 'Date de dernière synchronisation'}>
+                                                {isStale && <AlertTriangle size={12} style={{ marginLeft: '2px' }} />}
+                                                <Clock size={10} style={{ marginLeft: '4px' }} />
+                                                {ageDisplay}
+                                            </span>
+                                        )}
                                     </span>
                                 )}
                             </h2>

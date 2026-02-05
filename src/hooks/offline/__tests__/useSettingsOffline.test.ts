@@ -50,17 +50,19 @@ const mockStore = {
   paymentMethods: [
     {
       id: 'pm-online-1',
-      name: 'Online Cash',
-      type: 'cash',
+      name_en: 'Online Cash',
+      name_fr: 'Online Cash',
+      name_id: 'Online Cash',
+      code: 'cash',
+      payment_type: 'cash',
       is_default: true,
       is_active: true,
       sort_order: 1,
       created_at: '2024-01-01T00:00:00Z',
       updated_at: '2024-01-01T00:00:00Z',
-      description: null,
       icon: null,
       requires_reference: false,
-      reference_label: null,
+      settings: null,
     },
   ],
   getActivePaymentMethods: vi.fn(() =>
@@ -75,7 +77,9 @@ const mockStore = {
       day_of_week: 1,
       open_time: '08:00',
       close_time: '22:00',
-      is_open: true,
+      is_closed: false,
+      break_start: null,
+      break_end: null,
       created_at: '2024-01-01T00:00:00Z',
       updated_at: '2024-01-01T00:00:00Z',
     },
@@ -351,11 +355,10 @@ describe('useSettingsOffline', () => {
       await waitFor(() => {
         const taxRate = result.current.taxRates[0];
         expect(taxRate).toHaveProperty('id');
-        expect(taxRate).toHaveProperty('name');
+        expect(taxRate).toHaveProperty('name_en');
         expect(taxRate).toHaveProperty('rate');
         expect(taxRate).toHaveProperty('is_default');
         expect(taxRate).toHaveProperty('is_active');
-        expect(taxRate).toHaveProperty('description');
         expect(taxRate).toHaveProperty('code');
       });
     });
@@ -366,8 +369,8 @@ describe('useSettingsOffline', () => {
       await waitFor(() => {
         const pm = result.current.paymentMethods[0];
         expect(pm).toHaveProperty('id');
-        expect(pm).toHaveProperty('name');
-        expect(pm).toHaveProperty('type');
+        expect(pm).toHaveProperty('name_en');
+        expect(pm).toHaveProperty('payment_type');
         expect(pm).toHaveProperty('is_default');
         expect(pm).toHaveProperty('is_active');
         expect(pm).toHaveProperty('requires_reference');
@@ -383,7 +386,7 @@ describe('useSettingsOffline', () => {
         expect(bh).toHaveProperty('day_of_week');
         expect(bh).toHaveProperty('open_time');
         expect(bh).toHaveProperty('close_time');
-        expect(bh).toHaveProperty('is_open');
+        expect(bh).toHaveProperty('is_closed');
       });
     });
   });

@@ -5,7 +5,7 @@
  * Tests for StockAlertsBadge, StockAlertsPanel, and StaleDataWarning components.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { calculateStockStatus } from '@/hooks/offline/useStockLevelsOffline';
@@ -145,8 +145,8 @@ describe('StockAlertsBadge', () => {
     );
     vi.mocked(useStockLevelsOffline).mockReturnValue({
       stockLevels: [
-        { product_id: '1', quantity: 2, min_stock_level: 10, last_updated: '' },
-        { product_id: '2', quantity: 8, min_stock_level: 10, last_updated: '' },
+        { id: '1', product_id: '1', quantity: 2, min_stock_level: 10, last_updated: '', location_id: null },
+        { id: '2', product_id: '2', quantity: 8, min_stock_level: 10, last_updated: '', location_id: null },
       ],
       isLoading: false,
       isOffline: false,

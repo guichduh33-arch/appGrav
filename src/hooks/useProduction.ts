@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/authStore'
 import { Product, Section, ProductionRecord } from '../types/database'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 // Generate UUID using native crypto API
 const generateUUID = (): string => crypto.randomUUID()
@@ -284,8 +284,9 @@ export function useProduction() {
                     .eq('is_active', true)
 
                 if (recipeItems && recipeItems.length > 0) {
-                    for (const recipe of recipeItems) {
-                        const material = recipe.material as { id: string; current_stock: number } | null
+                    for (const recipe of recipeItems as any[]) {
+                        const rawMaterial = recipe.material
+                        const material = Array.isArray(rawMaterial) ? rawMaterial[0] : rawMaterial
                         if (!material) continue
 
                         const qtyToDeduct = recipe.quantity * item.quantity

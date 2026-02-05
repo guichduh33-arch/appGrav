@@ -59,12 +59,11 @@ const EXTRA_TAB_NAMES: Record<string, { fr: string; en: string; id: string }> = 
 
 const SettingsLayout = () => {
   const { data: categories, isLoading } = useSettingsCategories();
-  // Default to English
-  const lang = 'en';
 
   // Initialize settings store
   useInitializeSettings();
 
+  // Language is hardcoded to English (i18n suspended per CLAUDE.md)
   const nameKey = 'name_en' as const;
 
   // Get category name based on language

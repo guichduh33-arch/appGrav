@@ -5,7 +5,7 @@
  * and integration with ordersCacheService.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import 'fake-indexeddb/auto';
 import { db } from '@/lib/db';
 import {
@@ -21,7 +21,7 @@ import type { Product } from '@/types/database';
 // Test Fixtures
 // =====================================================
 
-const mockProduct: Product = {
+const mockProduct = {
   id: 'prod-001',
   name: 'Croissant',
   sku: 'CRO-001',
@@ -35,22 +35,15 @@ const mockProduct: Product = {
   available_for_sale: true,
   image_url: null,
   description: null,
-  barcode: null,
-  tax_rate_id: null,
-  unit_id: null,
-  min_stock: null,
-  max_stock: null,
-  reorder_point: null,
-  lead_time_days: null,
-  storage_instructions: null,
-  shelf_life_days: null,
-  weight: null,
-  dimensions: null,
-  country_of_origin: null,
-  supplier_id: null,
+  unit: 'pcs',
+  min_stock_level: null,
+  current_stock: 100,
+  deduct_ingredients: null,
+  is_made_to_order: null,
+  deleted_at: null,
   created_at: '2026-01-01T00:00:00Z',
   updated_at: '2026-01-01T00:00:00Z',
-};
+} as unknown as Product;
 
 const mockModifiers: CartModifier[] = [
   {
@@ -80,15 +73,11 @@ const mockComboCartItem: CartItem = {
     id: 'combo-001',
     name: 'Breakfast Deal',
     description: 'Croissant + Coffee',
-    fixed_price: 35000,
+    combo_price: 35000,
     is_active: true,
-    start_date: null,
-    end_date: null,
+    available_at_pos: true,
     image_url: null,
-    available_days: null,
-    min_quantity: null,
-    max_quantity: null,
-    terms_conditions: null,
+    sort_order: null,
     created_at: '2026-01-01T00:00:00Z',
     updated_at: '2026-01-01T00:00:00Z',
   },
@@ -278,7 +267,7 @@ describe('offlineOrderService', () => {
 
   describe('createOfflineOrder', () => {
     it('creates order with correct structure', async () => {
-      const { order, items } = await createOfflineOrder(
+      const { order, items: _items } = await createOfflineOrder(
         mockCartState,
         'user-001',
         'session-001'

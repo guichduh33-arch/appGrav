@@ -3,7 +3,7 @@ import {
     Factory, Calendar, ChevronLeft, ChevronRight, Search, Plus, Minus,
     Trash2, Save, Clock, Package, Lock, Eye, Layers, WifiOff, Bookmark, Bell, X
 } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { useProduction, ProductWithSection, ProductionRecordWithProduct, ProductionItem } from '../../hooks/useProduction'
 import { useNetworkStatus } from '../../hooks/offline/useNetworkStatus'
 import {
@@ -57,26 +57,14 @@ const ProductionPage = () => {
     useEffect(() => {
         if (isOnline && hasReminders()) {
             const count = getRemindersCount()
-            toast(
-                (toastInstance) => (
-                    <div className="flex items-center gap-3">
-                        <Bell size={20} className="text-amber-500" />
-                        <div>
-                            <p className="font-medium">{count} pending reminder(s)</p>
-                            <button
-                                onClick={() => {
-                                    setShowRemindersPanel(true)
-                                    toast.dismiss(toastInstance.id)
-                                }}
-                                className="text-sm text-amber-600 hover:underline"
-                            >
-                                View reminders
-                            </button>
-                        </div>
-                    </div>
-                ),
-                { duration: 8000 }
-            )
+            toast.info(`${count} pending reminder(s)`, {
+                description: 'Click to view reminders',
+                duration: 8000,
+                action: {
+                    label: 'View',
+                    onClick: () => setShowRemindersPanel(true),
+                },
+            })
         }
     }, [isOnline])
 

@@ -99,7 +99,7 @@ export const authService = {
       // 2. Use the magic link token to create a real Supabase Auth session
       if (data.auth?.token && data.auth?.email) {
         try {
-          const { data: authData, error: authError } = await supabase.auth.verifyOtp({
+          const { error: authError } = await supabase.auth.verifyOtp({
             token_hash: data.auth.token,
             type: 'magiclink',
           });

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRightLeft, CheckCircle, Clock, Package, AlertTriangle, WifiOff } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { useTransfer, useReceiveTransfer } from '@/hooks/inventory'
 import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'
 import './TransferDetailPage.css'
@@ -14,13 +14,6 @@ const STATUS_COLORS = {
   received: '#10b981',
   cancelled: '#ef4444'
 } as const
-
-// Locale mapping for date formatting
-const LOCALE_MAP: Record<string, string> = {
-  fr: 'fr-FR',
-  en: 'en-US',
-  id: 'id-ID'
-}
 
 export default function TransferDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -228,7 +221,7 @@ export default function TransferDetailPage() {
         <div className="info-item">
           <span className="info-label">Date</span>
           <span className="info-value">
-            {new Date(transfer.transfer_date).toLocaleDateString('en-US')}
+            {transfer.transfer_date ? new Date(transfer.transfer_date).toLocaleDateString('en-US') : '-'}
           </span>
         </div>
         <div className="info-item">
@@ -309,7 +302,7 @@ export default function TransferDetailPage() {
                           <input
                             type="number"
                             className={`quantity-input ${hasError ? 'input-error' : ''}`}
-                            value={quantityReceived}
+                            value={quantityReceived ?? ''}
                             onChange={(e) => handleQuantityChange(item.id, e.target.value)}
                             min="0"
                             step="0.01"

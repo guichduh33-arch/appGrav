@@ -7,7 +7,7 @@ import { ErrorBoundary } from './components/ui/ErrorBoundary'
 import { initializeSyncEngine } from './services/sync/syncEngine'
 import { initProductsCache, stopProductsCacheRefresh } from './services/offline/productsCacheInit'
 import { loadCart, validateAndFilterCartItems } from './services/offline/cartPersistenceService'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 // Layouts - loaded immediately as they're shells
 import BackOfficeLayout from './layouts/BackOfficeLayout'

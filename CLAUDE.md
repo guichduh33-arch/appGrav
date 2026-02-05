@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AppGrav is an ERP/POS system for "The Breakery," a French bakery in Lombok, Indonesia. The system handles ~200 transactions/day with 10% tax (included in prices) and supports three languages (French default, English, Indonesian).
+AppGrav is an ERP/POS system for "The Breakery," a French bakery in Lombok, Indonesia. The system handles ~200 transactions/day with 10% tax (included in prices).
+
+**Language**: English only (multilingual module suspended - i18next infrastructure exists but is not actively used).
 
 **Key Feature**: Offline-first architecture with automatic synchronization for reliable operation in areas with unstable connectivity.
 
@@ -30,7 +32,7 @@ npm run test:claude      # Test Claude API integration
 - **Styling**: Tailwind CSS + shadcn/ui + Lucide React icons
 - **Backend**: Supabase (PostgreSQL + Auth + Realtime + Edge Functions)
 - **Offline**: Dexie (IndexedDB) + vite-plugin-pwa
-- **i18n**: i18next (fr.json, en.json, id.json)
+- **i18n**: ~~i18next~~ SUSPENDED - English hardcoded (locale files exist but unused)
 - **Mobile**: Capacitor (iOS/Android)
 
 ### Key Directory Structure
@@ -74,7 +76,7 @@ src/
 ├── lib/
 │   ├── supabase.ts  # Supabase client
 │   └── db.ts        # Dexie IndexedDB client
-└── locales/         # Translation files (fr.json, en.json, id.json)
+└── locales/         # [SUSPENDED] Translation files exist but i18n is disabled
 
 supabase/
 ├── migrations/      # SQL migrations (113)
@@ -159,7 +161,7 @@ Offline Mode:
 
 **Purchasing**: `purchase_orders`, `po_items`
 
-**System**: `user_profiles`, `roles`, `permissions`, `role_permissions`, `user_roles`, `user_permissions`, `audit_logs`, `settings`
+**System**: `user_profiles`, `roles`, `permissions`, `role_permissions`, `user_roles`, `user_permissions`, `audit_logs`, `settings`, `printer_configurations`
 
 **Key Views**: `view_daily_kpis`, `view_inventory_valuation`, `view_payment_method_stats`
 
@@ -272,9 +274,12 @@ Used with `usePermissions` hook and `PermissionGuard` component:
 
 ### Settings & Admin
 - `/settings` - General settings
+- `/settings/company` - Company info (name, NPWP, logo, address)
+- `/settings/printing` - Printer configuration (receipt, kitchen, barista)
+- `/settings/notifications` - Email/SMTP notification settings
 - `/settings/sync-status` - Sync queue status and management
 - `/settings/history` - Settings change history
-- `/settings/audit` - Audit log
+- `/settings/audit` - Audit log viewer with filters and CSV export
 - `/settings/business-hours` - Business hours
 - `/settings/categories` - Category settings
 - `/settings/payment-methods` - Payment methods
@@ -304,19 +309,39 @@ ANTHROPIC_API_KEY=your-claude-api-key
 2. **Types**: Update `src/types/database.ts`
 3. **Hook**: Create `src/hooks/useFeatureName.ts` with react-query
 4. **Components**: Add to `src/components/feature/` and `src/pages/feature/`
-5. **Translations**: Add keys to ALL 3 locale files (fr.json, en.json, id.json)
-6. **Route**: Register in router
-7. **Offline support** (if needed): Add to sync services and IndexedDB schema
+5. **Route**: Register in router
+6. **Offline support** (if needed): Add to sync services and IndexedDB schema
+
+> **Note**: i18n/translations step removed - use English strings directly (multilingual module suspended).
 
 ## Common Pitfalls
 
 - **Async data**: Always use optional chaining (`data?.map(...)`)
 - **RLS forgotten**: Every new table MUST have RLS enabled + policies
 - **Types out of sync**: After SQL changes, update `src/types/database.ts`
-- **Missing translations**: Must add to ALL 3 locale files
 - **Locked cart items**: Items sent to kitchen are locked and require PIN to modify (see `cartStore.ts`)
 - **Offline sync**: New entities that need offline support must be added to sync services
 - **Network state**: Use `useNetworkStatus` hook to check connectivity before online-only operations
+- **Language**: Use English strings directly - do NOT use `t()` or i18next (module suspended)
+
+## Print Server (Local)
+
+The print server is a separate Node.js/Express application running on the POS PC for thermal printing.
+
+**Port**: 3001 (localhost + LAN accessible)
+
+**Endpoints**:
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | GET | Server status check |
+| `/print/receipt` | POST | Print receipt (ESC/POS, 80mm) |
+| `/print/kitchen` | POST | Print kitchen ticket |
+| `/print/barista` | POST | Print barista ticket |
+| `/drawer/open` | POST | Open cash drawer |
+
+**Configuration**: Via `/settings/printing` UI (table `printer_configurations`)
+
+**Note**: Print server is optional - system works without it (no printing).
 
 ## Mobile (Capacitor)
 

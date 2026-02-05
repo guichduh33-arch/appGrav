@@ -13,6 +13,10 @@ stepsCompleted:
   - step-11-polish
   - step-reports-extension
 status: 'ready-for-validation'
+last_updated: '2026-02-05'
+extensions:
+  - reports-module (v1.1.0)
+  - settings-print-server (v1.2.0)
 inputDocuments:
   - CLAUDE.md
   - docs/architecture-main.md
@@ -618,6 +622,8 @@ Confiance totale dans le système. Pak Made peut partir en réunion sans craindr
 | Documentation Index | `docs/index.md` |
 | Module Combos | `docs/COMBOS_AND_PROMOTIONS.md` |
 | Module Stock | `docs/STOCK_MOVEMENTS_MODULE.md` |
+| Architecture Print Server | `docs/architecture-print-server.md` |
+| Module Settings ERP | `docs/prompt-module-settings-erp.md` |
 
 ### C. Matrice de Traçabilité FR → NFR
 
@@ -1051,4 +1057,249 @@ interface ExpiredStockReport { ... }
 ---
 
 *Extension PRD générée avec le workflow BMAD v1.0 - 2026-01-28*
+
+---
+
+# Extension PRD - Settings UI & Print Server
+
+**Version Extension:** 1.2.0
+**Date:** 2026-02-05
+**Auteur:** MamatCEO
+
+---
+
+## Contexte
+
+### État Actuel
+
+Suite à l'analyse de la documentation existante (`docs/`), deux modules ont été identifiés comme documentés mais non couverts par les exigences fonctionnelles :
+
+1. **Settings UI** - Pages de configuration complètes (entreprise, imprimantes, notifications, audit)
+2. **Print Server** - Serveur d'impression thermique local (Node.js/Express)
+
+### Infrastructure Existante
+
+- **Table `settings`** : Configuration clé-valeur existante
+- **Table `printer_configurations`** : Configuration imprimantes (à créer)
+- **Table `audit_logs`** : Historique des actions système
+- **Print Server** : Architecture documentée dans `docs/architecture-print-server.md`
+
+---
+
+## User Journeys - Settings & Printing
+
+### Parcours 11 : Admin, Configuration Système
+
+**Persona :** Admin système, configure l'application
+
+**Situation :** L'admin doit configurer les informations de l'entreprise pour les tickets et rapports.
+
+**Scène d'ouverture :**
+Premier jour d'installation. L'admin ouvre `/settings/company`.
+
+**Action montante :**
+Il remplit les champs : nom entreprise "The Breakery", raison sociale, NPWP, adresse à Lombok, téléphone, email, et upload le logo.
+
+**Climax :**
+Il sauvegarde et vérifie un ticket de test. Le logo et les informations apparaissent correctement en en-tête.
+
+**Résolution :**
+Tous les tickets et rapports affichent désormais les informations officielles de l'entreprise.
+
+**Fonctionnalités révélées :** Company Settings UI, Upload logo Supabase Storage, Preview ticket
+
+---
+
+### Parcours 12 : Admin, Configuration Imprimantes
+
+**Persona :** Admin technique, configure le matériel
+
+**Situation :** L'admin doit configurer les imprimantes thermiques pour caisse et cuisine.
+
+**Scène d'ouverture :**
+L'admin ouvre `/settings/printing` et voit une liste vide.
+
+**Action montante :**
+Il ajoute une première imprimante : nom "Caisse Principale", type "receipt", connexion "network", IP "192.168.1.100", port 9100.
+
+**Climax :**
+Il clique sur "Test d'impression". Un ticket de test sort de l'imprimante. Succès ! Il ajoute ensuite l'imprimante cuisine.
+
+**Résolution :**
+Les deux imprimantes sont configurées et testées. Le système est prêt pour la production.
+
+**Fonctionnalités révélées :** Printer Configuration UI, CRUD imprimantes, Test d'impression, Types (receipt/kitchen/barista)
+
+---
+
+### Parcours 13 : Manager, Consultation Audit Logs
+
+**Persona :** Pak Made, manager, vérifie les modifications
+
+**Situation :** Pak Made suspecte une modification de prix non autorisée.
+
+**Scène d'ouverture :**
+Pak Made ouvre `/settings/audit` pour vérifier l'historique.
+
+**Action montante :**
+Il filtre par action "update", table "products", et date d'hier. Il voit 3 modifications.
+
+**Climax :**
+Une modification suspecte : le prix du croissant a été changé de 15,000 à 12,000 IDR par un utilisateur inattendu.
+
+**Résolution :**
+Pak Made exporte le log en CSV, corrige le prix, et discute avec l'utilisateur concerné.
+
+**Fonctionnalités révélées :** Audit Log Viewer, Filtres avancés, Export CSV, Valeurs avant/après
+
+---
+
+## Functional Requirements - Settings UI
+
+### Configuration Entreprise
+
+- **FR57:** L'Admin peut configurer les informations de l'entreprise (nom, raison sociale, NPWP, adresse, téléphone, email)
+- **FR58:** L'Admin peut uploader un logo d'entreprise vers Supabase Storage
+- **FR59:** Le Système peut afficher les informations entreprise sur les tickets et rapports
+
+### Configuration Imprimantes
+
+- **FR60:** L'Admin peut voir la liste des imprimantes configurées avec leur statut
+- **FR61:** L'Admin peut ajouter une nouvelle imprimante (nom, type receipt/kitchen/barista, connexion USB/network, IP/port)
+- **FR62:** L'Admin peut modifier ou supprimer une imprimante existante
+- **FR63:** L'Admin peut tester une imprimante configurée (impression ticket test)
+
+### Configuration Notifications
+
+- **FR64:** L'Admin peut configurer le serveur SMTP pour les notifications email
+- **FR65:** L'Admin peut activer/désactiver les alertes automatiques (stock bas, rapport quotidien)
+- **FR66:** L'Admin peut envoyer un email de test pour vérifier la configuration SMTP
+
+### Consultation Audit Logs
+
+- **FR67:** Le Manager peut consulter l'historique des actions système (timestamp, utilisateur, action, table, anciennes/nouvelles valeurs)
+- **FR68:** Le Manager peut filtrer les logs par utilisateur, action, table ou période
+- **FR69:** Le Manager peut exporter les logs filtrés en format CSV
+
+---
+
+## Functional Requirements - Print Server
+
+### Déploiement & Infrastructure
+
+- **FR70:** L'Admin peut déployer le print-server Node.js/Express sur le PC caisse
+- **FR71:** Le Système peut écouter sur le port 3001 (localhost + LAN accessible)
+- **FR72:** Le Système peut exposer un endpoint `/health` pour vérifier le statut du serveur
+- **FR73:** Le Système peut enregistrer les logs avec rotation quotidienne
+
+### Impression Tickets
+
+- **FR74:** Le Caissier peut imprimer automatiquement un ticket de caisse après paiement (si activé)
+- **FR75:** Le Système peut formater les tickets en ESC/POS (logo, items, TVA, total, 80mm)
+- **FR76:** Le Cuisinier peut recevoir un ticket papier pour chaque commande envoyée en cuisine
+- **FR77:** Le Barista peut recevoir ses tickets boissons sur une imprimante séparée (optionnel)
+
+### Tiroir-Caisse
+
+- **FR78:** Le Caissier peut ouvrir le tiroir-caisse automatiquement après paiement cash
+- **FR79:** Le Système peut logger chaque ouverture du tiroir-caisse (user_id, timestamp, reason)
+
+---
+
+## Non-Functional Requirements - Settings & Print Server
+
+### Performance
+
+| NFR ID | Exigence | Mesure | Seuil |
+|--------|----------|--------|-------|
+| **NFR-SET1** | Temps chargement settings | Page settings | < 1 seconde |
+| **NFR-SET2** | Upload logo | Temps upload | < 5 secondes pour 1MB |
+| **NFR-PRT1** | Latence impression | Temps entre paiement et ticket | < 2 secondes |
+| **NFR-PRT2** | Disponibilité print server | Uptime | 99% pendant heures d'ouverture |
+
+### Sécurité
+
+| NFR ID | Exigence | Mesure | Seuil |
+|--------|----------|--------|-------|
+| **NFR-SET3** | Accès settings | Permission requise | `settings.update` |
+| **NFR-SET4** | Audit access | Permission requise | `reports.audit` |
+| **NFR-PRT3** | Print server isolé | Réseau | LAN uniquement, pas internet |
+
+### Fiabilité
+
+| NFR ID | Exigence | Mesure | Seuil |
+|--------|----------|--------|-------|
+| **NFR-PRT4** | Graceful degradation | Sans print server | Système fonctionne, impression désactivée |
+| **NFR-PRT5** | Retry impression | Échecs réseau | 3 tentatives avec backoff |
+
+---
+
+## Matrice de Traçabilité - Settings & Print Server
+
+| Fonctionnalité | FR | NFR Associés | Story |
+|----------------|-----|--------------|-------|
+| Company Settings UI | FR57-FR59 | NFR-SET1, NFR-SET2, NFR-SET3 | 1.6 |
+| Printer Configuration UI | FR60-FR63 | NFR-SET1, NFR-SET3 | 1.7 |
+| Notification Settings UI | FR64-FR66 | NFR-SET1, NFR-SET3 | 1.8 |
+| Audit Log Viewer | FR67-FR69 | NFR-SET1, NFR-SET4 | 1.9 |
+| Print Server Deployment | FR70-FR73 | NFR-PRT2, NFR-PRT3, NFR-PRT4 | 7.11 |
+| Receipt Printing | FR74-FR75 | NFR-PRT1, NFR-PRT5 | 7.12 |
+| Kitchen Ticket Printing | FR76 | NFR-PRT1, NFR-PRT5 | 7.13 |
+| Cash Drawer Control | FR78-FR79 | NFR-PRT1 | 7.14 |
+| Barista Ticket Printing | FR77 | NFR-PRT1 | 7.15 |
+
+---
+
+## Dépendances Techniques
+
+### Tables SQL Requises
+
+```sql
+-- Table printer_configurations (nouvelle)
+CREATE TABLE printer_configurations (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name VARCHAR(100) NOT NULL,
+  type VARCHAR(20) NOT NULL CHECK (type IN ('receipt', 'kitchen', 'barista')),
+  connection_type VARCHAR(20) NOT NULL CHECK (connection_type IN ('usb', 'network')),
+  ip_address VARCHAR(45),
+  port INTEGER DEFAULT 9100,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### Endpoints Print Server
+
+| Endpoint | Méthode | Description |
+|----------|---------|-------------|
+| `/health` | GET | Statut serveur |
+| `/print/receipt` | POST | Impression ticket caisse |
+| `/print/kitchen` | POST | Impression ticket cuisine |
+| `/print/barista` | POST | Impression ticket barista |
+| `/drawer/open` | POST | Ouverture tiroir-caisse |
+
+### Permissions Requises
+
+```
+settings.view          - Consultation settings
+settings.update        - Modification settings
+settings.printing      - Configuration imprimantes
+settings.notifications - Configuration SMTP/alertes
+reports.audit          - Consultation audit logs
+```
+
+---
+
+## Historique des Versions
+
+| Version | Date | Auteur | Changements |
+|---------|------|--------|-------------|
+| 1.0.0 | 2026-01-26 | MamatCEO | Version initiale - PRD complet |
+| 1.1.0 | 2026-01-28 | Guich | Extension Module Reports |
+| 1.2.0 | 2026-02-05 | MamatCEO | Extension Settings UI & Print Server (FR57-FR79) |
+
+---
+
+*Extension PRD générée avec le workflow BMAD v1.0 - 2026-02-05*
 

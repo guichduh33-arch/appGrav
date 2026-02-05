@@ -11,7 +11,7 @@ import { exportProducts } from '@/services/products/productImportExport'
 import { exportRecipes } from '@/services/products/recipeImportExport'
 import ProductImportModal from '@/components/products/ProductImportModal'
 import RecipeImportModal from '@/components/products/RecipeImportModal'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import './ProductsPage.css'
 
 interface Category {
@@ -106,7 +106,7 @@ export default function ProductsPage() {
                     .order('name')
             ])
 
-            if (productsRes.data) setProducts(productsRes.data as Product[])
+            if (productsRes.data) setProducts(productsRes.data as unknown as Product[])
             if (categoriesRes.data) setCategories(categoriesRes.data)
         } catch (error) {
             console.error('Error fetching products:', error)

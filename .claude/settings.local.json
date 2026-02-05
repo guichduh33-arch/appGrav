@@ -98,7 +98,12 @@
       "mcp__plugin_supabase_supabase__generate_typescript_types",
       "mcp__supabase__get_publishable_keys",
       "Bash(netstat:*)",
-      "Bash(xxd:*)"
+      "Bash(xxd:*)",
+      "Bash(InternalTransfers)",
+      "Bash(TransferForm)",
+      "Bash(TransferDetail)",
+      "Bash(StockByLocation \")",
+      "Bash(^003_ \")"
     ]
   },
   "enableAllProjectMcpServers": true,

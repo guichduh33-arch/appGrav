@@ -15,7 +15,7 @@ const formatNumber = (num: number | null | undefined): string => {
 }
 import { supabase } from '@/lib/supabase'
 import * as XLSX from 'xlsx'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import './StockMovementsPage.css'
 
 // Icon mapping for movement types

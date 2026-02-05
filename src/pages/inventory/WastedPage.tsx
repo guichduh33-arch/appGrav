@@ -12,7 +12,7 @@ import {
 import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../stores/authStore'
 import { formatCurrency, formatDateTime } from '../../utils/helpers'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import './WastedPage.css'
 
 interface WasteRecord {

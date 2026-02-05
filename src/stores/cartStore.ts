@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import type { Product, ProductCombo } from '../types/database'
 import { saveCart, clearPersistedCart, type TSaveCartInput } from '@/services/offline/cartPersistenceService'
+import type { TPriceType } from '@/types/offline'
 
 export interface CartModifier {
     groupName: string
@@ -37,13 +38,17 @@ export interface CartItem {
     product?: Product // For regular products
     combo?: ProductCombo // For combos
     quantity: number
-    unitPrice: number // Base price
+    unitPrice: number // Base price (may be customer-specific)
     modifiers: CartModifier[] // For regular products
     comboSelections?: ComboSelectedItem[] // For combos
     modifiersTotal: number // Sum of modifier/adjustment prices
     notes: string
     selectedVariants?: SelectedVariant[] // Product variants with material tracking
     totalPrice: number // (unitPrice + modifiersTotal) * quantity
+    // Customer category pricing (Story 6.2)
+    appliedPriceType?: TPriceType // retail, wholesale, discount, custom
+    savingsAmount?: number // Amount saved compared to retail price
+    retailPrice?: number // Original retail price (for comparison display)
 }
 
 interface CartState {
@@ -94,6 +99,33 @@ interface CartState {
         activeOrderId: string | null,
         activeOrderNumber: string | null
     ) => void
+
+    // Customer category pricing (Story 6.2)
+    addItemWithPricing: (
+        product: Product,
+        quantity: number,
+        modifiers: CartModifier[],
+        notes: string,
+        customerPrice: number,
+        priceType: TPriceType,
+        savings: number,
+        selectedVariants?: SelectedVariant[]
+    ) => void
+    updateItemPricing: (
+        itemId: string,
+        newPrice: number,
+        priceType: TPriceType,
+        savings: number
+    ) => void
+    recalculateAllPrices: (
+        priceCalculator: (item: CartItem) => Promise<{ price: number; priceType: TPriceType; savings: number }>
+    ) => Promise<void>
+    setCustomerWithCategorySlug: (
+        id: string | null,
+        name: string | null,
+        categorySlug: string | null
+    ) => void
+    customerCategorySlug: string | null
 }
 
 function calculateTotals(items: CartItem[], discountType: 'percent' | 'amount' | null, discountValue: number) {
@@ -125,6 +157,7 @@ export const useCartStore = create<CartState>()(
     tableNumber: null,
     customerId: null,
     customerName: null,
+    customerCategorySlug: null,
     discountType: null,
     discountValue: 0,
     discountReason: null,
@@ -253,6 +286,7 @@ export const useCartStore = create<CartState>()(
             tableNumber: null,
             customerId: null,
             customerName: null,
+            customerCategorySlug: null,
             discountType: null,
             discountValue: 0,
             discountReason: null,
@@ -271,6 +305,9 @@ export const useCartStore = create<CartState>()(
     setTableNumber: (tableNumber) => set({ tableNumber }),
 
     setCustomer: (customerId, customerName) => set({ customerId, customerName }),
+
+    setCustomerWithCategorySlug: (customerId, customerName, categorySlug) =>
+        set({ customerId, customerName, customerCategorySlug: categorySlug }),
 
     setDiscount: (discountType, discountValue, discountReason) => {
         set(state => {
@@ -334,6 +371,83 @@ export const useCartStore = create<CartState>()(
             }
         })
     },
+
+    // Customer category pricing (Story 6.2)
+    addItemWithPricing: (product, quantity, modifiers, notes, customerPrice, priceType, savings, selectedVariants) => {
+        const modifiersTotal = modifiers.reduce((sum, m) => sum + m.priceAdjustment, 0)
+        const unitPrice = customerPrice // Use customer-specific price
+        const totalPrice = (unitPrice + modifiersTotal) * quantity
+
+        const newItem: CartItem = {
+            id: `${product.id}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
+            type: 'product',
+            product,
+            quantity,
+            unitPrice,
+            modifiers,
+            modifiersTotal,
+            notes,
+            selectedVariants,
+            totalPrice,
+            appliedPriceType: priceType,
+            savingsAmount: savings * quantity, // Total savings for this quantity
+            retailPrice: product.retail_price || 0,
+        }
+
+        set(state => {
+            const newItems = [...state.items, newItem]
+            const totals = calculateTotals(newItems, state.discountType, state.discountValue)
+            return { items: newItems, ...totals }
+        })
+    },
+
+    updateItemPricing: (itemId, newPrice, priceType, savings) => {
+        set(state => {
+            const newItems = state.items.map(item => {
+                if (item.id === itemId) {
+                    const totalPrice = (newPrice + item.modifiersTotal) * item.quantity
+                    return {
+                        ...item,
+                        unitPrice: newPrice,
+                        totalPrice,
+                        appliedPriceType: priceType,
+                        savingsAmount: savings * item.quantity,
+                    }
+                }
+                return item
+            })
+            const totals = calculateTotals(newItems, state.discountType, state.discountValue)
+            return { items: newItems, ...totals }
+        })
+    },
+
+    recalculateAllPrices: async (priceCalculator) => {
+        const state = get()
+        const updatedItems: CartItem[] = []
+
+        for (const item of state.items) {
+            if (item.type === 'product' && item.product) {
+                const { price, priceType, savings } = await priceCalculator(item)
+                const totalPrice = (price + item.modifiersTotal) * item.quantity
+                updatedItems.push({
+                    ...item,
+                    unitPrice: price,
+                    totalPrice,
+                    appliedPriceType: priceType,
+                    savingsAmount: savings * item.quantity,
+                    retailPrice: item.product.retail_price || 0,
+                })
+            } else {
+                // Combos keep their original pricing
+                updatedItems.push(item)
+            }
+        }
+
+        set(state => {
+            const totals = calculateTotals(updatedItems, state.discountType, state.discountValue)
+            return { items: updatedItems, ...totals }
+        })
+    },
 })))
 
 // =====================================================
@@ -362,6 +476,7 @@ export function initCartPersistence(): void {
             tableNumber: state.tableNumber,
             customerId: state.customerId,
             customerName: state.customerName,
+            customerCategorySlug: state.customerCategorySlug, // Story 6.2
             discountType: state.discountType,
             discountValue: state.discountValue,
             discountReason: state.discountReason,

@@ -19,7 +19,6 @@ interface GroupItemWithProduct extends ProductComboGroupItem {
 
 interface ComboGroupWithItems extends ProductComboGroup {
     items: GroupItemWithProduct[]
-    group_name: string
 }
 
 interface ComboWithGroups extends ProductCombo {
@@ -84,7 +83,6 @@ export default function CombosPage() {
                         const rawGroups = groupsWithItems as unknown as RawGroup[];
                         const mappedGroups = rawGroups.map((g) => ({
                             ...g,
-                            group_name: g.group_name ?? '',
                             items: (g.items || []).map((item) => ({
                                 ...item,
                                 price_adjustment: item.price_adjustment ?? 0,
@@ -313,7 +311,7 @@ export default function CombosPage() {
                                             combo.groups.map((group, groupIdx) => (
                                                 <div key={groupIdx} className="group-summary">
                                                     <div className="group-name">
-                                                        <strong>{group.group_name}</strong>
+                                                        <strong>{group.name}</strong>
                                                         {!group.is_required && (
                                                             <span className="optional-badge">Optionnel</span>
                                                         )}

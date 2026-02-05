@@ -119,7 +119,9 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
         const newSelections = new Map(selections)
         const groupSelections = newSelections.get(group.id) || new Set<string>()
 
-        if (group.group_type === 'single') {
+        // Single selection if max_selections is 1, otherwise multiple
+        const isSingleSelection = (group.max_selections ?? 1) === 1
+        if (isSingleSelection) {
             // Single selection: replace current selection
             newSelections.set(group.id, new Set([itemId]))
         } else {
@@ -129,7 +131,7 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
             } else {
                 // Check max selections
                 if (groupSelections.size >= (group.max_selections ?? 1)) {
-                    setError(`Maximum ${group.max_selections ?? 1} sélection(s) pour ${group.group_name}`)
+                    setError(`Maximum ${group.max_selections ?? 1} sélection(s) pour ${group.name}`)
                     setTimeout(() => setError(''), 3000)
                     return
                 }
@@ -174,15 +176,17 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
             const groupSelections = selections.get(group.id) || new Set()
 
             if (group.is_required && groupSelections.size === 0) {
-                return `Veuillez choisir une option pour ${group.group_name}`
+                return `Veuillez choisir une option pour ${group.name}`
             }
 
-            if (group.group_type === 'multiple') {
+            // Multi-selection validation
+            const isMultiSelection = (group.max_selections ?? 1) > 1
+            if (isMultiSelection) {
                 if (groupSelections.size < (group.min_selections ?? 0)) {
-                    return `Minimum ${group.min_selections ?? 0} sélection(s) pour ${group.group_name}`
+                    return `Minimum ${group.min_selections ?? 0} sélection(s) pour ${group.name}`
                 }
                 if (groupSelections.size > (group.max_selections ?? 1)) {
-                    return `Maximum ${group.max_selections ?? 1} sélection(s) pour ${group.group_name}`
+                    return `Maximum ${group.max_selections ?? 1} sélection(s) pour ${group.name}`
                 }
             }
         }
@@ -209,7 +213,7 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                     if (item && item.product) {
                         selectedItems.push({
                             group_id: group.id,
-                            group_name: group.group_name,
+                            group_name: group.name,
                             item_id: item.id,
                             product_id: item.product_id,
                             product_name: item.product.name,
@@ -289,15 +293,15 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                             <div key={group.id} className="combo-group">
                                 <div className="combo-group-header">
                                     <h3>
-                                        {group.group_name}
+                                        {group.name}
                                         {group.is_required && <span className="required-badge">*</span>}
                                         {!group.is_required && <span className="optional-badge">Optionnel</span>}
                                     </h3>
-                                    {group.group_type === 'multiple' && (
+                                    {(group.max_selections ?? 1) > 1 && (
                                         <span className="selection-hint">
                                             {group.min_selections === group.max_selections
                                                 ? `Choisir ${group.min_selections}`
-                                                : `Choisir ${group.min_selections}-${group.max_selections}`}
+                                                : `Choisir ${group.min_selections ?? 0}-${group.max_selections}`}
                                         </span>
                                     )}
                                 </div>

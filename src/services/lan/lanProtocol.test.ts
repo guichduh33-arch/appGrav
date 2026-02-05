@@ -160,7 +160,11 @@ describe('lanProtocol', () => {
     it('should call crypto.subtle.digest with SHA-256', async () => {
       await hashPayload({ test: 'payload' });
 
-      expect(mockDigest).toHaveBeenCalledWith('SHA-256', expect.any(ArrayBuffer));
+      expect(mockDigest).toHaveBeenCalledTimes(1);
+      const [algorithm, data] = mockDigest.mock.calls[0];
+      expect(algorithm).toBe('SHA-256');
+      // Verify data is a typed array (Uint8Array or ArrayBuffer view)
+      expect(data.constructor.name).toBe('Uint8Array');
     });
   });
 

@@ -209,19 +209,24 @@ export async function exportSalesReport(
 
         if (error) throw error
 
-        const csvData = (data || []).map((o) => ({
-            order_number: o.order_number,
-            date: new Date(o.created_at || '').toLocaleDateString('fr-FR'),
-            time: new Date(o.created_at || '').toLocaleTimeString('fr-FR'),
-            type: o.order_type,
-            status: o.status,
-            customer: (o.customer as { name: string } | null)?.name || '-',
-            subtotal: o.subtotal,
-            discount: o.discount_value || 0,
-            tax: o.tax_amount || 0,
-            total: o.total,
-            payment: o.payment_method
-        }))
+        const csvData = (data || []).map((o) => {
+            // Handle Supabase relation which may return array or object
+            const customerRaw = o.customer as unknown
+            const customer = Array.isArray(customerRaw) ? customerRaw[0] : customerRaw
+            return {
+                order_number: o.order_number,
+                date: new Date(o.created_at || '').toLocaleDateString('fr-FR'),
+                time: new Date(o.created_at || '').toLocaleTimeString('fr-FR'),
+                type: o.order_type,
+                status: o.status,
+                customer: (customer as { name: string } | null)?.name || '-',
+                subtotal: o.subtotal,
+                discount: o.discount_value || 0,
+                tax: o.tax_amount || 0,
+                total: o.total,
+                payment: o.payment_method
+            }
+        })
 
         const csv = toCSV(csvData, [
             { key: 'order_number', header: 'N° Commande' },
@@ -268,18 +273,23 @@ export async function exportInventoryReport(): Promise<{ success: boolean; error
 
         if (error) throw error
 
-        const csvData = (data || []).map((p) => ({
-            sku: p.sku || '-',
-            name: p.name,
-            category: (p.category as { name: string } | null)?.name || '-',
-            type: p.product_type,
-            stock: p.current_stock,
-            unit: p.unit,
-            min_stock: p.min_stock_level || 0,
-            cost: p.cost_price,
-            price: p.retail_price,
-            active: p.is_active ? 'Oui' : 'Non'
-        }))
+        const csvData = (data || []).map((p) => {
+            // Handle Supabase relation which may return array or object
+            const catRaw = p.category as unknown
+            const category = Array.isArray(catRaw) ? catRaw[0] : catRaw
+            return {
+                sku: p.sku || '-',
+                name: p.name,
+                category: (category as { name: string } | null)?.name || '-',
+                type: p.product_type,
+                stock: p.current_stock,
+                unit: p.unit,
+                min_stock: p.min_stock_level || 0,
+                cost: p.cost_price,
+                price: p.retail_price,
+                active: p.is_active ? 'Oui' : 'Non'
+            }
+        })
 
         const csv = toCSV(csvData, [
             { key: 'sku', header: 'SKU' },
@@ -461,19 +471,24 @@ export async function exportPurchaseOrdersReport(
 
         if (error) throw error
 
-        const csvData = (data || []).map((po) => ({
-            po_number: po.po_number,
-            supplier: (po.supplier as { name: string } | null)?.name || '-',
-            order_date: new Date(po.order_date).toLocaleDateString('fr-FR'),
-            expected: po.expected_delivery_date ? new Date(po.expected_delivery_date).toLocaleDateString('fr-FR') : '-',
-            received: po.actual_delivery_date ? new Date(po.actual_delivery_date).toLocaleDateString('fr-FR') : '-',
-            status: po.status,
-            subtotal: po.subtotal,
-            discount: po.discount_amount || 0,
-            tax: po.tax_amount || 0,
-            total: po.total_amount,
-            payment: po.payment_status
-        }))
+        const csvData = (data || []).map((po) => {
+            // Handle Supabase relation which may return array or object
+            const supplierRaw = po.supplier as unknown
+            const supplier = Array.isArray(supplierRaw) ? supplierRaw[0] : supplierRaw
+            return {
+                po_number: po.po_number,
+                supplier: (supplier as { name: string } | null)?.name || '-',
+                order_date: new Date(po.order_date).toLocaleDateString('fr-FR'),
+                expected: po.expected_delivery_date ? new Date(po.expected_delivery_date).toLocaleDateString('fr-FR') : '-',
+                received: po.actual_delivery_date ? new Date(po.actual_delivery_date).toLocaleDateString('fr-FR') : '-',
+                status: po.status,
+                subtotal: po.subtotal,
+                discount: po.discount_amount || 0,
+                tax: po.tax_amount || 0,
+                total: po.total_amount,
+                payment: po.payment_status
+            }
+        })
 
         const csv = toCSV(csvData, [
             { key: 'po_number', header: 'N° BC' },

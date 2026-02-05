@@ -17,9 +17,8 @@ const mockInsertSelect = vi.fn(() => ({
   ),
 }));
 
-const mockInsert = vi.fn(() => ({
-  select: mockInsertSelect,
-}));
+// Used by mockInsertSelect above
+void mockInsertSelect;
 
 vi.mock('@/lib/supabase', () => ({
   supabase: {

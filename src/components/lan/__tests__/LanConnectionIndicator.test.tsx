@@ -74,7 +74,7 @@ describe('LanConnectionIndicator', () => {
         />
       );
 
-      expect(screen.getByText('Attempt 3/10')).toBeTruthy();
+      expect(screen.getByText('Reconnecting (3/10)')).toBeTruthy();
     });
   });
 
@@ -98,7 +98,7 @@ describe('LanConnectionIndicator', () => {
       );
 
       const wrapper = container.firstChild as HTMLElement;
-      expect(wrapper.getAttribute('title')).toContain('LAN connection error');
+      expect(wrapper.getAttribute('title')).toContain('Connection error');
       expect(wrapper.getAttribute('title')).toContain('5/10');
     });
   });

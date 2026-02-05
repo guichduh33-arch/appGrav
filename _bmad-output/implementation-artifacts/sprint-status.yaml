@@ -47,6 +47,10 @@ development_status:
   1-3-offline-permissions-cache: done
   1-4-network-status-indicator: done
   1-5-settings-offline-cache: done
+  1-6-company-settings-ui: backlog  # 2026-02-05 - UI config entreprise
+  1-7-printer-configuration-ui: backlog  # 2026-02-05 - UI config imprimantes
+  1-8-notification-settings-ui: backlog  # 2026-02-05 - UI config notifications SMTP
+  1-9-audit-log-viewer: backlog  # 2026-02-05 - UI consultation audit logs
   epic-1-retrospective: done  # 2026-02-02 synthetic
 
   # Epic 2: Catalogue & Costing — Produits, Recettes & Production
@@ -83,7 +87,8 @@ development_status:
   epic-4-retrospective: done  # 2026-02-02
 
   # Epic 5: Stock & Approvisionnement — Inventaire, Transferts & Achats
-  epic-5: done
+  # Note: Réouvert 2026-02-05 - stories 5.9-5.10 ajoutées pour trigger déduction stock ventes
+  epic-5: in-progress
   5-1-stock-levels-read-only-cache: done
   5-2-stock-alerts-offline-display: done
   5-3-stock-adjustment-online-only: done
@@ -92,14 +97,16 @@ development_status:
   5-6-purchase-order-creation: done
   5-7-purchase-order-workflow: done
   5-8-purchase-reception-stock-update: done
-  epic-5-retrospective: done  # 2026-02-04
+  5-9-stock-deduction-on-sale: review  # 2026-02-05 - Trigger déduction auto à la vente
+  5-10-variant-ingredient-deduction: review  # 2026-02-05 - Déduction ingrédients variants
+  epic-5-retrospective: done  # 2026-02-04 (à refaire après 5.9-5.10)
 
   # Epic 6: Clients & Marketing — Fidélité, B2B, Combos & Promotions
-  epic-6: backlog
-  6-1-customers-offline-cache: backlog
-  6-2-customer-category-pricing-offline: backlog
-  6-3-loyalty-points-display-read-only: backlog
-  6-4-promotions-offline-cache: backlog
+  epic-6: in-progress
+  6-1-customers-offline-cache: done  # 2026-02-05
+  6-2-customer-category-pricing-offline: done  # 2026-02-05
+  6-3-loyalty-points-display-read-only: done  # 2026-02-05
+  6-4-promotions-offline-cache: review  # 2026-02-05 - All tasks completed, 50 tests passing
   6-5-automatic-promotion-application: backlog
   6-6-combos-selection-flow: backlog
   6-7-b2b-order-creation: backlog
@@ -118,6 +125,11 @@ development_status:
   7-8-lan-discovery-via-qr-code: backlog
   7-9-system-monitoring-dashboard: backlog
   7-10-offline-period-logging: backlog
+  7-11-print-server-deployment: backlog  # 2026-02-05 - Serveur impression local port 3001
+  7-12-receipt-printing-integration: backlog  # 2026-02-05 - Impression tickets caisse
+  7-13-kitchen-ticket-printing: backlog  # 2026-02-05 - Impression tickets cuisine
+  7-14-cash-drawer-control: backlog  # 2026-02-05 - Contrôle tiroir-caisse
+  7-15-barista-ticket-printing: backlog  # 2026-02-05 - Impression tickets barista (optionnel)
   epic-7-retrospective: optional
 
   # Epic 8: Analytics & Intelligence — Reports Complets

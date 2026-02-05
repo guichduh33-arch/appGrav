@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { NetworkIndicator } from './NetworkIndicator';
 import { useNetworkStore } from '../../stores/networkStore';

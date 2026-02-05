@@ -12,8 +12,8 @@ import {
   getBackoffDelay,
   shouldRetryNow,
   getPendingItems,
-  getRetryableItems,
-  getItemsToSync,
+  // getRetryableItems - available but not directly tested
+  // getItemsToSync - available but not directly tested
   sortQueueByDependency,
   markSyncing,
   markSynced,

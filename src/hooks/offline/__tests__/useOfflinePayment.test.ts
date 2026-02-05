@@ -35,6 +35,10 @@ vi.mock('@/services/offline/offlinePaymentService', () => ({
   calculateChange: vi.fn((total, received) => Math.max(0, received - total)),
 }));
 
+vi.mock('@/services/offline/kitchenDispatchService', () => ({
+  dispatchOrderToKitchen: vi.fn(() => Promise.resolve({ dispatched: [], queued: [] })),
+}));
+
 import { useCartStore } from '@/stores/cartStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useNetworkStatus } from '../useNetworkStatus';
@@ -205,9 +209,8 @@ describe('useOfflinePayment', () => {
       const { result } = renderHook(() => useOfflinePayment());
 
       // Amount is 49999 (1 off from 50000) - should be allowed
-      let paymentResult: unknown;
       await act(async () => {
-        paymentResult = await result.current.processPayment({
+        await result.current.processPayment({
           method: 'cash',
           amount: 49999,
           cashReceived: 50000,

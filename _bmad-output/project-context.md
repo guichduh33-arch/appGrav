@@ -1,7 +1,7 @@
 ---
 project_name: 'AppGrav'
 user_name: 'MamatCEO'
-date: '2026-02-04'
+date: '2026-02-05'
 sections_completed: ['technology_stack', 'framework_rules', 'performance_rules', 'code_organization', 'business_rules', 'critical_rules']
 status: 'complete'
 ---
@@ -38,9 +38,9 @@ _Ce fichier contient les règles critiques et patterns que les agents IA doivent
 - vite-plugin-pwa 1.2.0 + Workbox
 - Types: `src/types/offline.ts` (ISyncQueueItem, IOfflineUser, etc.)
 
-**i18n:**
-- i18next 25.7.4 (3 locales: fr, en, id)
-- ⚠️ TOUTES les 3 locales OBLIGATOIRES pour chaque clé
+**i18n:** ⚠️ SUSPENDU
+- i18next 25.7.4 installé mais **non utilisé**
+- English hardcodé - NE PAS utiliser `t()` ou `useTranslation()`
 
 **Mobile:**
 - Capacitor 8.0.1 (iOS/Android)
@@ -131,6 +131,23 @@ CREATE POLICY "Auth read" ON public.{table}
 ```typescript
 'order:created', 'order:updated', 'cart:sync', 'display:update'
 ```
+
+### Print Server Integration (Optionnel)
+
+**Serveur local:** Node.js/Express sur port 3001 (PC caisse)
+
+**Endpoints:**
+| Route | Usage |
+|-------|-------|
+| `GET /health` | Status serveur |
+| `POST /print/receipt` | Ticket caisse (ESC/POS 80mm) |
+| `POST /print/kitchen` | Ticket cuisine |
+| `POST /print/barista` | Ticket barista |
+| `POST /drawer/open` | Ouverture tiroir-caisse |
+
+**Configuration:** Table `printer_configurations` + UI `/settings/printing`
+
+**Note:** Système fonctionne sans print server (impression désactivée)
 
 ### Testing Patterns
 
@@ -421,19 +438,26 @@ if (!hasPermission('sales.void')) return null;
 
 **Calcul:** 1 point = 1,000 IDR dépensés
 
-### i18n Rules
+### i18n Rules - ⚠️ MODULE SUSPENDU
 
-**3 locales OBLIGATOIRES:** `fr.json`, `en.json`, `id.json`
+**Langue:** English uniquement (hardcodé)
 
-**Langue par défaut:** Français (fr)
-
-**Pattern:**
+**Ce qui est INTERDIT:**
 ```typescript
-// TOUJOURS ajouter aux 3 fichiers
-// fr.json: "pos.newKey": "Valeur française"
-// en.json: "pos.newKey": "English value"
-// id.json: "pos.newKey": "Nilai Indonesia"
+// ❌ NE PAS FAIRE - i18n suspendu
+import { useTranslation } from 'react-i18next';
+const { t } = useTranslation();
+<Button>{t('common.save')}</Button>
 ```
+
+**Pattern correct:**
+```typescript
+// ✅ CORRECT - Strings anglaises directes
+<Button>Save</Button>
+<h1>Products</h1>
+```
+
+**Note:** Les fichiers `fr.json`, `en.json`, `id.json` existent mais sont obsolètes et non maintenus.
 
 ---
 
@@ -444,7 +468,7 @@ if (!hasPermission('sales.void')) return null;
 | ❌ Anti-Pattern | ✅ Correct Approach |
 |----------------|---------------------|
 | Table sans RLS | `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` + policies |
-| i18n manquant | TOUJOURS ajouter aux 3 fichiers (fr, en, id) |
+| Utiliser `t()` ou i18next | Strings anglaises hardcodées (i18n suspendu) |
 | Zustand pour server data | `useQuery` pour données serveur |
 | `useEffect` pour fetch | `useQuery` avec `enabled` |
 | `.equals(true)` Dexie | `.equals(1)` (IndexedDB = 0/1) |
@@ -502,7 +526,7 @@ if (!hasPermission('module.action')) return null;
 | **POS** | Ignorer lockedItems | Check `cartStore.lockedItems` avant modif |
 | **Offline** | Boolean true/false Dexie | Utiliser 0/1 |
 | **Sync** | Sync immédiat | Attendre 5s après reconnexion |
-| **i18n** | Oublier une locale | Script de validation 3 fichiers |
+| **i18n** | Utiliser `t()` | ⚠️ SUSPENDU - Strings anglaises directes |
 | **Auth** | PIN non-hashé | bcrypt OBLIGATOIRE |
 | **Types** | `any` type | `I{Name}` ou `T{Name}` |
 
@@ -524,6 +548,6 @@ if (!hasPermission('module.action')) return null;
 
 ---
 
-_Dernière mise à jour: 2026-02-04_
+_Dernière mise à jour: 2026-02-05 (Print Server + Settings UI stories ajoutées)_
 _Généré par BMAD Generate Project Context Workflow_
 

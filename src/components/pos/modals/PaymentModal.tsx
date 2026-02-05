@@ -4,7 +4,7 @@ import { useCartStore } from '../../../stores/cartStore'
 import { formatPrice } from '../../../utils/helpers'
 import { useOfflinePayment } from '../../../hooks/offline/useOfflinePayment'
 import { useNetworkStore } from '../../../stores/networkStore'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import './PaymentModal.css'
 
 interface PaymentModalProps {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Save, Clock, AlertCircle } from 'lucide-react';
 import { useBusinessHours, useUpdateBusinessHours } from '../../hooks/settings';
 import type { BusinessHours } from '../../types/settings';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 const DAY_NAMES: Record<string, string[]> = {
   fr: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],

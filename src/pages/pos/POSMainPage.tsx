@@ -1,21 +1,19 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
-
-import { Search, PauseCircle, CheckCircle, AlertCircle, Clock, Users } from 'lucide-react'
+import { Search, CheckCircle, Clock, Users } from 'lucide-react'
 
 import { useCartStore, CartItem } from '../../stores/cartStore'
-import { useOrderStore } from '../../stores/orderStore'
 import { useAuthStore } from '../../stores/authStore'
 import { useProducts, useCategories } from '../../hooks/products'
-import { useShift, ShiftUser } from '../../hooks/useShift'
 import { useNetworkAlerts } from '../../hooks/useNetworkAlerts'
 import { useSyncReport } from '../../hooks/useSyncReport'
 import { useLanHub } from '../../hooks/lan'
+import { useCartPriceRecalculation } from '../../hooks/pricing'
+import { usePOSModals, usePOSShift, usePOSOrders } from '../../hooks/pos'
 import { PostOfflineSyncReport } from '../../components/sync/PostOfflineSyncReport'
 import CategoryNav from '../../components/pos/CategoryNav'
 import ProductGrid from '../../components/pos/ProductGrid'
 import Cart from '../../components/pos/Cart'
 import POSMenu from '../../components/pos/POSMenu'
-// Modals
 import {
     ModifierModal,
     PaymentModal,
@@ -25,7 +23,6 @@ import {
     TransactionHistoryModal,
     CashierAnalyticsModal,
 } from '../../components/pos/modals'
-// Shift modals
 import {
     OpenShiftModal,
     CloseShiftModal,
@@ -43,84 +40,68 @@ export default function POSMainPage() {
     // Enable post-offline sync report modal (Story 3.3)
     const { showReport: showSyncReport, period: syncPeriod, dismissReport: dismissSyncReport, retryFailed: retrySyncFailed } = useSyncReport()
 
+    // Enable automatic cart price recalculation on customer change (Story 6.2)
+    useCartPriceRecalculation()
+
     // Enable LAN Hub for KDS communication (Story 4.1)
     const { isRunning: lanHubRunning, error: lanHubError } = useLanHub({
         deviceName: 'Caisse Principale',
         autoStart: true,
     })
 
-    // Log LAN hub errors
     useEffect(() => {
-        if (lanHubError) {
-            console.error('[POS] LAN Hub error:', lanHubError)
-        }
+        if (lanHubError) console.error('[POS] LAN Hub error:', lanHubError)
     }, [lanHubError])
 
-    // Debug: Log LAN hub status changes
     useEffect(() => {
         console.log('[POS] LAN Hub running:', lanHubRunning)
     }, [lanHubRunning])
 
-    const {
-        items, itemCount, clearCart,
-        activeOrderId, activeOrderNumber, restoreCartState, lockedItemIds,
-        subtotal, discountAmount, total, orderType, tableNumber, customerId, customerName
-    } = useCartStore()
-    const { holdOrder, restoreHeldOrder } = useOrderStore()
+    // Cart state
+    const { itemCount } = useCartStore()
     const { user } = useAuthStore()
 
+    // UI state
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
     const [searchQuery, setSearchQuery] = useState('')
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+    const [editItem, setEditItem] = useState<CartItem | undefined>(undefined)
+
+    // Consolidated modal management
+    const { modals, openModal, closeModal } = usePOSModals()
 
     // Shift management
     const {
         hasOpenShift,
         currentSession,
         terminalSessions,
-        sessionStats: shiftStats,
+        shiftStats,
         sessionTransactions,
-        openShift,
-        closeShift,
-        switchToShift,
-        recoverShift,
         reconciliationData,
         clearReconciliation,
         isOpeningShift,
         isClosingShift,
-        activeShiftUserId
-    } = useShift()
+        activeShiftUserId,
+        verifiedUser,
+        setVerifiedUser,
+        pinModalAction,
+        setPinModalAction,
+        isRecoveringShift,
+        handlePinVerified,
+        handleOpenShift,
+        handleCloseShift,
+        handleSwitchShift,
+        handleRecoverShift,
+    } = usePOSShift()
 
-    // Verified user for shift operations
-    const [verifiedUser, setVerifiedUser] = useState<ShiftUser | null>(null)
-
-    // Modal states
-    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-    const [editItem, setEditItem] = useState<CartItem | undefined>(undefined)
-    const [showModifierModal, setShowModifierModal] = useState(false)
-    const [showPaymentModal, setShowPaymentModal] = useState(false)
-    const [showVariantModal, setShowVariantModal] = useState(false)
-    const [showHeldOrdersModal, setShowHeldOrdersModal] = useState(false)
-    const [showMenu, setShowMenu] = useState(false)
-    const [showOpenShiftModal, setShowOpenShiftModal] = useState(false)
-    const [showCloseShiftModal, setShowCloseShiftModal] = useState(false)
-    const [showPinModal, setShowPinModal] = useState(false)
-    const [pinModalAction, setPinModalAction] = useState<'open' | 'close'>('open')
-    const [showShiftSelector, setShowShiftSelector] = useState(false)
-    const [showTransactionHistory, setShowTransactionHistory] = useState(false)
-    const [showAnalytics, setShowAnalytics] = useState(false)
-    const [showShiftHistory, setShowShiftHistory] = useState(false)
-    const [showShiftStats, setShowShiftStats] = useState(false)
-    const [showNoShiftModal, setShowNoShiftModal] = useState(false)
-    const [isRecoveringShift, setIsRecoveringShift] = useState(false)
-
-    // Toast state
-    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
+    // Order management
+    const { handleSendToKitchen, handleRestoreHeldOrder } = usePOSOrders()
 
     // Data fetching
     const { data: categories = [], isLoading: categoriesLoading } = useCategories()
     const { data: products = [], isLoading: productsLoading } = useProducts(selectedCategory)
 
-    // Filter products by search - memoized to prevent unnecessary recalculations
+    // Filter products by search
     const filteredProducts = useMemo(() =>
         products.filter(product =>
             searchQuery === '' ||
@@ -130,209 +111,63 @@ export default function POSMainPage() {
         [products, searchQuery]
     )
 
-    // Handle product click - allow even without shift (block at checkout/send)
+    // Handle product click
     const handleProductClick = useCallback((product: Product) => {
-        setEditItem(undefined) // Reset edit item when adding new
+        setEditItem(undefined)
         setSelectedProduct(product)
-        // Always show variant modal first - it will load variants from database
-        // If no variants exist, it will add directly to cart
-        setShowVariantModal(true)
-    }, [])
+        openModal('variant')
+    }, [openModal])
 
     const handleCartItemClick = useCallback((item: CartItem) => {
         setEditItem(item)
         setSelectedProduct(item.product || null)
-        setShowModifierModal(true)
-    }, [])
+        openModal('modifier')
+    }, [openModal])
 
-    // Handle variant selection complete
     const handleVariantClose = useCallback(() => {
-        setShowVariantModal(false)
+        closeModal('variant')
         setSelectedProduct(null)
-    }, [])
+    }, [closeModal])
 
-    // Show toast notification
-    const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success') => {
-        setToast({ message, type })
-        setTimeout(() => setToast(null), 3000)
-    }, [])
-
-    // Get kitchen helper functions
-    const { sendToKitchenAsHeldOrder, updateKitchenHeldOrder } = useOrderStore()
-
-    // Handle send to kitchen - creates or updates a held order and clears the cart
-    const handleSendToKitchen = () => {
-        if (!hasOpenShift) {
-            setShowNoShiftModal(true)
-            return
-        }
-        if (itemCount === 0) {
-            showToast('No items to send', 'error')
-            return
-        }
-
-        if (activeOrderId) {
-            // Update existing kitchen order
-            updateKitchenHeldOrder(
-                activeOrderId,
-                items,
-                subtotal,
-                discountAmount,
-                total
-            )
-            showToast('Order updated successfully!', 'success')
-        } else {
-            // Create new kitchen order
-            const heldOrder = sendToKitchenAsHeldOrder(
-                items,
-                orderType,
-                tableNumber,
-                customerId,
-                customerName,
-                subtotal,
-                discountAmount,
-                total
-            )
-            showToast(`Order ${heldOrder.orderNumber} sent to kitchen!`, 'success')
-        }
-
-        // Clear the cart after sending
-        clearCart()
-    }
-
-    // Handle hold order - prefixed with underscore as it's kept for future use
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const _handleHoldOrder = () => {
-        if (!hasOpenShift) {
-            setShowNoShiftModal(true)
-            return
-        }
-        if (itemCount > 0) {
-            const heldOrder = holdOrder(
-                items,
-                orderType,
-                tableNumber,
-                customerId,
-                customerName,
-                subtotal,
-                discountAmount,
-                total,
-                '', // reason
-                activeOrderNumber || undefined, // existingOrderNumber
-                activeOrderId || undefined, // existingId (only if it was kitchen order)
-                !!activeOrderId, // sentToKitchen (true if it has activeOrderId)
-                lockedItemIds // lockedItemIds
-            )
-            clearCart()
-            showToast(`Order ${heldOrder.orderNumber} put on hold`, 'info')
-        }
-    }
-    void _handleHoldOrder
-
-    // Handle restore held order
-    const handleRestoreHeldOrder = useCallback((heldOrderId: string) => {
-        const heldOrder = restoreHeldOrder(heldOrderId)
-        if (heldOrder) {
-            // Restore items to cart with full state (including locks and active order ID)
-            restoreCartState(
-                heldOrder.items,
-                heldOrder.lockedItemIds || [], // Restore locked items
-                heldOrder.sentToKitchen ? heldOrder.id : null, // Restore active order ID if sent to kitchen
-                heldOrder.orderNumber
-            )
-
-            setShowHeldOrdersModal(false)
-            showToast(`Order ${heldOrder.orderNumber} restored`, 'success')
-        }
-    }, [restoreHeldOrder, restoreCartState, showToast])
-
-    // Handle checkout - block if no shift open
-    const handleCheckout = useCallback(() => {
-        if (!hasOpenShift) {
-            setShowNoShiftModal(true)
-            return
-        }
-        if (itemCount > 0) {
-            setShowPaymentModal(true)
-        }
-    }, [hasOpenShift, itemCount])
-
-    // Handle open shift request - show PIN verification first
+    // Shift request handlers
     const handleOpenShiftRequest = useCallback(() => {
         setPinModalAction('open')
-        setShowPinModal(true)
-    }, [])
+        openModal('pin')
+    }, [setPinModalAction, openModal])
 
-    // Handle close shift request - show PIN verification first
     const handleCloseShiftRequest = useCallback(() => {
         setPinModalAction('close')
-        setShowPinModal(true)
-    }, [])
+        openModal('pin')
+    }, [setPinModalAction, openModal])
 
-    // Handle PIN verification result
-    const handlePinVerified = (verified: boolean, user?: { id: string; name: string; role: string }) => {
-        if (verified && user) {
-            setShowPinModal(false) // Close PIN modal first
-            setVerifiedUser(user)
-            if (pinModalAction === 'open') {
-                setShowOpenShiftModal(true)
-            } else {
-                setShowCloseShiftModal(true)
-            }
+    // Handle checkout
+    const handleCheckout = useCallback(() => {
+        if (!hasOpenShift) {
+            openModal('noShift')
+            return
         }
-    }
-
-    // Handle open shift with verified user
-    const handleOpenShift = async (openingCash: number, _terminalId?: string, notes?: string) => {
-        if (!verifiedUser) return
-        try {
-            await openShift(openingCash, verifiedUser.id, verifiedUser.name, notes)
-            setShowOpenShiftModal(false)
-            setVerifiedUser(null)
-        } catch (error) {
-            console.error('Error opening shift:', error)
+        if (itemCount > 0) {
+            openModal('payment')
         }
-    }
-
-    // Handle close shift with verified user
-    const handleCloseShift = async (actualCash: number, actualQris: number, actualEdc: number, notes?: string) => {
-        if (!verifiedUser) return
-        try {
-            await closeShift(actualCash, actualQris, actualEdc, verifiedUser.id, notes)
-            setShowCloseShiftModal(false)
-            setVerifiedUser(null)
-        } catch (error) {
-            console.error('Error closing shift:', error)
-        }
-    }
-
-    // Handle shift switch
-    const handleSwitchShift = (userId: string) => {
-        switchToShift(userId)
-        setShowShiftSelector(false)
-    }
+    }, [hasOpenShift, itemCount, openModal])
 
     return (
         <div className="pos-app">
-            {/* Main Content (3 Zones) */}
             <main className="pos-main">
-                {/* Zone 1: Categories Sidebar */}
                 <CategoryNav
                     categories={categories}
                     selectedCategory={selectedCategory}
                     onSelectCategory={setSelectedCategory}
                     isLoading={categoriesLoading}
-                    onOpenMenu={() => setShowMenu(true)}
+                    onOpenMenu={() => openModal('menu')}
                 />
 
-                {/* Zone 2: Products Grid */}
                 <section className="pos-products">
                     <div className="pos-products__header">
                         <h2 className="pos-products__title">
                             {selectedCategory
                                 ? categories.find(c => c.id === selectedCategory)?.name || 'All Products'
-                                : 'All Products'
-                            }
+                                : 'All Products'}
                         </h2>
                         <div className="pos-products__search search-input">
                             <Search className="search-input__icon" size={20} />
@@ -344,7 +179,6 @@ export default function POSMainPage() {
                             />
                         </div>
                     </div>
-
                     <div className="pos-products__grid">
                         <ProductGrid
                             products={filteredProducts}
@@ -354,113 +188,76 @@ export default function POSMainPage() {
                     </div>
                 </section>
 
-                {/* Zone 3: Cart Sidebar with integrated Menu Button */}
                 <Cart
                     onCheckout={handleCheckout}
-                    onSendToKitchen={handleSendToKitchen}
-                    onShowPendingOrders={() => setShowHeldOrdersModal(true)}
+                    onSendToKitchen={() => handleSendToKitchen(hasOpenShift, () => openModal('noShift'))}
+                    onShowPendingOrders={() => openModal('heldOrders')}
                     onItemClick={handleCartItemClick}
                 />
             </main>
 
-            {/* Global Menu */}
             <POSMenu
-                isOpen={showMenu}
-                onClose={() => setShowMenu(false)}
-                onShowHeldOrders={() => setShowHeldOrdersModal(true)}
-                onShowTransactionHistory={() => setShowTransactionHistory(true)}
-                onShowAnalytics={() => setShowAnalytics(true)}
-                onShowShiftHistory={() => setShowShiftHistory(true)}
-                onShowShiftStats={() => setShowShiftStats(true)}
+                isOpen={modals.menu}
+                onClose={() => closeModal('menu')}
+                onShowHeldOrders={() => openModal('heldOrders')}
+                onShowTransactionHistory={() => openModal('transactionHistory')}
+                onShowAnalytics={() => openModal('analytics')}
+                onShowShiftHistory={() => openModal('shiftHistory')}
+                onShowShiftStats={() => openModal('shiftStats')}
                 hasOpenShift={hasOpenShift}
                 onOpenShift={handleOpenShiftRequest}
                 onCloseShift={handleCloseShiftRequest}
             />
 
-            {/* Toast Notifications */}
-            {toast && (
-                <div className={`pos-toast pos-toast--${toast.type}`}>
-                    {toast.type === 'success' && <CheckCircle size={20} />}
-                    {toast.type === 'error' && <AlertCircle size={20} />}
-                    {toast.type === 'info' && <PauseCircle size={20} />}
-                    {toast.message}
-                </div>
+            {modals.variant && selectedProduct && (
+                <VariantModal baseProduct={selectedProduct} onClose={handleVariantClose} />
             )}
 
-            {/* Modals */}
-            {showVariantModal && selectedProduct && (
-                <VariantModal
-                    baseProduct={selectedProduct}
-                    onClose={handleVariantClose}
-                />
-            )}
-
-            {showModifierModal && selectedProduct && (
+            {modals.modifier && selectedProduct && (
                 <ModifierModal
                     product={selectedProduct}
                     editItem={editItem}
                     onClose={() => {
-                        setShowModifierModal(false)
+                        closeModal('modifier')
                         setSelectedProduct(null)
                         setEditItem(undefined)
                     }}
                 />
             )}
 
-            {showPaymentModal && (
-                <PaymentModal
-                    onClose={() => setShowPaymentModal(false)}
-                />
-            )}
+            {modals.payment && <PaymentModal onClose={() => closeModal('payment')} />}
 
-            {showHeldOrdersModal && (
+            {modals.heldOrders && (
                 <HeldOrdersModal
-                    onClose={() => setShowHeldOrdersModal(false)}
-                    onRestore={handleRestoreHeldOrder}
+                    onClose={() => closeModal('heldOrders')}
+                    onRestore={(id) => handleRestoreHeldOrder(id, () => closeModal('heldOrders'))}
                 />
             )}
 
-            {/* PIN Verification Modal */}
-            {showPinModal && (
+            {modals.pin && (
                 <PinVerificationModal
-                    title={pinModalAction === 'open'
-                        ? 'Open a Shift'
-                        : 'Close Shift'
-                    }
-                    message={pinModalAction === 'open'
-                        ? 'Enter your PIN to open your shift'
-                        : 'Enter your PIN to close the shift'
-                    }
+                    title={pinModalAction === 'open' ? 'Open a Shift' : 'Close Shift'}
+                    message={pinModalAction === 'open' ? 'Enter your PIN to open your shift' : 'Enter your PIN to close the shift'}
                     allowedRoles={['cashier', 'manager', 'admin', 'barista']}
-                    onVerify={handlePinVerified}
-                    onClose={() => {
-                        setShowPinModal(false)
-                        setVerifiedUser(null)
-                    }}
+                    onVerify={(verified, user) => handlePinVerified(verified, user, () => closeModal('pin'), () => openModal('openShift'), () => openModal('closeShift'))}
+                    onClose={() => { closeModal('pin'); setVerifiedUser(null) }}
                 />
             )}
 
-            {/* Shift Modals */}
-            {showOpenShiftModal && verifiedUser && (
+            {modals.openShift && verifiedUser && (
                 <OpenShiftModal
-                    onOpen={handleOpenShift}
-                    onClose={() => {
-                        setShowOpenShiftModal(false)
-                        setVerifiedUser(null)
-                    }}
+                    onOpen={async (cash, terminal, notes) => { await handleOpenShift(cash, terminal, notes); closeModal('openShift') }}
+                    onClose={() => { closeModal('openShift'); setVerifiedUser(null) }}
                     isLoading={isOpeningShift}
                 />
             )}
 
-            {showCloseShiftModal && currentSession && verifiedUser && (
+            {modals.closeShift && currentSession && verifiedUser && (
                 <CloseShiftModal
                     sessionStats={shiftStats}
                     openingCash={currentSession.opening_cash}
-                    onClose={() => {
-                        setShowCloseShiftModal(false)
-                        setVerifiedUser(null)
-                    }}
-                    onConfirm={handleCloseShift}
+                    onClose={() => { closeModal('closeShift'); setVerifiedUser(null) }}
+                    onConfirm={async (cash, qris, edc, notes) => { await handleCloseShift(cash, qris, edc, notes); closeModal('closeShift') }}
                     isLoading={isClosingShift}
                 />
             )}
@@ -474,143 +271,71 @@ export default function POSMainPage() {
                 />
             )}
 
-            {/* Transaction History Modal */}
-            {showTransactionHistory && currentSession && (
+            {modals.transactionHistory && currentSession && (
                 <TransactionHistoryModal
                     sessionId={currentSession.id}
                     sessionOpenedAt={currentSession.opened_at}
-                    onClose={() => setShowTransactionHistory(false)}
+                    onClose={() => closeModal('transactionHistory')}
                 />
             )}
 
-            {/* Cashier Analytics Modal */}
-            {showAnalytics && (
-                <CashierAnalyticsModal
-                    onClose={() => setShowAnalytics(false)}
-                    sessionId={currentSession?.id}
-                />
+            {modals.analytics && (
+                <CashierAnalyticsModal onClose={() => closeModal('analytics')} sessionId={currentSession?.id} />
             )}
 
-            {/* Shift History Modal */}
-            {showShiftHistory && (
-                <ShiftHistoryModal
-                    onClose={() => setShowShiftHistory(false)}
-                />
+            {modals.shiftHistory && <ShiftHistoryModal onClose={() => closeModal('shiftHistory')} />}
+
+            {modals.shiftStats && currentSession && (
+                <ShiftStatsModal session={currentSession} transactions={sessionTransactions} stats={shiftStats} onClose={() => closeModal('shiftStats')} />
             )}
 
-            {/* Shift Stats Modal */}
-            {showShiftStats && currentSession && (
-                <ShiftStatsModal
-                    session={currentSession}
-                    transactions={sessionTransactions}
-                    stats={shiftStats}
-                    onClose={() => setShowShiftStats(false)}
-                />
-            )}
-
-            {/* Shift Selector Modal */}
-            {showShiftSelector && (
-                <div className="shift-selector-overlay" onClick={() => setShowShiftSelector(false)}>
+            {modals.shiftSelector && (
+                <div className="shift-selector-overlay" onClick={() => closeModal('shiftSelector')}>
                     <div className="shift-selector" onClick={e => e.stopPropagation()}>
-                        <h3 className="shift-selector__title">
-                            <Users size={20} />
-                            Sélectionner une caisse
-                        </h3>
+                        <h3 className="shift-selector__title"><Users size={20} />Sélectionner une caisse</h3>
                         <div className="shift-selector__list">
                             {terminalSessions.map(session => (
                                 <button
                                     key={session.id}
                                     className={`shift-selector__item ${session.user_id === activeShiftUserId ? 'is-active' : ''}`}
-                                    onClick={() => handleSwitchShift(session.user_id)}
+                                    onClick={() => handleSwitchShift(session.user_id, () => closeModal('shiftSelector'))}
                                 >
                                     <div className="shift-selector__user">
-                                        <span className="shift-selector__name">
-                                            {session.user_name || `Caissier ${session.session_number}`}
-                                        </span>
-                                        <span className="shift-selector__session">
-                                            #{session.session_number}
-                                        </span>
+                                        <span className="shift-selector__name">{session.user_name || `Caissier ${session.session_number}`}</span>
+                                        <span className="shift-selector__session">#{session.session_number}</span>
                                     </div>
-                                    {session.user_id === activeShiftUserId && (
-                                        <CheckCircle size={18} className="shift-selector__check" />
-                                    )}
+                                    {session.user_id === activeShiftUserId && <CheckCircle size={18} className="shift-selector__check" />}
                                 </button>
                             ))}
                         </div>
-                        <button
-                            className="shift-selector__add"
-                            onClick={() => {
-                                setShowShiftSelector(false)
-                                handleOpenShiftRequest()
-                            }}
-                        >
-                            <Clock size={18} />
-                            Ouvrir un nouveau shift
+                        <button className="shift-selector__add" onClick={() => { closeModal('shiftSelector'); handleOpenShiftRequest() }}>
+                            <Clock size={18} />Ouvrir un nouveau shift
                         </button>
                     </div>
                 </div>
             )}
 
-            {/* No Shift Modal - shown when trying to checkout/send without shift */}
-            {showNoShiftModal && (
+            {modals.noShift && (
                 <div className="pos-no-shift-modal-overlay">
                     <div className="pos-no-shift-modal">
-                        <div className="pos-no-shift-modal__icon">
-                            <Clock size={48} />
-                        </div>
-                        <h3 className="pos-no-shift-modal__title">
-                            No shift open
-                        </h3>
-                        <p className="pos-no-shift-modal__message">
-                            You must open a shift to perform this action.
-                        </p>
+                        <div className="pos-no-shift-modal__icon"><Clock size={48} /></div>
+                        <h3 className="pos-no-shift-modal__title">No shift open</h3>
+                        <p className="pos-no-shift-modal__message">You must open a shift to perform this action.</p>
                         <div className="pos-no-shift-modal__actions">
-                            <button
-                                type="button"
-                                className="pos-no-shift-modal__btn pos-no-shift-modal__btn--secondary"
-                                onClick={() => setShowNoShiftModal(false)}
-                            >
-                                Cancel
-                            </button>
+                            <button type="button" className="pos-no-shift-modal__btn pos-no-shift-modal__btn--secondary" onClick={() => closeModal('noShift')}>Cancel</button>
                             {user?.id && (
-                                <button
-                                    type="button"
-                                    className="pos-no-shift-modal__btn pos-no-shift-modal__btn--secondary"
-                                    disabled={isRecoveringShift}
-                                    onClick={async () => {
-                                        setIsRecoveringShift(true)
-                                        const recovered = await recoverShift(user.id)
-                                        setIsRecoveringShift(false)
-                                        if (recovered) {
-                                            setShowNoShiftModal(false)
-                                        }
-                                    }}
-                                >
+                                <button type="button" className="pos-no-shift-modal__btn pos-no-shift-modal__btn--secondary" disabled={isRecoveringShift} onClick={() => handleRecoverShift(user.id, () => closeModal('noShift'))}>
                                     {isRecoveringShift ? 'Searching...' : 'Recover my shift'}
                                 </button>
                             )}
-                            <button
-                                type="button"
-                                className="pos-no-shift-modal__btn pos-no-shift-modal__btn--primary"
-                                onClick={() => {
-                                    setShowNoShiftModal(false)
-                                    handleOpenShiftRequest()
-                                }}
-                            >
-                                Open a Shift
-                            </button>
+                            <button type="button" className="pos-no-shift-modal__btn pos-no-shift-modal__btn--primary" onClick={() => { closeModal('noShift'); handleOpenShiftRequest() }}>Open a Shift</button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Post-Offline Sync Report Modal (Story 3.3) */}
             {showSyncReport && syncPeriod && (
-                <PostOfflineSyncReport
-                    period={syncPeriod}
-                    onClose={dismissSyncReport}
-                    onRetryFailed={retrySyncFailed}
-                />
+                <PostOfflineSyncReport period={syncPeriod} onClose={dismissSyncReport} onRetryFailed={retrySyncFailed} />
             )}
         </div>
     )

@@ -34,6 +34,7 @@ import { processSessionSync, updateOrdersWithSessionServerId } from './sessionSy
 import { processOrderSync } from './orderSyncProcessor';
 import { processPaymentSync } from './paymentSyncProcessor';
 import { syncStockLevelsToOffline } from './stockSync';
+import { syncPromotionsToOffline } from './promotionSync';
 
 // =====================================================
 // Constants
@@ -391,6 +392,7 @@ export async function initializeSyncEngine(): Promise<void> {
  *
  * Called after network reconnection to update cached data.
  * Per Story 5.1: Stock levels auto-refresh on reconnect.
+ * Per Story 6.4: Promotions auto-refresh on reconnect.
  */
 async function refreshReadOnlyCaches(): Promise<void> {
   console.log('[SyncEngineV2] Refreshing read-only caches...');
@@ -401,5 +403,13 @@ async function refreshReadOnlyCaches(): Promise<void> {
     console.log(`[SyncEngineV2] Stock levels refreshed: ${stockCount} items`);
   } catch (error) {
     console.error('[SyncEngineV2] Error refreshing stock levels:', error);
+  }
+
+  try {
+    // Promotions (Story 6.4)
+    const promotionCount = await syncPromotionsToOffline();
+    console.log(`[SyncEngineV2] Promotions refreshed: ${promotionCount} items`);
+  } catch (error) {
+    console.error('[SyncEngineV2] Error refreshing promotions:', error);
   }
 }

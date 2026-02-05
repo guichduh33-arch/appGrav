@@ -32,7 +32,7 @@ import {
 // Mock Supabase
 vi.mock('@/lib/supabase', () => ({
   supabase: {
-    from: vi.fn((table: string) => ({
+    from: vi.fn((_table: string) => ({
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       order: vi.fn().mockReturnThis(),

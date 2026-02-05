@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Plus, Save, Trash2, Send, WifiOff } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { useSectionsByType, useCreateTransfer, useTransfer } from '@/hooks/inventory'
 import { useProducts } from '@/hooks/products'
 import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'

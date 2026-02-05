@@ -5,7 +5,7 @@ import {
     Building2, Crown, Users, UserCheck, Save, X
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import './CustomerCategoriesPage.css'
 
 interface CustomerCategory {

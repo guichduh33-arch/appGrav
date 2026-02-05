@@ -4,7 +4,7 @@ import { Save, RotateCcw, AlertCircle } from 'lucide-react';
 import { useSettingsByCategory, useUpdateSetting, useResetSetting } from '../../hooks/settings';
 import { useSettingsStore } from '../../stores/settingsStore';
 import SettingField from '../../components/settings/SettingField';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 const CategorySettingsPage = () => {
   const location = useLocation();

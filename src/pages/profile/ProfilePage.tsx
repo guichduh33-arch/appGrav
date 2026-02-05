@@ -9,7 +9,7 @@ import { authService } from '../../services/authService';
 import { supabase } from '../../lib/supabase';
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 interface UserSession {
   id: string;

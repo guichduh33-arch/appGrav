@@ -62,6 +62,9 @@ export interface IPersistedCartState {
   /** Customer display name */
   customerName: string | null;
 
+  /** Customer category slug for pricing (Story 6.2) */
+  customerCategorySlug: string | null;
+
   /** Discount type if applied */
   discountType: 'percent' | 'amount' | null;
 
@@ -138,6 +141,7 @@ export function loadCart(): IPersistedCartState | null {
       tableNumber: parsed.tableNumber ?? null,
       customerId: parsed.customerId ?? null,
       customerName: parsed.customerName ?? null,
+      customerCategorySlug: parsed.customerCategorySlug ?? null, // Story 6.2
       discountType: parsed.discountType ?? null,
       discountValue: parsed.discountValue ?? 0,
       discountReason: parsed.discountReason ?? null,

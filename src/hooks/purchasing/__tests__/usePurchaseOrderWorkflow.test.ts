@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook, waitFor, act } from '@testing-library/react'
+import { renderHook, act } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createElement } from 'react'
 import {
@@ -8,16 +8,13 @@ import {
   useSendToSupplier,
   useConfirmOrder,
   useCancelOrder,
-  TPOWorkflowAction,
 } from '../usePurchaseOrderWorkflow'
-import { TPOStatus } from '../usePurchaseOrders'
 
 // Mock Supabase
 const mockSelect = vi.fn()
 const mockInsert = vi.fn()
 const mockUpdate = vi.fn()
 const mockEq = vi.fn()
-const mockSingle = vi.fn()
 
 vi.mock('@/lib/supabase', () => ({
   supabase: {

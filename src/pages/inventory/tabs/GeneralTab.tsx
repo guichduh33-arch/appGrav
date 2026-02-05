@@ -2,14 +2,15 @@ import React from 'react'
 import { Product, Category, Section } from '../../../types/database'
 import { Star, Factory, ShoppingCart, Warehouse, Check, Layers } from 'lucide-react'
 
-interface ProductUOM {
+// Extended ProductUOM with UI-specific fields
+interface ProductUOMLocal {
     id: string
     product_id: string
-    unit_name: string
+    uom_name: string
+    uom_code?: string
     conversion_factor: number
-    is_purchase_unit?: boolean | null
-    is_consumption_unit?: boolean | null
-    is_stock_opname_unit?: boolean | null
+    is_purchase_uom?: boolean | null
+    is_sale_uom?: boolean | null
 }
 
 interface GeneralTabProps {
@@ -18,7 +19,7 @@ interface GeneralTabProps {
     sections: Section[]
     selectedSections: string[]
     primarySectionId: string | null
-    uoms?: ProductUOM[]
+    uoms?: ProductUOMLocal[]
     onSectionsChange: (sectionIds: string[]) => void
     onPrimarySectionChange: (sectionId: string | null) => void
     onChange: (product: Product) => void
@@ -36,8 +37,8 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
     onChange
 }) => {
     // Get the purchase unit for cost display
-    const purchaseUnit = uoms.find(u => u.is_purchase_unit) || uoms[0]
-    const costUnitLabel = purchaseUnit?.unit_name || product.unit || 'unité'
+    const purchaseUnit = uoms.find(u => u.is_purchase_uom) || uoms[0]
+    const costUnitLabel = purchaseUnit?.uom_name || product.unit || 'unité'
     const handleSectionToggle = (sectionId: string) => {
         if (selectedSections.includes(sectionId)) {
             const newSections = selectedSections.filter(id => id !== sectionId)
