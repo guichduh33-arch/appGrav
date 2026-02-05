@@ -22,20 +22,14 @@ vi.mock('../../../hooks/usePermissions', () => ({
   usePermissions: vi.fn(),
 }));
 
-// Create mock functions for storage operations
-const mockUpload = vi.fn();
-const mockGetPublicUrl = vi.fn();
-const mockRemove = vi.fn();
+// Create mock functions for storage service
+const mockReplaceLogo = vi.fn();
+const mockDeleteLogo = vi.fn();
 
-vi.mock('../../../lib/supabase', () => ({
-  supabase: {
-    storage: {
-      from: vi.fn(() => ({
-        upload: mockUpload,
-        getPublicUrl: mockGetPublicUrl,
-        remove: mockRemove,
-      })),
-    },
+vi.mock('../../../services/storage', () => ({
+  companyAssetsService: {
+    replaceLogo: (...args: unknown[]) => mockReplaceLogo(...args),
+    deleteLogo: (...args: unknown[]) => mockDeleteLogo(...args),
   },
 }));
 
@@ -50,7 +44,6 @@ vi.mock('sonner', () => ({
 import { useSettingsByCategory, useUpdateSetting } from '../../../hooks/settings';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { toast } from 'sonner';
-import { supabase } from '../../../lib/supabase';
 
 // Mock settings data
 const mockSettings = [
@@ -85,10 +78,9 @@ describe('CompanySettingsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // Reset storage mocks
-    mockUpload.mockReset();
-    mockGetPublicUrl.mockReset();
-    mockRemove.mockReset();
+    // Reset storage service mocks
+    mockReplaceLogo.mockReset();
+    mockDeleteLogo.mockReset();
 
     // Default mock implementations
     (useSettingsByCategory as ReturnType<typeof vi.fn>).mockReturnValue({
@@ -358,10 +350,10 @@ describe('CompanySettingsPage', () => {
       expect(screen.queryByRole('button', { name: /Upload Logo/i })).not.toBeInTheDocument();
     });
 
-    it('should call supabase storage upload when file is selected', async () => {
-      mockUpload.mockResolvedValue({ data: { path: 'logos/test.png' }, error: null });
-      mockGetPublicUrl.mockReturnValue({
-        data: { publicUrl: 'https://storage.example.com/logos/test.png' },
+    it('should call companyAssetsService when file is selected', async () => {
+      mockReplaceLogo.mockResolvedValue({
+        success: true,
+        publicUrl: 'https://storage.example.com/logos/test.png',
       });
 
       render(<CompanySettingsPage />, { wrapper: createWrapper() });
@@ -375,15 +367,7 @@ describe('CompanySettingsPage', () => {
 
       // Wait for upload to complete
       await waitFor(() => {
-        expect(mockUpload).toHaveBeenCalledWith(
-          expect.stringMatching(/^logos\/logo_\d+\.png$/),
-          file,
-          expect.objectContaining({
-            cacheControl: '3600',
-            upsert: true,
-            contentType: 'image/png',
-          })
-        );
+        expect(mockReplaceLogo).toHaveBeenCalledWith(file, undefined);
       });
 
       // Should show success toast
@@ -393,9 +377,9 @@ describe('CompanySettingsPage', () => {
     });
 
     it('should show error toast when upload fails', async () => {
-      mockUpload.mockResolvedValue({
-        data: null,
-        error: { message: 'Storage quota exceeded' },
+      mockReplaceLogo.mockResolvedValue({
+        success: false,
+        error: 'Storage quota exceeded',
       });
 
       render(<CompanySettingsPage />, { wrapper: createWrapper() });
@@ -406,13 +390,16 @@ describe('CompanySettingsPage', () => {
       fireEvent.change(fileInput, { target: { files: [file] } });
 
       await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith(
-          expect.stringContaining('Failed to upload logo')
-        );
+        expect(toast.error).toHaveBeenCalledWith('Storage quota exceeded');
       });
     });
 
-    it('should reject non-image files', async () => {
+    it('should reject non-image files via service validation', async () => {
+      mockReplaceLogo.mockResolvedValue({
+        success: false,
+        error: 'Please select an image file',
+      });
+
       render(<CompanySettingsPage />, { wrapper: createWrapper() });
 
       const file = new File(['test'], 'test.pdf', { type: 'application/pdf' });
@@ -423,12 +410,14 @@ describe('CompanySettingsPage', () => {
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith('Please select an image file');
       });
-
-      // Upload should not be called
-      expect(mockUpload).not.toHaveBeenCalled();
     });
 
-    it('should reject files larger than 2MB', async () => {
+    it('should reject files larger than 2MB via service validation', async () => {
+      mockReplaceLogo.mockResolvedValue({
+        success: false,
+        error: 'Image must be smaller than 2MB',
+      });
+
       render(<CompanySettingsPage />, { wrapper: createWrapper() });
 
       // Create a file larger than 2MB (2 * 1024 * 1024 bytes)
@@ -441,11 +430,9 @@ describe('CompanySettingsPage', () => {
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith('Image must be smaller than 2MB');
       });
-
-      expect(mockUpload).not.toHaveBeenCalled();
     });
 
-    it('should call supabase storage remove when logo is deleted', async () => {
+    it('should call companyAssetsService.deleteLogo when logo is deleted', async () => {
       const settingsWithLogo = [
         ...mockSettings.filter((s) => s.key !== 'company.logo_url'),
         {
@@ -459,7 +446,7 @@ describe('CompanySettingsPage', () => {
         isLoading: false,
       });
 
-      mockRemove.mockResolvedValue({ data: null, error: null });
+      mockDeleteLogo.mockResolvedValue(true);
 
       render(<CompanySettingsPage />, { wrapper: createWrapper() });
 
@@ -469,7 +456,9 @@ describe('CompanySettingsPage', () => {
 
       // Wait for removal to complete
       await waitFor(() => {
-        expect(mockRemove).toHaveBeenCalledWith(['logos/old_logo.png']);
+        expect(mockDeleteLogo).toHaveBeenCalledWith(
+          'https://example.com/company-assets/logos/old_logo.png'
+        );
       });
 
       // Should show success toast
