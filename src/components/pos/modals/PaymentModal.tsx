@@ -50,12 +50,12 @@ const PAYMENT_METHODS: Array<{
   icon: typeof Banknote;
   requiresReference?: boolean;
 }> = [
-  { id: 'cash', name: 'Cash', icon: Banknote },
-  { id: 'card', name: 'Card', icon: CreditCard, requiresReference: true },
-  { id: 'qris', name: 'QRIS', icon: QrCode, requiresReference: true },
-  { id: 'edc', name: 'EDC', icon: Smartphone, requiresReference: true },
-  { id: 'transfer', name: 'Transfer', icon: Building, requiresReference: true },
-];
+    { id: 'cash', name: 'Cash', icon: Banknote },
+    { id: 'card', name: 'Card', icon: CreditCard, requiresReference: true },
+    { id: 'qris', name: 'QRIS', icon: QrCode, requiresReference: true },
+    { id: 'edc', name: 'EDC', icon: Smartphone, requiresReference: true },
+    { id: 'transfer', name: 'Transfer', icon: Building, requiresReference: true },
+  ];
 
 export default function PaymentModal({ onClose }: PaymentModalProps) {
   const {
@@ -391,13 +391,13 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="modal modal-lg is-active">
-        <div className="modal__header">
+        <div className="modal-header">
           <div>
-            <h3 className="modal__title">
+            <h3 className="modal-title">
               <CreditCard size={24} />
               Checkout
             </h3>
-            <p className="modal__subtitle">
+            <p className="modal-subtitle">
               Total: {formatPrice(total)}
               {!isOnline && (
                 <span style={{ marginLeft: '8px', color: '#f59e0b', fontSize: '12px' }}>
@@ -407,12 +407,12 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
               )}
             </p>
           </div>
-          <button className="modal__close" onClick={onClose} aria-label="Close" title="Close">
+          <button className="modal-close" onClick={onClose} aria-label="Close" title="Close">
             <X size={24} />
           </button>
         </div>
 
-        <div className="modal__body payment-body">
+        <div className="modal-body payment-body">
           {/* Progress Section */}
           <div className="payment-progress">
             <div className="payment-progress__header">
@@ -616,7 +616,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
           )}
         </div>
 
-        <div className="modal__footer payment-footer">
+        <div className="modal-footer payment-footer">
           <button className="btn btn-secondary" onClick={onClose}>
             Cancel
           </button>

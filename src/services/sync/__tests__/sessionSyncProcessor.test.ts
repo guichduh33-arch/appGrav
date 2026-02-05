@@ -110,7 +110,7 @@ describe('sessionSyncProcessor', () => {
       const order1 = {
         id: 'LOCAL-ORDER-1',
         order_number: 'OFFLINE-20260201-001',
-        status: 'pending' as const,
+        status: 'new' as const,
         order_type: 'dine_in' as const,
         subtotal: 100000,
         tax_amount: 10000,
@@ -131,7 +131,7 @@ describe('sessionSyncProcessor', () => {
       const order2 = {
         id: 'LOCAL-ORDER-2',
         order_number: 'OFFLINE-20260201-002',
-        status: 'pending' as const,
+        status: 'new' as const,
         order_type: 'takeaway' as const,
         subtotal: 50000,
         tax_amount: 5000,
@@ -169,7 +169,7 @@ describe('sessionSyncProcessor', () => {
       const order = {
         id: 'LOCAL-ORDER-3',
         order_number: 'OFFLINE-20260201-003',
-        status: 'pending' as const,
+        status: 'new' as const,
         order_type: 'dine_in' as const,
         subtotal: 100000,
         tax_amount: 10000,

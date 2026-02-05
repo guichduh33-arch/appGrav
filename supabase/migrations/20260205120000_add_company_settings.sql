@@ -79,31 +79,84 @@ END $$;
 -- =====================================================
 -- Create storage bucket for company assets
 -- =====================================================
--- Note: Storage bucket creation must be done via Supabase Dashboard or API
--- The bucket 'company-assets' should be created with:
--- - Public access for read (logos are public)
--- - Authenticated access for write
---
--- SQL for RLS policies on storage.objects (if bucket created):
-/*
--- Allow public to view company assets
-CREATE POLICY "Public can view company assets"
-ON storage.objects FOR SELECT
-USING (bucket_id = 'company-assets');
 
--- Allow authenticated users with settings.update permission to upload
-CREATE POLICY "Auth users can upload company assets"
-ON storage.objects FOR INSERT
-WITH CHECK (
-    bucket_id = 'company-assets'
-    AND auth.uid() IS NOT NULL
-);
+-- Create the bucket if it doesn't exist
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+    'company-assets',
+    'company-assets',
+    true,  -- Public bucket for logo display
+    2097152,  -- 2MB max file size
+    ARRAY['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+)
+ON CONFLICT (id) DO NOTHING;
 
--- Allow authenticated users with settings.update permission to delete
-CREATE POLICY "Auth users can delete company assets"
-ON storage.objects FOR DELETE
-USING (
-    bucket_id = 'company-assets'
-    AND auth.uid() IS NOT NULL
-);
-*/
+-- RLS policies for storage.objects
+-- Allow public to view company assets (logos are public)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies
+        WHERE policyname = 'Public can view company assets'
+        AND tablename = 'objects'
+        AND schemaname = 'storage'
+    ) THEN
+        CREATE POLICY "Public can view company assets"
+        ON storage.objects FOR SELECT
+        USING (bucket_id = 'company-assets');
+    END IF;
+END $$;
+
+-- Allow authenticated users to upload company assets
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies
+        WHERE policyname = 'Auth users can upload company assets'
+        AND tablename = 'objects'
+        AND schemaname = 'storage'
+    ) THEN
+        CREATE POLICY "Auth users can upload company assets"
+        ON storage.objects FOR INSERT
+        WITH CHECK (
+            bucket_id = 'company-assets'
+            AND auth.uid() IS NOT NULL
+        );
+    END IF;
+END $$;
+
+-- Allow authenticated users to update company assets (for upsert)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies
+        WHERE policyname = 'Auth users can update company assets'
+        AND tablename = 'objects'
+        AND schemaname = 'storage'
+    ) THEN
+        CREATE POLICY "Auth users can update company assets"
+        ON storage.objects FOR UPDATE
+        USING (
+            bucket_id = 'company-assets'
+            AND auth.uid() IS NOT NULL
+        );
+    END IF;
+END $$;
+
+-- Allow authenticated users to delete company assets
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies
+        WHERE policyname = 'Auth users can delete company assets'
+        AND tablename = 'objects'
+        AND schemaname = 'storage'
+    ) THEN
+        CREATE POLICY "Auth users can delete company assets"
+        ON storage.objects FOR DELETE
+        USING (
+            bucket_id = 'company-assets'
+            AND auth.uid() IS NOT NULL
+        );
+    END IF;
+END $$;

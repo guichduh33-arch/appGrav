@@ -22,13 +22,18 @@ vi.mock('../../../hooks/usePermissions', () => ({
   usePermissions: vi.fn(),
 }));
 
+// Create mock functions for storage operations
+const mockUpload = vi.fn();
+const mockGetPublicUrl = vi.fn();
+const mockRemove = vi.fn();
+
 vi.mock('../../../lib/supabase', () => ({
   supabase: {
     storage: {
       from: vi.fn(() => ({
-        upload: vi.fn(),
-        getPublicUrl: vi.fn(),
-        remove: vi.fn(),
+        upload: mockUpload,
+        getPublicUrl: mockGetPublicUrl,
+        remove: mockRemove,
       })),
     },
   },
@@ -45,6 +50,7 @@ vi.mock('sonner', () => ({
 import { useSettingsByCategory, useUpdateSetting } from '../../../hooks/settings';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { toast } from 'sonner';
+import { supabase } from '../../../lib/supabase';
 
 // Mock settings data
 const mockSettings = [
@@ -78,6 +84,11 @@ describe('CompanySettingsPage', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Reset storage mocks
+    mockUpload.mockReset();
+    mockGetPublicUrl.mockReset();
+    mockRemove.mockReset();
 
     // Default mock implementations
     (useSettingsByCategory as ReturnType<typeof vi.fn>).mockReturnValue({
@@ -345,6 +356,126 @@ describe('CompanySettingsPage', () => {
       render(<CompanySettingsPage />, { wrapper: createWrapper() });
 
       expect(screen.queryByRole('button', { name: /Upload Logo/i })).not.toBeInTheDocument();
+    });
+
+    it('should call supabase storage upload when file is selected', async () => {
+      mockUpload.mockResolvedValue({ data: { path: 'logos/test.png' }, error: null });
+      mockGetPublicUrl.mockReturnValue({
+        data: { publicUrl: 'https://storage.example.com/logos/test.png' },
+      });
+
+      render(<CompanySettingsPage />, { wrapper: createWrapper() });
+
+      // Create a mock file
+      const file = new File(['test'], 'test.png', { type: 'image/png' });
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+
+      // Trigger file selection
+      fireEvent.change(fileInput, { target: { files: [file] } });
+
+      // Wait for upload to complete
+      await waitFor(() => {
+        expect(mockUpload).toHaveBeenCalledWith(
+          expect.stringMatching(/^logos\/logo_\d+\.png$/),
+          file,
+          expect.objectContaining({
+            cacheControl: '3600',
+            upsert: true,
+            contentType: 'image/png',
+          })
+        );
+      });
+
+      // Should show success toast
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Logo uploaded successfully');
+      });
+    });
+
+    it('should show error toast when upload fails', async () => {
+      mockUpload.mockResolvedValue({
+        data: null,
+        error: { message: 'Storage quota exceeded' },
+      });
+
+      render(<CompanySettingsPage />, { wrapper: createWrapper() });
+
+      const file = new File(['test'], 'test.png', { type: 'image/png' });
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+
+      fireEvent.change(fileInput, { target: { files: [file] } });
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          expect.stringContaining('Failed to upload logo')
+        );
+      });
+    });
+
+    it('should reject non-image files', async () => {
+      render(<CompanySettingsPage />, { wrapper: createWrapper() });
+
+      const file = new File(['test'], 'test.pdf', { type: 'application/pdf' });
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+
+      fireEvent.change(fileInput, { target: { files: [file] } });
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Please select an image file');
+      });
+
+      // Upload should not be called
+      expect(mockUpload).not.toHaveBeenCalled();
+    });
+
+    it('should reject files larger than 2MB', async () => {
+      render(<CompanySettingsPage />, { wrapper: createWrapper() });
+
+      // Create a file larger than 2MB (2 * 1024 * 1024 bytes)
+      const largeContent = new Array(3 * 1024 * 1024).fill('a').join('');
+      const file = new File([largeContent], 'large.png', { type: 'image/png' });
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+
+      fireEvent.change(fileInput, { target: { files: [file] } });
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Image must be smaller than 2MB');
+      });
+
+      expect(mockUpload).not.toHaveBeenCalled();
+    });
+
+    it('should call supabase storage remove when logo is deleted', async () => {
+      const settingsWithLogo = [
+        ...mockSettings.filter((s) => s.key !== 'company.logo_url'),
+        {
+          key: 'company.logo_url',
+          value: '"https://example.com/company-assets/logos/old_logo.png"',
+        },
+      ];
+
+      (useSettingsByCategory as ReturnType<typeof vi.fn>).mockReturnValue({
+        data: settingsWithLogo,
+        isLoading: false,
+      });
+
+      mockRemove.mockResolvedValue({ data: null, error: null });
+
+      render(<CompanySettingsPage />, { wrapper: createWrapper() });
+
+      // Find and click the remove button
+      const removeButton = screen.getByTitle('Remove logo');
+      fireEvent.click(removeButton);
+
+      // Wait for removal to complete
+      await waitFor(() => {
+        expect(mockRemove).toHaveBeenCalledWith(['logos/old_logo.png']);
+      });
+
+      // Should show success toast
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Logo removed');
+      });
     });
   });
 });

@@ -60,7 +60,7 @@ function createMockOrder(overrides?: Partial<IOfflineOrder>): IOfflineOrder {
   return {
     id: `LOCAL-${crypto.randomUUID()}`,
     order_number: `OFFLINE-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-001`,
-    status: 'pending',
+    status: 'new',
     order_type: 'dine_in',
     subtotal: 100000,
     tax_amount: 9091,
@@ -98,7 +98,7 @@ function createMockOrderItem(
     modifiers: [],
     notes: null,
     dispatch_station: 'kitchen',
-    item_status: 'pending',
+    item_status: 'new',
     created_at: new Date().toISOString(),
     ...overrides,
   };

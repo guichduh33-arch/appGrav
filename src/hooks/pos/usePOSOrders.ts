@@ -33,7 +33,7 @@ export function usePOSOrders(): IUsePOSOrdersReturn {
     const {
         restoreHeldOrder,
         sendToKitchenAsHeldOrder,
-        updateKitchenHeldOrder,
+        holdOrder,
     } = useOrderStore()
 
     // Handle send to kitchen - creates or updates a held order and clears the cart
@@ -51,15 +51,23 @@ export function usePOSOrders(): IUsePOSOrdersReturn {
         }
 
         if (activeOrderId) {
-            // Update existing kitchen order
-            updateKitchenHeldOrder(
-                activeOrderId,
+            // Update existing kitchen order (handles cases where order was restored/removed)
+            const heldOrder = holdOrder(
                 items,
+                orderType,
+                tableNumber,
+                customerId,
+                customerName,
                 subtotal,
                 discountAmount,
-                total
+                total,
+                'En cuisine',
+                _activeOrderNumber || undefined,
+                activeOrderId,
+                true, // sentToKitchen
+                items.map(i => i.id) // lock all items
             )
-            toast.success('Order updated successfully!')
+            toast.success(`Order ${heldOrder.orderNumber} updated successfully!`)
         } else {
             // Create new kitchen order
             const heldOrder = sendToKitchenAsHeldOrder(
@@ -80,6 +88,7 @@ export function usePOSOrders(): IUsePOSOrdersReturn {
     }, [
         itemCount,
         activeOrderId,
+        _activeOrderNumber,
         items,
         subtotal,
         discountAmount,
@@ -88,7 +97,7 @@ export function usePOSOrders(): IUsePOSOrdersReturn {
         tableNumber,
         customerId,
         customerName,
-        updateKitchenHeldOrder,
+        holdOrder,
         sendToKitchenAsHeldOrder,
         clearCart,
     ])

@@ -65,7 +65,7 @@ describe('orderSyncProcessor', () => {
       const localOrder: IOfflineOrder = {
         id: 'LOCAL-ORDER-123',
         order_number: 'OFFLINE-20260201-001',
-        status: 'pending',
+        status: 'new',
         order_type: 'dine_in',
         subtotal: 100000,
         tax_amount: 10000,
@@ -96,7 +96,7 @@ describe('orderSyncProcessor', () => {
         modifiers: [],
         notes: null,
         dispatch_station: 'kitchen',
-        item_status: 'pending',
+        item_status: 'new',
         created_at: '2026-02-01T08:00:00Z',
       };
       await db.offline_order_items.add(localItem);
@@ -150,7 +150,7 @@ describe('orderSyncProcessor', () => {
       const localOrder: IOfflineOrder = {
         id: 'LOCAL-ORDER-456',
         order_number: 'OFFLINE-20260201-002',
-        status: 'pending',
+        status: 'new',
         order_type: 'takeaway',
         subtotal: 50000,
         tax_amount: 5000,
@@ -214,7 +214,7 @@ describe('orderSyncProcessor', () => {
       const localOrder: IOfflineOrder = {
         id: 'LOCAL-ORDER-UPDATE',
         order_number: 'OFFLINE-20260201-003',
-        status: 'pending',
+        status: 'new',
         order_type: 'dine_in',
         subtotal: 100000,
         tax_amount: 10000,

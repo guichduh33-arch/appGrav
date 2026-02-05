@@ -343,7 +343,7 @@ describe('ordersCacheService', () => {
   describe('updateOfflineOrderStatus', () => {
     it('should update order status', async () => {
       const { order } = await saveOfflineOrder(
-        createMockOrderInput({ status: 'pending' }),
+        createMockOrderInput({ status: 'new' }),
         []
       );
 
@@ -380,14 +380,14 @@ describe('ordersCacheService', () => {
 
   describe('getOfflineOrdersByStatus', () => {
     it('should filter orders by status', async () => {
-      await saveOfflineOrder(createMockOrderInput({ status: 'pending' }), []);
-      await saveOfflineOrder(createMockOrderInput({ status: 'pending' }), []);
+      await saveOfflineOrder(createMockOrderInput({ status: 'new' }), []);
+      await saveOfflineOrder(createMockOrderInput({ status: 'new' }), []);
       await saveOfflineOrder(createMockOrderInput({ status: 'completed' }), []);
 
-      const pendingOrders = await getOfflineOrdersByStatus('pending');
+      const newOrders = await getOfflineOrdersByStatus('new');
       const completedOrders = await getOfflineOrdersByStatus('completed');
 
-      expect(pendingOrders).toHaveLength(2);
+      expect(newOrders).toHaveLength(2);
       expect(completedOrders).toHaveLength(1);
     });
   });
@@ -413,7 +413,7 @@ describe('ordersCacheService', () => {
   describe('updateOfflineOrderItemStatus', () => {
     it('should update item status', async () => {
       const { items } = await saveOfflineOrder(createMockOrderInput(), [
-        createMockItemInput({ item_status: 'pending' }),
+        createMockItemInput({ item_status: 'new' }),
       ]);
 
       await updateOfflineOrderItemStatus(items[0].id, 'preparing');
@@ -541,7 +541,7 @@ function createMockOrderInput(
   overrides: Partial<TCreateOfflineOrderInput> = {}
 ): TCreateOfflineOrderInput {
   return {
-    status: 'pending',
+    status: 'new',
     order_type: 'dine_in',
     subtotal: 50000,
     tax_amount: 5000,
@@ -571,7 +571,7 @@ function createMockItemInput(
     modifiers: [],
     notes: null,
     dispatch_station: 'kitchen',
-    item_status: 'pending',
+    item_status: 'new',
     ...overrides,
   };
 }

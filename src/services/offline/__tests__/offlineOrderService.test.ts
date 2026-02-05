@@ -187,7 +187,7 @@ describe('offlineOrderService', () => {
       expect(result.unit_price).toBe(25000);
       expect(result.subtotal).toBe(60000);
       expect(result.notes).toBe('Extra butter');
-      expect(result.item_status).toBe('pending');
+      expect(result.item_status).toBe('new');
     });
 
     it('maps modifiers correctly', async () => {
@@ -276,7 +276,7 @@ describe('offlineOrderService', () => {
       // Order structure
       expect(order.id).toMatch(/^LOCAL-/);
       expect(order.order_number).toMatch(/^OFFLINE-\d{8}-\d{3}$/);
-      expect(order.status).toBe('pending');
+      expect(order.status).toBe('new');
       expect(order.order_type).toBe('dine_in');
       expect(order.sync_status).toBe('pending_sync');
       expect(order.user_id).toBe('user-001');

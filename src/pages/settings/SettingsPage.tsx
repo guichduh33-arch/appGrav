@@ -8,6 +8,7 @@ import FloorPlanEditor from '../../components/settings/FloorPlanEditor';
 import TerminalSettingsSection from '../../components/settings/TerminalSettingsSection';
 import POSAdvancedSettingsSection from '../../components/settings/POSAdvancedSettingsSection';
 import ModuleSettingsSection from '../../components/settings/ModuleSettingsSection';
+import NotificationSettingsSection from '../../components/settings/NotificationSettingsSection';
 import './SettingsPage.css';
 
 type SettingsTab = 'general' | 'terminal' | 'pos_advanced' | 'modules' | 'printers' | 'notifications' | 'security' | 'sections' | 'kds' | 'floorplan';
@@ -77,10 +78,6 @@ const SettingsPage = () => {
         timezone: 'Asia/Makassar',
         currency: 'IDR',
         autoLogout: true,
-        printReceipt: true,
-        printKitchenTicket: true,
-        soundNotifications: true,
-        emailReports: false,
     });
 
     useEffect(() => {
@@ -638,67 +635,7 @@ const SettingsPage = () => {
                     )}
 
                     {activeTab === 'notifications' && (
-                        <div className="settings-section">
-                            <div className="settings-section__header">
-                                <h2 className="settings-section__title">Notifications</h2>
-                                <p className="settings-section__description">
-                                    Configurez vos préférences de notification
-                                </p>
-                            </div>
-                            <div className="settings-section__body">
-                                <div className="toggle-group">
-                                    <div className="toggle-group__info">
-                                        <span className="toggle-group__label">Sons de notification</span>
-                                        <span className="toggle-group__description">
-                                            Jouer un son lors de nouvelles commandes
-                                        </span>
-                                    </div>
-                                    <div
-                                        className={`toggle-switch ${settings.soundNotifications ? 'is-on' : ''}`}
-                                        onClick={() => toggleSetting('soundNotifications')}
-                                    />
-                                </div>
-
-                                <div className="toggle-group">
-                                    <div className="toggle-group__info">
-                                        <span className="toggle-group__label">Imprimer ticket automatiquement</span>
-                                        <span className="toggle-group__description">
-                                            Impression automatique après paiement
-                                        </span>
-                                    </div>
-                                    <div
-                                        className={`toggle-switch ${settings.printReceipt ? 'is-on' : ''}`}
-                                        onClick={() => toggleSetting('printReceipt')}
-                                    />
-                                </div>
-
-                                <div className="toggle-group">
-                                    <div className="toggle-group__info">
-                                        <span className="toggle-group__label">Ticket cuisine</span>
-                                        <span className="toggle-group__description">
-                                            Imprimer automatiquement en cuisine
-                                        </span>
-                                    </div>
-                                    <div
-                                        className={`toggle-switch ${settings.printKitchenTicket ? 'is-on' : ''}`}
-                                        onClick={() => toggleSetting('printKitchenTicket')}
-                                    />
-                                </div>
-
-                                <div className="toggle-group">
-                                    <div className="toggle-group__info">
-                                        <span className="toggle-group__label">Rapports par email</span>
-                                        <span className="toggle-group__description">
-                                            Recevoir le rapport journalier par email
-                                        </span>
-                                    </div>
-                                    <div
-                                        className={`toggle-switch ${settings.emailReports ? 'is-on' : ''}`}
-                                        onClick={() => toggleSetting('emailReports')}
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                        <NotificationSettingsSection />
                     )}
 
                     {activeTab === 'floorplan' && (

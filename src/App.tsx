@@ -80,6 +80,7 @@ const SettingsHistoryPage = lazy(() => import('./pages/settings/SettingsHistoryP
 const RolesPage = lazy(() => import('./pages/settings/RolesPage'))
 const AuditPage = lazy(() => import('./pages/settings/AuditPage'))
 const SyncStatusPage = lazy(() => import('./pages/settings/SyncStatusPage'))
+const PrintingSettingsPage = lazy(() => import('./pages/settings/PrintingSettingsPage'))
 
 // Profile
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
@@ -349,7 +350,7 @@ function App() {
                             <Route path="pos" element={<CategorySettingsPage />} />
                             <Route path="tax" element={<TaxSettingsPage />} />
                             <Route path="inventory" element={<CategorySettingsPage />} />
-                            <Route path="printing" element={<CategorySettingsPage />} />
+                            <Route path="printing" element={<PrintingSettingsPage />} />
                             <Route path="notifications" element={<CategorySettingsPage />} />
                             <Route path="localization" element={<CategorySettingsPage />} />
                             <Route path="security" element={<CategorySettingsPage />} />

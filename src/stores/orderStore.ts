@@ -99,10 +99,6 @@ interface OrderState {
         discountAmount: number,
         total: number
     ) => HeldOrder
-    // NEW: Update kitchen held order
-    updateKitchenHeldOrder: (heldOrderId: string, items: CartItem[], subtotal: number, discountAmount: number, total: number) => void
-    // NEW: Add items to an existing held order
-    addItemsToHeldOrder: (heldOrderId: string, newItems: CartItem[], newSubtotal: number, newTotal: number) => void
     // NEW: Remove item from held order (for PIN-verified deletion)
     removeItemFromHeldOrder: (heldOrderId: string, itemId: string) => void
 }
@@ -196,9 +192,14 @@ export const useOrderStore = create<OrderState>()(
                     lockedItemIds,
                 }
 
-                set(state => ({
-                    heldOrders: [...state.heldOrders, heldOrder]
-                }))
+                set(state => {
+                    const exists = state.heldOrders.some(o => o.id === heldOrder.id)
+                    return {
+                        heldOrders: exists
+                            ? state.heldOrders.map(o => o.id === heldOrder.id ? heldOrder : o)
+                            : [...state.heldOrders, heldOrder]
+                    }
+                })
 
                 return heldOrder
             },
@@ -287,43 +288,6 @@ export const useOrderStore = create<OrderState>()(
                 }))
 
                 return heldOrder
-            },
-
-            // Update a kitchen held order (replace items with new state, lock everything)
-            updateKitchenHeldOrder: (heldOrderId, items, subtotal, discountAmount, total) => {
-                set(state => ({
-                    heldOrders: state.heldOrders.map(order => {
-                        if (order.id !== heldOrderId) return order
-
-                        const itemIds = items.map(item => item.id)
-                        return {
-                            ...order,
-                            items: [...items],
-                            lockedItemIds: itemIds, // Lock all items
-                            subtotal,
-                            discountAmount,
-                            total,
-                            kitchenSentAt: new Date(), // Update sent time
-                        }
-                    })
-                }))
-            },
-
-            // Add new items to an existing held order
-            addItemsToHeldOrder: (heldOrderId, newItems, newSubtotal, newTotal) => {
-                set(state => ({
-                    heldOrders: state.heldOrders.map(order =>
-                        order.id === heldOrderId
-                            ? {
-                                ...order,
-                                items: [...order.items, ...newItems],
-                                lockedItemIds: [...order.lockedItemIds, ...newItems.map(i => i.id)],
-                                subtotal: newSubtotal,
-                                total: newTotal,
-                            }
-                            : order
-                    )
-                }))
             },
 
             // Remove a single item from a held order (for PIN-verified deletion)

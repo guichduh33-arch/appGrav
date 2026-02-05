@@ -196,8 +196,8 @@ const CompanySettingsPage = () => {
     setIsUploading(true);
 
     try {
-      // Generate unique filename
-      const fileExt = file.name.split('.').pop();
+      // Generate unique filename with fallback for missing extension
+      const fileExt = file.name.includes('.') ? file.name.split('.').pop() : 'png';
       const fileName = `logo_${Date.now()}.${fileExt}`;
 
       // Upload to Supabase Storage
@@ -231,7 +231,8 @@ const CompanySettingsPage = () => {
       toast.success('Logo uploaded successfully');
     } catch (error) {
       console.error('Logo upload error:', error);
-      toast.error('Failed to upload logo');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to upload logo: ${errorMessage}`);
     } finally {
       setIsUploading(false);
       // Reset file input
@@ -256,7 +257,8 @@ const CompanySettingsPage = () => {
       toast.success('Logo removed');
     } catch (error) {
       console.error('Logo removal error:', error);
-      toast.error('Failed to remove logo');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to remove logo: ${errorMessage}`);
     }
   };
 

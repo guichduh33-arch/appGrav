@@ -124,7 +124,7 @@ describe('paymentSyncProcessor', () => {
       const syncedOrder: IOfflineOrder = {
         id: 'LOCAL-ORDER-SYNCED',
         order_number: 'OFFLINE-20260201-099',
-        status: 'pending',
+        status: 'new',
         order_type: 'dine_in',
         subtotal: 100000,
         tax_amount: 10000,
@@ -182,7 +182,7 @@ describe('paymentSyncProcessor', () => {
       const unsyncedOrder: IOfflineOrder = {
         id: 'LOCAL-ORDER-UNSYNCED',
         order_number: 'OFFLINE-20260201-100',
-        status: 'pending',
+        status: 'new',
         order_type: 'dine_in',
         subtotal: 50000,
         tax_amount: 5000,

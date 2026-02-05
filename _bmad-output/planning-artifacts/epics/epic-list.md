@@ -406,22 +406,205 @@ Les caissiers peuvent prendre des commandes, appliquer des remises, encaisser et
 **Then** elle est marquée `dispatch_pending`
 **And** sera envoyée automatiquement quand le LAN revient
 
-#### Story 3.8: Pending Sync Counter Display
+#### Story 3.9: ADR Payment System Architecture
 
-**As a** Manager,
-**I want** voir combien de transactions attendent la sync,
-**So that** je peux surveiller le système.
+**As a** Developer,
+**I want** un document ADR pour la refonte du système de paiement,
+**So that** je peux suivre des décisions architecturales cohérentes.
 
 **Acceptance Criteria:**
 
-**Given** des transactions sont en attente de sync
-**When** je regarde le header/dashboard
-**Then** je vois un compteur (ex: "5 pending")
+**Given** besoin de clarifier la refonte des paiements
+**When** je consulte les documents techniques
+**Then** je trouve `docs/adr/ADR-001-payment-system-refactor.md`
 
-**Given** je clique sur le compteur
-**When** le panel s'ouvre
-**Then** je vois la liste des transactions en attente
-**And** leur statut (pending, syncing, failed)
+#### Story 3.10: Migration Order Payments Table
+
+**As a** Database Admin,
+**I want** créer la table order_payments,
+**So that** le système peut supporter les paiements multiples (Split Payment).
+
+**Acceptance Criteria:**
+
+**Given** schéma Supabase
+**When** migration appliquée
+**Then** table `public.order_payments` existe
+**And** RLS activé avec politiques Authenticated (Read/Insert/Update)
+
+#### Story 3.11: Migration Refund Fields
+
+**As a** Financial Manager,
+**I want** pouvoir tracker les remboursements sur les commandes,
+**So that** les rapports financiers sont exacts et audités.
+
+**Acceptance Criteria:**
+
+**Given** table `public.orders` existante
+**When** migration appliquée
+**Then** colonnes suivantes existent : `refund_amount`, `refund_reason`, `refund_method`, `refunded_at`, `refunded_by`
+
+#### Story 3.12: Consolidate Payment Types
+
+**As a** Developer,
+**I want** une source unique de vérité pour les types de paiement,
+**So that** le code TypeScript est synchronisé avec l'enum de la base de données.
+
+**Acceptance Criteria:**
+
+**Given** plusieurs définitions de `TPaymentMethod` éparpillées
+**When** je cherche le type de référence
+**Then** je le trouve dans `src/types/payment.ts`
+**And** il inclut : `cash`, `card`, `qris`, `edc`, `transfer`
+
+#### Story 3.13: Payment Service Base
+
+**As a** Developer,
+**I want** un service unifié pour gérer tous les paiements (simple et split),
+**So that** la logique de paiement n'est pas dupliquée dans les composants UI.
+
+**Acceptance Criteria:**
+
+**Given** besoin de traiter un paiement
+**When** j'utilise `paymentService`
+**Then** je peux appeler `processPayment` (simple) ou `processSplitPayment` (multiple)
+
+#### Story 3.14: Financial Operation Service
+
+**As a** Security Officer,
+**I want** un service central pour les opérations critiques (Void/Refund),
+**So that** chaque annulation ou remboursement est audité et résolu en cas de conflit.
+
+**Acceptance Criteria:**
+
+**Given** besoin d'annuler ou rembourser une commande
+**When** j'utilise les services financiers
+**Then** un log est créé dans `auditService` avec sévérité `critical`
+
+#### Story 3.15: French Strings Cleanup
+
+**As a** User,
+**I want** une interface entièrement en anglais,
+**So that** l'expérience utilisateur est cohérente et professionnelle.
+
+**Acceptance Criteria:**
+
+**Given** page POS et Cart
+**When** je parcours l'interface
+**Then** je ne vois plus de chaînes françaises comme "Caisse Principale" ou "Changer"
+
+#### Story 3.16: Phase 1 Unit Tests
+
+**As a** Quality Engineer,
+**I want** des tests unitaires pour les nouveaux services de paiement et financiers,
+**So that** les opérations monétaires sont fiables et sans bugs.
+
+**Acceptance Criteria:**
+
+**Given** nouveaux services implémentés
+**When** exécution des tests
+**Then** la couverture (coverage) est d'au moins 95% pour le paiement et 100% pour le financier
+
+#### Story 3.17: UX Wireframes Excalidraw
+
+**As a** UX Designer,
+**I want** concevoir les wireframes pour le split payment et les modales void/refund,
+**So that** les développeurs ont un guide visuel clair avant l'implémentation.
+
+#### Story 3.18: Split Payment UI + State Machine
+
+**As a** Cashier,
+**I want** pouvoir diviser un paiement entre plusieurs méthodes (ex: Cash + Card),
+**So that** je peux satisfaire les demandes de paiement complexes des clients.
+
+#### Story 3.19: EDC Payment Method
+
+**As a** Cashier,
+**I want** pouvoir sélectionner 'EDC' comme méthode de paiement,
+**So that** je peux enregistrer les paiements par carte traités via un terminal externe.
+
+#### Story 3.20: Void Modal Component
+
+**As a** Manager,
+**I want** une modale dédiée pour annuler (void) une commande,
+**So that** je peux arrêter le traitement d'une commande erronée avec une raison documentée.
+
+#### Story 3.21: Refund Modal Component
+
+**As a** Manager,
+**I want** pouvoir rembourser une commande partiellement ou totalement,
+**So that** je peux gérer les retours clients et les erreurs de facturation après paiement.
+
+#### Story 3.22: Void Service Offline Sync
+
+**As a** Developer,
+**I want** implémenter la synchronisation et la résolution de conflits pour les annulations (void),
+**So that** les annulations faites offline sont correctement répercutées sur le serveur.
+
+#### Story 3.23: Refund Service Offline Sync
+
+**As a** Developer,
+**I want** implémenter la synchronisation pour les remboursements (refund),
+**So that** les données financières sont exactes même après une période offline.
+
+#### Story 3.24: Delivery Type Button
+
+**As a** User,
+**I want** pouvoir sélectionner 'Delivery' comme type de commande,
+**So that** je peux différencier les commandes à livrer des commandes sur place ou à emporter.
+
+#### Story 3.25: Shift Indicator Banner
+
+**As a** Cashier,
+**I want** voir les détails de mon shift actuel sur l'écran POS,
+**So that** je suis sûr que mes ventes sont enregistrées sur la bonne session.
+
+#### Story 3.26: Phase 2 Integration Tests
+
+**As a** Quality Engineer,
+**I want** des tests d'intégration pour les flux complexes (Split Pay, Void, Refund),
+**So that** je peux garantir que l'UI et les services fonctionnent ensemble sans erreur.
+
+#### Story 3.27: Security Audit
+
+**As a** Security Auditor,
+**I want** vérifier l'intégrité des opérations critiques,
+**So that** le système est protégé contre les fraudes et les manipulations.
+
+#### Story 3.28: Print Service Integration
+
+**As a** Cashier,
+**I want** imprimer automatiquement les tickets de caisse via un serveur local,
+**So that** je peux donner un reçu physique au client instantanément.
+
+#### Story 3.29: Customer Display Broadcast
+
+**As a** Customer,
+**I want** voir le contenu de mon panier sur un écran secondaire,
+**So that** je peux vérifier les articles et le prix total pendant la saisie.
+
+#### Story 3.30: Order Level Notes
+
+**As a** Cashier,
+**I want** pouvoir ajouter une note générale à une commande,
+**So that** je peux transmettre des instructions spéciales à la cuisine.
+
+#### Story 3.31: Performance Testing
+
+**As a** Developer,
+**I want** mesurer et optimiser les performances de l'interface POS révisée,
+**So that** l'application reste fluide même avec un grand volume de données.
+
+#### Story 3.32: Documentation Update
+
+**As a** Lead Developer,
+**I want** mettre à jour la documentation technique,
+**So that** les futurs développeurs comprennent le nouveau système de paiement.
+
+#### Story 3.33: Smoke Test Suite
+
+**As a** DevOps Engineer,
+**I want** une suite de tests "Smoke" (chemins critiques),
+**So that** je peux rapidement valider qu'une release est prête pour la production.
 
 ---
 

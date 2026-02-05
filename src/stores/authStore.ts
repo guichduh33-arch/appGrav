@@ -84,6 +84,12 @@ export const useAuthStore = create<AuthState>()(
           }
 
           // Update state with user data
+          console.debug('[auth] Login successful:', {
+            userId: response.user?.id,
+            roles: response.roles?.map(r => r.code),
+            permissionsCount: response.permissions?.length
+          });
+
           set({
             user: response.user as UserProfile,
             roles: response.roles || [],
@@ -171,6 +177,12 @@ export const useAuthStore = create<AuthState>()(
           }
 
           // Update state with fresh data
+          console.debug('[auth] Session refreshed:', {
+            userId: response.user?.id,
+            roles: response.roles?.map(r => r.code),
+            permissionsCount: response.permissions?.length
+          });
+
           set({
             user: response.user as UserProfile,
             roles: response.roles || [],

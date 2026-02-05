@@ -47,9 +47,9 @@ development_status:
   1-3-offline-permissions-cache: done
   1-4-network-status-indicator: done
   1-5-settings-offline-cache: done
-  1-6-company-settings-ui: review  # 2026-02-05 - Implementation complete, ready for code review
+  1-6-company-settings-ui: done  # 2026-02-05 - Code review passed, all issues fixed
   1-7-printer-configuration-ui: ready-for-dev  # 2026-02-05 - Story created
-  1-8-notification-settings-ui: backlog  # 2026-02-05 - UI config notifications SMTP
+  1-8-notification-settings-ui: ready-for-dev  # 2026-02-05 - UI config notifications SMTP
   1-9-audit-log-viewer: backlog  # 2026-02-05 - UI consultation audit logs
   epic-1-retrospective: done  # 2026-02-02 synthetic
 
@@ -76,39 +76,33 @@ development_status:
 
   # === POS REVISION PHASE 1: Foundation (2-3 semaines) ===
   # Gate: Architecture validated + tests green + no French strings
-  3-9-adr-payment-system-architecture: backlog  # F1.1 - ADR document
-  3-10-migration-order-payments-table: backlog  # F1.2 - BLOCKER fix - table manquante
-  3-11-migration-refund-fields: backlog  # F1.3 - Champs refund sur orders
-  3-12-consolidate-payment-types: backlog  # F1.4 - TPaymentMethod single source
-  3-13-payment-service-base: backlog  # F1.5 - Interface unifiée paiements
-  3-14-financial-operation-service: backlog  # F1.6 - Void/Refund base services
-  3-15-french-strings-cleanup: backlog  # F1.7 - 14 strings FR → EN
-  3-16-phase1-unit-tests: backlog  # F1.8 - Tests services (95%+ coverage)
+  3-9-adr-payment-system-architecture: ready-for-dev  # 2026-02-05 - Story created
+  3-10-migration-order-payments-table: ready-for-dev  # 2026-02-05 - Story created
+  3-11-migration-refund-fields: ready-for-dev  # 2026-02-05 - Story created
+  3-12-consolidate-payment-types: ready-for-dev  # 2026-02-05 - Story created
+  3-13-payment-service-base: ready-for-dev  # 2026-02-05 - Story created
+  3-14-financial-operation-service: ready-for-dev  # 2026-02-05 - Story created
+  3-15-french-strings-cleanup: ready-for-dev  # 2026-02-05 - Story created
+  3-16-phase1-unit-tests: ready-for-dev  # 2026-02-05 - Story created
   3-phase1-validation-gate: backlog  # Validation avant Phase 2
-
-  # === POS REVISION PHASE 2: Core Features (3-4 semaines) ===
-  # Gate: UX approved + financial tests 100% + security audit passed
-  3-17-ux-wireframes-excalidraw: backlog  # F2.1 - Split Pay, Void, Refund wireframes
-  3-18-split-payment-ui-state-machine: backlog  # F2.2 - PaymentModal refactor + paymentStore
-  3-19-edc-payment-method: backlog  # F2.3 - Ajout EDC au PaymentModal
-  3-20-void-modal-component: backlog  # F2.4 - VoidModal avec PIN + reason
-  3-21-refund-modal-component: backlog  # F2.5 - RefundModal full/partial
-  3-22-void-service-offline-sync: backlog  # F2.6 - Service void + conflict resolution
-  3-23-refund-service-offline-sync: backlog  # F2.7 - Service refund + sync
-  3-24-delivery-type-button: backlog  # F2.8 - Bouton delivery dans Cart
-  3-25-shift-indicator-banner: backlog  # F2.9 - Banner shift visible
-  3-26-phase2-integration-tests: backlog  # F2.10 - Tests intégration (100% financial)
-  3-27-security-audit: backlog  # F2.11 - Audit sécurité PIN/audit trail
+  3-17-ux-wireframes-excalidraw: ready-for-dev  # 2026-02-05 - Story created
+  3-18-split-payment-ui-state-machine: ready-for-dev  # 2026-02-05 - Story created
+  3-19-edc-payment-method: ready-for-dev  # 2026-02-05 - Story created
+  3-20-void-modal-component: ready-for-dev  # 2026-02-05 - Story created
+  3-21-refund-modal-component: ready-for-dev  # 2026-02-05 - Story created
+  3-22-void-service-offline-sync: ready-for-dev  # 2026-02-05 - Story created
+  3-23-refund-service-offline-sync: ready-for-dev  # 2026-02-05 - Story created
+  3-24-delivery-type-button: ready-for-dev  # 2026-02-05 - Story created
+  3-25-shift-indicator-banner: ready-for-dev  # 2026-02-05 - Story created
+  3-26-phase2-integration-tests: ready-for-dev  # 2026-02-05 - Story created
+  3-27-security-audit: ready-for-dev  # 2026-02-05 - Story created
   3-phase2-validation-gate: backlog  # Validation avant Phase 3
-
-  # === POS REVISION PHASE 3: Polish (2 semaines) ===
-  # Gate: Performance targets met + documentation complete
-  3-28-print-service-integration: backlog  # F3.1 - localhost:3001 print server
-  3-29-customer-display-broadcast: backlog  # F3.2 - BroadcastChannel pour display
-  3-30-order-level-notes: backlog  # F3.3 - Notes commande dans cartStore
-  3-31-performance-testing: backlog  # F3.4 - Targets <100ms UI, <500ms ops
-  3-32-documentation-update: backlog  # F3.5 - CLAUDE.md + docs payment
-  3-33-smoke-test-suite: backlog  # F3.6 - Critical paths E2E
+  3-28-print-service-integration: ready-for-dev  # 2026-02-05 - Story created
+  3-29-customer-display-broadcast: ready-for-dev  # 2026-02-05 - Story created
+  3-30-order-level-notes: ready-for-dev  # 2026-02-05 - Story created
+  3-31-performance-testing: ready-for-dev  # 2026-02-05 - Story created
+  3-32-documentation-update: ready-for-dev  # 2026-02-05 - Story created
+  3-33-smoke-test-suite: ready-for-dev  # 2026-02-05 - Story created
   3-phase3-validation-gate: backlog  # Validation production ready
 
   epic-3-retrospective: optional  # À refaire après révision complète
@@ -146,54 +140,54 @@ development_status:
   6-2-customer-category-pricing-offline: done  # 2026-02-05
   6-3-loyalty-points-display-read-only: done  # 2026-02-05
   6-4-promotions-offline-cache: review  # 2026-02-05 - All tasks completed, 50 tests passing
-  6-5-automatic-promotion-application: backlog
-  6-6-combos-selection-flow: backlog
-  6-7-b2b-order-creation: backlog
-  6-8-b2b-payments-tracking: backlog
+  6-5-automatic-promotion-application: ready-for-dev  # 2026-02-05 - Story created
+  6-6-combos-selection-flow: ready-for-dev  # 2026-02-05 - Story created
+  6-7-b2b-order-creation: ready-for-dev  # 2026-02-05 - Story created
+  6-8-b2b-payments-tracking: ready-for-dev  # 2026-02-05 - Story created
   epic-6-retrospective: optional
 
   # Epic 7: Multi-Device — Customer Display, Mobile Serveurs & LAN Hub
-  epic-7: backlog
-  7-1-customer-display-socket-io-connection: backlog
-  7-2-customer-display-cart-updates: backlog
-  7-3-customer-display-total-branding: backlog
-  7-4-mobile-app-authentication: backlog
-  7-5-mobile-app-product-catalog: backlog
-  7-6-mobile-app-order-creation: backlog
-  7-7-mobile-app-order-status: backlog
-  7-8-lan-discovery-via-qr-code: backlog
-  7-9-system-monitoring-dashboard: backlog
-  7-10-offline-period-logging: backlog
-  7-11-print-server-deployment: backlog  # 2026-02-05 - Serveur impression local port 3001
-  7-12-receipt-printing-integration: backlog  # 2026-02-05 - Impression tickets caisse
-  7-13-kitchen-ticket-printing: backlog  # 2026-02-05 - Impression tickets cuisine
-  7-14-cash-drawer-control: backlog  # 2026-02-05 - Contrôle tiroir-caisse
-  7-15-barista-ticket-printing: backlog  # 2026-02-05 - Impression tickets barista (optionnel)
+  epic-7: ready-for-dev
+  7-1-customer-display-socket-io-connection: ready-for-dev  # 2026-02-05 - Story created
+  7-2-customer-display-cart-updates: ready-for-dev  # 2026-02-05 - Story created
+  7-3-customer-display-total-branding: ready-for-dev  # 2026-02-05 - Story created
+  7-4-mobile-app-authentication: ready-for-dev  # 2026-02-05 - Story created
+  7-5-mobile-app-product-catalog: ready-for-dev  # 2026-02-05 - Story created
+  7-6-mobile-app-order-creation: ready-for-dev  # 2026-02-05 - Story created
+  7-7-mobile-app-order-status: ready-for-dev  # 2026-02-05 - Story created
+  7-8-lan-discovery-via-qr-code: ready-for-dev  # 2026-02-05 - Story created
+  7-9-system-monitoring-dashboard: ready-for-dev  # 2026-02-05 - Story created
+  7-10-offline-period-logging: ready-for-dev  # 2026-02-05 - Story created
+  7-11-print-server-deployment: ready-for-dev  # 2026-02-05 - Story created
+  7-12-receipt-printing-integration: ready-for-dev  # 2026-02-05 - Story created
+  7-13-kitchen-ticket-printing: ready-for-dev  # 2026-02-05 - Story created
+  7-14-cash-drawer-control: ready-for-dev  # 2026-02-05 - Story created
+  7-15-barista-ticket-printing: ready-for-dev  # 2026-02-05 - Story created
   epic-7-retrospective: optional
 
   # Epic 8: Analytics & Intelligence — Reports Complets
-  epic-8: backlog
-  8-1-report-framework-base: backlog
-  8-2-sales-reports-suite: backlog
-  8-3-inventory-reports-suite: backlog
-  8-4-financial-reports-suite: backlog
-  8-5-report-drill-down: backlog
-  8-6-report-export-csv-pdf: backlog
-  8-7-period-comparison: backlog
-  8-8-reports-offline-cache-7-days: backlog
-  8-9-audit-trail-alerts: backlog
+  epic-8: ready-for-dev
+  8-1-report-framework-base: ready-for-dev  # 2026-02-05 - Story created
+  8-2-sales-reports-suite: ready-for-dev  # 2026-02-05 - Story created
+  8-3-inventory-reports-suite: ready-for-dev  # 2026-02-05 - Story created
+  8-4-financial-reports-suite: ready-for-dev  # 2026-02-05 - Story created
+  8-5-report-drill-down: ready-for-dev  # 2026-02-05 - Story created
+  8-6-report-export-csv-pdf: ready-for-dev  # 2026-02-05 - Story created
+  8-7-period-comparison: ready-for-dev  # 2026-02-05 - Story created
+  8-8-reports-offline-cache-7-days: ready-for-dev  # 2026-02-05 - Story created
+  8-9-audit-trail-alerts: ready-for-dev  # 2026-02-05 - Story created
   epic-8-retrospective: optional
 
   # Epic 9: Comptabilité & Fiscalité — Journal, Grand Livre, États Financiers, TVA
-  epic-9: backlog
-  9-1-chart-of-accounts: backlog
-  9-2-sales-journal-auto: backlog
-  9-3-purchase-journal-auto: backlog
-  9-4-bank-cash-journal: backlog
-  9-5-general-ledger: backlog
-  9-6-trial-balance: backlog
-  9-7-balance-sheet: backlog
-  9-8-income-statement: backlog
-  9-9-vat-management: backlog
-  9-10-vat-declaration: backlog
+  epic-9: ready-for-dev
+  9-1-chart-of-accounts: ready-for-dev  # 2026-02-05 - Story created
+  9-2-sales-journal-auto: ready-for-dev  # 2026-02-05 - Story created
+  9-3-purchase-journal-auto: ready-for-dev  # 2026-02-05 - Story created
+  9-4-bank-cash-journal: ready-for-dev  # 2026-02-05 - Story created
+  9-5-general-ledger: ready-for-dev  # 2026-02-05 - Story created
+  9-6-trial-balance: ready-for-dev  # 2026-02-05 - Story created
+  9-7-balance-sheet: ready-for-dev  # 2026-02-05 - Story created
+  9-8-income-statement: ready-for-dev  # 2026-02-05 - Story created
+  9-9-vat-management: ready-for-dev  # 2026-02-05 - Story created
+  9-10-vat-declaration: ready-for-dev  # 2026-02-05 - Story created
   epic-9-retrospective: optional

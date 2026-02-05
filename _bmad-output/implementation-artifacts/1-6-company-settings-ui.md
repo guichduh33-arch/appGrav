@@ -1,6 +1,6 @@
 # Story 1.6: Company Settings UI
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -281,7 +281,7 @@ Claude Opus 4.5 (claude-opus-4-5-20251101)
 ### Completion Notes List
 
 - All 5 acceptance criteria implemented and tested
-- 17 unit tests passing covering form rendering, validation, submission, and permission checks
+- 22 unit tests passing covering form rendering, validation, submission, permission checks, and logo upload/removal
 - NPWP auto-formatting implemented (XX.XXX.XXX.X-XXX.XXX)
 - Logo upload to Supabase Storage bucket `company-assets`
 - Permission-based read-only mode working
@@ -290,10 +290,42 @@ Claude Opus 4.5 (claude-opus-4-5-20251101)
 
 **Created:**
 - `src/pages/settings/CompanySettingsPage.tsx` - Main page component
-- `src/pages/settings/__tests__/CompanySettingsPage.test.tsx` - 17 unit tests
-- `supabase/migrations/20260205120000_add_company_settings.sql` - Migration for company settings
+- `src/pages/settings/__tests__/CompanySettingsPage.test.tsx` - 22 unit tests
+- `supabase/migrations/20260205120000_add_company_settings.sql` - Migration for company settings + storage bucket
 
 **Modified:**
 - `src/App.tsx` - Added route for `/settings/company`
 - `src/pages/settings/SettingsPage.css` - Added CSS for company settings form
+
+---
+
+## Senior Developer Review (AI)
+
+**Reviewer:** Claude Opus 4.5 (claude-opus-4-5-20251101)
+**Date:** 2026-02-05
+**Outcome:** ✅ APPROVED (after fixes)
+
+### Issues Found & Fixed
+
+| ID | Severity | Issue | Fix Applied |
+|----|----------|-------|-------------|
+| H1 | HIGH | Storage bucket `company-assets` not created in migration (policies were commented out) | Enabled bucket creation with INSERT INTO storage.buckets + RLS policies |
+| H2 | HIGH | No integration test for logo upload flow | Added 5 new tests for upload, validation, and removal |
+| M1 | MEDIUM | Generic error messages in upload/remove handlers | Improved toast messages to include actual error details |
+| M2 | MEDIUM | No test for logo removal flow | Added test verifying supabase.storage.remove() is called |
+| M3 | MEDIUM | Potential null pointer on file extension extraction | Added fallback for files without extensions |
+
+### Test Results After Fix
+- **Tests:** 22/22 passing (was 17/17 before)
+- **New tests added:**
+  - `should call supabase storage upload when file is selected`
+  - `should show error toast when upload fails`
+  - `should reject non-image files`
+  - `should reject files larger than 2MB`
+  - `should call supabase storage remove when logo is deleted`
+
+### Files Modified During Review
+- `supabase/migrations/20260205120000_add_company_settings.sql` - Enabled bucket + RLS policies
+- `src/pages/settings/CompanySettingsPage.tsx` - Improved error handling + null safety
+- `src/pages/settings/__tests__/CompanySettingsPage.test.tsx` - Added 5 integration tests
 
