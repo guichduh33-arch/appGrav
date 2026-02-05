@@ -13,6 +13,7 @@ export interface IRecipeIngredient {
     name: string
     unit: string
     current_stock: number
+    cost_price: number | null
   } | null
 }
 
@@ -29,7 +30,7 @@ export function useProductRecipe(productId: string | null) {
         .from('recipes')
         .select(`
           *,
-          material:products!material_id(id, name, unit, current_stock)
+          material:products!material_id(id, name, unit, current_stock, cost_price)
         `)
         .eq('product_id', productId)
         .eq('is_active', true)

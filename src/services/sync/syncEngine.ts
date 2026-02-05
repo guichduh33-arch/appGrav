@@ -60,6 +60,11 @@ const BACKGROUND_SYNC_INTERVAL = 30000;
 let backgroundSyncIntervalId: ReturnType<typeof setInterval> | null = null;
 
 /**
+ * C-5: Timeout ID for delayed sync start
+ */
+let startDelayTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+/**
  * Flag to track if auto-sync is enabled
  */
 let autoSyncEnabled = true;
@@ -287,8 +292,14 @@ export async function runSyncEngine(): Promise<{
  * Per Story 2.5: Starts automatically within 5 seconds
  */
 export function startSyncWithDelay(): void {
+  // C-5: Clear any existing delay timeout before starting new one
+  if (startDelayTimeoutId) {
+    clearTimeout(startDelayTimeoutId);
+  }
+
   console.log(`[SyncEngine] Will start sync in ${SYNC_START_DELAY / 1000}s`);
-  setTimeout(() => {
+  startDelayTimeoutId = setTimeout(() => {
+    startDelayTimeoutId = null;
     runSyncEngine().catch((err) => {
       console.error('[SyncEngine] Error during sync:', err);
     });
@@ -297,8 +308,19 @@ export function startSyncWithDelay(): void {
 
 /**
  * Stop the sync engine
+ *
+ * C-5: Properly cleans up all timers before stopping
  */
 export function stopSyncEngine(): void {
+  // C-5: Clear delay timeout if pending
+  if (startDelayTimeoutId) {
+    clearTimeout(startDelayTimeoutId);
+    startDelayTimeoutId = null;
+  }
+
+  // Stop background sync
+  stopBackgroundSync();
+
   engineState.isRunning = false;
   console.log('[SyncEngine] Stopped');
 }

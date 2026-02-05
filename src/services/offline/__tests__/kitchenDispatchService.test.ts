@@ -137,6 +137,7 @@ function createMockProduct(
     retail_price: 25000,
     wholesale_price: null,
     cost_price: null,
+    current_stock: null,
     image_url: null,
     is_active: true,
     pos_visible: true,
@@ -384,6 +385,7 @@ describe('kitchenDispatchService', () => {
         created_at: new Date().toISOString(),
         attempts: 0,
         last_error: null,
+        last_attempt_at: null,
         status: 'pending',
       });
 
@@ -406,6 +408,7 @@ describe('kitchenDispatchService', () => {
         created_at: new Date().toISOString(),
         attempts: 0,
         last_error: null,
+        last_attempt_at: null,
         status: 'pending',
       });
 
@@ -429,6 +432,7 @@ describe('kitchenDispatchService', () => {
           created_at: new Date().toISOString(),
           attempts: 0,
           last_error: null,
+          last_attempt_at: null,
           status: 'pending',
         },
         {
@@ -438,6 +442,7 @@ describe('kitchenDispatchService', () => {
           created_at: new Date().toISOString(),
           attempts: 0,
           last_error: null,
+          last_attempt_at: null,
           status: 'pending',
         },
       ]);
@@ -467,6 +472,7 @@ describe('kitchenDispatchService', () => {
         created_at: new Date().toISOString(),
         attempts: 0,
         last_error: null,
+        last_attempt_at: null,
         status: 'pending',
       });
 
@@ -491,6 +497,7 @@ describe('kitchenDispatchService', () => {
         created_at: new Date().toISOString(),
         attempts: 0,
         last_error: null,
+        last_attempt_at: null,
         status: 'pending',
       });
 
@@ -512,6 +519,7 @@ describe('kitchenDispatchService', () => {
         created_at: new Date().toISOString(),
         attempts: 0,
         last_error: null,
+        last_attempt_at: null,
         status: 'pending',
       });
 
@@ -535,6 +543,7 @@ describe('kitchenDispatchService', () => {
         created_at: new Date().toISOString(),
         attempts: 2, // Will become 3 after this attempt
         last_error: null,
+        last_attempt_at: null,
         status: 'pending',
       });
 
@@ -566,6 +575,7 @@ describe('kitchenDispatchService', () => {
         created_at: new Date().toISOString(),
         attempts: 0,
         last_error: null,
+        last_attempt_at: null,
         status: 'pending',
       });
 
@@ -616,6 +626,7 @@ describe('kitchenDispatchService', () => {
           created_at: new Date().toISOString(),
           attempts: 0,
           last_error: null,
+          last_attempt_at: null,
           status: 'pending',
         },
         {
@@ -625,6 +636,7 @@ describe('kitchenDispatchService', () => {
           created_at: new Date().toISOString(),
           attempts: 0,
           last_error: null,
+          last_attempt_at: null,
           status: 'pending',
         },
         {
@@ -634,6 +646,7 @@ describe('kitchenDispatchService', () => {
           created_at: new Date().toISOString(),
           attempts: 0,
           last_error: null,
+          last_attempt_at: null,
           status: 'pending',
         },
       ]);

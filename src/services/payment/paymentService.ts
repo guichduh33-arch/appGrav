@@ -245,15 +245,38 @@ export function resetSplitPaymentState(orderTotal: number): ISplitPaymentState {
  * @param input - Payment input
  * @param userId - User processing the payment
  * @param sessionId - Optional POS session ID
+ * @param orderTotal - Optional order total for validation
  * @returns Payment result
  */
 export async function processPayment(
   orderId: string,
   input: IPaymentInput,
   userId: string,
-  sessionId?: string
+  sessionId?: string,
+  orderTotal?: number
 ): Promise<IPaymentResult> {
   try {
+    // Validate payment if order total is provided
+    if (orderTotal !== undefined) {
+      const validation = validatePayment(input, orderTotal);
+      if (!validation.valid) {
+        return {
+          success: false,
+          paymentId: '',
+          error: validation.errors.join('; '),
+        };
+      }
+
+      // C-2: Validate payment amount matches order total (with 1 IDR tolerance)
+      if (Math.abs(input.amount - orderTotal) > 1) {
+        return {
+          success: false,
+          paymentId: '',
+          error: `Payment amount (${input.amount.toLocaleString()} IDR) does not match order total (${orderTotal.toLocaleString()} IDR)`,
+        };
+      }
+    }
+
     // Calculate change for cash
     let change: number | undefined;
     let changeGiven: number | null = null;
@@ -298,15 +321,29 @@ export async function processPayment(
  * @param inputs - Array of payment inputs
  * @param userId - User processing the payments
  * @param sessionId - Optional POS session ID
+ * @param orderTotal - Optional order total for validation
  * @returns Payment result (paymentId is first payment's ID)
  */
 export async function processSplitPayment(
   orderId: string,
   inputs: IPaymentInput[],
   userId: string,
-  sessionId?: string
+  sessionId?: string,
+  orderTotal?: number
 ): Promise<IPaymentResult> {
   try {
+    // C-2: Validate split payments if order total is provided
+    if (orderTotal !== undefined) {
+      const validation = validateSplitPayments(inputs, orderTotal);
+      if (!validation.valid) {
+        return {
+          success: false,
+          paymentId: '',
+          error: validation.errors.join('; '),
+        };
+      }
+    }
+
     // Prepare payments with calculated change
     const paymentInputs = inputs.map((input) => {
       let changeGiven: number | undefined;

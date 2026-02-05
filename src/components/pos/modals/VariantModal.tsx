@@ -45,6 +45,7 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                 retail_price: baseProduct.retail_price || 0,
                 wholesale_price: baseProduct.wholesale_price || null,
                 cost_price: baseProduct.cost_price || null,
+                current_stock: null,
                 image_url: baseProduct.image_url || null,
                 is_active: baseProduct.is_active ?? true,
                 updated_at: baseProduct.updated_at || new Date().toISOString(),

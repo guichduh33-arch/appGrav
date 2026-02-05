@@ -14,7 +14,7 @@
 import { db } from '@/lib/db';
 import { supabase } from '@/lib/supabase';
 import type { ISyncQueueItem, IOfflineOrderItem, IOfflinePayment } from '@/types/offline';
-import { isLocalId, type ISyncResult } from './syncQueueHelpers';
+import { isLocalId, detectConflictType, type ISyncResult } from './syncQueueHelpers';
 
 /**
  * Process an order sync queue item
@@ -85,7 +85,9 @@ export async function processOrderSync(
       .single();
 
     if (orderError) {
-      return { success: false, error: orderError.message };
+      // C-3: Detect conflict type
+      const conflictType = detectConflictType(orderError);
+      return { success: false, error: orderError.message, conflictType };
     }
 
     const serverId = serverOrder.id;
@@ -154,9 +156,12 @@ export async function processOrderSync(
 
     return { success: true, serverId };
   } catch (error) {
+    // C-3: Detect conflict type from exception
+    const conflictType = detectConflictType(error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
+      conflictType,
     };
   }
 }

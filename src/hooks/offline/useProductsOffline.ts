@@ -9,7 +9,7 @@
  * @see ADR-001: Entités Synchronisées Offline
  */
 
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useNetworkStatus } from './useNetworkStatus';
 import { useProducts } from '../products/useProductList';
@@ -101,6 +101,7 @@ export function useProductsOffline(
   categoryId: string | null = null
 ): IUseProductsOfflineReturn {
   const { isOnline } = useNetworkStatus();
+  const [offlineError, setOfflineError] = useState<Error | null>(null);
 
   // Online: use existing useProducts hook (Supabase via React Query)
   const onlineResult = useProducts(categoryId);
@@ -108,11 +109,16 @@ export function useProductsOffline(
   // Offline: use Dexie with live updates
   const offlineProducts = useLiveQuery(
     async () => {
-      if (isOnline) return null;
+      if (isOnline) {
+        setOfflineError(null);
+        return null;
+      }
       try {
+        setOfflineError(null);
         return await getCachedProducts(categoryId);
       } catch (error) {
         console.error('Error loading offline products:', error);
+        setOfflineError(error instanceof Error ? error : new Error('Failed to load offline products'));
         return [];
       }
     },
@@ -169,8 +175,10 @@ export function useProductsOffline(
   // Determine data source
   const data = isOnline ? (onlineResult.data ?? []) : offlineData;
 
-  // Error only from online mode
-  const error = isOnline ? (onlineResult.error as Error | null) : null;
+  // Error from online mode or offline mode
+  const error = isOnline
+    ? (onlineResult.error as Error | null)
+    : offlineError;
 
   return {
     data,

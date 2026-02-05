@@ -42,6 +42,7 @@ describe('customerPricingService', () => {
     product_type: 'finished',
     image_url: null,
     cost_price: 10000,
+    current_stock: null,
     updated_at: '2024-01-01T00:00:00Z',
   };
 
@@ -262,6 +263,7 @@ describe('customerPricingService', () => {
         name: 'Pain au Chocolat',
         retail_price: 30000,
         wholesale_price: 25000,
+        current_stock: null,
       },
     ];
 

@@ -180,7 +180,7 @@ export function useRecipesOffline(
             name: item.material.name,
             sku: null,
             unit: item.material.unit,
-            cost_price: 0, // Not available in IRecipeIngredient.material
+            cost_price: item.material.cost_price ?? null,
             current_stock: item.material.current_stock,
           } as unknown as Product)
         : ({
@@ -188,7 +188,7 @@ export function useRecipesOffline(
             name: 'Unknown',
             sku: null,
             unit: null,
-            cost_price: 0,
+            cost_price: null,
             current_stock: 0,
           } as unknown as Product),
     })) as (Recipe & { material: Product })[];

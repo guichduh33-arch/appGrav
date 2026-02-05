@@ -3,9 +3,12 @@
  * Story 3.3, 3.4 - Post-Offline Sync Report & Offline Period History
  *
  * Tracks offline periods for reporting and history.
+ *
+ * @migration Uses db.ts (unified schema) instead of legacy offlineDb.ts
  */
 
-import { offlineDb, IOfflinePeriod } from './offlineDb';
+import { db } from '@/lib/db';
+import type { IOfflinePeriod } from '@/types/offline';
 
 // Re-export interface for consumers
 export type { IOfflinePeriod };
@@ -26,7 +29,7 @@ export async function startOfflinePeriod(): Promise<string> {
     sync_report_generated: false,
   };
 
-  await offlineDb.offline_periods.add(period);
+  await db.offline_periods.add(period);
   console.log(`[OfflinePeriod] Started tracking period: ${period.id}`);
   return period.id;
 }
@@ -36,7 +39,7 @@ export async function startOfflinePeriod(): Promise<string> {
  * Called when the system comes back online
  */
 export async function endOfflinePeriod(periodId: string): Promise<IOfflinePeriod | null> {
-  const period = await offlineDb.offline_periods.get(periodId);
+  const period = await db.offline_periods.get(periodId);
   if (!period) {
     console.warn(`[OfflinePeriod] Period ${periodId} not found`);
     return null;
@@ -47,18 +50,18 @@ export async function endOfflinePeriod(periodId: string): Promise<IOfflinePeriod
   const durationMs = endTime.getTime() - startTime.getTime();
 
   // Count transactions created during this period
-  const offlineOrders = await offlineDb.offline_orders
+  const offlineOrders = await db.offline_legacy_orders
     .where('created_at')
     .between(period.start_time, endTime.toISOString())
     .count();
 
-  await offlineDb.offline_periods.update(periodId, {
+  await db.offline_periods.update(periodId, {
     end_time: endTime.toISOString(),
     duration_ms: durationMs,
     transactions_created: offlineOrders,
   });
 
-  const updatedPeriod = await offlineDb.offline_periods.get(periodId);
+  const updatedPeriod = await db.offline_periods.get(periodId);
   console.log(`[OfflinePeriod] Ended period ${periodId}, duration: ${Math.round(durationMs / 1000)}s`);
   return updatedPeriod || null;
 }
@@ -67,7 +70,7 @@ export async function endOfflinePeriod(periodId: string): Promise<IOfflinePeriod
  * Get the current active offline period (if any)
  */
 export async function getCurrentOfflinePeriod(): Promise<IOfflinePeriod | null> {
-  const periods = await offlineDb.offline_periods
+  const periods = await db.offline_periods
     .where('end_time')
     .equals(null as unknown as string)
     .toArray();
@@ -83,7 +86,7 @@ export async function updatePeriodSyncStats(
   syncedCount: number,
   failedCount: number
 ): Promise<void> {
-  await offlineDb.offline_periods.update(periodId, {
+  await db.offline_periods.update(periodId, {
     transactions_synced: syncedCount,
     transactions_failed: failedCount,
     sync_report_generated: true,
@@ -95,7 +98,7 @@ export async function updatePeriodSyncStats(
  * Get all offline periods, sorted by most recent first
  */
 export async function getOfflinePeriods(limit = 50): Promise<IOfflinePeriod[]> {
-  return offlineDb.offline_periods
+  return db.offline_periods
     .orderBy('start_time')
     .reverse()
     .limit(limit)
@@ -109,7 +112,7 @@ export async function getOfflinePeriodsInRange(
   startDate: Date,
   endDate: Date
 ): Promise<IOfflinePeriod[]> {
-  return offlineDb.offline_periods
+  return db.offline_periods
     .where('start_time')
     .between(startDate.toISOString(), endDate.toISOString())
     .reverse()
@@ -120,7 +123,7 @@ export async function getOfflinePeriodsInRange(
  * Get a specific offline period by ID
  */
 export async function getOfflinePeriodById(periodId: string): Promise<IOfflinePeriod | undefined> {
-  return offlineDb.offline_periods.get(periodId);
+  return db.offline_periods.get(periodId);
 }
 
 /**
@@ -128,7 +131,7 @@ export async function getOfflinePeriodById(periodId: string): Promise<IOfflinePe
  * Keeps the last N periods
  */
 export async function cleanupOldPeriods(keepCount = 100): Promise<number> {
-  const allPeriods = await offlineDb.offline_periods
+  const allPeriods = await db.offline_periods
     .orderBy('start_time')
     .reverse()
     .toArray();
@@ -139,7 +142,7 @@ export async function cleanupOldPeriods(keepCount = 100): Promise<number> {
 
   const periodsToDelete = allPeriods.slice(keepCount);
   const ids = periodsToDelete.map((p) => p.id);
-  await offlineDb.offline_periods.bulkDelete(ids);
+  await db.offline_periods.bulkDelete(ids);
 
   console.log(`[OfflinePeriod] Cleaned up ${ids.length} old periods`);
   return ids.length;
@@ -156,7 +159,7 @@ export async function getOfflinePeriodStats(): Promise<{
   totalSynced: number;
   totalFailed: number;
 }> {
-  const periods = await offlineDb.offline_periods.toArray();
+  const periods = await db.offline_periods.toArray();
   const completedPeriods = periods.filter((p) => p.end_time !== null);
 
   const totalDurationMs = completedPeriods.reduce((sum, p) => sum + (p.duration_ms || 0), 0);

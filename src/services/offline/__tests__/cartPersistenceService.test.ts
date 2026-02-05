@@ -55,6 +55,7 @@ const createMockProduct = (id: string, name: string) => ({
   available_for_sale: true,
   wholesale_price: null,
   cost_price: null,
+  current_stock: null,
   image_url: null,
   updated_at: new Date().toISOString(),
 });
@@ -362,6 +363,7 @@ describe('cartPersistenceService', () => {
         available_for_sale: true,
         wholesale_price: null,
         cost_price: null,
+        current_stock: null,
         image_url: null,
         updated_at: new Date().toISOString(),
       });
@@ -403,6 +405,7 @@ describe('cartPersistenceService', () => {
         available_for_sale: true,
         wholesale_price: null,
         cost_price: null,
+        current_stock: null,
         image_url: null,
         updated_at: new Date().toISOString(),
       });
@@ -432,6 +435,7 @@ describe('cartPersistenceService', () => {
         available_for_sale: true,
         wholesale_price: null,
         cost_price: null,
+        current_stock: null,
         image_url: null,
         updated_at: new Date().toISOString(),
       });
@@ -462,6 +466,7 @@ describe('cartPersistenceService', () => {
         available_for_sale: false, // Not available for sale
         wholesale_price: null,
         cost_price: null,
+        current_stock: null,
         image_url: null,
         updated_at: new Date().toISOString(),
       });
@@ -519,6 +524,7 @@ describe('cartPersistenceService', () => {
           available_for_sale: true,
           wholesale_price: null,
           cost_price: null,
+          current_stock: null,
           image_url: null,
           updated_at: new Date().toISOString(),
         },
@@ -534,6 +540,7 @@ describe('cartPersistenceService', () => {
           available_for_sale: true,
           wholesale_price: null,
           cost_price: null,
+          current_stock: null,
           image_url: null,
           updated_at: new Date().toISOString(),
         },
@@ -569,6 +576,7 @@ describe('cartPersistenceService', () => {
         available_for_sale: true,
         wholesale_price: null,
         cost_price: null,
+        current_stock: null,
         image_url: null,
         updated_at: new Date().toISOString(),
       });

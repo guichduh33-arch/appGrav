@@ -36,7 +36,7 @@ export async function cacheAllProducts(): Promise<void> {
   const { data, error } = await supabase
     .from('products')
     .select(
-      'id, category_id, sku, name, product_type, retail_price, wholesale_price, cost_price, image_url, is_active, pos_visible, available_for_sale, updated_at'
+      'id, category_id, sku, name, product_type, retail_price, wholesale_price, cost_price, current_stock, image_url, is_active, pos_visible, available_for_sale, updated_at'
     )
     .eq('is_active', true);
 

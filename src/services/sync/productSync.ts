@@ -4,18 +4,55 @@
  *
  * Handles synchronization of products and categories between Supabase and IndexedDB.
  * Enables offline product browsing for POS operations.
+ *
+ * @migration Uses db.ts (unified schema) instead of legacy offlineDb.ts
+ * Note: This service uses simplified schemas. For full-featured cache,
+ * use productsCacheService.ts and categoriesCacheService.ts instead.
  */
 
 import { supabase } from '@/lib/supabase';
-import {
-  offlineDb,
-  IOfflineProduct,
-  IOfflineCategory,
-  IOfflineProductModifier,
-} from './offlineDb';
+import { db } from '@/lib/db';
+import type { IOfflineModifier as IOfficialModifier } from '@/types/offline';
 
-// Re-export interfaces for consumers
-export type { IOfflineProduct, IOfflineCategory, IOfflineProductModifier };
+/**
+ * Legacy product interface for this sync service
+ * Maps to official IOfflineProduct with field adaptations
+ */
+export interface IOfflineProduct {
+  id: string;
+  category_id: string | null;
+  name: string;
+  sku: string | null;
+  price: number;
+  is_active: boolean;
+  image_url: string | null;
+  updated_at: string;
+}
+
+/**
+ * Legacy category interface for this sync service
+ */
+export interface IOfflineCategory {
+  id: string;
+  name: string;
+  display_order: number;
+  is_active: boolean;
+}
+
+/**
+ * Legacy modifier interface for this sync service
+ */
+export interface IOfflineProductModifier {
+  id: string;
+  product_id: string;
+  name: string;
+  price_adjustment: number;
+}
+
+// Internal legacy type aliases for clarity
+type ILegacyProduct = IOfflineProduct;
+type ILegacyCategory = IOfflineCategory;
+type ILegacyModifier = IOfflineProductModifier;
 
 /**
  * Local storage keys for sync timestamps
@@ -74,27 +111,34 @@ export async function syncProductsToOffline(): Promise<number> {
     return 0;
   }
 
-  // Transform to offline format
-  const offlineProducts: IOfflineProduct[] = data.map((p) => ({
+  // Transform to official offline format with field mapping
+  const now = new Date().toISOString();
+  const officialProducts = data.map((p) => ({
     id: p.id,
     category_id: p.category_id,
     name: p.name,
     sku: p.sku,
-    price: p.retail_price ?? 0,
-    is_active: p.is_active ?? true,
+    product_type: 'finished' as const,
+    retail_price: p.retail_price ?? 0,
+    wholesale_price: null,
+    cost_price: null,
+    current_stock: null,
     image_url: p.image_url,
-    updated_at: p.updated_at ?? new Date().toISOString(),
+    is_active: p.is_active ?? true,
+    pos_visible: true,
+    available_for_sale: true,
+    updated_at: p.updated_at ?? now,
   }));
 
-  // Bulk upsert to IndexedDB
-  await offlineDb.products.bulkPut(offlineProducts);
+  // Bulk upsert to IndexedDB using official table
+  await db.offline_products.bulkPut(officialProducts);
 
   // Update last sync timestamp
   const latestTimestamp = data[0].updated_at ?? new Date().toISOString();
   setLastSyncTimestamp(SYNC_TIMESTAMPS.PRODUCTS, latestTimestamp);
 
-  console.log(`[ProductSync] Synced ${offlineProducts.length} products`);
-  return offlineProducts.length;
+  console.log(`[ProductSync] Synced ${officialProducts.length} products`);
+  return officialProducts.length;
 }
 
 /**
@@ -105,23 +149,34 @@ export async function syncProductsToOffline(): Promise<number> {
  */
 export async function getProductsFromOffline(
   categoryId?: string | null
-): Promise<IOfflineProduct[]> {
-  let products: IOfflineProduct[];
+): Promise<ILegacyProduct[]> {
+  let officialProducts;
 
   if (categoryId) {
-    products = await offlineDb.products
+    officialProducts = await db.offline_products
       .where('category_id')
       .equals(categoryId)
-      .filter((p) => p.is_active)
+      .filter((p) => Boolean(p.is_active))
       .toArray();
   } else {
-    products = await offlineDb.products
-      .filter((p) => p.is_active)
+    officialProducts = await db.offline_products
+      .filter((p) => Boolean(p.is_active))
       .toArray();
   }
 
-  // Sort by name
-  return products.sort((a, b) => a.name.localeCompare(b.name));
+  // Map to legacy format and sort by name
+  return officialProducts
+    .map((p) => ({
+      id: p.id,
+      category_id: p.category_id,
+      name: p.name,
+      sku: p.sku,
+      price: p.retail_price,
+      is_active: Boolean(p.is_active),
+      image_url: p.image_url,
+      updated_at: p.updated_at,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /**
@@ -151,23 +206,29 @@ export async function syncCategoriesToOffline(): Promise<number> {
     return 0;
   }
 
-  // Transform to offline format
-  const offlineCategories: IOfflineCategory[] = data.map((c) => ({
+  // Transform to official format
+  const now = new Date().toISOString();
+  const officialCategories = data.map((c) => ({
     id: c.id,
     name: c.name,
-    display_order: c.sort_order ?? 0,
+    sort_order: c.sort_order ?? 0,
     is_active: c.is_active ?? true,
+    is_raw_material: false,
+    dispatch_station: 'none' as const,
+    color: null,
+    icon: null,
+    updated_at: now,
   }));
 
   // Clear and replace all categories (they're small enough)
-  await offlineDb.categories.clear();
-  await offlineDb.categories.bulkAdd(offlineCategories);
+  await db.offline_categories.clear();
+  await db.offline_categories.bulkAdd(officialCategories);
 
   // Update last sync timestamp
   setLastSyncTimestamp(SYNC_TIMESTAMPS.CATEGORIES, new Date().toISOString());
 
-  console.log(`[ProductSync] Synced ${offlineCategories.length} categories`);
-  return offlineCategories.length;
+  console.log(`[ProductSync] Synced ${officialCategories.length} categories`);
+  return officialCategories.length;
 }
 
 /**
@@ -175,12 +236,20 @@ export async function syncCategoriesToOffline(): Promise<number> {
  *
  * @returns Array of offline categories sorted by display order
  */
-export async function getCategoriesFromOffline(): Promise<IOfflineCategory[]> {
-  const categories = await offlineDb.categories
-    .filter((c) => c.is_active)
+export async function getCategoriesFromOffline(): Promise<ILegacyCategory[]> {
+  const officialCategories = await db.offline_categories
+    .filter((c) => Boolean(c.is_active))
     .toArray();
 
-  return categories.sort((a, b) => a.display_order - b.display_order);
+  // Map to legacy format and sort
+  return officialCategories
+    .map((c) => ({
+      id: c.id,
+      name: c.name,
+      display_order: c.sort_order ?? 0,
+      is_active: Boolean(c.is_active),
+    }))
+    .sort((a, b) => a.display_order - b.display_order);
 }
 
 /**
@@ -204,22 +273,34 @@ export async function syncModifiersToOffline(): Promise<number> {
     return 0;
   }
 
-  // Transform to offline format
-  const offlineModifiers: IOfflineProductModifier[] = data.map((m) => ({
+  // Transform to official format with all required fields
+  const now = new Date().toISOString();
+  const officialModifiers: IOfficialModifier[] = data.map((m) => ({
     id: m.id,
-    product_id: m.product_id ?? '',
-    name: m.option_label,
+    product_id: m.product_id ?? null,
+    category_id: null,
+    group_name: 'Default',
+    group_type: 'single' as const,
+    group_required: false,
+    group_sort_order: 0,
+    option_id: m.id,
+    option_label: m.option_label,
+    option_icon: null,
     price_adjustment: m.price_adjustment ?? 0,
+    is_default: false,
+    option_sort_order: 0,
+    is_active: true,
+    created_at: now,
   }));
 
   // Clear and replace all modifiers
-  await offlineDb.product_modifiers.clear();
-  await offlineDb.product_modifiers.bulkAdd(offlineModifiers);
+  await db.offline_modifiers.clear();
+  await db.offline_modifiers.bulkAdd(officialModifiers);
 
   setLastSyncTimestamp(SYNC_TIMESTAMPS.MODIFIERS, new Date().toISOString());
 
-  console.log(`[ProductSync] Synced ${offlineModifiers.length} modifiers`);
-  return offlineModifiers.length;
+  console.log(`[ProductSync] Synced ${officialModifiers.length} modifiers`);
+  return officialModifiers.length;
 }
 
 /**
@@ -230,11 +311,19 @@ export async function syncModifiersToOffline(): Promise<number> {
  */
 export async function getModifiersFromOffline(
   productId: string
-): Promise<IOfflineProductModifier[]> {
-  return offlineDb.product_modifiers
+): Promise<ILegacyModifier[]> {
+  const officialModifiers = await db.offline_modifiers
     .where('product_id')
     .equals(productId)
     .toArray();
+
+  // Map to legacy format
+  return officialModifiers.map((m) => ({
+    id: m.id,
+    product_id: m.product_id ?? '',
+    name: m.option_label,
+    price_adjustment: m.price_adjustment,
+  }));
 }
 
 /**
@@ -263,7 +352,7 @@ export async function syncAllProductData(): Promise<{
  * @returns true if products are cached locally
  */
 export async function hasOfflineProductData(): Promise<boolean> {
-  const count = await offlineDb.products.count();
+  const count = await db.offline_products.count();
   return count > 0;
 }
 
@@ -273,9 +362,9 @@ export async function hasOfflineProductData(): Promise<boolean> {
  */
 export async function clearOfflineProductData(): Promise<void> {
   await Promise.all([
-    offlineDb.products.clear(),
-    offlineDb.categories.clear(),
-    offlineDb.product_modifiers.clear(),
+    db.offline_products.clear(),
+    db.offline_categories.clear(),
+    db.offline_modifiers.clear(),
   ]);
 
   localStorage.removeItem(SYNC_TIMESTAMPS.PRODUCTS);

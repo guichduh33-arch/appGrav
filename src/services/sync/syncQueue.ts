@@ -4,13 +4,22 @@
  *
  * Manages the synchronization queue for offline transactions.
  * Implements FIFO processing with exponential backoff for retries.
+ *
+ * @migration Uses db.ts (unified schema) instead of legacy offlineDb.ts
  */
 
-import { offlineDb, ISyncQueueItem, TSyncQueueType, TSyncQueueStatus } from './offlineDb';
+import { db } from '@/lib/db';
+import type {
+  ILegacySyncQueueItem,
+  TLegacySyncQueueType,
+  TLegacySyncQueueStatus,
+} from '@/types/offline';
 import { OFFLINE_CONSTANTS } from '../../constants/offline';
 
-// Re-export types
-export type { ISyncQueueItem, TSyncQueueType, TSyncQueueStatus };
+// Re-export types for backward compatibility
+export type ISyncQueueItem = ILegacySyncQueueItem;
+export type TSyncQueueType = TLegacySyncQueueType;
+export type TSyncQueueStatus = TLegacySyncQueueStatus;
 
 /**
  * Exponential backoff delays in milliseconds
@@ -41,14 +50,15 @@ export function getBackoffDelay(attempts: number): number {
  */
 export async function addToSyncQueue(
   type: TSyncQueueType,
-  payload: object
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  payload: Record<string, any>
 ): Promise<string> {
-  const queueCount = await offlineDb.sync_queue.count();
+  const queueCount = await db.offline_legacy_sync_queue.count();
 
   // Story 2.5: Clean up synced items if queue is near capacity
   if (queueCount >= OFFLINE_CONSTANTS.MAX_QUEUE_SIZE) {
     const cleaned = await cleanupSyncedItems();
-    const newCount = await offlineDb.sync_queue.count();
+    const newCount = await db.offline_legacy_sync_queue.count();
     if (newCount >= OFFLINE_CONSTANTS.MAX_QUEUE_SIZE) {
       throw new Error(`Sync queue full (max: ${OFFLINE_CONSTANTS.MAX_QUEUE_SIZE})`);
     }
@@ -65,7 +75,7 @@ export async function addToSyncQueue(
     lastError: null
   };
 
-  await offlineDb.sync_queue.add(item);
+  await db.offline_legacy_sync_queue.add(item);
   console.log(`[SyncQueue] Added ${type} item: ${item.id}`);
   return item.id;
 }
@@ -79,9 +89,9 @@ export async function getSyncQueueItems(
   status?: TSyncQueueStatus
 ): Promise<ISyncQueueItem[]> {
   if (status) {
-    return offlineDb.sync_queue.where('status').equals(status).toArray();
+    return db.offline_legacy_sync_queue.where('status').equals(status).toArray();
   }
-  return offlineDb.sync_queue.toArray();
+  return db.offline_legacy_sync_queue.toArray();
 }
 
 /**
@@ -93,7 +103,7 @@ export async function updateSyncQueueItem(
   id: string,
   updates: Partial<Omit<ISyncQueueItem, 'id' | 'type' | 'payload' | 'createdAt'>>
 ): Promise<void> {
-  await offlineDb.sync_queue.update(id, updates);
+  await db.offline_legacy_sync_queue.update(id, updates);
 }
 
 /**
@@ -101,7 +111,7 @@ export async function updateSyncQueueItem(
  * @param id - Item ID to remove
  */
 export async function removeSyncQueueItem(id: string): Promise<void> {
-  await offlineDb.sync_queue.delete(id);
+  await db.offline_legacy_sync_queue.delete(id);
 }
 
 /**
@@ -110,7 +120,7 @@ export async function removeSyncQueueItem(id: string): Promise<void> {
  * @returns Count of items with 'pending' status
  */
 export async function getPendingSyncCount(): Promise<number> {
-  return offlineDb.sync_queue.where('status').equals('pending').count();
+  return db.offline_legacy_sync_queue.where('status').equals('pending').count();
 }
 
 /**
@@ -118,7 +128,7 @@ export async function getPendingSyncCount(): Promise<number> {
  * Used for testing and recovery scenarios
  */
 export async function clearSyncQueue(): Promise<void> {
-  await offlineDb.sync_queue.clear();
+  await db.offline_legacy_sync_queue.clear();
   console.log('[SyncQueue] Queue cleared');
 }
 
@@ -127,7 +137,7 @@ export async function clearSyncQueue(): Promise<void> {
  * Keeps the queue size manageable
  */
 export async function cleanupSyncedItems(): Promise<number> {
-  const syncedItems = await offlineDb.sync_queue
+  const syncedItems = await db.offline_legacy_sync_queue
     .where('status')
     .equals('synced')
     .toArray();
@@ -135,7 +145,7 @@ export async function cleanupSyncedItems(): Promise<number> {
   if (syncedItems.length === 0) return 0;
 
   const ids = syncedItems.map((item) => item.id);
-  await offlineDb.sync_queue.bulkDelete(ids);
+  await db.offline_legacy_sync_queue.bulkDelete(ids);
 
   console.log(`[SyncQueue] Cleaned up ${ids.length} synced items`);
   return ids.length;
@@ -145,7 +155,7 @@ export async function cleanupSyncedItems(): Promise<number> {
  * Mark an item as syncing (in progress)
  */
 export async function markSyncing(itemId: string): Promise<void> {
-  await offlineDb.sync_queue.update(itemId, {
+  await db.offline_legacy_sync_queue.update(itemId, {
     status: 'syncing' as TSyncQueueStatus,
   });
 }
@@ -154,7 +164,7 @@ export async function markSyncing(itemId: string): Promise<void> {
  * Mark an item as successfully synced
  */
 export async function markSynced(itemId: string): Promise<void> {
-  await offlineDb.sync_queue.update(itemId, {
+  await db.offline_legacy_sync_queue.update(itemId, {
     status: 'synced' as TSyncQueueStatus,
   });
   console.log(`[SyncQueue] Item ${itemId} synced successfully`);
@@ -165,10 +175,10 @@ export async function markSynced(itemId: string): Promise<void> {
  * Increments attempts counter for backoff calculation
  */
 export async function markFailed(itemId: string, error: string): Promise<void> {
-  const item = await offlineDb.sync_queue.get(itemId);
+  const item = await db.offline_legacy_sync_queue.get(itemId);
   if (!item) return;
 
-  await offlineDb.sync_queue.update(itemId, {
+  await db.offline_legacy_sync_queue.update(itemId, {
     status: 'failed' as TSyncQueueStatus,
     attempts: item.attempts + 1,
     lastError: error,
@@ -180,7 +190,7 @@ export async function markFailed(itemId: string, error: string): Promise<void> {
  * Get items that are ready to retry (failed items past their backoff delay)
  */
 export async function getRetryableItems(): Promise<ISyncQueueItem[]> {
-  const failedItems = await offlineDb.sync_queue
+  const failedItems = await db.offline_legacy_sync_queue
     .where('status')
     .equals('failed')
     .toArray();
@@ -203,7 +213,7 @@ export async function getQueueCounts(): Promise<{
   synced: number;
   total: number;
 }> {
-  const items = await offlineDb.sync_queue.toArray();
+  const items = await db.offline_legacy_sync_queue.toArray();
 
   return {
     pending: items.filter((i) => i.status === 'pending').length,
@@ -218,14 +228,14 @@ export async function getQueueCounts(): Promise<{
  * Check if queue has any pending or failed items that need syncing
  */
 export async function hasItemsToSync(): Promise<boolean> {
-  const pendingCount = await offlineDb.sync_queue
+  const pendingCount = await db.offline_legacy_sync_queue
     .where('status')
     .equals('pending')
     .count();
 
   if (pendingCount > 0) return true;
 
-  const failedCount = await offlineDb.sync_queue
+  const failedCount = await db.offline_legacy_sync_queue
     .where('status')
     .equals('failed')
     .count();
@@ -237,7 +247,7 @@ export async function hasItemsToSync(): Promise<boolean> {
  * Reset a failed item back to pending for immediate retry
  */
 export async function resetToPending(itemId: string): Promise<void> {
-  await offlineDb.sync_queue.update(itemId, {
+  await db.offline_legacy_sync_queue.update(itemId, {
     status: 'pending' as TSyncQueueStatus,
     lastError: null,
   });

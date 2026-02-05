@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test:claude": "ts-node --esm scripts/test-claude.ts"
+    "test:claude": "ts-node --esm scripts/test-claude.ts",
+    "test:smoke": "vitest run src/__tests__/smoke/pos-smoke.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",

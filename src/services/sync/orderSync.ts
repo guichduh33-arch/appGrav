@@ -3,14 +3,23 @@
  * Story 2.2 - Offline Order Creation
  *
  * Handles saving and managing orders created during offline mode.
+ *
+ * @migration Uses db.ts (unified schema) with legacy types for backward compatibility
  */
 
-import { offlineDb, IOfflineOrder, IOfflineOrderItem, ISyncQueueItem } from './offlineDb';
+import { db } from '@/lib/db';
+import type {
+  ILegacyOfflineOrder,
+  ILegacyOfflineOrderItem,
+  ILegacySyncQueueItem,
+} from '@/types/offline';
 import type { CartItem } from '@/stores/cartStore';
 import type { OrderType } from '@/stores/orderStore';
 
-// Re-export interfaces for consumers
-export type { IOfflineOrder, IOfflineOrderItem };
+// Re-export interfaces for consumers (using legacy types)
+export type IOfflineOrder = ILegacyOfflineOrder;
+export type IOfflineOrderItem = ILegacyOfflineOrderItem;
+type ISyncQueueItem = ILegacySyncQueueItem;
 
 /**
  * Generate a unique offline order ID
@@ -111,7 +120,7 @@ export async function saveOrderOffline(params: {
   };
 
   // Save to IndexedDB
-  await offlineDb.offline_orders.add(offlineOrder);
+  await db.offline_legacy_orders.add(offlineOrder);
 
   // Add to sync queue
   await addToSyncQueue(offlineOrder);
@@ -134,7 +143,7 @@ async function addToSyncQueue(order: IOfflineOrder): Promise<void> {
     lastError: null,
   };
 
-  await offlineDb.sync_queue.add(syncItem);
+  await db.offline_legacy_sync_queue.add(syncItem);
   console.log(`[OrderSync] Added order ${order.order_number} to sync queue`);
 }
 
@@ -142,7 +151,7 @@ async function addToSyncQueue(order: IOfflineOrder): Promise<void> {
  * Get all offline orders that haven't been synced
  */
 export async function getOfflineOrders(): Promise<IOfflineOrder[]> {
-  return offlineDb.offline_orders
+  return db.offline_legacy_orders
     .filter((order) => !order.synced)
     .toArray();
 }
@@ -151,7 +160,7 @@ export async function getOfflineOrders(): Promise<IOfflineOrder[]> {
  * Get all offline orders (including synced)
  */
 export async function getAllOfflineOrders(): Promise<IOfflineOrder[]> {
-  return offlineDb.offline_orders
+  return db.offline_legacy_orders
     .orderBy('created_at')
     .reverse()
     .toArray();
@@ -161,21 +170,21 @@ export async function getAllOfflineOrders(): Promise<IOfflineOrder[]> {
  * Get offline order by ID
  */
 export async function getOfflineOrderById(orderId: string): Promise<IOfflineOrder | undefined> {
-  return offlineDb.offline_orders.get(orderId);
+  return db.offline_legacy_orders.get(orderId);
 }
 
 /**
  * Mark an offline order as synced
  */
 export async function markOrderSynced(orderId: string, serverOrderId?: string): Promise<void> {
-  await offlineDb.offline_orders.update(orderId, {
+  await db.offline_legacy_orders.update(orderId, {
     synced: true,
     synced_at: new Date().toISOString(),
     server_order_id: serverOrderId,
   });
 
   // Update sync queue item status
-  await offlineDb.sync_queue
+  await db.offline_legacy_sync_queue
     .where('id')
     .equals(`sync-${orderId}`)
     .modify({ status: 'synced' });
@@ -187,7 +196,7 @@ export async function markOrderSynced(orderId: string, serverOrderId?: string): 
  * Get count of pending (unsynced) orders
  */
 export async function getPendingOrdersCount(): Promise<number> {
-  return offlineDb.offline_orders
+  return db.offline_legacy_orders
     .filter((order) => !order.synced)
     .count();
 }
@@ -196,7 +205,7 @@ export async function getPendingOrdersCount(): Promise<number> {
  * Get all items from sync queue
  */
 export async function getSyncQueueItems(): Promise<ISyncQueueItem[]> {
-  return offlineDb.sync_queue
+  return db.offline_legacy_sync_queue
     .where('status')
     .equals('pending')
     .toArray();
@@ -207,12 +216,12 @@ export async function getSyncQueueItems(): Promise<ISyncQueueItem[]> {
  */
 export async function getSyncQueueCount(status?: 'pending' | 'syncing' | 'failed' | 'synced'): Promise<number> {
   if (status) {
-    return offlineDb.sync_queue
+    return db.offline_legacy_sync_queue
       .where('status')
       .equals(status)
       .count();
   }
-  return offlineDb.sync_queue.count();
+  return db.offline_legacy_sync_queue.count();
 }
 
 /**
@@ -229,25 +238,25 @@ export async function updateSyncQueueStatus(
   }
   if (status === 'failed') {
     // Increment attempts on failure
-    const item = await offlineDb.sync_queue.get(syncId);
+    const item = await db.offline_legacy_sync_queue.get(syncId);
     if (item) {
       updates.attempts = item.attempts + 1;
     }
   }
-  await offlineDb.sync_queue.update(syncId, updates);
+  await db.offline_legacy_sync_queue.update(syncId, updates);
 }
 
 /**
  * Clear synced items from the queue (cleanup)
  */
 export async function clearSyncedItems(): Promise<number> {
-  const synced = await offlineDb.sync_queue
+  const synced = await db.offline_legacy_sync_queue
     .where('status')
     .equals('synced')
     .toArray();
 
   const ids = synced.map((item) => item.id);
-  await offlineDb.sync_queue.bulkDelete(ids);
+  await db.offline_legacy_sync_queue.bulkDelete(ids);
 
   console.log(`[OrderSync] Cleared ${ids.length} synced items from queue`);
   return ids.length;

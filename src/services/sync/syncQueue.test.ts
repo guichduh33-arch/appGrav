@@ -1,6 +1,6 @@
 import 'fake-indexeddb/auto';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { offlineDb } from './offlineDb';
+import { db } from '@/lib/db';
 import {
   addToSyncQueue,
   getSyncQueueItems,
@@ -11,13 +11,17 @@ import {
 } from './syncQueue';
 import { OFFLINE_CONSTANTS } from '../../constants/offline';
 
+/**
+ * Test suite for syncQueue service
+ * @migration Uses db.ts (unified schema) instead of legacy offlineDb.ts
+ */
 describe('syncQueue', () => {
   beforeEach(async () => {
-    await offlineDb.sync_queue.clear();
+    await db.offline_legacy_sync_queue.clear();
   });
 
   afterEach(async () => {
-    await offlineDb.sync_queue.clear();
+    await db.offline_legacy_sync_queue.clear();
   });
 
   describe('addToSyncQueue', () => {
@@ -28,7 +32,7 @@ describe('syncQueue', () => {
       expect(id).toBeDefined();
       expect(typeof id).toBe('string');
 
-      const item = await offlineDb.sync_queue.get(id);
+      const item = await db.offline_legacy_sync_queue.get(id);
       expect(item).toBeDefined();
       expect(item?.type).toBe('order');
       expect(item?.payload).toEqual(payload);
@@ -41,7 +45,7 @@ describe('syncQueue', () => {
       const payload = { paymentId: 'pay-1', amount: 50000, method: 'cash' };
       const id = await addToSyncQueue('payment', payload);
 
-      const item = await offlineDb.sync_queue.get(id);
+      const item = await db.offline_legacy_sync_queue.get(id);
       expect(item?.type).toBe('payment');
       expect(item?.payload).toEqual(payload);
     });
@@ -50,7 +54,7 @@ describe('syncQueue', () => {
       const payload = { productId: 'prod-1', quantity: -5, type: 'sale' };
       const id = await addToSyncQueue('stock_movement', payload);
 
-      const item = await offlineDb.sync_queue.get(id);
+      const item = await db.offline_legacy_sync_queue.get(id);
       expect(item?.type).toBe('stock_movement');
     });
 
@@ -59,7 +63,7 @@ describe('syncQueue', () => {
       const id = await addToSyncQueue('order', {});
       const afterAdd = new Date().toISOString();
 
-      const item = await offlineDb.sync_queue.get(id);
+      const item = await db.offline_legacy_sync_queue.get(id);
       expect(item?.createdAt).toBeDefined();
       expect(item!.createdAt >= beforeAdd).toBe(true);
       expect(item!.createdAt <= afterAdd).toBe(true);
@@ -69,7 +73,7 @@ describe('syncQueue', () => {
       // Fill the queue to max capacity
       const promises = [];
       for (let i = 0; i < OFFLINE_CONSTANTS.MAX_QUEUE_SIZE; i++) {
-        promises.push(offlineDb.sync_queue.add({
+        promises.push(db.offline_legacy_sync_queue.add({
           id: `item-${i}`,
           type: 'order',
           payload: {},
@@ -100,7 +104,7 @@ describe('syncQueue', () => {
 
   describe('getSyncQueueItems', () => {
     beforeEach(async () => {
-      await offlineDb.sync_queue.bulkAdd([
+      await db.offline_legacy_sync_queue.bulkAdd([
         { id: 'item-1', type: 'order', payload: {}, status: 'pending', createdAt: '2026-01-27T10:00:00Z', attempts: 0, lastError: null },
         { id: 'item-2', type: 'payment', payload: {}, status: 'synced', createdAt: '2026-01-27T10:01:00Z', attempts: 1, lastError: null },
         { id: 'item-3', type: 'order', payload: {}, status: 'pending', createdAt: '2026-01-27T10:02:00Z', attempts: 0, lastError: null },
@@ -139,7 +143,7 @@ describe('syncQueue', () => {
 
   describe('updateSyncQueueItem', () => {
     beforeEach(async () => {
-      await offlineDb.sync_queue.add({
+      await db.offline_legacy_sync_queue.add({
         id: 'update-test',
         type: 'order',
         payload: { data: 'test' },
@@ -153,21 +157,21 @@ describe('syncQueue', () => {
     it('should update status', async () => {
       await updateSyncQueueItem('update-test', { status: 'syncing' });
 
-      const item = await offlineDb.sync_queue.get('update-test');
+      const item = await db.offline_legacy_sync_queue.get('update-test');
       expect(item?.status).toBe('syncing');
     });
 
     it('should update attempts', async () => {
       await updateSyncQueueItem('update-test', { attempts: 3 });
 
-      const item = await offlineDb.sync_queue.get('update-test');
+      const item = await db.offline_legacy_sync_queue.get('update-test');
       expect(item?.attempts).toBe(3);
     });
 
     it('should update lastError', async () => {
       await updateSyncQueueItem('update-test', { lastError: 'Connection timeout' });
 
-      const item = await offlineDb.sync_queue.get('update-test');
+      const item = await db.offline_legacy_sync_queue.get('update-test');
       expect(item?.lastError).toBe('Connection timeout');
     });
 
@@ -178,18 +182,18 @@ describe('syncQueue', () => {
         lastError: 'Max retries exceeded'
       });
 
-      const item = await offlineDb.sync_queue.get('update-test');
+      const item = await db.offline_legacy_sync_queue.get('update-test');
       expect(item?.status).toBe('failed');
       expect(item?.attempts).toBe(5);
       expect(item?.lastError).toBe('Max retries exceeded');
     });
 
     it('should preserve immutable fields', async () => {
-      const originalItem = await offlineDb.sync_queue.get('update-test');
+      const originalItem = await db.offline_legacy_sync_queue.get('update-test');
 
       await updateSyncQueueItem('update-test', { status: 'synced' });
 
-      const updatedItem = await offlineDb.sync_queue.get('update-test');
+      const updatedItem = await db.offline_legacy_sync_queue.get('update-test');
       expect(updatedItem?.id).toBe(originalItem?.id);
       expect(updatedItem?.type).toBe(originalItem?.type);
       expect(updatedItem?.payload).toEqual(originalItem?.payload);
@@ -199,7 +203,7 @@ describe('syncQueue', () => {
 
   describe('removeSyncQueueItem', () => {
     beforeEach(async () => {
-      await offlineDb.sync_queue.bulkAdd([
+      await db.offline_legacy_sync_queue.bulkAdd([
         { id: 'remove-1', type: 'order', payload: {}, status: 'synced', createdAt: '2026-01-27T10:00:00Z', attempts: 1, lastError: null },
         { id: 'remove-2', type: 'payment', payload: {}, status: 'pending', createdAt: '2026-01-27T10:01:00Z', attempts: 0, lastError: null }
       ]);
@@ -208,14 +212,14 @@ describe('syncQueue', () => {
     it('should remove an item', async () => {
       await removeSyncQueueItem('remove-1');
 
-      const item = await offlineDb.sync_queue.get('remove-1');
+      const item = await db.offline_legacy_sync_queue.get('remove-1');
       expect(item).toBeUndefined();
     });
 
     it('should not affect other items', async () => {
       await removeSyncQueueItem('remove-1');
 
-      const remaining = await offlineDb.sync_queue.toArray();
+      const remaining = await db.offline_legacy_sync_queue.toArray();
       expect(remaining).toHaveLength(1);
       expect(remaining[0].id).toBe('remove-2');
     });
@@ -232,7 +236,7 @@ describe('syncQueue', () => {
     });
 
     it('should return correct count of pending items', async () => {
-      await offlineDb.sync_queue.bulkAdd([
+      await db.offline_legacy_sync_queue.bulkAdd([
         { id: 'p1', type: 'order', payload: {}, status: 'pending', createdAt: '', attempts: 0, lastError: null },
         { id: 'p2', type: 'order', payload: {}, status: 'pending', createdAt: '', attempts: 0, lastError: null },
         { id: 's1', type: 'order', payload: {}, status: 'synced', createdAt: '', attempts: 1, lastError: null },
@@ -244,7 +248,7 @@ describe('syncQueue', () => {
     });
 
     it('should not count syncing items', async () => {
-      await offlineDb.sync_queue.bulkAdd([
+      await db.offline_legacy_sync_queue.bulkAdd([
         { id: 'p1', type: 'order', payload: {}, status: 'pending', createdAt: '', attempts: 0, lastError: null },
         { id: 'syncing1', type: 'order', payload: {}, status: 'syncing', createdAt: '', attempts: 1, lastError: null }
       ]);
@@ -256,17 +260,17 @@ describe('syncQueue', () => {
 
   describe('clearSyncQueue', () => {
     it('should remove all items from queue', async () => {
-      await offlineDb.sync_queue.bulkAdd([
+      await db.offline_legacy_sync_queue.bulkAdd([
         { id: 'c1', type: 'order', payload: {}, status: 'pending', createdAt: '', attempts: 0, lastError: null },
         { id: 'c2', type: 'payment', payload: {}, status: 'synced', createdAt: '', attempts: 1, lastError: null },
         { id: 'c3', type: 'stock_movement', payload: {}, status: 'failed', createdAt: '', attempts: 5, lastError: 'Error' }
       ]);
 
-      expect(await offlineDb.sync_queue.count()).toBe(3);
+      expect(await db.offline_legacy_sync_queue.count()).toBe(3);
 
       await clearSyncQueue();
 
-      expect(await offlineDb.sync_queue.count()).toBe(0);
+      expect(await db.offline_legacy_sync_queue.count()).toBe(0);
     });
 
     it('should not throw when queue is already empty', async () => {

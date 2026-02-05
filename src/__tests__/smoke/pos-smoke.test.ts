@@ -305,9 +305,10 @@ describe('POS Smoke Tests', () => {
       // @ts-expect-error - Mock
       global.BroadcastChannel = MockBroadcastChannel;
 
-      const { useDisplayBroadcast } = await import('@/hooks/pos/useDisplayBroadcast');
+      const displayBroadcastModule = await import('@/hooks/pos/useDisplayBroadcast');
 
-      // Check isSupported via the module
+      // Check module loaded and BroadcastChannel is available
+      expect(displayBroadcastModule).toBeDefined();
       expect(typeof BroadcastChannel).toBe('function');
     });
   });

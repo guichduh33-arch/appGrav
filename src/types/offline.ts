@@ -383,6 +383,9 @@ export interface IOfflineProduct {
   /** Cost price for margin calculation */
   cost_price: number | null;
 
+  /** Current stock quantity */
+  current_stock: number | null;
+
   /** Product image URL */
   image_url: string | null;
 
@@ -1133,6 +1136,9 @@ export interface IDispatchQueueItem {
   /** Last error message */
   last_error: string | null;
 
+  /** C-7: ISO 8601 timestamp of last attempt (for backoff) */
+  last_attempt_at: string | null;
+
   /** Queue status */
   status: TDispatchQueueStatus;
 }
@@ -1532,3 +1538,198 @@ export const PROMOTIONS_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 /** Refresh interval for promotions when online (1 hour in ms) */
 export const PROMOTIONS_REFRESH_INTERVAL_MS = 60 * 60 * 1000;
+
+// =====================================================
+// Offline Period Types (Story 3.3, 3.4)
+// =====================================================
+
+/**
+ * Offline period tracking for sync reports
+ *
+ * Stored in Dexie table: offline_periods
+ * Tracks when the system was offline for reporting
+ *
+ * @see Story 3.3: Post-Offline Sync Report
+ * @see Story 3.4: Offline Period History
+ */
+export interface IOfflinePeriod {
+  /** Unique period UUID (primary key) */
+  id: string;
+
+  /** ISO 8601 timestamp when offline period started */
+  start_time: string;
+
+  /** ISO 8601 timestamp when offline period ended, null if still offline */
+  end_time: string | null;
+
+  /** Duration in milliseconds, null if still offline */
+  duration_ms: number | null;
+
+  /** Number of transactions created during this period */
+  transactions_created: number;
+
+  /** Number of transactions successfully synced */
+  transactions_synced: number;
+
+  /** Number of transactions that failed to sync */
+  transactions_failed: number;
+
+  /** Whether the sync report has been generated/shown */
+  sync_report_generated: boolean;
+}
+
+// =====================================================
+// Legacy Sync Queue Types (for migration compatibility)
+// =====================================================
+
+/**
+ * Legacy sync queue type identifiers
+ * Used by services/sync/* for order sync operations
+ */
+export type TLegacySyncQueueType = 'order' | 'payment' | 'stock_movement';
+
+/**
+ * Legacy sync queue status
+ */
+export type TLegacySyncQueueStatus = 'pending' | 'syncing' | 'failed' | 'synced';
+
+/**
+ * Legacy sync queue item structure
+ * Used by sync services for backward compatibility
+ *
+ * @see services/sync/syncQueue.ts
+ */
+export interface ILegacySyncQueueItem {
+  /** Unique sync item UUID */
+  id: string;
+
+  /** Type of transaction */
+  type: TLegacySyncQueueType;
+
+  /** Transaction payload data */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  payload: Record<string, any>;
+
+  /** Current sync status */
+  status: TLegacySyncQueueStatus;
+
+  /** ISO 8601 timestamp when created */
+  createdAt: string;
+
+  /** Number of sync attempts */
+  attempts: number;
+
+  /** Last error message if failed */
+  lastError: string | null;
+}
+
+// =====================================================
+// Legacy Order Types (for orderSync.ts compatibility)
+// =====================================================
+
+/**
+ * Legacy offline order item structure
+ * Used by orderSync.ts for embedded items array
+ *
+ * @deprecated Use IOfflineOrderItem with separate table
+ */
+export interface ILegacyOfflineOrderItem {
+  /** Item UUID */
+  id: string;
+
+  /** FK to products.id */
+  product_id: string;
+
+  /** Product name for display */
+  product_name: string;
+
+  /** Quantity ordered */
+  quantity: number;
+
+  /** Unit price (IDR) */
+  unit_price: number;
+
+  /** Total price for this line (IDR) */
+  total_price: number;
+
+  /** Applied modifiers */
+  modifiers: Array<{
+    id: string;
+    name: string;
+    price_adjustment: number;
+  }>;
+}
+
+/**
+ * Legacy offline order structure with embedded items
+ * Used by orderSync.ts for backward compatibility
+ *
+ * @deprecated Use IOfflineOrder with separate order_items table
+ */
+export interface ILegacyOfflineOrder {
+  /** Order UUID (prefixed with offline-) */
+  id: string;
+
+  /** Order number for display */
+  order_number: string;
+
+  /** Order type */
+  order_type: 'dine_in' | 'takeaway' | 'delivery';
+
+  /** Table number for dine_in */
+  table_number: string | null;
+
+  /** FK to customers.id */
+  customer_id: string | null;
+
+  /** Customer name for display */
+  customer_name: string | null;
+
+  /** Embedded order items (legacy format) */
+  items: ILegacyOfflineOrderItem[];
+
+  /** Subtotal before discounts (IDR) */
+  subtotal: number;
+
+  /** Discount amount applied (IDR) */
+  discount_amount: number;
+
+  /** Discount type */
+  discount_type: string | null;
+
+  /** Discount value */
+  discount_value: number | null;
+
+  /** Tax amount (IDR) */
+  tax_amount: number;
+
+  /** Final total (IDR) */
+  total: number;
+
+  /** Payment method used */
+  payment_method: string;
+
+  /** Payment status */
+  payment_status: 'pending' | 'paid';
+
+  /** Order notes */
+  notes: string;
+
+  /** ISO 8601 creation timestamp */
+  created_at: string;
+
+  /** Whether order was created offline */
+  created_offline: boolean;
+
+  /** Whether order has been synced */
+  synced: boolean;
+
+  /** ISO 8601 sync timestamp */
+  synced_at: string | null;
+
+  /** POS terminal ID */
+  pos_terminal_id: string | null;
+
+  /** Server order ID after sync */
+  server_order_id?: string;
+}

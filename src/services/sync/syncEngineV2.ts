@@ -68,6 +68,8 @@ let engineState: ISyncEngineState = {
 };
 
 let backgroundSyncIntervalId: ReturnType<typeof setInterval> | null = null;
+/** C-5: Store delay timeout ID for cleanup */
+let startDelayTimeoutId: ReturnType<typeof setTimeout> | null = null;
 let autoSyncEnabled = true;
 
 // ID mappings for FK resolution during batch sync
@@ -255,8 +257,14 @@ export async function runSyncEngine(): Promise<{
  * Per Story requirements: Starts automatically within 5 seconds
  */
 export function startSyncWithDelay(): void {
+  // C-5: Clear any existing delay timeout before starting new one
+  if (startDelayTimeoutId) {
+    clearTimeout(startDelayTimeoutId);
+  }
+
   console.log(`[SyncEngineV2] Will start sync in ${SYNC_START_DELAY / 1000}s`);
-  setTimeout(() => {
+  startDelayTimeoutId = setTimeout(() => {
+    startDelayTimeoutId = null;
     runSyncEngine().catch((err) => {
       console.error('[SyncEngineV2] Error during sync:', err);
     });
@@ -265,8 +273,19 @@ export function startSyncWithDelay(): void {
 
 /**
  * Stop the sync engine
+ *
+ * C-5: Properly cleans up all timers before stopping
  */
 export function stopSyncEngine(): void {
+  // C-5: Clear delay timeout if pending
+  if (startDelayTimeoutId) {
+    clearTimeout(startDelayTimeoutId);
+    startDelayTimeoutId = null;
+  }
+
+  // Stop background sync
+  stopBackgroundSync();
+
   engineState.isRunning = false;
   console.log('[SyncEngineV2] Stopped');
 }

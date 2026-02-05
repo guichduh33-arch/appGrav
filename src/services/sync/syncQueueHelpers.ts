@@ -16,12 +16,83 @@ import { SYNC_MAX_RETRIES } from '@/types/offline';
 // =====================================================
 
 /**
+ * Type of sync conflict detected (C-3)
+ */
+export type TSyncConflictType =
+  | 'duplicate' // Entity already exists on server
+  | 'fk_violation' // Referenced entity doesn't exist
+  | 'version_mismatch' // Entity was modified on server
+  | 'deleted' // Entity was deleted on server
+  | null; // No conflict
+
+/**
  * Result of a sync operation
  */
 export interface ISyncResult {
   success: boolean;
   serverId?: string;
   error?: string;
+  /** C-3: Type of conflict if sync failed due to conflict */
+  conflictType?: TSyncConflictType;
+}
+
+/**
+ * C-3: Detect conflict type from Supabase error
+ *
+ * Analyzes error messages to categorize the type of sync conflict.
+ *
+ * @param error - Error from Supabase or other source
+ * @returns Conflict type or null if not a conflict
+ */
+export function detectConflictType(error: unknown): TSyncConflictType {
+  if (!error) return null;
+
+  const message = error instanceof Error
+    ? error.message
+    : typeof error === 'object' && error !== null && 'message' in error
+      ? String((error as { message: unknown }).message)
+      : String(error);
+
+  const lowerMessage = message.toLowerCase();
+
+  // Duplicate key violation
+  if (
+    lowerMessage.includes('duplicate key') ||
+    lowerMessage.includes('unique constraint') ||
+    lowerMessage.includes('already exists')
+  ) {
+    return 'duplicate';
+  }
+
+  // Foreign key violation (referenced entity missing)
+  if (
+    lowerMessage.includes('foreign key constraint') ||
+    lowerMessage.includes('violates foreign key') ||
+    lowerMessage.includes('is not present in table')
+  ) {
+    return 'fk_violation';
+  }
+
+  // Version/timestamp mismatch (concurrent update)
+  if (
+    lowerMessage.includes('updated_at') ||
+    lowerMessage.includes('version') ||
+    lowerMessage.includes('concurrent') ||
+    lowerMessage.includes('conflict')
+  ) {
+    return 'version_mismatch';
+  }
+
+  // Entity deleted
+  if (
+    lowerMessage.includes('not found') ||
+    lowerMessage.includes('does not exist') ||
+    lowerMessage.includes('deleted')
+  ) {
+    return 'deleted';
+  }
+
+  return null;
 }
 
 // =====================================================

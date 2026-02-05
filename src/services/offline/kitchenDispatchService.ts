@@ -101,6 +101,7 @@ export async function addToDispatchQueue(
     created_at: now,
     attempts: 0,
     last_error: null,
+    last_attempt_at: null, // C-7: Track last attempt for backoff
     status: 'pending',
   };
 
@@ -215,14 +216,17 @@ export async function markStationDispatched(
  * Process pending dispatch queue
  * Called when LAN connection is restored
  *
+ * C-7: Now respects exponential backoff between retries
+ *
  * @returns Number of processed and failed items
  */
 export async function processDispatchQueue(): Promise<{
   processed: number;
   failed: number;
+  skipped: number;
 }> {
   if (!isLanConnected()) {
-    return { processed: 0, failed: 0 };
+    return { processed: 0, failed: 0, skipped: 0 };
   }
 
   const pending = await db.offline_dispatch_queue
@@ -232,10 +236,22 @@ export async function processDispatchQueue(): Promise<{
 
   let processed = 0;
   let failed = 0;
+  let skipped = 0;
 
   for (const item of pending) {
-    // Update status to sending
-    await db.offline_dispatch_queue.update(item.id!, { status: 'sending' });
+    // C-7: Check if item is ready for retry based on backoff delay
+    if (!isReadyForRetry(item)) {
+      skipped++;
+      continue;
+    }
+
+    const now = new Date().toISOString();
+
+    // Update status to sending and record attempt time
+    await db.offline_dispatch_queue.update(item.id!, {
+      status: 'sending',
+      last_attempt_at: now,
+    });
 
     try {
       const order = await db.offline_orders.get(item.order_id);
@@ -252,7 +268,7 @@ export async function processDispatchQueue(): Promise<{
         order_type: order.order_type,
         items: item.items,
         station: item.station,
-        timestamp: new Date().toISOString(),
+        timestamp: now,
       };
 
       await lanHub.broadcast(LAN_MESSAGE_TYPES.KDS_NEW_ORDER, payload);
@@ -287,12 +303,13 @@ export async function processDispatchQueue(): Promise<{
           last_error: errorMsg,
         });
 
-        console.warn(`[kitchenDispatch] Dispatch attempt ${attempts} failed, will retry:`, errorMsg);
+        const nextDelay = getRetryDelay(attempts);
+        console.warn(`[kitchenDispatch] Dispatch attempt ${attempts} failed, will retry in ${nextDelay}ms:`, errorMsg);
       }
     }
   }
 
-  return { processed, failed };
+  return { processed, failed, skipped };
 }
 
 /**
@@ -300,6 +317,22 @@ export async function processDispatchQueue(): Promise<{
  */
 export function getRetryDelay(attempts: number): number {
   return DISPATCH_RETRY_BACKOFF_MS * Math.pow(2, attempts);
+}
+
+/**
+ * C-7: Check if item is ready for retry based on backoff delay
+ */
+export function isReadyForRetry(item: IDispatchQueueItem): boolean {
+  // First attempt (never tried before)
+  if (item.attempts === 0 || !item.last_attempt_at) {
+    return true;
+  }
+
+  const lastAttempt = new Date(item.last_attempt_at).getTime();
+  const backoffDelay = getRetryDelay(item.attempts - 1); // attempts is already incremented
+  const now = Date.now();
+
+  return now - lastAttempt >= backoffDelay;
 }
 
 /**

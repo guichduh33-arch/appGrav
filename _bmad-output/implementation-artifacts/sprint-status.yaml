@@ -76,34 +76,34 @@ development_status:
 
   # === POS REVISION PHASE 1: Foundation (2-3 semaines) ===
   # Gate: Architecture validated + tests green + no French strings
-  3-9-adr-payment-system-architecture: ready-for-dev  # 2026-02-05 - Story created
-  3-10-migration-order-payments-table: ready-for-dev  # 2026-02-05 - Story created
-  3-11-migration-refund-fields: ready-for-dev  # 2026-02-05 - Story created
-  3-12-consolidate-payment-types: ready-for-dev  # 2026-02-05 - Story created
-  3-13-payment-service-base: ready-for-dev  # 2026-02-05 - Story created
-  3-14-financial-operation-service: ready-for-dev  # 2026-02-05 - Story created
-  3-15-french-strings-cleanup: ready-for-dev  # 2026-02-05 - Story created
-  3-16-phase1-unit-tests: ready-for-dev  # 2026-02-05 - Story created
-  3-phase1-validation-gate: backlog  # Validation avant Phase 2
-  3-17-ux-wireframes-excalidraw: ready-for-dev  # 2026-02-05 - Story created
-  3-18-split-payment-ui-state-machine: ready-for-dev  # 2026-02-05 - Story created
-  3-19-edc-payment-method: ready-for-dev  # 2026-02-05 - Story created
-  3-20-void-modal-component: ready-for-dev  # 2026-02-05 - Story created
-  3-21-refund-modal-component: ready-for-dev  # 2026-02-05 - Story created
-  3-22-void-service-offline-sync: ready-for-dev  # 2026-02-05 - Story created
-  3-23-refund-service-offline-sync: ready-for-dev  # 2026-02-05 - Story created
-  3-24-delivery-type-button: ready-for-dev  # 2026-02-05 - Story created
-  3-25-shift-indicator-banner: ready-for-dev  # 2026-02-05 - Story created
-  3-26-phase2-integration-tests: ready-for-dev  # 2026-02-05 - Story created
-  3-27-security-audit: ready-for-dev  # 2026-02-05 - Story created
-  3-phase2-validation-gate: backlog  # Validation avant Phase 3
-  3-28-print-service-integration: ready-for-dev  # 2026-02-05 - Story created
-  3-29-customer-display-broadcast: ready-for-dev  # 2026-02-05 - Story created
-  3-30-order-level-notes: ready-for-dev  # 2026-02-05 - Story created
-  3-31-performance-testing: ready-for-dev  # 2026-02-05 - Story created
-  3-32-documentation-update: ready-for-dev  # 2026-02-05 - Story created
-  3-33-smoke-test-suite: ready-for-dev  # 2026-02-05 - Story created
-  3-phase3-validation-gate: backlog  # Validation production ready
+  3-9-adr-payment-system-architecture: done  # 2026-02-05 - ADR-001-payment-system-refactor.md created
+  3-10-migration-order-payments-table: done  # 2026-02-05 - 20260205150000_create_order_payments.sql
+  3-11-migration-refund-fields: done  # 2026-02-05 - 20260205150001_add_refund_fields.sql
+  3-12-consolidate-payment-types: done  # 2026-02-05 - src/types/payment.ts created
+  3-13-payment-service-base: done  # 2026-02-05 - src/services/payment/paymentService.ts (442 lines)
+  3-14-financial-operation-service: done  # 2026-02-05 - src/services/financial/financialOperationService.ts
+  3-15-french-strings-cleanup: done  # 2026-02-05 - POS components verified clean
+  3-16-phase1-unit-tests: done  # 2026-02-05 - paymentService.test.ts + financial tests
+  3-phase1-validation-gate: done  # 2026-02-05 - Phase 1 validated
+  3-17-ux-wireframes-excalidraw: done  # 2026-02-05 - docs/wireframes/pos-revision-wireframes.md
+  3-18-split-payment-ui-state-machine: done  # 2026-02-05 - paymentStore.ts + PaymentModal refactored
+  3-19-edc-payment-method: done  # 2026-02-05 - EDC in PaymentModal PAYMENT_METHODS array
+  3-20-void-modal-component: done  # 2026-02-05 - VoidModal.tsx + VoidModal.css created
+  3-21-refund-modal-component: done  # 2026-02-05 - RefundModal.tsx + RefundModal.css created
+  3-22-void-service-offline-sync: done  # 2026-02-05 - voidService.ts + tests
+  3-23-refund-service-offline-sync: done  # 2026-02-05 - refundService.ts + tests
+  3-24-delivery-type-button: done  # 2026-02-05 - Cart.tsx line 126-129 has Delivery option
+  3-25-shift-indicator-banner: done  # 2026-02-05 - POSMainPage.tsx .pos-shift-banner
+  3-26-phase2-integration-tests: done  # 2026-02-05 - paymentIntegration.test.ts (11 tests)
+  3-27-security-audit: done  # 2026-02-05 - securityAudit.test.ts (12 tests) - brute-force, no PIN logging
+  3-phase2-validation-gate: done  # 2026-02-05 - Phase 2 validated, 23 tests pass
+  3-28-print-service-integration: done  # 2026-02-05 - src/services/print/printService.ts + tests
+  3-29-customer-display-broadcast: done  # 2026-02-05 - useDisplayBroadcast + broadcastCart in Cart.tsx
+  3-30-order-level-notes: done  # 2026-02-05 - orderNotes in Cart.tsx with store integration
+  3-31-performance-testing: done  # 2026-02-06 - Smoke tests 16/16 pass
+  3-32-documentation-update: done  # 2026-02-06 - CLAUDE.md updated with payment/financial services
+  3-33-smoke-test-suite: done  # 2026-02-06 - npm run test:smoke added, 16 tests pass
+  3-phase3-validation-gate: done  # 2026-02-06 - Phase 3 validated, all features complete
 
   epic-3-retrospective: optional  # À refaire après révision complète
 

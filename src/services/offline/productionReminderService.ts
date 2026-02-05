@@ -19,6 +19,9 @@ import type {
 } from '@/types/offline';
 import { PRODUCTION_REMINDERS_STORAGE_KEY } from '@/types/offline';
 
+/** TTL for production reminders (7 days in ms) */
+const REMINDER_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
 /**
  * Save a production reminder to localStorage
  *
@@ -62,7 +65,10 @@ export function saveProductionReminder(
 /**
  * Get all production reminders from localStorage
  *
- * @returns Array of production reminders, empty if none
+ * Automatically filters out expired reminders (older than 7 days)
+ * and updates localStorage to remove them.
+ *
+ * @returns Array of valid (non-expired) production reminders, empty if none
  */
 export function getProductionReminders(): IProductionReminder[] {
   try {
@@ -75,7 +81,24 @@ export function getProductionReminders(): IProductionReminder[] {
       return [];
     }
 
-    return parsed;
+    // Filter out expired reminders (older than REMINDER_TTL_MS)
+    const now = Date.now();
+    const validReminders = parsed.filter((r: IProductionReminder) => {
+      const createdTime = new Date(r.createdAt).getTime();
+      return now - createdTime < REMINDER_TTL_MS;
+    });
+
+    // Update storage if any were removed
+    if (validReminders.length !== parsed.length) {
+      const removedCount = parsed.length - validReminders.length;
+      console.debug(`[ProductionReminder] Auto-removed ${removedCount} expired reminder(s)`);
+      localStorage.setItem(
+        PRODUCTION_REMINDERS_STORAGE_KEY,
+        JSON.stringify(validReminders)
+      );
+    }
+
+    return validReminders;
   } catch (error) {
     console.error('[ProductionReminder] Error reading reminders:', error);
     return [];

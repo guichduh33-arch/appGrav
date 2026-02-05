@@ -62,12 +62,16 @@ src/
 ├── services/        # Business logic & external APIs
 │   ├── offline/     # offlineAuthService, rateLimitService
 │   ├── sync/        # syncEngine, syncQueue, orderSync, productSync, customerSync, offlineDb, offlinePeriod, syncDeviceService
+│   ├── payment/     # paymentService (split payment, validation, change calculation)
+│   ├── financial/   # voidService, refundService, financialOperationService, auditService
+│   ├── print/       # printService (receipt, kitchen, barista tickets, cash drawer)
 │   ├── inventory/   # Stock management
 │   ├── products/    # Product import/export
 │   ├── b2b/         # B2B credit system
 │   ├── lan/         # LAN device discovery (lanClient, lanHub, lanProtocol)
 │   ├── display/     # Customer display broadcast
 │   └── ...          # ClaudeService, anthropicService, promotionService, ReportingService
+
 ├── types/           # TypeScript definitions
 │   ├── database.ts  # Full Supabase schema
 │   ├── database.generated.ts  # Auto-generated Supabase types
@@ -343,7 +347,38 @@ The print server is a separate Node.js/Express application running on the POS PC
 
 **Note**: Print server is optional - system works without it (no printing).
 
+## Payment & Financial Services
+
+### Payment Service (`src/services/payment/paymentService.ts`)
+
+Unified payment processing with split payment support:
+
+| Function | Purpose |
+|----------|---------|
+| `validatePayment()` | Validate single payment (amount, method, cash received) |
+| `validateSplitPayments()` | Validate multiple payments total matches order |
+| `calculateChange()` | Calculate change rounded to 100 IDR |
+| `processPayment()` | Process single payment (online/offline) |
+| `processSplitPayment()` | Process multiple payments for one order |
+| `createSplitPaymentState()` | Initialize split payment state machine |
+
+### Financial Operations (`src/services/financial/`)
+
+Void and refund operations with audit trail:
+
+| Service | Purpose |
+|---------|---------|
+| `voidService.ts` | Cancel orders, queue for offline sync, conflict resolution |
+| `refundService.ts` | Process full/partial refunds, multiple payment methods |
+| `financialOperationService.ts` | Validation, conflict detection (`shouldRejectForConflict`) |
+| `auditService.ts` | Log critical operations (severity='critical') |
+
+**Conflict Resolution**: Offline voids/refunds check `order.updated_at < operation.created_at`. If server is newer, operation is rejected and user notified.
+
+**PIN Required**: All void/refund operations require manager PIN verification.
+
 ## Mobile (Capacitor)
+
 
 ```bash
 npx cap sync          # Sync web assets to native

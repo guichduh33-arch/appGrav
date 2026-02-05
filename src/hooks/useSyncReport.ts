@@ -14,7 +14,7 @@ import {
   updatePeriodSyncStats,
   type IOfflinePeriod,
 } from '../services/sync/offlinePeriod';
-import { offlineDb } from '../services/sync/offlineDb';
+import { db } from '@/lib/db';
 
 interface ISyncReportState {
   /** Whether to show the report modal */
@@ -89,12 +89,12 @@ export function useSyncReport(): ISyncReportState {
 
       if (unreportedPeriod) {
         // Count synced and failed transactions from this period
-        const syncedCount = await offlineDb.sync_queue
+        const syncedCount = await db.offline_legacy_sync_queue
           .where('status')
           .equals('synced')
           .count();
 
-        const failedCount = await offlineDb.sync_queue
+        const failedCount = await db.offline_legacy_sync_queue
           .where('status')
           .equals('failed')
           .count();
@@ -134,13 +134,13 @@ export function useSyncReport(): ISyncReportState {
   const retryFailed = useCallback(async () => {
     try {
       // Reset failed items to pending
-      const failedItems = await offlineDb.sync_queue
+      const failedItems = await db.offline_legacy_sync_queue
         .where('status')
         .equals('failed')
         .toArray();
 
       for (const item of failedItems) {
-        await offlineDb.sync_queue.update(item.id, {
+        await db.offline_legacy_sync_queue.update(item.id, {
           status: 'pending',
           attempts: 0,
           lastError: null,

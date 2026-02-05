@@ -66,11 +66,6 @@ export async function openSession(
   userId: string,
   openingAmount: number
 ): Promise<IOfflineSession> {
-  // Check for existing active session
-  if (await hasActiveSession(userId)) {
-    throw new Error('Session already active');
-  }
-
   const now = new Date().toISOString();
   const sessionId = generateLocalSessionId();
 
@@ -88,10 +83,22 @@ export async function openSession(
     sync_status: 'pending_sync',
   };
 
+  // C-4: Atomic transaction - check and create in single transaction
+  // to prevent race condition where two threads could both pass
+  // the hasActiveSession check before either creates a session
   await db.transaction(
     'rw',
     [db.offline_sessions, db.offline_sync_queue],
     async () => {
+      // Check inside transaction for atomicity
+      const existingCount = await db.offline_sessions
+        .where({ user_id: userId, status: 'open' })
+        .count();
+
+      if (existingCount > 0) {
+        throw new Error('Session already active');
+      }
+
       await db.offline_sessions.add(session);
 
       // Add to sync queue

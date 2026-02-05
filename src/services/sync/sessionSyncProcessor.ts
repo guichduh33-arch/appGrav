@@ -11,7 +11,7 @@
 import { db } from '@/lib/db';
 import { supabase } from '@/lib/supabase';
 import type { ISyncQueueItem } from '@/types/offline';
-import type { ISyncResult } from './syncQueueHelpers';
+import { detectConflictType, type ISyncResult } from './syncQueueHelpers';
 
 /**
  * Process a POS session sync queue item
@@ -60,7 +60,8 @@ export async function processSessionSync(
       .single();
 
     if (sessionError) {
-      return { success: false, error: sessionError.message };
+      const conflictType = detectConflictType(sessionError);
+      return { success: false, error: sessionError.message, conflictType };
     }
 
     const serverId = serverSession.id;
@@ -73,9 +74,11 @@ export async function processSessionSync(
 
     return { success: true, serverId };
   } catch (error) {
+    const conflictType = detectConflictType(error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
+      conflictType,
     };
   }
 }

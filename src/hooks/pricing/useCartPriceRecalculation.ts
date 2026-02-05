@@ -55,6 +55,7 @@ export function useCartPriceRecalculation(): void {
         product_type: item.product.product_type || 'finished',
         image_url: item.product.image_url || null,
         cost_price: item.product.cost_price || null,
+        current_stock: null,
         updated_at: item.product.updated_at || new Date().toISOString(),
       };
 
@@ -122,6 +123,7 @@ export function useManualPriceRecalculation() {
         product_type: item.product.product_type || 'finished',
         image_url: item.product.image_url || null,
         cost_price: item.product.cost_price || null,
+        current_stock: null,
         updated_at: item.product.updated_at || new Date().toISOString(),
       };
 

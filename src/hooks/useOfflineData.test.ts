@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { offlineDb } from '../services/sync/offlineDb';
+import { db } from '@/lib/db';
 import {
   useOfflineProducts,
   useOfflineProductsByCategory,
@@ -13,21 +13,23 @@ import {
   useOfflineSyncQueue
 } from './useOfflineData';
 
+/**
+ * Test suite for useOfflineData hooks
+ * @migration Uses db.ts (unified schema) instead of legacy offlineDb.ts
+ */
 describe('useOfflineData hooks', () => {
   beforeEach(async () => {
-    await offlineDb.products.clear();
-    await offlineDb.categories.clear();
-    await offlineDb.customers.clear();
-    await offlineDb.floor_plan_items.clear();
-    await offlineDb.sync_queue.clear();
+    await db.offline_products.clear();
+    await db.offline_categories.clear();
+    await db.offline_customers.clear();
+    await db.offline_legacy_sync_queue.clear();
   });
 
   afterEach(async () => {
-    await offlineDb.products.clear();
-    await offlineDb.categories.clear();
-    await offlineDb.customers.clear();
-    await offlineDb.floor_plan_items.clear();
-    await offlineDb.sync_queue.clear();
+    await db.offline_products.clear();
+    await db.offline_categories.clear();
+    await db.offline_customers.clear();
+    await db.offline_legacy_sync_queue.clear();
   });
 
   describe('useOfflineProducts', () => {
@@ -48,9 +50,9 @@ describe('useOfflineData hooks', () => {
     });
 
     it('should return only active products', async () => {
-      await offlineDb.products.bulkAdd([
-        { id: 'p1', category_id: 'c1', name: 'Active', sku: null, price: 1000, is_active: true, image_url: null, updated_at: '' },
-        { id: 'p2', category_id: 'c1', name: 'Inactive', sku: null, price: 2000, is_active: false, image_url: null, updated_at: '' }
+      await db.offline_products.bulkAdd([
+        { id: 'p1', category_id: 'c1', name: 'Active', sku: null, product_type: 'finished', retail_price: 1000, wholesale_price: null, cost_price: null, current_stock: null, is_active: true, pos_visible: true, available_for_sale: true, image_url: null, updated_at: '' },
+        { id: 'p2', category_id: 'c1', name: 'Inactive', sku: null, product_type: 'finished', retail_price: 2000, wholesale_price: null, cost_price: null, current_stock: null, is_active: false, pos_visible: true, available_for_sale: true, image_url: null, updated_at: '' }
       ]);
 
       const { result } = renderHook(() => useOfflineProducts());
@@ -72,13 +74,19 @@ describe('useOfflineData hooks', () => {
       expect(result.current).toHaveLength(0);
 
       // Add a product
-      await offlineDb.products.add({
+      await db.offline_products.add({
         id: 'new-p1',
         category_id: null,
         name: 'New Product',
         sku: null,
-        price: 5000,
+        product_type: 'finished',
+        retail_price: 5000,
+        wholesale_price: null,
+        cost_price: null,
+        current_stock: null,
         is_active: true,
+        pos_visible: true,
+        available_for_sale: true,
         image_url: null,
         updated_at: ''
       });
@@ -93,11 +101,11 @@ describe('useOfflineData hooks', () => {
 
   describe('useOfflineProductsByCategory', () => {
     beforeEach(async () => {
-      await offlineDb.products.bulkAdd([
-        { id: 'p1', category_id: 'cat-1', name: 'Product 1', sku: null, price: 1000, is_active: true, image_url: null, updated_at: '' },
-        { id: 'p2', category_id: 'cat-1', name: 'Product 2', sku: null, price: 2000, is_active: true, image_url: null, updated_at: '' },
-        { id: 'p3', category_id: 'cat-2', name: 'Product 3', sku: null, price: 3000, is_active: true, image_url: null, updated_at: '' },
-        { id: 'p4', category_id: 'cat-1', name: 'Inactive', sku: null, price: 4000, is_active: false, image_url: null, updated_at: '' }
+      await db.offline_products.bulkAdd([
+        { id: 'p1', category_id: 'cat-1', name: 'Product 1', sku: null, product_type: 'finished', retail_price: 1000, wholesale_price: null, cost_price: null, current_stock: null, is_active: true, pos_visible: true, available_for_sale: true, image_url: null, updated_at: '' },
+        { id: 'p2', category_id: 'cat-1', name: 'Product 2', sku: null, product_type: 'finished', retail_price: 2000, wholesale_price: null, cost_price: null, current_stock: null, is_active: true, pos_visible: true, available_for_sale: true, image_url: null, updated_at: '' },
+        { id: 'p3', category_id: 'cat-2', name: 'Product 3', sku: null, product_type: 'finished', retail_price: 3000, wholesale_price: null, cost_price: null, current_stock: null, is_active: true, pos_visible: true, available_for_sale: true, image_url: null, updated_at: '' },
+        { id: 'p4', category_id: 'cat-1', name: 'Inactive', sku: null, product_type: 'finished', retail_price: 4000, wholesale_price: null, cost_price: null, current_stock: null, is_active: false, pos_visible: true, available_for_sale: true, image_url: null, updated_at: '' }
       ]);
     });
 
@@ -140,11 +148,11 @@ describe('useOfflineData hooks', () => {
   });
 
   describe('useOfflineCategories', () => {
-    it('should return categories sorted by display_order', async () => {
-      await offlineDb.categories.bulkAdd([
-        { id: 'c3', name: 'Third', display_order: 3, is_active: true },
-        { id: 'c1', name: 'First', display_order: 1, is_active: true },
-        { id: 'c2', name: 'Second', display_order: 2, is_active: true }
+    it('should return categories sorted by sort_order', async () => {
+      await db.offline_categories.bulkAdd([
+        { id: 'c3', name: 'Third', sort_order: 3, is_active: true, is_raw_material: false, dispatch_station: 'none', color: null, icon: null, updated_at: null },
+        { id: 'c1', name: 'First', sort_order: 1, is_active: true, is_raw_material: false, dispatch_station: 'none', color: null, icon: null, updated_at: null },
+        { id: 'c2', name: 'Second', sort_order: 2, is_active: true, is_raw_material: false, dispatch_station: 'none', color: null, icon: null, updated_at: null }
       ]);
 
       const { result } = renderHook(() => useOfflineCategories());
@@ -157,9 +165,9 @@ describe('useOfflineData hooks', () => {
     });
 
     it('should return only active categories', async () => {
-      await offlineDb.categories.bulkAdd([
-        { id: 'c1', name: 'Active', display_order: 1, is_active: true },
-        { id: 'c2', name: 'Inactive', display_order: 2, is_active: false }
+      await db.offline_categories.bulkAdd([
+        { id: 'c1', name: 'Active', sort_order: 1, is_active: true, is_raw_material: false, dispatch_station: 'none', color: null, icon: null, updated_at: null },
+        { id: 'c2', name: 'Inactive', sort_order: 2, is_active: false, is_raw_material: false, dispatch_station: 'none', color: null, icon: null, updated_at: null }
       ]);
 
       const { result } = renderHook(() => useOfflineCategories());
@@ -174,10 +182,10 @@ describe('useOfflineData hooks', () => {
 
   describe('useOfflineCustomers', () => {
     beforeEach(async () => {
-      await offlineDb.customers.bulkAdd([
-        { id: 'cust-1', phone: '+62812345678', name: 'John', email: null, loyalty_points: 100, customer_category_slug: null, updated_at: '' },
-        { id: 'cust-2', phone: '+62812999999', name: 'Jane', email: null, loyalty_points: 200, customer_category_slug: null, updated_at: '' },
-        { id: 'cust-3', phone: '+62899000000', name: 'Bob', email: null, loyalty_points: 50, customer_category_slug: null, updated_at: '' }
+      await db.offline_customers.bulkAdd([
+        { id: 'cust-1', phone: '+62812345678', name: 'John', email: null, category_slug: null, loyalty_tier: null, points_balance: 100, updated_at: '' },
+        { id: 'cust-2', phone: '+62812999999', name: 'Jane', email: null, category_slug: null, loyalty_tier: null, points_balance: 200, updated_at: '' },
+        { id: 'cust-3', phone: '+62899000000', name: 'Bob', email: null, category_slug: null, loyalty_tier: null, points_balance: 50, updated_at: '' }
       ]);
     });
 
@@ -221,13 +229,14 @@ describe('useOfflineData hooks', () => {
 
   describe('useOfflineCustomerById', () => {
     beforeEach(async () => {
-      await offlineDb.customers.add({
+      await db.offline_customers.add({
         id: 'cust-lookup',
         phone: '+62812345678',
         name: 'Lookup Test',
         email: 'test@example.com',
-        loyalty_points: 500,
-        customer_category_slug: 'retail',
+        category_slug: 'retail',
+        loyalty_tier: 'Bronze',
+        points_balance: 500,
         updated_at: ''
       });
     });
@@ -240,7 +249,7 @@ describe('useOfflineData hooks', () => {
       });
 
       expect(result.current?.name).toBe('Lookup Test');
-      expect(result.current?.loyalty_points).toBe(500);
+      expect(result.current?.points_balance).toBe(500);
     });
 
     it('should return undefined when ID is null', async () => {
@@ -262,17 +271,11 @@ describe('useOfflineData hooks', () => {
   });
 
   describe('useOfflineFloorPlan', () => {
-    it('should return all floor plan items', async () => {
-      await offlineDb.floor_plan_items.bulkAdd([
-        { id: 'f1', table_number: 1, label: 'Table 1', capacity: 4, position_x: 100, position_y: 100 },
-        { id: 'f2', table_number: 2, label: 'Table 2', capacity: 2, position_x: 200, position_y: 100 }
-      ]);
-
+    it('should return empty array (deprecated feature)', async () => {
       const { result } = renderHook(() => useOfflineFloorPlan());
 
-      await waitFor(() => {
-        expect(result.current).toHaveLength(2);
-      });
+      // useOfflineFloorPlan is deprecated - returns empty array
+      expect(result.current).toEqual([]);
     });
   });
 
@@ -286,7 +289,7 @@ describe('useOfflineData hooks', () => {
     });
 
     it('should return count of pending items only', async () => {
-      await offlineDb.sync_queue.bulkAdd([
+      await db.offline_legacy_sync_queue.bulkAdd([
         { id: 's1', type: 'order', payload: {}, status: 'pending', createdAt: '', attempts: 0, lastError: null },
         { id: 's2', type: 'order', payload: {}, status: 'pending', createdAt: '', attempts: 0, lastError: null },
         { id: 's3', type: 'order', payload: {}, status: 'synced', createdAt: '', attempts: 1, lastError: null }
@@ -306,7 +309,7 @@ describe('useOfflineData hooks', () => {
         expect(result.current).toBe(0);
       });
 
-      await offlineDb.sync_queue.add({
+      await db.offline_legacy_sync_queue.add({
         id: 'new-sync',
         type: 'order',
         payload: {},
@@ -324,7 +327,7 @@ describe('useOfflineData hooks', () => {
 
   describe('useOfflineSyncQueue', () => {
     it('should return all sync queue items', async () => {
-      await offlineDb.sync_queue.bulkAdd([
+      await db.offline_legacy_sync_queue.bulkAdd([
         { id: 's1', type: 'order', payload: {}, status: 'pending', createdAt: '', attempts: 0, lastError: null },
         { id: 's2', type: 'payment', payload: {}, status: 'synced', createdAt: '', attempts: 1, lastError: null },
         { id: 's3', type: 'stock_movement', payload: {}, status: 'failed', createdAt: '', attempts: 5, lastError: 'Error' }

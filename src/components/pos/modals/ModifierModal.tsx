@@ -155,6 +155,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                 retail_price: product.retail_price || 0,
                 wholesale_price: product.wholesale_price || null,
                 cost_price: product.cost_price || null,
+                current_stock: null,
                 image_url: product.image_url || null,
                 is_active: product.is_active ?? true,
                 updated_at: product.updated_at || new Date().toISOString(),

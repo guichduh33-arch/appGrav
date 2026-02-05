@@ -33,6 +33,10 @@ import type {
   IOfflinePromotionProduct,
   IOfflinePromotionFreeProduct,
   IOfflineRateLimit,
+  IOfflinePeriod,
+  ILegacySyncQueueItem,
+  ILegacyOfflineOrder,
+  ILegacyOfflineOrderItem,
 } from '@/types/offline';
 
 /**
@@ -110,6 +114,15 @@ export class OfflineDatabase extends Dexie {
 
   // Promotion free products cache (Story 6.4)
   offline_promotion_free_products!: Table<IOfflinePromotionFreeProduct>;
+
+  // Offline periods tracking (Story 3.3, 3.4)
+  offline_periods!: Table<IOfflinePeriod>;
+
+  // Legacy sync queue for backward compatibility (Story 3.x migration)
+  offline_legacy_sync_queue!: Table<ILegacySyncQueueItem>;
+
+  // Legacy orders for backward compatibility (orderSync.ts)
+  offline_legacy_orders!: Table<ILegacyOfflineOrder>;
 
   constructor() {
     super('appgrav-offline');
@@ -509,6 +522,48 @@ export class OfflineDatabase extends Dexie {
       // Indexes: id (primary = user_id), last_attempt for cleanup
       offline_rate_limits: 'id, last_attempt',
     });
+
+    // Version 17: Offline Periods & Legacy Sync Queue (Story 3.3, 3.4 migration)
+    this.version(17).stores({
+      // Preserve existing tables
+      offline_users: 'id, cached_at',
+      offline_sync_queue: '++id, entity, status, created_at',
+      offline_settings: 'key, category_id, updated_at',
+      offline_tax_rates: 'id, is_active, is_default, [is_active+is_default]',
+      offline_payment_methods: 'id, is_active, is_default, sort_order, [is_active+is_default]',
+      offline_business_hours: 'day_of_week',
+      offline_sync_meta: 'entity',
+      offline_products: 'id, category_id, sku, name, is_active, pos_visible, [is_active+pos_visible+available_for_sale]',
+      offline_categories: 'id, name, sort_order, is_active, dispatch_station, [is_active+is_raw_material]',
+      offline_modifiers: 'id, product_id, category_id, group_name, is_active, [is_active+product_id], [is_active+category_id]',
+      offline_recipes: 'id, product_id, material_id, is_active, [is_active+product_id]',
+      offline_orders: 'id, order_number, status, order_type, customer_id, session_id, created_at, sync_status, dispatch_status, [status+created_at]',
+      offline_order_items: 'id, order_id, product_id, item_status',
+      offline_payments: 'id, order_id, method, sync_status, created_at',
+      offline_sessions: 'id, user_id, status, opened_at, sync_status',
+      offline_dispatch_queue: '++id, order_id, station, status, created_at, [status+station]',
+      offline_stock_levels: 'id, product_id, location_id, quantity, [product_id+location_id]',
+      offline_adjustment_notes: '++id, product_id, created_at',
+      offline_customers: 'id, phone, email, name, category_slug, loyalty_tier, updated_at',
+      offline_customer_categories: 'id, slug, is_active',
+      offline_product_category_prices: '[product_id+customer_category_id], product_id, customer_category_id, is_active',
+      offline_promotions: 'id, code, is_active, start_date, end_date, priority, [is_active+start_date+end_date]',
+      offline_promotion_products: 'id, promotion_id, product_id, category_id, [promotion_id+product_id], [promotion_id+category_id]',
+      offline_promotion_free_products: 'id, promotion_id, free_product_id',
+      offline_rate_limits: 'id, last_attempt',
+
+      // NEW: Offline periods tracking (Story 3.3, 3.4)
+      // Indexes: id (primary), start_time, end_time for range queries
+      offline_periods: 'id, start_time, end_time',
+
+      // NEW: Legacy sync queue for backward compatibility
+      // Indexes: id (primary), type, status, createdAt for FIFO processing
+      offline_legacy_sync_queue: 'id, type, status, createdAt',
+
+      // NEW: Legacy orders for orderSync.ts backward compatibility
+      // Indexes: id (primary), order_number, created_at, synced for queries
+      offline_legacy_orders: 'id, order_number, created_at, synced, payment_status',
+    });
   }
 }
 
@@ -542,4 +597,8 @@ export type {
   IOfflinePromotionProduct,
   IOfflinePromotionFreeProduct,
   IOfflineRateLimit,
+  IOfflinePeriod,
+  ILegacySyncQueueItem,
+  ILegacyOfflineOrder,
+  ILegacyOfflineOrderItem,
 };

@@ -8,7 +8,7 @@
 
 import React from 'react';
 import { X, CheckCircle, AlertCircle, Clock, ShoppingCart, Upload, XCircle } from 'lucide-react';
-import { IOfflinePeriod } from '../../services/sync/offlineDb';
+import type { IOfflinePeriod } from '@/types/offline';
 
 interface IPostOfflineSyncReportProps {
   period: IOfflinePeriod;

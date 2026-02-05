@@ -98,6 +98,7 @@ const mockMaterials: IOfflineProduct[] = [
     retail_price: 0,
     wholesale_price: null,
     cost_price: 15000, // 15,000 IDR per kg
+    current_stock: null,
     image_url: null,
     is_active: true,
     pos_visible: false,
@@ -113,6 +114,7 @@ const mockMaterials: IOfflineProduct[] = [
     retail_price: 0,
     wholesale_price: null,
     cost_price: 120000, // 120,000 IDR per kg
+    current_stock: null,
     image_url: null,
     is_active: true,
     pos_visible: false,
@@ -128,6 +130,7 @@ const mockMaterials: IOfflineProduct[] = [
     retail_price: 0,
     wholesale_price: null,
     cost_price: 18000, // 18,000 IDR per kg
+    current_stock: null,
     image_url: null,
     is_active: true,
     pos_visible: false,

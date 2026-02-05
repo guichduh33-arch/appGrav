@@ -98,10 +98,19 @@ export async function initProductsCache(
       console.log(`[DataCache] Recipes cache is fresh (last sync: ${lastSync})`);
     }
 
-    // Refresh all in parallel
+    // Refresh all in parallel - use allSettled to handle partial failures
     if (refreshPromises.length > 0) {
-      await Promise.all(refreshPromises);
-      console.log('[DataCache] Cache refresh completed');
+      const results = await Promise.allSettled(refreshPromises);
+      const failures = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
+
+      if (failures.length > 0) {
+        failures.forEach((failure, idx) => {
+          console.error(`[DataCache] Cache refresh failed for entity ${idx}:`, failure.reason);
+        });
+        console.log(`[DataCache] Cache refresh completed with ${failures.length} failure(s)`);
+      } else {
+        console.log('[DataCache] Cache refresh completed successfully');
+      }
     }
 
     // Start hourly refresh if not already started
@@ -170,10 +179,19 @@ function startHourlyRefresh(): void {
         refreshPromises.push(cacheAllRecipes());
       }
 
-      await Promise.all(refreshPromises);
-      console.log('[DataCache] Hourly refresh completed');
+      const results = await Promise.allSettled(refreshPromises);
+      const failures = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
+
+      if (failures.length > 0) {
+        failures.forEach((failure) => {
+          console.error('[DataCache] Hourly refresh failed for entity:', failure.reason);
+        });
+        console.log(`[DataCache] Hourly refresh completed with ${failures.length} failure(s)`);
+      } else {
+        console.log('[DataCache] Hourly refresh completed successfully');
+      }
     } catch (error) {
-      console.error('[DataCache] Hourly refresh failed:', error);
+      console.error('[DataCache] Hourly refresh error:', error);
     }
   }, PRODUCTS_REFRESH_INTERVAL_MS);
 

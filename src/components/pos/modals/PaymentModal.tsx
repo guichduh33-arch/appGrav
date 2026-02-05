@@ -35,6 +35,7 @@ import { toast } from 'sonner';
 import type { TPaymentMethod } from '@/types/payment';
 import { printReceipt, type IOrderPrintData } from '@/services/print/printService';
 import { useDisplayBroadcast } from '@/hooks/pos';
+import { calculateTaxAmount } from '@/services/offline/offlineOrderService';
 import './PaymentModal.css';
 
 interface PaymentModalProps {
@@ -250,8 +251,8 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
     setIsPrinting(true);
 
     try {
-      // Calculate tax (10% included in prices: tax = total * 10/110)
-      const tax = Math.round(total * 10 / 110);
+      // C-6: Use centralized tax calculation utility
+      const tax = calculateTaxAmount(total);
 
       // Build order data for printing
       const orderData: IOrderPrintData = {
@@ -398,11 +399,14 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
               Checkout
             </h3>
             <p className="modal-subtitle">
-              Total: {formatPrice(total)}
+              Total to collect:{' '}
+              <strong style={{ color: 'var(--color-charcoal)', fontSize: 'var(--text-lg)' }}>
+                {formatPrice(total)}
+              </strong>
               {!isOnline && (
-                <span style={{ marginLeft: '8px', color: '#f59e0b', fontSize: '12px' }}>
-                  <WifiOff size={14} style={{ display: 'inline', marginRight: '4px' }} />
-                  Offline
+                <span style={{ marginLeft: '12px', color: 'var(--color-warning)', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  <WifiOff size={14} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
+                  Offline Mode
                 </span>
               )}
             </p>
@@ -428,7 +432,8 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                 className="payment-progress__fill"
                 style={{
                   width: `${progressPercent}%`,
-                  backgroundColor: status === 'complete' ? '#22c55e' : '#3b82f6',
+                  backgroundColor: status === 'complete' ? 'var(--color-success)' : 'var(--color-gold)',
+                  boxShadow: status === 'complete' ? '0 0 10px rgba(34, 197, 94, 0.3)' : '0 0 10px rgba(212, 180, 101, 0.3)',
                 }}
               />
             </div>
