@@ -73,9 +73,9 @@ export default function TableSelectionModal({ onSelectTable, onClose: _onClose }
                     <div>
                         <h2 className="modal__title">
                             <Users size={24} />
-                            Sélectionner une Table
+                            Select a Table
                         </h2>
-                        <p className="modal__subtitle">Choisissez une table disponible pour cette commande (obligatoire)</p>
+                        <p className="modal__subtitle">Select an available table for this order (required)</p>
                     </div>
                 </div>
 
@@ -89,7 +89,7 @@ export default function TableSelectionModal({ onSelectTable, onClose: _onClose }
                                 className={`section-btn ${selectedSection === section ? 'is-active' : ''}`}
                                 onClick={() => setSelectedSection(section)}
                             >
-                                {section === 'all' ? 'Toutes' : section}
+                                {section === 'all' ? 'All' : section}
                             </button>
                         ))}
                     </div>

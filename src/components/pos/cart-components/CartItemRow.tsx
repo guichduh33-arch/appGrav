@@ -78,7 +78,7 @@ export function CartItemRow({
                             e.stopPropagation()
                             onDiscountClick(item)
                         }}
-                        title="Ajouter une remise"
+                        title="Add discount"
                     >
                         <Tag size={14} />
                     </button>

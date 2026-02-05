@@ -1,0 +1,177 @@
+/**
+ * VoidModal Styles (F2.4)
+ * Red warning theme for destructive actions
+ */
+
+.void-modal {
+  max-width: 500px;
+}
+
+.void-modal__header {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  border-bottom: none;
+}
+
+.void-modal__header-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.void-modal__icon {
+  color: #fef2f2;
+}
+
+.void-modal__header .modal__title {
+  color: white;
+}
+
+.void-modal__body {
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* Order Summary Card */
+.void-modal__summary {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+}
+
+.void-modal__summary-header {
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid #fecaca;
+}
+
+.void-modal__order-number {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: #991b1b;
+}
+
+.void-modal__summary-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.void-modal__detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.void-modal__detail-label {
+  color: #7f1d1d;
+  font-size: var(--text-sm);
+}
+
+.void-modal__detail-value {
+  font-weight: 600;
+  color: #991b1b;
+}
+
+/* Form Fields */
+.void-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.void-modal__label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.void-modal__label .required {
+  color: #dc2626;
+}
+
+.void-modal__select {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.void-modal__select:focus {
+  outline: none;
+  border-color: #dc2626;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+}
+
+.void-modal__textarea {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  resize: vertical;
+  font-family: inherit;
+}
+
+.void-modal__textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+}
+
+/* Warning Box */
+.void-modal__warning {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: var(--radius-md);
+  color: #92400e;
+  font-size: var(--text-sm);
+}
+
+.void-modal__warning svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Footer */
+.void-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-xl);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Danger Button */
+.btn-danger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.btn-danger:disabled {
+  background: #fca5a5;
+  cursor: not-allowed;
+}

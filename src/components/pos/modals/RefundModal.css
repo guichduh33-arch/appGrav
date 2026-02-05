@@ -1,0 +1,264 @@
+/**
+ * RefundModal Styles (F2.5)
+ * Financial operation theme
+ */
+
+.refund-modal {
+  max-width: 520px;
+}
+
+.refund-modal__header {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  border-bottom: none;
+}
+
+.refund-modal__header-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.refund-modal__icon {
+  color: #dbeafe;
+}
+
+.refund-modal__header .modal__title {
+  color: white;
+}
+
+.refund-modal__body {
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Order Summary Card */
+.refund-modal__summary {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+}
+
+.refund-modal__summary-header {
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid #bfdbfe;
+}
+
+.refund-modal__order-number {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: #1e40af;
+}
+
+.refund-modal__summary-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.refund-modal__detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.refund-modal__detail-label {
+  color: #3b82f6;
+  font-size: var(--text-sm);
+}
+
+.refund-modal__detail-value {
+  font-weight: 600;
+  color: #1e40af;
+}
+
+/* Form Fields */
+.refund-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.refund-modal__label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.refund-modal__label .required {
+  color: #dc2626;
+}
+
+/* Toggle Buttons */
+.refund-modal__toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.refund-modal__toggle-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.refund-modal__toggle-btn:hover:not(:disabled) {
+  border-color: #2563eb;
+}
+
+.refund-modal__toggle-btn.is-active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1e40af;
+}
+
+.refund-modal__toggle-amount {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin-top: var(--space-xs);
+}
+
+.refund-modal__toggle-hint {
+  font-size: var(--text-xs);
+  opacity: 0.7;
+  margin-top: var(--space-xs);
+}
+
+/* Amount Input */
+.refund-modal__amount-input {
+  display: flex;
+  align-items: center;
+  background: var(--color-surface);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.refund-modal__currency {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-right: var(--space-sm);
+}
+
+.refund-modal__amount-input input {
+  border: none;
+  background: transparent;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text);
+  width: 100%;
+  outline: none;
+}
+
+.refund-modal__hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* Refund Methods */
+.refund-modal__methods {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+}
+
+.refund-modal__method-btn {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--color-text);
+}
+
+.refund-modal__method-btn:hover:not(:disabled) {
+  border-color: #2563eb;
+}
+
+.refund-modal__method-btn.is-active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1e40af;
+}
+
+/* Select & Textarea */
+.refund-modal__select {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.refund-modal__select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.refund-modal__textarea {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  resize: vertical;
+  font-family: inherit;
+}
+
+.refund-modal__textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+}
+
+/* Footer */
+.refund-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-xl);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Refund Button */
+.btn-refund {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-refund:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.btn-refund:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+}

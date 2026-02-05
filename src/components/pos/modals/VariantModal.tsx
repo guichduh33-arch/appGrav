@@ -95,12 +95,12 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
     const [selections, setSelections] = useState<Record<string, string[]>>(() => {
         const initial: Record<string, string[]> = {}
         variantGroups.forEach(group => {
-            // Sélectionner les options par défaut
+            // Select default options
             const defaultOptions = group.options.filter(opt => opt.is_default)
             if (defaultOptions.length > 0) {
                 initial[group.group_name] = defaultOptions.map(opt => opt.option_id)
             } else if (group.options.length > 0) {
-                // Sinon, sélectionner la première option pour les groupes single
+                // Otherwise, select first option for single groups
                 if (group.group_type === 'single') {
                     initial[group.group_name] = [group.options[0].option_id]
                 } else {
@@ -216,14 +216,14 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
             <div className="modal-backdrop is-active" onClick={(e) => e.target === e.currentTarget && onClose()}>
                 <div className="modal modal-md is-active variant-modal">
                     <div className="modal__header">
-                        <h3 className="modal__title">Chargement...</h3>
-                        <button className="modal__close" onClick={onClose} title="Fermer" aria-label="Fermer">
+                        <h3 className="modal__title">Loading...</h3>
+                        <button className="modal__close" onClick={onClose} title="Close" aria-label="Close">
                             <X size={24} />
                         </button>
                     </div>
                     <div className="modal__body">
                         <div style={{ textAlign: 'center', padding: '2rem' }}>
-                            Chargement des options...
+                            Loading options...
                         </div>
                     </div>
                 </div>
@@ -245,10 +245,10 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                         )}
                         <div>
                             <h3 className="modal__title">{baseProduct.name}</h3>
-                            <p className="modal__subtitle">Choisissez vos options</p>
+                            <p className="modal__subtitle">Choose your options</p>
                         </div>
                     </div>
-                    <button className="modal__close" onClick={onClose} title="Fermer" aria-label="Fermer">
+                    <button className="modal__close" onClick={onClose} title="Close" aria-label="Close">
                         <X size={24} />
                     </button>
                 </div>
@@ -256,7 +256,7 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                 <div className="modal__body">
                     {variantGroups.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '1rem', color: '#6B7280' }}>
-                            Aucune option disponible pour ce produit
+                            No options available for this product
                         </div>
                     ) : (
                         variantGroups.map(group => (

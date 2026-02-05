@@ -72,6 +72,7 @@ const PermissionsPage = lazy(() => import('./pages/users/PermissionsPage'))
 const SettingsPage = lazy(() => import('./pages/settings/SettingsPage'))
 const SettingsLayout = lazy(() => import('./pages/settings/SettingsLayout'))
 const CategorySettingsPage = lazy(() => import('./pages/settings/CategorySettingsPage'))
+const CompanySettingsPage = lazy(() => import('./pages/settings/CompanySettingsPage'))
 const TaxSettingsPage = lazy(() => import('./pages/settings/TaxSettingsPage'))
 const PaymentMethodsPage = lazy(() => import('./pages/settings/PaymentMethodsPage'))
 const BusinessHoursPage = lazy(() => import('./pages/settings/BusinessHoursPage'))
@@ -342,9 +343,9 @@ function App() {
 
                         {/* Settings Module Routes with Layout */}
                         <Route path="/settings" element={<SettingsLayout />}>
-                            <Route index element={<CategorySettingsPage />} />
+                            <Route index element={<CompanySettingsPage />} />
                             {/* Dynamic category pages */}
-                            <Route path="company" element={<CategorySettingsPage />} />
+                            <Route path="company" element={<CompanySettingsPage />} />
                             <Route path="pos" element={<CategorySettingsPage />} />
                             <Route path="tax" element={<TaxSettingsPage />} />
                             <Route path="inventory" element={<CategorySettingsPage />} />

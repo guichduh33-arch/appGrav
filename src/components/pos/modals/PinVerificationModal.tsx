@@ -204,7 +204,7 @@ export default function PinVerificationModal({
                         <h3 className="modal__title">{title}</h3>
                         <p className="modal__subtitle">{message}</p>
                     </div>
-                    <button className="modal__close" onClick={onClose} title="Fermer">
+                    <button className="modal__close" onClick={onClose} title="Close">
                         <X size={24} />
                     </button>
                 </div>
@@ -213,7 +213,7 @@ export default function PinVerificationModal({
                     {isLoadingUsers ? (
                         <div className="pin-loading">
                             <Loader2 size={32} className="spin" />
-                            <p>Chargement...</p>
+                            <p>Loading...</p>
                         </div>
                     ) : (
                         <>
@@ -254,7 +254,7 @@ export default function PinVerificationModal({
 
                 <div className="modal__footer">
                     <button className="btn btn-secondary" onClick={onClose} disabled={isVerifying}>
-                        Annuler
+                        Cancel
                     </button>
                     <button
                         className="btn btn-primary"

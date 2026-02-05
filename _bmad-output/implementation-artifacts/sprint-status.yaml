@@ -41,14 +41,14 @@ story_location: _bmad-output/implementation-artifacts
 
 development_status:
   # Epic 1: Core System — Authentification, Permissions & Configuration
-  epic-1: done
+  epic-1: in-progress  # 2026-02-05 - Réouvert pour stories 1-6 à 1-9
   1-1-offline-pin-cache-setup: done
   1-2-offline-pin-authentication: done
   1-3-offline-permissions-cache: done
   1-4-network-status-indicator: done
   1-5-settings-offline-cache: done
-  1-6-company-settings-ui: backlog  # 2026-02-05 - UI config entreprise
-  1-7-printer-configuration-ui: backlog  # 2026-02-05 - UI config imprimantes
+  1-6-company-settings-ui: review  # 2026-02-05 - Implementation complete, ready for code review
+  1-7-printer-configuration-ui: ready-for-dev  # 2026-02-05 - Story created
   1-8-notification-settings-ui: backlog  # 2026-02-05 - UI config notifications SMTP
   1-9-audit-log-viewer: backlog  # 2026-02-05 - UI consultation audit logs
   epic-1-retrospective: done  # 2026-02-02 synthetic
@@ -63,7 +63,8 @@ development_status:
   epic-2-retrospective: done  # 2026-02-02 synthetic
 
   # Epic 3: POS & Ventes — Commandes, Encaissement & Sessions
-  epic-3: done
+  # Réouvert 2026-02-05 - POS Revision complète (tech-spec-pos-interface-revision.md)
+  epic-3: in-progress
   3-1-dexie-schema-for-orders-sync-queue: done
   3-2-cart-persistence-offline: done
   3-3-offline-order-creation: done
@@ -72,7 +73,45 @@ development_status:
   3-6-sync-queue-processing: done
   3-7-kitchen-dispatch-via-lan-offline: done
   3-8-pending-sync-counter-display: done
-  epic-3-retrospective: done  # 2026-02-02 synthetic
+
+  # === POS REVISION PHASE 1: Foundation (2-3 semaines) ===
+  # Gate: Architecture validated + tests green + no French strings
+  3-9-adr-payment-system-architecture: backlog  # F1.1 - ADR document
+  3-10-migration-order-payments-table: backlog  # F1.2 - BLOCKER fix - table manquante
+  3-11-migration-refund-fields: backlog  # F1.3 - Champs refund sur orders
+  3-12-consolidate-payment-types: backlog  # F1.4 - TPaymentMethod single source
+  3-13-payment-service-base: backlog  # F1.5 - Interface unifiée paiements
+  3-14-financial-operation-service: backlog  # F1.6 - Void/Refund base services
+  3-15-french-strings-cleanup: backlog  # F1.7 - 14 strings FR → EN
+  3-16-phase1-unit-tests: backlog  # F1.8 - Tests services (95%+ coverage)
+  3-phase1-validation-gate: backlog  # Validation avant Phase 2
+
+  # === POS REVISION PHASE 2: Core Features (3-4 semaines) ===
+  # Gate: UX approved + financial tests 100% + security audit passed
+  3-17-ux-wireframes-excalidraw: backlog  # F2.1 - Split Pay, Void, Refund wireframes
+  3-18-split-payment-ui-state-machine: backlog  # F2.2 - PaymentModal refactor + paymentStore
+  3-19-edc-payment-method: backlog  # F2.3 - Ajout EDC au PaymentModal
+  3-20-void-modal-component: backlog  # F2.4 - VoidModal avec PIN + reason
+  3-21-refund-modal-component: backlog  # F2.5 - RefundModal full/partial
+  3-22-void-service-offline-sync: backlog  # F2.6 - Service void + conflict resolution
+  3-23-refund-service-offline-sync: backlog  # F2.7 - Service refund + sync
+  3-24-delivery-type-button: backlog  # F2.8 - Bouton delivery dans Cart
+  3-25-shift-indicator-banner: backlog  # F2.9 - Banner shift visible
+  3-26-phase2-integration-tests: backlog  # F2.10 - Tests intégration (100% financial)
+  3-27-security-audit: backlog  # F2.11 - Audit sécurité PIN/audit trail
+  3-phase2-validation-gate: backlog  # Validation avant Phase 3
+
+  # === POS REVISION PHASE 3: Polish (2 semaines) ===
+  # Gate: Performance targets met + documentation complete
+  3-28-print-service-integration: backlog  # F3.1 - localhost:3001 print server
+  3-29-customer-display-broadcast: backlog  # F3.2 - BroadcastChannel pour display
+  3-30-order-level-notes: backlog  # F3.3 - Notes commande dans cartStore
+  3-31-performance-testing: backlog  # F3.4 - Targets <100ms UI, <500ms ops
+  3-32-documentation-update: backlog  # F3.5 - CLAUDE.md + docs payment
+  3-33-smoke-test-suite: backlog  # F3.6 - Critical paths E2E
+  3-phase3-validation-gate: backlog  # Validation production ready
+
+  epic-3-retrospective: optional  # À refaire après révision complète
 
   # Epic 4: Cuisine & Dispatch — Kitchen Display System
   # Note: Stories 4.1 et 4.2 utilisent BroadcastChannel + Supabase Realtime (pas Socket.IO natif)

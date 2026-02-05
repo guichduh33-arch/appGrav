@@ -686,7 +686,7 @@ export default function CustomerSearchModal({
                         onClick={() => handleSelectCustomer(selectedDetailCustomer)}
                     >
                         <Check size={16} />
-                        Sélectionner
+                        Select
                     </button>
                 </div>
 
@@ -717,7 +717,7 @@ export default function CustomerSearchModal({
                         </span>
                         {(selectedDetailCustomer.category?.discount_percentage ?? TIER_DISCOUNTS[selectedDetailCustomer.loyalty_tier]) > 0 && (
                             <span className="discount-badge discount-badge--large">
-                                -{selectedDetailCustomer.category?.discount_percentage || TIER_DISCOUNTS[selectedDetailCustomer.loyalty_tier]}% remise
+                                -{selectedDetailCustomer.category?.discount_percentage || TIER_DISCOUNTS[selectedDetailCustomer.loyalty_tier]}% discount
                             </span>
                         )}
                     </div>
@@ -726,7 +726,7 @@ export default function CustomerSearchModal({
                 {loadingHistory ? (
                     <div className="customer-detail__loading">
                         <div className="spinner"></div>
-                        <span>Chargement de l'historique...</span>
+                        <span>Loading history...</span>
                     </div>
                 ) : (
                     <>
@@ -747,9 +747,9 @@ export default function CustomerSearchModal({
 
                         {/* Order history (Story 7.4) */}
                         <div className="customer-detail__section">
-                            <h4><ShoppingBag size={16} /> Historique des commandes</h4>
+                            <h4><ShoppingBag size={16} /> Order History</h4>
                             {orderHistory.length === 0 ? (
-                                <p className="no-history">Aucune commande précédente</p>
+                                <p className="no-history">No previous orders</p>
                             ) : (
                                 <div className="order-history">
                                     {orderHistory.map(order => (
@@ -805,17 +805,17 @@ export default function CustomerSearchModal({
                                 {mode === 'scan' && <QrCode size={22} />}
                                 {mode === 'create' && <UserPlus size={22} />}
                                 {mode === 'favorites' && <Heart size={22} />}
-                                {mode === 'search' && 'Sélectionner un Client'}
-                                {mode === 'scan' && 'Scanner Code QR Client'}
-                                {mode === 'create' && 'Nouveau Client'}
-                                {mode === 'favorites' && 'Clients Favoris'}
+                                {mode === 'search' && 'Select a Customer'}
+                                {mode === 'scan' && 'Scan Customer QR Code'}
+                                {mode === 'create' && 'New Customer'}
+                                {mode === 'favorites' && 'Favorite Customers'}
                                 {/* Story 6.1 AC4: Offline indicator with data age */}
                                 {!isOnline && (
                                     <span style={{ marginLeft: '10px', fontSize: '12px', color: isStale ? '#ef4444' : '#f59e0b', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                                         <WifiOff size={14} />
-                                        Hors-ligne
+                                        Offline
                                         {ageDisplay && (
-                                            <span title={isStale ? 'Données de plus de 24h' : 'Date de dernière synchronisation'}>
+                                            <span title={isStale ? 'Data older than 24h' : 'Last sync time'}>
                                                 {isStale && <AlertTriangle size={12} style={{ marginLeft: '2px' }} />}
                                                 <Clock size={10} style={{ marginLeft: '4px' }} />
                                                 {ageDisplay}
@@ -962,7 +962,7 @@ export default function CustomerSearchModal({
                                         disabled={saving || !newCustomerName.trim()}
                                     >
                                         <Save size={18} />
-                                        {saving ? 'Enregistrement...' : 'Enregistrer et Sélectionner'}
+                                        {saving ? 'Saving...' : 'Save and Select'}
                                     </button>
                                 </div>
                             ) : mode === 'scan' ? (
@@ -971,7 +971,7 @@ export default function CustomerSearchModal({
                                         <QrCode size={80} />
                                     </div>
                                     <p className="qr-scan-instruction">
-                                        Scannez le code QR du client ou entrez son numéro de membre
+                                        Scan customer QR code or enter member number
                                     </p>
                                     {qrError && (
                                         <div className="qr-error">
@@ -1002,7 +1002,7 @@ export default function CustomerSearchModal({
                                     {loading ? (
                                         <div className="customer-list__loading">
                                             <div className="spinner"></div>
-                                            <span>Chargement...</span>
+                                            <span>Loading...</span>
                                         </div>
                                     ) : favoriteCustomers.length === 0 ? (
                                         <div className="customer-list__empty">
@@ -1043,7 +1043,7 @@ export default function CustomerSearchModal({
                                         {loading ? (
                                             <div className="customer-list__loading">
                                                 <div className="spinner"></div>
-                                                <span>Chargement...</span>
+                                                <span>Loading...</span>
                                             </div>
                                         ) : customers.length === 0 ? (
                                             <div className="customer-list__empty">

@@ -234,7 +234,7 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                 <div className="combo-modal">
                     <div className="combo-modal-loading">
                         <div className="spinner"></div>
-                        <span>Chargement du combo...</span>
+                        <span>Loading combo...</span>
                     </div>
                 </div>
             </div>
@@ -246,9 +246,9 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
             <div className="combo-modal-overlay">
                 <div className="combo-modal">
                     <div className="combo-modal-error">
-                        <p>Combo introuvable</p>
+                        <p>Combo not found</p>
                         <button type="button" className="btn btn-secondary" onClick={onClose}>
-                            Fermer
+                            Close
                         </button>
                     </div>
                 </div>
@@ -273,7 +273,7 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                         type="button"
                         className="btn-close"
                         onClick={onClose}
-                        aria-label="Fermer"
+                        aria-label="Close"
                     >
                         <X size={24} />
                     </button>
@@ -358,7 +358,7 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                             className="btn btn-secondary"
                             onClick={onClose}
                         >
-                            Annuler
+                            Cancel
                         </button>
                         <button
                             type="button"

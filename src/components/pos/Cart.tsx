@@ -50,11 +50,12 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
     const handleOrderTypeChange = (type: 'dine_in' | 'takeaway' | 'delivery') => {
         if (type === 'dine_in') {
             setShowTableModal(true)
-            setOrderType(type)
-        } else {
-            setTableNumber(null)
-            setOrderType(type)
         }
+        // Clear table for non-dine-in orders
+        if (type !== 'dine_in') {
+            setTableNumber(null)
+        }
+        setOrderType(type)
     }
 
     const handleDeleteClick = (itemId: string) => {
@@ -111,9 +112,9 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
             <div className="pos-cart__header">
                 <div className="pos-cart__header-row">
                     <div className="pos-cart__types">
-                        {(['dine_in', 'takeaway'] as const).map((type) => (
+                        {(['dine_in', 'takeaway', 'delivery'] as const).map((type) => (
                             <button key={type} type="button" className={`order-type-btn ${orderType === type ? 'is-active' : ''}`} onClick={() => handleOrderTypeChange(type)}>
-                                {type === 'dine_in' ? 'Dine In' : 'Takeaway'}
+                                {type === 'dine_in' ? 'Dine In' : type === 'takeaway' ? 'Takeaway' : 'Delivery'}
                             </button>
                         ))}
                     </div>
@@ -129,7 +130,7 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                 {orderType === 'dine_in' && tableNumber && (
                     <div className="pos-cart__table-info">
                         <span>Table: {tableNumber}</span>
-                        <button type="button" className="btn-change-table" onClick={() => setShowTableModal(true)}>Changer</button>
+                        <button type="button" className="btn-change-table" onClick={() => setShowTableModal(true)}>Change</button>
                     </div>
                 )}
 

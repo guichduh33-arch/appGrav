@@ -285,20 +285,37 @@
 
 /* Shift Banner */
 .pos-shift-banner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 12px 24px;
-    background: linear-gradient(90deg, #F59E0B, #D97706);
-    color: #0F172A;
+    padding: 8px 16px;
+    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    color: white;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 12px;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.pos-shift-banner__info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pos-shift-banner__session {
     font-weight: 600;
-    z-index: 1100;
-    animation: slideDown 0.3s ease-out;
+}
+
+.pos-shift-banner__divider {
+    opacity: 0.5;
+}
+
+.pos-shift-banner__user {
+    opacity: 0.9;
+}
+
+.pos-shift-banner__time {
+    font-size: 12px;
+    opacity: 0.8;
 }
 
 @keyframes slideDown {

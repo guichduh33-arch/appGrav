@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
-import { Search, CheckCircle, Clock, Users } from 'lucide-react'
+import { Search, CheckCircle, Clock, Users, User } from 'lucide-react'
 
 import { useCartStore, CartItem } from '../../stores/cartStore'
 import { useAuthStore } from '../../stores/authStore'
@@ -45,7 +45,7 @@ export default function POSMainPage() {
 
     // Enable LAN Hub for KDS communication (Story 4.1)
     const { isRunning: lanHubRunning, error: lanHubError } = useLanHub({
-        deviceName: 'Caisse Principale',
+        deviceName: 'Main Terminal',
         autoStart: true,
     })
 
@@ -161,6 +161,24 @@ export default function POSMainPage() {
                     isLoading={categoriesLoading}
                     onOpenMenu={() => openModal('menu')}
                 />
+
+                {/* Shift Indicator Banner (F2.9) */}
+                {hasOpenShift && currentSession && (
+                    <div className="pos-shift-banner">
+                        <div className="pos-shift-banner__info">
+                            <Clock size={16} />
+                            <span className="pos-shift-banner__session">Shift #{currentSession.session_number}</span>
+                            <span className="pos-shift-banner__divider">|</span>
+                            <User size={14} />
+                            <span className="pos-shift-banner__user">
+                                {currentSession.user_name || 'Cashier'}
+                            </span>
+                        </div>
+                        <span className="pos-shift-banner__time">
+                            Since {new Date(currentSession.opened_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                    </div>
+                )}
 
                 <section className="pos-products">
                     <div className="pos-products__header">
@@ -292,7 +310,7 @@ export default function POSMainPage() {
             {modals.shiftSelector && (
                 <div className="shift-selector-overlay" onClick={() => closeModal('shiftSelector')}>
                     <div className="shift-selector" onClick={e => e.stopPropagation()}>
-                        <h3 className="shift-selector__title"><Users size={20} />Sélectionner une caisse</h3>
+                        <h3 className="shift-selector__title"><Users size={20} />Select a terminal</h3>
                         <div className="shift-selector__list">
                             {terminalSessions.map(session => (
                                 <button
@@ -301,7 +319,7 @@ export default function POSMainPage() {
                                     onClick={() => handleSwitchShift(session.user_id, () => closeModal('shiftSelector'))}
                                 >
                                     <div className="shift-selector__user">
-                                        <span className="shift-selector__name">{session.user_name || `Caissier ${session.session_number}`}</span>
+                                        <span className="shift-selector__name">{session.user_name || `Cashier ${session.session_number}`}</span>
                                         <span className="shift-selector__session">#{session.session_number}</span>
                                     </div>
                                     {session.user_id === activeShiftUserId && <CheckCircle size={18} className="shift-selector__check" />}
@@ -309,7 +327,7 @@ export default function POSMainPage() {
                             ))}
                         </div>
                         <button className="shift-selector__add" onClick={() => { closeModal('shiftSelector'); handleOpenShiftRequest() }}>
-                            <Clock size={18} />Ouvrir un nouveau shift
+                            <Clock size={18} />Open a new shift
                         </button>
                     </div>
                 </div>

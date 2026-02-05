@@ -26,7 +26,7 @@ export default function DiscountModal({
 
     const isItemDiscount = !!itemName
 
-    // Calculer le montant de la remise
+    // Calculate discount amount
     const calculateDiscountAmount = (): number => {
         const value = parseFloat(discountValue)
         if (isNaN(value) || value <= 0) return 0
@@ -36,7 +36,7 @@ export default function DiscountModal({
             return (totalPrice * percentage) / 100
         } else {
             // Fixed amount (IDR)
-            return Math.min(value, totalPrice) // Ne peut pas dépasser le total
+            return Math.min(value, totalPrice) // Cannot exceed total
         }
     }
 
@@ -81,10 +81,10 @@ export default function DiscountModal({
                         <div>
                             <h2 className="modal__title">
                                 <Tag size={24} />
-                                {isItemDiscount ? 'Remise sur Article' : 'Remise sur Commande'}
+                                {isItemDiscount ? 'Item Discount' : 'Order Discount'}
                             </h2>
                             <p className="modal__subtitle">
-                                {isItemDiscount ? itemName : 'Appliquer une remise sur le total'}
+                                {isItemDiscount ? itemName : 'Apply discount to total'}
                             </p>
                         </div>
                         <button className="modal__close" onClick={onClose}>
@@ -174,14 +174,14 @@ export default function DiscountModal({
 
                         <div className="discount-warning">
                             <Tag size={16} />
-                            Vérification par code PIN requise pour appliquer la remise
+                            PIN verification required to apply discount
                         </div>
                     </div>
 
                     {/* Footer */}
                     <div className="modal__footer">
                         <button className="btn btn-secondary" onClick={onClose}>
-                            Annuler
+                            Cancel
                         </button>
                         <button
                             className="btn btn-primary-lg"
@@ -189,7 +189,7 @@ export default function DiscountModal({
                             disabled={discountAmount === 0}
                         >
                             <Tag size={18} />
-                            Appliquer la Remise
+                            Apply Discount
                         </button>
                     </div>
                 </div>
@@ -198,8 +198,8 @@ export default function DiscountModal({
             {/* PIN Verification Modal */}
             {showPinModal && (
                 <PinVerificationModal
-                    title="Vérification requise"
-                    message="Entrez votre code PIN pour appliquer cette remise"
+                    title="Verification Required"
+                    message="Enter your PIN to apply this discount"
                     allowedRoles={['manager', 'admin']}
                     onVerify={handlePinVerify}
                     onClose={() => {

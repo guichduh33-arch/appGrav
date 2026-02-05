@@ -843,9 +843,11 @@ export type TOfflinePaymentSyncStatus =
   | 'conflict';          // Sync conflict detected
 
 /**
- * Payment method types
+ * Payment method types - re-exported from payment.ts (single source of truth)
+ * @see docs/adr/ADR-001-payment-system-refactor.md
  */
-export type TPaymentMethod = 'cash' | 'card' | 'qris' | 'transfer' | 'ewallet';
+import type { TPaymentMethod } from './payment';
+export type { TPaymentMethod } from './payment';
 
 /**
  * Cached payment for offline POS operations

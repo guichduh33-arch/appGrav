@@ -218,12 +218,12 @@ export default function TransactionHistoryModal({
                 <div className="transaction-history__content">
                     {isLoading ? (
                         <div className="transaction-history__loading">
-                            Chargement...
+                            Loading...
                         </div>
                     ) : orders.length === 0 ? (
                         <div className="transaction-history__empty">
                             <Receipt size={48} />
-                            <p>Aucune transaction pour ce shift</p>
+                            <p>No transactions for this shift</p>
                         </div>
                     ) : (
                         <div className="transaction-history__list">

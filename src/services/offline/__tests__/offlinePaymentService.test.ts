@@ -127,10 +127,10 @@ describe('offlinePaymentService', () => {
       expect(payment.sync_status).toBe('pending_validation');
     });
 
-    it('should create ewallet payment with pending_validation status', async () => {
+    it('should create edc payment with pending_validation status', async () => {
       const payment = await saveOfflinePayment({
         ...baseInput,
-        method: 'ewallet',
+        method: 'edc',
       });
 
       expect(payment.sync_status).toBe('pending_validation');

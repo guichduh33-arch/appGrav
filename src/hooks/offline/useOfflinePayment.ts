@@ -15,6 +15,7 @@ import { useNetworkStatus } from './useNetworkStatus';
 import { createOfflineOrder } from '@/services/offline/offlineOrderService';
 import {
   saveOfflinePayment,
+  saveOfflinePayments,
   calculateChange,
 } from '@/services/offline/offlinePaymentService';
 import { dispatchOrderToKitchen } from '@/services/offline/kitchenDispatchService';
@@ -59,11 +60,31 @@ export interface IPaymentResult {
 }
 
 /**
+ * Result of processing split payments
+ */
+export interface ISplitPaymentResult {
+  /** Created order */
+  order: IOfflineOrder;
+  /** Created order items */
+  items: IOfflineOrderItem[];
+  /** Created payments */
+  payments: IOfflinePayment[];
+  /** Total change to give back (for cash payments) */
+  change: number;
+  /** Stations dispatched to KDS */
+  dispatchedStations: TKitchenStation[];
+  /** Stations queued for later dispatch */
+  queuedStations: TKitchenStation[];
+}
+
+/**
  * Return type for useOfflinePayment hook
  */
 export interface IUseOfflinePaymentResult {
-  /** Process payment and create order */
+  /** Process single payment and create order */
   processPayment: (input: IPaymentInput) => Promise<IPaymentResult | null>;
+  /** Process split payments and create order */
+  processSplitPayment: (inputs: IPaymentInput[]) => Promise<ISplitPaymentResult | null>;
   /** Whether the network is offline */
   isOffline: boolean;
   /** Whether payment processing is in progress */
@@ -233,8 +254,125 @@ export function useOfflinePayment(): IUseOfflinePaymentResult {
     [cartState, user, sessionId]
   );
 
+  /**
+   * Process multiple split payments for an order
+   */
+  const processSplitPayment = useCallback(
+    async (inputs: IPaymentInput[]): Promise<ISplitPaymentResult | null> => {
+      // Validate user is authenticated
+      if (!user?.id) {
+        setError('User must be authenticated to process payments');
+        return null;
+      }
+
+      // Validate cart has items
+      if (cartState.items.length === 0) {
+        setError('Cart is empty');
+        return null;
+      }
+
+      // Validate at least one payment
+      if (inputs.length === 0) {
+        setError('At least one payment is required');
+        return null;
+      }
+
+      // Validate total payment amount matches cart total (allow 1 IDR tolerance)
+      const totalPayments = inputs.reduce((sum, p) => sum + p.amount, 0);
+      if (Math.abs(totalPayments - cartState.total) > 1) {
+        setError('Total payments must match cart total');
+        return null;
+      }
+
+      // Validate each payment
+      for (const input of inputs) {
+        if (input.amount <= 0) {
+          setError('Each payment amount must be positive');
+          return null;
+        }
+        if (input.method === 'cash' && input.cashReceived && input.cashReceived < input.amount) {
+          setError('Cash received must be at least the payment amount');
+          return null;
+        }
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        // Calculate total change for cash payments
+        const totalChange = inputs.reduce((sum, input) => {
+          if (input.method === 'cash' && input.cashReceived) {
+            return sum + calculateChange(input.amount, input.cashReceived);
+          }
+          return sum;
+        }, 0);
+
+        // 1. Create order from cart
+        const cart = {
+          items: cartState.items,
+          orderType: cartState.orderType,
+          tableNumber: cartState.tableNumber,
+          customerId: cartState.customerId,
+          discountType: cartState.discountType,
+          discountValue: cartState.discountValue,
+          discountReason: cartState.discountReason,
+          subtotal: cartState.subtotal,
+          discountAmount: cartState.discountAmount,
+          total: cartState.total,
+        };
+
+        const { order, items } = await createOfflineOrder(
+          cart,
+          user.id,
+          sessionId ?? null
+        );
+
+        // 2. Save all payments linked to order
+        const paymentInputs = inputs.map((input) => ({
+          method: input.method,
+          amount: input.amount,
+          cash_received: input.cashReceived,
+          change_given:
+            input.method === 'cash' && input.cashReceived
+              ? calculateChange(input.amount, input.cashReceived)
+              : undefined,
+          reference: input.reference,
+          user_id: user.id,
+          session_id: sessionId ?? null,
+        }));
+
+        const payments = await saveOfflinePayments(order.id, paymentInputs);
+
+        // 3. Dispatch order to kitchen
+        const { dispatched, queued } = await dispatchOrderToKitchen(order, items);
+
+        // 4. Clear cart after successful creation
+        cartState.clearCart();
+
+        return {
+          order,
+          items,
+          payments,
+          change: totalChange,
+          dispatchedStations: dispatched,
+          queuedStations: queued,
+        };
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : 'Failed to process split payment';
+        setError(message);
+        return null;
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [cartState, user, sessionId]
+  );
+
   return {
     processPayment,
+    processSplitPayment,
     isOffline: !isOnline,
     isProcessing,
     error,

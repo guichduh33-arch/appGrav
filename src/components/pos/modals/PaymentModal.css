@@ -37,8 +37,8 @@
 
 .payment-methods {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-md);
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-sm);
 }
 
 .payment-method__label {
@@ -362,4 +362,130 @@
 :root {
     --color-primary-dark: #1e3a8a;
     /* Example dark blue */
+}
+
+/* ============================================
+   SPLIT PAYMENT STYLES (F2.2)
+   ============================================ */
+
+/* Payment Progress Bar */
+.payment-progress {
+    padding: var(--space-md);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+}
+
+.payment-progress__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+}
+
+.payment-progress__label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.payment-progress__amount {
+    font-size: var(--text-md);
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.payment-progress__bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.payment-progress__fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.payment-progress__remaining {
+    margin-top: var(--space-xs);
+    font-size: var(--text-sm);
+    color: rgba(255, 255, 255, 0.7);
+    text-align: right;
+}
+
+.payment-progress__remaining strong {
+    color: #ffffff;
+}
+
+/* Payment List (Added Payments) */
+.payment-list {
+    margin-top: var(--space-md);
+}
+
+.payment-list__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-sm);
+}
+
+.payment-list__info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.payment-list__method {
+    font-weight: 600;
+    min-width: 60px;
+}
+
+.payment-list__amount {
+    font-weight: 700;
+    color: #22c55e;
+}
+
+.payment-list__remove {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: var(--space-xs);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+}
+
+.payment-list__remove:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+/* Payment Amount Input (for non-cash methods) */
+.payment-amount-input {
+    margin-top: var(--space-md);
+}
+
+.payment-amount-input .amount-input {
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+/* Footer with multiple buttons */
+.payment-footer {
+    gap: var(--space-md);
+}
+
+.payment-footer .btn-primary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
 }
