@@ -640,14 +640,16 @@ export const PRODUCTION_REMINDERS_STORAGE_KEY = 'offline_production_reminders';
 /**
  * Order status for POS operations
  * Tracks order lifecycle from creation to completion
+ * NOTE: Must match database enum 'order_status'
  */
 export type TOrderStatus =
-  | 'pending'     // Just created, not yet sent to kitchen
+  | 'new'         // New order, not yet sent to kitchen
   | 'preparing'   // Sent to kitchen, being prepared
   | 'ready'       // Ready for pickup/serve
+  | 'served'      // Served to customer
   | 'completed'   // Paid and done
   | 'cancelled'   // Order cancelled
-  | 'refunded';   // Order refunded
+  | 'voided';     // Order voided (added via migration)
 
 /**
  * Order type for POS operations
@@ -671,8 +673,9 @@ export type TOfflineOrderSyncStatus =
 
 /**
  * Item status for KDS (Kitchen Display System) tracking
+ * NOTE: Must match database enum 'item_status'
  */
-export type TOrderItemStatus = 'pending' | 'preparing' | 'ready';
+export type TOrderItemStatus = 'new' | 'preparing' | 'ready' | 'served';
 
 /**
  * Cached order for offline POS operations

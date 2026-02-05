@@ -341,7 +341,7 @@ export function useShift() {
             const { data, error } = await supabase
                 .from('pos_sessions')
                 .select('*')
-                .eq('terminal_id', terminalId)
+                .eq('terminal_id_str', terminalId)
                 .neq('status', 'open')
                 .order('closed_at', { ascending: false })
                 .limit(10)

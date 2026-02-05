@@ -166,7 +166,7 @@ export async function convertCartItemToOrderItem(
       modifiers: cartItem.modifiers.map(convertModifier),
       notes: cartItem.notes || null,
       dispatch_station: dispatchStation,
-      item_status: 'pending',
+      item_status: 'new',
     };
   }
 
@@ -184,7 +184,7 @@ export async function convertCartItemToOrderItem(
       modifiers: (cartItem.comboSelections || []).map(convertComboSelection),
       notes: cartItem.notes || null,
       dispatch_station: null, // Combos are dispatched based on their individual items
-      item_status: 'pending',
+      item_status: 'new',
     };
   }
 
@@ -247,7 +247,7 @@ export async function createOfflineOrder(
 
   // Build order input
   const orderInput: TCreateOfflineOrderInput = {
-    status: 'pending',
+    status: 'new',
     order_type: cartState.orderType as TOrderType,
     subtotal: cartState.subtotal,
     tax_amount: taxAmount,
