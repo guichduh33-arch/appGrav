@@ -18,7 +18,7 @@ interface IOfflineUserData {
   preferred_language: 'fr' | 'en' | 'id';
 }
 
-interface AuthState {
+interface IAuthState {
   // User data
   user: UserProfile | null;
   roles: Role[];
@@ -51,7 +51,7 @@ interface AuthState {
   setSession: (sessionId: string | null) => void;
 }
 
-export const useAuthStore = create<AuthState>()(
+export const useAuthStore = create<IAuthState>()(
   persist(
     (set, get) => ({
       // Initial state
@@ -339,23 +339,23 @@ export async function initializeAuth(): Promise<boolean> {
 // Selectors for common checks
 // ========================================
 
-export const selectIsAdmin = (state: AuthState) =>
+export const selectIsAdmin = (state: IAuthState) =>
   state.roles.some(r => ['SUPER_ADMIN', 'ADMIN'].includes(r.code));
 
-export const selectIsSuperAdmin = (state: AuthState) =>
+export const selectIsSuperAdmin = (state: IAuthState) =>
   state.roles.some(r => r.code === 'SUPER_ADMIN');
 
-export const selectIsManager = (state: AuthState) =>
+export const selectIsManager = (state: IAuthState) =>
   state.roles.some(r => ['SUPER_ADMIN', 'ADMIN', 'MANAGER'].includes(r.code));
 
-export const selectPrimaryRole = (state: AuthState) => {
+export const selectPrimaryRole = (state: IAuthState) => {
   if (state.roles.length === 0) return null;
   return state.roles.reduce((highest, current) =>
     (current.hierarchy_level || 0) > (highest.hierarchy_level || 0) ? current : highest
   );
 };
 
-export const selectHasPermission = (code: string) => (state: AuthState) => {
+export const selectHasPermission = (code: string) => (state: IAuthState) => {
   const perm = state.permissions.find(p => p.permission_code === code);
   return perm?.is_granted ?? false;
 };

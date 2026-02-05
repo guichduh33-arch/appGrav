@@ -1,6 +1,6 @@
 # Story 1.8: Notification Settings UI
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 

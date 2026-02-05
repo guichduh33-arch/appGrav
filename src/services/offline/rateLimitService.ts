@@ -2,31 +2,24 @@
  * Rate Limiting Service for Offline Authentication
  *
  * Prevents brute-force PIN attacks by limiting failed login attempts.
- * Rate limit state is kept in memory only (not persisted) - acceptable for MVP.
+ * Rate limit state is PERSISTED to IndexedDB to survive page refreshes.
  *
  * Rules:
- * - After 3 failed attempts: 30 second cooldown
- * - Cooldown resets after 30s or on successful login
- * - State clears on page refresh (memory only)
+ * - After 3 failed attempts: 15 minute cooldown (per Story 1.2 requirement)
+ * - Cooldown resets after 15 minutes or on successful login
+ * - State persists in IndexedDB to prevent bypass via refresh
  *
- * @see Story 1.2: AC3 - Rate Limiting After Failed Attempts
+ * @see Story 1.2: AC3 - Rate Limiting After Failed Attempts (3 attempts per 15 minutes)
  */
+
+import { db } from '@/lib/db';
+import type { IOfflineRateLimit } from '@/types/offline';
 
 /** Maximum failed attempts before rate limiting */
 const MAX_ATTEMPTS = 3;
 
-/** Cooldown duration in milliseconds (30 seconds) */
-const COOLDOWN_MS = 30 * 1000;
-
-/**
- * Rate limit tracking entry per user
- */
-interface IRateLimitEntry {
-  /** Number of consecutive failed attempts */
-  attempts: number;
-  /** Timestamp of last failed attempt (ms since epoch) */
-  lastAttempt: number;
-}
+/** Cooldown duration in milliseconds (15 minutes per Story 1.2) */
+const COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes
 
 /**
  * Result of rate limit check
@@ -39,15 +32,10 @@ export interface IRateLimitCheck {
 }
 
 /**
- * In-memory map tracking rate limits per user
- * Key: userId, Value: rate limit entry
- */
-const rateLimitMap = new Map<string, IRateLimitEntry>();
-
-/**
  * Rate Limiting Service
  *
  * Tracks and enforces rate limits for offline PIN authentication.
+ * All state is persisted to IndexedDB to prevent bypass via page refresh.
  */
 export const rateLimitService = {
   /**
@@ -56,8 +44,8 @@ export const rateLimitService = {
    * @param userId - User UUID to check
    * @returns Rate limit check result with allowed status and wait time
    */
-  checkRateLimit(userId: string): IRateLimitCheck {
-    const entry = rateLimitMap.get(userId);
+  async checkRateLimit(userId: string): Promise<IRateLimitCheck> {
+    const entry = await db.offline_rate_limits.get(userId);
 
     // No entry or under limit - allowed
     if (!entry || entry.attempts < MAX_ATTEMPTS) {
@@ -65,10 +53,12 @@ export const rateLimitService = {
     }
 
     // Check if cooldown has elapsed
-    const elapsed = Date.now() - entry.lastAttempt;
+    const lastAttemptTime = new Date(entry.last_attempt).getTime();
+    const elapsed = Date.now() - lastAttemptTime;
+
     if (elapsed >= COOLDOWN_MS) {
       // Cooldown complete - reset and allow
-      rateLimitMap.delete(userId);
+      await db.offline_rate_limits.delete(userId);
       return { allowed: true };
     }
 
@@ -83,16 +73,25 @@ export const rateLimitService = {
    * Record a failed login attempt for a user
    *
    * Increments the failure counter and updates timestamp.
+   * Persisted to IndexedDB to survive page refreshes.
    *
    * @param userId - User UUID that failed authentication
    */
-  recordFailedAttempt(userId: string): void {
-    const existing = rateLimitMap.get(userId);
-    const entry: IRateLimitEntry = existing
-      ? { attempts: existing.attempts + 1, lastAttempt: Date.now() }
-      : { attempts: 1, lastAttempt: Date.now() };
+  async recordFailedAttempt(userId: string): Promise<void> {
+    const existing = await db.offline_rate_limits.get(userId);
+    const entry: IOfflineRateLimit = existing
+      ? {
+          id: userId,
+          attempts: existing.attempts + 1,
+          last_attempt: new Date().toISOString(),
+        }
+      : {
+          id: userId,
+          attempts: 1,
+          last_attempt: new Date().toISOString(),
+        };
 
-    rateLimitMap.set(userId, entry);
+    await db.offline_rate_limits.put(entry);
 
     console.debug(
       '[rateLimit] Failed attempt recorded:',
@@ -106,9 +105,10 @@ export const rateLimitService = {
    *
    * @param userId - User UUID to reset
    */
-  resetAttempts(userId: string): void {
-    if (rateLimitMap.has(userId)) {
-      rateLimitMap.delete(userId);
+  async resetAttempts(userId: string): Promise<void> {
+    const exists = await db.offline_rate_limits.get(userId);
+    if (exists) {
+      await db.offline_rate_limits.delete(userId);
       console.debug('[rateLimit] Attempts reset for user:', userId);
     }
   },
@@ -119,8 +119,8 @@ export const rateLimitService = {
    * @param userId - User UUID to check
    * @returns Number of failed attempts (0 if no entry)
    */
-  getAttemptCount(userId: string): number {
-    const entry = rateLimitMap.get(userId);
+  async getAttemptCount(userId: string): Promise<number> {
+    const entry = await db.offline_rate_limits.get(userId);
     return entry?.attempts ?? 0;
   },
 
@@ -130,15 +130,33 @@ export const rateLimitService = {
    * @param userId - User UUID to check
    * @returns true if user is blocked by rate limit
    */
-  isRateLimited(userId: string): boolean {
-    return !this.checkRateLimit(userId).allowed;
+  async isRateLimited(userId: string): Promise<boolean> {
+    const result = await this.checkRateLimit(userId);
+    return !result.allowed;
   },
 
   /**
    * Clear all rate limit entries (for testing)
    */
-  clearAll(): void {
-    rateLimitMap.clear();
+  async clearAll(): Promise<void> {
+    await db.offline_rate_limits.clear();
+  },
+
+  /**
+   * Cleanup expired rate limit entries
+   * Can be called periodically to free up storage
+   */
+  async cleanupExpired(): Promise<void> {
+    const cutoff = new Date(Date.now() - COOLDOWN_MS).toISOString();
+    const expired = await db.offline_rate_limits
+      .where('last_attempt')
+      .below(cutoff)
+      .toArray();
+
+    if (expired.length > 0) {
+      await db.offline_rate_limits.bulkDelete(expired.map((e) => e.id));
+      console.debug('[rateLimit] Cleaned up', expired.length, 'expired entries');
+    }
   },
 };
 

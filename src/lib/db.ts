@@ -32,6 +32,7 @@ import type {
   IOfflinePromotion,
   IOfflinePromotionProduct,
   IOfflinePromotionFreeProduct,
+  IOfflineRateLimit,
 } from '@/types/offline';
 
 /**
@@ -43,6 +44,9 @@ import type {
 export class OfflineDatabase extends Dexie {
   // Auth & User cache (Story 1.1)
   offline_users!: Table<IOfflineUser>;
+
+  // Rate limiting for PIN auth (Story 1.2 - persisted to prevent refresh bypass)
+  offline_rate_limits!: Table<IOfflineRateLimit>;
 
   // Sync queue for pending operations (foundation for Story 3.1)
   offline_sync_queue!: Table<ISyncQueueItem>;
@@ -471,6 +475,40 @@ export class OfflineDatabase extends Dexie {
       // Index by promotion_id for fetching free products for a promotion
       offline_promotion_free_products: 'id, promotion_id, free_product_id',
     });
+
+    // Version 16: Rate Limiting Persistence (Story 1.2 security fix)
+    this.version(16).stores({
+      // Preserve existing tables
+      offline_users: 'id, cached_at',
+      offline_sync_queue: '++id, entity, status, created_at',
+      offline_settings: 'key, category_id, updated_at',
+      offline_tax_rates: 'id, is_active, is_default, [is_active+is_default]',
+      offline_payment_methods: 'id, is_active, is_default, sort_order, [is_active+is_default]',
+      offline_business_hours: 'day_of_week',
+      offline_sync_meta: 'entity',
+      offline_products: 'id, category_id, sku, name, is_active, pos_visible, [is_active+pos_visible+available_for_sale]',
+      offline_categories: 'id, name, sort_order, is_active, dispatch_station, [is_active+is_raw_material]',
+      offline_modifiers: 'id, product_id, category_id, group_name, is_active, [is_active+product_id], [is_active+category_id]',
+      offline_recipes: 'id, product_id, material_id, is_active, [is_active+product_id]',
+      offline_orders: 'id, order_number, status, order_type, customer_id, session_id, created_at, sync_status, dispatch_status, [status+created_at]',
+      offline_order_items: 'id, order_id, product_id, item_status',
+      offline_payments: 'id, order_id, method, sync_status, created_at',
+      offline_sessions: 'id, user_id, status, opened_at, sync_status',
+      offline_dispatch_queue: '++id, order_id, station, status, created_at, [status+station]',
+      offline_stock_levels: 'id, product_id, location_id, quantity, [product_id+location_id]',
+      offline_adjustment_notes: '++id, product_id, created_at',
+      offline_customers: 'id, phone, email, name, category_slug, loyalty_tier, updated_at',
+      offline_customer_categories: 'id, slug, is_active',
+      offline_product_category_prices: '[product_id+customer_category_id], product_id, customer_category_id, is_active',
+      offline_promotions: 'id, code, is_active, start_date, end_date, priority, [is_active+start_date+end_date]',
+      offline_promotion_products: 'id, promotion_id, product_id, category_id, [promotion_id+product_id], [promotion_id+category_id]',
+      offline_promotion_free_products: 'id, promotion_id, free_product_id',
+
+      // NEW: Rate limiting persistence (Story 1.2 security fix)
+      // Prevents brute-force bypass via page refresh
+      // Indexes: id (primary = user_id), last_attempt for cleanup
+      offline_rate_limits: 'id, last_attempt',
+    });
   }
 }
 
@@ -503,4 +541,5 @@ export type {
   IOfflinePromotion,
   IOfflinePromotionProduct,
   IOfflinePromotionFreeProduct,
+  IOfflineRateLimit,
 };

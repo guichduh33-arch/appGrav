@@ -330,7 +330,7 @@ export const useSettingsStore = create<SettingsState>()(
         try {
           const { error } = await supabase.rpc('update_setting', {
             p_key: key,
-            p_value: JSON.stringify(value),
+            p_value: value,
             p_reason: reason,
           });
 

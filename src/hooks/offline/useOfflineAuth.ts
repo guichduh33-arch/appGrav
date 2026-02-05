@@ -6,7 +6,7 @@
  *
  * Features:
  * - bcrypt PIN verification against cached hash
- * - Rate limiting (3 attempts, then 30s cooldown)
+ * - Rate limiting (3 attempts, then 15min cooldown - persisted to IndexedDB)
  * - Countdown timer for rate limit display
  * - Integration with authStore for session management
  *
@@ -97,10 +97,10 @@ export function useOfflineAuth(): IUseOfflineAuthReturn {
    */
   const loginOffline = useCallback(
     async (userId: string, pin: string): Promise<void> => {
-      // Check rate limit first
-      const rateLimitCheck = rateLimitService.checkRateLimit(userId);
+      // Check rate limit first (async - persisted to IndexedDB)
+      const rateLimitCheck = await rateLimitService.checkRateLimit(userId);
       if (!rateLimitCheck.allowed) {
-        setCooldownSeconds(rateLimitCheck.waitSeconds ?? 30);
+        setCooldownSeconds(rateLimitCheck.waitSeconds ?? 900); // 15 minutes default
         const authError: IOfflineAuthError = {
           code: 'RATE_LIMITED',
           message: `Too many attempts. Please wait ${rateLimitCheck.waitSeconds} seconds`,
@@ -117,13 +117,13 @@ export function useOfflineAuth(): IUseOfflineAuthReturn {
         const result = await offlineAuthService.verifyPinOffline(userId, pin);
 
         if (!result.success) {
-          // Record failed attempt
-          rateLimitService.recordFailedAttempt(userId);
+          // Record failed attempt (async - persisted to IndexedDB)
+          await rateLimitService.recordFailedAttempt(userId);
 
           // Check if now rate limited
-          const newCheck = rateLimitService.checkRateLimit(userId);
+          const newCheck = await rateLimitService.checkRateLimit(userId);
           if (!newCheck.allowed) {
-            setCooldownSeconds(newCheck.waitSeconds ?? 30);
+            setCooldownSeconds(newCheck.waitSeconds ?? 900); // 15 minutes default
           }
 
           // Set error based on result
@@ -137,7 +137,7 @@ export function useOfflineAuth(): IUseOfflineAuthReturn {
         }
 
         // Success - reset rate limit and set session
-        rateLimitService.resetAttempts(userId);
+        await rateLimitService.resetAttempts(userId);
 
         const cachedUser = result.user!;
 

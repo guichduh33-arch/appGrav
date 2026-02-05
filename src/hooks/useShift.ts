@@ -38,7 +38,7 @@ export interface ShiftTransaction {
     payment_method: string
     status: string
     created_at: string
-    cashier_id?: string
+    staff_id?: string
 }
 
 export interface ReconciliationData {
@@ -194,7 +194,7 @@ export function useShift() {
 
             const { data, error } = await supabase
                 .from('orders')
-                .select('id, order_number, total, payment_method, status, created_at, cashier_id')
+                .select('id, order_number, total, payment_method, status, created_at, staff_id')
                 .eq('pos_session_id', currentSession.id)
                 .eq('status', 'completed')
                 .order('created_at', { ascending: false })

@@ -65,6 +65,25 @@ export type TOfflineAuthError =
   | 'RATE_LIMITED';     // Too many failed attempts
 
 /**
+ * Rate limit entry persisted in IndexedDB
+ * Prevents brute-force PIN attacks across page refreshes
+ *
+ * Stored in Dexie table: offline_rate_limits
+ *
+ * @see Story 1.2: 3 attempts per 15 minutes
+ */
+export interface IOfflineRateLimit {
+  /** User UUID (primary key) */
+  id: string;
+
+  /** Number of consecutive failed attempts */
+  attempts: number;
+
+  /** ISO 8601 timestamp of last failed attempt */
+  last_attempt: string;
+}
+
+/**
  * Result of offline PIN verification
  * @see offlineAuthService.verifyPinOffline()
  */

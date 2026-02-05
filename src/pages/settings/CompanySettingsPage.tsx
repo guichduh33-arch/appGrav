@@ -2,11 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { Save, Upload, Building2, AlertCircle, Loader2, Trash2 } from 'lucide-react';
 import { useSettingsByCategory, useUpdateSetting } from '../../hooks/settings';
 import { usePermissions } from '../../hooks/usePermissions';
-import { supabase } from '../../lib/supabase';
+import { companyAssetsService } from '../../services/storage';
 import { toast } from 'sonner';
 
 // Company form data interface
-interface CompanyFormData {
+interface ICompanyFormData {
   name: string;
   legal_name: string;
   npwp: string;
@@ -17,7 +17,7 @@ interface CompanyFormData {
 }
 
 // Validation errors interface
-interface ValidationErrors {
+interface IValidationErrors {
   name?: string;
   email?: string;
   phone?: string;
@@ -36,7 +36,7 @@ const COMPANY_SETTINGS_KEYS = {
 } as const;
 
 // Default form values
-const defaultFormData: CompanyFormData = {
+const defaultFormData: ICompanyFormData = {
   name: '',
   legal_name: '',
   npwp: '',
@@ -65,8 +65,8 @@ const parseSettingValue = (value: unknown): string => {
 /**
  * Validate company form data
  */
-const validateForm = (data: CompanyFormData): ValidationErrors => {
-  const errors: ValidationErrors = {};
+const validateForm = (data: ICompanyFormData): IValidationErrors => {
+  const errors: IValidationErrors = {};
 
   // Company name is required
   if (!data.name?.trim()) {
@@ -101,8 +101,8 @@ const CompanySettingsPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
-  const [formData, setFormData] = useState<CompanyFormData>(defaultFormData);
-  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [formData, setFormData] = useState<ICompanyFormData>(defaultFormData);
+  const [errors, setErrors] = useState<IValidationErrors>({});
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -110,7 +110,7 @@ const CompanySettingsPage = () => {
   // Initialize form from settings
   useEffect(() => {
     if (settings && settings.length > 0) {
-      const newFormData: CompanyFormData = { ...defaultFormData };
+      const newFormData: ICompanyFormData = { ...defaultFormData };
 
       settings.forEach((setting) => {
         const value = parseSettingValue(setting.value);
@@ -145,15 +145,15 @@ const CompanySettingsPage = () => {
   }, [settings]);
 
   // Handle field change
-  const handleChange = (field: keyof CompanyFormData, value: string) => {
+  const handleChange = (field: keyof ICompanyFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setIsDirty(true);
 
     // Clear error for this field
-    if (errors[field as keyof ValidationErrors]) {
+    if (errors[field as keyof IValidationErrors]) {
       setErrors((prev) => {
         const next = { ...prev };
-        delete next[field as keyof ValidationErrors];
+        delete next[field as keyof IValidationErrors];
         return next;
       });
     }
@@ -181,53 +181,19 @@ const CompanySettingsPage = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
-      return;
-    }
-
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Image must be smaller than 2MB');
-      return;
-    }
-
     setIsUploading(true);
 
     try {
-      // Generate unique filename with fallback for missing extension
-      const fileExt = file.name.includes('.') ? file.name.split('.').pop() : 'png';
-      const fileName = `logo_${Date.now()}.${fileExt}`;
+      // Use service to replace logo (handles upload + old logo deletion)
+      const result = await companyAssetsService.replaceLogo(file, formData.logo_url || undefined);
 
-      // Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from('company-assets')
-        .upload(`logos/${fileName}`, file, {
-          cacheControl: '3600',
-          upsert: true,
-          contentType: file.type,
-        });
-
-      if (uploadError) {
-        throw uploadError;
+      if (!result.success) {
+        toast.error(result.error || 'Failed to upload logo');
+        return;
       }
 
-      // Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from('company-assets')
-        .getPublicUrl(`logos/${fileName}`);
-
-      // Delete old logo if exists
-      if (formData.logo_url) {
-        const oldPath = formData.logo_url.split('/company-assets/')[1];
-        if (oldPath) {
-          await supabase.storage.from('company-assets').remove([oldPath]);
-        }
-      }
-
-      // Update form data
-      handleChange('logo_url', publicUrlData.publicUrl);
+      // Update form data with new URL
+      handleChange('logo_url', result.publicUrl!);
       toast.success('Logo uploaded successfully');
     } catch (error) {
       console.error('Logo upload error:', error);
@@ -247,12 +213,8 @@ const CompanySettingsPage = () => {
     if (!formData.logo_url) return;
 
     try {
-      // Delete from storage
-      const oldPath = formData.logo_url.split('/company-assets/')[1];
-      if (oldPath) {
-        await supabase.storage.from('company-assets').remove([oldPath]);
-      }
-
+      // Use service to delete logo
+      await companyAssetsService.deleteLogo(formData.logo_url);
       handleChange('logo_url', '');
       toast.success('Logo removed');
     } catch (error) {
