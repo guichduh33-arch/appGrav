@@ -62,6 +62,7 @@ describe('useDisplayBroadcast', () => {
     it('should broadcast cart update with correct format', () => {
       const { result } = renderHook(() => useDisplayBroadcast());
 
+      // Mock cart items with minimal required fields for broadcast
       const items = [
         {
           id: 'item-1',
@@ -74,7 +75,7 @@ describe('useDisplayBroadcast', () => {
           modifiersTotal: 0,
           notes: '',
         },
-      ];
+      ] as unknown as import('@/stores/cartStore').CartItem[];
 
       act(() => {
         result.current.broadcastCart(items, 50000, 0, 50000);
@@ -188,14 +189,26 @@ describe('useDisplayBroadcast', () => {
       const messageHandler = vi.fn();
       let capturedOnMessage: ((event: MessageEvent) => void) | null = null;
 
-      // Override to capture onmessage handler
-      class CaptureMockBroadcastChannel extends MockBroadcastChannel {
+      // Create a separate mock class to capture onmessage
+      class CaptureMockBroadcastChannel {
+        name: string;
+        private _onmessage: ((event: MessageEvent) => void) | null = null;
+
+        constructor(name: string) {
+          this.name = name;
+        }
+
         set onmessage(handler: ((event: MessageEvent) => void) | null) {
+          this._onmessage = handler;
           capturedOnMessage = handler;
         }
+
         get onmessage() {
-          return capturedOnMessage;
+          return this._onmessage;
         }
+
+        postMessage = mockPostMessage;
+        close = mockClose;
       }
 
       // @ts-expect-error - Override mock

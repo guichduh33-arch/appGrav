@@ -926,10 +926,10 @@ export interface ISessionPaymentTotals {
   card: number;
   /** Total QRIS payments in IDR */
   qris: number;
+  /** Total EDC payments in IDR */
+  edc: number;
   /** Total transfer payments in IDR */
   transfer: number;
-  /** Total e-wallet payments in IDR */
-  ewallet: number;
   /** Grand total of all payment methods in IDR */
   total: number;
 }
@@ -944,10 +944,10 @@ export interface ISessionClosingData {
   actual_card: number;
   /** Actual QRIS total at close */
   actual_qris: number;
+  /** Actual EDC total at close */
+  actual_edc: number;
   /** Actual transfer total at close */
   actual_transfer: number;
-  /** Actual ewallet total at close */
-  actual_ewallet: number;
   /** Notes explaining any variance */
   notes?: string;
 }

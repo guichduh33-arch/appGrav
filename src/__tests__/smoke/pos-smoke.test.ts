@@ -87,7 +87,7 @@ describe('POS Smoke Tests', () => {
       );
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Cash received is less than amount');
+      expect(result.errors).toContain('Cash received must be at least the payment amount');
     });
 
     it('should calculate change correctly', async () => {
@@ -126,7 +126,8 @@ describe('POS Smoke Tests', () => {
       );
 
       expect(result.valid).toBe(false);
-      expect(result.errors).toContain('Total payments (100000) less than order total (150000)');
+      // Error message includes localized numbers
+      expect(result.errors.some(e => e.includes('less than order total'))).toBe(true);
     });
   });
 

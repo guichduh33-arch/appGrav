@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Save, Upload, X, Building2, AlertCircle, Loader2, Trash2 } from 'lucide-react';
+import { Save, Upload, Building2, AlertCircle, Loader2, Trash2 } from 'lucide-react';
 import { useSettingsByCategory, useUpdateSetting } from '../../hooks/settings';
 import { usePermissions } from '../../hooks/usePermissions';
 import { supabase } from '../../lib/supabase';
@@ -201,7 +201,7 @@ const CompanySettingsPage = () => {
       const fileName = `logo_${Date.now()}.${fileExt}`;
 
       // Upload to Supabase Storage
-      const { data, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('company-assets')
         .upload(`logos/${fileName}`, file, {
           cacheControl: '3600',

@@ -164,7 +164,7 @@ describe('offlineSessionService', () => {
       expect(totals.card).toBe(0);
       expect(totals.qris).toBe(0);
       expect(totals.transfer).toBe(0);
-      expect(totals.ewallet).toBe(0);
+      expect(totals.edc).toBe(0);
       expect(totals.total).toBe(0);
     });
 
@@ -249,7 +249,7 @@ describe('offlineSessionService', () => {
         {
           id: 'pay-4',
           order_id: orderId2,
-          method: 'ewallet',
+          method: 'edc',
           amount: 20000,
           cash_received: null,
           change_given: null,
@@ -268,7 +268,7 @@ describe('offlineSessionService', () => {
       expect(totals.cash).toBe(50000);
       expect(totals.card).toBe(50000);
       expect(totals.qris).toBe(30000);
-      expect(totals.ewallet).toBe(20000);
+      expect(totals.edc).toBe(20000);
       expect(totals.transfer).toBe(0);
       expect(totals.total).toBe(150000);
     });
@@ -327,7 +327,7 @@ describe('offlineSessionService', () => {
         actual_card: 0,
         actual_qris: 0,
         actual_transfer: 0,
-        actual_ewallet: 0,
+        actual_edc: 0,
         notes: 'End of shift',
       };
 
@@ -383,7 +383,7 @@ describe('offlineSessionService', () => {
         actual_card: 0,
         actual_qris: 0,
         actual_transfer: 0,
-        actual_ewallet: 0,
+        actual_edc: 0,
       };
 
       const closed = await closeSession(session.id, closingData);
@@ -439,7 +439,7 @@ describe('offlineSessionService', () => {
         actual_card: 0,
         actual_qris: 0,
         actual_transfer: 0,
-        actual_ewallet: 0,
+        actual_edc: 0,
       });
 
       expect(closed.cash_variance).toBe(20000);
@@ -491,7 +491,7 @@ describe('offlineSessionService', () => {
         actual_card: 0,
         actual_qris: 0,
         actual_transfer: 0,
-        actual_ewallet: 0,
+        actual_edc: 0,
       });
 
       expect(closed.cash_variance).toBe(-20000);
@@ -505,7 +505,7 @@ describe('offlineSessionService', () => {
         actual_card: 0,
         actual_qris: 0,
         actual_transfer: 0,
-        actual_ewallet: 0,
+        actual_edc: 0,
       });
 
       const syncItems = await db.offline_sync_queue.toArray();
@@ -521,7 +521,7 @@ describe('offlineSessionService', () => {
           actual_card: 0,
           actual_qris: 0,
           actual_transfer: 0,
-          actual_ewallet: 0,
+          actual_edc: 0,
         })
       ).rejects.toThrow('Session not found');
     });
@@ -534,7 +534,7 @@ describe('offlineSessionService', () => {
         actual_card: 0,
         actual_qris: 0,
         actual_transfer: 0,
-        actual_ewallet: 0,
+        actual_edc: 0,
       });
 
       await expect(
@@ -543,7 +543,7 @@ describe('offlineSessionService', () => {
           actual_card: 0,
           actual_qris: 0,
           actual_transfer: 0,
-          actual_ewallet: 0,
+          actual_edc: 0,
         })
       ).rejects.toThrow('Session is not open');
     });

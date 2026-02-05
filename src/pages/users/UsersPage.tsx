@@ -74,6 +74,8 @@ const UsersPage = () => {
       setRoles(rolesData);
 
       // Load users with roles
+      // Note: Use !user_roles_user_id_fkey to specify which FK to use
+      // (there are 2 FKs from user_roles to user_profiles: user_id and assigned_by)
       let query = supabase
         .from('user_profiles')
         .select(`
@@ -89,7 +91,7 @@ const UsersPage = () => {
           is_active,
           last_login_at,
           created_at,
-          user_roles (
+          user_roles!user_roles_user_id_fkey (
             id,
             is_primary,
             role:roles (

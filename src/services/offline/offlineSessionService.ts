@@ -134,8 +134,8 @@ export async function calculateSessionTotals(
     cash: 0,
     card: 0,
     qris: 0,
+    edc: 0,
     transfer: 0,
-    ewallet: 0,
     total: 0,
   };
 
@@ -165,11 +165,11 @@ export async function calculateSessionTotals(
       case 'qris':
         totals.qris += amount;
         break;
+      case 'edc':
+        totals.edc += amount;
+        break;
       case 'transfer':
         totals.transfer += amount;
-        break;
-      case 'ewallet':
-        totals.ewallet += amount;
         break;
     }
     totals.total += amount;
@@ -212,14 +212,14 @@ export async function closeSession(
     cash: closingData.actual_cash,
     card: closingData.actual_card,
     qris: closingData.actual_qris,
+    edc: closingData.actual_edc,
     transfer: closingData.actual_transfer,
-    ewallet: closingData.actual_ewallet,
     total:
       closingData.actual_cash +
       closingData.actual_card +
       closingData.actual_qris +
-      closingData.actual_transfer +
-      closingData.actual_ewallet,
+      closingData.actual_edc +
+      closingData.actual_transfer,
   };
 
   // Calculate cash variance (including opening amount)
