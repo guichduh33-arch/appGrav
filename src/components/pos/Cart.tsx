@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
-import { Trash2, Tag, Lock, List, User, QrCode, Star } from 'lucide-react'
+import { Trash2, Tag, Lock, List, User, QrCode, Star, FileText, ChevronDown, ChevronUp } from 'lucide-react'
 import { useCartStore } from '../../stores/cartStore'
 import { PinVerificationModal, TableSelectionModal, DiscountModal, CustomerSearchModal } from './modals'
 import { LoyaltyBadge } from './LoyaltyBadge'
 import { CartItemRow, CartTotals, CartActions } from './cart-components'
 import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'
+import { useDisplayBroadcast } from '@/hooks/pos'
 import { getTierColor } from '@/constants/loyalty'
 import './Cart.css'
 import type { CartItem } from '../../stores/cartStore'
@@ -33,6 +34,7 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
         subtotal, discountAmount, total, updateItemQuantity, removeItem, clearCart, setDiscount,
         lockedItemIds, activeOrderNumber, isItemLocked, removeLockedItem,
         customerId, customerName, setCustomerWithCategorySlug,
+        orderNotes, setOrderNotes,
     } = useCartStore()
 
     const [showPinModal, setShowPinModal] = useState(false)
@@ -42,6 +44,15 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
     const [selectedItemForDiscount, setSelectedItemForDiscount] = useState<CartItem | null>(null)
     const [pendingDeleteItemId, setPendingDeleteItemId] = useState<string | null>(null)
     const [selectedCustomer, setSelectedCustomer] = useState<SelectedCustomer | null>(null)
+    const [showOrderNotes, setShowOrderNotes] = useState(false)
+
+    // Customer display broadcast
+    const { broadcastCart } = useDisplayBroadcast()
+
+    // Broadcast cart updates to customer display
+    useEffect(() => {
+        broadcastCart(items, subtotal, discountAmount, total)
+    }, [items, subtotal, discountAmount, total, broadcastCart])
 
     const displayOrderNumber = activeOrderNumber || `#${String(Date.now()).slice(-4)}`
     const hasLockedItems = lockedItemIds.length > 0
@@ -163,6 +174,28 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                         <button type="button" className="btn-add-customer" onClick={() => setShowCustomerModal(true)}>
                             <QrCode size={16} /><User size={16} /><span>Client</span>
                         </button>
+                    )}
+                </div>
+
+                {/* Order Notes (F3.3) */}
+                <div className="pos-cart__notes">
+                    <button
+                        type="button"
+                        className={`pos-cart__notes-toggle ${showOrderNotes || orderNotes ? 'has-notes' : ''}`}
+                        onClick={() => setShowOrderNotes(!showOrderNotes)}
+                    >
+                        <FileText size={16} />
+                        <span>{orderNotes ? 'Order Notes' : 'Add Notes'}</span>
+                        {showOrderNotes ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                    </button>
+                    {showOrderNotes && (
+                        <textarea
+                            className="pos-cart__notes-input"
+                            placeholder="Add special instructions for this order..."
+                            value={orderNotes}
+                            onChange={(e) => setOrderNotes(e.target.value)}
+                            rows={2}
+                        />
                     )}
                 </div>
             </div>

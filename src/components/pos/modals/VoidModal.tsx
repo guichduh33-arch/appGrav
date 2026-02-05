@@ -11,7 +11,7 @@
 import { useState, useCallback } from 'react';
 import { X, AlertTriangle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { PinVerificationModal } from './PinVerificationModal';
+import PinVerificationModal from './PinVerificationModal';
 import { voidOrder } from '@/services/financial/voidService';
 import { useAuthStore } from '@/stores/authStore';
 import { useNetworkStore } from '@/stores/networkStore';
@@ -42,7 +42,7 @@ export default function VoidModal({
   onVoid,
   onClose,
 }: VoidModalProps) {
-  const { user } = useAuthStore();
+  const { user: _user } = useAuthStore();
   const isOnline = useNetworkStore((state) => state.isOnline);
 
   // Form state

@@ -428,4 +428,7 @@ export const refundService = {
   syncRefundOperation,
 };
 
+// Alias for backward compatibility with modal imports
+export const processRefund = refundOrder;
+
 export default refundService;

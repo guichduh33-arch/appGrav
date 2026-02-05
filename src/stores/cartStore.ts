@@ -61,6 +61,9 @@ interface CartState {
     discountValue: number
     discountReason: string | null
 
+    // Order-level notes (F3.3)
+    orderNotes: string
+
     // Locked items tracking (items sent to kitchen)
     lockedItemIds: string[]
     activeOrderId: string | null
@@ -83,6 +86,7 @@ interface CartState {
     setTableNumber: (table: string | null) => void
     setCustomer: (id: string | null, name: string | null) => void
     setDiscount: (type: 'percent' | 'amount' | null, value: number, reason: string | null) => void
+    setOrderNotes: (notes: string) => void
 
     // Locked items actions
     lockCurrentItems: () => void
@@ -161,6 +165,7 @@ export const useCartStore = create<CartState>()(
     discountType: null,
     discountValue: 0,
     discountReason: null,
+    orderNotes: '',
     lockedItemIds: [],
     activeOrderId: null,
     activeOrderNumber: null,
@@ -290,6 +295,7 @@ export const useCartStore = create<CartState>()(
             discountType: null,
             discountValue: 0,
             discountReason: null,
+            orderNotes: '',
             lockedItemIds: [],
             activeOrderId: null,
             activeOrderNumber: null,
@@ -314,6 +320,10 @@ export const useCartStore = create<CartState>()(
             const totals = calculateTotals(state.items, discountType, discountValue)
             return { discountType, discountValue, discountReason, ...totals }
         })
+    },
+
+    setOrderNotes: (orderNotes) => {
+        set({ orderNotes })
     },
 
     // Locked items actions

@@ -23,14 +23,18 @@ import {
   Plus,
   Trash2,
   Building,
+  Loader2,
 } from 'lucide-react';
 import { useCartStore } from '../../../stores/cartStore';
 import { usePaymentStore } from '../../../stores/paymentStore';
 import { formatPrice } from '../../../utils/helpers';
 import { useOfflinePayment } from '../../../hooks/offline/useOfflinePayment';
 import { useNetworkStore } from '../../../stores/networkStore';
+import { useAuthStore } from '../../../stores/authStore';
 import { toast } from 'sonner';
 import type { TPaymentMethod } from '@/types/payment';
+import { printReceipt, type IOrderPrintData } from '@/services/print/printService';
+import { useDisplayBroadcast } from '@/hooks/pos';
 import './PaymentModal.css';
 
 interface PaymentModalProps {
@@ -54,8 +58,18 @@ const PAYMENT_METHODS: Array<{
 ];
 
 export default function PaymentModal({ onClose }: PaymentModalProps) {
-  const { total } = useCartStore();
+  const {
+    items: cartItems,
+    total,
+    subtotal,
+    discountAmount,
+    orderType,
+    tableNumber,
+    customerName,
+    activeOrderNumber,
+  } = useCartStore();
   const isOnline = useNetworkStore((state) => state.isOnline);
+  const { user } = useAuthStore();
 
   // Payment store for split payment state
   const {
@@ -79,10 +93,14 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
   const { processPayment, processSplitPayment, isProcessing, error, clearError } =
     useOfflinePayment();
 
+  // Display broadcast for customer display
+  const { broadcastOrderComplete, broadcastClear } = useDisplayBroadcast();
+
   // Local state
   const [showSuccess, setShowSuccess] = useState(false);
   const [successChange, setSuccessChange] = useState<number>(0);
   const [cashReceived, setCashReceived] = useState<number>(0);
+  const [isPrinting, setIsPrinting] = useState(false);
 
   // Track if error toast was shown
   const errorShownRef = useRef(false);
@@ -205,6 +223,10 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
         setSuccessChange(totalChange);
         setShowSuccess(true);
 
+        // Broadcast order completion to customer display
+        const orderNum = activeOrderNumber || `ORD-${Date.now()}`;
+        broadcastOrderComplete(orderNum, total, totalChange > 0 ? totalChange : undefined);
+
         if (!isOnline) {
           toast.success('Payment saved offline');
         }
@@ -212,14 +234,78 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
     } catch (err) {
       console.error('Payment error:', err);
     }
-  }, [isComplete, isProcessing, getPaymentInputs, processPayment, processSplitPayment, payments, isOnline]);
+  }, [isComplete, isProcessing, getPaymentInputs, processPayment, processSplitPayment, payments, isOnline, activeOrderNumber, total, broadcastOrderComplete]);
 
   // Handle new order
   const handleNewOrder = useCallback(() => {
+    // Clear customer display
+    broadcastClear();
     reset();
     onClose();
     toast.success('Ready for new order');
-  }, [reset, onClose]);
+  }, [reset, onClose, broadcastClear]);
+
+  // Handle print receipt
+  const handlePrint = useCallback(async () => {
+    setIsPrinting(true);
+
+    try {
+      // Calculate tax (10% included in prices: tax = total * 10/110)
+      const tax = Math.round(total * 10 / 110);
+
+      // Build order data for printing
+      const orderData: IOrderPrintData = {
+        orderNumber: activeOrderNumber || `ORD-${Date.now()}`,
+        orderType: orderType,
+        tableNumber: tableNumber || undefined,
+        customerName: customerName || undefined,
+        items: cartItems.map((item) => ({
+          name: item.type === 'combo' ? (item.combo?.name || 'Combo') : (item.product?.name || 'Product'),
+          quantity: item.quantity,
+          price: item.totalPrice,
+          modifiers: item.modifiers.map((m) => m.optionLabel),
+          notes: item.notes || undefined,
+        })),
+        subtotal: subtotal,
+        tax: tax,
+        discount: discountAmount > 0 ? discountAmount : undefined,
+        total: total,
+        payments: payments.map((p) => ({
+          method: p.method,
+          amount: p.amount,
+          reference: p.reference,
+        })),
+        change: successChange > 0 ? successChange : undefined,
+        cashierName: user?.name || user?.email || 'Cashier',
+        createdAt: new Date().toISOString(),
+      };
+
+      const result = await printReceipt(orderData);
+
+      if (result.success) {
+        toast.success('Receipt printed');
+      } else {
+        toast.error(result.error || 'Print failed');
+      }
+    } catch (err) {
+      console.error('Print error:', err);
+      toast.error('Failed to print receipt');
+    } finally {
+      setIsPrinting(false);
+    }
+  }, [
+    activeOrderNumber,
+    orderType,
+    tableNumber,
+    customerName,
+    cartItems,
+    subtotal,
+    discountAmount,
+    total,
+    payments,
+    successChange,
+    user,
+  ]);
 
   // Can add current payment?
   const canAddCurrent =
@@ -271,9 +357,22 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
             )}
 
             <div className="success-actions">
-              <button className="btn btn-secondary" onClick={() => toast('Printing receipt...')}>
-                <Printer size={18} className="mr-2" />
-                Print
+              <button
+                className="btn btn-secondary"
+                onClick={handlePrint}
+                disabled={isPrinting}
+              >
+                {isPrinting ? (
+                  <>
+                    <Loader2 size={18} className="mr-2 spin" />
+                    Printing...
+                  </>
+                ) : (
+                  <>
+                    <Printer size={18} className="mr-2" />
+                    Print
+                  </>
+                )}
               </button>
               <button className="btn btn-primary" onClick={handleNewOrder}>
                 <RotateCcw size={18} className="mr-2" />

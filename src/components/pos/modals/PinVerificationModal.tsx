@@ -25,8 +25,8 @@ interface PinVerificationModalProps {
 }
 
 export default function PinVerificationModal({
-    title = 'Vérification requise',
-    message = 'Entrez un code PIN manager pour continuer',
+    title = 'Verification Required',
+    message = 'Enter a manager PIN to continue',
     onVerify,
     onClose,
     allowedRoles = ['manager', 'admin']
@@ -51,7 +51,7 @@ export default function PinVerificationModal({
 
                 if (usersError) {
                     console.error('Error fetching users:', usersError)
-                    setError('Erreur de chargement des utilisateurs')
+                    setError('Error loading users')
                     return
                 }
 
@@ -116,7 +116,7 @@ export default function PinVerificationModal({
                 setUsers(filteredUsers)
             } catch (err) {
                 console.error('Error:', err)
-                setError('Erreur de connexion')
+                setError('Connection error')
             } finally {
                 setIsLoadingUsers(false)
             }
@@ -142,12 +142,12 @@ export default function PinVerificationModal({
 
     const handleVerify = async () => {
         if (pin.length < 4) {
-            setError('Code PIN trop court')
+            setError('PIN too short')
             return
         }
 
         if (users.length === 0) {
-            setError('Aucun utilisateur autorisé trouvé')
+            setError('No authorized user found')
             return
         }
 
@@ -179,13 +179,13 @@ export default function PinVerificationModal({
             }
 
             // No matching user found
-            setError('Code PIN invalide ou rôle non autorisé')
+            setError('Invalid PIN or unauthorized role')
             setIsShaking(true)
             setTimeout(() => setIsShaking(false), 500)
             setPin('')
         } catch (err) {
             console.error('Verification error:', err)
-            setError('Erreur de vérification')
+            setError('Verification error')
         } finally {
             setIsVerifying(false)
         }
@@ -264,10 +264,10 @@ export default function PinVerificationModal({
                         {isVerifying ? (
                             <>
                                 <Loader2 size={16} className="spin" />
-                                Vérification...
+                                Verifying...
                             </>
                         ) : (
-                            'Vérifier'
+                            'Verify'
                         )}
                     </button>
                 </div>

@@ -11,7 +11,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { X, DollarSign, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { PinVerificationModal } from './PinVerificationModal';
+import PinVerificationModal from './PinVerificationModal';
 import { processRefund } from '@/services/financial/refundService';
 import { useAuthStore } from '@/stores/authStore';
 import { useNetworkStore } from '@/stores/networkStore';
@@ -51,7 +51,7 @@ export default function RefundModal({
   onRefund,
   onClose,
 }: RefundModalProps) {
-  const { user } = useAuthStore();
+  const { user: _user } = useAuthStore();
   const isOnline = useNetworkStore((state) => state.isOnline);
 
   // Form state
