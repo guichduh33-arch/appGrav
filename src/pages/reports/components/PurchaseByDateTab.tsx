@@ -43,7 +43,7 @@ async function getPurchasesByDate(from: Date, to: Date): Promise<PurchaseByDate[
   const poIds = purchaseOrders.map((po) => po.id);
 
   // Fetch items count for these POs
-  let itemsByPo = new Map<string, number>();
+  const itemsByPo = new Map<string, number>();
   if (poIds.length > 0) {
     const { data: items } = await supabase
       .from('purchase_order_items')

@@ -140,7 +140,7 @@ const SettingField: React.FC<SettingFieldProps> = ({
           />
         );
 
-      case 'array':
+      case 'array': {
         // Render as comma-separated input for simple arrays
         const arrayValue = Array.isArray(parsedValue) ? parsedValue : [];
         return (
@@ -160,8 +160,9 @@ const SettingField: React.FC<SettingFieldProps> = ({
             disabled={disabled}
           />
         );
+      }
 
-      case 'json':
+      case 'json': {
         // For JSON, render a textarea with formatted JSON
         const jsonString = typeof parsedValue === 'object'
           ? JSON.stringify(parsedValue, null, 2)
@@ -182,6 +183,7 @@ const SettingField: React.FC<SettingFieldProps> = ({
             rows={4}
           />
         );
+      }
 
       case 'file':
         return (

@@ -217,7 +217,7 @@ export async function calculatePromotionDiscount(
                 }
                 break
 
-            case 'free_product':
+            case 'free_product': {
                 // Get free products
                 const { data: freeProductsData } = await supabase
                     .from('promotion_free_products')
@@ -236,6 +236,7 @@ export async function calculatePromotionDiscount(
                     freeProducts.push(...validItems)
                 }
                 break
+            }
         }
 
         return {

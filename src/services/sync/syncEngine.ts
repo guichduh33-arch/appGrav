@@ -32,7 +32,7 @@ interface ISyncEngineState {
   itemsFailed: number;
 }
 
-let engineState: ISyncEngineState = {
+const engineState: ISyncEngineState = {
   isRunning: false,
   lastSyncAt: null,
   itemsSynced: 0,

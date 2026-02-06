@@ -32,7 +32,8 @@ BEGIN
     -- Check if setting exists
     SELECT id, value INTO v_setting_id, v_old_value
     FROM settings
-    WHERE key = p_key;
+    WHERE key = p_key
+    FOR UPDATE;
 
     IF v_setting_id IS NULL THEN
         RETURN FALSE;

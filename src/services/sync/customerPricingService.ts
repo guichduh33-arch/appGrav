@@ -184,7 +184,7 @@ export async function calculateCustomerPricesBatch(
   const modifierType = category.price_modifier_type;
 
   // For custom pricing, batch fetch all custom prices for this category
-  let customPricesMap = new Map<string, IOfflineProductCategoryPrice>();
+  const customPricesMap = new Map<string, IOfflineProductCategoryPrice>();
   if (modifierType === 'custom') {
     const customPrices = await db.offline_product_category_prices
       .where('customer_category_id')

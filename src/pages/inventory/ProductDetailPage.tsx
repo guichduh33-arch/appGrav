@@ -279,7 +279,6 @@ export default function ProductDetailPage() {
                 .single()
 
             if (error) throw error
-            // @ts-ignore
             setRecipeItems([...recipeItems, data])
             setShowIngredientSearch(false)
         } catch (error) {

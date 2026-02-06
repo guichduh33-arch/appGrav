@@ -113,7 +113,7 @@ function toBusinessHours(offline: IOfflineBusinessHours): BusinessHours {
     day_of_week: offline.day_of_week,
     open_time: offline.open_time,
     close_time: offline.close_time,
-    is_closed: !Boolean(offline.is_open), // Negate is_open to is_closed
+    is_closed: !offline.is_open, // Negate is_open to is_closed
     break_start: null,
     break_end: null,
     created_at: '1970-01-01T00:00:00.000Z',

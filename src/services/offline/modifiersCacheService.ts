@@ -239,7 +239,7 @@ export function groupOfflineModifiers(
 
   for (const mod of modifiers) {
     // Skip inactive modifiers
-    if (!Boolean(mod.is_active)) continue;
+    if (!mod.is_active) continue;
 
     if (!groupMap.has(mod.group_name)) {
       groupMap.set(mod.group_name, {

@@ -643,20 +643,24 @@ export const useSettingsStore = create<SettingsState>()(
         const newAppearance = { ...get().appearance, ...updates };
         set({ appearance: newAppearance });
 
-        // Sync to database in background
+        // Sync to database in bulk
+        const dbUpdates: Record<string, unknown> = {};
         Object.entries(updates).forEach(([key, value]) => {
-          get().updateSetting(`appearance.${key}`, value);
+          dbUpdates[`appearance.${key}`] = value;
         });
+        get().updateSettings(dbUpdates);
       },
 
       setLocalization: (updates) => {
         const newLocalization = { ...get().localization, ...updates };
         set({ localization: newLocalization });
 
-        // Sync to database in background
+        // Sync to database in bulk
+        const dbUpdates: Record<string, unknown> = {};
         Object.entries(updates).forEach(([key, value]) => {
-          get().updateSetting(`localization.${key}`, value);
+          dbUpdates[`localization.${key}`] = value;
         });
+        get().updateSettings(dbUpdates);
       },
     }),
     {

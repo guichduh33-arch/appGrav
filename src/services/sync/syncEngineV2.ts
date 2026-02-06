@@ -60,7 +60,7 @@ interface ISyncEngineState {
   itemsFailed: number;
 }
 
-let engineState: ISyncEngineState = {
+const engineState: ISyncEngineState = {
   isRunning: false,
   lastSyncAt: null,
   itemsSynced: 0,
@@ -73,8 +73,8 @@ let startDelayTimeoutId: ReturnType<typeof setTimeout> | null = null;
 let autoSyncEnabled = true;
 
 // ID mappings for FK resolution during batch sync
-let sessionIdMap: Map<string, string> = new Map();
-let orderIdMap: Map<string, string> = new Map();
+const sessionIdMap: Map<string, string> = new Map();
+const orderIdMap: Map<string, string> = new Map();
 
 // =====================================================
 // Engine State Accessors

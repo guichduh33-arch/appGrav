@@ -65,7 +65,7 @@ export async function getCachedCategories(): Promise<IOfflineCategory[]> {
   // Filter: is_active = true AND is_raw_material = false
   // Note: Dexie stores booleans as 0/1, use Boolean() for coercion
   return categories
-    .filter((c) => Boolean(c.is_active) && !Boolean(c.is_raw_material))
+    .filter((c) => Boolean(c.is_active) && !c.is_raw_material)
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 }
 

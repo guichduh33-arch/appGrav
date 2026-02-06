@@ -193,7 +193,7 @@ export default function LoginPage() {
   // Legacy login for demo mode or when Edge Functions are unavailable
   const handleLegacyLogin = async () => {
     // First check if we have PIN in current users list
-    let user = users.find(u => u.id === selectedUser);
+    const user = users.find(u => u.id === selectedUser);
 
     if (!user) {
       setError('User not found');

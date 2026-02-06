@@ -180,7 +180,7 @@ describe('categoriesCacheService', () => {
 
       expect(categories).toHaveLength(3); // cat-1, cat-2, cat-5
       expect(categories.every(c => Boolean(c.is_active))).toBe(true);
-      expect(categories.every(c => !Boolean(c.is_raw_material))).toBe(true);
+      expect(categories.every(c => !c.is_raw_material)).toBe(true);
     });
 
     it('should sort categories by sort_order', async () => {
