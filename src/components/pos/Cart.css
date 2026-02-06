@@ -96,6 +96,28 @@
 }
 
 /* Table Info Display */
+/* B2B Mode Banner (Story 6.7) */
+.pos-cart__b2b-banner {
+    margin-top: 6px;
+    padding: 6px 10px;
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #a78bfa;
+}
+
+.pos-cart__b2b-credit {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 400;
+    opacity: 0.8;
+}
+
 .pos-cart__table-info {
     margin-top: 6px;
     padding: 6px 10px;
@@ -305,6 +327,32 @@
     color: var(--color-primary-light);
     font-weight: 700;
     margin-right: 4px;
+}
+
+/* Combo selections (Story 6.6) */
+.cart-item__combo-selections {
+    margin-top: 3px;
+    padding-left: 12px;
+    border-left: 2px solid var(--color-gray-600);
+}
+
+.cart-item__combo-sel {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--color-gray-300);
+    line-height: 1.5;
+}
+
+.cart-item__combo-sel-name {
+    opacity: 0.85;
+}
+
+.cart-item__combo-sel-adj {
+    color: var(--color-primary-light);
+    font-weight: 500;
+    font-size: 10px;
 }
 
 .cart-item__mods {

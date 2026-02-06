@@ -44,7 +44,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
             // First, unset all units for this context
             const field = context === 'stock_opname' ? 'is_stock_opname_unit'
                 : context === 'recipe' ? 'is_consumption_unit'
-                : 'is_purchase_uom'
+                    : 'is_purchase_uom'
 
             // Unset all
             await supabase
@@ -87,7 +87,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
             setNewUOM({ uom_name: '', uom_code: '', conversion_factor: 1 })
             window.location.reload()
         } catch (error: any) {
-            alert('Erreur: ' + error.message)
+            alert('Error: ' + error.message)
         } finally {
             setSaving(false)
         }
@@ -104,23 +104,23 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
         {
             id: 'stock_opname' as UOMContext,
             label: 'Stock Opname',
-            description: 'Unité utilisée pour le comptage d\'inventaire',
+            description: 'Unit used for inventory counting',
             icon: ClipboardList,
             color: '#3B82F6',
             bgColor: '#EFF6FF'
         },
         {
             id: 'recipe' as UOMContext,
-            label: 'Recettes',
-            description: 'Unité utilisée dans les recettes de production',
+            label: 'Recipes',
+            description: 'Unit used in production recipes',
             icon: Scale,
             color: '#F59E0B',
             bgColor: '#FFFBEB'
         },
         {
             id: 'purchase' as UOMContext,
-            label: 'Achats (PO)',
-            description: 'Unité utilisée pour les commandes fournisseurs',
+            label: 'Purchases (PO)',
+            description: 'Unit used for supplier orders',
             icon: ShoppingCart,
             color: '#10B981',
             bgColor: '#ECFDF5'
@@ -145,10 +145,10 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                     </div>
                     <div style={{ flex: 1 }}>
                         <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: '#4A3728' }}>
-                            Unité de Base (Stock)
+                            Base Unit (Stock)
                         </h3>
                         <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8125rem', color: '#8B7355' }}>
-                            Toutes les conversions se font par rapport à cette unité
+                            All conversions are done relative to this unit
                         </p>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -164,7 +164,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                                 fontWeight: 700,
                                 fontSize: '1rem'
                             }}
-                            title="Unité de base"
+                            title="Base unit"
                         />
                     </div>
                 </div>
@@ -174,9 +174,9 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
             <div className="card">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                     <div>
-                        <h3 className="card-title" style={{ marginBottom: '0.25rem' }}>Unités Alternatives</h3>
+                        <h3 className="card-title" style={{ marginBottom: '0.25rem' }}>Alternative Units</h3>
                         <p style={{ margin: 0, fontSize: '0.8125rem', color: '#8B7355' }}>
-                            Définissez les unités d'achat ou de consommation
+                            Define purchase or consumption units
                         </p>
                     </div>
                     <button
@@ -194,7 +194,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                             cursor: 'pointer'
                         }}
                     >
-                        <Plus size={18} /> Nouvelle Unité
+                        <Plus size={18} /> New Unit
                     </button>
                 </div>
 
@@ -207,9 +207,9 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                         border: '2px dashed #E5E7EB'
                     }}>
                         <Package size={40} style={{ color: '#D1D5DB', margin: '0 auto 0.75rem' }} />
-                        <p style={{ margin: 0, color: '#6B7280' }}>Aucune unité alternative</p>
+                        <p style={{ margin: 0, color: '#6B7280' }}>No alternative unit</p>
                         <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8125rem', color: '#9CA3AF' }}>
-                            Ajoutez des unités comme "Sac 5kg", "Carton", etc.
+                            Add units like "Bag 5kg", "Box", etc.
                         </p>
                     </div>
                 ) : (
@@ -252,10 +252,10 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                                         <span style={{ padding: '0.25rem 0.5rem', background: '#DBEAFE', color: '#1D4ED8', borderRadius: '0.25rem', fontSize: '0.625rem', fontWeight: 600 }}>STOCK</span>
                                     )}
                                     {uom.is_consumption_unit && (
-                                        <span style={{ padding: '0.25rem 0.5rem', background: '#FEF3C7', color: '#B45309', borderRadius: '0.25rem', fontSize: '0.625rem', fontWeight: 600 }}>RECETTE</span>
+                                        <span style={{ padding: '0.25rem 0.5rem', background: '#FEF3C7', color: '#B45309', borderRadius: '0.25rem', fontSize: '0.625rem', fontWeight: 600 }}>RECIPE</span>
                                     )}
                                     {uom.is_purchase_uom && (
-                                        <span style={{ padding: '0.25rem 0.5rem', background: '#D1FAE5', color: '#047857', borderRadius: '0.25rem', fontSize: '0.625rem', fontWeight: 600 }}>ACHAT</span>
+                                        <span style={{ padding: '0.25rem 0.5rem', background: '#D1FAE5', color: '#047857', borderRadius: '0.25rem', fontSize: '0.625rem', fontWeight: 600 }}>PURCHASE</span>
                                     )}
                                 </div>
                                 <button
@@ -268,7 +268,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                                         cursor: 'pointer',
                                         borderRadius: '0.375rem'
                                     }}
-                                    title="Supprimer"
+                                    title="Delete"
                                 >
                                     <Trash2 size={18} />
                                 </button>
@@ -335,7 +335,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                                                 cursor: 'pointer'
                                             }}
                                         >
-                                            <option value="base">{product.unit} (Unité de base)</option>
+                                            <option value="base">{product.unit} (Base unit)</option>
                                             {uoms.map(uom => (
                                                 <option key={uom.id} value={uom.id}>
                                                     {uom.uom_name} (1 = {uom.conversion_factor} {product.unit})
@@ -369,18 +369,18 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                         maxWidth: '90vw'
                     }} onClick={e => e.stopPropagation()}>
                         <h3 style={{ margin: '0 0 1.5rem 0', fontSize: '1.125rem', fontWeight: 600 }}>
-                            Nouvelle Unité
+                            New Unit
                         </h3>
 
                         <div style={{ marginBottom: '1rem' }}>
                             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, fontSize: '0.875rem' }}>
-                                Nom de l'unité
+                                Unit name
                             </label>
                             <input
                                 type="text"
                                 value={newUOM.uom_name}
                                 onChange={e => setNewUOM({ ...newUOM, uom_name: e.target.value })}
-                                placeholder="Ex: Sac 5kg, Carton, Pack"
+                                placeholder="Ex: Bag 5kg, Box, Pack"
                                 style={{
                                     width: '100%',
                                     padding: '0.75rem',
@@ -393,10 +393,10 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
 
                         <div style={{ marginBottom: '1.5rem' }}>
                             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, fontSize: '0.875rem' }}>
-                                Facteur de conversion
+                                Conversion factor
                             </label>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <span style={{ color: '#6B7280' }}>1 {newUOM.uom_name || 'unité'} =</span>
+                                <span style={{ color: '#6B7280' }}>1 {newUOM.uom_name || 'unit'} =</span>
                                 <input
                                     type="number"
                                     value={newUOM.conversion_factor}
@@ -415,7 +415,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                                 <span style={{ fontWeight: 600 }}>{product.unit}</span>
                             </div>
                             <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#9CA3AF' }}>
-                                Ex: Si 1 Sac = 5000g, entrez 5000
+                                Ex: If 1 Bag = 5000g, enter 5000
                             </p>
                         </div>
 
@@ -432,7 +432,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                                     cursor: 'pointer'
                                 }}
                             >
-                                Annuler
+                                Cancel
                             </button>
                             <button
                                 onClick={handleAddUOM}
@@ -449,7 +449,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                                     opacity: saving || !newUOM.uom_name ? 0.5 : 1
                                 }}
                             >
-                                {saving ? 'Enregistrement...' : 'Ajouter'}
+                                {saving ? 'Saving...' : 'Add'}
                             </button>
                         </div>
                     </div>

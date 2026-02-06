@@ -3,15 +3,16 @@ import { Search, CheckCircle, Clock, Users, User } from 'lucide-react'
 
 import { useCartStore, CartItem } from '../../stores/cartStore'
 import { useAuthStore } from '../../stores/authStore'
-import { useProducts, useCategories } from '../../hooks/products'
+import { useProducts, useCategories, usePOSCombos } from '../../hooks/products'
 import { useNetworkAlerts } from '../../hooks/useNetworkAlerts'
 import { useSyncReport } from '../../hooks/useSyncReport'
 import { useLanHub } from '../../hooks/lan'
 import { useCartPriceRecalculation } from '../../hooks/pricing'
-import { usePOSModals, usePOSShift, usePOSOrders } from '../../hooks/pos'
+import { usePOSModals, usePOSShift, usePOSOrders, useCartPromotions } from '../../hooks/pos'
 import { PostOfflineSyncReport } from '../../components/sync/PostOfflineSyncReport'
 import CategoryNav from '../../components/pos/CategoryNav'
 import ProductGrid from '../../components/pos/ProductGrid'
+import ComboGrid from '../../components/pos/ComboGrid'
 import Cart from '../../components/pos/Cart'
 import POSMenu from '../../components/pos/POSMenu'
 import {
@@ -22,6 +23,7 @@ import {
     PinVerificationModal,
     TransactionHistoryModal,
     CashierAnalyticsModal,
+    ComboSelectorModal,
 } from '../../components/pos/modals'
 import {
     OpenShiftModal,
@@ -30,7 +32,7 @@ import {
     ShiftHistoryModal,
     ShiftStatsModal,
 } from '../../components/pos/shift'
-import type { Product } from '../../types/database'
+import type { Product, ProductCombo } from '../../types/database'
 import './POSMainPage.css'
 
 export default function POSMainPage() {
@@ -42,6 +44,9 @@ export default function POSMainPage() {
 
     // Enable automatic cart price recalculation on customer change (Story 6.2)
     useCartPriceRecalculation()
+
+    // Enable automatic promotion evaluation on cart changes (Story 6.5)
+    useCartPromotions()
 
     // Enable LAN Hub for KDS communication (Story 4.1)
     const { isRunning: lanHubRunning, error: lanHubError } = useLanHub({
@@ -65,6 +70,7 @@ export default function POSMainPage() {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+    const [selectedComboId, setSelectedComboId] = useState<string | null>(null)
     const [editItem, setEditItem] = useState<CartItem | undefined>(undefined)
 
     // Consolidated modal management
@@ -100,6 +106,7 @@ export default function POSMainPage() {
     // Data fetching
     const { data: categories = [], isLoading: categoriesLoading } = useCategories()
     const { data: products = [], isLoading: productsLoading } = useProducts(selectedCategory)
+    const { data: combos = [], isLoading: combosLoading } = usePOSCombos()
 
     // Filter products by search
     const filteredProducts = useMemo(() =>
@@ -128,6 +135,22 @@ export default function POSMainPage() {
         closeModal('variant')
         setSelectedProduct(null)
     }, [closeModal])
+
+    // Combo handlers (Story 6.6)
+    const handleComboClick = useCallback((combo: ProductCombo) => {
+        setSelectedComboId(combo.id)
+        openModal('combo')
+    }, [openModal])
+
+    const handleComboConfirm = useCallback((_combo: any, selectedItems: any[], totalPrice: number) => {
+        const combo = combos.find(c => c.id === selectedComboId)
+        if (combo) {
+            const { addCombo } = useCartStore.getState()
+            addCombo(combo, 1, selectedItems, totalPrice, '')
+        }
+        closeModal('combo')
+        setSelectedComboId(null)
+    }, [selectedComboId, combos, closeModal])
 
     // Shift request handlers
     const handleOpenShiftRequest = useCallback(() => {
@@ -198,6 +221,14 @@ export default function POSMainPage() {
                         </div>
                     </div>
                     <div className="pos-products__grid">
+                        {/* Combo deals (Story 6.6) */}
+                        {!selectedCategory && (
+                            <ComboGrid
+                                combos={combos}
+                                onComboClick={handleComboClick}
+                                isLoading={combosLoading}
+                            />
+                        )}
                         <ProductGrid
                             products={filteredProducts}
                             onProductClick={handleProductClick}
@@ -240,6 +271,14 @@ export default function POSMainPage() {
                         setSelectedProduct(null)
                         setEditItem(undefined)
                     }}
+                />
+            )}
+
+            {modals.combo && selectedComboId && (
+                <ComboSelectorModal
+                    comboId={selectedComboId}
+                    onClose={() => { closeModal('combo'); setSelectedComboId(null) }}
+                    onConfirm={handleComboConfirm}
                 />
             )}
 

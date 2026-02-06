@@ -18,6 +18,7 @@ export type TPOSModalName =
     | 'shiftHistory'
     | 'shiftStats'
     | 'noShift'
+    | 'combo'
 
 type TModalState = Record<TPOSModalName, boolean>
 
@@ -42,6 +43,7 @@ const initialState: TModalState = {
     shiftHistory: false,
     shiftStats: false,
     noShift: false,
+    combo: false,
 }
 
 function modalReducer(state: TModalState, action: TModalAction): TModalState {

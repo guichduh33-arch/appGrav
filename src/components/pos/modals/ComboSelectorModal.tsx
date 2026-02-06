@@ -109,7 +109,7 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
 
         } catch (err) {
             console.error('Error fetching combo:', err)
-            setError('Erreur lors du chargement du combo')
+            setError('Error loading combo')
         } finally {
             setLoading(false)
         }
@@ -131,7 +131,7 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
             } else {
                 // Check max selections
                 if (groupSelections.size >= (group.max_selections ?? 1)) {
-                    setError(`Maximum ${group.max_selections ?? 1} sélection(s) pour ${group.name}`)
+                    setError(`Maximum ${group.max_selections ?? 1} selection(s) for ${group.name}`)
                     setTimeout(() => setError(''), 3000)
                     return
                 }
@@ -170,23 +170,23 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
     }
 
     const validateSelections = (): string | null => {
-        if (!combo) return 'Combo non chargé'
+        if (!combo) return 'Combo not loaded'
 
         for (const group of combo.groups) {
             const groupSelections = selections.get(group.id) || new Set()
 
             if (group.is_required && groupSelections.size === 0) {
-                return `Veuillez choisir une option pour ${group.name}`
+                return `Please choose an option for ${group.name}`
             }
 
             // Multi-selection validation
             const isMultiSelection = (group.max_selections ?? 1) > 1
             if (isMultiSelection) {
                 if (groupSelections.size < (group.min_selections ?? 0)) {
-                    return `Minimum ${group.min_selections ?? 0} sélection(s) pour ${group.name}`
+                    return `Minimum ${group.min_selections ?? 0} selection(s) for ${group.name}`
                 }
                 if (groupSelections.size > (group.max_selections ?? 1)) {
-                    return `Maximum ${group.max_selections ?? 1} sélection(s) pour ${group.name}`
+                    return `Maximum ${group.max_selections ?? 1} selection(s) for ${group.name}`
                 }
             }
         }
@@ -295,13 +295,13 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                                     <h3>
                                         {group.name}
                                         {group.is_required && <span className="required-badge">*</span>}
-                                        {!group.is_required && <span className="optional-badge">Optionnel</span>}
+                                        {!group.is_required && <span className="optional-badge">Optional</span>}
                                     </h3>
                                     {(group.max_selections ?? 1) > 1 && (
                                         <span className="selection-hint">
                                             {group.min_selections === group.max_selections
-                                                ? `Choisir ${group.min_selections}`
-                                                : `Choisir ${group.min_selections ?? 0}-${group.max_selections}`}
+                                                ? `Choose ${group.min_selections}`
+                                                : `Choose ${group.min_selections ?? 0}-${group.max_selections}`}
                                         </span>
                                     )}
                                 </div>
@@ -365,7 +365,7 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                             className="btn btn-primary"
                             onClick={handleConfirm}
                         >
-                            Ajouter au panier
+                            Add to Cart
                         </button>
                     </div>
                 </div>

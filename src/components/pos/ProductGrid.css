@@ -149,6 +149,27 @@
     opacity: 0.8;
 }
 
+/* Combo Badge */
+.pos-product-card--combo {
+    border-color: var(--color-primary);
+}
+
+.pos-product-card__combo-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 3px 8px;
+    background: var(--color-primary);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: var(--radius-full);
+    z-index: 2;
+    pointer-events: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 /* Skeleton */
 .pos-product-card-skeleton {
     height: 200px;

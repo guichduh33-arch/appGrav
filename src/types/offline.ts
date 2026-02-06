@@ -374,6 +374,9 @@ export interface IOfflineProduct {
   /** Product type: finished, semi_finished, raw_material */
   product_type: string | null;
 
+  /** Units of measure (e.g., 'pcs', 'kg') */
+  unit?: string | null;
+
   /** Retail price in IDR */
   retail_price: number;
 
@@ -385,6 +388,9 @@ export interface IOfflineProduct {
 
   /** Current stock quantity */
   current_stock: number | null;
+
+  /** Minimum stock level for alerts */
+  min_stock_level?: number | null;
 
   /** Product image URL */
   image_url: string | null;
@@ -1586,7 +1592,7 @@ export interface IOfflinePeriod {
  * Legacy sync queue type identifiers
  * Used by services/sync/* for order sync operations
  */
-export type TLegacySyncQueueType = 'order' | 'payment' | 'stock_movement';
+export type TLegacySyncQueueType = 'order' | 'payment' | 'stock_movement' | 'product' | 'category' | 'product_category_price';
 
 /**
  * Legacy sync queue status
@@ -1605,6 +1611,12 @@ export interface ILegacySyncQueueItem {
 
   /** Type of transaction */
   type: TLegacySyncQueueType;
+
+  /** UUID of the entity being synced (optional for legacy) */
+  entityId?: string;
+
+  /** CRUD action: create, update, delete (optional for legacy) */
+  action?: 'create' | 'update' | 'delete';
 
   /** Transaction payload data */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

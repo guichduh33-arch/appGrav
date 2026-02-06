@@ -38,7 +38,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
 }) => {
     // Get the purchase unit for cost display
     const purchaseUnit = uoms.find(u => u.is_purchase_uom) || uoms[0]
-    const costUnitLabel = purchaseUnit?.uom_name || product.unit || 'unité'
+    const costUnitLabel = purchaseUnit?.uom_name || product.unit || 'unit'
     const handleSectionToggle = (sectionId: string) => {
         if (selectedSections.includes(sectionId)) {
             const newSections = selectedSections.filter(id => id !== sectionId)
@@ -81,16 +81,16 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
     return (
         <div className="grid grid-cols-2 gap-6">
             <div className="card">
-                <h3 className="card-title">Identité du Produit</h3>
+                <h3 className="card-title">Product Identity</h3>
                 <div className="form-section">
                     <div className="form-group">
-                        <label htmlFor="prod-name">Nom du produit</label>
+                        <label htmlFor="prod-name">Product Name</label>
                         <input
                             id="prod-name"
                             className="form-input"
                             value={product.name}
                             onChange={e => onChange({ ...product, name: e.target.value })}
-                            placeholder="Ex: Baguette Tradition"
+                            placeholder="Ex: Tradition Baguette"
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -104,14 +104,14 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="prod-cat">Catégorie</label>
+                            <label htmlFor="prod-cat">Category</label>
                             <select
                                 id="prod-cat"
                                 className="form-select"
                                 value={product.category_id || ''}
                                 onChange={e => onChange({ ...product, category_id: e.target.value })}
                             >
-                                <option value="">Sélectionner...</option>
+                                <option value="">Select...</option>
                                 {categories.map(c => (
                                     <option key={c.id} value={c.id}>{c.name}</option>
                                 ))}
@@ -137,7 +137,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                 <div className="form-section">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="form-group">
-                            <label htmlFor="prod-price">Prix de Vente</label>
+                            <label htmlFor="prod-price">Retail Price</label>
                             <div className="form-input-prefix">
                                 <span>Rp</span>
                                 <input
@@ -150,7 +150,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                             </div>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="prod-cost">Coût Fixe <span className="label-unit-suffix">/ {costUnitLabel}</span></label>
+                            <label htmlFor="prod-cost">Fixed Cost <span className="label-unit-suffix">/ {costUnitLabel}</span></label>
                             <div className="form-input-prefix">
                                 <span>Rp</span>
                                 <input
@@ -175,8 +175,8 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                                 onChange={e => onChange({ ...product, pos_visible: e.target.checked })}
                             />
                             <div>
-                                <span className="font-medium text-gray-900">Visible sur le POS</span>
-                                <p className="text-xs text-gray-500 mt-1">Si décoché, le produit ne sera pas proposé aux vendeurs.</p>
+                                <span className="font-medium text-gray-900">Visible on POS</span>
+                                <p className="text-xs text-gray-500 mt-1">If unchecked, the product will not be available in POS.</p>
                             </div>
                         </label>
                     </div>
@@ -190,8 +190,8 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                                 onChange={e => onChange({ ...product, deduct_ingredients: e.target.checked })}
                             />
                             <div>
-                                <span className="font-medium text-gray-900">Déduire les ingrédients à la vente</span>
-                                <p className="text-xs text-gray-500 mt-1">Pour les produits faits à la demande (café, sandwiches, etc.). Les ingrédients de la recette seront automatiquement déduits du stock lors de chaque vente.</p>
+                                <span className="font-medium text-gray-900">Deduct ingredients on sale</span>
+                                <p className="text-xs text-gray-500 mt-1">For products made to order (coffee, sandwiches, etc.). Recipe ingredients will be automatically deducted from stock upon each sale.</p>
                             </div>
                         </label>
                     </div>
@@ -202,9 +202,9 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
             <div className="card col-span-2">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                     <div>
-                        <h3 className="card-title" style={{ marginBottom: '0.25rem' }}>Sections d'utilisation</h3>
+                        <h3 className="card-title" style={{ marginBottom: '0.25rem' }}>Usage Sections</h3>
                         <p style={{ fontSize: '0.8125rem', color: '#8B7355', margin: 0 }}>
-                            Sélectionnez où ce produit peut être utilisé. Cliquez sur l'étoile pour définir la section principale.
+                            Select where this product can be used. Click the star to set the primary section.
                         </p>
                     </div>
                     {selectedSections.length > 0 && (
@@ -216,7 +216,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                             fontSize: '0.875rem',
                             fontWeight: 600
                         }}>
-                            {selectedSections.length} section{selectedSections.length > 1 ? 's' : ''} sélectionnée{selectedSections.length > 1 ? 's' : ''}
+                            {selectedSections.length} section{selectedSections.length > 1 ? 's' : ''} selected
                         </div>
                     )}
                 </div>
@@ -230,9 +230,9 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                         border: '2px dashed #E5E7EB'
                     }}>
                         <Layers size={48} style={{ color: '#D1D5DB', margin: '0 auto 1rem' }} />
-                        <p style={{ color: '#6B7280', margin: 0 }}>Aucune section configurée.</p>
+                        <p style={{ color: '#6B7280', margin: 0 }}>No sections configured.</p>
                         <p style={{ color: '#9CA3AF', fontSize: '0.875rem', marginTop: '0.5rem' }}>
-                            Créez des sections dans Paramètres → Sections
+                            Create sections in Settings → Sections
                         </p>
                     </div>
                 ) : (
@@ -329,7 +329,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                                                 fontWeight: 600,
                                                 textTransform: 'uppercase',
                                                 letterSpacing: '0.025em'
-                                            }}>Vente</span>
+                                            }}>Sales</span>
                                         )}
                                         {((section as any).section_type === 'warehouse' || (section as any).is_warehouse) && (
                                             <span style={{
@@ -341,7 +341,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                                                 fontWeight: 600,
                                                 textTransform: 'uppercase',
                                                 letterSpacing: '0.025em'
-                                            }}>Entrepôt</span>
+                                            }}>Warehouse</span>
                                         )}
                                     </div>
 
@@ -368,7 +368,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                                             }}
                                         >
                                             <Star size={14} fill={isPrimary ? 'white' : 'none'} />
-                                            {isPrimary ? 'Section Principale' : 'Définir comme principale'}
+                                            {isPrimary ? 'Primary Section' : 'Set as primary'}
                                         </button>
                                     )}
                                 </div>

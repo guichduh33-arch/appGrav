@@ -36,6 +36,7 @@ import type { TPaymentMethod } from '@/types/payment';
 import { printReceipt, type IOrderPrintData } from '@/services/print/printService';
 import { useDisplayBroadcast } from '@/hooks/pos';
 import { calculateTaxAmount } from '@/services/offline/offlineOrderService';
+import { createB2BPosOrder } from '@/services/b2b/b2bPosOrderService';
 import './PaymentModal.css';
 
 interface PaymentModalProps {
@@ -58,6 +59,14 @@ const PAYMENT_METHODS: Array<{
     { id: 'transfer', name: 'Transfer', icon: Building, requiresReference: true },
   ];
 
+// B2B Store Credit method (Story 6.7)
+const B2B_PAYMENT_METHOD = {
+  id: 'store_credit' as TPaymentMethod,
+  name: 'Store Credit',
+  icon: Building,
+  requiresReference: false,
+};
+
 export default function PaymentModal({ onClose }: PaymentModalProps) {
   const {
     items: cartItems,
@@ -67,6 +76,8 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
     orderType,
     tableNumber,
     customerName,
+    customerId,
+    customerCategorySlug,
     activeOrderNumber,
   } = useCartStore();
   const isOnline = useNetworkStore((state) => state.isOnline);
@@ -213,6 +224,32 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
       }
 
       if (result) {
+        // Create B2B order if store credit was used (Story 6.7)
+        // The B2B order tracks the accounts receivable (credit debt), linked to the POS order
+        const hasStoreCredit = payments.some(p => p.method === 'store_credit');
+        if (hasStoreCredit && customerId && customerCategorySlug === 'wholesale') {
+          const posOrderId = typeof result === 'object' && result !== null && 'id' in result
+            ? (result as { id: string }).id
+            : undefined;
+          const b2bResult = await createB2BPosOrder({
+            customerId,
+            customerName: customerName || 'B2B Customer',
+            items: cartItems,
+            subtotal,
+            discountAmount,
+            total,
+            orderNotes: '',
+            createdBy: user?.id || '',
+            posOrderId,
+          });
+
+          if (b2bResult.success) {
+            toast.success(`B2B order ${b2bResult.orderNumber} created on credit`);
+          } else {
+            toast.error(`B2B order failed: ${b2bResult.error}`);
+          }
+        }
+
         // Calculate total change from all cash payments
         const totalChange = payments.reduce((sum, p) => {
           if (p.method === 'cash' && p.cashReceived) {
@@ -235,7 +272,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
     } catch (err) {
       console.error('Payment error:', err);
     }
-  }, [isComplete, isProcessing, getPaymentInputs, processPayment, processSplitPayment, payments, isOnline, activeOrderNumber, total, broadcastOrderComplete]);
+  }, [isComplete, isProcessing, getPaymentInputs, processPayment, processSplitPayment, payments, isOnline, activeOrderNumber, total, broadcastOrderComplete, customerId, customerName, customerCategorySlug, cartItems, subtotal, discountAmount, user]);
 
   // Handle new order
   const handleNewOrder = useCallback(() => {
@@ -480,7 +517,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                   {payments.length > 0 ? 'ADD ANOTHER PAYMENT' : 'PAYMENT METHOD'}
                 </label>
                 <div className="payment-methods">
-                  {PAYMENT_METHODS.map((method) => {
+                  {[...PAYMENT_METHODS, ...(customerCategorySlug === 'wholesale' ? [B2B_PAYMENT_METHOD] : [])].map((method) => {
                     const Icon = method.icon;
                     return (
                       <div key={method.id} className="payment-method">

@@ -8,12 +8,12 @@
 import { supabase } from '@/lib/supabase'
 
 export interface IRecipeImport {
-    product_name?: string    // Nom du produit fini (prioritaire)
-    material_name?: string   // Nom de l'ingrédient (prioritaire)
-    product_sku?: string     // SKU du produit fini (fallback)
-    material_sku?: string    // SKU de l'ingrédient (fallback)
-    quantity: number         // Quantité nécessaire
-    unit?: string            // Unité (optionnel, utilise l'unité du matériau par défaut)
+    product_name?: string    // Product name (priority)
+    material_name?: string   // Ingredient name (priority)
+    product_sku?: string     // Product SKU (fallback)
+    material_sku?: string    // Ingredient SKU (fallback)
+    quantity: number         // Required quantity
+    unit?: string            // Unit (optional, defaults to material unit)
 }
 
 export interface IRecipeImportResult {
@@ -68,25 +68,25 @@ export async function exportRecipes(): Promise<{ success: boolean; error?: strin
         }
 
         const csvContent = csvRows.join('\n')
-        downloadCSV(csvContent, `recettes_${new Date().toISOString().split('T')[0]}.csv`)
+        downloadCSV(csvContent, `recipes_${new Date().toISOString().split('T')[0]}.csv`)
 
         return { success: true }
     } catch (err) {
         console.error('Export recipes error:', err)
-        return { success: false, error: 'Erreur lors de l\'export des recettes' }
+        return { success: false, error: 'Error during recipe export' }
     }
 }
 
 // Download recipe import template
 export function downloadRecipeImportTemplate(): void {
     const template = `product_name,material_name,quantity,unit
-Croissant,Beurre,0.250,kg
-Croissant,Farine T45,0.100,kg
-Croissant,Levure,2,pièce
-Pain au chocolat,Beurre,0.200,kg
-Pain au chocolat,Chocolat noir,0.050,kg`
+Croissant,Butter,0.250,kg
+Croissant,Flour T45,0.100,kg
+Croissant,Yeast,2,piece
+Chocolate croissant,Butter,0.200,kg
+Chocolate croissant,Dark chocolate,0.050,kg`
 
-    downloadCSV(template, 'template_import_recettes.csv')
+    downloadCSV(template, 'recipe_import_template.csv')
 }
 
 // Parse CSV file
@@ -158,7 +158,7 @@ export async function importRecipes(
             success: false,
             created: 0,
             updated: 0,
-            errors: [{ row: 0, product: '', material: '', error: 'Fichier vide ou format invalide' }]
+            errors: [{ row: 0, product: '', material: '', error: 'Empty file or invalid format' }]
         }
     }
 
@@ -195,7 +195,7 @@ export async function importRecipes(
                 return matches[0]
             }
             if (matches && matches.length > 1) {
-                throw new Error(`Plusieurs produits trouvés avec le nom "${name}". Utilisez le SKU pour lever l'ambiguïté.`)
+                throw new Error(`Multiple products found with name "${name}". Use SKU to disambiguate.`)
             }
         }
 
@@ -224,30 +224,30 @@ export async function importRecipes(
         try {
             // Validate required fields
             if ((!productName && !productSku) || (!materialName && !materialSku) || !row.quantity) {
-                throw new Error('Champs obligatoires manquants (product_name/sku, material_name/sku, quantity)')
+                throw new Error('Missing required fields (product_name/sku, material_name/sku, quantity)')
             }
 
             // Parse quantity
             const quantity = parseFloat(row.quantity)
             if (isNaN(quantity) || quantity <= 0) {
-                throw new Error('Quantité invalide (doit être un nombre positif)')
+                throw new Error('Invalid quantity (must be a positive number)')
             }
 
             // Look up product (finished product)
             const product = findProduct(productName, productSku)
             if (!product) {
-                throw new Error(`Produit fini "${productIdentifier}" non trouvé`)
+                throw new Error(`Product "${productIdentifier}" not found`)
             }
 
             // Look up material (ingredient)
             const material = findProduct(materialName, materialSku)
             if (!material) {
-                throw new Error(`Ingrédient "${materialIdentifier}" non trouvé`)
+                throw new Error(`Ingredient "${materialIdentifier}" not found`)
             }
 
             // Prevent self-reference
             if (product.id === material.id) {
-                throw new Error('Un produit ne peut pas être son propre ingrédient')
+                throw new Error('A product cannot be its own ingredient')
             }
 
             // Determine unit (use provided or material's default unit)
@@ -280,7 +280,7 @@ export async function importRecipes(
                         row: rowNum,
                         product: productIdentifier,
                         material: materialIdentifier,
-                        error: 'Recette existe déjà (activer "Mettre à jour" pour modifier)'
+                        error: 'Recipe already exists (enable "Update" to modify)'
                     })
                     continue
                 }
@@ -303,7 +303,7 @@ export async function importRecipes(
                 row: rowNum,
                 product: productIdentifier,
                 material: materialIdentifier,
-                error: err instanceof Error ? err.message : 'Erreur inconnue'
+                error: err instanceof Error ? err.message : 'Unknown error'
             })
 
             if (!options?.skipErrors) {

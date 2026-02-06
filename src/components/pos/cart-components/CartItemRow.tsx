@@ -1,6 +1,7 @@
-import { Trash2, Tag, Plus, Minus, Lock } from 'lucide-react'
+import { Trash2, Tag, Plus, Minus, Lock, Percent } from 'lucide-react'
 import { formatPrice } from '@/utils/helpers'
-import type { CartItem } from '@/stores/cartStore'
+import { useCartStore, type CartItem } from '@/stores/cartStore'
+import type { IItemPromotionDiscount } from '@/services/pos/promotionEngine'
 
 interface CartItemRowProps {
     item: CartItem
@@ -19,6 +20,9 @@ export function CartItemRow({
     onDeleteClick,
     onDiscountClick,
 }: CartItemRowProps) {
+    const itemPromotions = useCartStore(state => state.promotionDiscounts.filter(d => d.itemId === item.id))
+    const totalPromoDiscount = itemPromotions.reduce((sum, d) => sum + d.discountAmount, 0)
+
     return (
         <div
             className={`cart-item ${isLocked ? 'is-locked' : ''}`}
@@ -30,6 +34,21 @@ export function CartItemRow({
                     <span className="cart-item__qty">{item.quantity}x</span>
                     {item.type === 'combo' ? item.combo?.name : item.product?.name}
                 </div>
+                {/* Combo selections (Story 6.6) */}
+                {item.type === 'combo' && item.comboSelections && item.comboSelections.length > 0 && (
+                    <div className="cart-item__combo-selections">
+                        {item.comboSelections.map((sel) => (
+                            <div key={sel.item_id} className="cart-item__combo-sel">
+                                <span className="cart-item__combo-sel-name">{sel.product_name}</span>
+                                {sel.price_adjustment !== 0 && (
+                                    <span className="cart-item__combo-sel-adj">
+                                        {sel.price_adjustment > 0 ? '+' : ''}{formatPrice(sel.price_adjustment)}
+                                    </span>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
                 {item.modifiers.length > 0 && (
                     <div className="cart-item__mods">
                         {item.modifiers.map(m => m.optionLabel).join(', ')}
@@ -37,6 +56,14 @@ export function CartItemRow({
                 )}
                 {item.notes && (
                     <div className="cart-item__notes">{item.notes}</div>
+                )}
+                {/* Promotion badges (Story 6.5) */}
+                {itemPromotions.length > 0 && (
+                    <div className="cart-item__promos">
+                        {itemPromotions.map((promo) => (
+                            <PromotionBadge key={promo.promotionId} discount={promo} />
+                        ))}
+                    </div>
                 )}
             </div>
 
@@ -84,7 +111,18 @@ export function CartItemRow({
                     </button>
 
                     <div className="cart-item__price">
-                        {formatPrice(item.totalPrice)}
+                        {totalPromoDiscount > 0 ? (
+                            <>
+                                <span style={{ textDecoration: 'line-through', color: '#94a3b8', fontSize: '11px' }}>
+                                    {formatPrice(item.totalPrice)}
+                                </span>
+                                <span style={{ color: '#059669', fontWeight: 600 }}>
+                                    {formatPrice(item.totalPrice - totalPromoDiscount)}
+                                </span>
+                            </>
+                        ) : (
+                            formatPrice(item.totalPrice)
+                        )}
                         {item.appliedPriceType && item.appliedPriceType !== 'retail' && (
                             <span
                                 className="cart-item__price-type"
@@ -130,5 +168,30 @@ export function CartItemRow({
                 </div>
             </div>
         </div>
+    )
+}
+
+function PromotionBadge({ discount }: { discount: IItemPromotionDiscount }) {
+    return (
+        <span
+            className="cart-item__promo-badge"
+            style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px',
+                fontSize: '9px',
+                fontWeight: 600,
+                color: '#ea580c',
+                backgroundColor: '#fff7ed',
+                border: '1px solid #fed7aa',
+                borderRadius: '4px',
+                padding: '1px 5px',
+                marginRight: '4px',
+            }}
+            title={`${discount.promotionName}: -${formatPrice(discount.discountAmount)}`}
+        >
+            <Percent size={8} />
+            {discount.description}
+        </span>
     )
 }

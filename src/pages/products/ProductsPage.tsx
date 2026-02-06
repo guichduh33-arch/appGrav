@@ -1,14 +1,15 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '@/lib/supabase'
+import { formatCurrency } from '../../utils/helpers'
+import { exportProducts, pushLocalProductsToCloud } from '@/services/products/productImportExport'
+import { exportRecipes } from '@/services/products/recipeImportExport'
+import { db } from '@/lib/db'
 import {
-    Package, Coffee, Croissant, Search, Plus,
+    Cloud, Package, Coffee, Croissant, Search, Plus,
     Eye, Edit, Tag, DollarSign, LayoutGrid, List,
     Upload, Download, ChefHat
 } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
-import { formatCurrency } from '../../utils/helpers'
-import { exportProducts } from '@/services/products/productImportExport'
-import { exportRecipes } from '@/services/products/recipeImportExport'
 import ProductImportModal from '@/components/products/ProductImportModal'
 import RecipeImportModal from '@/components/products/RecipeImportModal'
 import { toast } from 'sonner'
@@ -51,42 +52,17 @@ export default function ProductsPage() {
     const [showRecipeImportModal, setShowRecipeImportModal] = useState(false)
     const [exporting, setExporting] = useState(false)
     const [exportingRecipes, setExportingRecipes] = useState(false)
+    const [syncingToCloud, setSyncingToCloud] = useState(false)
+    const [localCount, setLocalCount] = useState(0)
 
     useEffect(() => {
+        const checkLocalData = async () => {
+            const count = await db.offline_products.count()
+            setLocalCount(count)
+        }
+        checkLocalData()
         fetchData()
     }, [])
-
-    const handleExport = async () => {
-        setExporting(true)
-        try {
-            const result = await exportProducts()
-            if (result.success) {
-                toast.success('Export réussi')
-            } else {
-                toast.error(result.error || 'Erreur lors de l\'export')
-            }
-        } catch (error) {
-            toast.error('Erreur lors de l\'export')
-        } finally {
-            setExporting(false)
-        }
-    }
-
-    const handleExportRecipes = async () => {
-        setExportingRecipes(true)
-        try {
-            const result = await exportRecipes()
-            if (result.success) {
-                toast.success('Export des recettes réussi')
-            } else {
-                toast.error(result.error || 'Erreur lors de l\'export des recettes')
-            }
-        } catch (error) {
-            toast.error('Erreur lors de l\'export des recettes')
-        } finally {
-            setExportingRecipes(false)
-        }
-    }
 
     const fetchData = async () => {
         try {
@@ -115,16 +91,72 @@ export default function ProductsPage() {
         }
     }
 
+    const handleExport = async () => {
+        setExporting(true)
+        try {
+            const result = await exportProducts()
+            if (result.success) {
+                toast.success('Export successful')
+            } else {
+                toast.error(result.error || 'Error during export')
+            }
+        } catch (error) {
+            toast.error('Error during export')
+        } finally {
+            setExporting(false)
+        }
+    }
+
+    const handleExportRecipes = async () => {
+        setExportingRecipes(true)
+        try {
+            const result = await exportRecipes()
+            if (result.success) {
+                toast.success('Recipes export successful')
+            } else {
+                toast.error(result.error || 'Error during recipes export')
+            }
+        } catch (error) {
+            toast.error('Error during recipes export')
+        } finally {
+            setExportingRecipes(false)
+        }
+    }
+
+    const handleSyncToCloud = async () => {
+        if (syncingToCloud) return
+        setSyncingToCloud(true)
+        const loadingToast = toast.loading('Syncing products to cloud...')
+
+        try {
+            const result = await pushLocalProductsToCloud()
+            toast.dismiss(loadingToast)
+
+            if (result.success) {
+                toast.success(`${result.created} products synced successfully`)
+                // Refresh data to show what's now in Supabase
+                fetchData()
+            } else {
+                toast.error(result.errors[0]?.error || 'Error during synchronization')
+            }
+        } catch (error) {
+            toast.dismiss(loadingToast)
+            toast.error('Unexpected error during synchronization')
+        } finally {
+            setSyncingToCloud(false)
+        }
+    }
+
     const stats = useMemo(() => {
         const all = products.length
-        const finished = products.filter(p => p.product_type === 'finished').length
-        const semiFinished = products.filter(p => p.product_type === 'semi_finished').length
-        const rawMaterial = products.filter(p => p.product_type === 'raw_material').length
+        const finished = products.filter((p: Product) => p.product_type === 'finished').length
+        const semiFinished = products.filter((p: Product) => p.product_type === 'semi_finished').length
+        const rawMaterial = products.filter((p: Product) => p.product_type === 'raw_material').length
         return { all, finished, semiFinished, rawMaterial }
     }, [products])
 
     const filteredProducts = useMemo(() => {
-        return products.filter(product => {
+        return products.filter((product: Product) => {
             const matchesSearch =
                 product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 product.sku?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -148,9 +180,9 @@ export default function ProductsPage() {
 
     const getProductTypeLabel = (type: string) => {
         switch (type) {
-            case 'finished': return 'Produit Fini'
-            case 'semi_finished': return 'Semi-Fini'
-            case 'raw_material': return 'Matière Première'
+            case 'finished': return 'Finished Product'
+            case 'semi_finished': return 'Semi-Finished'
+            case 'raw_material': return 'Raw Material'
             default: return type
         }
     }
@@ -162,47 +194,59 @@ export default function ProductsPage() {
                 <div className="products-header__info">
                     <h1 className="products-header__title">
                         <Package size={28} />
-                        Gestion des Produits
+                        Product Management
                     </h1>
                     <p className="products-header__subtitle">
-                        Gérez vos produits, prix et tarification par catégorie client
+                        Manage your products, prices and customer category pricing
                     </p>
                 </div>
                 <div className="products-header__actions">
+                    {localCount > 0 && products.length === 0 && (
+                        <button
+                            type="button"
+                            className="btn btn-warning"
+                            onClick={handleSyncToCloud}
+                            disabled={syncingToCloud}
+                            title="Push local products to Supabase"
+                        >
+                            <Cloud size={18} className={syncingToCloud ? 'animate-spin' : ''} />
+                            {syncingToCloud ? 'Sync in progress...' : 'Push to Cloud'}
+                        </button>
+                    )}
                     <button
                         type="button"
                         className="btn btn-outline"
                         onClick={handleExport}
                         disabled={exporting}
-                        title="Exporter les produits"
+                        title="Export products"
                     >
                         <Download size={18} />
-                        {exporting ? 'Export...' : 'Produits'}
+                        {exporting ? 'Export...' : 'Products'}
                     </button>
                     <button
                         type="button"
                         className="btn btn-outline"
                         onClick={() => setShowImportModal(true)}
-                        title="Importer des produits"
+                        title="Import products"
                     >
                         <Upload size={18} />
-                        Produits
+                        Products
                     </button>
                     <button
                         type="button"
                         className="btn btn-outline"
                         onClick={handleExportRecipes}
                         disabled={exportingRecipes}
-                        title="Exporter les recettes"
+                        title="Export recipes"
                     >
                         <ChefHat size={18} />
-                        {exportingRecipes ? 'Export...' : 'Recettes'}
+                        {exportingRecipes ? 'Export...' : 'Recipes'}
                     </button>
                     <button
                         type="button"
                         className="btn btn-outline"
                         onClick={() => setShowRecipeImportModal(true)}
-                        title="Importer des recettes"
+                        title="Import recipes"
                     >
                         <ChefHat size={18} />
                         <Upload size={14} style={{ marginLeft: -4 }} />
@@ -213,7 +257,7 @@ export default function ProductsPage() {
                         onClick={() => navigate('/products/new')}
                     >
                         <Plus size={18} />
-                        Nouveau Produit
+                        New Product
                     </button>
                 </div>
             </header>
@@ -227,7 +271,7 @@ export default function ProductsPage() {
                     <Package size={24} />
                     <div className="stat-content">
                         <span className="stat-value">{stats.all}</span>
-                        <span className="stat-label">Tous les produits</span>
+                        <span className="stat-label">All Products</span>
                     </div>
                 </div>
                 <div
@@ -237,7 +281,7 @@ export default function ProductsPage() {
                     <Coffee size={24} />
                     <div className="stat-content">
                         <span className="stat-value">{stats.finished}</span>
-                        <span className="stat-label">Produits Finis</span>
+                        <span className="stat-label">Finished Products</span>
                     </div>
                 </div>
                 <div
@@ -247,7 +291,7 @@ export default function ProductsPage() {
                     <Croissant size={24} />
                     <div className="stat-content">
                         <span className="stat-value">{stats.semiFinished}</span>
-                        <span className="stat-label">Semi-Finis</span>
+                        <span className="stat-label">Semi-Finished</span>
                     </div>
                 </div>
                 <div
@@ -257,7 +301,7 @@ export default function ProductsPage() {
                     <Package size={24} />
                     <div className="stat-content">
                         <span className="stat-value">{stats.rawMaterial}</span>
-                        <span className="stat-label">Matières Premières</span>
+                        <span className="stat-label">Raw Materials</span>
                     </div>
                 </div>
             </div>
@@ -268,7 +312,7 @@ export default function ProductsPage() {
                     <Search size={20} />
                     <input
                         type="text"
-                        placeholder="Rechercher par nom ou SKU..."
+                        placeholder="Search by name or SKU..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -277,9 +321,9 @@ export default function ProductsPage() {
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
                     className="products-filter"
-                    aria-label="Filtrer par catégorie"
+                    aria-label="Filter by category"
                 >
-                    <option value="all">Toutes catégories</option>
+                    <option value="all">All categories</option>
                     {categories.map(cat => (
                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                     ))}
@@ -288,16 +332,16 @@ export default function ProductsPage() {
                     <button
                         className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
                         onClick={() => setViewMode('grid')}
-                        title="Vue grille"
-                        aria-label="Vue grille"
+                        title="Grid view"
+                        aria-label="Grid view"
                     >
                         <LayoutGrid size={18} />
                     </button>
                     <button
                         className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
                         onClick={() => setViewMode('list')}
-                        title="Vue liste"
-                        aria-label="Vue liste"
+                        title="List view"
+                        aria-label="List view"
                     >
                         <List size={18} />
                     </button>
@@ -308,16 +352,16 @@ export default function ProductsPage() {
             {loading ? (
                 <div className="products-loading">
                     <div className="spinner"></div>
-                    <span>Chargement des produits...</span>
+                    <span>Loading products...</span>
                 </div>
             ) : filteredProducts.length === 0 ? (
                 <div className="products-empty">
                     <Package size={64} />
-                    <h3>Aucun produit trouvé</h3>
+                    <h3>No product found</h3>
                     <p>
                         {searchTerm || categoryFilter !== 'all'
-                            ? 'Essayez de modifier vos filtres'
-                            : 'Commencez par ajouter votre premier produit'}
+                            ? 'Try modifying your filters'
+                            : 'Start by adding your first product'}
                     </p>
                 </div>
             ) : viewMode === 'grid' ? (
@@ -360,7 +404,7 @@ export default function ProductsPage() {
                                     </div>
                                     {product.wholesale_price && (
                                         <div className="price">
-                                            <span className="price-label">Gros</span>
+                                            <span className="price-label">Wholesale</span>
                                             <span className="price-value">{formatCurrency(product.wholesale_price)}</span>
                                         </div>
                                     )}
@@ -368,10 +412,10 @@ export default function ProductsPage() {
                             </div>
                             <div className="product-card__footer">
                                 <span className={`status-badge ${product.is_active ? 'active' : 'inactive'}`}>
-                                    {product.is_active ? 'Actif' : 'Inactif'}
+                                    {product.is_active ? 'Active' : 'Inactive'}
                                 </span>
                                 <span className={`pos-badge ${product.pos_visible ? 'visible' : ''}`}>
-                                    {product.pos_visible ? 'POS' : 'Masqué'}
+                                    {product.pos_visible ? 'POS' : 'Hidden'}
                                 </span>
                             </div>
                             <div className="product-card__actions">
@@ -381,8 +425,8 @@ export default function ProductsPage() {
                                         e.stopPropagation()
                                         navigate(`/products/${product.id}`)
                                     }}
-                                    title="Voir détails"
-                                    aria-label="Voir détails"
+                                    title="View details"
+                                    aria-label="View details"
                                 >
                                     <Eye size={16} />
                                 </button>
@@ -392,8 +436,8 @@ export default function ProductsPage() {
                                         e.stopPropagation()
                                         navigate(`/products/${product.id}/edit`)
                                     }}
-                                    title="Modifier"
-                                    aria-label="Modifier"
+                                    title="Edit"
+                                    aria-label="Edit"
                                 >
                                     <Edit size={16} />
                                 </button>
@@ -403,8 +447,8 @@ export default function ProductsPage() {
                                         e.stopPropagation()
                                         navigate(`/products/${product.id}/pricing`)
                                     }}
-                                    title="Prix par catégorie"
-                                    aria-label="Prix par catégorie"
+                                    title="Price by category"
+                                    aria-label="Price by category"
                                 >
                                     <DollarSign size={16} />
                                 </button>
@@ -417,13 +461,13 @@ export default function ProductsPage() {
                     <table>
                         <thead>
                             <tr>
-                                <th>Produit</th>
+                                <th>Product</th>
                                 <th>SKU</th>
                                 <th>Type</th>
-                                <th>Catégorie</th>
-                                <th className="text-right">Prix Retail</th>
-                                <th className="text-right">Prix Gros</th>
-                                <th>Statut</th>
+                                <th>Category</th>
+                                <th className="text-right">Retail Price</th>
+                                <th className="text-right">Wholesale Price</th>
+                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -462,7 +506,7 @@ export default function ProductsPage() {
                                     </td>
                                     <td>
                                         <span className={`status-badge ${product.is_active ? 'active' : 'inactive'}`}>
-                                            {product.is_active ? 'Actif' : 'Inactif'}
+                                            {product.is_active ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
                                     <td className="actions-cell">
@@ -472,8 +516,8 @@ export default function ProductsPage() {
                                                 e.stopPropagation()
                                                 navigate(`/products/${product.id}`)
                                             }}
-                                            title="Voir"
-                                            aria-label="Voir"
+                                            title="View"
+                                            aria-label="View"
                                         >
                                             <Eye size={16} />
                                         </button>
@@ -483,8 +527,8 @@ export default function ProductsPage() {
                                                 e.stopPropagation()
                                                 navigate(`/products/${product.id}/pricing`)
                                             }}
-                                            title="Prix"
-                                            aria-label="Prix"
+                                            title="Prices"
+                                            aria-label="Prices"
                                         >
                                             <DollarSign size={16} />
                                         </button>
@@ -511,7 +555,7 @@ export default function ProductsPage() {
                 <RecipeImportModal
                     onClose={() => setShowRecipeImportModal(false)}
                     onSuccess={() => {
-                        toast.success('Recettes importées avec succès')
+                        toast.success('Recipes imported successfully')
                     }}
                 />
             )}

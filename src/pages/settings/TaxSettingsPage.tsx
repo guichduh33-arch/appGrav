@@ -84,7 +84,7 @@ const TaxSettingsPage = () => {
   // Handle save
   const handleSave = async () => {
     if (!formData.code || !formData.name_fr) {
-      toast.error('Le code et le nom sont requis');
+      toast.error('Code and name are required');
       return;
     }
 
@@ -94,31 +94,31 @@ const TaxSettingsPage = () => {
           id: editingRate.id,
           updates: formData,
         });
-        toast.success('Taux de taxe mis à jour');
+        toast.success('Tax rate updated');
       } else {
         await createTaxRate.mutateAsync(formData as Omit<TaxRate, 'id' | 'created_at' | 'updated_at'>);
-        toast.success('Taux de taxe créé');
+        toast.success('Tax rate created');
       }
       setShowModal(false);
     } catch (error) {
-      toast.error('Erreur lors de la sauvegarde');
+      toast.error('Error saving');
     }
   };
 
   // Handle delete
   const handleDelete = async (rate: TaxRate) => {
     if (rate.is_default) {
-      toast.error('Impossible de supprimer le taux par défaut');
+      toast.error('Cannot delete default tax rate');
       return;
     }
 
-    if (!confirm(`Supprimer le taux "${rate[nameKey]}" ?`)) return;
+    if (!confirm(`Delete rate "${rate[nameKey]}"?`)) return;
 
     try {
       await deleteTaxRate.mutateAsync(rate.id);
-      toast.success('Taux de taxe supprimé');
+      toast.success('Tax rate deleted');
     } catch (error) {
-      toast.error('Erreur lors de la suppression');
+      toast.error('Error deleting');
     }
   };
 
@@ -146,9 +146,9 @@ const TaxSettingsPage = () => {
         value: rate.code,
       });
 
-      toast.success(`${rate[nameKey]} défini par défaut`);
+      toast.success(`${rate[nameKey]} set as default`);
     } catch (error) {
-      toast.error('Erreur lors de la modification');
+      toast.error('Error updating');
     }
   };
 
@@ -156,9 +156,9 @@ const TaxSettingsPage = () => {
   const handleSettingChange = async (key: string, value: unknown) => {
     try {
       await updateSetting.mutateAsync({ key, value });
-      toast.success('Paramètre enregistré');
+      toast.success('Setting saved');
     } catch (error) {
-      toast.error('Erreur lors de la sauvegarde');
+      toast.error('Error saving');
     }
   };
 
@@ -171,14 +171,14 @@ const TaxSettingsPage = () => {
         <div className="settings-section__header">
           <div className="settings-section__header-content">
             <div>
-              <h2 className="settings-section__title">Taux de Taxe (PPN)</h2>
+              <h2 className="settings-section__title">Tax Rates (PPN)</h2>
               <p className="settings-section__description">
-                Gérez les taux de TVA applicables aux produits
+                Manage applicable VAT rates for products
               </p>
             </div>
             <button className="btn-primary" onClick={openCreateModal}>
               <Plus size={16} />
-              Nouveau Taux
+              New Rate
             </button>
           </div>
         </div>
@@ -187,16 +187,16 @@ const TaxSettingsPage = () => {
           {isLoading ? (
             <div className="settings-section__loading">
               <div className="spinner" />
-              <span>Chargement...</span>
+              <span>Loading...</span>
             </div>
           ) : taxRates?.length === 0 ? (
             <div className="settings-section__empty">
               <Percent size={48} />
-              <h3>Aucun taux de taxe</h3>
-              <p>Créez votre premier taux de taxe pour commencer.</p>
+              <h3>No tax rates</h3>
+              <p>Create your first tax rate to get started.</p>
               <button className="btn-primary" onClick={openCreateModal}>
                 <Plus size={16} />
-                Créer un taux
+                Create Rate
               </button>
             </div>
           ) : (
@@ -212,12 +212,12 @@ const TaxSettingsPage = () => {
                       {rate.is_default && (
                         <span className="tax-rate-item__default-badge">
                           <CheckCircle size={12} />
-                          Par défaut
+                          Default
                         </span>
                       )}
                       {!rate.is_active && (
                         <span className="tax-rate-item__inactive-badge">
-                          Inactif
+                          Inactive
                         </span>
                       )}
                     </div>
@@ -235,7 +235,7 @@ const TaxSettingsPage = () => {
                       <button
                         className="btn-ghost"
                         onClick={() => handleSetDefault(rate)}
-                        title="Définir par défaut"
+                        title="Set as default"
                       >
                         <CheckCircle size={16} />
                       </button>
@@ -243,14 +243,14 @@ const TaxSettingsPage = () => {
                     <button
                       className="btn-ghost"
                       onClick={() => openEditModal(rate)}
-                      title="Modifier"
+                      title="Edit"
                     >
                       <Edit2 size={16} />
                     </button>
                     <button
                       className="btn-ghost btn-ghost--danger"
                       onClick={() => handleDelete(rate)}
-                      title="Supprimer"
+                      title="Delete"
                       disabled={rate.is_default ?? false}
                     >
                       <Trash2 size={16} />
@@ -266,9 +266,9 @@ const TaxSettingsPage = () => {
       {/* Tax Settings Section */}
       <div className="settings-section">
         <div className="settings-section__header">
-          <h2 className="settings-section__title">Paramètres de Facturation</h2>
+          <h2 className="settings-section__title">Billing Settings</h2>
           <p className="settings-section__description">
-            Configuration de l'affichage et du calcul des taxes
+            Configure tax display and calculation
           </p>
         </div>
 
@@ -301,7 +301,7 @@ const TaxSettingsPage = () => {
           <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
             <div className="settings-modal__header">
               <h2 className="settings-modal__title">
-                {editingRate ? 'Modifier le Taux' : 'Nouveau Taux de Taxe'}
+                {editingRate ? 'Edit Tax Rate' : 'New Tax Rate'}
               </h2>
               <button className="settings-modal__close" onClick={() => setShowModal(false)}>
                 <X size={20} />
@@ -322,7 +322,7 @@ const TaxSettingsPage = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Taux (%) *</label>
+                  <label className="form-label">Rate (%) *</label>
                   <input
                     type="number"
                     className="form-input"
@@ -336,7 +336,7 @@ const TaxSettingsPage = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Nom (Français) *</label>
+                <label className="form-label">Name (French) *</label>
                 <input
                   type="text"
                   className="form-input"
@@ -348,7 +348,7 @@ const TaxSettingsPage = () => {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label className="form-label">Nom (Anglais)</label>
+                  <label className="form-label">Name (English)</label>
                   <input
                     type="text"
                     className="form-input"
@@ -358,7 +358,7 @@ const TaxSettingsPage = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Nom (Indonésien)</label>
+                  <label className="form-label">Name (Indonesian)</label>
                   <input
                     type="text"
                     className="form-input"
@@ -376,7 +376,7 @@ const TaxSettingsPage = () => {
                     checked={formData.is_inclusive}
                     onChange={(e) => setFormData({ ...formData, is_inclusive: e.target.checked })}
                   />
-                  <span>Prix TTC (taxe incluse dans le prix affiché)</span>
+                  <span>Tax-inclusive price (tax included in displayed price)</span>
                 </label>
               </div>
 
@@ -387,14 +387,14 @@ const TaxSettingsPage = () => {
                     checked={formData.is_active}
                     onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                   />
-                  <span>Actif</span>
+                  <span>Active</span>
                 </label>
               </div>
             </div>
 
             <div className="settings-modal__footer">
               <button className="btn-secondary" onClick={() => setShowModal(false)}>
-                Annuler
+                Cancel
               </button>
               <button
                 className="btn-primary"
@@ -402,7 +402,7 @@ const TaxSettingsPage = () => {
                 disabled={createTaxRate.isPending || updateTaxRate.isPending}
               >
                 <Save size={16} />
-                {editingRate ? 'Mettre à jour' : 'Créer'}
+                {editingRate ? 'Update' : 'Create'}
               </button>
             </div>
           </div>

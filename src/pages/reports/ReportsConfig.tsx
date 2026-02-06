@@ -36,7 +36,7 @@ export type ReportCategory = {
 export const REPORT_CATEGORIES: ReportCategory[] = [
     {
         id: 'overview',
-        title: 'reporting.tabs.overview', // utilizing existing translation keys where possible
+        title: 'Overview',
         icon: LayoutGrid,
         reports: [
             {
@@ -49,11 +49,11 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
     },
     {
         id: 'sales',
-        title: 'reporting.tabs.sales',
+        title: 'Sales',
         icon: DollarSign,
         reports: [
             {
-                id: 'all_in_one_sales',
+                id: 'sales_dashboard',
                 title: 'All in 1 Sales Summary',
                 description: 'Comprehensive sales overview',
                 icon: FileText
@@ -122,11 +122,11 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
     },
     {
         id: 'inventory',
-        title: 'reporting.tabs.inventory',
+        title: 'Inventory',
         icon: Package,
         reports: [
             {
-                id: 'stock_balance',
+                id: 'inventory_dashboard',
                 title: 'Product Stock Balance',
                 description: 'Current stock levels and valuation',
                 icon: LayoutGrid
@@ -234,6 +234,12 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 title: 'Expenses by Date',
                 description: 'Operational expenses',
                 icon: TrendingDown
+            },
+            {
+                id: 'discounts_voids',
+                title: 'Discounts & Voids',
+                description: 'Analysis of discounts, voids and refunds',
+                icon: AlertTriangle
             }
         ]
     },
@@ -258,6 +264,12 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 id: 'audit_log',
                 title: 'General Audit Log',
                 description: 'System-wide security events',
+                icon: ShieldAlert
+            },
+            {
+                id: 'alerts_dashboard',
+                title: 'Alerts Dashboard',
+                description: 'Smart anomaly detection alerts',
                 icon: ShieldAlert
             }
         ]

@@ -6,6 +6,7 @@
  */
 
 import { supabase } from '@/lib/supabase'
+import { db } from '@/lib/db'
 
 export interface IProductImport {
     sku: string
@@ -111,23 +112,23 @@ export async function exportProducts(): Promise<{ success: boolean; error?: stri
         }
 
         const csvContent = csvRows.join('\n')
-        downloadCSV(csvContent, `produits_${new Date().toISOString().split('T')[0]}.csv`)
+        downloadCSV(csvContent, `products_${new Date().toISOString().split('T')[0]}.csv`)
 
         return { success: true }
     } catch (err) {
         console.error('Export error:', err)
-        return { success: false, error: 'Erreur lors de l\'export' }
+        return { success: false, error: 'Error during export' }
     }
 }
 
 // Story 10.10: Export product template for import with sections
 export function downloadImportTemplate(): void {
     const template = `sku,name,description,category,section,product_type,unit,cost_price,sale_price,wholesale_price,min_stock_level,stock_quantity,is_active
-PRD-001,Pain au chocolat,Viennoiserie au chocolat,Viennoiseries,viennoiserie,finished,pièce,5000,15000,12000,10,50,true
-PRD-002,Baguette tradition,Pain tradition française,Pains,breakery,finished,pièce,3000,8000,6500,20,100,true
-ING-001,Farine T55,Farine de blé type 55,Ingrédients,warehouse,raw_material,kg,15000,0,,50,200,true`
+PRD-001,Chocolate croissant,Chocolate pastry,Pastries,pastry,finished,piece,5000,15000,12000,10,50,true
+PRD-002,Traditional baguette,French traditional bread,Breads,breakery,finished,piece,3000,8000,6500,20,100,true
+ING-001,Flour T55,Type 55 wheat flour,Ingredients,warehouse,raw_material,kg,15000,0,,50,200,true`
 
-    downloadCSV(template, 'template_import_produits.csv')
+    downloadCSV(template, 'product_import_template.csv')
 }
 
 // Story 10.10: Parse CSV file
@@ -199,7 +200,7 @@ export async function importProducts(
             success: false,
             created: 0,
             updated: 0,
-            errors: [{ row: 0, sku: '', error: 'Fichier vide ou format invalide' }]
+            errors: [{ row: 0, sku: '', error: 'Empty file or invalid format' }]
         }
     }
 
@@ -232,12 +233,12 @@ export async function importProducts(
         try {
             // Validate required fields
             if (!row.sku || !row.name || !row.product_type || !row.unit) {
-                throw new Error('Champs obligatoires manquants (sku, name, product_type, unit)')
+                throw new Error('Missing required fields (sku, name, product_type, unit)')
             }
 
             // Validate product_type
             if (!['finished', 'semi_finished', 'raw_material'].includes(row.product_type)) {
-                throw new Error('Type de produit invalide')
+                throw new Error('Invalid product type')
             }
 
             // Get category ID
@@ -264,7 +265,7 @@ export async function importProducts(
                 sectionId = sectionMap.get(row.section.toLowerCase()) || null
                 if (!sectionId) {
                     // Section not found - add warning but continue
-                    console.warn(`Section "${row.section}" non trouvée pour SKU ${row.sku}`)
+                    console.warn(`Section "${row.section}" not found for SKU ${row.sku}`)
                 }
             }
 
@@ -309,7 +310,7 @@ export async function importProducts(
                     result.errors.push({
                         row: rowNum,
                         sku: row.sku,
-                        error: 'Produit existe déjà (activer "Mettre à jour" pour modifier)'
+                        error: 'Product already exists (enable "Update" to modify)'
                     })
                     continue
                 }
@@ -351,7 +352,7 @@ export async function importProducts(
             result.errors.push({
                 row: rowNum,
                 sku: row.sku || '',
-                error: err instanceof Error ? err.message : 'Erreur inconnue'
+                error: err instanceof Error ? err.message : 'Unknown error'
             })
 
             if (!options?.skipErrors) {
@@ -363,6 +364,93 @@ export async function importProducts(
 
     if (result.errors.length > 0 && !options?.skipErrors) {
         result.success = false
+    }
+
+    return result
+}
+
+/**
+ * Push local IndexedDB products and categories to Supabase (Recovery Utility)
+ * 
+ * Used when products were imported locally but failed to reach the cloud.
+ */
+export async function pushLocalProductsToCloud(): Promise<IImportResult> {
+    const result: IImportResult = {
+        success: true,
+        created: 0,
+        updated: 0,
+        errors: []
+    }
+
+    try {
+        // 1. Get all local data
+        const localProducts = await db.offline_products.toArray()
+        const localCategories = await db.offline_categories.toArray()
+
+        if (localProducts.length === 0) {
+            return {
+                success: true,
+                created: 0,
+                updated: 0,
+                errors: [{ row: 0, sku: '', error: 'No local products to synchronize' }]
+            }
+        }
+
+        // 2. Sync Categories first
+        const categoryMap = new Map<string, string>()
+        for (const cat of localCategories) {
+            try {
+                const { data: syncedCat, error: catError } = await supabase
+                    .from('categories')
+                    .upsert({
+                        id: cat.id,
+                        name: cat.name,
+                        updated_at: new Date().toISOString()
+                    })
+                    .select('id')
+                    .single()
+
+                if (catError) throw catError
+                if (syncedCat) categoryMap.set(cat.id, syncedCat.id)
+            } catch (err: any) {
+                result.errors.push({ row: 0, sku: 'CAT', error: `Category ${cat.name}: ${err.message}` })
+            }
+        }
+
+        // 3. Sync Products
+        for (const prod of localProducts) {
+            try {
+                // Map fields from offline format to Supabase format
+                // Note: The offline table uses names consistent with Supabase but some fields might be missing
+                const { error: prodError } = await supabase
+                    .from('products')
+                    .upsert({
+                        id: prod.id,
+                        sku: prod.sku,
+                        name: prod.name,
+                        category_id: prod.category_id,
+                        product_type: prod.product_type,
+                        unit: prod.unit,
+                        cost_price: prod.cost_price,
+                        retail_price: prod.retail_price,
+                        wholesale_price: prod.wholesale_price,
+                        min_stock_level: prod.min_stock_level,
+                        current_stock: prod.current_stock,
+                        is_active: prod.is_active,
+                        pos_visible: prod.pos_visible,
+                        image_url: prod.image_url,
+                        updated_at: new Date().toISOString()
+                    })
+
+                if (prodError) throw prodError
+                result.created++ // Count as created/updated since it's an upsert
+            } catch (err: any) {
+                result.errors.push({ row: 0, sku: prod.sku || 'N/A', error: err.message })
+            }
+        }
+    } catch (err: any) {
+        result.success = false
+        result.errors.push({ row: 0, sku: 'GLOBAL', error: err.message })
     }
 
     return result

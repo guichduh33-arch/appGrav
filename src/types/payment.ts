@@ -10,7 +10,7 @@
 /**
  * Payment method - aligned with database enum `payment_method`
  */
-export type TPaymentMethod = 'cash' | 'card' | 'qris' | 'edc' | 'transfer';
+export type TPaymentMethod = 'cash' | 'card' | 'qris' | 'edc' | 'transfer' | 'store_credit';
 
 /**
  * Payment input for processing a single payment

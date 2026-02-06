@@ -113,7 +113,7 @@ export default function CombosPage() {
     )
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer ce combo ?')) return
+        if (!confirm('Are you sure you want to delete this combo?')) return
 
         try {
             const { error } = await supabase
@@ -200,10 +200,10 @@ export default function CombosPage() {
                 <div className="combos-header__info">
                     <h1 className="combos-header__title">
                         <Box size={28} />
-                        Gestion des Combos
+                        Combo Management
                     </h1>
                     <p className="combos-header__subtitle">
-                        Créez des offres groupées de produits à prix réduit
+                        Create bundles of products at a reduced price
                     </p>
                 </div>
                 <button
@@ -211,7 +211,7 @@ export default function CombosPage() {
                     onClick={() => navigate('/products/combos/new')}
                 >
                     <Plus size={18} />
-                    Nouveau Combo
+                    New Combo
                 </button>
             </header>
 
@@ -228,14 +228,14 @@ export default function CombosPage() {
                     <Package size={24} />
                     <div className="stat-content">
                         <span className="stat-value">{combos.filter(c => c.is_active).length}</span>
-                        <span className="stat-label">Actifs</span>
+                        <span className="stat-label">Active</span>
                     </div>
                 </div>
                 <div className="stat-card">
                     <AlertCircle size={24} />
                     <div className="stat-content">
                         <span className="stat-value">{combos.filter(c => !c.is_active).length}</span>
-                        <span className="stat-label">Inactifs</span>
+                        <span className="stat-label">Inactive</span>
                     </div>
                 </div>
             </div>
@@ -246,7 +246,7 @@ export default function CombosPage() {
                     <Search size={20} />
                     <input
                         type="text"
-                        placeholder="Rechercher un combo..."
+                        placeholder="Search for a combo..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -257,16 +257,16 @@ export default function CombosPage() {
             {loading ? (
                 <div className="combos-loading">
                     <div className="spinner"></div>
-                    <span>Chargement des combos...</span>
+                    <span>Loading combos...</span>
                 </div>
             ) : filteredCombos.length === 0 ? (
                 <div className="combos-empty">
                     <Box size={64} />
-                    <h3>Aucun combo trouvé</h3>
+                    <h3>No combo found</h3>
                     <p>
                         {searchTerm
-                            ? 'Essayez de modifier votre recherche'
-                            : 'Commencez par créer votre premier combo'}
+                            ? 'Try modifying your search'
+                            : 'Start by creating your first combo'}
                     </p>
                 </div>
             ) : (
@@ -295,7 +295,7 @@ export default function CombosPage() {
                                     <div className="combo-card__header">
                                         <h3 className="combo-card__name">{combo.name}</h3>
                                         {!combo.is_active && (
-                                            <span className="status-badge inactive">Inactif</span>
+                                            <span className="status-badge inactive">Inactive</span>
                                         )}
                                     </div>
 
@@ -304,22 +304,22 @@ export default function CombosPage() {
                                     )}
 
                                     <div className="combo-card__items">
-                                        <h4>Groupes de choix:</h4>
+                                        <h4>Choice Groups:</h4>
                                         {combo.groups.length === 0 ? (
-                                            <p className="no-groups">Aucun groupe configuré</p>
+                                            <p className="no-groups">No group configured</p>
                                         ) : (
                                             combo.groups.map((group, groupIdx) => (
                                                 <div key={groupIdx} className="group-summary">
                                                     <div className="group-name">
                                                         <strong>{group.name}</strong>
                                                         {!group.is_required && (
-                                                            <span className="optional-badge">Optionnel</span>
+                                                            <span className="optional-badge">Optional</span>
                                                         )}
                                                     </div>
                                                     <ul className="group-options">
                                                         {group.items.map((item, itemIdx) => (
                                                             <li key={itemIdx}>
-                                                                {item.product?.name || 'Produit inconnu'}
+                                                                {item.product?.name || 'Unknown product'}
                                                                 {(item.price_adjustment ?? 0) !== 0 && (
                                                                     <span className="price-adj">
                                                                         {(item.price_adjustment ?? 0) > 0 ? '+' : ''}
@@ -327,7 +327,7 @@ export default function CombosPage() {
                                                                     </span>
                                                                 )}
                                                                 {item.is_default && (
-                                                                    <span className="default-tag">Par défaut</span>
+                                                                    <span className="default-tag">Default</span>
                                                                 )}
                                                             </li>
                                                         ))}
@@ -341,12 +341,12 @@ export default function CombosPage() {
                                         <div className="price-comparison">
                                             {regularPrice > 0 && (
                                                 <div className="regular-price">
-                                                    <span className="label">Prix normal:</span>
+                                                    <span className="label">Regular price:</span>
                                                     <span className="value crossed">{formatCurrency(regularPrice)}</span>
                                                 </div>
                                             )}
                                             <div className="combo-price">
-                                                <span className="label">Prix combo:</span>
+                                                <span className="label">Combo price:</span>
                                                 {minPrice === maxPrice ? (
                                                     <span className="value highlight">{formatCurrency(minPrice)}</span>
                                                 ) : (
@@ -358,14 +358,14 @@ export default function CombosPage() {
                                         </div>
                                         {savings > 0 && (
                                             <div className="savings-badge">
-                                                Économie: {formatCurrency(savings)} ({savingsPercentage}%)
+                                                Savings: {formatCurrency(savings)} ({savingsPercentage}%)
                                             </div>
                                         )}
                                     </div>
 
                                     <div className="combo-card__footer">
                                         <span className={`pos-badge ${combo.available_at_pos ? 'visible' : ''}`}>
-                                            {combo.available_at_pos ? 'Visible POS' : 'Masqué POS'}
+                                            {combo.available_at_pos ? 'Visible POS' : 'Hidden POS'}
                                         </span>
                                     </div>
                                 </div>
@@ -374,28 +374,28 @@ export default function CombosPage() {
                                     <button
                                         className="btn-icon"
                                         onClick={() => navigate(`/products/combos/${combo.id}`)}
-                                        title="Voir détails"
+                                        title="View details"
                                     >
                                         <Eye size={16} />
                                     </button>
                                     <button
                                         className="btn-icon"
                                         onClick={() => navigate(`/products/combos/${combo.id}/edit`)}
-                                        title="Modifier"
+                                        title="Edit"
                                     >
                                         <Edit size={16} />
                                     </button>
                                     <button
                                         className={`btn-icon ${combo.is_active ? 'active' : 'inactive'}`}
                                         onClick={() => handleToggleActive(combo)}
-                                        title={combo.is_active ? 'Désactiver' : 'Activer'}
+                                        title={combo.is_active ? 'Deactivate' : 'Activate'}
                                     >
                                         <Package size={16} />
                                     </button>
                                     <button
                                         className="btn-icon danger"
                                         onClick={() => handleDelete(combo.id)}
-                                        title="Supprimer"
+                                        title="Delete"
                                     >
                                         <Trash2 size={16} />
                                     </button>

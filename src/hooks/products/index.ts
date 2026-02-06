@@ -13,5 +13,7 @@ export {
     type ModifierGroup
 } from './useProductModifiers'
 
+export { usePOSCombos } from './useCombos'
+
 // Re-export mock data for backward compatibility
 export { MOCK_CATEGORIES, MOCK_PRODUCTS } from '../useProducts'

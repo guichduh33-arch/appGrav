@@ -121,7 +121,7 @@ development_status:
 
   # Epic 5: Stock & Approvisionnement — Inventaire, Transferts & Achats
   # Note: Réouvert 2026-02-05 - stories 5.9-5.10 ajoutées pour trigger déduction stock ventes
-  epic-5: in-progress
+  epic-5: done  # 2026-02-06 - All stories complete, triggers deployed
   5-1-stock-levels-read-only-cache: done
   5-2-stock-alerts-offline-display: done
   5-3-stock-adjustment-online-only: done
@@ -130,52 +130,56 @@ development_status:
   5-6-purchase-order-creation: done
   5-7-purchase-order-workflow: done
   5-8-purchase-reception-stock-update: done
-  5-9-stock-deduction-on-sale: review  # 2026-02-05 - Trigger déduction auto à la vente
-  5-10-variant-ingredient-deduction: review  # 2026-02-05 - Déduction ingrédients variants
+  5-9-stock-deduction-on-sale: done  # 2026-02-06 - Migration applied, trigger active
+  5-10-variant-ingredient-deduction: done  # 2026-02-06 - Migration applied, variant logic active
   epic-5-retrospective: done  # 2026-02-04 (à refaire après 5.9-5.10)
 
   # Epic 6: Clients & Marketing — Fidélité, B2B, Combos & Promotions
-  epic-6: in-progress
+  epic-6: done  # 2026-02-06 - All 8 stories completed
   6-1-customers-offline-cache: done  # 2026-02-05
   6-2-customer-category-pricing-offline: done  # 2026-02-05
   6-3-loyalty-points-display-read-only: done  # 2026-02-05
-  6-4-promotions-offline-cache: review  # 2026-02-05 - All tasks completed, 50 tests passing
-  6-5-automatic-promotion-application: ready-for-dev  # 2026-02-05 - Story created
-  6-6-combos-selection-flow: ready-for-dev  # 2026-02-05 - Story created
-  6-7-b2b-order-creation: ready-for-dev  # 2026-02-05 - Story created
-  6-8-b2b-payments-tracking: ready-for-dev  # 2026-02-05 - Story created
+  6-4-promotions-offline-cache: done  # 2026-02-05 - All tasks completed, 50 tests passing
+  6-5-automatic-promotion-application: done  # 2026-02-06 - Engine + cart integration + UI, 26 tests passing
+  6-6-combos-selection-flow: done  # 2026-02-06 - POS integration + cart display, 18 tests passing
+  6-7-b2b-order-creation: done  # 2026-02-06 - B2B POS integration + store credit, 8 tests passing
+  6-8-b2b-payments-tracking: done  # 2026-02-06 - AR service + aging report + FIFO payment, 13 tests passing
   epic-6-retrospective: optional
 
   # Epic 7: Multi-Device — Customer Display, Mobile Serveurs & LAN Hub
-  epic-7: ready-for-dev
-  7-1-customer-display-socket-io-connection: ready-for-dev  # 2026-02-05 - Story created
-  7-2-customer-display-cart-updates: ready-for-dev  # 2026-02-05 - Story created
-  7-3-customer-display-total-branding: ready-for-dev  # 2026-02-05 - Story created
-  7-4-mobile-app-authentication: ready-for-dev  # 2026-02-05 - Story created
-  7-5-mobile-app-product-catalog: ready-for-dev  # 2026-02-05 - Story created
-  7-6-mobile-app-order-creation: ready-for-dev  # 2026-02-05 - Story created
-  7-7-mobile-app-order-status: ready-for-dev  # 2026-02-05 - Story created
-  7-8-lan-discovery-via-qr-code: ready-for-dev  # 2026-02-05 - Story created
-  7-9-system-monitoring-dashboard: ready-for-dev  # 2026-02-05 - Story created
-  7-10-offline-period-logging: ready-for-dev  # 2026-02-05 - Story created
-  7-11-print-server-deployment: ready-for-dev  # 2026-02-05 - Story created
-  7-12-receipt-printing-integration: ready-for-dev  # 2026-02-05 - Story created
-  7-13-kitchen-ticket-printing: ready-for-dev  # 2026-02-05 - Story created
-  7-14-cash-drawer-control: ready-for-dev  # 2026-02-05 - Story created
-  7-15-barista-ticket-printing: ready-for-dev  # 2026-02-05 - Story created
+  epic-7: done  # 2026-02-06 - All 15 stories completed
+  7-1-customer-display-socket-io-connection: done  # 2026-02-06 - lanClient/lanHub/lanProtocol already implemented in Epic 4
+  7-2-customer-display-cart-updates: done  # 2026-02-06 - displayBroadcast.ts + CustomerDisplayPage.tsx
+  7-3-customer-display-total-branding: done  # 2026-02-06 - CustomerDisplayPage.tsx with branding, idle promos
+  7-4-mobile-app-authentication: done  # 2026-02-06 - MobileLoginPage.tsx with PIN, lockout, session
+  7-5-mobile-app-product-catalog: done  # 2026-02-06 - MobileCatalogPage.tsx with search, modifiers, favorites
+  7-6-mobile-app-order-creation: done  # 2026-02-06 - MobileCartPage.tsx + MobileHomePage.tsx table picker
+  7-7-mobile-app-order-status: done  # 2026-02-06 - MobileOrdersPage.tsx with LAN status updates
+  7-8-lan-discovery-via-qr-code: done  # 2026-02-06 - QR/connection info in LanMonitoringPage
+  7-9-system-monitoring-dashboard: done  # 2026-02-06 - LanMonitoringPage.tsx with device grid, hub control, offline history
+  7-10-offline-period-logging: done  # 2026-02-06 - offlinePeriod.ts + LanMonitoringPage offline tab
+  7-11-print-server-deployment: done  # 2026-02-06 - print-server/ directory with full Node/Express implementation
+  7-12-receipt-printing-integration: done  # 2026-02-06 - printService.printReceipt() implemented
+  7-13-kitchen-ticket-printing: done  # 2026-02-06 - printService.printKitchenTicket() implemented
+  7-14-cash-drawer-control: done  # 2026-02-06 - printService.openCashDrawer() implemented
+  7-15-barista-ticket-printing: done  # 2026-02-06 - printService.printBaristaTicket() implemented
   epic-7-retrospective: optional
 
   # Epic 8: Analytics & Intelligence — Reports Complets
+  # Note: Stories rewritten 2026-02-06 after comprehensive audit of existing codebase
+  # Story 8.0 is a BLOCKING prerequisite for all other stories (missing DB migrations)
+  # Dependency chain: 8.0 → 8.1 → {8.2, 8.3, 8.4} → {8.5, 8.6, 8.7} → 8.8 → 8.9
   epic-8: ready-for-dev
-  8-1-report-framework-base: ready-for-dev  # 2026-02-05 - Story created
-  8-2-sales-reports-suite: ready-for-dev  # 2026-02-05 - Story created
-  8-3-inventory-reports-suite: ready-for-dev  # 2026-02-05 - Story created
-  8-4-financial-reports-suite: ready-for-dev  # 2026-02-05 - Story created
-  8-5-report-drill-down: ready-for-dev  # 2026-02-05 - Story created
-  8-6-report-export-csv-pdf: ready-for-dev  # 2026-02-05 - Story created
-  8-7-period-comparison: ready-for-dev  # 2026-02-05 - Story created
-  8-8-reports-offline-cache-7-days: ready-for-dev  # 2026-02-05 - Story created
-  8-9-audit-trail-alerts: ready-for-dev  # 2026-02-05 - Story created
+  8-0-reports-db-foundation: ready-for-dev  # 2026-02-06 - NEW: 8 missing views + system_alerts table + 2 RPCs
+  8-1-report-framework-base: ready-for-dev  # 2026-02-06 - REWRITTEN: Migrate 6 legacy tabs to Pattern B + recharts
+  8-2-sales-reports-suite: ready-for-dev  # 2026-02-06 - REWRITTEN: Tax KPI + top 10 + heatmap + filters
+  8-3-inventory-reports-suite: ready-for-dev  # 2026-02-06 - REWRITTEN: Enrich StockMovementTab + InventoryTab
+  8-4-financial-reports-suite: ready-for-dev  # 2026-02-06 - REWRITTEN: New DiscountsVoids tab + normalize purchase tabs
+  8-5-report-drill-down: ready-for-dev  # 2026-02-06 - REWRITTEN: Breadcrumb + useDrillDown + 3 tabs
+  8-6-report-export-csv-pdf: ready-for-dev  # 2026-02-06 - REWRITTEN: Coverage audit + progress indicator + perf
+  8-7-period-comparison: ready-for-dev  # 2026-02-06 - REWRITTEN: DateRangePicker compare mode + dual-series charts
+  8-8-reports-offline-cache-7-days: ready-for-dev  # 2026-02-06 - REWRITTEN: Dexie cache + sync + useOfflineReports
+  8-9-audit-trail-alerts: ready-for-dev  # 2026-02-06 - REWRITTEN: AuditTab refonte + AlertsDashboard + triggers
   epic-8-retrospective: optional
 
   # Epic 9: Comptabilité & Fiscalité — Journal, Grand Livre, États Financiers, TVA

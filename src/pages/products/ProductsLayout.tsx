@@ -12,7 +12,7 @@ type Tab = {
 const TABS: Tab[] = [
     {
         id: 'products',
-        label: 'Produits',
+        label: 'Products',
         icon: <Package size={18} />,
         path: '/products'
     },

@@ -82,6 +82,7 @@ const AuditPage = lazy(() => import('./pages/settings/AuditPage'))
 const SyncStatusPage = lazy(() => import('./pages/settings/SyncStatusPage'))
 const PrintingSettingsPage = lazy(() => import('./pages/settings/PrintingSettingsPage'))
 const NotificationSettingsPage = lazy(() => import('./pages/settings/NotificationSettingsPage'))
+const LanMonitoringPage = lazy(() => import('./pages/settings/LanMonitoringPage'))
 
 // Profile
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
@@ -367,6 +368,7 @@ function App() {
                             <Route path="sections" element={<SettingsPage />} />
                             <Route path="floorplan" element={<SettingsPage />} />
                             <Route path="kds" element={<SettingsPage />} />
+                            <Route path="lan" element={<LanMonitoringPage />} />
                         </Route>
                         {/* Settings sub-pages outside layout */}
                         <Route path="/settings/roles" element={<RolesPage />} />

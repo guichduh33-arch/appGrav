@@ -5,6 +5,7 @@ import {
     Building2, Crown, UserCheck, Plus, Trash2
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import { saveProductCategoryPrice } from '@/services/products/catalogSyncService'
 import { formatCurrency } from '../../utils/helpers'
 import { toast } from 'sonner'
 import './ProductCategoryPricingPage.css'
@@ -88,7 +89,7 @@ export default function ProductCategoryPricingPage() {
             }
         } catch (error) {
             console.error('Error fetching data:', error)
-            toast.error('Erreur lors du chargement')
+            toast.error('Error during loading')
             navigate('/products')
         } finally {
             setLoading(false)
@@ -193,35 +194,30 @@ export default function ProductCategoryPricingPage() {
         try {
             // Process each category price
             for (const cp of categoryPrices) {
-                if (cp.isNew && cp.is_active) {
-                    // Insert new
-                    const { error } = await supabase
-                        .from('product_category_prices')
-                        .insert({
-                            product_id: product.id,
-                            customer_category_id: cp.customer_category_id,
-                            price: cp.price,
-                            is_active: true
-                        })
-                    if (error) throw error
-                } else if (cp.id && cp.isModified) {
-                    // Update existing
-                    const { error } = await supabase
-                        .from('product_category_prices')
-                        .update({
-                            price: cp.price,
-                            is_active: cp.is_active
-                        })
-                        .eq('id', cp.id)
-                    if (error) throw error
+                if ((cp.isNew && cp.is_active) || cp.isModified) {
+                    const priceId = cp.id || crypto.randomUUID()
+
+                    const priceData = {
+                        id: priceId,
+                        product_id: product.id,
+                        customer_category_id: cp.customer_category_id,
+                        price: cp.price,
+                        is_active: cp.is_active
+                    }
+
+                    const result = await saveProductCategoryPrice(priceData as any)
+
+                    if (!result.success) {
+                        throw new Error(result.error)
+                    }
                 }
             }
 
-            toast.success('Prix enregistrés avec succès')
+            toast.success('Prices saved successfully')
             fetchData() // Refresh
         } catch (error) {
             console.error('Error saving prices:', error)
-            toast.error('Erreur lors de l\'enregistrement')
+            toast.error('Error during save')
         } finally {
             setSaving(false)
         }
@@ -240,7 +236,7 @@ export default function ProductCategoryPricingPage() {
             <div className="pricing-page">
                 <div className="pricing-loading">
                     <div className="spinner"></div>
-                    <span>Chargement...</span>
+                    <span>Loading...</span>
                 </div>
             </div>
         )
@@ -262,7 +258,7 @@ export default function ProductCategoryPricingPage() {
                     <div>
                         <h1 className="pricing-header__title">
                             <DollarSign size={28} />
-                            Prix par Catégorie Client
+                            Customer Category Pricing
                         </h1>
                         <p className="pricing-header__product">
                             <Tag size={14} />
@@ -277,24 +273,24 @@ export default function ProductCategoryPricingPage() {
                     disabled={saving}
                 >
                     <Save size={18} />
-                    {saving ? 'Enregistrement...' : 'Enregistrer'}
+                    {saving ? 'Saving...' : 'Save'}
                 </button>
             </header>
 
             {/* Reference Prices */}
             <div className="reference-prices">
-                <h2>Prix de Référence</h2>
+                <h2>Reference Prices</h2>
                 <div className="reference-grid">
                     <div className="reference-card">
-                        <span className="reference-label">Prix Retail</span>
+                        <span className="reference-label">Retail Price</span>
                         <span className="reference-value">{formatCurrency(product.retail_price)}</span>
                     </div>
                     <div className="reference-card">
-                        <span className="reference-label">Prix Wholesale</span>
+                        <span className="reference-label">Wholesale Price</span>
                         <span className="reference-value">
                             {product.wholesale_price
                                 ? formatCurrency(product.wholesale_price)
-                                : 'Non défini'}
+                                : 'Not defined'}
                         </span>
                     </div>
                 </div>
@@ -302,11 +298,11 @@ export default function ProductCategoryPricingPage() {
 
             {/* Category Prices */}
             <div className="category-prices-section">
-                <h2>Prix par Catégorie</h2>
+                <h2>Pricing by Category</h2>
                 <p className="section-description">
-                    Définissez des prix spécifiques pour chaque catégorie de client.
-                    Si aucun prix n'est défini, le système utilisera la logique de la catégorie
-                    (prix wholesale, réduction %, etc.)
+                    Define specific prices for each customer category.
+                    If no price is defined, the system will use the category logic
+                    (wholesale price, % discount, etc.)
                 </p>
 
                 {categoriesWithPrices.length > 0 ? (
@@ -334,11 +330,11 @@ export default function ProductCategoryPricingPage() {
                                         <div className="category-info">
                                             <span className="category-name">{category.name}</span>
                                             <span className="category-type">
-                                                {category.price_modifier_type === 'retail' && 'Prix Standard'}
-                                                {category.price_modifier_type === 'wholesale' && 'Prix de Gros'}
+                                                {category.price_modifier_type === 'retail' && 'Standard Price'}
+                                                {category.price_modifier_type === 'wholesale' && 'Wholesale Price'}
                                                 {category.price_modifier_type === 'discount_percentage' &&
-                                                    `${category.discount_percentage}% de réduction`}
-                                                {category.price_modifier_type === 'custom' && 'Prix Personnalisé'}
+                                                    `${category.discount_percentage}% discount`}
+                                                {category.price_modifier_type === 'custom' && 'Custom Price'}
                                             </span>
                                         </div>
                                         <div className="category-actions">
@@ -346,12 +342,12 @@ export default function ProductCategoryPricingPage() {
                                                 className={`btn-toggle ${cp.is_active ? 'active' : ''}`}
                                                 onClick={() => handleToggleActive(category.id)}
                                             >
-                                                {cp.is_active ? 'Actif' : 'Inactif'}
+                                                {cp.is_active ? 'Active' : 'Inactive'}
                                             </button>
                                             <button
                                                 className="btn-icon btn-danger"
                                                 onClick={() => handleRemovePrice(category.id)}
-                                                title="Supprimer"
+                                                title="Delete"
                                             >
                                                 <Trash2 size={16} />
                                             </button>
@@ -360,7 +356,7 @@ export default function ProductCategoryPricingPage() {
 
                                     <div className="category-price-card__content">
                                         <div className="price-input-group">
-                                            <label>Prix Personnalisé</label>
+                                            <label>Custom Price</label>
                                             <div className="price-input">
                                                 <span className="currency">Rp</span>
                                                 <input
@@ -375,11 +371,11 @@ export default function ProductCategoryPricingPage() {
 
                                         <div className="price-comparison">
                                             <div className="comparison-item">
-                                                <span className="comparison-label">Prix calculé auto:</span>
+                                                <span className="comparison-label">Auto price:</span>
                                                 <span className="comparison-value">{formatCurrency(calculatedPrice)}</span>
                                             </div>
                                             <div className="comparison-item">
-                                                <span className="comparison-label">Différence:</span>
+                                                <span className="comparison-label">Difference:</span>
                                                 <span className={`comparison-value ${difference > 0 ? 'positive' : difference < 0 ? 'negative' : ''}`}>
                                                     {difference > 0 ? '+' : ''}{formatCurrency(difference)}
                                                     <span className="percent">
@@ -396,8 +392,8 @@ export default function ProductCategoryPricingPage() {
                 ) : (
                     <div className="no-prices">
                         <DollarSign size={48} />
-                        <h3>Aucun prix personnalisé</h3>
-                        <p>Ajoutez des prix spécifiques pour chaque catégorie client</p>
+                        <h3>No custom price</h3>
+                        <p>Add specific prices for each customer category</p>
                     </div>
                 )}
 
@@ -406,7 +402,7 @@ export default function ProductCategoryPricingPage() {
                     <div className="add-category-section">
                         <h3>
                             <Plus size={18} />
-                            Ajouter une Catégorie
+                            Add a Category
                         </h3>
                         <div className="available-categories">
                             {categoriesWithoutPrices.map(category => (
@@ -425,7 +421,7 @@ export default function ProductCategoryPricingPage() {
                                     <div className="category-add-info">
                                         <span className="category-add-name">{category.name}</span>
                                         <span className="category-add-price">
-                                            Prix auto: {formatCurrency(getCalculatedPrice(category))}
+                                            Auto price: {formatCurrency(getCalculatedPrice(category))}
                                         </span>
                                     </div>
                                     <Plus size={16} />

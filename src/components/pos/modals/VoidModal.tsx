@@ -107,13 +107,14 @@ export default function VoidModal({
   );
 
   // Payment method display name
-  const paymentMethodName = {
+  const paymentMethodName: string = ({
     cash: 'Cash',
     card: 'Card',
     qris: 'QRIS',
     edc: 'EDC',
     transfer: 'Transfer',
-  }[paymentMethod];
+    store_credit: 'Store Credit',
+  } as Record<string, string>)[paymentMethod] || paymentMethod;
 
   return (
     <>

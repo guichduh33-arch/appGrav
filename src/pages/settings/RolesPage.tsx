@@ -145,7 +145,7 @@ export default function RolesPage() {
       setPermissions(mappedPerms as Permission[]);
     } catch (error) {
       console.error('Error loading roles:', error);
-      toast.error('Erreur de chargement');
+      toast.error('Error loading');
     } finally {
       setIsLoading(false);
     }
@@ -267,7 +267,7 @@ export default function RolesPage() {
       loadData();
     } catch (error) {
       console.error('Error saving role:', error);
-      toast.error(error instanceof Error ? error.message : 'Erreur lors de la sauvegarde');
+      toast.error(error instanceof Error ? error.message : 'Error saving');
     } finally {
       setIsSaving(false);
     }
@@ -275,7 +275,7 @@ export default function RolesPage() {
 
   const handleDelete = async (role: RoleWithPermissions) => {
     if (role.is_system) {
-      toast.error('Impossible de supprimer un rôle système');
+      toast.error('Cannot delete a system role');
       return;
     }
 
@@ -284,7 +284,7 @@ export default function RolesPage() {
       return;
     }
 
-    if (!confirm(`Supprimer le rôle "${getRoleName(role)}" ?`)) {
+    if (!confirm(`Delete role "${getRoleName(role)}"?`)) {
       return;
     }
 
@@ -305,7 +305,7 @@ export default function RolesPage() {
       loadData();
     } catch (error) {
       console.error('Error deleting role:', error);
-      toast.error(error instanceof Error ? error.message : 'Erreur lors de la suppression');
+      toast.error(error instanceof Error ? error.message : 'Error deleting');
     }
   };
 
@@ -360,7 +360,7 @@ export default function RolesPage() {
         <div className="settings-section">
           <div className="settings-section__body settings-section__loading">
             <div className="spinner" />
-            <span>Chargement des rôles...</span>
+            <span>Loading roles...</span>
           </div>
         </div>
       </div>
@@ -375,20 +375,20 @@ export default function RolesPage() {
           <Link
             to="/settings/security"
             className="btn-icon"
-            title="Retour aux paramètres"
+            title="Back to settings"
           >
             <ArrowLeft size={18} />
           </Link>
           <div>
-            <h1 className="settings-page__title">Gestion des Rôles</h1>
+            <h1 className="settings-page__title">Role Management</h1>
             <p className="text-[var(--color-gris-chaud)] text-sm mt-1">
-              Configurez les rôles et leurs permissions d'accès
+              Configure roles and their access permissions
             </p>
           </div>
         </div>
         <button className="btn-primary" onClick={openCreateModal}>
           <Plus size={18} />
-          Nouveau rôle
+          New Role
         </button>
       </header>
 
@@ -397,9 +397,9 @@ export default function RolesPage() {
         <div className="settings-section__header">
           <div className="settings-section__header-content">
             <div>
-              <h2 className="settings-section__title">Rôles du système</h2>
+              <h2 className="settings-section__title">System Roles</h2>
               <p className="settings-section__description">
-                {roles.length} rôle{roles.length > 1 ? 's' : ''} configuré{roles.length > 1 ? 's' : ''}
+                {roles.length} role{roles.length > 1 ? 's' : ''} configured
               </p>
             </div>
           </div>
@@ -440,14 +440,14 @@ export default function RolesPage() {
 
                   {/* Description */}
                   <p className="text-sm text-[var(--color-gris-chaud)] mb-4 leading-normal">
-                    {role.description || 'Aucune description'}
+                    {role.description || 'No description'}
                   </p>
 
                   {/* Stats */}
                   <div className="flex gap-6 mb-4 pb-4 border-b border-[var(--color-border)]">
                     <div className="flex items-center gap-2 text-[var(--color-gris-chaud)] text-sm">
                       <Users size={16} />
-                      <span>{role.user_count || 0} utilisateur{(role.user_count || 0) > 1 ? 's' : ''}</span>
+                      <span>{role.user_count || 0} user{(role.user_count || 0) > 1 ? 's' : ''}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[var(--color-gris-chaud)] text-sm">
                       <Key size={16} />
@@ -577,7 +577,7 @@ export default function RolesPage() {
                       className="form-input form-textarea"
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="Description du rôle..."
+                      placeholder="Role description..."
                       rows={3}
                     />
                   </div>

@@ -4,6 +4,7 @@ import {
     Edit2, Trash2, X, ShoppingCart, Factory, Warehouse, ChefHat, Coffee, Monitor, Grid, Wifi, Sliders, Package
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { saveCategory } from '../../services/products/catalogSyncService';
 import FloorPlanEditor from '../../components/settings/FloorPlanEditor';
 import TerminalSettingsSection from '../../components/settings/TerminalSettingsSection';
 import POSAdvancedSettingsSection from '../../components/settings/POSAdvancedSettingsSection';
@@ -66,9 +67,9 @@ const SettingsPage = () => {
 
     // Section type options for the form
     const SECTION_TYPES = [
-        { value: 'warehouse' as const, label: 'Entrepôt / Stockage', icon: <Warehouse size={20} />, color: '#3B82F6' },
+        { value: 'warehouse' as const, label: 'Warehouse / Storage', icon: <Warehouse size={20} />, color: '#3B82F6' },
         { value: 'production' as const, label: 'Production', icon: <Factory size={20} />, color: '#10B981' },
-        { value: 'sales' as const, label: 'Point de Vente', icon: <ShoppingCart size={20} />, color: '#F59E0B' }
+        { value: 'sales' as const, label: 'Point of Sale', icon: <ShoppingCart size={20} />, color: '#F59E0B' }
     ];
 
     const [settings, setSettings] = useState({
@@ -147,12 +148,14 @@ const SettingsPage = () => {
     const updateCategoryStation = async (categoryId: string, newStation: string) => {
         setSavingCategory(categoryId);
         try {
-            const { error } = await supabase
-                .from('categories')
-                .update({ dispatch_station: newStation } as never)
-                .eq('id', categoryId);
+            const result = await saveCategory({
+                id: categoryId,
+                dispatch_station: newStation as any
+            });
 
-            if (error) throw error;
+            if (!result.success) {
+                throw new Error(result.error);
+            }
 
             // Update local state
             setCategories(prev => prev.map(cat =>
@@ -162,7 +165,7 @@ const SettingsPage = () => {
             ));
         } catch (error) {
             console.error('Error updating category station:', error);
-            alert('Erreur lors de la mise a jour');
+            alert('Error updating station');
         } finally {
             setSavingCategory(null);
         }
@@ -211,7 +214,7 @@ const SettingsPage = () => {
 
     const handleSaveSection = async () => {
         if (!sectionForm.name.trim()) {
-            alert('Le nom de la section est requis');
+            alert('Section name is required');
             return;
         }
 
@@ -255,14 +258,14 @@ const SettingsPage = () => {
             fetchSections();
         } catch (error) {
             console.error('Error saving section:', error);
-            alert('Erreur lors de la sauvegarde: ' + (error instanceof Error ? error.message : 'Erreur inconnue'));
+            alert('Error saving section: ' + (error instanceof Error ? error.message : 'Unknown error'));
         } finally {
             setSavingSection(false);
         }
     };
 
     const handleDeleteSection = async (section: Section) => {
-        if (!confirm(`Êtes-vous sûr de vouloir supprimer la section "${section.name}" ?\n\nCette action est irréversible et peut affecter les produits liés à cette section.`)) {
+        if (!confirm(`Are you sure you want to delete section "${section.name}"?\n\nThis action is irreversible and may affect products linked to this section.`)) {
             return;
         }
 
@@ -276,7 +279,7 @@ const SettingsPage = () => {
             fetchSections();
         } catch (error) {
             console.error('Error deleting section:', error);
-            alert('Erreur lors de la suppression: ' + (error instanceof Error ? error.message : 'Erreur inconnue'));
+            alert('Error deleting section: ' + (error instanceof Error ? error.message : 'Unknown error'));
         }
     };
 
@@ -294,22 +297,22 @@ const SettingsPage = () => {
     ];
 
     const tabs = [
-        { id: 'general' as const, label: 'Général', icon: <Store size={18} /> },
-        { id: 'terminal' as const, label: 'Terminal POS', icon: <Wifi size={18} /> },
-        { id: 'pos_advanced' as const, label: 'POS Avancé', icon: <Sliders size={18} /> },
+        { id: 'general' as const, label: 'General', icon: <Store size={18} /> },
+        { id: 'terminal' as const, label: 'POS Terminal', icon: <Wifi size={18} /> },
+        { id: 'pos_advanced' as const, label: 'POS Advanced', icon: <Sliders size={18} /> },
         { id: 'modules' as const, label: 'Modules', icon: <Package size={18} /> },
         { id: 'sections' as const, label: 'Sections', icon: <Layers size={18} /> },
-        { id: 'floorplan' as const, label: 'Plan de Salle', icon: <Grid size={18} /> },
-        { id: 'kds' as const, label: 'Stations KDS', icon: <ChefHat size={18} /> },
-        { id: 'printers' as const, label: 'Imprimantes', icon: <Printer size={18} /> },
+        { id: 'floorplan' as const, label: 'Floor Plan', icon: <Grid size={18} /> },
+        { id: 'kds' as const, label: 'KDS Stations', icon: <ChefHat size={18} /> },
+        { id: 'printers' as const, label: 'Printers', icon: <Printer size={18} /> },
         { id: 'notifications' as const, label: 'Notifications', icon: <Bell size={18} /> },
-        { id: 'security' as const, label: 'Sécurité', icon: <Shield size={18} /> },
+        { id: 'security' as const, label: 'Security', icon: <Shield size={18} /> },
     ];
 
     return (
         <div className="settings-page">
             <header className="settings-page__header">
-                <h1 className="settings-page__title">Paramètres</h1>
+                <h1 className="settings-page__title">Settings</h1>
             </header>
 
             <div className="settings-grid">
@@ -332,14 +335,14 @@ const SettingsPage = () => {
                     {activeTab === 'general' && (
                         <div className="settings-section">
                             <div className="settings-section__header">
-                                <h2 className="settings-section__title">Informations du magasin</h2>
+                                <h2 className="settings-section__title">Store Information</h2>
                                 <p className="settings-section__description">
-                                    Paramètres généraux de votre établissement
+                                    General settings for your establishment
                                 </p>
                             </div>
                             <div className="settings-section__body">
                                 <div className="form-group">
-                                    <label className="form-label" htmlFor="store-name">Nom du magasin</label>
+                                    <label className="form-label" htmlFor="store-name">Store Name</label>
                                     <input
                                         id="store-name"
                                         type="text"
@@ -349,7 +352,7 @@ const SettingsPage = () => {
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label" htmlFor="store-address">Adresse</label>
+                                    <label className="form-label" htmlFor="store-address">Address</label>
                                     <input
                                         id="store-address"
                                         type="text"
@@ -360,7 +363,7 @@ const SettingsPage = () => {
                                 </div>
                                 <div className="form-row">
                                     <div className="form-group">
-                                        <label className="form-label" htmlFor="store-phone">Téléphone</label>
+                                        <label className="form-label" htmlFor="store-phone">Phone</label>
                                         <input
                                             id="store-phone"
                                             type="tel"
@@ -370,13 +373,13 @@ const SettingsPage = () => {
                                         />
                                     </div>
                                     <div className="form-group">
-                                        <label className="form-label" htmlFor="store-timezone">Fuseau horaire</label>
+                                        <label className="form-label" htmlFor="store-timezone">Timezone</label>
                                         <select
                                             id="store-timezone"
                                             className="form-input form-select"
                                             value={settings.timezone}
                                             onChange={(e) => setSettings({ ...settings, timezone: e.target.value })}
-                                            aria-label="Fuseau horaire"
+                                            aria-label="Timezone"
                                         >
                                             <option value="Asia/Jakarta">Jakarta (WIB)</option>
                                             <option value="Asia/Makassar">Makassar (WITA)</option>
@@ -386,10 +389,10 @@ const SettingsPage = () => {
                                 </div>
 
                                 <div className="form-footer">
-                                    <button className="btn-secondary">Annuler</button>
+                                    <button className="btn-secondary">Cancel</button>
                                     <button className="btn-primary">
                                         <Save size={18} />
-                                        Enregistrer
+                                        Save
                                     </button>
                                 </div>
                             </div>
@@ -413,14 +416,14 @@ const SettingsPage = () => {
                             <div className="settings-section__header">
                                 <div className="settings-section__header-content">
                                     <div>
-                                        <h2 className="settings-section__title">Sections de l'Établissement</h2>
+                                        <h2 className="settings-section__title">Establishment Sections</h2>
                                         <p className="settings-section__description">
-                                            Gérez les différentes sections de votre établissement (cuisine, bar, entrepôt, etc.)
+                                            Manage the different sections of your establishment (kitchen, bar, warehouse, etc.)
                                         </p>
                                     </div>
                                     <button className="btn-primary" onClick={openCreateModal}>
                                         <Plus size={18} />
-                                        Nouvelle Section
+                                        New Section
                                     </button>
                                 </div>
                             </div>
@@ -428,16 +431,16 @@ const SettingsPage = () => {
                                 {loadingSections ? (
                                     <div className="sections-loading">
                                         <RefreshCw size={24} className="spinning" />
-                                        <span>Chargement...</span>
+                                        <span>Loading...</span>
                                     </div>
                                 ) : sections.length === 0 ? (
                                     <div className="sections-empty">
                                         <Layers size={48} />
-                                        <h3>Aucune section configurée</h3>
-                                        <p>Créez des sections pour organiser vos stocks et la production.</p>
+                                        <h3>No sections configured</h3>
+                                        <p>Create sections to organize your stock and production.</p>
                                         <button className="btn-primary" onClick={openCreateModal}>
                                             <Plus size={18} />
-                                            Créer une section
+                                            Create a section
                                         </button>
                                     </div>
                                 ) : (
@@ -455,7 +458,7 @@ const SettingsPage = () => {
                                                             {section.section_type === 'sales' && (
                                                                 <span className="section-badge section-badge--sales">
                                                                     <ShoppingCart size={12} />
-                                                                    Point de Vente
+                                                                    Point of Sale
                                                                 </span>
                                                             )}
                                                             {section.section_type === 'production' && (
@@ -467,7 +470,7 @@ const SettingsPage = () => {
                                                             {section.section_type === 'warehouse' && (
                                                                 <span className="section-badge section-badge--warehouse">
                                                                     <Warehouse size={12} />
-                                                                    Entrepôt
+                                                                    Warehouse
                                                                 </span>
                                                             )}
                                                         </div>
@@ -482,16 +485,16 @@ const SettingsPage = () => {
                                                         <button
                                                             className="btn-icon"
                                                             onClick={() => openEditModal(section)}
-                                                            title="Modifier"
-                                                            aria-label="Modifier"
+                                                            title="Edit"
+                                                            aria-label="Edit"
                                                         >
                                                             <Edit2 size={16} />
                                                         </button>
                                                         <button
                                                             className="btn-icon btn-icon--danger"
                                                             onClick={() => handleDeleteSection(section)}
-                                                            title="Supprimer"
-                                                            aria-label="Supprimer"
+                                                            title="Delete"
+                                                            aria-label="Delete"
                                                         >
                                                             <Trash2 size={16} />
                                                         </button>
@@ -510,9 +513,9 @@ const SettingsPage = () => {
                             <div className="settings-section__header">
                                 <div className="settings-section__header-content">
                                     <div>
-                                        <h2 className="settings-section__title">Configuration des Stations KDS</h2>
+                                        <h2 className="settings-section__title">KDS Station Configuration</h2>
                                         <p className="settings-section__description">
-                                            Assignez chaque categorie de produit a une station KDS specifique
+                                            Assign each product category to a specific KDS station
                                         </p>
                                     </div>
                                 </div>
@@ -537,13 +540,13 @@ const SettingsPage = () => {
                                 {loadingCategories ? (
                                     <div className="sections-loading">
                                         <RefreshCw size={24} className="spinning" />
-                                        <span>Chargement des categories...</span>
+                                        <span>Loading categories...</span>
                                     </div>
                                 ) : categories.length === 0 ? (
                                     <div className="sections-empty">
                                         <ChefHat size={48} />
-                                        <h3>Aucune categorie trouvee</h3>
-                                        <p>Les categories de produits apparaitront ici.</p>
+                                        <h3>No categories found</h3>
+                                        <p>Product categories will appear here.</p>
                                     </div>
                                 ) : (
                                     <div className="kds-categories-list">
@@ -591,9 +594,9 @@ const SettingsPage = () => {
                     {activeTab === 'printers' && (
                         <div className="settings-section">
                             <div className="settings-section__header">
-                                <h2 className="settings-section__title">Imprimantes</h2>
+                                <h2 className="settings-section__title">Printers</h2>
                                 <p className="settings-section__description">
-                                    Gérez vos imprimantes de tickets et cuisine
+                                    Manage your receipt and kitchen printers
                                 </p>
                             </div>
                             <div className="settings-section__body">
@@ -605,7 +608,7 @@ const SettingsPage = () => {
                                                 <div className="printer-item__name">{printer.name}</div>
                                                 <div className="printer-item__status">
                                                     <span className={`status-dot ${printer.status}`} />
-                                                    {printer.status === 'connected' ? 'Connecté' : 'Déconnecté'}
+                                                    {printer.status === 'connected' ? 'Connected' : 'Disconnected'}
                                                     <span className="printer-ip">
                                                         • {printer.ip}
                                                     </span>
@@ -616,7 +619,7 @@ const SettingsPage = () => {
                                                     <RefreshCw size={16} />
                                                     Test
                                                 </button>
-                                                <button className="btn-secondary" title="Paramètres" aria-label="Paramètres imprimante">
+                                                <button className="btn-secondary" title="Settings" aria-label="Printer settings">
                                                     <Settings size={16} />
                                                 </button>
                                             </div>
@@ -627,7 +630,7 @@ const SettingsPage = () => {
                                 <div className="form-footer">
                                     <button className="btn-primary">
                                         <Plus size={18} />
-                                        Ajouter imprimante
+                                        Add Printer
                                     </button>
                                 </div>
                             </div>
@@ -641,9 +644,9 @@ const SettingsPage = () => {
                     {activeTab === 'floorplan' && (
                         <div className="settings-section">
                             <div className="settings-section__header">
-                                <h2 className="settings-section__title">Plan de Salle</h2>
+                                <h2 className="settings-section__title">Floor Plan</h2>
                                 <p className="settings-section__description">
-                                    Configurez le plan de salle pour les commandes Dine In
+                                    Configure the floor plan for Dine In orders
                                 </p>
                             </div>
                             <div className="settings-section__body">
@@ -655,17 +658,17 @@ const SettingsPage = () => {
                     {activeTab === 'security' && (
                         <div className="settings-section">
                             <div className="settings-section__header">
-                                <h2 className="settings-section__title">Sécurité</h2>
+                                <h2 className="settings-section__title">Security</h2>
                                 <p className="settings-section__description">
-                                    Options de sécurité et contrôle d'accès
+                                    Security options and access control
                                 </p>
                             </div>
                             <div className="settings-section__body">
                                 <div className="toggle-group">
                                     <div className="toggle-group__info">
-                                        <span className="toggle-group__label">Déconnexion automatique</span>
+                                        <span className="toggle-group__label">Auto Logout</span>
                                         <span className="toggle-group__description">
-                                            Déconnecter après 30 minutes d'inactivité
+                                            Disconnect after 30 minutes of inactivity
                                         </span>
                                     </div>
                                     <div
@@ -675,7 +678,7 @@ const SettingsPage = () => {
                                 </div>
 
                                 <div className="form-group form-group--mt-lg">
-                                    <label className="form-label" htmlFor="manager-pin">Code PIN Manager</label>
+                                    <label className="form-label" htmlFor="manager-pin">Manager PIN Code</label>
                                     <input
                                         id="manager-pin"
                                         type="password"
@@ -687,7 +690,7 @@ const SettingsPage = () => {
                                 <div className="form-footer">
                                     <button className="btn-primary">
                                         <Save size={18} />
-                                        Modifier PIN
+                                        Change PIN
                                     </button>
                                 </div>
                             </div>
@@ -706,13 +709,13 @@ const SettingsPage = () => {
                             </div>
                             <div>
                                 <h2 className="section-modal__title">
-                                    {editingSection ? 'Modifier la Section' : 'Nouvelle Section'}
+                                    {editingSection ? 'Edit Section' : 'New Section'}
                                 </h2>
                                 <p className="section-modal__subtitle">
-                                    {editingSection ? 'Modifiez les informations de la section' : 'Créez une nouvelle section pour organiser vos stocks'}
+                                    {editingSection ? 'Edit section information' : 'Create a new section to organize your stock'}
                                 </p>
                             </div>
-                            <button className="section-modal__close" onClick={() => setShowSectionModal(false)} aria-label="Fermer">
+                            <button className="section-modal__close" onClick={() => setShowSectionModal(false)} aria-label="Close">
                                 <X size={24} />
                             </button>
                         </div>
@@ -720,16 +723,16 @@ const SettingsPage = () => {
                         <div className="section-modal__content">
                             <div className="section-form__group">
                                 <label className="section-form__label">
-                                    Nom de la section *
+                                    Section Name *
                                 </label>
                                 <input
                                     type="text"
                                     className="section-form__input"
                                     value={sectionForm.name}
                                     onChange={(e) => handleSectionNameChange(e.target.value)}
-                                    placeholder="Ex: Cuisine, Bar, Entrepôt..."
+                                    placeholder="e.g. Kitchen, Bar, Warehouse..."
                                     autoFocus
-                                    aria-label="Nom de la section"
+                                    aria-label="Section name"
                                 />
                             </div>
 
@@ -743,16 +746,16 @@ const SettingsPage = () => {
                                         className="section-form__input section-form__input--mono"
                                         value={sectionForm.code}
                                         onChange={(e) => setSectionForm({ ...sectionForm, code: e.target.value })}
-                                        placeholder="cuisine"
-                                        aria-label="Code de la section"
+                                        placeholder="kitchen"
+                                        aria-label="Section code"
                                     />
                                     <p className="section-form__hint">
-                                        Identifiant unique. Auto-généré.
+                                        Unique identifier. Auto-generated.
                                     </p>
                                 </div>
                                 <div className="section-form__group">
                                     <label className="section-form__label">
-                                        Icône (emoji)
+                                        Icon (emoji)
                                     </label>
                                     <input
                                         type="text"
@@ -761,7 +764,7 @@ const SettingsPage = () => {
                                         onChange={(e) => setSectionForm({ ...sectionForm, icon: e.target.value })}
                                         placeholder="🍳"
                                         maxLength={4}
-                                        aria-label="Icône de la section"
+                                        aria-label="Section icon"
                                     />
                                 </div>
                             </div>
@@ -775,13 +778,13 @@ const SettingsPage = () => {
                                     className="section-form__input"
                                     value={sectionForm.description}
                                     onChange={(e) => setSectionForm({ ...sectionForm, description: e.target.value })}
-                                    placeholder="Description de la section..."
-                                    aria-label="Description de la section"
+                                    placeholder="Section description..."
+                                    aria-label="Section description"
                                 />
                             </div>
 
                             <div className="section-form__group">
-                                <label className="section-form__label">Type de section *</label>
+                                <label className="section-form__label">Section Type *</label>
                                 <div className="section-form__types">
                                     {SECTION_TYPES.map(type => (
                                         <label
@@ -811,7 +814,7 @@ const SettingsPage = () => {
 
                         <div className="section-modal__footer">
                             <button className="btn-secondary" onClick={() => setShowSectionModal(false)}>
-                                Annuler
+                                Cancel
                             </button>
                             <button
                                 className="btn-primary"
@@ -819,7 +822,7 @@ const SettingsPage = () => {
                                 disabled={savingSection || !sectionForm.name.trim()}
                             >
                                 <Save size={18} />
-                                {savingSection ? 'Enregistrement...' : (editingSection ? 'Mettre à jour' : 'Créer')}
+                                {savingSection ? 'Saving...' : (editingSection ? 'Update' : 'Create')}
                             </button>
                         </div>
                     </div>

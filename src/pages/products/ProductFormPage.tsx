@@ -12,6 +12,7 @@ import {
     Tag, Image as ImageIcon, Upload, X, FileText
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { saveProduct } from '@/services/products/catalogSyncService'
 import { formatCurrency } from '@/utils/helpers'
 import { toast } from 'sonner'
 import './ProductFormPage.css'
@@ -41,13 +42,13 @@ interface ProductForm {
 }
 
 const PRODUCT_TYPES = [
-    { value: 'finished', label: 'Produit fini', description: 'Produit vendu tel quel' },
-    { value: 'semi_finished', label: 'Semi-fini', description: 'Produit intermédiaire' },
-    { value: 'raw_material', label: 'Matière première', description: 'Ingrédient de base' }
+    { value: 'finished', label: 'Finished product', description: 'Product sold as is' },
+    { value: 'semi_finished', label: 'Semi-finished', description: 'Intermediate product' },
+    { value: 'raw_material', label: 'Raw material', description: 'Basic ingredient' }
 ]
 
 const UNITS = [
-    'pièce', 'kg', 'g', 'L', 'mL', 'unité', 'portion', 'boîte', 'sachet'
+    'piece', 'kg', 'g', 'L', 'mL', 'unit', 'portion', 'box', 'pouch'
 ]
 
 export default function ProductFormPage() {
@@ -65,7 +66,7 @@ export default function ProductFormPage() {
         description: '',
         category_id: '',
         product_type: 'finished',
-        unit: 'pièce',
+        unit: 'piece',
         cost_price: 0,
         sale_price: 0,
         retail_price: 0,
@@ -110,7 +111,7 @@ export default function ProductFormPage() {
                         description: product.description || '',
                         category_id: product.category_id || '',
                         product_type: product.product_type || 'finished',
-                        unit: product.unit || 'pièce',
+                        unit: product.unit || 'piece',
                         cost_price: product.cost_price || 0,
                         sale_price: product.retail_price || 0,
                         retail_price: product.retail_price || 0,
@@ -147,7 +148,7 @@ export default function ProductFormPage() {
             }
         } catch (error) {
             console.error('Error loading data:', error)
-            toast.error('Erreur de chargement')
+            toast.error('Error loading data')
         } finally {
             setLoading(false)
         }
@@ -157,19 +158,19 @@ export default function ProductFormPage() {
         const newErrors: Record<string, string> = {}
 
         if (!form.sku.trim()) {
-            newErrors.sku = 'SKU obligatoire'
+            newErrors.sku = 'SKU required'
         }
         if (!form.name.trim()) {
-            newErrors.name = 'Nom obligatoire'
+            newErrors.name = 'Name required'
         }
         if (!form.unit.trim()) {
-            newErrors.unit = 'Unité obligatoire'
+            newErrors.unit = 'Unit required'
         }
         if (form.sale_price < 0) {
-            newErrors.sale_price = 'Prix invalide'
+            newErrors.sale_price = 'Invalid price'
         }
         if (form.cost_price < 0) {
-            newErrors.cost_price = 'Coût invalide'
+            newErrors.cost_price = 'Invalid cost'
         }
 
         setErrors(newErrors)
@@ -180,13 +181,15 @@ export default function ProductFormPage() {
         e.preventDefault()
 
         if (!validate()) {
-            toast.error('Veuillez corriger les erreurs')
+            toast.error('Please correct the errors')
             return
         }
 
         setSaving(true)
         try {
+            const productId = id || crypto.randomUUID()
             const productData = {
+                id: productId,
                 sku: form.sku.trim(),
                 name: form.name.trim(),
                 description: form.description.trim() || null,
@@ -194,39 +197,32 @@ export default function ProductFormPage() {
                 product_type: form.product_type,
                 unit: form.unit,
                 cost_price: form.cost_price,
-                sale_price: form.sale_price,
                 retail_price: form.retail_price || form.sale_price,
                 wholesale_price: form.wholesale_price || null,
+                current_stock: form.stock_quantity,
                 min_stock_level: form.min_stock_level || null,
-                stock_quantity: form.stock_quantity,
                 pos_visible: form.pos_visible,
                 is_active: form.is_active,
-                deduct_ingredients: form.deduct_ingredients,
                 image_url: form.image_url || null,
                 updated_at: new Date().toISOString()
             }
 
-            if (isEditing) {
-                const { error } = await supabase
-                    .from('products')
-                    .update(productData as never)
-                    .eq('id', id!)
+            const result = await saveProduct(productData as any)
 
-                if (error) throw error
-                toast.success('Produit mis à jour')
+            if (!result.success) {
+                throw new Error(result.error)
+            }
+
+            if (result.synced) {
+                toast.success(isEditing ? 'Product updated' : 'Product created')
             } else {
-                const { error } = await supabase
-                    .from('products')
-                    .insert(productData)
-
-                if (error) throw error
-                toast.success('Produit créé')
+                toast.success(isEditing ? 'Product updated locally (pending sync)' : 'Product created locally (pending sync)')
             }
 
             navigate('/products')
         } catch (error) {
             console.error('Error saving product:', error)
-            toast.error('Erreur lors de l\'enregistrement')
+            toast.error('Error during save')
         } finally {
             setSaving(false)
         }
@@ -252,10 +248,10 @@ export default function ProductFormPage() {
                 .getPublicUrl(filePath)
 
             setForm(prev => ({ ...prev, image_url: publicUrl }))
-            toast.success('Image uploadée')
+            toast.success('Image uploaded')
         } catch (error) {
             console.error('Error uploading image:', error)
-            toast.error('Erreur lors de l\'upload')
+            toast.error('Error during upload')
         }
     }
 
@@ -268,7 +264,7 @@ export default function ProductFormPage() {
         return (
             <div className="product-form-page loading">
                 <div className="spinner" />
-                <span>Chargement...</span>
+                <span>Loading...</span>
             </div>
         )
     }
@@ -279,13 +275,13 @@ export default function ProductFormPage() {
                 <button className="btn btn-ghost" onClick={() => navigate('/products')}>
                     <ArrowLeft size={20} />
                 </button>
-                <h1>{isEditing ? 'Modifier le produit' : 'Nouveau produit'}</h1>
+                <h1>{isEditing ? 'Edit Product' : 'New Product'}</h1>
             </header>
 
             <form className="product-form" onSubmit={handleSubmit}>
                 {/* Basic Info Section */}
                 <section className="form-section">
-                    <h2><Package size={20} /> Informations de base</h2>
+                    <h2><Package size={20} /> Basic information</h2>
 
                     <div className="form-row">
                         <div className="form-group">
@@ -300,12 +296,12 @@ export default function ProductFormPage() {
                             {errors.sku && <span className="error-text">{errors.sku}</span>}
                         </div>
                         <div className="form-group">
-                            <label>Nom *</label>
+                            <label>Name *</label>
                             <input
                                 type="text"
                                 value={form.name}
                                 onChange={e => setForm({ ...form, name: e.target.value })}
-                                placeholder="Nom du produit"
+                                placeholder="Product name"
                                 className={errors.name ? 'error' : ''}
                             />
                             {errors.name && <span className="error-text">{errors.name}</span>}
@@ -317,26 +313,26 @@ export default function ProductFormPage() {
                         <textarea
                             value={form.description}
                             onChange={e => setForm({ ...form, description: e.target.value })}
-                            placeholder="Description du produit..."
+                            placeholder="Product description..."
                             rows={3}
                         />
                     </div>
 
                     <div className="form-row">
                         <div className="form-group">
-                            <label>Catégorie</label>
+                            <label>Category</label>
                             <select
                                 value={form.category_id}
                                 onChange={e => setForm({ ...form, category_id: e.target.value })}
                             >
-                                <option value="">Sans catégorie</option>
+                                <option value="">No category</option>
                                 {categories.map(cat => (
                                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                                 ))}
                             </select>
                         </div>
                         <div className="form-group">
-                            <label>Type de produit</label>
+                            <label>Product Type</label>
                             <select
                                 value={form.product_type}
                                 onChange={e => setForm({ ...form, product_type: e.target.value as ProductForm['product_type'] })}
@@ -347,7 +343,7 @@ export default function ProductFormPage() {
                             </select>
                         </div>
                         <div className="form-group">
-                            <label>Unité *</label>
+                            <label>Unit *</label>
                             <select
                                 value={form.unit}
                                 onChange={e => setForm({ ...form, unit: e.target.value })}
@@ -363,11 +359,11 @@ export default function ProductFormPage() {
 
                 {/* Pricing Section */}
                 <section className="form-section">
-                    <h2><DollarSign size={20} /> Prix</h2>
+                    <h2><DollarSign size={20} /> Price</h2>
 
                     <div className="form-row">
                         <div className="form-group">
-                            <label>Prix de vente</label>
+                            <label>Retail price</label>
                             <input
                                 type="number"
                                 value={form.sale_price}
@@ -379,7 +375,7 @@ export default function ProductFormPage() {
                             <small>{formatCurrency(form.sale_price)}</small>
                         </div>
                         <div className="form-group">
-                            <label>Prix de gros</label>
+                            <label>Wholesale price</label>
                             <input
                                 type="number"
                                 value={form.wholesale_price}
@@ -390,7 +386,7 @@ export default function ProductFormPage() {
                             <small>{formatCurrency(form.wholesale_price)}</small>
                         </div>
                         <div className="form-group">
-                            <label>Prix de revient</label>
+                            <label>Cost price</label>
                             <input
                                 type="number"
                                 value={form.cost_price}
@@ -406,7 +402,7 @@ export default function ProductFormPage() {
                     {form.cost_price > 0 && form.sale_price > 0 && (
                         <div className="margin-display">
                             <Tag size={16} />
-                            <span>Marge: {calculateMargin().toFixed(1)}%</span>
+                            <span>Margin: {calculateMargin().toFixed(1)}%</span>
                             <span className="margin-amount">
                                 ({formatCurrency(form.sale_price - form.cost_price)})
                             </span>
@@ -420,7 +416,7 @@ export default function ProductFormPage() {
 
                     <div className="form-row">
                         <div className="form-group">
-                            <label>Stock actuel</label>
+                            <label>Current stock</label>
                             <input
                                 type="number"
                                 value={form.stock_quantity}
@@ -429,7 +425,7 @@ export default function ProductFormPage() {
                             />
                         </div>
                         <div className="form-group">
-                            <label>Stock minimum</label>
+                            <label>Minimum stock</label>
                             <input
                                 type="number"
                                 value={form.min_stock_level}
@@ -448,7 +444,7 @@ export default function ProductFormPage() {
                     <div className="image-upload">
                         {form.image_url ? (
                             <div className="image-preview">
-                                <img src={form.image_url} alt="Produit" />
+                                <img src={form.image_url} alt="Product" />
                                 <button
                                     type="button"
                                     className="btn-remove-image"
@@ -460,7 +456,7 @@ export default function ProductFormPage() {
                         ) : (
                             <label className="image-upload-zone">
                                 <Upload size={24} />
-                                <span>Cliquer pour ajouter une image</span>
+                                <span>Click to add an image</span>
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -483,7 +479,7 @@ export default function ProductFormPage() {
                                 checked={form.pos_visible}
                                 onChange={e => setForm({ ...form, pos_visible: e.target.checked })}
                             />
-                            <span>Visible au POS</span>
+                            <span>Visible on POS</span>
                         </label>
                         <label className="checkbox-option">
                             <input
@@ -491,7 +487,7 @@ export default function ProductFormPage() {
                                 checked={form.is_active}
                                 onChange={e => setForm({ ...form, is_active: e.target.checked })}
                             />
-                            <span>Produit actif</span>
+                            <span>Product active</span>
                         </label>
                         <label className="checkbox-option">
                             <input
@@ -499,9 +495,9 @@ export default function ProductFormPage() {
                                 checked={form.deduct_ingredients}
                                 onChange={e => setForm({ ...form, deduct_ingredients: e.target.checked })}
                             />
-                            <span>Déduire les ingrédients à la vente</span>
+                            <span>Deduct ingredients on sale</span>
                             <small style={{ display: 'block', marginTop: '4px', color: '#6b7280' }}>
-                                Pour les produits faits à la demande (café, sandwiches, etc.)
+                                For products made to order (coffee, sandwiches, etc.)
                             </small>
                         </label>
                     </div>
@@ -514,7 +510,7 @@ export default function ProductFormPage() {
                         className="btn btn-secondary"
                         onClick={() => navigate('/products')}
                     >
-                        Annuler
+                        Cancel
                     </button>
                     <button
                         type="submit"
@@ -522,7 +518,7 @@ export default function ProductFormPage() {
                         disabled={saving}
                     >
                         <Save size={18} />
-                        {saving ? 'Enregistrement...' : 'Enregistrer'}
+                        {saving ? 'Saving...' : 'Save'}
                     </button>
                 </div>
             </form>

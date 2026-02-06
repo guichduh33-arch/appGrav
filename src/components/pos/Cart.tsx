@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
-import { Trash2, Tag, Lock, List, User, QrCode, Star, FileText, ChevronDown, ChevronUp } from 'lucide-react'
+import { Trash2, Tag, Lock, List, User, QrCode, Star, FileText, ChevronDown, ChevronUp, Building2 } from 'lucide-react'
 import { useCartStore } from '../../stores/cartStore'
 import { PinVerificationModal, TableSelectionModal, DiscountModal, CustomerSearchModal } from './modals'
 import { LoyaltyBadge } from './LoyaltyBadge'
@@ -33,7 +33,7 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
         items, orderType, setOrderType, tableNumber, setTableNumber,
         subtotal, discountAmount, total, updateItemQuantity, removeItem, clearCart, setDiscount,
         lockedItemIds, activeOrderNumber, isItemLocked, removeLockedItem,
-        customerId, customerName, setCustomerWithCategorySlug,
+        customerId, customerName, customerCategorySlug, setCustomerWithCategorySlug,
         orderNotes, setOrderNotes,
     } = useCartStore()
 
@@ -137,6 +137,15 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
                         <Trash2 size={18} />
                     </button>
                 </div>
+
+                {/* B2B mode indicator (Story 6.7) */}
+                {customerCategorySlug === 'wholesale' && (
+                    <div className="pos-cart__b2b-banner">
+                        <Building2 size={14} />
+                        <span>B2B Mode</span>
+                        <span className="pos-cart__b2b-credit">Store Credit Available</span>
+                    </div>
+                )}
 
                 {orderType === 'dine_in' && tableNumber && (
                     <div className="pos-cart__table-info">

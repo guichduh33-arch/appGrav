@@ -7,6 +7,8 @@ export type { IUsePOSShiftReturn } from './usePOSShift'
 export { usePOSOrders } from './usePOSOrders'
 export type { IUsePOSOrdersReturn } from './usePOSOrders'
 
+export { useCartPromotions } from './useCartPromotions'
+
 export { useDisplayBroadcast, useDisplayBroadcastListener } from './useDisplayBroadcast'
 export type {
   IUseDisplayBroadcastReturn,

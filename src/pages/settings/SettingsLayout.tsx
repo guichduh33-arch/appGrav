@@ -18,6 +18,7 @@ import {
   ChefHat,
   Grid,
   Wallet,
+  Wifi,
 } from 'lucide-react';
 import { useSettingsCategories, useInitializeSettings } from '../../hooks/settings';
 import './SettingsPage.css';
@@ -46,6 +47,7 @@ const EXTRA_TABS = [
   { code: 'floorplan', path: 'floorplan', icon: <Grid size={18} /> },
   { code: 'kds', path: 'kds', icon: <ChefHat size={18} /> },
   { code: 'history', path: 'history', icon: <History size={18} /> },
+  { code: 'lan', path: 'lan', icon: <Wifi size={18} /> },
 ];
 
 const EXTRA_TAB_NAMES: Record<string, { fr: string; en: string; id: string }> = {
@@ -55,6 +57,7 @@ const EXTRA_TAB_NAMES: Record<string, { fr: string; en: string; id: string }> = 
   floorplan: { fr: 'Plan de Salle', en: 'Floor Plan', id: 'Denah Lantai' },
   kds: { fr: 'Stations KDS', en: 'KDS Stations', id: 'Stasiun KDS' },
   history: { fr: 'Historique', en: 'History', id: 'Riwayat' },
+  lan: { fr: 'Réseau LAN', en: 'LAN Network', id: 'Jaringan LAN' },
 };
 
 const SettingsLayout = () => {

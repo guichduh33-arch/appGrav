@@ -136,13 +136,14 @@ export default function RefundModal({
   );
 
   // Payment method display name
-  const paymentMethodName = {
+  const paymentMethodName: string = ({
     cash: 'Cash',
     card: 'Card',
     qris: 'QRIS',
     edc: 'EDC',
     transfer: 'Transfer',
-  }[originalPaymentMethod];
+    store_credit: 'Store Credit',
+  } as Record<string, string>)[originalPaymentMethod] || originalPaymentMethod;
 
   return (
     <>

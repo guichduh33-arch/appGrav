@@ -74,12 +74,12 @@ export default function NotificationSettingsSection() {
 
     const handleSendTestEmail = () => {
         if (!testEmail) {
-            alert('Veuillez entrer une adresse email');
+            alert('Please enter an email address');
             return;
         }
         sendTestEmail.mutate(testEmail, {
-            onSuccess: () => alert('Email de test envoyé avec succès'),
-            onError: (err) => alert('Erreur lors de l’envoi : ' + (err instanceof Error ? err.message : 'Erreur inconnue')),
+            onSuccess: () => alert('Test email sent successfully'),
+            onError: (err) => alert('Error sending email: ' + (err instanceof Error ? err.message : 'Unknown error')),
         });
     };
 
@@ -87,11 +87,11 @@ export default function NotificationSettingsSection() {
         return (
             <div className="settings-section">
                 <div className="settings-section__header">
-                    <h2 className="settings-section__title">Paramètres de Notification</h2>
+                    <h2 className="settings-section__title">Notification Settings</h2>
                 </div>
                 <div className="settings-section__body--centered">
                     <RefreshCw size={24} className="spinning" />
-                    <p>Chargement...</p>
+                    <p>Loading...</p>
                 </div>
             </div>
         );
@@ -100,9 +100,9 @@ export default function NotificationSettingsSection() {
     return (
         <div className="settings-section">
             <div className="settings-section__header">
-                <h2 className="settings-section__title">Paramètres de Notification</h2>
+                <h2 className="settings-section__title">Notification Settings</h2>
                 <p className="settings-section__description">
-                    Configurez comment le système envoie des alertes et des rapports.
+                    Configure how the system sends alerts and reports.
                 </p>
             </div>
 
@@ -111,25 +111,25 @@ export default function NotificationSettingsSection() {
                 <div className="settings-group">
                     <h3 className="settings-group__title">
                         <Mail size={18} />
-                        Configuration Email (SMTP)
+                        Email Configuration (SMTP)
                     </h3>
                     <Toggle
-                        label="Email activé"
-                        description="Activer l’envoi d’emails par le système"
+                        label="Email enabled"
+                        description="Enable email sending by the system"
                         checked={settings.email_enabled}
                         onChange={(v) => handleUpdate('email_enabled', v)}
                     />
 
                     <div className="form-row">
                         <Input
-                            label="Serveur SMTP"
+                            label="SMTP Server"
                             value={settings.smtp_host}
                             placeholder="smtp.example.com"
                             onChange={(v) => handleUpdate('smtp_host', v)}
                             disabled={!settings.email_enabled}
                         />
                         <Input
-                            label="Port SMTP"
+                            label="SMTP Port"
                             type="number"
                             value={settings.smtp_port}
                             placeholder="587"
@@ -140,14 +140,14 @@ export default function NotificationSettingsSection() {
 
                     <div className="form-row">
                         <Input
-                            label="Utilisateur SMTP"
+                            label="SMTP User"
                             value={settings.smtp_user}
                             placeholder="user@example.com"
                             onChange={(v) => handleUpdate('smtp_user', v)}
                             disabled={!settings.email_enabled}
                         />
                         <Input
-                            label="Mot de passe SMTP"
+                            label="SMTP Password"
                             type="password"
                             value={settings.smtp_password}
                             placeholder="••••••••"
@@ -157,7 +157,7 @@ export default function NotificationSettingsSection() {
                     </div>
 
                     <Input
-                        label="Email expéditeur"
+                        label="From Email"
                         value={settings.from_email}
                         placeholder="noreply@breakery.com"
                         onChange={(v) => handleUpdate('from_email', v)}
@@ -166,10 +166,10 @@ export default function NotificationSettingsSection() {
 
                     {/* Test Email */}
                     <div className="notification-test-box">
-                        <h4 className="notification-test-header">Tester la configuration</h4>
+                        <h4 className="notification-test-header">Test Configuration</h4>
                         <div className="form-row">
                             <Input
-                                label="Email de destination"
+                                label="Destination Email"
                                 value={testEmail}
                                 placeholder="dest@example.com"
                                 onChange={setTestEmail}
@@ -181,7 +181,7 @@ export default function NotificationSettingsSection() {
                                 disabled={!settings.email_enabled || sendTestEmail.isPending}
                             >
                                 {sendTestEmail.isPending ? <RefreshCw size={16} className="spinning" /> : <Send size={16} />}
-                                Envoyer test
+                                Send Test
                             </button>
                         </div>
                     </div>
@@ -191,17 +191,17 @@ export default function NotificationSettingsSection() {
                 <div className="settings-group">
                     <h3 className="settings-group__title">
                         <Bell size={18} />
-                        Alertes et Rapports
+                        Alerts and Reports
                     </h3>
                     <Toggle
-                        label="Alertes stock bas"
-                        description="Recevoir une notification quand un produit atteint le seuil critique"
+                        label="Low stock alerts"
+                        description="Receive a notification when a product reaches critical threshold"
                         checked={settings.low_stock_alerts}
                         onChange={(v) => handleUpdate('low_stock_alerts', v)}
                     />
                     <Toggle
-                        label="Rapport journalier"
-                        description="Recevoir un résumé des ventes chaque soir"
+                        label="Daily report"
+                        description="Receive a sales summary every evening"
                         checked={settings.daily_report}
                         onChange={(v) => handleUpdate('daily_report', v)}
                     />
@@ -210,7 +210,7 @@ export default function NotificationSettingsSection() {
                         <div className="form-group daily-report-time-input">
                             <label className="form-label" htmlFor="daily-report-time">
                                 <Clock size={14} />
-                                Heure d’envoi
+                                Send Time
                             </label>
                             <input
                                 id="daily-report-time"
@@ -227,11 +227,11 @@ export default function NotificationSettingsSection() {
                 <div className="settings-group">
                     <h3 className="settings-group__title">
                         <MessageSquare size={18} />
-                        Canaux supplémentaires
+                        Additional Channels
                     </h3>
                     <Toggle
-                        label="WhatsApp (Bêta)"
-                        description="Bientôt disponible : notifications via WhatsApp Business API"
+                        label="WhatsApp (Beta)"
+                        description="Coming soon: notifications via WhatsApp Business API"
                         checked={settings.whatsapp_enabled}
                         onChange={(v) => handleUpdate('whatsapp_enabled', v)}
                         disabled={true}

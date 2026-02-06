@@ -20,21 +20,21 @@ export interface FloorPlanItem {
 }
 
 const TABLE_SHAPES = [
-    { value: 'square' as const, label: 'Carrée', icon: <Square size={20} /> },
-    { value: 'round' as const, label: 'Ronde', icon: <Circle size={20} /> },
+    { value: 'square' as const, label: 'Square', icon: <Square size={20} /> },
+    { value: 'round' as const, label: 'Round', icon: <Circle size={20} /> },
     { value: 'rectangle' as const, label: 'Rectangle', icon: <Minus size={20} /> }
 ]
 
 const DECORATION_TYPES = [
-    { value: 'plant' as const, label: '🌿 Plante', emoji: '🌿' },
-    { value: 'wall' as const, label: '🧱 Mur', emoji: '🧱' },
+    { value: 'plant' as const, label: '🌿 Plant', emoji: '🌿' },
+    { value: 'wall' as const, label: '🧱 Wall', emoji: '🧱' },
     { value: 'bar' as const, label: '🍺 Bar', emoji: '🍺' },
-    { value: 'entrance' as const, label: '🚪 Entrée', emoji: '🚪' }
+    { value: 'entrance' as const, label: '🚪 Entrance', emoji: '🚪' }
 ]
 
 const FLOOR_SECTIONS = [
-    { value: 'Main', label: 'Intérieur', icon: <Home size={18} /> },
-    { value: 'Terrace', label: 'Terrasse', icon: <Sun size={18} /> },
+    { value: 'Main', label: 'Indoor', icon: <Home size={18} /> },
+    { value: 'Terrace', label: 'Terrace', icon: <Sun size={18} /> },
     { value: 'VIP', label: 'VIP', icon: <Star size={18} /> }
 ]
 
@@ -112,10 +112,10 @@ export default function FloorPlanEditor() {
 
             if (error) throw error
 
-            alert('Plan de salle sauvegardé avec succès!')
+            alert('Floor plan saved successfully!')
         } catch (error) {
             console.error('Error saving floor plan:', error)
-            alert('Erreur lors de la sauvegarde')
+            alert('Error saving floor plan')
         } finally {
             setSaving(false)
         }
@@ -123,7 +123,7 @@ export default function FloorPlanEditor() {
 
     const handleAddTable = async () => {
         if (!tableForm.number.trim()) {
-            alert('Le numéro de table est requis')
+            alert('Table number is required')
             return
         }
 
@@ -157,7 +157,7 @@ export default function FloorPlanEditor() {
             }
         } catch (error) {
             console.error('Error adding table:', error)
-            alert('Erreur lors de l\'ajout: ' + (error instanceof Error ? error.message : String(error)))
+            alert('Error adding table: ' + (error instanceof Error ? error.message : String(error)))
         }
     }
 
@@ -189,12 +189,12 @@ export default function FloorPlanEditor() {
             }
         } catch (error) {
             console.error('Error adding decoration:', error)
-            alert('Erreur lors de l\'ajout: ' + (error instanceof Error ? error.message : String(error)))
+            alert('Error adding decoration: ' + (error instanceof Error ? error.message : String(error)))
         }
     }
 
     const handleDeleteItem = async (itemId: string) => {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
+        if (!confirm('Are you sure you want to delete this item?')) {
             return
         }
 
@@ -210,7 +210,7 @@ export default function FloorPlanEditor() {
             setSelectedItem(null)
         } catch (error) {
             console.error('Error deleting item:', error)
-            alert('Erreur lors de la suppression')
+            alert('Error deleting item')
         }
     }
 
@@ -331,7 +331,7 @@ export default function FloorPlanEditor() {
                             onClick={() => setShowAddMenu(!showAddMenu)}
                         >
                             <Plus size={18} />
-                            Ajouter un Élément
+                            Add Element
                         </button>
 
                         {showAddMenu && (
@@ -346,7 +346,7 @@ export default function FloorPlanEditor() {
                                     <Grid size={18} />
                                     <div>
                                         <div className="add-menu__item-title">Table</div>
-                                        <div className="add-menu__item-desc">Ajouter une table pour les clients</div>
+                                        <div className="add-menu__item-desc">Add a table for customers</div>
                                     </div>
                                 </button>
                                 <button
@@ -358,8 +358,8 @@ export default function FloorPlanEditor() {
                                 >
                                     <span className="text-lg">🌿</span>
                                     <div>
-                                        <div className="add-menu__item-title">Décoration</div>
-                                        <div className="add-menu__item-desc">Plante, mur, bar, etc.</div>
+                                        <div className="add-menu__item-title">Decoration</div>
+                                        <div className="add-menu__item-desc">Plant, wall, bar, etc.</div>
                                     </div>
                                 </button>
                             </div>
@@ -373,11 +373,11 @@ export default function FloorPlanEditor() {
                         </div>
                         <div className="floor-plan-stat">
                             <Users size={16} />
-                            <span>{totalCovers} couverts</span>
+                            <span>{totalCovers} covers</span>
                         </div>
                         <div className="floor-plan-stat">
                             <span className="text-base">🌿</span>
-                            <span>{decorations.length} décorations</span>
+                            <span>{decorations.length} decorations</span>
                         </div>
                     </div>
                 </div>
@@ -388,7 +388,7 @@ export default function FloorPlanEditor() {
                     disabled={saving}
                 >
                     <Save size={18} />
-                    {saving ? 'Sauvegarde...' : 'Sauvegarder le Plan'}
+                    {saving ? 'Saving...' : 'Save Floor Plan'}
                 </button>
             </div>
 
@@ -396,26 +396,26 @@ export default function FloorPlanEditor() {
             {addMode === 'table' && (
                 <div className="floor-plan-form">
                     <div className="floor-plan-form__header">
-                        <h4>Nouvelle Table</h4>
-                        <button className="btn-text" onClick={() => setAddMode(null)}>Annuler</button>
+                        <h4>New Table</h4>
+                        <button className="btn-text" onClick={() => setAddMode(null)}>Cancel</button>
                     </div>
                     <div className="floor-plan-form__body">
                         <div className="floor-plan-form__group">
-                            <label>Numéro de Table</label>
+                            <label>Table Number</label>
                             <input
                                 type="text"
-                                aria-label="Numéro de Table"
+                                aria-label="Table Number"
                                 value={tableForm.number}
                                 onChange={(e) => setTableForm({ ...tableForm, number: e.target.value })}
-                                placeholder="Ex: 1, A1, T5..."
+                                placeholder="e.g. 1, A1, T5..."
                                 autoFocus
                             />
                         </div>
                         <div className="floor-plan-form__group">
-                            <label>Capacité</label>
+                            <label>Capacity</label>
                             <input
                                 type="number"
-                                aria-label="Capacité"
+                                aria-label="Capacity"
                                 min="1"
                                 max="20"
                                 value={tableForm.capacity}
@@ -435,7 +435,7 @@ export default function FloorPlanEditor() {
                             </select>
                         </div>
                         <div className="floor-plan-form__group floor-plan-form__group--full">
-                            <label>Forme de la Table</label>
+                            <label>Table Shape</label>
                             <div className="shape-selector">
                                 {TABLE_SHAPES.map(shape => (
                                     <button
@@ -452,7 +452,7 @@ export default function FloorPlanEditor() {
                         </div>
                         <button className="btn-primary" onClick={handleAddTable}>
                             <Plus size={16} />
-                            Créer la Table
+                            Create Table
                         </button>
                     </div>
                 </div>
@@ -462,12 +462,12 @@ export default function FloorPlanEditor() {
             {addMode === 'decoration' && (
                 <div className="floor-plan-form">
                     <div className="floor-plan-form__header">
-                        <h4>Nouvel Élément de Décoration</h4>
-                        <button className="btn-text" onClick={() => setAddMode(null)}>Annuler</button>
+                        <h4>New Decoration Element</h4>
+                        <button className="btn-text" onClick={() => setAddMode(null)}>Cancel</button>
                     </div>
                     <div className="floor-plan-form__body">
                         <div className="floor-plan-form__group floor-plan-form__group--full">
-                            <label>Type d'Élément</label>
+                            <label>Element Type</label>
                             <div className="decoration-selector">
                                 {DECORATION_TYPES.map(deco => (
                                     <button
@@ -484,7 +484,7 @@ export default function FloorPlanEditor() {
                         </div>
                         <button className="btn-primary" onClick={handleAddDecoration}>
                             <Plus size={16} />
-                            Ajouter
+                            Add
                         </button>
                     </div>
                 </div>
@@ -506,7 +506,7 @@ export default function FloorPlanEditor() {
                         >
                             {section.icon}
                             <span className="floor-plan-section-tab__label">{section.label}</span>
-                            <span className="floor-plan-section-tab__count">{sectionTables.length} tables · {sectionCovers} couverts</span>
+                            <span className="floor-plan-section-tab__count">{sectionTables.length} tables · {sectionCovers} covers</span>
                         </button>
                     )
                 })}
@@ -523,13 +523,13 @@ export default function FloorPlanEditor() {
                 >
                     {loading ? (
                         <div className="floor-plan-loading">
-                            Chargement du plan de salle...
+                            Loading floor plan...
                         </div>
                     ) : filteredItems.length === 0 ? (
                         <div className="floor-plan-empty">
                             <Grid size={48} opacity={0.3} />
-                            <h3>Aucun élément dans "{FLOOR_SECTIONS.find(s => s.value === activeSection)?.label}"</h3>
-                            <p>Cliquez sur "Ajouter un Élément" pour commencer</p>
+                            <h3>No elements in "{FLOOR_SECTIONS.find(s => s.value === activeSection)?.label}"</h3>
+                            <p>Click "Add Element" to get started</p>
                         </div>
                     ) : (
                         <>
@@ -605,13 +605,13 @@ export default function FloorPlanEditor() {
                             <h3>
                                 {selectedItem.type === 'table'
                                     ? `Table ${selectedItem.number}`
-                                    : `Décoration ${DECORATION_TYPES.find(d => d.value === selectedItem.decoration_type)?.label || ''}`
+                                    : `Decoration ${DECORATION_TYPES.find(d => d.value === selectedItem.decoration_type)?.label || ''}`
                                 }
                             </h3>
                             <button
                                 className="btn-icon btn-icon--danger"
                                 onClick={() => handleDeleteItem(selectedItem.id)}
-                                title="Supprimer"
+                                title="Delete"
                             >
                                 <Trash2 size={16} />
                             </button>
@@ -620,7 +620,7 @@ export default function FloorPlanEditor() {
                             {selectedItem.type === 'table' ? (
                                 <>
                                     <div className="floor-plan-details__field">
-                                        <label>Forme</label>
+                                        <label>Shape</label>
                                         <span>{TABLE_SHAPES.find(s => s.value === selectedItem.shape)?.label}</span>
                                     </div>
                                     <div className="floor-plan-details__field">
@@ -628,10 +628,10 @@ export default function FloorPlanEditor() {
                                         <span>{selectedItem.section}</span>
                                     </div>
                                     <div className="floor-plan-details__field">
-                                        <label>Capacité</label>
+                                        <label>Capacity</label>
                                         <input
                                             type="number"
-                                            aria-label="Capacité"
+                                            aria-label="Capacity"
                                             min="1"
                                             max="20"
                                             value={selectedItem.capacity || 2}
@@ -650,13 +650,13 @@ export default function FloorPlanEditor() {
                                 <span>X: {selectedItem.x.toFixed(0)}%, Y: {selectedItem.y.toFixed(0)}%</span>
                             </div>
                             <div className="floor-plan-details__field floor-plan-details__field--size">
-                                <label>Taille</label>
+                                <label>Size</label>
                                 <div className="size-inputs">
                                     <div className="size-input">
-                                        <span>L:</span>
+                                        <span>W:</span>
                                         <input
                                             type="number"
-                                            aria-label="Largeur"
+                                            aria-label="Width"
                                             min="40"
                                             max="200"
                                             value={selectedItem.width || 80}
@@ -668,7 +668,7 @@ export default function FloorPlanEditor() {
                                         <span>H:</span>
                                         <input
                                             type="number"
-                                            aria-label="Hauteur"
+                                            aria-label="Height"
                                             min="40"
                                             max="200"
                                             value={selectedItem.height || 80}
@@ -680,7 +680,7 @@ export default function FloorPlanEditor() {
                             </div>
                         </div>
                         <div className="floor-plan-details__hint">
-                            💡 Glissez les coins pour redimensionner, ou déplacez l'élément
+                            💡 Drag corners to resize, or move the element
                         </div>
                     </div>
                 )}
@@ -690,12 +690,12 @@ export default function FloorPlanEditor() {
             <div className="floor-plan-instructions">
                 <h4>Instructions</h4>
                 <ul>
-                    <li><strong>Ajouter:</strong> Cliquez sur "Ajouter un Élément" et choisissez entre Table ou Décoration</li>
-                    <li><strong>Formes de tables:</strong> Choisissez entre carrée, ronde ou rectangle selon vos besoins</li>
-                    <li><strong>Décorations:</strong> Ajoutez des plantes, murs, bars ou entrées pour structurer votre salle</li>
-                    <li><strong>Déplacer:</strong> Cliquez et maintenez sur un élément, puis déplacez-le</li>
-                    <li><strong>Modifier:</strong> Cliquez sur un élément pour voir les détails et modifier</li>
-                    <li><strong>Sauvegarder:</strong> N'oubliez pas de cliquer sur "Sauvegarder le Plan" pour enregistrer</li>
+                    <li><strong>Add:</strong> Click "Add Element" and choose between Table or Decoration</li>
+                    <li><strong>Table shapes:</strong> Choose between square, round or rectangle as needed</li>
+                    <li><strong>Decorations:</strong> Add plants, walls, bars or entrances to structure your room</li>
+                    <li><strong>Move:</strong> Click and hold on an element, then drag it</li>
+                    <li><strong>Edit:</strong> Click on an element to see details and edit</li>
+                    <li><strong>Save:</strong> Don't forget to click "Save Floor Plan" to save</li>
                 </ul>
             </div>
         </div>

@@ -95,9 +95,9 @@ const validateForm = (data: ICompanyFormData): IValidationErrors => {
 const CompanySettingsPage = () => {
   const { data: settings, isLoading } = useSettingsByCategory('company');
   const updateSetting = useUpdateSetting();
-  const { hasPermission } = usePermissions();
+  const { hasPermission, isAdmin } = usePermissions();
 
-  const canEdit = hasPermission('settings.update');
+  const canEdit = hasPermission('settings.update') || isAdmin;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form state

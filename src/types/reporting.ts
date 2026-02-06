@@ -64,9 +64,12 @@ export interface DailySalesStat {
 export interface ProductPerformanceStat {
     product_id: string;
     product_name: string;
+    category_name?: string;
     quantity_sold: number;
     total_revenue: number;
     avg_price: number;
+    cost_price?: number;
+    margin_percentage?: number;
 }
 
 export interface CategorySalesStat {

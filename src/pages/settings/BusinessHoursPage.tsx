@@ -76,10 +76,10 @@ const BusinessHoursPage = () => {
       }
 
       if (errors.length === 0) {
-        toast.success('Horaires enregistrés');
+        toast.success('Business hours saved');
         setPendingChanges(new Set());
       } else {
-        toast.error(`Erreur sur ${errors.length} jour(s)`);
+        toast.error(`Error on ${errors.length} day(s)`);
       }
     } finally {
       setIsSaving(false);
@@ -106,7 +106,7 @@ const BusinessHoursPage = () => {
       <div className="settings-section">
         <div className="settings-section__body settings-section__loading">
           <div className="spinner" />
-          <span>Chargement...</span>
+          <span>Loading...</span>
         </div>
       </div>
     );
@@ -117,9 +117,9 @@ const BusinessHoursPage = () => {
       <div className="settings-section__header">
         <div className="settings-section__header-content">
           <div>
-            <h2 className="settings-section__title">Horaires d'Ouverture</h2>
+            <h2 className="settings-section__title">Business Hours</h2>
             <p className="settings-section__description">
-              Configurez les heures d'ouverture de votre établissement
+              Configure the opening hours of your establishment
             </p>
           </div>
           {pendingChanges.size > 0 && (
@@ -129,7 +129,7 @@ const BusinessHoursPage = () => {
               disabled={isSaving}
             >
               <Save size={16} />
-              {isSaving ? 'Enregistrement...' : `Enregistrer (${pendingChanges.size})`}
+              {isSaving ? 'Saving...' : `Save (${pendingChanges.size})`}
             </button>
           )}
         </div>
@@ -151,14 +151,14 @@ const BusinessHoursPage = () => {
                 <button
                   className={`toggle-mini ${!hours.is_closed ? 'is-on' : ''}`}
                   onClick={() => handleToggleClosed(hours.day_of_week)}
-                  title={hours.is_closed ? 'Ouvrir' : 'Fermer'}
+                  title={hours.is_closed ? 'Open' : 'Close'}
                 />
               </div>
 
               {!hours.is_closed ? (
                 <div className="business-hours-item__times">
                   <div className="business-hours-item__time-group">
-                    <label>Ouverture</label>
+                    <label>Opening</label>
                     <input
                       type="time"
                       className="business-hours-input"
@@ -168,7 +168,7 @@ const BusinessHoursPage = () => {
                   </div>
                   <span className="business-hours-item__separator">-</span>
                   <div className="business-hours-item__time-group">
-                    <label>Fermeture</label>
+                    <label>Closing</label>
                     <input
                       type="time"
                       className="business-hours-input"
@@ -178,13 +178,13 @@ const BusinessHoursPage = () => {
                   </div>
 
                   <div className="business-hours-item__break">
-                    <span className="business-hours-item__break-label">Pause:</span>
+                    <span className="business-hours-item__break-label">Break:</span>
                     <input
                       type="time"
                       className="business-hours-input business-hours-input--small"
                       value={hours.break_start || ''}
                       onChange={(e) => handleChange(hours.day_of_week, 'break_start', e.target.value || null)}
-                      placeholder="Début"
+                      placeholder="Start"
                     />
                     <span>-</span>
                     <input
@@ -192,14 +192,14 @@ const BusinessHoursPage = () => {
                       className="business-hours-input business-hours-input--small"
                       value={hours.break_end || ''}
                       onChange={(e) => handleChange(hours.day_of_week, 'break_end', e.target.value || null)}
-                      placeholder="Fin"
+                      placeholder="End"
                     />
                   </div>
                 </div>
               ) : (
                 <div className="business-hours-item__closed">
                   <Clock size={16} />
-                  Fermé
+                  Closed
                 </div>
               )}
 
@@ -207,9 +207,9 @@ const BusinessHoursPage = () => {
                 <button
                   className="btn-ghost btn-ghost--small"
                   onClick={() => applyToAll(hours)}
-                  title="Appliquer à tous les jours"
+                  title="Apply to all days"
                 >
-                  Appliquer à tous
+                  Apply to all
                 </button>
               </div>
             </div>
@@ -222,7 +222,7 @@ const BusinessHoursPage = () => {
           <div className="settings-unsaved-notice">
             <AlertCircle size={16} />
             <span>
-              {pendingChanges.size} modification{pendingChanges.size > 1 ? 's' : ''} non enregistrée{pendingChanges.size > 1 ? 's' : ''}
+              {pendingChanges.size} unsaved change{pendingChanges.size > 1 ? 's' : ''}
             </span>
           </div>
         </div>

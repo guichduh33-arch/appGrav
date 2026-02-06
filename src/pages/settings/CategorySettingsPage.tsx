@@ -53,14 +53,14 @@ const CategorySettingsPage = () => {
   const handleReset = async (key: string) => {
     try {
       await resetSettingMutation.mutateAsync(key);
-      toast.success('Paramètre réinitialisé');
+      toast.success('Setting reset');
       setPendingChanges((prev) => {
         const next = new Set(prev);
         next.delete(key);
         return next;
       });
     } catch (error) {
-      toast.error('Erreur lors de la réinitialisation');
+      toast.error('Error resetting setting');
     }
   };
 
@@ -84,10 +84,10 @@ const CategorySettingsPage = () => {
       }
 
       if (errors.length === 0) {
-        toast.success('Paramètres enregistrés');
+        toast.success('Settings saved');
         setPendingChanges(new Set());
       } else {
-        toast.error(`Erreur sur ${errors.length} paramètre(s)`);
+        toast.error(`Error on ${errors.length} setting(s)`);
       }
     } finally {
       setIsSaving(false);
@@ -105,7 +105,7 @@ const CategorySettingsPage = () => {
     });
     setFormValues(values);
     setPendingChanges(new Set());
-    toast.success('Modifications annulées');
+    toast.success('Changes discarded');
   };
 
   if (isLoading) {
@@ -113,7 +113,7 @@ const CategorySettingsPage = () => {
       <div className="settings-section">
         <div className="settings-section__body settings-section__loading">
           <div className="spinner" />
-          <span>Chargement des paramètres...</span>
+          <span>Loading settings...</span>
         </div>
       </div>
     );
@@ -124,7 +124,7 @@ const CategorySettingsPage = () => {
       <div className="settings-section">
         <div className="settings-section__body settings-section__error">
           <AlertCircle size={24} />
-          <span>Erreur lors du chargement des paramètres</span>
+          <span>Error loading settings</span>
         </div>
       </div>
     );
@@ -151,7 +151,7 @@ const CategorySettingsPage = () => {
                 disabled={isSaving}
               >
                 <RotateCcw size={16} />
-                Annuler
+                Cancel
               </button>
               <button
                 className="btn-primary"
@@ -159,7 +159,7 @@ const CategorySettingsPage = () => {
                 disabled={isSaving}
               >
                 <Save size={16} />
-                {isSaving ? 'Enregistrement...' : `Enregistrer (${pendingChanges.size})`}
+                {isSaving ? 'Saving...' : `Save (${pendingChanges.size})`}
               </button>
             </div>
           )}
@@ -169,7 +169,7 @@ const CategorySettingsPage = () => {
       <div className="settings-section__body">
         {settings.length === 0 ? (
           <div className="settings-section__empty">
-            <p>Aucun paramètre dans cette catégorie.</p>
+            <p>No settings in this category.</p>
           </div>
         ) : (
           <div className="settings-list">
@@ -192,7 +192,7 @@ const CategorySettingsPage = () => {
           <div className="settings-unsaved-notice">
             <AlertCircle size={16} />
             <span>
-              {pendingChanges.size} modification{pendingChanges.size > 1 ? 's' : ''} non enregistrée{pendingChanges.size > 1 ? 's' : ''}
+              {pendingChanges.size} unsaved change{pendingChanges.size > 1 ? 's' : ''}
             </span>
           </div>
         </div>

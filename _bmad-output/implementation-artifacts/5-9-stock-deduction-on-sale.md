@@ -1,6 +1,6 @@
 # Story 5.9: Stock Deduction on Sale (Auto)
 
-Status: review
+Status: done
 
 ## Story
 

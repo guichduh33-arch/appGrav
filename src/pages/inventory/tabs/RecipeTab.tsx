@@ -36,7 +36,7 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
         <div className="card">
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div>
-                    <h3 className="card-title" style={{ marginBottom: '0.25rem' }}>Ingrédients de la recette</h3>
+                    <h3 className="card-title" style={{ marginBottom: '0.25rem' }}>Recipe Ingredients</h3>
                     {productType === 'semi_finished' && (
                         <div style={{
                             display: 'flex',
@@ -51,10 +51,10 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
                             <Scale size={18} style={{ color: '#D97706' }} />
                             <div>
                                 <span style={{ fontWeight: 600, color: '#92400E', fontSize: '0.875rem' }}>
-                                    Base de calcul : 1 kg de produit fini
+                                    Calculation base: 1 kg of finished product
                                 </span>
                                 <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.75rem', color: '#B45309' }}>
-                                    Les quantités ci-dessous sont pour produire 1 kg de ce semi-produit
+                                    The quantities below are to produce 1 kg of this semi-finished product
                                 </p>
                             </div>
                         </div>
@@ -64,7 +64,7 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
                     className="btn-secondary flex items-center gap-2 text-sm"
                     onClick={() => setShowIngredientSearch(!showIngredientSearch)}
                 >
-                    <Plus size={14} /> Ajouter un ingrédient
+                    <Plus size={14} /> Add an ingredient
                 </button>
             </div>
 
@@ -76,7 +76,7 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
                                 key={ing.id}
                                 className="ingredient-btn"
                                 onClick={() => onAddIngredient(ing.id)}
-                                title={`Ajouter ${ing.name}`}
+                                title={`Add ${ing.name}`}
                             >
                                 <div className="font-medium">{ing.name}</div>
                                 <div className="text-xs text-gray-500">Stock: {ing.current_stock} {ing.unit}</div>
@@ -90,9 +90,9 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
                 <table className="detail-table">
                     <thead>
                         <tr>
-                            <th>Matériau</th>
-                            <th>Quantité</th>
-                            <th>Unité</th>
+                            <th>Material</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
                             <th className="text-right">Actions</th>
                         </tr>
                     </thead>
@@ -109,7 +109,7 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
                                     <input
                                         type="number"
                                         aria-label="Quantity"
-                                        title="Quantité"
+                                        title="Quantity"
                                         placeholder="0"
                                         className="form-input w-24 text-right py-1"
                                         value={item.quantity}
@@ -123,7 +123,7 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
                                         className="form-input w-20 py-1"
                                         value={item.unit || ''}
                                         placeholder={item.material.unit ?? ''}
-                                        title="Entrez l'unité"
+                                        title="Enter unit"
                                         onChange={e => onUpdateQuantity(item.id, item.quantity, e.target.value)}
                                     />
                                 </td>
@@ -131,7 +131,7 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
                                     <button
                                         className="p-2 text-red-500 hover:bg-red-50 rounded transition-colors"
                                         onClick={() => onRemoveIngredient(item.id)}
-                                        title="Retirer"
+                                        title="Remove"
                                     >
                                         <Trash2 size={16} />
                                     </button>
@@ -141,7 +141,7 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
                         {recipeItems.length === 0 && (
                             <tr>
                                 <td colSpan={4} className="p-8 text-center text-gray-500 italic">
-                                    Aucun ingrédient. Ajoutez des matières premières pour définir la recette.
+                                    No ingredients. Add raw materials to define the recipe.
                                 </td>
                             </tr>
                         )}
@@ -150,7 +150,7 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
                         <tfoot>
                             <tr style={{ background: '#F9FAFB' }}>
                                 <td style={{ fontWeight: 600, color: '#4A3728' }}>
-                                    Total ({recipeItems.length} ingrédient{recipeItems.length > 1 ? 's' : ''})
+                                    Total ({recipeItems.length} ingredient{recipeItems.length > 1 ? 's' : ''})
                                 </td>
                                 <td colSpan={3} style={{ textAlign: 'right', fontWeight: 600, color: '#4A3728' }}>
                                     {totalWeight >= 1000
@@ -178,9 +178,9 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
                 }}>
                     <Info size={20} style={{ color: '#0284C7', flexShrink: 0, marginTop: '0.125rem' }} />
                     <div style={{ fontSize: '0.8125rem', color: '#0369A1' }}>
-                        <strong>Calcul du coût :</strong> Le coût de revient de ce semi-produit sera calculé
-                        en additionnant le coût de chaque ingrédient. Pour produire une quantité différente,
-                        multipliez le coût par le poids souhaité (ex: 2.5 kg = coût × 2.5).
+                        <strong>Cost calculation:</strong> The cost price of this semi-finished product will be calculated
+                        by adding the cost of each ingredient. To produce a different quantity,
+                        multiply the cost by the desired weight (e.g., 2.5 kg = cost × 2.5).
                     </div>
                 </div>
             )}

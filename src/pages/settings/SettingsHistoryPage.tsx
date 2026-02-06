@@ -15,7 +15,7 @@ const SettingsHistoryPage = () => {
   // Format value for display
   const formatValue = (value: unknown): string => {
     if (value === null || value === undefined) return '-';
-    if (typeof value === 'boolean') return value ? 'Oui' : 'Non';
+    if (typeof value === 'boolean') return value ? 'Yes' : 'No';
     if (typeof value === 'object') return JSON.stringify(value);
     return String(value);
   };
@@ -48,9 +48,9 @@ const SettingsHistoryPage = () => {
       <div className="settings-section__header">
         <div className="settings-section__header-content">
           <div>
-            <h2 className="settings-section__title">Historique des Modifications</h2>
+            <h2 className="settings-section__title">Change History</h2>
             <p className="settings-section__description">
-              Journal des modifications apportées aux paramètres
+              Log of changes made to settings
             </p>
           </div>
         </div>
@@ -64,7 +64,7 @@ const SettingsHistoryPage = () => {
             <input
               type="text"
               className="search-input"
-              placeholder="Rechercher un paramètre..."
+              placeholder="Search for a setting..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -74,13 +74,13 @@ const SettingsHistoryPage = () => {
         {isLoading ? (
           <div className="settings-section__loading">
             <div className="spinner" />
-            <span>Chargement...</span>
+            <span>Loading...</span>
           </div>
         ) : !filteredHistory || filteredHistory.length === 0 ? (
           <div className="settings-section__empty">
             <History size={48} />
-            <h3>Aucune modification</h3>
-            <p>L'historique des modifications apparaîtra ici.</p>
+            <h3>No changes</h3>
+            <p>Change history will appear here.</p>
           </div>
         ) : (
           <div className="settings-history-list">
@@ -90,7 +90,7 @@ const SettingsHistoryPage = () => {
               const userName = user?.display_name ||
                 (user?.first_name && user?.last_name
                   ? `${user.first_name} ${user.last_name}`
-                  : 'Système');
+                  : 'System');
 
               return (
                 <div key={item.id} className="settings-history-item">
@@ -100,7 +100,7 @@ const SettingsHistoryPage = () => {
                   <div className="settings-history-item__content">
                     <div className="settings-history-item__header">
                       <span className="settings-history-item__setting">
-                        {setting?.[nameKey] || setting?.name_en || setting?.key || 'Paramètre inconnu'}
+                        {setting?.[nameKey] || setting?.name_en || setting?.key || 'Unknown setting'}
                       </span>
                       <span className="settings-history-item__key">
                         {setting?.key}
@@ -117,7 +117,7 @@ const SettingsHistoryPage = () => {
                     </div>
                     {item.change_reason && (
                       <div className="settings-history-item__reason">
-                        Raison: {item.change_reason}
+                        Reason: {item.change_reason}
                       </div>
                     )}
                     <div className="settings-history-item__meta">

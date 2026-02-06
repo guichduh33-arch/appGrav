@@ -108,7 +108,7 @@ export const ReportingService = {
     async getProductPerformance(startDate: Date, endDate: Date): Promise<ProductPerformanceStat[]> {
         const { data, error } = await supabase
             .from('order_items')
-            .select('product_id, product_name, quantity, total_price')
+            .select('product_id, product_name, quantity, total_price, product:products(cost_price, category:categories(name))')
             .gte('created_at', startDate.toISOString())
             .lte('created_at', endDate.toISOString())
             .eq('item_status', 'served');
@@ -122,6 +122,7 @@ export const ReportingService = {
             product_name: string;
             quantity: number;
             total_price: number;
+            product?: { cost_price?: number; category?: { name?: string } };
         };
         const rawData = data as unknown as OrderItemRow[];
         rawData?.forEach((item) => {
@@ -130,9 +131,11 @@ export const ReportingService = {
                 map.set(key, {
                     product_id: item.product_id ?? '',
                     product_name: item.product_name,
+                    category_name: item.product?.category?.name || 'Uncategorized',
                     quantity_sold: 0,
                     total_revenue: 0,
-                    avg_price: 0
+                    avg_price: 0,
+                    cost_price: item.product?.cost_price || 0,
                 });
             }
             const stat = map.get(key)!;
@@ -142,7 +145,10 @@ export const ReportingService = {
 
         const result = Array.from(map.values()).map(stat => ({
             ...stat,
-            avg_price: stat.quantity_sold > 0 ? stat.total_revenue / stat.quantity_sold : 0
+            avg_price: stat.quantity_sold > 0 ? stat.total_revenue / stat.quantity_sold : 0,
+            margin_percentage: stat.total_revenue > 0
+                ? ((stat.total_revenue - stat.quantity_sold * (stat.cost_price || 0)) / stat.total_revenue) * 100
+                : 0,
         }));
 
         return result.sort((a, b) => b.total_revenue - a.total_revenue);

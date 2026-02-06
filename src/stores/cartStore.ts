@@ -3,6 +3,7 @@ import { subscribeWithSelector } from 'zustand/middleware'
 import type { Product, ProductCombo } from '../types/database'
 import { saveCart, clearPersistedCart, type TSaveCartInput } from '@/services/offline/cartPersistenceService'
 import type { TPriceType } from '@/types/offline'
+import type { IItemPromotionDiscount, IPromotionEvaluationResult } from '@/services/pos/promotionEngine'
 
 export interface CartModifier {
     groupName: string
@@ -69,6 +70,11 @@ interface CartState {
     activeOrderId: string | null
     activeOrderNumber: string | null
 
+    // Promotion discounts (Story 6.5)
+    promotionDiscounts: IItemPromotionDiscount[]
+    promotionTotalDiscount: number
+    appliedPromotions: IPromotionEvaluationResult['appliedPromotions']
+
     // Computed
     subtotal: number
     discountAmount: number
@@ -130,9 +136,13 @@ interface CartState {
         categorySlug: string | null
     ) => void
     customerCategorySlug: string | null
+
+    // Promotion discounts (Story 6.5)
+    setPromotionResult: (result: IPromotionEvaluationResult) => void
+    getItemPromotionDiscount: (itemId: string) => IItemPromotionDiscount[]
 }
 
-function calculateTotals(items: CartItem[], discountType: 'percent' | 'amount' | null, discountValue: number) {
+function calculateTotals(items: CartItem[], discountType: 'percent' | 'amount' | null, discountValue: number, promotionTotalDiscount = 0) {
     const subtotal = items.reduce((sum, item) => sum + item.totalPrice, 0)
     let discountAmount = 0
 
@@ -148,7 +158,8 @@ function calculateTotals(items: CartItem[], discountType: 'percent' | 'amount' |
         discountAmount = Math.min(subtotal, safeDiscountValue)
     }
 
-    const total = Math.max(0, subtotal - discountAmount)
+    // Promotion discount applied before manual discount
+    const total = Math.max(0, subtotal - promotionTotalDiscount - discountAmount)
     const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
 
     return { subtotal, discountAmount, total, itemCount }
@@ -169,6 +180,9 @@ export const useCartStore = create<CartState>()(
     lockedItemIds: [],
     activeOrderId: null,
     activeOrderNumber: null,
+    promotionDiscounts: [],
+    promotionTotalDiscount: 0,
+    appliedPromotions: [],
     subtotal: 0,
     discountAmount: 0,
     total: 0,
@@ -194,15 +208,16 @@ export const useCartStore = create<CartState>()(
 
         set(state => {
             const newItems = [...state.items, newItem]
-            const totals = calculateTotals(newItems, state.discountType, state.discountValue)
+            const totals = calculateTotals(newItems, state.discountType, state.discountValue, state.promotionTotalDiscount)
             return { items: newItems, ...totals }
         })
     },
 
     addCombo: (combo, quantity, comboSelections, totalPrice, notes) => {
-        // Calculate adjustments total from selections
-        const modifiersTotal = comboSelections.reduce((sum, sel) => sum + sel.price_adjustment, 0)
-        const unitPrice = totalPrice / quantity // Unit price already includes selections
+        // unitPrice already includes price adjustments, so modifiersTotal must be 0
+        // to avoid double-counting in updateItemQuantity: (unitPrice + modifiersTotal) * qty
+        const modifiersTotal = 0
+        const unitPrice = totalPrice / quantity
 
         const newItem: CartItem = {
             id: `combo-${combo.id}-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
@@ -219,7 +234,7 @@ export const useCartStore = create<CartState>()(
 
         set(state => {
             const newItems = [...state.items, newItem]
-            const totals = calculateTotals(newItems, state.discountType, state.discountValue)
+            const totals = calculateTotals(newItems, state.discountType, state.discountValue, state.promotionTotalDiscount)
             return { items: newItems, ...totals }
         })
     },
@@ -234,7 +249,7 @@ export const useCartStore = create<CartState>()(
                 }
                 return item
             })
-            const totals = calculateTotals(newItems, state.discountType, state.discountValue)
+            const totals = calculateTotals(newItems, state.discountType, state.discountValue, state.promotionTotalDiscount)
             return { items: newItems, ...totals }
         })
     },
@@ -263,7 +278,7 @@ export const useCartStore = create<CartState>()(
                 }
                 return item
             })
-            const totals = calculateTotals(newItems, state.discountType, state.discountValue)
+            const totals = calculateTotals(newItems, state.discountType, state.discountValue, state.promotionTotalDiscount)
             return { items: newItems, ...totals }
         })
     },
@@ -278,7 +293,7 @@ export const useCartStore = create<CartState>()(
 
         set(state => {
             const newItems = state.items.filter(item => item.id !== itemId)
-            const totals = calculateTotals(newItems, state.discountType, state.discountValue)
+            const totals = calculateTotals(newItems, state.discountType, state.discountValue, state.promotionTotalDiscount)
             return { items: newItems, ...totals }
         })
     },
@@ -299,6 +314,9 @@ export const useCartStore = create<CartState>()(
             lockedItemIds: [],
             activeOrderId: null,
             activeOrderNumber: null,
+            promotionDiscounts: [],
+            promotionTotalDiscount: 0,
+            appliedPromotions: [],
             subtotal: 0,
             discountAmount: 0,
             total: 0,
@@ -317,7 +335,7 @@ export const useCartStore = create<CartState>()(
 
     setDiscount: (discountType, discountValue, discountReason) => {
         set(state => {
-            const totals = calculateTotals(state.items, discountType, discountValue)
+            const totals = calculateTotals(state.items, discountType, discountValue, state.promotionTotalDiscount)
             return { discountType, discountValue, discountReason, ...totals }
         })
     },
@@ -346,7 +364,7 @@ export const useCartStore = create<CartState>()(
         set(state => {
             const newItems = state.items.filter(item => item.id !== itemId)
             const newLockedIds = state.lockedItemIds.filter(id => id !== itemId)
-            const totals = calculateTotals(newItems, state.discountType, state.discountValue)
+            const totals = calculateTotals(newItems, state.discountType, state.discountValue, state.promotionTotalDiscount)
             return { items: newItems, lockedItemIds: newLockedIds, ...totals }
         })
     },
@@ -371,7 +389,7 @@ export const useCartStore = create<CartState>()(
 
     restoreCartState: (items, lockedItemIds, activeOrderId, activeOrderNumber) => {
         set(state => {
-            const totals = calculateTotals(items, state.discountType, state.discountValue)
+            const totals = calculateTotals(items, state.discountType, state.discountValue, state.promotionTotalDiscount)
             return {
                 items,
                 lockedItemIds,
@@ -406,7 +424,7 @@ export const useCartStore = create<CartState>()(
 
         set(state => {
             const newItems = [...state.items, newItem]
-            const totals = calculateTotals(newItems, state.discountType, state.discountValue)
+            const totals = calculateTotals(newItems, state.discountType, state.discountValue, state.promotionTotalDiscount)
             return { items: newItems, ...totals }
         })
     },
@@ -426,7 +444,7 @@ export const useCartStore = create<CartState>()(
                 }
                 return item
             })
-            const totals = calculateTotals(newItems, state.discountType, state.discountValue)
+            const totals = calculateTotals(newItems, state.discountType, state.discountValue, state.promotionTotalDiscount)
             return { items: newItems, ...totals }
         })
     },
@@ -454,9 +472,26 @@ export const useCartStore = create<CartState>()(
         }
 
         set(state => {
-            const totals = calculateTotals(updatedItems, state.discountType, state.discountValue)
+            const totals = calculateTotals(updatedItems, state.discountType, state.discountValue, state.promotionTotalDiscount)
             return { items: updatedItems, ...totals }
         })
+    },
+
+    // Promotion discounts (Story 6.5)
+    setPromotionResult: (result) => {
+        set(state => {
+            const totals = calculateTotals(state.items, state.discountType, state.discountValue, result.totalDiscount)
+            return {
+                promotionDiscounts: result.itemDiscounts,
+                promotionTotalDiscount: result.totalDiscount,
+                appliedPromotions: result.appliedPromotions,
+                ...totals,
+            }
+        })
+    },
+
+    getItemPromotionDiscount: (itemId) => {
+        return get().promotionDiscounts.filter(d => d.itemId === itemId)
     },
 })))
 

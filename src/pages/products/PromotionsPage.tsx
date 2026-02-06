@@ -10,12 +10,12 @@ import { Promotion, PromotionType } from '../../types/database'
 import './PromotionsPage.css'
 
 const PROMOTION_TYPE_LABELS: Record<PromotionType, string> = {
-    percentage: 'Réduction %',
-    fixed_amount: 'Montant fixe',
-    buy_x_get_y: 'Achetez X obtenez Y',
-    free_product: 'Produit offert',
-    fixed: 'Montant fixe',
-    free: 'Gratuit'
+    percentage: 'Discount %',
+    fixed_amount: 'Fixed amount',
+    buy_x_get_y: 'Buy X get Y',
+    free_product: 'Free product',
+    fixed: 'Fixed amount',
+    free: 'Free'
 }
 
 const PROMOTION_TYPE_ICONS: Record<PromotionType, React.ReactNode> = {
@@ -28,13 +28,13 @@ const PROMOTION_TYPE_ICONS: Record<PromotionType, React.ReactNode> = {
 }
 
 const DAYS_OF_WEEK = [
-    { value: 0, label: 'Dimanche' },
-    { value: 1, label: 'Lundi' },
-    { value: 2, label: 'Mardi' },
-    { value: 3, label: 'Mercredi' },
-    { value: 4, label: 'Jeudi' },
-    { value: 5, label: 'Vendredi' },
-    { value: 6, label: 'Samedi' }
+    { value: 0, label: 'Sunday' },
+    { value: 1, label: 'Monday' },
+    { value: 2, label: 'Tuesday' },
+    { value: 3, label: 'Wednesday' },
+    { value: 4, label: 'Thursday' },
+    { value: 5, label: 'Friday' },
+    { value: 6, label: 'Saturday' }
 ]
 
 export default function PromotionsPage() {
@@ -98,7 +98,7 @@ export default function PromotionsPage() {
     })
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer cette promotion ?')) return
+        if (!confirm('Are you sure you want to delete this promotion?')) return
 
         try {
             const { error } = await supabase
@@ -130,13 +130,13 @@ export default function PromotionsPage() {
     const formatPromotionValue = (promo: Promotion): string => {
         switch (promo.promotion_type) {
             case 'percentage':
-                return `${promo.discount_percentage}% de réduction`
+                return `${promo.discount_percentage}% discount`
             case 'fixed_amount':
-                return `${formatCurrency(promo.discount_amount || 0)} de réduction`
+                return `${formatCurrency(promo.discount_amount || 0)} discount`
             case 'buy_x_get_y':
-                return `Achetez ${promo.buy_quantity}, obtenez ${promo.get_quantity} gratuit`
+                return `Buy ${promo.buy_quantity}, get ${promo.get_quantity} free`
             case 'free_product':
-                return 'Produit gratuit'
+                return 'Free product'
             default:
                 return '-'
         }
@@ -146,16 +146,16 @@ export default function PromotionsPage() {
         const constraints: string[] = []
 
         if (promo.start_date || promo.end_date) {
-            const start = promo.start_date ? new Date(promo.start_date).toLocaleDateString('fr-FR') : '...'
-            const end = promo.end_date ? new Date(promo.end_date).toLocaleDateString('fr-FR') : '...'
-            constraints.push(`Du ${start} au ${end}`)
+            const start = promo.start_date ? new Date(promo.start_date).toLocaleDateString('en-GB') : '...'
+            const end = promo.end_date ? new Date(promo.end_date).toLocaleDateString('en-GB') : '...'
+            constraints.push(`From ${start} to ${end}`)
         }
 
         if (promo.days_of_week && promo.days_of_week.length > 0) {
             const days = promo.days_of_week
                 .map(d => DAYS_OF_WEEK.find(day => day.value === d)?.label.substring(0, 3))
                 .join(', ')
-            constraints.push(`Jours: ${days}`)
+            constraints.push(`Days: ${days}`)
         }
 
         if (promo.time_start && promo.time_end) {
@@ -181,10 +181,10 @@ export default function PromotionsPage() {
                 <div className="promotions-header__info">
                     <h1 className="promotions-header__title">
                         <Tag size={28} />
-                        Gestion des Promotions
+                        Promotion Management
                     </h1>
                     <p className="promotions-header__subtitle">
-                        Créez des promotions avec règles temporelles et conditions d'achat
+                        Create promotions with time rules and purchase conditions
                     </p>
                 </div>
                 <button
@@ -192,7 +192,7 @@ export default function PromotionsPage() {
                     onClick={() => navigate('/products/promotions/new')}
                 >
                     <Plus size={18} />
-                    Nouvelle Promotion
+                    New Promotion
                 </button>
             </header>
 
@@ -209,21 +209,21 @@ export default function PromotionsPage() {
                     <CheckCircle size={24} />
                     <div className="stat-content">
                         <span className="stat-value">{stats.active}</span>
-                        <span className="stat-label">Actives</span>
+                        <span className="stat-label">Active</span>
                     </div>
                 </div>
                 <div className="stat-card inactive">
                     <AlertCircle size={24} />
                     <div className="stat-content">
                         <span className="stat-value">{stats.inactive}</span>
-                        <span className="stat-label">Inactives</span>
+                        <span className="stat-label">Inactive</span>
                     </div>
                 </div>
                 <div className="stat-card expired">
                     <Calendar size={24} />
                     <div className="stat-content">
                         <span className="stat-value">{stats.expired}</span>
-                        <span className="stat-label">Expirées</span>
+                        <span className="stat-label">Expired</span>
                     </div>
                 </div>
             </div>
@@ -234,7 +234,7 @@ export default function PromotionsPage() {
                     <Search size={20} />
                     <input
                         type="text"
-                        placeholder="Rechercher par nom, code ou description..."
+                        placeholder="Search by name, code or description..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -244,20 +244,20 @@ export default function PromotionsPage() {
                     onChange={(e) => setFilterType(e.target.value as PromotionType | 'all')}
                     className="filter-select"
                 >
-                    <option value="all">Tous les types</option>
-                    <option value="percentage">Réduction %</option>
-                    <option value="fixed_amount">Montant fixe</option>
-                    <option value="buy_x_get_y">Achetez X obtenez Y</option>
-                    <option value="free_product">Produit offert</option>
+                    <option value="all">All types</option>
+                    <option value="percentage">Discount %</option>
+                    <option value="fixed_amount">Fixed amount</option>
+                    <option value="buy_x_get_y">Buy X get Y</option>
+                    <option value="free_product">Free product</option>
                 </select>
                 <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value as 'all' | 'active' | 'inactive')}
                     className="filter-select"
                 >
-                    <option value="all">Tous les statuts</option>
-                    <option value="active">Actives</option>
-                    <option value="inactive">Inactives</option>
+                    <option value="all">All statuses</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
                 </select>
             </div>
 
@@ -265,16 +265,16 @@ export default function PromotionsPage() {
             {loading ? (
                 <div className="promotions-loading">
                     <div className="spinner"></div>
-                    <span>Chargement des promotions...</span>
+                    <span>Loading promotions...</span>
                 </div>
             ) : filteredPromotions.length === 0 ? (
                 <div className="promotions-empty">
                     <Tag size={64} />
-                    <h3>Aucune promotion trouvée</h3>
+                    <h3>No promotion found</h3>
                     <p>
                         {searchTerm || filterType !== 'all'
-                            ? 'Essayez de modifier vos filtres'
-                            : 'Commencez par créer votre première promotion'}
+                            ? 'Try modifying your filters'
+                            : 'Start by creating your first promotion'}
                     </p>
                 </div>
             ) : (
@@ -323,7 +323,7 @@ export default function PromotionsPage() {
 
                                     {promo.min_purchase_amount && (
                                         <div className="promotion-card__requirement">
-                                            Achat minimum: {formatCurrency(promo.min_purchase_amount)}
+                                            Minimum purchase: {formatCurrency(promo.min_purchase_amount)}
                                         </div>
                                     )}
 
@@ -331,11 +331,11 @@ export default function PromotionsPage() {
                                         <div className="promotion-card__usage">
                                             <Users size={14} />
                                             <span>
-                                                {promo.current_uses} / {promo.max_uses_total || '∞'} utilisations
+                                                {promo.current_uses} / {promo.max_uses_total || '∞'} uses
                                             </span>
                                             {promo.max_uses_per_customer && (
                                                 <span className="per-customer">
-                                                    (Max {promo.max_uses_per_customer}/client)
+                                                    (Max {promo.max_uses_per_customer}/customer)
                                                 </span>
                                             )}
                                         </div>
@@ -343,10 +343,10 @@ export default function PromotionsPage() {
 
                                     <div className="promotion-card__meta">
                                         <span className="priority-badge">
-                                            Priorité: {promo.priority}
+                                            Priority: {promo.priority}
                                         </span>
                                         {promo.is_stackable && (
-                                            <span className="stackable-badge">Cumulable</span>
+                                            <span className="stackable-badge">Stackable</span>
                                         )}
                                     </div>
                                 </div>
@@ -355,28 +355,28 @@ export default function PromotionsPage() {
                                     <button
                                         className="btn-icon"
                                         onClick={() => navigate(`/products/promotions/${promo.id}`)}
-                                        title="Voir détails"
+                                        title="View details"
                                     >
                                         <Eye size={16} />
                                     </button>
                                     <button
                                         className="btn-icon"
                                         onClick={() => navigate(`/products/promotions/${promo.id}/edit`)}
-                                        title="Modifier"
+                                        title="Edit"
                                     >
                                         <Edit size={16} />
                                     </button>
                                     <button
                                         className={`btn-icon ${promo.is_active ? 'active' : 'inactive'}`}
                                         onClick={() => handleToggleActive(promo)}
-                                        title={promo.is_active ? 'Désactiver' : 'Activer'}
+                                        title={promo.is_active ? 'Deactivate' : 'Activate'}
                                     >
                                         <CheckCircle size={16} />
                                     </button>
                                     <button
                                         className="btn-icon danger"
                                         onClick={() => handleDelete(promo.id)}
-                                        title="Supprimer"
+                                        title="Delete"
                                     >
                                         <Trash2 size={16} />
                                     </button>

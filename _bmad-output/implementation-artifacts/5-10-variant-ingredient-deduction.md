@@ -1,6 +1,6 @@
 # Story 5.10: Variant Ingredient Deduction
 
-Status: review
+Status: done
 
 ## Story
 

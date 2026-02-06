@@ -96,6 +96,19 @@ const ReportsPage = () => {
                 return <PurchaseByDateTab />;
             case 'outstanding_purchase_payment':
                 return <OutstandingPurchasePaymentTab />;
+            // Epic 8: Discounts & Alerts
+            case 'discounts_voids':
+                return (
+                    <div className="flex flex-col items-center justify-center h-96 text-gray-400">
+                        <h3 className="text-lg font-medium text-gray-900">Coming soon</h3>
+                    </div>
+                );
+            case 'alerts_dashboard':
+                return (
+                    <div className="flex flex-col items-center justify-center h-96 text-gray-400">
+                        <h3 className="text-lg font-medium text-gray-900">Coming soon</h3>
+                    </div>
+                );
             // Placeholders for remaining reports
             default:
                 return (
@@ -147,7 +160,7 @@ const ReportsPage = () => {
                                     onClick={() => setActiveReportId(null)}
                                     className="reports-back-btn"
                                     aria-label="Back to categories"
-                                    title="Retour"
+                                    title="Back"
                                 >
                                     <ArrowLeft size={20} />
                                 </button>

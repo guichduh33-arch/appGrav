@@ -33,20 +33,20 @@ interface PromotionFormData {
 }
 
 const PROMOTION_TYPES: { type: PromotionType; label: string; desc: string; icon: typeof Percent }[] = [
-    { type: 'percentage', label: 'Réduction %', desc: 'Pourcentage de réduction', icon: Percent },
-    { type: 'fixed_amount', label: 'Montant fixe', desc: 'Réduction en Rupiah', icon: Tag },
-    { type: 'buy_x_get_y', label: 'Achetez X, Obtenez Y', desc: 'Offre quantité', icon: ShoppingBag },
-    { type: 'free_product', label: 'Produit offert', desc: 'Cadeau avec achat', icon: Gift }
+    { type: 'percentage', label: 'Discount %', desc: 'Percentage discount', icon: Percent },
+    { type: 'fixed_amount', label: 'Fixed amount', desc: 'Discount in Rupiah', icon: Tag },
+    { type: 'buy_x_get_y', label: 'Buy X, Get Y', desc: 'Quantity offer', icon: ShoppingBag },
+    { type: 'free_product', label: 'Free product', desc: 'Gift with purchase', icon: Gift }
 ]
 
 const DAYS_OF_WEEK = [
-    { value: 0, label: 'Dim', full: 'Dimanche' },
-    { value: 1, label: 'Lun', full: 'Lundi' },
-    { value: 2, label: 'Mar', full: 'Mardi' },
-    { value: 3, label: 'Mer', full: 'Mercredi' },
-    { value: 4, label: 'Jeu', full: 'Jeudi' },
-    { value: 5, label: 'Ven', full: 'Vendredi' },
-    { value: 6, label: 'Sam', full: 'Samedi' }
+    { value: 0, label: 'Sun', full: 'Sunday' },
+    { value: 1, label: 'Mon', full: 'Monday' },
+    { value: 2, label: 'Tue', full: 'Tuesday' },
+    { value: 3, label: 'Wed', full: 'Wednesday' },
+    { value: 4, label: 'Thu', full: 'Thursday' },
+    { value: 5, label: 'Fri', full: 'Friday' },
+    { value: 6, label: 'Sat', full: 'Saturday' }
 ]
 
 const initialFormData: PromotionFormData = {
@@ -106,7 +106,7 @@ export default function PromotionFormPage() {
             if (error) throw error
             if (data) setProducts(data)
         } catch (error) {
-            toast.error('Erreur chargement produits')
+            toast.error('Error loading products')
         }
     }
 
@@ -169,7 +169,7 @@ export default function PromotionFormPage() {
                 }
             }
         } catch (error) {
-            toast.error('Erreur chargement promotion')
+            toast.error('Error loading promotion')
         } finally {
             setLoading(false)
         }
@@ -224,21 +224,21 @@ export default function PromotionFormPage() {
     const validate = (): boolean => {
         const newErrors: Partial<Record<keyof PromotionFormData, string>> = {}
 
-        if (!form.code.trim()) newErrors.code = 'Code requis'
-        if (!form.name.trim()) newErrors.name = 'Nom requis'
+        if (!form.code.trim()) newErrors.code = 'Code required'
+        if (!form.name.trim()) newErrors.name = 'Name required'
 
         if (form.promotion_type === 'percentage' && (form.discount_percentage <= 0 || form.discount_percentage > 100)) {
-            newErrors.discount_percentage = 'Entre 1% et 100%'
+            newErrors.discount_percentage = 'Between 1% and 100%'
         }
         if (form.promotion_type === 'fixed_amount' && form.discount_amount <= 0) {
-            newErrors.discount_amount = 'Montant requis'
+            newErrors.discount_amount = 'Amount required'
         }
         if (form.promotion_type === 'buy_x_get_y' && (form.buy_quantity < 1 || form.get_quantity < 1)) {
-            newErrors.buy_quantity = 'Quantités requises'
+            newErrors.buy_quantity = 'Quantities required'
         }
 
         if (form.start_date && form.end_date && new Date(form.start_date) > new Date(form.end_date)) {
-            newErrors.end_date = 'Date fin après date début'
+            newErrors.end_date = 'End date after start date'
         }
 
         setErrors(newErrors)
@@ -252,6 +252,7 @@ export default function PromotionFormPage() {
         setSaving(true)
         try {
             const promotionData = {
+                code: form.code,
                 name: form.name,
                 description: form.description || null,
                 promotion_type: form.promotion_type,
@@ -263,7 +264,12 @@ export default function PromotionFormPage() {
                 start_date: form.start_date || null,
                 end_date: form.end_date || null,
                 days_of_week: form.days_of_week.length > 0 ? form.days_of_week : null,
+                time_start: form.time_start || null,
+                time_end: form.time_end || null,
+                max_uses_total: form.max_uses_total,
+                max_uses_per_customer: form.max_uses_per_customer,
                 priority: form.priority,
+                is_stackable: form.is_stackable,
                 is_active: form.is_active
             }
 
@@ -312,10 +318,10 @@ export default function PromotionFormPage() {
                 )
             }
 
-            toast.success(isEditing ? 'Promotion mise à jour' : 'Promotion créée')
+            toast.success(isEditing ? 'Promotion updated' : 'Promotion created')
             navigate('/products/promotions')
         } catch (error) {
-            toast.error(error instanceof Error ? error.message : 'Erreur sauvegarde')
+            toast.error(error instanceof Error ? error.message : 'Error saving promotion')
         } finally {
             setSaving(false)
         }
@@ -328,9 +334,9 @@ export default function PromotionFormPage() {
             case 'fixed_amount':
                 return `-${formatCurrency(form.discount_amount)}`
             case 'buy_x_get_y':
-                return `${form.buy_quantity} + ${form.get_quantity} gratuit`
+                return `${form.buy_quantity} + ${form.get_quantity} free`
             case 'free_product':
-                return 'Cadeau offert'
+                return 'Free gift'
             default:
                 return ''
         }
@@ -341,7 +347,7 @@ export default function PromotionFormPage() {
             <div className="promo-form-page">
                 <div className="promo-loading">
                     <div className="promo-loading-spinner" />
-                    <span className="promo-loading-text">Chargement de la promotion...</span>
+                    <span className="promo-loading-text">Loading promotion...</span>
                 </div>
             </div>
         )
@@ -357,14 +363,14 @@ export default function PromotionFormPage() {
                     onClick={() => navigate('/products/promotions')}
                 >
                     <ArrowLeft size={18} />
-                    Retour
+                    Back
                 </button>
                 <div className="promo-form-title">
                     <h1>
                         <Sparkles size={28} />
-                        {isEditing ? 'Modifier la Promotion' : 'Nouvelle Promotion'}
+                        {isEditing ? 'Edit Promotion' : 'New Promotion'}
                     </h1>
-                    <span>Créez des offres irrésistibles pour vos clients</span>
+                    <span>Create irresistible offers for your customers</span>
                 </div>
             </header>
 
@@ -375,11 +381,11 @@ export default function PromotionFormPage() {
                     <div className="promo-section">
                         <h2 className="promo-section-title">
                             <Tag size={20} />
-                            Informations de base
+                            Basic Information
                         </h2>
 
                         <div className="promo-field">
-                            <label className="promo-label promo-label-required">Code promotion</label>
+                            <label className="promo-label promo-label-required">Promotion code</label>
                             <input
                                 type="text"
                                 className={`promo-input ${errors.code ? 'error' : ''}`}
@@ -389,17 +395,17 @@ export default function PromotionFormPage() {
                                 maxLength={20}
                             />
                             {errors.code && <span className="promo-error-text"><Info size={12} />{errors.code}</span>}
-                            <span className="promo-hint">Code unique pour appliquer la promotion</span>
+                            <span className="promo-hint">Unique code to apply the promotion</span>
                         </div>
 
                         <div className="promo-field">
-                            <label className="promo-label promo-label-required">Nom de l'offre</label>
+                            <label className="promo-label promo-label-required">Offer Name</label>
                             <input
                                 type="text"
                                 className={`promo-input ${errors.name ? 'error' : ''}`}
                                 value={form.name}
                                 onChange={(e) => updateField('name', e.target.value)}
-                                placeholder="Ex: Petit Déjeuner du Boulanger"
+                                placeholder="Ex: Baker's Breakfast Special"
                             />
                             {errors.name && <span className="promo-error-text"><Info size={12} />{errors.name}</span>}
                         </div>
@@ -410,14 +416,14 @@ export default function PromotionFormPage() {
                                 className="promo-textarea"
                                 value={form.description}
                                 onChange={(e) => updateField('description', e.target.value)}
-                                placeholder="Décrivez votre offre promotionnelle..."
+                                placeholder="Describe your promotional offer..."
                                 rows={3}
                             />
                         </div>
 
                         {/* Promotion Type Selection */}
                         <div className="promo-field">
-                            <label className="promo-label promo-label-required">Type de promotion</label>
+                            <label className="promo-label promo-label-required">Promotion type</label>
                             <div className="promo-type-grid">
                                 {PROMOTION_TYPES.map(({ type, label, desc, icon: Icon }) => (
                                     <div
@@ -439,12 +445,12 @@ export default function PromotionFormPage() {
                         <div className="promo-conditional">
                             <div className="promo-conditional-title">
                                 <Sparkles size={16} />
-                                Paramètres de la réduction
+                                Discount settings
                             </div>
 
                             {form.promotion_type === 'percentage' && (
                                 <div className="promo-field">
-                                    <label className="promo-label promo-label-required">Pourcentage de réduction</label>
+                                    <label className="promo-label promo-label-required">Discount percentage</label>
                                     <input
                                         type="number"
                                         className={`promo-input ${errors.discount_percentage ? 'error' : ''}`}
@@ -461,7 +467,7 @@ export default function PromotionFormPage() {
 
                             {form.promotion_type === 'fixed_amount' && (
                                 <div className="promo-field">
-                                    <label className="promo-label promo-label-required">Montant de réduction (IDR)</label>
+                                    <label className="promo-label promo-label-required">Discount amount (IDR)</label>
                                     <input
                                         type="number"
                                         className={`promo-input ${errors.discount_amount ? 'error' : ''}`}
@@ -479,7 +485,7 @@ export default function PromotionFormPage() {
                             {form.promotion_type === 'buy_x_get_y' && (
                                 <div className="promo-row">
                                     <div className="promo-field">
-                                        <label className="promo-label promo-label-required">Achetez (X)</label>
+                                        <label className="promo-label promo-label-required">Buy (X)</label>
                                         <input
                                             type="number"
                                             className={`promo-input ${errors.buy_quantity ? 'error' : ''}`}
@@ -489,7 +495,7 @@ export default function PromotionFormPage() {
                                         />
                                     </div>
                                     <div className="promo-field">
-                                        <label className="promo-label promo-label-required">Obtenez gratuit (Y)</label>
+                                        <label className="promo-label promo-label-required">Get free (Y)</label>
                                         <input
                                             type="number"
                                             className="promo-input"
@@ -505,8 +511,8 @@ export default function PromotionFormPage() {
                                 <div className="promo-products-panel">
                                     <div className="promo-products-header">
                                         <div>
-                                            <div className="promo-products-title">Produits offerts</div>
-                                            <div className="promo-products-subtitle">Sélectionnez les cadeaux</div>
+                                            <div className="promo-products-title">Free products</div>
+                                            <div className="promo-products-subtitle">Select gifts</div>
                                         </div>
                                         <button
                                             type="button"
@@ -514,7 +520,7 @@ export default function PromotionFormPage() {
                                             onClick={() => setShowProductSearch('free')}
                                         >
                                             <Plus size={16} />
-                                            Ajouter
+                                            Add
                                         </button>
                                     </div>
 
@@ -527,7 +533,7 @@ export default function PromotionFormPage() {
                                                     className="promo-search-input"
                                                     value={searchTerm}
                                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                                    placeholder="Rechercher un produit..."
+                                                    placeholder="Search for a product..."
                                                     autoFocus
                                                 />
                                             </div>
@@ -556,7 +562,7 @@ export default function PromotionFormPage() {
                                     <div className="promo-selected-products">
                                         {freeProducts.length === 0 ? (
                                             <div className="promo-no-products">
-                                                Aucun produit offert sélectionné
+                                                No free product selected
                                             </div>
                                         ) : (
                                             freeProducts.map(product => (
@@ -585,12 +591,12 @@ export default function PromotionFormPage() {
                     <div className="promo-section">
                         <h2 className="promo-section-title">
                             <Calendar size={20} />
-                            Contraintes temporelles
+                            Time Constraints
                         </h2>
 
                         <div className="promo-row">
                             <div className="promo-field">
-                                <label className="promo-label">Date de début</label>
+                                <label className="promo-label">Start date</label>
                                 <input
                                     type="date"
                                     className="promo-input"
@@ -599,7 +605,7 @@ export default function PromotionFormPage() {
                                 />
                             </div>
                             <div className="promo-field">
-                                <label className="promo-label">Date de fin</label>
+                                <label className="promo-label">End date</label>
                                 <input
                                     type="date"
                                     className={`promo-input ${errors.end_date ? 'error' : ''}`}
@@ -613,7 +619,7 @@ export default function PromotionFormPage() {
                         </div>
 
                         <div className="promo-field">
-                            <label className="promo-label">Jours de la semaine</label>
+                            <label className="promo-label">Days of the week</label>
                             <div className="promo-days-grid">
                                 {DAYS_OF_WEEK.map(day => (
                                     <button
@@ -627,12 +633,12 @@ export default function PromotionFormPage() {
                                     </button>
                                 ))}
                             </div>
-                            <span className="promo-hint">Laissez vide pour tous les jours</span>
+                            <span className="promo-hint">Leave blank for all days</span>
                         </div>
 
                         <div className="promo-row">
                             <div className="promo-field">
-                                <label className="promo-label">Heure de début</label>
+                                <label className="promo-label">Start time</label>
                                 <input
                                     type="time"
                                     className="promo-input"
@@ -641,7 +647,7 @@ export default function PromotionFormPage() {
                                 />
                             </div>
                             <div className="promo-field">
-                                <label className="promo-label">Heure de fin</label>
+                                <label className="promo-label">End time</label>
                                 <input
                                     type="time"
                                     className="promo-input"
@@ -653,11 +659,11 @@ export default function PromotionFormPage() {
 
                         <h2 className="promo-section-title" style={{ marginTop: '2rem' }}>
                             <Clock size={20} />
-                            Limites d'utilisation
+                            Usage Limits
                         </h2>
 
                         <div className="promo-field">
-                            <label className="promo-label">Achat minimum (IDR)</label>
+                            <label className="promo-label">Minimum purchase (IDR)</label>
                             <input
                                 type="number"
                                 className="promo-input"
@@ -670,31 +676,31 @@ export default function PromotionFormPage() {
 
                         <div className="promo-row">
                             <div className="promo-field">
-                                <label className="promo-label">Utilisations max (total)</label>
+                                <label className="promo-label">Max uses (total)</label>
                                 <input
                                     type="number"
                                     className="promo-input"
                                     value={form.max_uses_total || ''}
                                     onChange={(e) => updateField('max_uses_total', e.target.value ? Number(e.target.value) : null)}
                                     min={0}
-                                    placeholder="Illimité"
+                                    placeholder="Unlimited"
                                 />
                             </div>
                             <div className="promo-field">
-                                <label className="promo-label">Max par client</label>
+                                <label className="promo-label">Max per customer</label>
                                 <input
                                     type="number"
                                     className="promo-input"
                                     value={form.max_uses_per_customer || ''}
                                     onChange={(e) => updateField('max_uses_per_customer', e.target.value ? Number(e.target.value) : null)}
                                     min={0}
-                                    placeholder="Illimité"
+                                    placeholder="Unlimited"
                                 />
                             </div>
                         </div>
 
                         <div className="promo-field">
-                            <label className="promo-label">Priorité</label>
+                            <label className="promo-label">Priority</label>
                             <input
                                 type="number"
                                 className="promo-input"
@@ -702,7 +708,7 @@ export default function PromotionFormPage() {
                                 onChange={(e) => updateField('priority', Number(e.target.value))}
                                 min={0}
                             />
-                            <span className="promo-hint">Les promotions avec priorité plus élevée s'appliquent en premier</span>
+                            <span className="promo-hint">Higher priority promotions apply first</span>
                         </div>
 
                         {/* Toggles */}
@@ -714,8 +720,8 @@ export default function PromotionFormPage() {
                                 <div className="promo-toggle-thumb" />
                             </div>
                             <div>
-                                <div className="promo-toggle-label">Cumulable</div>
-                                <div className="promo-toggle-desc">Peut être combinée avec d'autres promotions</div>
+                                <div className="promo-toggle-label">Stackable</div>
+                                <div className="promo-toggle-desc">Can be combined with other promotions</div>
                             </div>
                         </div>
 
@@ -728,7 +734,7 @@ export default function PromotionFormPage() {
                             </div>
                             <div>
                                 <div className="promo-toggle-label">Active</div>
-                                <div className="promo-toggle-desc">La promotion est disponible pour les clients</div>
+                                <div className="promo-toggle-desc">Promotion is available for customers</div>
                             </div>
                         </div>
 
@@ -736,8 +742,8 @@ export default function PromotionFormPage() {
                         <div className="promo-products-panel" style={{ marginTop: '1.5rem' }}>
                             <div className="promo-products-header">
                                 <div>
-                                    <div className="promo-products-title">Produits applicables</div>
-                                    <div className="promo-products-subtitle">Laissez vide pour tous les produits</div>
+                                    <div className="promo-products-title">Applicable products</div>
+                                    <div className="promo-products-subtitle">Leave blank for all products</div>
                                 </div>
                                 <button
                                     type="button"
@@ -745,7 +751,7 @@ export default function PromotionFormPage() {
                                     onClick={() => setShowProductSearch('applicable')}
                                 >
                                     <Plus size={16} />
-                                    Ajouter
+                                    Add
                                 </button>
                             </div>
 
@@ -758,7 +764,7 @@ export default function PromotionFormPage() {
                                             className="promo-search-input"
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
-                                            placeholder="Rechercher un produit..."
+                                            placeholder="Search for a product..."
                                             autoFocus
                                         />
                                     </div>
@@ -787,7 +793,7 @@ export default function PromotionFormPage() {
                             <div className="promo-selected-products">
                                 {selectedProducts.length === 0 ? (
                                     <div className="promo-no-products">
-                                        Tous les produits sont éligibles
+                                        All products are eligible
                                     </div>
                                 ) : (
                                     selectedProducts.map(product => (
@@ -829,7 +835,7 @@ export default function PromotionFormPage() {
                             onClick={() => navigate('/products/promotions')}
                             disabled={saving}
                         >
-                            Annuler
+                            Cancel
                         </button>
                         <button
                             type="submit"
@@ -839,12 +845,12 @@ export default function PromotionFormPage() {
                             {saving ? (
                                 <>
                                     <div className="promo-spinner-sm" />
-                                    Enregistrement...
+                                    Saving...
                                 </>
                             ) : (
                                 <>
                                     <Save size={18} />
-                                    {isEditing ? 'Mettre à jour' : 'Créer la promotion'}
+                                    {isEditing ? 'Update' : 'Create Promotion'}
                                 </>
                             )}
                         </button>

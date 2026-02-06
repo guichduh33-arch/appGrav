@@ -106,7 +106,8 @@
       "Bash(^003_ \")",
       "mcp__plugin_context7_context7__resolve-library-id",
       "mcp__plugin_context7_context7__query-docs",
-      "Bash(npx vite build)"
+      "Bash(npx vite build)",
+      "Bash(cat:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -182,6 +182,39 @@ async function syncStockMovement(item: ISyncQueueItem): Promise<void> {
 }
 
 /**
+ * Sync a single product to Supabase
+ */
+async function syncProduct(item: ISyncQueueItem): Promise<void> {
+  const { error } = await supabase.from('products').upsert(item.payload as never);
+  if (error) {
+    throw new Error(`Failed to sync product: ${error.message}`);
+  }
+  console.log(`[SyncEngine] Product ${item.entityId || 'unknown'} synced`);
+}
+
+/**
+ * Sync a single category to Supabase
+ */
+async function syncCategory(item: ISyncQueueItem): Promise<void> {
+  const { error } = await supabase.from('categories').upsert(item.payload as never);
+  if (error) {
+    throw new Error(`Failed to sync category: ${error.message}`);
+  }
+  console.log(`[SyncEngine] Category ${item.entityId || 'unknown'} synced`);
+}
+
+/**
+ * Sync a single product category price to Supabase
+ */
+async function syncProductCategoryPrice(item: ISyncQueueItem): Promise<void> {
+  const { error } = await supabase.from('product_category_prices').upsert(item.payload as never);
+  if (error) {
+    throw new Error(`Failed to sync product category price: ${error.message}`);
+  }
+  console.log(`[SyncEngine] Product category price ${item.entityId || 'unknown'} synced`);
+}
+
+/**
  * Process a single sync queue item
  */
 async function processItem(item: ISyncQueueItem): Promise<boolean> {
@@ -197,6 +230,15 @@ async function processItem(item: ISyncQueueItem): Promise<boolean> {
         break;
       case 'stock_movement':
         await syncStockMovement(item);
+        break;
+      case 'product':
+        await syncProduct(item);
+        break;
+      case 'category':
+        await syncCategory(item);
+        break;
+      case 'product_category_price':
+        await syncProductCategoryPrice(item);
         break;
       default:
         console.warn(`[SyncEngine] Unknown item type: ${item.type}`);

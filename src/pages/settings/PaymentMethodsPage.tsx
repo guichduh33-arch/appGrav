@@ -51,11 +51,11 @@ const emptyForm: PaymentMethodFormData = {
 };
 
 const PAYMENT_TYPES: { value: PaymentType; label: string; icon: React.ReactNode }[] = [
-  { value: 'cash', label: 'Espèces', icon: <Banknote size={16} /> },
-  { value: 'card', label: 'Carte', icon: <CreditCard size={16} /> },
-  { value: 'transfer', label: 'Virement', icon: <Building size={16} /> },
+  { value: 'cash', label: 'Cash', icon: <Banknote size={16} /> },
+  { value: 'card', label: 'Card', icon: <CreditCard size={16} /> },
+  { value: 'transfer', label: 'Transfer', icon: <Building size={16} /> },
   { value: 'ewallet', label: 'E-Wallet', icon: <Wallet size={16} /> },
-  { value: 'other', label: 'Autre', icon: <QrCode size={16} /> },
+  { value: 'other', label: 'Other', icon: <QrCode size={16} /> },
 ];
 
 const ICONS = [
@@ -118,7 +118,7 @@ const PaymentMethodsPage = () => {
   // Handle save
   const handleSave = async () => {
     if (!formData.code || !formData.name_fr) {
-      toast.error('Le code et le nom sont requis');
+      toast.error('Code and name are required');
       return;
     }
 
@@ -128,31 +128,31 @@ const PaymentMethodsPage = () => {
           id: editingMethod.id,
           updates: formData as never,
         });
-        toast.success('Mode de paiement mis à jour');
+        toast.success('Payment method updated');
       } else {
         await createMethod.mutateAsync(formData as never);
-        toast.success('Mode de paiement créé');
+        toast.success('Payment method created');
       }
       setShowModal(false);
     } catch (error) {
-      toast.error('Erreur lors de la sauvegarde');
+      toast.error('Error saving');
     }
   };
 
   // Handle delete
   const handleDelete = async (method: PaymentMethod) => {
     if (method.is_default) {
-      toast.error('Impossible de supprimer le mode par défaut');
+      toast.error('Cannot delete default payment method');
       return;
     }
 
-    if (!confirm(`Supprimer "${method[nameKey]}" ?`)) return;
+    if (!confirm(`Delete "${method[nameKey]}"?`)) return;
 
     try {
       await deleteMethod.mutateAsync(method.id);
-      toast.success('Mode de paiement supprimé');
+      toast.success('Payment method deleted');
     } catch (error) {
-      toast.error('Erreur lors de la suppression');
+      toast.error('Error deleting');
     }
   };
 
@@ -163,9 +163,9 @@ const PaymentMethodsPage = () => {
         id: method.id,
         updates: { is_active: !method.is_active },
       });
-      toast.success(method.is_active ? 'Désactivé' : 'Activé');
+      toast.success(method.is_active ? 'Disabled' : 'Enabled');
     } catch (error) {
-      toast.error('Erreur');
+      toast.error('Error');
     }
   };
 
@@ -187,9 +187,9 @@ const PaymentMethodsPage = () => {
         updates: { is_default: true },
       });
 
-      toast.success(`${method[nameKey]} défini par défaut`);
+      toast.success(`${method[nameKey]} set as default`);
     } catch (error) {
-      toast.error('Erreur');
+      toast.error('Error');
     }
   };
 
@@ -207,14 +207,14 @@ const PaymentMethodsPage = () => {
         <div className="settings-section__header">
           <div className="settings-section__header-content">
             <div>
-              <h2 className="settings-section__title">Modes de Paiement</h2>
+              <h2 className="settings-section__title">Payment Methods</h2>
               <p className="settings-section__description">
-                Configurez les moyens de paiement acceptés au POS
+                Configure payment methods accepted at POS
               </p>
             </div>
             <button className="btn-primary" onClick={openCreateModal}>
               <Plus size={16} />
-              Nouveau Mode
+              New Payment Method
             </button>
           </div>
         </div>
@@ -223,16 +223,16 @@ const PaymentMethodsPage = () => {
           {isLoading ? (
             <div className="settings-section__loading">
               <div className="spinner" />
-              <span>Chargement...</span>
+              <span>Loading...</span>
             </div>
           ) : methods?.length === 0 ? (
             <div className="settings-section__empty">
               <Wallet size={48} />
-              <h3>Aucun mode de paiement</h3>
-              <p>Créez votre premier mode de paiement.</p>
+              <h3>No payment methods</h3>
+              <p>Create your first payment method.</p>
               <button className="btn-primary" onClick={openCreateModal}>
                 <Plus size={16} />
-                Créer un mode
+                Create Payment Method
               </button>
             </div>
           ) : (
@@ -274,13 +274,13 @@ const PaymentMethodsPage = () => {
                             <button
                               className={`toggle-mini ${method.is_active ? 'is-on' : ''}`}
                               onClick={() => handleToggleActive(method)}
-                              title={method.is_active ? 'Désactiver' : 'Activer'}
+                              title={method.is_active ? 'Disable' : 'Enable'}
                             />
                             {!method.is_default && method.is_active && (
                               <button
                                 className="btn-icon"
                                 onClick={() => handleSetDefault(method)}
-                                title="Définir par défaut"
+                                title="Set as default"
                               >
                                 <CheckCircle size={14} />
                               </button>
@@ -288,14 +288,14 @@ const PaymentMethodsPage = () => {
                             <button
                               className="btn-icon"
                               onClick={() => openEditModal(method)}
-                              title="Modifier"
+                              title="Edit"
                             >
                               <Edit2 size={14} />
                             </button>
                             <button
                               className="btn-icon btn-icon--danger"
                               onClick={() => handleDelete(method)}
-                              title="Supprimer"
+                              title="Delete"
                               disabled={method.is_default ?? false}
                             >
                               <Trash2 size={14} />
@@ -318,7 +318,7 @@ const PaymentMethodsPage = () => {
           <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
             <div className="settings-modal__header">
               <h2 className="settings-modal__title">
-                {editingMethod ? 'Modifier le Mode' : 'Nouveau Mode de Paiement'}
+                {editingMethod ? 'Edit Payment Method' : 'New Payment Method'}
               </h2>
               <button className="settings-modal__close" onClick={() => setShowModal(false)}>
                 <X size={20} />
@@ -355,7 +355,7 @@ const PaymentMethodsPage = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Nom (Français) *</label>
+                <label className="form-label">Name (French) *</label>
                 <input
                   type="text"
                   className="form-input"
@@ -367,7 +367,7 @@ const PaymentMethodsPage = () => {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label className="form-label">Nom (Anglais)</label>
+                  <label className="form-label">Name (English)</label>
                   <input
                     type="text"
                     className="form-input"
@@ -377,7 +377,7 @@ const PaymentMethodsPage = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Nom (Indonésien)</label>
+                  <label className="form-label">Name (Indonesian)</label>
                   <input
                     type="text"
                     className="form-input"
@@ -389,7 +389,7 @@ const PaymentMethodsPage = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Icône</label>
+                <label className="form-label">Icon</label>
                 <select
                   className="form-input form-select"
                   value={formData.icon}
@@ -410,7 +410,7 @@ const PaymentMethodsPage = () => {
                     checked={formData.requires_reference}
                     onChange={(e) => setFormData({ ...formData, requires_reference: e.target.checked })}
                   />
-                  <span>Nécessite une référence (numéro de transaction)</span>
+                  <span>Requires reference (transaction number)</span>
                 </label>
               </div>
 
@@ -421,14 +421,14 @@ const PaymentMethodsPage = () => {
                     checked={formData.is_active}
                     onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                   />
-                  <span>Actif</span>
+                  <span>Active</span>
                 </label>
               </div>
             </div>
 
             <div className="settings-modal__footer">
               <button className="btn-secondary" onClick={() => setShowModal(false)}>
-                Annuler
+                Cancel
               </button>
               <button
                 className="btn-primary"
@@ -436,7 +436,7 @@ const PaymentMethodsPage = () => {
                 disabled={createMethod.isPending || updateMethod.isPending}
               >
                 <Save size={16} />
-                {editingMethod ? 'Mettre à jour' : 'Créer'}
+                {editingMethod ? 'Update' : 'Create'}
               </button>
             </div>
           </div>
