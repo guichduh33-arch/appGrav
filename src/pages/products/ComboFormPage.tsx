@@ -47,7 +47,7 @@ export default function ComboFormPage() {
 
     // Product selection
     const [products, setProducts] = useState<Product[]>([])
-    const [showProductSearch, setShowProductSearch] = useState<number | null>(null) // index du groupe
+    const [showProductSearch, setShowProductSearch] = useState<number | null>(null) // group index
     const [searchTerm, setSearchTerm] = useState('')
 
     useEffect(() => {
@@ -69,7 +69,7 @@ export default function ComboFormPage() {
             if (data) setProducts(data)
         } catch (error) {
             console.error('Error fetching products:', error)
-            toast.error('Erreur lors du chargement des produits')
+            toast.error('Error loading products')
         }
     }
 
@@ -133,7 +133,7 @@ export default function ComboFormPage() {
 
                             return {
                                 id: group.id,
-                                group_name: group.group_name ?? '',
+                                group_name: group.name ?? '',
                                 group_type: (group.max_selections ?? 1) === 1 ? 'single' : 'multiple',
                                 is_required: group.is_required ?? true,
                                 min_selections: group.min_selections ?? 1,
@@ -149,7 +149,7 @@ export default function ComboFormPage() {
             }
         } catch (error) {
             console.error('Error fetching combo:', error)
-            toast.error('Erreur lors du chargement du combo')
+            toast.error('Error loading combo')
         } finally {
             setLoading(false)
         }
@@ -188,7 +188,7 @@ export default function ComboFormPage() {
         const group = groups[groupIndex]
 
         if (group.items.some(item => item.product_id === product.id)) {
-            toast.error('Ce produit est déjà dans ce groupe')
+            toast.error('This product is already in this group')
             return
         }
 
@@ -197,7 +197,7 @@ export default function ComboFormPage() {
             product_id: product.id,
             product,
             price_adjustment: 0,
-            is_default: group.items.length === 0, // Premier produit = défaut
+            is_default: group.items.length === 0, // First product = default
             sort_order: group.items.length
         })
         setGroups(newGroups)
@@ -237,7 +237,7 @@ export default function ComboFormPage() {
                 const defaultItem = group.items.find(item => item.is_default)
                 const cheapest = group.items.reduce((min, item) =>
                     item.price_adjustment < min.price_adjustment ? item : min
-                , group.items[0])
+                    , group.items[0])
 
                 min += (defaultItem || cheapest).price_adjustment
             }
@@ -252,7 +252,7 @@ export default function ComboFormPage() {
                 // For single selection, take most expensive
                 const mostExpensive = group.items.reduce((max, item) =>
                     item.price_adjustment > max.price_adjustment ? item : max
-                , group.items[0] || { price_adjustment: 0 })
+                    , group.items[0] || { price_adjustment: 0 })
                 max += mostExpensive.price_adjustment
             } else {
                 // For multiple, sum up to max_selections of most expensive
@@ -269,36 +269,36 @@ export default function ComboFormPage() {
 
         // Validation
         if (!name.trim()) {
-            toast.error('Le nom du combo est requis')
+            toast.error('Combo name is required')
             return
         }
 
         if (comboPrice <= 0) {
-            toast.error('Le prix du combo doit être supérieur à 0')
+            toast.error('Combo price must be greater than 0')
             return
         }
 
         if (groups.length === 0) {
-            toast.error('Ajoutez au moins un groupe de choix')
+            toast.error('Add at least one choice group')
             return
         }
 
         for (let i = 0; i < groups.length; i++) {
             const group = groups[i]
             if (!group.group_name.trim()) {
-                toast.error(`Le nom du groupe ${i + 1} est requis`)
+                toast.error(`Group ${i + 1} name is required`)
                 return
             }
             if (group.items.length === 0) {
-                toast.error(`Le groupe "${group.group_name}" doit contenir au moins un produit`)
+                toast.error(`Group "${group.group_name}" must contain at least one product`)
                 return
             }
             if (group.group_type === 'single' && group.max_selections !== 1) {
-                toast.error(`Le groupe "${group.group_name}" de type "choix unique" doit avoir max_selections = 1`)
+                toast.error(`Group "${group.group_name}" of type "single choice" must have max_selections = 1`)
                 return
             }
             if (group.min_selections > group.max_selections) {
-                toast.error(`Le groupe "${group.group_name}": min_selections ne peut pas être > max_selections`)
+                toast.error(`Group "${group.group_name}": min_selections cannot be > max_selections`)
                 return
             }
         }
@@ -333,7 +333,7 @@ export default function ComboFormPage() {
                 // Insert new groups and items
                 await insertGroupsAndItems(id!)
 
-                toast.success('Combo mis à jour avec succès')
+                toast.success('Combo updated successfully')
             } else {
                 // Create combo
                 const { data: comboData, error: comboError } = await supabase
@@ -354,13 +354,13 @@ export default function ComboFormPage() {
 
                 await insertGroupsAndItems(comboData.id)
 
-                toast.success('Combo créé avec succès')
+                toast.success('Combo created successfully')
             }
 
             navigate('/products/combos')
         } catch (error) {
             console.error('Error saving combo:', error)
-            toast.error('Erreur lors de la sauvegarde du combo')
+            toast.error('Error saving combo')
         } finally {
             setSaving(false)
         }
@@ -373,7 +373,7 @@ export default function ComboFormPage() {
                 .from('product_combo_groups')
                 .insert({
                     combo_id: comboId,
-                    group_name: group.group_name,
+                    name: group.group_name,
                     is_required: group.is_required,
                     min_selections: group.min_selections,
                     max_selections: group.max_selections,
@@ -415,7 +415,7 @@ export default function ComboFormPage() {
         return (
             <div className="combo-form-loading">
                 <div className="spinner"></div>
-                <span>Chargement...</span>
+                <span>Loading...</span>
             </div>
         )
     }
@@ -429,11 +429,11 @@ export default function ComboFormPage() {
                     onClick={() => navigate('/products/combos')}
                 >
                     <ArrowLeft size={20} />
-                    Retour
+                    Back
                 </button>
                 <h1>
                     <Box size={28} />
-                    {isEditing ? 'Modifier le combo' : 'Nouveau combo'}
+                    {isEditing ? 'Edit combo' : 'New combo'}
                 </h1>
             </header>
 
@@ -441,16 +441,16 @@ export default function ComboFormPage() {
                 <div className="form-grid">
                     {/* Left column - General info */}
                     <div className="form-section">
-                        <h2>Informations générales</h2>
+                        <h2>General Information</h2>
 
                         <div className="form-group">
-                            <label htmlFor="name">Nom du combo *</label>
+                            <label htmlFor="name">Combo Name *</label>
                             <input
                                 id="name"
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                placeholder="Ex: Petit Déjeuner Complet"
+                                placeholder="Ex: Full Breakfast Pack"
                                 required
                             />
                         </div>
@@ -461,13 +461,13 @@ export default function ComboFormPage() {
                                 id="description"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                placeholder="Choisissez votre boisson et votre viennoiserie..."
+                                placeholder="Choose your drink and pastry..."
                                 rows={3}
                             />
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="comboPrice">Prix de base (IDR) *</label>
+                            <label htmlFor="comboPrice">Base Price (IDR) *</label>
                             <input
                                 id="comboPrice"
                                 type="number"
@@ -477,11 +477,11 @@ export default function ComboFormPage() {
                                 step="1000"
                                 required
                             />
-                            <small>Les suppléments seront ajoutés selon les choix du client</small>
+                            <small>Surcharges will be added based on the customer's choices</small>
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="imageUrl">URL de l'image</label>
+                            <label htmlFor="imageUrl">Image URL</label>
                             <input
                                 id="imageUrl"
                                 type="text"
@@ -492,7 +492,7 @@ export default function ComboFormPage() {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="sortOrder">Ordre d'affichage</label>
+                            <label htmlFor="sortOrder">Display Order</label>
                             <input
                                 id="sortOrder"
                                 type="number"
@@ -509,7 +509,7 @@ export default function ComboFormPage() {
                                     checked={isActive}
                                     onChange={(e) => setIsActive(e.target.checked)}
                                 />
-                                <span>Actif</span>
+                                <span>Active</span>
                             </label>
 
                             <label>
@@ -518,21 +518,21 @@ export default function ComboFormPage() {
                                     checked={availableAtPos}
                                     onChange={(e) => setAvailableAtPos(e.target.checked)}
                                 />
-                                <span>Visible au POS</span>
+                                <span>Visible in POS</span>
                             </label>
                         </div>
 
                         {/* Price summary */}
                         {groups.length > 0 && (
                             <div className="pricing-preview">
-                                <h3>Aperçu des prix</h3>
+                                <h3>Price Preview</h3>
                                 <div className="price-range">
                                     <div className="price-item">
-                                        <span>Prix minimum:</span>
+                                        <span>Minimum price:</span>
                                         <span className="price">{new Intl.NumberFormat('id-ID').format(minPrice)} IDR</span>
                                     </div>
                                     <div className="price-item">
-                                        <span>Prix maximum:</span>
+                                        <span>Maximum price:</span>
                                         <span className="price highlight">{new Intl.NumberFormat('id-ID').format(maxPrice)} IDR</span>
                                     </div>
                                 </div>
@@ -543,14 +543,14 @@ export default function ComboFormPage() {
                     {/* Right column - Groups */}
                     <div className="form-section">
                         <div className="section-header">
-                            <h2>Groupes de choix</h2>
+                            <h2>Choice Groups</h2>
                             <button
                                 type="button"
                                 className="btn btn-secondary"
                                 onClick={addGroup}
                             >
                                 <Plus size={18} />
-                                Ajouter un groupe
+                                Add Group
                             </button>
                         </div>
 
@@ -558,8 +558,8 @@ export default function ComboFormPage() {
                             {groups.length === 0 ? (
                                 <div className="empty-state">
                                     <Box size={48} />
-                                    <p>Aucun groupe ajouté</p>
-                                    <small>Ex: "Boissons", "Viennoiseries", "Accompagnements"</small>
+                                    <p>No group added</p>
+                                    <small>Ex: "Drinks", "Pastries", "Sides"</small>
                                 </div>
                             ) : (
                                 groups.map((group, groupIndex) => (
@@ -577,13 +577,13 @@ export default function ComboFormPage() {
                                                 className="group-name-input"
                                                 value={group.group_name}
                                                 onChange={(e) => updateGroup(groupIndex, { group_name: e.target.value })}
-                                                placeholder="Nom du groupe (ex: Boissons)"
+                                                placeholder="Group name (ex: Drinks)"
                                             />
                                             <button
                                                 type="button"
                                                 className="btn-icon danger"
                                                 onClick={() => removeGroup(groupIndex)}
-                                                title="Supprimer le groupe"
+                                                title="Delete group"
                                             >
                                                 <Trash2 size={18} />
                                             </button>
@@ -593,7 +593,7 @@ export default function ComboFormPage() {
                                             <div className="group-body">
                                                 <div className="group-settings">
                                                     <div className="form-group">
-                                                        <label htmlFor={`group-type-${groupIndex}`}>Type de sélection</label>
+                                                        <label htmlFor={`group-type-${groupIndex}`}>Selection Type</label>
                                                         <select
                                                             id={`group-type-${groupIndex}`}
                                                             value={group.group_type}
@@ -605,8 +605,8 @@ export default function ComboFormPage() {
                                                                 })
                                                             }}
                                                         >
-                                                            <option value="single">Choix unique (1 option)</option>
-                                                            <option value="multiple">Choix multiple</option>
+                                                            <option value="single">Single choice (1 option)</option>
+                                                            <option value="multiple">Multiple choice</option>
                                                         </select>
                                                     </div>
 
@@ -617,32 +617,32 @@ export default function ComboFormPage() {
                                                                 checked={group.is_required}
                                                                 onChange={(e) => updateGroup(groupIndex, { is_required: e.target.checked })}
                                                             />
-                                                            <span>Obligatoire</span>
+                                                            <span>Required</span>
                                                         </label>
                                                     </div>
 
                                                     {group.group_type === 'multiple' && (
                                                         <div className="form-row">
                                                             <div className="form-group">
-                                                                <label htmlFor={`min-sel-${groupIndex}`}>Min sélections</label>
+                                                                <label htmlFor={`min-sel-${groupIndex}`}>Min selections</label>
                                                                 <input
                                                                     id={`min-sel-${groupIndex}`}
                                                                     type="number"
                                                                     value={group.min_selections}
                                                                     onChange={(e) => updateGroup(groupIndex, { min_selections: Number(e.target.value) })}
                                                                     min="0"
-                                                                    title="Nombre minimum de sélections"
+                                                                    title="Minimum number of selections"
                                                                 />
                                                             </div>
                                                             <div className="form-group">
-                                                                <label htmlFor={`max-sel-${groupIndex}`}>Max sélections</label>
+                                                                <label htmlFor={`max-sel-${groupIndex}`}>Max selections</label>
                                                                 <input
                                                                     id={`max-sel-${groupIndex}`}
                                                                     type="number"
                                                                     value={group.max_selections}
                                                                     onChange={(e) => updateGroup(groupIndex, { max_selections: Number(e.target.value) })}
                                                                     min="1"
-                                                                    title="Nombre maximum de sélections"
+                                                                    title="Maximum number of selections"
                                                                 />
                                                             </div>
                                                         </div>
@@ -650,14 +650,14 @@ export default function ComboFormPage() {
                                                 </div>
 
                                                 <div className="group-items-header">
-                                                    <h4>Options disponibles</h4>
+                                                    <h4>Available Options</h4>
                                                     <button
                                                         type="button"
                                                         className="btn btn-sm"
                                                         onClick={() => setShowProductSearch(groupIndex)}
                                                     >
                                                         <Plus size={16} />
-                                                        Ajouter
+                                                        Add
                                                     </button>
                                                 </div>
 
@@ -669,14 +669,14 @@ export default function ComboFormPage() {
                                                                 type="text"
                                                                 value={searchTerm}
                                                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                                                placeholder="Rechercher un produit..."
+                                                                placeholder="Search for a product..."
                                                                 autoFocus
                                                             />
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setShowProductSearch(null)}
-                                                                title="Fermer la recherche"
-                                                                aria-label="Fermer la recherche"
+                                                                title="Close search"
+                                                                aria-label="Close search"
                                                             >
                                                                 <X size={18} />
                                                             </button>
@@ -701,7 +701,7 @@ export default function ComboFormPage() {
                                                 <div className="group-items-list">
                                                     {group.items.length === 0 ? (
                                                         <div className="empty-items">
-                                                            <small>Aucune option ajoutée</small>
+                                                            <small>No option added</small>
                                                         </div>
                                                     ) : (
                                                         group.items.map((item, itemIndex) => (
@@ -709,11 +709,11 @@ export default function ComboFormPage() {
                                                                 <div className="item-info">
                                                                     <span className="item-name">
                                                                         {item.product?.name}
-                                                                        {item.is_default && <span className="default-badge">Par défaut</span>}
+                                                                        {item.is_default && <span className="default-badge">Default</span>}
                                                                     </span>
                                                                     <div className="item-controls">
                                                                         <div className="price-adjustment">
-                                                                            <label>Supplément:</label>
+                                                                            <label>Surcharge:</label>
                                                                             <input
                                                                                 type="number"
                                                                                 value={item.price_adjustment}
@@ -729,14 +729,14 @@ export default function ComboFormPage() {
                                                                             onClick={() => setAsDefault(groupIndex, itemIndex)}
                                                                             disabled={item.is_default}
                                                                         >
-                                                                            Défaut
+                                                                            Default
                                                                         </button>
                                                                         <button
                                                                             type="button"
                                                                             className="btn-icon danger"
                                                                             onClick={() => removeProductFromGroup(groupIndex, itemIndex)}
-                                                                            title="Retirer ce produit"
-                                                                            aria-label="Retirer ce produit"
+                                                                            title="Remove this product"
+                                                                            aria-label="Remove this product"
                                                                         >
                                                                             <X size={16} />
                                                                         </button>
@@ -762,7 +762,7 @@ export default function ComboFormPage() {
                         onClick={() => navigate('/products/combos')}
                         disabled={saving}
                     >
-                        Annuler
+                        Cancel
                     </button>
                     <button
                         type="submit"
@@ -772,12 +772,12 @@ export default function ComboFormPage() {
                         {saving ? (
                             <>
                                 <div className="spinner-small"></div>
-                                Enregistrement...
+                                Saving...
                             </>
                         ) : (
                             <>
                                 <Save size={18} />
-                                {isEditing ? 'Mettre à jour' : 'Créer le combo'}
+                                {isEditing ? 'Update' : 'Create Combo'}
                             </>
                         )}
                     </button>
