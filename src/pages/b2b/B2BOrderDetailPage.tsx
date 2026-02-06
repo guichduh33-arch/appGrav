@@ -251,8 +251,6 @@ export default function B2BOrderDetailPage() {
 
     const fetchHistory = async () => {
         try {
-            // Note: b2b_order_history table may not exist in DB schema
-            // Wrapping in try-catch to handle gracefully
             const { data, error } = await supabase
                 .from('b2b_order_history')
                 .select('*')
@@ -260,7 +258,6 @@ export default function B2BOrderDetailPage() {
                 .order('created_at', { ascending: false })
 
             if (error) {
-                // Table might not exist, set empty array
                 setHistory([])
                 return
             }
