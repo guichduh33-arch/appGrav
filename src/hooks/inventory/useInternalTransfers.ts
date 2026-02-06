@@ -317,7 +317,8 @@ export function useReceiveTransfer() {
       // ============================================================
 
       // 2. Update transfer status to 'received' FIRST (marks intent)
-      const { error: statusError } = await supabase
+      // Guard: only update if status is still pending/in_transit (optimistic lock)
+      const { data: updatedTransfer, error: statusError } = await supabase
         .from('internal_transfers')
         .update({
           status: 'received',
@@ -327,8 +328,13 @@ export function useReceiveTransfer() {
           updated_at: new Date().toISOString(),
         })
         .eq('id', params.transferId)
+        .in('status', ['pending', 'in_transit'])
+        .select()
 
       if (statusError) throw statusError
+      if (!updatedTransfer || updatedTransfer.length === 0) {
+        throw new Error('Transfer has already been received or cancelled by another user. Please refresh the page.')
+      }
 
       // 3. Update each transfer_item with quantity_received
       for (const item of params.items) {
@@ -344,7 +350,20 @@ export function useReceiveTransfer() {
         }
       }
 
-      // 4. Create stock_movements for each item
+      // 4. Check if stock movements already exist for this transfer (idempotency guard)
+      const { data: existingMovements } = await supabase
+        .from('stock_movements')
+        .select('id')
+        .eq('reference_type', 'transfer')
+        .eq('reference_id', params.transferId)
+        .limit(1)
+
+      if (existingMovements && existingMovements.length > 0) {
+        // Movements already created (e.g. from a previous partial attempt) - skip
+        return transfer
+      }
+
+      // 5. Create stock_movements for each item
       const stockMovements: Array<{
         product_id: string
         location_id: string
