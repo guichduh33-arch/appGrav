@@ -2,6 +2,10 @@
 -- Generated: 2026-02-02T19:17:42.954Z
 -- Total recipes: 768
 
+-- Temporarily drop FK constraints for data import (products may not exist in shadow DB)
+ALTER TABLE recipes DROP CONSTRAINT IF EXISTS recipes_product_id_fkey;
+ALTER TABLE recipes DROP CONSTRAINT IF EXISTS recipes_material_id_fkey;
+
 INSERT INTO recipes (product_id, material_id, quantity, unit, is_active) VALUES
   ('25e5482c-cba8-4425-8149-f4bd355be6ad', 'c384368b-4d08-48cf-8722-05f447a4cf97', 0.018000000000000002, 'kg', true),
   ('25e5482c-cba8-4425-8149-f4bd355be6ad', 'c756db2f-7fdf-42c7-ac3f-3d11ccc6415c', 0.11750000000000001, 'kg', true),
@@ -775,3 +779,7 @@ ON CONFLICT (product_id, material_id) DO UPDATE SET
   quantity = EXCLUDED.quantity,
   unit = EXCLUDED.unit,
   updated_at = NOW();
+
+-- Re-add FK constraints
+ALTER TABLE recipes ADD CONSTRAINT recipes_product_id_fkey FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE NOT VALID;
+ALTER TABLE recipes ADD CONSTRAINT recipes_material_id_fkey FOREIGN KEY (material_id) REFERENCES products(id) ON DELETE CASCADE NOT VALID;

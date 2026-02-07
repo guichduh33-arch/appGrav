@@ -17,12 +17,12 @@ ON CONFLICT (code) DO NOTHING;
 -- =====================================================
 -- DEFAULT STOCK LOCATIONS
 -- =====================================================
-INSERT INTO stock_locations (code, name, location_type, is_default, sort_order) VALUES
-    ('MAIN', 'Entrepôt Principal', 'main_warehouse', TRUE, 1),
-    ('KITCHEN', 'Cuisine', 'kitchen', FALSE, 2),
-    ('BAKERY', 'Boulangerie', 'section', FALSE, 3),
-    ('BAR', 'Bar', 'section', FALSE, 4),
-    ('DISPLAY', 'Vitrine', 'storage', FALSE, 5)
+INSERT INTO stock_locations (code, name, location_type, is_default) VALUES
+    ('MAIN', 'Entrepôt Principal', 'main_warehouse', TRUE),
+    ('KITCHEN', 'Cuisine', 'kitchen', FALSE),
+    ('BAKERY', 'Boulangerie', 'section', FALSE),
+    ('BAR', 'Bar', 'section', FALSE),
+    ('DISPLAY', 'Vitrine', 'storage', FALSE)
 ON CONFLICT (code) DO NOTHING;
 
 -- =====================================================

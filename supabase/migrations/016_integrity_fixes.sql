@@ -456,13 +456,25 @@ SELECT * FROM products WHERE deleted_at IS NULL AND is_active = TRUE;
 
 -- Remove sensitive tables from realtime
 -- Keep only tables that need real-time updates for KDS/Display
-ALTER PUBLICATION supabase_realtime DROP TABLE IF EXISTS orders;
-ALTER PUBLICATION supabase_realtime DROP TABLE IF EXISTS pos_sessions;
-ALTER PUBLICATION supabase_realtime DROP TABLE IF EXISTS stock_movements;
+DO $$ BEGIN
+    ALTER PUBLICATION supabase_realtime DROP TABLE orders;
+EXCEPTION WHEN undefined_object THEN NULL;
+END $$;
+DO $$ BEGIN
+    ALTER PUBLICATION supabase_realtime DROP TABLE pos_sessions;
+EXCEPTION WHEN undefined_object THEN NULL;
+END $$;
+DO $$ BEGIN
+    ALTER PUBLICATION supabase_realtime DROP TABLE stock_movements;
+EXCEPTION WHEN undefined_object THEN NULL;
+END $$;
 
 -- Re-add with filtering (Supabase handles this via RLS)
 -- Orders: still needed for KDS
-ALTER PUBLICATION supabase_realtime ADD TABLE orders;
+DO $$ BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE orders;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- =====================================================
 -- 9. CREATE SECURE VIEW FOR USER PROFILES

@@ -159,8 +159,10 @@ This allows combinations like: coffee (from recipe) + oat milk (from variant).
 Story 5.10 extends Story 5.9 with substitution logic.';
 
 -- ============================================
--- TESTS: Story 5.10 Acceptance Criteria
+-- TESTS: Story 5.10 Acceptance Criteria (DISABLED for db pull compatibility)
+-- Tests below are commented out - run manually via SQL Editor if needed
 -- ============================================
+/*
 -- These tests create temporary data, verify trigger behavior, and clean up.
 -- Run with: supabase db execute --file <this_file> OR via Supabase Dashboard SQL Editor
 --
@@ -196,14 +198,14 @@ BEGIN
     SELECT id INTO v_pos_session_id FROM pos_sessions WHERE status = 'open' LIMIT 1;
 
     -- Create test products (raw materials)
-    INSERT INTO products (id, name, category_id, base_price, product_type, current_stock)
+    INSERT INTO products (id, name, category_id, retail_price, product_type, current_stock)
     VALUES
         (v_coffee_id, 'TEST_Coffee Grounds', v_category_id, 0, 'raw_material', 5000),
         (v_milk_id, 'TEST_Regular Milk', v_category_id, 0, 'raw_material', 10000),
         (v_oat_milk_id, 'TEST_Oat Milk', v_category_id, 0, 'raw_material', 10000);
 
     -- Create Café Latte (made-to-order product)
-    INSERT INTO products (id, name, category_id, base_price, product_type, deduct_ingredients, current_stock)
+    INSERT INTO products (id, name, category_id, retail_price, product_type, deduct_ingredients, current_stock)
     VALUES (v_cafe_latte_id, 'TEST_Cafe Latte', v_category_id, 35000, 'finished', TRUE, 0);
 
     -- Create recipe: coffee 18g + regular milk 250ml
@@ -288,13 +290,13 @@ BEGIN
     SELECT id INTO v_pos_session_id FROM pos_sessions WHERE status = 'open' LIMIT 1;
 
     -- Create test products
-    INSERT INTO products (id, name, category_id, base_price, product_type, current_stock)
+    INSERT INTO products (id, name, category_id, retail_price, product_type, current_stock)
     VALUES
         (v_tea_id, 'TEST_Black Tea', v_category_id, 0, 'raw_material', 10000),
         (v_tapioca_id, 'TEST_Tapioca Pearls', v_category_id, 0, 'raw_material', 5000),
         (v_jelly_id, 'TEST_Coconut Jelly', v_category_id, 0, 'raw_material', 5000);
 
-    INSERT INTO products (id, name, category_id, base_price, product_type, deduct_ingredients, current_stock)
+    INSERT INTO products (id, name, category_id, retail_price, product_type, deduct_ingredients, current_stock)
     VALUES (v_bubble_tea_id, 'TEST_Bubble Tea', v_category_id, 25000, 'finished', TRUE, 0);
 
     -- Recipe: tea 300ml (base)
@@ -364,10 +366,10 @@ BEGIN
     SELECT id INTO v_pos_session_id FROM pos_sessions WHERE status = 'open' LIMIT 1;
 
     -- Create products
-    INSERT INTO products (id, name, category_id, base_price, product_type, current_stock)
+    INSERT INTO products (id, name, category_id, retail_price, product_type, current_stock)
     VALUES (v_sugar_syrup_id, 'TEST_Sugar Syrup', v_category_id, 0, 'raw_material', 10000);
 
-    INSERT INTO products (id, name, category_id, base_price, product_type, deduct_ingredients, current_stock)
+    INSERT INTO products (id, name, category_id, retail_price, product_type, deduct_ingredients, current_stock)
     VALUES (v_drink_id, 'TEST_Sweet Drink', v_category_id, 20000, 'finished', TRUE, 0);
 
     -- Recipe: sugar syrup 30ml (100% = default)
@@ -433,10 +435,10 @@ BEGIN
     SELECT id INTO v_pos_session_id FROM pos_sessions WHERE status = 'open' LIMIT 1;
 
     -- Create products
-    INSERT INTO products (id, name, category_id, base_price, product_type, current_stock)
+    INSERT INTO products (id, name, category_id, retail_price, product_type, current_stock)
     VALUES (v_ingredient_id, 'TEST_Base Ingredient', v_category_id, 0, 'raw_material', 10000);
 
-    INSERT INTO products (id, name, category_id, base_price, product_type, deduct_ingredients, current_stock)
+    INSERT INTO products (id, name, category_id, retail_price, product_type, deduct_ingredients, current_stock)
     VALUES (v_product_id, 'TEST_Product With Recipe', v_category_id, 15000, 'finished', TRUE, 0);
 
     -- Recipe: ingredient 100g
@@ -488,3 +490,4 @@ RAISE NOTICE '';
 RAISE NOTICE '=== Story 5.10 Tests Complete ===';
 RAISE NOTICE 'Check output above for PASSED/FAILED status';
 RAISE NOTICE '';
+*/

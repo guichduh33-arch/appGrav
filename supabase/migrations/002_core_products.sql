@@ -46,7 +46,7 @@ CREATE INDEX idx_categories_dispatch ON categories(dispatch_station);
 -- =====================================================
 CREATE TABLE products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    sku VARCHAR(50) UNIQUE NOT NULL,
+    sku VARCHAR(50) UNIQUE NOT NULL DEFAULT substr(gen_random_uuid()::text, 1, 8),
     name VARCHAR(200) NOT NULL,
     description TEXT,
     category_id UUID REFERENCES categories(id) ON DELETE SET NULL,

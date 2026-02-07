@@ -55,6 +55,7 @@ CREATE INDEX IF NOT EXISTS idx_pos_sessions_terminal_str ON public.pos_sessions(
 -- =====================================================
 -- PART 3: Create get_user_open_shift function
 -- =====================================================
+DROP FUNCTION IF EXISTS public.get_user_open_shift(UUID);
 CREATE OR REPLACE FUNCTION public.get_user_open_shift(
     p_user_id UUID
 )
@@ -110,6 +111,7 @@ GRANT EXECUTE ON FUNCTION public.get_user_open_shift(UUID) TO authenticated;
 -- =====================================================
 -- PART 4: Create get_terminal_open_shifts function
 -- =====================================================
+DROP FUNCTION IF EXISTS public.get_terminal_open_shifts(VARCHAR);
 CREATE OR REPLACE FUNCTION public.get_terminal_open_shifts(
     p_terminal_id VARCHAR
 )
@@ -165,6 +167,7 @@ GRANT EXECUTE ON FUNCTION public.get_terminal_open_shifts(VARCHAR) TO authentica
 -- =====================================================
 -- PART 5: Create open_shift function
 -- =====================================================
+DROP FUNCTION IF EXISTS public.open_shift(UUID, VARCHAR, DECIMAL);
 CREATE OR REPLACE FUNCTION public.open_shift(
     p_user_id UUID,
     p_opening_cash DECIMAL,
@@ -244,6 +247,7 @@ ALTER TABLE public.pos_sessions
 -- =====================================================
 -- PART 6: Create close_shift function
 -- =====================================================
+DROP FUNCTION IF EXISTS public.close_shift(UUID, DECIMAL, DECIMAL, DECIMAL, VARCHAR, TEXT);
 CREATE OR REPLACE FUNCTION public.close_shift(
     p_session_id UUID,
     p_actual_cash DECIMAL,

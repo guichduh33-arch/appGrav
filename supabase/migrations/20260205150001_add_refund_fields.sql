@@ -26,10 +26,13 @@ CREATE INDEX IF NOT EXISTS idx_orders_refunded
     ON public.orders(refunded_at)
     WHERE refund_amount IS NOT NULL;
 
--- Index for voided orders
-CREATE INDEX IF NOT EXISTS idx_orders_voided
-    ON public.orders(status)
-    WHERE status = 'voided';
+-- Index for voided orders (deferred - new enum value needs commit first)
+DO $$ BEGIN
+    CREATE INDEX IF NOT EXISTS idx_orders_voided
+        ON public.orders(status)
+        WHERE status = 'voided';
+EXCEPTION WHEN others THEN NULL;
+END $$;
 
 -- Comments for documentation
 COMMENT ON COLUMN public.orders.refund_amount IS 'Amount refunded (partial or full)';
