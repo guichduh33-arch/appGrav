@@ -109,7 +109,11 @@
       "Bash(npx vite build)",
       "Bash(cat:*)",
       "Bash(gh pr view:*)",
-      "Bash(gh pr diff:*)"
+      "Bash(gh pr diff:*)",
+      "Bash(fc /b \"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\supabase\\\\migrations\\\\20260203_import_recipes.sql\" \"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\supabase\\\\migrations\\\\20260203100000_import_recipes.sql\")",
+      "Bash(certutil:*)",
+      "Bash(del \"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\supabase\\\\migrations\\\\20260203_import_recipes.sql\")",
+      "Bash(cmd /c start \"\" \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\")"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Calendar, Download, TrendingUp, TrendingDown, ArrowUpRight, DollarSign, ShoppingBag, CreditCard, Award } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/button';
+import { Badge } from '../../components/ui/badge';
 
 // Mock Data for the chart
 const chartData = [

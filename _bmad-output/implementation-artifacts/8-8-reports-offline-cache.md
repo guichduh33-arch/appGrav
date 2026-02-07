@@ -126,7 +126,7 @@ Offline: Component → useOfflineReports(type) → offlineReportCache.getCachedR
 - Snapshots : ~10-50 KB chacun
 - **Total estimé : < 200 KB** (très léger)
 
-### Dépendances
-- **Requiert Story 8.0** (vues SQL doivent exister)
-- **Requiert Story 8.1** (tabs migrés vers useQuery pour intercepter les données)
-- Dexie est déjà configuré dans le projet (src/lib/db.ts)
+### Dependencies
+- **Requiert Story 8.0** (done) — vues SQL existent
+- Les tabs cibles sont deja Pattern B avec useQuery — pas de dependance sur 8.1
+- Dexie est deja configure dans le projet (src/lib/db.ts)

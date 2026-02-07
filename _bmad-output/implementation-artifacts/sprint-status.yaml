@@ -166,20 +166,21 @@ development_status:
   epic-7-retrospective: optional
 
   # Epic 8: Analytics & Intelligence — Reports Complets
-  # Note: Stories rewritten 2026-02-06 after comprehensive audit of existing codebase
-  # Story 8.0 is a BLOCKING prerequisite for all other stories (missing DB migrations)
-  # Dependency chain: 8.0 → 8.1 → {8.2, 8.3, 8.4} → {8.5, 8.6, 8.7} → 8.8 → 8.9
-  epic-8: ready-for-dev
-  8-0-reports-db-foundation: ready-for-dev  # 2026-02-06 - NEW: 8 missing views + system_alerts table + 2 RPCs
-  8-1-report-framework-base: ready-for-dev  # 2026-02-06 - REWRITTEN: Migrate 6 legacy tabs to Pattern B + recharts
-  8-2-sales-reports-suite: ready-for-dev  # 2026-02-06 - REWRITTEN: Tax KPI + top 10 + heatmap + filters
-  8-3-inventory-reports-suite: ready-for-dev  # 2026-02-06 - REWRITTEN: Enrich StockMovementTab + InventoryTab
-  8-4-financial-reports-suite: ready-for-dev  # 2026-02-06 - REWRITTEN: New DiscountsVoids tab + normalize purchase tabs
-  8-5-report-drill-down: ready-for-dev  # 2026-02-06 - REWRITTEN: Breadcrumb + useDrillDown + 3 tabs
-  8-6-report-export-csv-pdf: ready-for-dev  # 2026-02-06 - REWRITTEN: Coverage audit + progress indicator + perf
-  8-7-period-comparison: ready-for-dev  # 2026-02-06 - REWRITTEN: DateRangePicker compare mode + dual-series charts
-  8-8-reports-offline-cache-7-days: ready-for-dev  # 2026-02-06 - REWRITTEN: Dexie cache + sync + useOfflineReports
-  8-9-audit-trail-alerts: ready-for-dev  # 2026-02-06 - REWRITTEN: AuditTab refonte + AlertsDashboard + triggers
+  # Revised 2026-02-07 after comprehensive codebase audit
+  # 8.0 DONE (migration already deployed). 8.1 REWRITTEN (cleanup+skeleton only).
+  # 6 original "legacy" tabs were already Pattern B — stories 8.1/8.2/8.4/8.6 reduced in scope.
+  # New dependency chain: {8.1, 8.2, 8.3, 8.4} → {8.5, 8.6, 8.7} → 8.8 → 8.9
+  epic-8: in-progress
+  8-0-reports-db-foundation: done  # 2026-02-07 - Migration 20260206120000 already deployed (8 views + 2 RPCs + system_alerts)
+  8-1-report-framework-base: ready-for-dev  # 2026-02-07 - REVISED: Cleanup mockup + placeholders + skeleton screens (tabs already Pattern B)
+  8-2-sales-reports-suite: ready-for-dev  # 2026-02-07 - REVISED: Tax KPI + top 10 + heatmap + filters (no Pattern migration needed)
+  8-3-inventory-reports-suite: ready-for-dev  # 2026-02-06 - Enrich StockMovementTab + InventoryTab (true Legacy tabs)
+  8-4-financial-reports-suite: ready-for-dev  # 2026-02-07 - REVISED: DiscountsVoids tab + normalize 2 purchase Legacy tabs (ProfitLossTab already Pattern B)
+  8-5-report-drill-down: ready-for-dev  # 2026-02-06 - Breadcrumb + useDrillDown + 3 tabs
+  8-6-report-export-csv-pdf: ready-for-dev  # 2026-02-07 - REVISED: Polish pass only (progress indicator + naming + perf)
+  8-7-period-comparison: ready-for-dev  # 2026-02-06 - DateRangePicker compare mode + dual-series charts
+  8-8-reports-offline-cache-7-days: ready-for-dev  # 2026-02-06 - Dexie cache + sync + useOfflineReports
+  8-9-audit-trail-alerts: ready-for-dev  # 2026-02-06 - AuditTab refonte + AlertsDashboard + triggers
   epic-8-retrospective: optional
 
   # Epic 9: Comptabilité & Fiscalité — Journal, Grand Livre, États Financiers, TVA

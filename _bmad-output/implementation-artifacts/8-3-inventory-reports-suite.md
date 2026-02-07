@@ -71,5 +71,5 @@ So that **je gère le stock efficacement avec des données à jour et exportable
 ### Modèle à suivre
 - StockWarningTab.tsx et ExpiredStockTab.tsx sont les références (Pattern B, export, spinners)
 
-### Dépendances
-- **Requiert Story 8.0** (view_stock_warning, view_expired_stock doivent exister)
+### Dependencies
+- **Requiert Story 8.0** (done) — view_stock_warning, view_expired_stock existent

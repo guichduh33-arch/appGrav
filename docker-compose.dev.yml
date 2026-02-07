@@ -1,0 +1,107 @@
+services:
+  # Frontend POS Application - Development Mode
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: development
+    image: appgrav-pos:dev
+    container_name: appgrav-pos-web-dev
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+    volumes:
+      # Mount source for hot reload
+      - ./src:/app/src:ro
+      - ./public:/app/public:ro
+      - ./index.html:/app/index.html:ro
+      - ./vite.config.ts:/app/vite.config.ts:ro
+      - ./tailwind.config.js:/app/tailwind.config.js:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
+      # Exclude node_modules
+      - /app/node_modules
+    networks:
+      - appgrav-network
+    labels:
+      - "com.appgrav.service=web"
+      - "com.appgrav.description=POS Frontend (Development)"
+
+  # Print Server - Development Mode
+  print-server:
+    build:
+      context: ./print-server
+      dockerfile: Dockerfile.dev
+    image: appgrav-print-server:dev
+    container_name: appgrav-print-server-dev
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - CORS_ORIGIN=http://localhost:3000
+      - LOG_LEVEL=debug
+    volumes:
+      # Mount source for hot reload
+      - ./print-server/src:/app/src:ro
+      - ./print-server/.env:/app/.env:ro
+      # Persist logs
+      - print-logs:/app/logs
+      # Exclude node_modules
+      - /app/node_modules
+    networks:
+      - appgrav-network
+    labels:
+      - "com.appgrav.service=print-server"
+      - "com.appgrav.description=Print Server (Development)"
+
+  # PostgreSQL Database
+  postgres:
+    image: supabase/postgres:15.1.0.147
+    container_name: appgrav-postgres-dev
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - postgres-data-dev:/var/lib/postgresql/data
+      - ./supabase/migrations:/docker-entrypoint-initdb.d:ro
+    networks:
+      - appgrav-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Supabase Studio
+  studio:
+    image: supabase/studio:20231123-64a766c
+    container_name: appgrav-studio-dev
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - appgrav-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  appgrav-network:
+    driver: bridge
+    name: appgrav-network-dev
+
+volumes:
+  postgres-data-dev:
+    name: appgrav-postgres-data-dev
+  print-logs:
+    name: appgrav-print-logs-dev

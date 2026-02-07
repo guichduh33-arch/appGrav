@@ -12,8 +12,8 @@
 
 import { useState } from 'react';
 import { Cloud, CloudOff, Loader2 } from 'lucide-react';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useSyncQueue } from '@/hooks/useSyncQueue';
 import { PendingSyncPanel } from './PendingSyncPanel';

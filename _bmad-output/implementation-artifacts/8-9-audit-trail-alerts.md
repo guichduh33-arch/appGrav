@@ -123,6 +123,6 @@ So that **je détecte les fraudes, erreurs et manipulations rapidement**.
   2. Brancher les triggers aux bons endroits
   3. Construire l'UI
 
-### Dépendances
-- **BLOQUANT : Requiert Story 8.0** (table system_alerts + RLS)
-- Settings/AuditPage (/settings/audit) reste en place — le AuditTab dans Reports est une vue complémentaire orientée reporting, pas un doublon exact
+### Dependencies
+- **Requiert Story 8.0** (done) — table system_alerts + RLS existent
+- Settings/AuditPage (/settings/audit) reste en place — le AuditTab dans Reports est une vue complementaire orientee reporting, pas un doublon exact

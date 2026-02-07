@@ -1,0 +1,111 @@
+services:
+  # Frontend POS Application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
+    image: appgrav-pos:latest
+    container_name: appgrav-pos-web
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    networks:
+      - appgrav-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    labels:
+      - "com.appgrav.service=web"
+      - "com.appgrav.description=POS Frontend Application"
+
+  # Print Server
+  print-server:
+    build:
+      context: ./print-server
+      dockerfile: Dockerfile
+    image: appgrav-print-server:latest
+    container_name: appgrav-print-server
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - CORS_ORIGIN=${CORS_ORIGIN:-http://localhost:3000}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      # Persist logs
+      - print-logs:/app/logs
+    networks:
+      - appgrav-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1); })"]
+      interval: 30s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+    labels:
+      - "com.appgrav.service=print-server"
+      - "com.appgrav.description=Receipt Print Server"
+
+  # Supabase PostgreSQL Database (Local Development)
+  postgres:
+    image: supabase/postgres:15.1.0.147
+    container_name: appgrav-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-your-super-secret-and-long-postgres-password}
+      - POSTGRES_DB=${POSTGRES_DB:-postgres}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      # Initialize with migrations if needed
+      - ./supabase/migrations:/docker-entrypoint-initdb.d:ro
+    networks:
+      - appgrav-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "com.appgrav.service=database"
+      - "com.appgrav.description=PostgreSQL Database"
+
+  # Supabase Studio (Database Management UI)
+  studio:
+    image: supabase/studio:20231123-64a766c
+    container_name: appgrav-studio
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    environment:
+      - SUPABASE_URL=http://kong:8000
+      - STUDIO_PG_META_URL=http://meta:8080
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-your-anon-key}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY:-your-service-key}
+    networks:
+      - appgrav-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    labels:
+      - "com.appgrav.service=studio"
+      - "com.appgrav.description=Supabase Studio UI"
+
+networks:
+  appgrav-network:
+    driver: bridge
+    name: appgrav-network
+
+volumes:
+  postgres-data:
+    name: appgrav-postgres-data
+  print-logs:
+    name: appgrav-print-logs

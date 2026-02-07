@@ -1,116 +1,92 @@
-# Story 8.1: Report Framework Base — Normalisation & Charts
+# Story 8.1: Report Framework Base — Cleanup & Skeleton Screens
 
 Status: ready-for-dev
 
 ## Story
 
 As a **Manager**,
-I want **que tous les rapports utilisent un framework cohérent avec graphiques, filtres et exports**,
-So that **l'expérience utilisateur est uniforme et professionnelle sur les 25 tabs de reporting**.
+I want **que le module rapports soit propre, sans placeholders orphelins, avec des skeleton screens pendant le chargement**,
+So that **l'experience utilisateur est professionnelle et coherente sur tous les tabs**.
 
-## Context (Audit Findings)
+## Context (Audit Revision 2026-02-07)
 
-Le codebase a **2 patterns coexistants** dans les 25 tabs :
-- **Pattern A (Legacy)** : 6 tabs avec useState, dates hardcodées, pas d'export, pas de DatePicker (OverviewTab, DailySalesTab, SalesTab, SalesByCategoryTab, ProductPerformanceTab, PaymentMethodTab)
-- **Pattern B (Modern)** : 7 tabs avec useQuery, DateRangePicker, ExportButtons, Loader2 spinners
+L'audit a revele que les 6 tabs cibles de la version precedente de cette story (OverviewTab, DailySalesTab, SalesTab, SalesByCategoryTab, ProductPerformanceTab, PaymentMethodTab) sont **deja migres vers Pattern B Modern** avec DateRangePicker, ExportButtons, useQuery et recharts.
 
-**Framework existant (production-ready)** :
-- `DateRangePicker` (10 presets, calendrier custom, sync URL) — src/components/reports/DateRangePicker/
-- `ExportButtons` (CSV + PDF, watermark, permissions) — src/components/reports/ExportButtons/
-- `ReportFilters` (5 types de filtres) — src/components/reports/ReportFilters/
-- `useDateRange`, `useReportFilters`, `useReportPermissions` — src/hooks/reports/
-- **recharts 3.6.0** installé mais utilisé dans **0 tabs** actuellement
+**Etat reel du codebase** :
+- **20/25 tabs** sont Pattern B (Modern) — 80%
+- **5 tabs Legacy** restants : InventoryTab, StockMovementTab, PurchaseDetailsTab, PurchaseBySupplierTab, AuditTab
+  - InventoryTab et StockMovementTab sont traites par **Story 8.3**
+  - PurchaseDetailsTab et PurchaseBySupplierTab sont traites par **Story 8.4**
+  - AuditTab est traite par **Story 8.9**
 
-**Incohérences** :
-- `ReportsConfig.tsx` a des IDs qui ne matchent pas le switch de `ReportsPage.tsx`
-- `SalesReportsPage.tsx` est un mockup avec données hardcodées
+**Ce qui reste a faire dans cette story** :
+1. SalesReportsPage.tsx est un **mockup avec donnees hardcodees** (218 lignes, mock €) — a supprimer
+2. ReportsConfig a **6 placeholders non implementes** (sales_by_date, sales_items_by_date, sales_by_brand, incoming_stock, outgoing_stock, purchase_returns) — a nettoyer
+3. **Aucun skeleton screen** n'existe — a creer
+4. ExpensesTab est desactive (feature flag false, table expenses inexistante) — a documenter ou masquer
 
 ## Acceptance Criteria
 
-### AC1: Tabs Legacy migrés vers Pattern Modern
-**Given** les 6 tabs Legacy (OverviewTab, DailySalesTab, SalesTab, SalesByCategoryTab, ProductPerformanceTab, PaymentMethodTab)
-**When** ils sont refactorisés
-**Then** chacun utilise :
-- `useDateRange` hook avec `DateRangePicker`
-- `useQuery` pour le data fetching (pas useState + useEffect)
-- `ExportButtons` avec config CSV + PDF
-- `Loader2` spinner pendant le chargement
-- Message d'erreur en cas d'échec de requête
+### AC1: SalesReportsPage mockup supprime
+**Given** SalesReportsPage.tsx contient des donnees mockees (€, dates 2023)
+**When** le cleanup est effectue
+**Then** le fichier est supprime
+**And** toute reference dans le router est nettoyee
 
-### AC2: Recharts intégré dans les tabs avec graphiques
-**Given** recharts 3.6.0 est installé mais non utilisé
-**When** les tabs affichent des graphiques
-**Then** ils utilisent des composants recharts (`BarChart`, `LineChart`, `PieChart`, `AreaChart`) au lieu de divs custom
-**And** les couleurs respectent le thème Tailwind de l'app
-**And** les tooltips sont formatés (currency IDR, pourcentages)
+### AC2: Placeholders marques "Coming Soon" proprement
+**Given** 6 rapports dans ReportsConfig n'ont pas d'implementation
+**When** je consulte ces rapports
+**Then** chacun affiche un placeholder propre avec icone et message "This report is planned for a future release"
+**And** le placeholder est un composant reutilisable `ReportPlaceholder.tsx`
 
-### AC3: ReportsConfig réconcilié
-**Given** ReportsConfig.tsx a des IDs incohérents
-**When** la config est corrigée
-**Then** chaque rapport dans ReportsConfig a un ID qui correspond exactement au switch dans ReportsPage.tsx
-**And** les clés i18n sont remplacées par des strings English directes (i18n suspendu)
-**And** SalesReportsPage.tsx mockup est supprimé ou intégré
-
-### AC4: Skeleton screens
-**Given** un rapport charge ses données
-**When** la requête est en cours
+### AC3: Skeleton screens
+**Given** un rapport charge ses donnees
+**When** la requete est en cours
 **Then** un skeleton screen (pas juste un spinner) s'affiche pour les KPI cards et les tableaux
-**And** la transition vers les données réelles est fluide (pas de "jump")
+**And** la transition vers les donnees reelles est fluide (pas de "jump")
+
+### AC4: ExpensesTab gere proprement
+**Given** ExpensesTab est desactive car la table expenses n'existe pas
+**When** je consulte le rapport Expenses
+**Then** un message clair indique "Expenses tracking will be available when the Accounting module (Epic 9) is implemented"
+**And** le tab n'apparait pas dans la navigation principale (cache de ReportsConfig)
 
 ## Tasks
 
-- [ ] **Task 1: Migrer OverviewTab vers Pattern Modern**
-  - [ ] 1.1: Remplacer useState/useEffect par useQuery + useDateRange
-  - [ ] 1.2: Remplacer `getSalesComparison()` hardcodé par appel avec date range dynamique
-  - [ ] 1.3: Ajouter ExportButtons, Loader2 spinner, error state
+- [ ] **Task 1: Supprimer SalesReportsPage mockup**
+  - [ ] 1.1: Supprimer `src/pages/reports/SalesReportsPage.tsx`
+  - [ ] 1.2: Verifier et nettoyer les references dans le router
 
-- [ ] **Task 2: Migrer DailySalesTab**
-  - [ ] 2.1: Ajouter DateRangePicker (remplacer le 30j hardcodé)
-  - [ ] 2.2: Remplacer le bar chart custom par recharts BarChart
-  - [ ] 2.3: Ajouter ExportButtons PDF (CSV existe déjà)
+- [ ] **Task 2: Composant ReportPlaceholder**
+  - [ ] 2.1: Creer `src/components/reports/ReportPlaceholder.tsx`
+  - [ ] 2.2: Props : `title: string, description?: string`
+  - [ ] 2.3: Design : icone Construction/Wrench + message + suggestion de rapport alternatif
+  - [ ] 2.4: Utiliser dans ReportsPage.tsx pour les 6 IDs non implementes
 
-- [ ] **Task 3: Migrer SalesTab**
-  - [ ] 3.1: Ajouter DateRangePicker
-  - [ ] 3.2: Remplacer pie/bar charts customs par recharts PieChart/BarChart
-  - [ ] 3.3: Ajouter ExportButtons
+- [ ] **Task 3: Composant ReportSkeleton**
+  - [ ] 3.1: Creer `src/components/reports/ReportSkeleton.tsx`
+  - [ ] 3.2: Variante KPI : 4 cards skeleton (pulse animation)
+  - [ ] 3.3: Variante Table : header + 10 lignes skeleton
+  - [ ] 3.4: Variante Chart : rectangle skeleton avec dimensions du chart
+  - [ ] 3.5: Integrer dans les tabs Pattern B existants (remplacer Loader2 spinners)
 
-- [ ] **Task 4: Migrer SalesByCategoryTab**
-  - [ ] 4.1: Ajouter DateRangePicker + ExportButtons
-  - [ ] 4.2: Remplacer pie chart custom par recharts PieChart
-
-- [ ] **Task 5: Migrer ProductPerformanceTab**
-  - [ ] 5.1: Ajouter DateRangePicker + ExportButtons
-  - [ ] 5.2: Étendre top 5 → top 10 produits
-  - [ ] 5.3: Remplacer bar chart par recharts BarChart horizontal
-
-- [ ] **Task 6: Migrer PaymentMethodTab**
-  - [ ] 6.1: Ajouter DateRangePicker + ExportButtons
-  - [ ] 6.2: Remplacer bar chart par recharts BarChart
-
-- [ ] **Task 7: Réconcilier ReportsConfig**
-  - [ ] 7.1: Aligner les IDs de ReportsConfig avec le switch de ReportsPage.tsx
-  - [ ] 7.2: Remplacer les clés i18n par des strings English
-  - [ ] 7.3: Supprimer ou nettoyer SalesReportsPage.tsx
-
-- [ ] **Task 8: Composant Skeleton Screen réutilisable**
-  - [ ] 8.1: Créer `src/components/reports/ReportSkeleton.tsx` (KPI cards skeleton + table skeleton)
-  - [ ] 8.2: Intégrer dans les 6 tabs migrés
+- [ ] **Task 4: Masquer ExpensesTab**
+  - [ ] 4.1: Ajouter `hidden: true` ou `disabled: true` au rapport expenses dans ReportsConfig
+  - [ ] 4.2: Filtrer les rapports hidden de la navigation sidebar
 
 ## Dev Notes
 
-### Fichiers à modifier
-- `src/pages/reports/components/OverviewTab.tsx` (97 lignes → ~200)
-- `src/pages/reports/components/DailySalesTab.tsx` (160 lignes)
-- `src/pages/reports/components/SalesTab.tsx` (119 lignes)
-- `src/pages/reports/components/SalesByCategoryTab.tsx` (135 lignes)
-- `src/pages/reports/components/ProductPerformanceTab.tsx` (117 lignes)
-- `src/pages/reports/components/PaymentMethodTab.tsx` (135 lignes)
-- `src/pages/reports/ReportsConfig.tsx`
-- `src/pages/reports/ReportsPage.tsx`
+### Fichiers a supprimer
+- `src/pages/reports/SalesReportsPage.tsx` (218 lignes, mockup pur)
 
-### Pattern à suivre (modèle)
-Utiliser `SalesByHourTab.tsx` (264 lignes) ou `SalesCancellationTab.tsx` (287 lignes) comme référence — ce sont les meilleures implémentations Pattern B.
+### Fichiers a creer
+- `src/components/reports/ReportPlaceholder.tsx`
+- `src/components/reports/ReportSkeleton.tsx`
 
-### Dépendances
-- **Requiert Story 8.0** (vues SQL) pour que getSalesComparison() et getDashboardSummary() fonctionnent
-- recharts est déjà dans package.json, pas besoin de `npm install`
+### Fichiers a modifier
+- `src/pages/reports/ReportsPage.tsx` — utiliser ReportPlaceholder pour les cases non implementes
+- `src/pages/reports/ReportsConfig.tsx` — ajouter flag hidden pour ExpensesTab
+
+### Dependencies
+- **Aucune dependance bloquante** — cette story peut demarrer immediatement
+- Les tabs Legacy seront migres par les stories 8.3, 8.4 et 8.9

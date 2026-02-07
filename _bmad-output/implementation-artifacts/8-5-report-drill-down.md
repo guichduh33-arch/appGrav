@@ -93,6 +93,6 @@ Les 24 autres tabs affichent des données "plates" sans interaction de navigatio
 ### Pattern de référence
 Utiliser SalesCancellationTab.tsx comme modèle de drill-down (pie → reason breakdown → detail list).
 
-### Dépendances
-- **Requiert Story 8.1** (tabs migrés vers Pattern Modern avec useQuery)
+### Dependencies
 - **Requiert Story 8.2** (top 10 produits dans ProductPerformanceTab)
+- Les tabs cibles (DailySalesTab, SalesByCategoryTab, ProductPerformanceTab) sont deja Pattern B Modern avec useQuery — pas de dependance sur 8.1

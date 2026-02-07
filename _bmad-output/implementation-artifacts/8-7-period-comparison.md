@@ -115,7 +115,7 @@ const prevFrom = subYears(from, 1);
 const prevTo = subYears(to, 1);
 ```
 
-### Dépendances
-- **Requiert Story 8.1** (tabs migrés vers Pattern Modern avec DateRangePicker)
-- **Requiert Story 8.0** (RPC get_sales_comparison pour OverviewTab)
-- date-fns est déjà installé (differenceInDays, subDays, subYears)
+### Dependencies
+- **Requiert Story 8.0** (done) — RPC get_sales_comparison pour OverviewTab
+- Les tabs cibles sont deja Pattern B Modern avec DateRangePicker — pas de dependance sur 8.1
+- date-fns est deja installe (differenceInDays, subDays, subYears)

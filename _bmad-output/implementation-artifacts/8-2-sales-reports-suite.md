@@ -1,4 +1,4 @@
-# Story 8.2: Sales Reports Suite — KPIs manquants & améliorations
+# Story 8.2: Sales Reports Suite — KPIs manquants & ameliorations
 
 Status: ready-for-dev
 
@@ -6,84 +6,85 @@ Status: ready-for-dev
 
 As a **Manager**,
 I want **des KPIs de ventes complets incluant la taxe, un vrai heatmap horaire et un top 10 produits**,
-So that **je comprends la performance commerciale avec toutes les métriques nécessaires**.
+So that **je comprends la performance commerciale avec toutes les metriques necessaires**.
 
-## Context (Audit Findings)
+## Context (Audit Revision 2026-02-07)
 
-Les tabs de ventes existants couvrent ~60% des besoins. Gaps identifiés :
-- **Tax KPI absent** : Aucun tab n'isole la taxe (10% incluse dans les prix). `view_daily_kpis` a la colonne `total_tax` mais elle n'est pas affichée.
-- **Top 10 → Top 5** : ProductPerformanceTab montre seulement top 5
-- **Heatmap 2D absent** : SalesByHourTab a un bar chart coloré mais pas un vrai heatmap jour × heure
-- **Filtrage avancé absent** : Pas de filtre par catégorie ou shift sur les tabs legacy
+Les tabs de ventes sont **deja Pattern B Modern** avec DateRangePicker, ExportButtons, useQuery et recharts. Les gaps restants sont des enrichissements fonctionnels :
 
-**Tabs existants (ventes)** : OverviewTab, DailySalesTab, SalesTab, SalesByHourTab, SalesByCategoryTab, SalesByCustomerTab, ProductPerformanceTab, PaymentMethodTab, SalesCancellationTab, SessionCashBalanceTab
+- **Tax KPI absent** : view_daily_kpis a la colonne `total_tax` mais elle n'est pas affichee dans OverviewTab
+- **Top produits** : ProductPerformanceTab (153 lignes) — verifier si top 5 ou top 10, ajouter margin
+- **Heatmap 2D absent** : SalesByHourTab (263 lignes) a un BarChart colore mais pas un vrai heatmap jour x heure
+- **Filtrage avance** : ReportFilters existe mais pas integre dans tous les tabs de ventes
+
+**Note** : Pas besoin de migration Pattern A vers B (deja fait).
 
 ## Acceptance Criteria
 
-### AC1: Tax KPI affiché
+### AC1: Tax KPI affiche
 **Given** le rapport Sales Overview (OverviewTab)
 **When** je consulte les KPIs
 **Then** je vois **Total Tax** en plus de Total Revenue, Order Count, ATV
-**And** le calcul est : tax = total_revenue × 10/110
-**And** le Net Revenue (HT) = total_revenue - tax est aussi affiché
+**And** le calcul est : tax = total_revenue x 10/110
+**And** le Net Revenue (HT) = total_revenue - tax est aussi affiche
 
-### AC2: Top 10 produits
+### AC2: Top 10 produits avec margin
 **Given** le rapport Product Performance
-**When** les données s'affichent
-**Then** le graphique montre les **10** meilleures ventes (pas 5)
-**And** le tableau montre tous les produits triés par revenue desc
+**When** les donnees s'affichent
+**Then** le graphique montre les **10** meilleures ventes
+**And** le tableau montre tous les produits tries par revenue desc
 **And** les colonnes incluent : Product, Category, Qty Sold, Revenue, Avg Price, Margin %
 
-### AC3: Heatmap horaire (jour × heure)
+### AC3: Heatmap horaire (jour x heure)
 **Given** le rapport Sales by Hour
-**When** les données s'affichent
-**Then** en plus du bar chart existant, un **heatmap grid** (7 jours × 24 heures) montre l'intensité des ventes
-**And** les cellules sont colorées par intensité (vert foncé = peak, blanc = zero)
+**When** les donnees s'affichent
+**Then** en plus du bar chart existant, un **heatmap grid** (7 jours x 24 heures) montre l'intensite des ventes
+**And** les cellules sont colorees par intensite (vert fonce = peak, blanc = zero)
 **And** le heatmap est cliquable (voir AC drill-down story 8.5)
 
-### AC4: Filtres avancés sur les rapports de ventes
+### AC4: Filtres avances sur les rapports de ventes
 **Given** les tabs de ventes
 **When** je regarde les options de filtre
 **Then** je peux filtrer par :
-- Catégorie de produit
+- Categorie de produit
 - Shift/Session de caisse
 - Type de commande (dine_in, takeaway, delivery, b2b)
 **And** les filtres utilisent le composant `ReportFilters` existant
 
 ## Tasks
 
-- [ ] **Task 1: Ajouter Tax KPI à OverviewTab**
+- [ ] **Task 1: Ajouter Tax KPI a OverviewTab**
   - [ ] 1.1: Ajouter KPI card "Total Tax" (extraire de view_daily_kpis.total_tax)
   - [ ] 1.2: Ajouter KPI card "Net Revenue (HT)" = revenue - tax
-  - [ ] 1.3: Formater en IDR arrondi à 100
+  - [ ] 1.3: Formater en IDR arrondi a 100
 
-- [ ] **Task 2: Étendre ProductPerformanceTab à Top 10**
-  - [ ] 2.1: Modifier le slice de données de .slice(0, 5) → .slice(0, 10)
+- [ ] **Task 2: Etendre ProductPerformanceTab a Top 10 + Margin**
+  - [ ] 2.1: Modifier le slice de donnees vers top 10
   - [ ] 2.2: Ajouter colonne Margin % = (revenue - qty*cost_price) / revenue * 100
   - [ ] 2.3: Ajouter colonne Category
 
 - [ ] **Task 3: Heatmap horaire dans SalesByHourTab**
-  - [ ] 3.1: Modifier la requête pour récupérer les données par jour × heure (pas juste heure agrégée)
-  - [ ] 3.2: Créer composant `HourlyHeatmap` avec grid CSS 7×24
-  - [ ] 3.3: Implémenter l'échelle de couleur (interpolation blanc → vert foncé)
-  - [ ] 3.4: Ajouter tooltip au hover avec détails (jour, heure, revenue, orders)
+  - [ ] 3.1: Modifier la requete pour recuperer les donnees par jour x heure (pas juste heure agregee)
+  - [ ] 3.2: Creer composant `HourlyHeatmap` avec grid CSS 7x24
+  - [ ] 3.3: Implementer l'echelle de couleur (interpolation blanc -> vert fonce)
+  - [ ] 3.4: Ajouter tooltip au hover avec details (jour, heure, revenue, orders)
 
-- [ ] **Task 4: Filtres avancés**
-  - [ ] 4.1: Intégrer `ReportFilters` dans OverviewTab, DailySalesTab, SalesTab
-  - [ ] 4.2: Passer les filtres sélectionnés aux requêtes ReportingService
+- [ ] **Task 4: Filtres avances**
+  - [ ] 4.1: Integrer `ReportFilters` dans OverviewTab, DailySalesTab, SalesTab
+  - [ ] 4.2: Passer les filtres selectionnes aux requetes ReportingService
   - [ ] 4.3: Ajouter filtre "Order Type" (dine_in, takeaway, delivery, b2b) au composant ReportFilters
 
 ## Dev Notes
 
-### Fichiers à modifier
-- `src/pages/reports/components/OverviewTab.tsx` — ajouter Tax + Net Revenue KPIs
-- `src/pages/reports/components/ProductPerformanceTab.tsx` — top 10 + margin + category
-- `src/pages/reports/components/SalesByHourTab.tsx` — ajouter heatmap grid
+### Fichiers a modifier
+- `src/pages/reports/components/OverviewTab.tsx` (205 lignes) — ajouter Tax + Net Revenue KPIs + filtres
+- `src/pages/reports/components/ProductPerformanceTab.tsx` (153 lignes) — top 10 + margin + category
+- `src/pages/reports/components/SalesByHourTab.tsx` (263 lignes) — ajouter heatmap grid
 - `src/components/reports/ReportFilters/ReportFilters.tsx` — ajouter filtre order_type
 
-### Fichiers à créer
-- `src/components/reports/HourlyHeatmap.tsx` — composant heatmap réutilisable
+### Fichiers a creer
+- `src/components/reports/HourlyHeatmap.tsx` — composant heatmap reutilisable
 
-### Dépendances
-- **Requiert Story 8.0** (RPC get_sales_comparison pour OverviewTab)
-- **Requiert Story 8.1** (migration Pattern A → B pour les tabs legacy)
+### Dependencies
+- **Requiert Story 8.0** (done) — RPCs get_sales_comparison, get_reporting_dashboard_summary
+- **Pas de dependance sur 8.1** — les tabs sont deja Pattern B
