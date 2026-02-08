@@ -5,6 +5,7 @@ import { Clock, DollarSign, ShoppingCart, TrendingUp, Loader2 } from 'lucide-rea
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
+import { HourlyHeatmap } from '@/components/reports/HourlyHeatmap';
 import { useDateRange } from '@/hooks/reports/useDateRange';
 import { formatCurrency as formatCurrencyPdf } from '@/services/reports/pdfExport';
 
@@ -70,6 +71,21 @@ export function SalesByHourTab() {
       totalOrders: hourlyData.reduce((sum, h) => sum + h.orders, 0),
     };
   }, [hourlyData]);
+
+  // Transform data for heatmap (extract day_of_week from report_date)
+  const heatmapData = useMemo(() => {
+    if (!data) return [];
+
+    return data.map((d) => {
+      const date = new Date(d.report_date);
+      return {
+        day_of_week: date.getDay(), // 0 = Sunday, 6 = Saturday
+        hour_of_day: d.hour_of_day,
+        total_revenue: d.total_revenue || 0,
+        order_count: d.order_count || 0,
+      };
+    });
+  }, [data]);
 
   // Export config
   const exportConfig: ExportConfig<{ hour: number; label: string; orders: number; revenue: number }> = useMemo(() => ({
@@ -217,6 +233,11 @@ export function SalesByHourTab() {
           </div>
         </div>
       </div>
+
+      {/* Heatmap */}
+      {!isLoading && heatmapData.length > 0 && (
+        <HourlyHeatmap data={heatmapData} />
+      )}
 
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">

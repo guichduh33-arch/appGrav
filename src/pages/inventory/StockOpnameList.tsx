@@ -34,7 +34,7 @@ export default function StockOpnameList() {
             const countNumber = `INV-${Date.now()}`
             const sessionData = {
                 count_number: countNumber,
-                notes: 'Nouvel inventaire',
+                notes: 'New inventory',
                 status: 'draft' as const
             }
             const { data, error } = await supabase
@@ -48,24 +48,24 @@ export default function StockOpnameList() {
                 navigate(`/inventory/stock-opname/${data.id}`)
             }
         } catch (error: unknown) {
-            alert('Erreur: ' + (error instanceof Error ? error.message : String(error)))
+            alert('Error: ' + (error instanceof Error ? error.message : String(error)))
         }
     }
 
-    if (loading) return <div className="opname-container"><div className="p-8 text-center text-gray-500">Chargement...</div></div>
+    if (loading) return <div className="opname-container"><div className="p-8 text-center text-gray-500">Loading...</div></div>
 
     return (
         <div className="opname-container">
             <header className="opname-header">
                 <div className="opname-title">
-                    <h1>Inventaires Physiques (Opname)</h1>
-                    <p className="opname-subtitle">Historique des comptages</p>
+                    <h1>Physical Inventory (Opname)</h1>
+                    <p className="opname-subtitle">Count history</p>
                 </div>
                 <button
                     onClick={createNewSession}
                     className="btn btn-primary"
                 >
-                    <Plus size={18} /> Nouvel Inventaire
+                    <Plus size={18} /> New Inventory
                 </button>
             </header>
 
@@ -74,9 +74,9 @@ export default function StockOpnameList() {
                     <table className="opname-table">
                         <thead>
                             <tr>
-                                <th>Numéro</th>
+                                <th>Number</th>
                                 <th>Date</th>
-                                <th>Statut</th>
+                                <th>Status</th>
                                 <th>Notes</th>
                                 <th className="text-right">Action</th>
                             </tr>
@@ -99,7 +99,7 @@ export default function StockOpnameList() {
                                             onClick={() => navigate(`/inventory/stock-opname/${session.id}`)}
                                             className="btn btn-secondary btn-sm"
                                         >
-                                            {session.status === 'draft' ? 'Continuer' : 'Voir Détails'}
+                                            {session.status === 'draft' ? 'Continue' : 'View Details'}
                                             <ArrowRight size={14} className="ml-1" />
                                         </button>
                                     </td>
@@ -108,7 +108,7 @@ export default function StockOpnameList() {
                             {counts.length === 0 && (
                                 <tr>
                                     <td colSpan={5} className="p-8 text-center text-gray-400">
-                                        Aucun inventaire trouvé. Commencez par en créer un.
+                                        No inventory found. Start by creating one.
                                     </td>
                                 </tr>
                             )}
@@ -123,11 +123,11 @@ export default function StockOpnameList() {
 function StatusBadge({ status }: { status: string }) {
     switch (status) {
         case 'draft':
-            return <span className="status-badge draft"><Clock size={12} /> Brouillon</span>
+            return <span className="status-badge draft"><Clock size={12} /> Draft</span>
         case 'completed':
-            return <span className="status-badge completed"><CheckCircle size={12} /> Validé</span>
+            return <span className="status-badge completed"><CheckCircle size={12} /> Validated</span>
         case 'cancelled':
-            return <span className="status-badge cancelled"><XCircle size={12} /> Annulé</span>
+            return <span className="status-badge cancelled"><XCircle size={12} /> Cancelled</span>
         default:
             return <span className="status-badge">{status}</span>
     }

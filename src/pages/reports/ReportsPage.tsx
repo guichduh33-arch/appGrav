@@ -29,7 +29,11 @@ import { PriceChangesTab } from './components/PriceChangesTab';
 import { DeletedProductsTab } from './components/DeletedProductsTab';
 import { PurchaseByDateTab } from './components/PurchaseByDateTab';
 import { OutstandingPurchasePaymentTab } from './components/OutstandingPurchasePaymentTab';
+// Epic 8: Financial Reports
+import { DiscountsVoidsTab } from './components/DiscountsVoidsTab';
+import { AlertsDashboardTab } from './components/AlertsDashboardTab';
 import { REPORT_CATEGORIES } from './ReportsConfig';
+import { ReportPlaceholder } from '@/components/reports/ReportPlaceholder';
 import './ReportsPage.css';
 
 const ReportsPage = () => {
@@ -98,28 +102,25 @@ const ReportsPage = () => {
                 return <OutstandingPurchasePaymentTab />;
             // Epic 8: Discounts & Alerts
             case 'discounts_voids':
-                return (
-                    <div className="flex flex-col items-center justify-center h-96 text-gray-400">
-                        <h3 className="text-lg font-medium text-gray-900">Coming soon</h3>
-                    </div>
-                );
+                return <DiscountsVoidsTab />;
             case 'alerts_dashboard':
-                return (
-                    <div className="flex flex-col items-center justify-center h-96 text-gray-400">
-                        <h3 className="text-lg font-medium text-gray-900">Coming soon</h3>
-                    </div>
-                );
+                return <AlertsDashboardTab />;
             // Placeholders for remaining reports
-            default:
+            default: {
+                // Check if report has a custom placeholder message
+                const report = activeCategory.reports.find(r => r.id === reportId);
                 return (
-                    <div className="flex flex-col items-center justify-center h-96 text-gray-400">
-                        <div className="p-4 bg-gray-50 rounded-full mb-4">
-                            {activeReport?.icon && <activeReport.icon size={48} className="text-gray-300" />}
-                        </div>
-                        <h3 className="text-lg font-medium text-gray-900">Report Under Construction</h3>
-                        <p className="mt-1">Use the existing dashboards for now.</p>
-                    </div>
+                    <ReportPlaceholder
+                        title={report?.title || 'Report Under Construction'}
+                        description={report?.placeholder || 'This report is planned for a future release.'}
+                        suggestedReport={{ id: 'dashboard', title: 'General Dashboard' }}
+                        onNavigateToReport={(id) => {
+                            setActiveCategoryId('overview');
+                            setActiveReportId(id);
+                        }}
+                    />
                 );
+            }
         }
     };
 
@@ -196,23 +197,25 @@ const ReportsPage = () => {
                     ) : (
                         <div className="reports-content__container">
                             <div className="reports-grid">
-                                {activeCategory.reports.map((report) => (
-                                    <button
-                                        key={report.id}
-                                        onClick={() => setActiveReportId(report.id)}
-                                        className="report-card-btn group"
-                                    >
-                                        <div className="report-card-btn__icon-wrapper">
-                                            <report.icon size={24} />
-                                        </div>
-                                        <h3 className="report-card-btn__title">
-                                            {report.title}
-                                        </h3>
-                                        <p className="report-card-btn__desc">
-                                            {report.description}
-                                        </p>
-                                    </button>
-                                ))}
+                                {activeCategory.reports
+                                    .filter((report) => !report.hidden)
+                                    .map((report) => (
+                                        <button
+                                            key={report.id}
+                                            onClick={() => setActiveReportId(report.id)}
+                                            className="report-card-btn group"
+                                        >
+                                            <div className="report-card-btn__icon-wrapper">
+                                                <report.icon size={24} />
+                                            </div>
+                                            <h3 className="report-card-btn__title">
+                                                {report.title}
+                                            </h3>
+                                            <p className="report-card-btn__desc">
+                                                {report.description}
+                                            </p>
+                                        </button>
+                                    ))}
                             </div>
                         </div>
                     )}

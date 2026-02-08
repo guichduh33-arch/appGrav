@@ -23,6 +23,10 @@ export type ReportDefinition = {
     description: string;
     icon: any;
     component?: React.ReactNode;
+    /** Hide report from navigation (e.g., feature not yet implemented) */
+    hidden?: boolean;
+    /** Show placeholder message instead of component */
+    placeholder?: string;
 };
 
 
@@ -68,13 +72,15 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 id: 'sales_by_date',
                 title: 'Sales By Date',
                 description: 'Detailed sales log by date',
-                icon: Calendar
+                icon: Calendar,
+                placeholder: 'This report is planned for a future release.'
             },
             {
                 id: 'sales_items_by_date',
                 title: 'Sales Items By Date',
                 description: 'Itemized sales log',
-                icon: List
+                icon: List,
+                placeholder: 'This report is planned for a future release.'
             },
             {
                 id: 'product_performance',
@@ -92,7 +98,8 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 id: 'sales_by_brand',
                 title: 'Product Sales By Brand',
                 description: 'Performance by brand',
-                icon: LayoutGrid
+                icon: LayoutGrid,
+                placeholder: 'This report is planned for a future release.'
             },
             {
                 id: 'sales_by_customer',
@@ -141,13 +148,15 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 id: 'incoming_stock',
                 title: 'Incoming Stocks',
                 description: 'Purchases and internal transfers in',
-                icon: TrendingUp
+                icon: TrendingUp,
+                placeholder: 'This report is planned for a future release.'
             },
             {
                 id: 'outgoing_stock',
                 title: 'Outgoing Stocks',
                 description: 'Sales, wastage, and transfers out',
-                icon: TrendingDown
+                icon: TrendingDown,
+                placeholder: 'This report is planned for a future release.'
             },
             {
                 id: 'stock_warning',
@@ -196,7 +205,8 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 id: 'purchase_returns',
                 title: 'Purchase Returns',
                 description: 'Items returned to suppliers',
-                icon: TrendingDown
+                icon: TrendingDown,
+                placeholder: 'This report is planned for a future release.'
             },
             {
                 id: 'outstanding_purchase_payment',
@@ -233,7 +243,9 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 id: 'expenses',
                 title: 'Expenses by Date',
                 description: 'Operational expenses',
-                icon: TrendingDown
+                icon: TrendingDown,
+                hidden: true,
+                placeholder: 'Expenses tracking will be available when the Accounting module (Epic 9) is implemented.'
             },
             {
                 id: 'discounts_voids',

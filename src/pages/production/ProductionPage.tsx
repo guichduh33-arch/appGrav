@@ -141,7 +141,7 @@ const ProductionPage = () => {
                         </div>
                         <div>
                             <h1 className="m-0 text-2xl font-bold text-gray-800">Production</h1>
-                            <p className="m-0 text-gray-500 text-sm">Saisie de production par section</p>
+                            <p className="m-0 text-gray-500 text-sm">Production entry by section</p>
                         </div>
                     </div>
                     {/* Reminders indicator */}
@@ -249,7 +249,7 @@ function SectionSelector({ sections, selectedSectionId, onSelect }: {
                     </button>
                 ))}
                 {sections.length === 0 && (
-                    <p className="text-gray-400 text-sm italic">Aucune section de production configurée</p>
+                    <p className="text-gray-400 text-sm italic">No production section configured</p>
                 )}
             </div>
         </div>
@@ -272,19 +272,19 @@ function DateSelector({ selectedDate, isToday, formatDate, onNavigate }: {
                 <button
                     onClick={() => onNavigate(-1)}
                     className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
-                    aria-label="Jour précédent"
+                    aria-label="Previous day"
                 >
                     <ChevronLeft size={20} />
                 </button>
                 <div className={`flex-1 text-center py-2.5 px-4 rounded-lg font-semibold capitalize ${
                     isToday ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
                 }`}>
-                    {isToday ? "Aujourd'hui" : formatDate(selectedDate)}
+                    {isToday ? "Today" : formatDate(selectedDate)}
                 </div>
                 <button
                     onClick={() => onNavigate(1)}
                     className="p-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
-                    aria-label="Jour suivant"
+                    aria-label="Next day"
                 >
                     <ChevronRight size={20} />
                 </button>
@@ -297,8 +297,8 @@ function EmptyState() {
     return (
         <div className="text-center p-16 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
             <Layers size={48} className="text-gray-300 mx-auto mb-4" />
-            <h3 className="m-0 text-gray-600 font-medium">Sélectionnez une section</h3>
-            <p className="text-gray-400 mt-2 text-sm">Choisissez une section de production pour commencer</p>
+            <h3 className="m-0 text-gray-600 font-medium">Select a section</h3>
+            <p className="text-gray-400 mt-2 text-sm">Choose a production section to start</p>
         </div>
     )
 }
@@ -327,7 +327,7 @@ function ProductionEntry({
 }) {
     return (
         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-            <h2 className="m-0 mb-4 text-lg font-semibold text-gray-800">Saisie Production - {sectionName}</h2>
+            <h2 className="m-0 mb-4 text-lg font-semibold text-gray-800">Production Entry - {sectionName}</h2>
 
             {/* Offline warning banner */}
             {!isOnline && (
@@ -344,7 +344,7 @@ function ProductionEntry({
                 <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
                     type="text"
-                    placeholder="Rechercher un produit à produire..."
+                    placeholder="Search for a product to produce..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl text-base focus:border-amber-500 focus:outline-none transition-colors"
@@ -379,8 +379,8 @@ function ProductionEntry({
             ) : (
                 <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
                     <Package size={40} className="mx-auto mb-3 text-gray-300" />
-                    <p className="m-0 text-gray-500 font-medium">Aucun produit ajouté</p>
-                    <p className="mt-1 text-sm text-gray-400">Recherchez un produit pour l'ajouter</p>
+                    <p className="m-0 text-gray-500 font-medium">No product added</p>
+                    <p className="mt-1 text-sm text-gray-400">Search for a product to add</p>
                 </div>
             )}
 
@@ -401,7 +401,7 @@ function ProductionEntry({
                     )}
                     <div className="flex justify-end gap-3">
                         <button onClick={onClear} disabled={isSaving} className="px-6 py-3 rounded-lg border border-gray-200 bg-white text-gray-600 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50">
-                            Annuler
+                            Cancel
                         </button>
                         {isOnline ? (
                             <button
@@ -439,9 +439,9 @@ function ProductionTable({ items, onUpdateQuantity, onUpdateReason, onRemove }: 
             <table className="w-full border-collapse">
                 <thead>
                     <tr className="bg-gray-50 border-b border-gray-200">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Produit</th>
-                        <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Quantité</th>
-                        <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Perte</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Product</th>
+                        <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Quantity</th>
+                        <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Waste</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Note</th>
                         <th className="w-[50px]"></th>
                     </tr>
@@ -468,7 +468,7 @@ function ProductionTable({ items, onUpdateQuantity, onUpdateReason, onRemove }: 
                                 {item.wasted > 0 && (
                                     <input
                                         type="text"
-                                        placeholder="Raison..."
+                                        placeholder="Reason..."
                                         value={item.wasteReason}
                                         onChange={(e) => onUpdateReason(item.productId, e.target.value)}
                                         className="w-full px-2 py-1.5 border border-red-200 rounded text-sm text-gray-700 bg-red-50/30 focus:border-red-400 focus:outline-none"
@@ -476,7 +476,7 @@ function ProductionTable({ items, onUpdateQuantity, onUpdateReason, onRemove }: 
                                 )}
                             </td>
                             <td className="p-4 text-center">
-                                <button onClick={() => onRemove(item.productId)} className="p-2 rounded hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" aria-label="Supprimer">
+                                <button onClick={() => onRemove(item.productId)} className="p-2 rounded hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" aria-label="Delete">
                                     <Trash2 size={18} />
                                 </button>
                             </td>
@@ -499,14 +499,14 @@ function QuantityControl({ value, unit, onChange, isWaste = false }: {
 
     return (
         <div className="flex items-center justify-center gap-2">
-            <button onClick={() => onChange(-1)} className={`p-1 rounded ${btnClass} transition-colors`} aria-label="Diminuer">
+            <button onClick={() => onChange(-1)} className={`p-1 rounded ${btnClass} transition-colors`} aria-label="Decrease">
                 <Minus size={16} />
             </button>
             <div className="text-center min-w-[3rem]">
                 <span className={`block font-bold text-lg leading-none ${valueClass}`}>{value}</span>
                 {(!isWaste || value > 0) && <span className={`text-[10px] font-medium uppercase ${isWaste ? 'text-red-500' : 'text-gray-500'}`}>{unit}</span>}
             </div>
-            <button onClick={() => onChange(1)} className={`p-1 rounded ${btnClass} transition-colors`} aria-label="Augmenter">
+            <button onClick={() => onChange(1)} className={`p-1 rounded ${btnClass} transition-colors`} aria-label="Increase">
                 <Plus size={16} />
             </button>
         </div>
@@ -516,15 +516,15 @@ function QuantityControl({ value, unit, onChange, isWaste = false }: {
 function SummaryCard({ totalProduced, totalWaste }: { totalProduced: number; totalWaste: number }) {
     return (
         <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-            <h3 className="m-0 mb-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Résumé du jour</h3>
+            <h3 className="m-0 mb-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Today's summary</h3>
             <div className="grid grid-cols-2 gap-3">
                 <div className="p-4 bg-emerald-50 rounded-xl text-center border border-emerald-100">
                     <div className="text-2xl font-bold text-emerald-600">{totalProduced}</div>
-                    <div className="text-xs font-semibold text-emerald-700 uppercase mt-1">Produit</div>
+                    <div className="text-xs font-semibold text-emerald-700 uppercase mt-1">Produced</div>
                 </div>
                 <div className="p-4 bg-red-50 rounded-xl text-center border border-red-100">
                     <div className="text-2xl font-bold text-red-600">{totalWaste}</div>
-                    <div className="text-xs font-semibold text-red-700 uppercase mt-1">Perte</div>
+                    <div className="text-xs font-semibold text-red-700 uppercase mt-1">Waste</div>
                 </div>
             </div>
         </div>
@@ -540,10 +540,10 @@ function HistoryCard({ history, isAdmin, getRecordUnit, onDelete }: {
     return (
         <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm flex-1">
             <div className="flex items-center justify-between mb-4">
-                <h3 className="m-0 text-xs font-bold text-gray-500 uppercase tracking-wider">Historique ({history.length})</h3>
+                <h3 className="m-0 text-xs font-bold text-gray-500 uppercase tracking-wider">History ({history.length})</h3>
                 {!isAdmin && (
                     <div className="flex items-center gap-1 text-xs text-gray-400">
-                        <Eye size={14} />Lecture seule
+                        <Eye size={14} />Read-only
                     </div>
                 )}
             </div>
@@ -557,7 +557,7 @@ function HistoryCard({ history, isAdmin, getRecordUnit, onDelete }: {
                                     <div className="font-semibold text-gray-800 text-sm">{record.product?.name}</div>
                                     <div className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
                                         <Clock size={12} />
-                                        {record.created_at ? new Date(record.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '-'}
+                                        {record.created_at ? new Date(record.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '-'}
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -566,7 +566,7 @@ function HistoryCard({ history, isAdmin, getRecordUnit, onDelete }: {
                                         <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-bold">-{record.quantity_waste} {getRecordUnit(record)}</span>
                                     )}
                                     {isAdmin && (
-                                        <button onClick={() => onDelete(record.id)} className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors" aria-label="Supprimer">
+                                        <button onClick={() => onDelete(record.id)} className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors" aria-label="Delete">
                                             <Trash2 size={14} />
                                         </button>
                                     )}
@@ -577,7 +577,7 @@ function HistoryCard({ history, isAdmin, getRecordUnit, onDelete }: {
                 ) : (
                     <div className="text-center py-8 text-gray-400">
                         <Clock size={32} className="mx-auto mb-2 opacity-50" />
-                        <p className="m-0 text-sm">Aucune production enregistrée</p>
+                        <p className="m-0 text-sm">No production recorded</p>
                     </div>
                 )}
             </div>
@@ -585,7 +585,7 @@ function HistoryCard({ history, isAdmin, getRecordUnit, onDelete }: {
             {!isAdmin && history.length > 0 && (
                 <div className="mt-4 p-3 bg-amber-50 rounded-lg flex items-center gap-2 border border-amber-100">
                     <Lock size={16} className="text-amber-600" />
-                    <span className="text-xs text-amber-800 font-medium">Seul un administrateur peut modifier les entrées</span>
+                    <span className="text-xs text-amber-800 font-medium">Only an administrator can modify entries</span>
                 </div>
             )}
         </div>

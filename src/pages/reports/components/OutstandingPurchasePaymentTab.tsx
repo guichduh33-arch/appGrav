@@ -221,6 +221,20 @@ export function OutstandingPurchasePaymentTab() {
         </div>
       </div>
 
+      {/* Estimation Warning */}
+      {data && data.some((po) => po.is_estimated) && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-amber-800">Montants partiels estimés</p>
+            <p className="text-sm text-amber-700">
+              Les paiements partiels sont estimés à 50% du total. Les montants réels seront disponibles
+              lorsque le module de paiements fournisseurs sera implémenté.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
@@ -269,7 +283,12 @@ export function OutstandingPurchasePaymentTab() {
                       <div className="flex items-center justify-end gap-1">
                         {formatCurrency(row.amount_paid)}
                         {row.is_estimated && (
-                          <span className="text-xs text-amber-600" title="Montant estimé">~</span>
+                          <span
+                            className="inline-flex items-center justify-center w-4 h-4 text-xs text-amber-700 bg-amber-100 rounded-full cursor-help"
+                            title="Montant estimé à 50% - les paiements partiels réels ne sont pas encore trackés dans le système"
+                          >
+                            ~
+                          </span>
                         )}
                       </div>
                     </td>

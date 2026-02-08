@@ -62,7 +62,6 @@ const OrdersPage = lazy(() => import('./pages/orders/OrdersPage'))
 
 // Reports
 const ReportsPage = lazy(() => import('./pages/reports/ReportsPage'))
-const SalesReportsPage = lazy(() => import('./pages/reports/SalesReportsPage'))
 
 // Users
 const UsersPage = lazy(() => import('./pages/users/UsersPage'))
@@ -340,7 +339,6 @@ function App() {
                         <Route path="/products/:id/pricing" element={<ProductCategoryPricingPage />} />
 
                         <Route path="/reports" element={<ReportsPage />} />
-                        <Route path="/reports/sales" element={<SalesReportsPage />} />
                         <Route path="/users" element={<UsersPage />} />
                         <Route path="/users/permissions" element={<PermissionsPage />} />
 

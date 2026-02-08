@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { Loader2 } from 'lucide-react';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -72,9 +71,7 @@ export const SalesTab = () => {
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
           <h3 className="text-lg font-semibold mb-6">Payment Methods</h3>
           {isLoading ? (
-            <div className="h-64 flex items-center justify-center">
-              <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-            </div>
+            <div className="h-64 animate-pulse bg-gray-100 rounded-lg" />
           ) : (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -96,9 +93,7 @@ export const SalesTab = () => {
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
           <h3 className="text-lg font-semibold mb-6">Period Comparison</h3>
           {isLoading ? (
-            <div className="h-64 flex items-center justify-center">
-              <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-            </div>
+            <div className="h-64 animate-pulse bg-gray-100 rounded-lg" />
           ) : (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -131,11 +126,13 @@ export const SalesTab = () => {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {isLoading ? (
-              <tr>
-                <td colSpan={3} className="px-6 py-8 text-center">
-                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                </td>
-              </tr>
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i}>
+                  <td className="px-6 py-3"><div className="h-4 w-24 bg-gray-200 rounded animate-pulse" /></td>
+                  <td className="px-6 py-3 text-right"><div className="h-4 w-16 bg-gray-200 rounded animate-pulse ml-auto" /></td>
+                  <td className="px-6 py-3 text-right"><div className="h-4 w-20 bg-gray-200 rounded animate-pulse ml-auto" /></td>
+                </tr>
+              ))
             ) : paymentStats.length === 0 ? (
               <tr>
                 <td colSpan={3} className="px-6 py-12 text-center text-gray-400">No data available.</td>

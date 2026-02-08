@@ -365,14 +365,21 @@ export function useReceiveTransfer() {
 
       // 5. Create stock_movements for each item
       const stockMovements: Array<{
+        movement_id: string
         product_id: string
-        location_id: string
+        from_location_id: string | null
+        to_location_id: string | null
         movement_type: string
         quantity: number
         reference_type: string
         reference_id: string
-        notes: string
+        reason: string
+        stock_before: number
+        stock_after: number
       }> = []
+
+      let movementCounter = 1
+      const timestamp = Date.now().toString(36).toUpperCase()
 
       for (const item of params.items) {
         const transferItem = transfer.transfer_items.find(
@@ -382,24 +389,34 @@ export function useReceiveTransfer() {
 
         // OUT from source location (negative quantity)
         stockMovements.push({
+          movement_id: `MV-${timestamp}-${movementCounter++}`,
           product_id: transferItem.product_id,
-          location_id: transfer.from_location_id,
-          movement_type: 'out',
+          from_location_id: transfer.from_location_id,
+          to_location_id: null,
+          movement_type: 'transfer_out',
           quantity: -Math.abs(item.quantityReceived),
           reference_type: 'transfer',
           reference_id: params.transferId,
-          notes: `Transfer ${transfer.transfer_number} - OUT`,
+          reason: `Transfer ${transfer.transfer_number} - OUT`,
+          // TODO: Query actual stock levels for accurate tracking
+          stock_before: 0,
+          stock_after: 0,
         })
 
         // IN to destination location (positive quantity)
         stockMovements.push({
+          movement_id: `MV-${timestamp}-${movementCounter++}`,
           product_id: transferItem.product_id,
-          location_id: transfer.to_location_id,
-          movement_type: 'in',
+          from_location_id: null,
+          to_location_id: transfer.to_location_id,
+          movement_type: 'transfer_in',
           quantity: Math.abs(item.quantityReceived),
           reference_type: 'transfer',
           reference_id: params.transferId,
-          notes: `Transfer ${transfer.transfer_number} - IN`,
+          reason: `Transfer ${transfer.transfer_number} - IN`,
+          // TODO: Query actual stock levels for accurate tracking
+          stock_before: 0,
+          stock_after: 0,
         })
       }
 

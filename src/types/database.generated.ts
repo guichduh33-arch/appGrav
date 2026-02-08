@@ -276,6 +276,50 @@ export type Database = {
           },
         ]
       }
+      b2b_order_history: {
+        Row: {
+          action_type: string
+          created_at: string
+          created_by: string | null
+          description: string
+          id: string
+          metadata: Json | null
+          new_status: string | null
+          order_id: string
+          previous_status: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          created_by?: string | null
+          description: string
+          id?: string
+          metadata?: Json | null
+          new_status?: string | null
+          order_id: string
+          previous_status?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          metadata?: Json | null
+          new_status?: string | null
+          order_id?: string
+          previous_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "b2b_order_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "b2b_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       b2b_order_items: {
         Row: {
           created_at: string | null
@@ -691,6 +735,7 @@ export type Database = {
           day_of_week: number
           id: string
           is_closed: boolean | null
+          is_open: boolean | null
           open_time: string | null
           updated_at: string | null
         }
@@ -702,6 +747,7 @@ export type Database = {
           day_of_week: number
           id?: string
           is_closed?: boolean | null
+          is_open?: boolean | null
           open_time?: string | null
           updated_at?: string | null
         }
@@ -713,6 +759,7 @@ export type Database = {
           day_of_week?: number
           id?: string
           is_closed?: boolean | null
+          is_open?: boolean | null
           open_time?: string | null
           updated_at?: string | null
         }
@@ -1150,49 +1197,67 @@ export type Database = {
       }
       internal_transfers: {
         Row: {
+          approved_at: string | null
           approved_by: string | null
           created_at: string | null
           created_by: string | null
           expected_date: string | null
-          from_location_id: string
+          from_location_id: string | null
+          from_section_id: string | null
           id: string
           notes: string | null
           received_by: string | null
           received_date: string | null
+          responsible_person: string | null
           status: Database["public"]["Enums"]["transfer_status"] | null
-          to_location_id: string
+          to_location_id: string | null
+          to_section_id: string | null
+          total_items: number | null
+          total_value: number | null
           transfer_date: string | null
           transfer_number: string
           updated_at: string | null
         }
         Insert: {
+          approved_at?: string | null
           approved_by?: string | null
           created_at?: string | null
           created_by?: string | null
           expected_date?: string | null
-          from_location_id: string
+          from_location_id?: string | null
+          from_section_id?: string | null
           id?: string
           notes?: string | null
           received_by?: string | null
           received_date?: string | null
+          responsible_person?: string | null
           status?: Database["public"]["Enums"]["transfer_status"] | null
-          to_location_id: string
+          to_location_id?: string | null
+          to_section_id?: string | null
+          total_items?: number | null
+          total_value?: number | null
           transfer_date?: string | null
           transfer_number: string
           updated_at?: string | null
         }
         Update: {
+          approved_at?: string | null
           approved_by?: string | null
           created_at?: string | null
           created_by?: string | null
           expected_date?: string | null
-          from_location_id?: string
+          from_location_id?: string | null
+          from_section_id?: string | null
           id?: string
           notes?: string | null
           received_by?: string | null
           received_date?: string | null
+          responsible_person?: string | null
           status?: Database["public"]["Enums"]["transfer_status"] | null
-          to_location_id?: string
+          to_location_id?: string | null
+          to_section_id?: string | null
+          total_items?: number | null
+          total_value?: number | null
           transfer_date?: string | null
           transfer_number?: string
           updated_at?: string | null
@@ -1269,10 +1334,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "internal_transfers_from_section_id_fkey"
+            columns: ["from_section_id"]
+            isOneToOne: false
+            referencedRelation: "sections"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "internal_transfers_to_location_id_fkey"
             columns: ["to_location_id"]
             isOneToOne: false
             referencedRelation: "stock_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "internal_transfers_to_section_id_fkey"
+            columns: ["to_section_id"]
+            isOneToOne: false
+            referencedRelation: "sections"
             referencedColumns: ["id"]
           },
         ]
@@ -2171,6 +2250,7 @@ export type Database = {
           points_discount: number | null
           points_earned: number | null
           points_used: number | null
+          pos_session_id: string | null
           session_id: string | null
           staff_id: string | null
           status: Database["public"]["Enums"]["order_status"] | null
@@ -2209,6 +2289,7 @@ export type Database = {
           points_discount?: number | null
           points_earned?: number | null
           points_used?: number | null
+          pos_session_id?: string | null
           session_id?: string | null
           staff_id?: string | null
           status?: Database["public"]["Enums"]["order_status"] | null
@@ -2247,6 +2328,7 @@ export type Database = {
           points_discount?: number | null
           points_earned?: number | null
           points_used?: number | null
+          pos_session_id?: string | null
           session_id?: string | null
           staff_id?: string | null
           status?: Database["public"]["Enums"]["order_status"] | null
@@ -2344,6 +2426,20 @@ export type Database = {
             referencedColumns: ["customer_id"]
           },
           {
+            foreignKeyName: "orders_pos_session_id_fkey"
+            columns: ["pos_session_id"]
+            isOneToOne: false
+            referencedRelation: "pos_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_pos_session_id_fkey"
+            columns: ["pos_session_id"]
+            isOneToOne: false
+            referencedRelation: "view_session_summary"
+            referencedColumns: ["session_id"]
+          },
+          {
             foreignKeyName: "orders_session_id_fkey"
             columns: ["session_id"]
             isOneToOne: false
@@ -2367,6 +2463,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_default: boolean | null
+          name: string | null
           name_en: string
           name_fr: string
           name_id: string
@@ -2374,6 +2471,7 @@ export type Database = {
           requires_reference: boolean | null
           settings: Json | null
           sort_order: number | null
+          type: string | null
           updated_at: string | null
         }
         Insert: {
@@ -2383,6 +2481,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_default?: boolean | null
+          name?: string | null
           name_en: string
           name_fr: string
           name_id: string
@@ -2390,6 +2489,7 @@ export type Database = {
           requires_reference?: boolean | null
           settings?: Json | null
           sort_order?: number | null
+          type?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -2399,6 +2499,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_default?: boolean | null
+          name?: string | null
           name_en?: string
           name_fr?: string
           name_id?: string
@@ -2406,6 +2507,7 @@ export type Database = {
           requires_reference?: boolean | null
           settings?: Json | null
           sort_order?: number | null
+          type?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -2449,105 +2551,24 @@ export type Database = {
         }
         Relationships: []
       }
-      po_items: {
-        Row: {
-          created_at: string | null
-          id: string
-          po_id: string
-          product_id: string
-          quantity_ordered: number
-          quantity_received: number | null
-          total: number
-          unit: string | null
-          unit_price: number
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          po_id: string
-          product_id: string
-          quantity_ordered: number
-          quantity_received?: number | null
-          total: number
-          unit?: string | null
-          unit_price: number
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          po_id?: string
-          product_id?: string
-          quantity_ordered?: number
-          quantity_received?: number | null
-          total?: number
-          unit?: string | null
-          unit_price?: number
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "po_items_po_id_fkey"
-            columns: ["po_id"]
-            isOneToOne: false
-            referencedRelation: "purchase_orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "po_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "active_products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "po_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "po_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "view_inventory_valuation"
-            referencedColumns: ["product_id"]
-          },
-          {
-            foreignKeyName: "po_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "view_product_sales"
-            referencedColumns: ["product_id"]
-          },
-          {
-            foreignKeyName: "po_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "view_production_summary"
-            referencedColumns: ["product_id"]
-          },
-          {
-            foreignKeyName: "po_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "view_stock_alerts"
-            referencedColumns: ["product_id"]
-          },
-        ]
-      }
       pos_sessions: {
         Row: {
+          actual_cash: number | null
+          actual_edc: number | null
+          actual_qris: number | null
           cash_difference: number | null
           closed_at: string | null
           closed_by: string | null
+          closed_by_name: string | null
           closing_cash: number | null
           closing_cash_details: Json | null
+          counted_cash: number | null
           created_at: string | null
           difference_reason: string | null
+          edc_difference: number | null
           expected_cash: number | null
+          expected_edc: number | null
+          expected_qris: number | null
           id: string
           manager_id: string | null
           manager_validated: boolean | null
@@ -2556,9 +2577,11 @@ export type Database = {
           opened_by: string | null
           opening_cash: number | null
           opening_cash_details: Json | null
+          qris_difference: number | null
           session_number: string
           status: Database["public"]["Enums"]["session_status"] | null
           terminal_id: string | null
+          terminal_id_str: string | null
           tips_card: number | null
           tips_cash: number | null
           total_card_sales: number | null
@@ -2568,17 +2591,28 @@ export type Database = {
           total_orders: number | null
           total_qris_sales: number | null
           total_refunds: number | null
+          total_sales: number | null
+          transaction_count: number | null
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
+          actual_cash?: number | null
+          actual_edc?: number | null
+          actual_qris?: number | null
           cash_difference?: number | null
           closed_at?: string | null
           closed_by?: string | null
+          closed_by_name?: string | null
           closing_cash?: number | null
           closing_cash_details?: Json | null
+          counted_cash?: number | null
           created_at?: string | null
           difference_reason?: string | null
+          edc_difference?: number | null
           expected_cash?: number | null
+          expected_edc?: number | null
+          expected_qris?: number | null
           id?: string
           manager_id?: string | null
           manager_validated?: boolean | null
@@ -2587,9 +2621,11 @@ export type Database = {
           opened_by?: string | null
           opening_cash?: number | null
           opening_cash_details?: Json | null
+          qris_difference?: number | null
           session_number: string
           status?: Database["public"]["Enums"]["session_status"] | null
           terminal_id?: string | null
+          terminal_id_str?: string | null
           tips_card?: number | null
           tips_cash?: number | null
           total_card_sales?: number | null
@@ -2599,17 +2635,28 @@ export type Database = {
           total_orders?: number | null
           total_qris_sales?: number | null
           total_refunds?: number | null
+          total_sales?: number | null
+          transaction_count?: number | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
+          actual_cash?: number | null
+          actual_edc?: number | null
+          actual_qris?: number | null
           cash_difference?: number | null
           closed_at?: string | null
           closed_by?: string | null
+          closed_by_name?: string | null
           closing_cash?: number | null
           closing_cash_details?: Json | null
+          counted_cash?: number | null
           created_at?: string | null
           difference_reason?: string | null
+          edc_difference?: number | null
           expected_cash?: number | null
+          expected_edc?: number | null
+          expected_qris?: number | null
           id?: string
           manager_id?: string | null
           manager_validated?: boolean | null
@@ -2618,9 +2665,11 @@ export type Database = {
           opened_by?: string | null
           opening_cash?: number | null
           opening_cash_details?: Json | null
+          qris_difference?: number | null
           session_number?: string
           status?: Database["public"]["Enums"]["session_status"] | null
           terminal_id?: string | null
+          terminal_id_str?: string | null
           tips_card?: number | null
           tips_cash?: number | null
           total_card_sales?: number | null
@@ -2630,7 +2679,10 @@ export type Database = {
           total_orders?: number | null
           total_qris_sales?: number | null
           total_refunds?: number | null
+          total_sales?: number | null
+          transaction_count?: number | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -2702,6 +2754,27 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "pos_terminals"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "view_staff_performance"
+            referencedColumns: ["staff_id"]
           },
         ]
       }
@@ -4004,6 +4077,101 @@ export type Database = {
         }
         Relationships: []
       }
+      purchase_order_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: string
+          product_name: string | null
+          purchase_order_id: string
+          quantity: number
+          quantity_received: number | null
+          quantity_returned: number | null
+          total: number
+          unit: string | null
+          unit_price: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id: string
+          product_name?: string | null
+          purchase_order_id: string
+          quantity: number
+          quantity_received?: number | null
+          quantity_returned?: number | null
+          total: number
+          unit?: string | null
+          unit_price: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: string
+          product_name?: string | null
+          purchase_order_id?: string
+          quantity?: number
+          quantity_received?: number | null
+          quantity_returned?: number | null
+          total?: number
+          unit?: string | null
+          unit_price?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "active_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "view_inventory_valuation"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "purchase_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "view_product_sales"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "purchase_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "view_production_summary"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "purchase_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "view_stock_alerts"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "purchase_order_items_purchase_order_id_fkey"
+            columns: ["purchase_order_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       purchase_orders: {
         Row: {
           created_at: string | null
@@ -4976,6 +5144,8 @@ export type Database = {
         Row: {
           batch_number: string | null
           created_at: string | null
+          created_by: string | null
+          created_by_name: string | null
           expiry_date: string | null
           from_location_id: string | null
           from_section_id: string | null
@@ -4990,6 +5160,7 @@ export type Database = {
           staff_id: string | null
           stock_after: number
           stock_before: number
+          supplier_id: string | null
           to_location_id: string | null
           to_section_id: string | null
           unit_cost: number | null
@@ -4997,6 +5168,8 @@ export type Database = {
         Insert: {
           batch_number?: string | null
           created_at?: string | null
+          created_by?: string | null
+          created_by_name?: string | null
           expiry_date?: string | null
           from_location_id?: string | null
           from_section_id?: string | null
@@ -5011,6 +5184,7 @@ export type Database = {
           staff_id?: string | null
           stock_after: number
           stock_before: number
+          supplier_id?: string | null
           to_location_id?: string | null
           to_section_id?: string | null
           unit_cost?: number | null
@@ -5018,6 +5192,8 @@ export type Database = {
         Update: {
           batch_number?: string | null
           created_at?: string | null
+          created_by?: string | null
+          created_by_name?: string | null
           expiry_date?: string | null
           from_location_id?: string | null
           from_section_id?: string | null
@@ -5032,6 +5208,7 @@ export type Database = {
           staff_id?: string | null
           stock_after?: number
           stock_before?: number
+          supplier_id?: string | null
           to_location_id?: string | null
           to_section_id?: string | null
           unit_cost?: number | null
@@ -5054,6 +5231,27 @@ export type Database = {
           {
             foreignKeyName: "fk_stock_movements_staff"
             columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "view_staff_performance"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "stock_movements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "view_staff_performance"
             referencedColumns: ["staff_id"]
@@ -5115,6 +5313,13 @@ export type Database = {
             referencedColumns: ["product_id"]
           },
           {
+            foreignKeyName: "stock_movements_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "stock_movements_to_location_id_fkey"
             columns: ["to_location_id"]
             isOneToOne: false
@@ -5149,6 +5354,7 @@ export type Database = {
           payment_terms: Database["public"]["Enums"]["payment_terms"] | null
           phone: string | null
           postal_code: string | null
+          tax_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -5169,6 +5375,7 @@ export type Database = {
           payment_terms?: Database["public"]["Enums"]["payment_terms"] | null
           phone?: string | null
           postal_code?: string | null
+          tax_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -5189,6 +5396,7 @@ export type Database = {
           payment_terms?: Database["public"]["Enums"]["payment_terms"] | null
           phone?: string | null
           postal_code?: string | null
+          tax_id?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -5347,6 +5555,7 @@ export type Database = {
           is_active: boolean | null
           is_default: boolean | null
           is_inclusive: boolean | null
+          name: string | null
           name_en: string
           name_fr: string
           name_id: string
@@ -5363,6 +5572,7 @@ export type Database = {
           is_active?: boolean | null
           is_default?: boolean | null
           is_inclusive?: boolean | null
+          name?: string | null
           name_en: string
           name_fr: string
           name_id: string
@@ -5379,6 +5589,7 @@ export type Database = {
           is_active?: boolean | null
           is_default?: boolean | null
           is_inclusive?: boolean | null
+          name?: string | null
           name_en?: string
           name_fr?: string
           name_id?: string
@@ -6318,6 +6529,17 @@ export type Database = {
         }
         Returns: number
       }
+      close_shift: {
+        Args: {
+          p_actual_cash: number
+          p_actual_edc: number
+          p_actual_qris: number
+          p_closed_by: string
+          p_notes?: string
+          p_session_id: string
+        }
+        Returns: Json
+      }
       get_current_user_profile_id: { Args: never; Returns: string }
       get_customer_product_price: {
         Args: { p_customer_category_slug: string; p_product_id: string }
@@ -6331,7 +6553,101 @@ export type Database = {
         Args: { p_date?: string; p_sequence_name: string }
         Returns: number
       }
+      get_settings_by_category: {
+        Args: { p_category_code: string }
+        Returns: {
+          category_id: string | null
+          created_at: string | null
+          default_value: Json | null
+          description_en: string | null
+          description_fr: string | null
+          description_id: string | null
+          id: string
+          is_readonly: boolean | null
+          is_sensitive: boolean | null
+          is_system: boolean | null
+          key: string
+          name_en: string
+          name_fr: string
+          name_id: string
+          requires_restart: boolean | null
+          sort_order: number | null
+          updated_at: string | null
+          updated_by: string | null
+          validation_rules: Json | null
+          value: Json
+          value_type: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "settings"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_terminal_open_shifts: {
+        Args: { p_terminal_id: string }
+        Returns: {
+          created_at: string
+          expected_cash: number
+          expected_edc: number
+          expected_qris: number
+          id: string
+          notes: string
+          opened_at: string
+          opening_cash: number
+          session_number: string
+          status: string
+          terminal_id: string
+          total_sales: number
+          transaction_count: number
+          updated_at: string
+          user_id: string
+          user_name: string
+        }[]
+      }
+      get_user_open_shift: {
+        Args: { p_user_id: string }
+        Returns: {
+          created_at: string
+          expected_cash: number
+          expected_edc: number
+          expected_qris: number
+          id: string
+          notes: string
+          opened_at: string
+          opening_cash: number
+          session_number: string
+          status: string
+          terminal_id: string
+          total_sales: number
+          transaction_count: number
+          updated_at: string
+          user_id: string
+          user_name: string
+        }[]
+      }
+      get_user_permissions: {
+        Args: { p_user_id: string }
+        Returns: {
+          is_granted: boolean
+          is_sensitive: boolean
+          permission_action: string
+          permission_code: string
+          permission_module: string
+          source: string
+        }[]
+      }
       is_admin: { Args: { p_user_id: string }; Returns: boolean }
+      open_shift: {
+        Args: {
+          p_notes?: string
+          p_opening_cash: number
+          p_terminal_id: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       redeem_loyalty_points: {
         Args: {
           p_created_by?: string
@@ -6342,10 +6658,35 @@ export type Database = {
         }
         Returns: boolean
       }
+      register_lan_node: {
+        Args: {
+          p_device_id: string
+          p_device_name?: string
+          p_device_type?: string
+          p_ip_address?: string
+          p_is_hub?: boolean
+          p_port?: number
+        }
+        Returns: string
+      }
+      reset_category_settings: {
+        Args: { p_category_code: string }
+        Returns: number
+      }
+      reset_setting: { Args: { p_key: string }; Returns: boolean }
       set_user_pin: {
         Args: { p_pin: string; p_user_id: string }
         Returns: boolean
       }
+      update_lan_node_heartbeat: {
+        Args: { p_device_id: string }
+        Returns: boolean
+      }
+      update_setting: {
+        Args: { p_key: string; p_reason?: string; p_value: Json }
+        Returns: boolean
+      }
+      update_settings_bulk: { Args: { p_settings: Json }; Returns: number }
       user_has_permission: {
         Args: { p_permission_code: string; p_user_id: string }
         Returns: boolean

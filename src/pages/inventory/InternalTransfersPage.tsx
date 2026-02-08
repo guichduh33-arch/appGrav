@@ -224,12 +224,11 @@ export default function InternalTransfersPage() {
 
                 <div className="transfer-card__route">
                   <div className="transfer-card__location from">
-                    {/* Support both section-based and location-based transfers */}
-                    {(transfer as any).from_section?.icon} {(transfer as any).from_section?.name ?? transfer.from_location?.name ?? 'Unknown'}
+                    {transfer.from_section?.icon} {transfer.from_section?.name ?? transfer.from_location?.name ?? 'Unknown'}
                   </div>
                   <ArrowRightLeft size={20} className="transfer-card__arrow" />
                   <div className="transfer-card__location to">
-                    {(transfer as any).to_section?.icon} {(transfer as any).to_section?.name ?? transfer.to_location?.name ?? 'Unknown'}
+                    {transfer.to_section?.icon} {transfer.to_section?.name ?? transfer.to_location?.name ?? 'Unknown'}
                   </div>
                 </div>
 

@@ -20,22 +20,22 @@ interface OrderItemStatusBadgeProps {
 
 const STATUS_CONFIG: Record<TItemStatus, { label: string; icon: React.ReactNode; className: string }> = {
   new: {
-    label: 'Nouveau',
+    label: 'New',
     icon: <Clock size={12} />,
     className: 'order-item-badge--new',
   },
   preparing: {
-    label: 'En prépa.',
+    label: 'Preparing',
     icon: <ChefHat size={12} />,
     className: 'order-item-badge--preparing',
   },
   ready: {
-    label: 'Prêt',
+    label: 'Ready',
     icon: <CheckCircle size={12} />,
     className: 'order-item-badge--ready',
   },
   served: {
-    label: 'Servi',
+    label: 'Served',
     icon: <UtensilsCrossed size={12} />,
     className: 'order-item-badge--served',
   },

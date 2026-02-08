@@ -70,7 +70,11 @@ export type B2BPayment = Tables<'b2b_payments'>
 
 // Purchasing
 export type PurchaseOrder = Tables<'purchase_orders'>
-export type POItem = Tables<'po_items'>
+export type PurchaseOrderItem = Tables<'purchase_order_items'>
+
+// Backward compatibility alias (deprecated - use PurchaseOrderItem instead)
+/** @deprecated Use PurchaseOrderItem instead */
+export type POItem = PurchaseOrderItem
 
 // Users & Permissions
 export type UserProfile = Tables<'user_profiles'>
@@ -154,19 +158,14 @@ export interface OrderWithItems extends Order {
 }
 
 // Internal Transfer extended types (Story 5.4)
+// Note: from_section_id, to_section_id, responsible_person, total_items, total_value, approved_at
+// are already part of InternalTransfer table schema
 export interface ITransferWithLocations extends InternalTransfer {
     from_location?: StockLocation | null
     to_location?: StockLocation | null
-    // Section-based transfer support (new model)
+    // Section-based transfer support (populated via join)
     from_section?: ISection | null
     to_section?: ISection | null
-    from_section_id?: string | null
-    to_section_id?: string | null
-    // Additional columns from migration
-    responsible_person?: string | null
-    total_items?: number | null
-    total_value?: number | null
-    approved_at?: string | null
 }
 
 export interface ITransferItemWithProduct extends TransferItem {

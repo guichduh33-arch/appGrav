@@ -131,6 +131,11 @@ export default function TransferFormPage() {
       return
     }
 
+    if (fromSectionId === toSectionId) {
+      toast.error('Source and destination must be different')
+      return
+    }
+
     if (!responsiblePerson.trim()) {
       toast.error('Responsible person is required')
       return

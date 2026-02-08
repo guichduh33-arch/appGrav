@@ -9,9 +9,9 @@ import { Product, Section, ProductionRecord } from '../../types/database'
 import { toast } from 'sonner'
 import './StockProductionPage.css'
 
-// Format number with thousand separators (French locale uses spaces)
+// Format number with thousand separators
 const formatNumber = (num: number): string => {
-    return num.toLocaleString('fr-FR')
+    return num.toLocaleString('en-US')
 }
 
 interface AvailableUnit {
@@ -192,7 +192,7 @@ export default function StockProductionPage() {
     }
 
     const formatDate = (date: Date) => {
-        return date.toLocaleDateString('fr-FR', {
+        return date.toLocaleDateString('en-US', {
             weekday: 'long',
             day: 'numeric',
             month: 'long',
@@ -323,7 +323,7 @@ export default function StockProductionPage() {
                 // Validate numeric overflow (DECIMAL(10,3) max = 9,999,999.999)
                 const MAX_DECIMAL = 9999999.999
                 if (quantityInBaseUnit > MAX_DECIMAL || wastedInBaseUnit > MAX_DECIMAL) {
-                    throw new Error(`Quantité trop grande (${quantityInBaseUnit.toLocaleString()}). Maximum: ${MAX_DECIMAL.toLocaleString()}. Utilisez une unité plus grande.`)
+                    throw new Error(`Quantity too large (${quantityInBaseUnit.toLocaleString()}). Maximum: ${MAX_DECIMAL.toLocaleString()}. Use a larger unit.`)
                 }
 
                 // Generate production number
@@ -331,9 +331,9 @@ export default function StockProductionPage() {
 
                 // Build notes with unit info
                 const unitNote = item.selectedUnit !== item.unit
-                    ? `Saisi: ${item.quantity} ${item.selectedUnit} (= ${quantityInBaseUnit} ${item.unit})`
+                    ? `Entered: ${item.quantity} ${item.selectedUnit} (= ${quantityInBaseUnit} ${item.unit})`
                     : ''
-                const wasteNote = item.wasteReason ? `Perte: ${item.wasteReason}` : ''
+                const wasteNote = item.wasteReason ? `Waste: ${item.wasteReason}` : ''
                 const sectionNote = `Section: ${selectedSection?.name || ''}`
                 const notes = [unitNote, wasteNote, sectionNote].filter(Boolean).join('. ')
 
@@ -454,12 +454,12 @@ export default function StockProductionPage() {
                 }
             }
 
-            toast.success('Production enregistree')
+            toast.success('Production recorded')
             setProductionItems([])
             fetchTodayHistory()
         } catch (error) {
             console.error('Error saving:', error)
-            toast.error('Erreur: ' + (error instanceof Error ? error.message : 'Erreur inconnue'))
+            toast.error('Error: ' + (error instanceof Error ? error.message : 'Unknown error'))
         } finally {
             setIsSaving(false)
         }
@@ -467,7 +467,7 @@ export default function StockProductionPage() {
 
     const handleDeleteRecord = async (recordId: string) => {
         if (!isAdmin) return
-        if (!confirm('Supprimer cette entree et ses mouvements de stock?')) return
+        if (!confirm('Delete this entry and its stock movements?')) return
 
         try {
             const { data: record } = await supabase
@@ -504,10 +504,10 @@ export default function StockProductionPage() {
                 .eq('id', recordId)
 
             if (error) throw error
-            toast.success('Entree et mouvements supprimes')
+            toast.success('Entry and movements deleted')
             fetchTodayHistory()
         } catch (error) {
-            toast.error('Erreur: ' + (error instanceof Error ? error.message : 'Erreur inconnue'))
+            toast.error('Error: ' + (error instanceof Error ? error.message : 'Unknown error'))
         }
     }
 
@@ -518,7 +518,7 @@ export default function StockProductionPage() {
         return (
             <div className="production-loading">
                 <div className="spinner" />
-                <p>Chargement...</p>
+                <p>Loading...</p>
             </div>
         )
     }
@@ -544,7 +544,7 @@ export default function StockProductionPage() {
                             </button>
                         ))}
                         {sections.length === 0 && (
-                            <p className="no-sections">Aucune section de production configuree</p>
+                            <p className="no-sections">No production section configured</p>
                         )}
                     </div>
                 </div>
@@ -556,13 +556,13 @@ export default function StockProductionPage() {
                         <span>Date</span>
                     </div>
                     <div className="date-nav">
-                        <button onClick={() => navigateDate(-1)} className="date-nav-btn" title="Jour précédent" aria-label="Jour précédent">
+                        <button onClick={() => navigateDate(-1)} className="date-nav-btn" title="Previous day" aria-label="Previous day">
                             <ChevronLeft size={20} />
                         </button>
                         <div className={`date-display ${isToday ? 'today' : ''}`}>
-                            {isToday ? "Aujourd'hui" : formatDate(selectedDate)}
+                            {isToday ? "Today" : formatDate(selectedDate)}
                         </div>
-                        <button onClick={() => navigateDate(1)} className="date-nav-btn" title="Jour suivant" aria-label="Jour suivant">
+                        <button onClick={() => navigateDate(1)} className="date-nav-btn" title="Next day" aria-label="Next day">
                             <ChevronRight size={20} />
                         </button>
                     </div>
@@ -573,21 +573,21 @@ export default function StockProductionPage() {
             {!selectedSectionId ? (
                 <div className="production-empty-state">
                     <Layers size={48} />
-                    <h3>Selectionnez une section</h3>
-                    <p>Choisissez une section de production pour commencer</p>
+                    <h3>Select a section</h3>
+                    <p>Choose a production section to start</p>
                 </div>
             ) : (
                 <div className="production-content">
                     {/* Left - Production Entry */}
                     <div className="production-entry-card">
-                        <h2>Saisie Production - {selectedSection?.name}</h2>
+                        <h2>Production Entry - {selectedSection?.name}</h2>
 
                         {/* Product Search */}
                         <div className="product-search-wrapper">
                             <Search size={20} className="search-icon" />
                             <input
                                 type="text"
-                                placeholder="Rechercher un produit..."
+                                placeholder="Search for a product..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="product-search-input"
@@ -613,7 +613,7 @@ export default function StockProductionPage() {
 
                             {searchQuery && filteredProducts.length === 0 && (
                                 <div className="product-search-empty">
-                                    Aucun produit trouve dans cette section
+                                    No product found in this section
                                 </div>
                             )}
                         </div>
@@ -624,9 +624,9 @@ export default function StockProductionPage() {
                                 <table className="production-table">
                                     <thead>
                                         <tr>
-                                            <th>Produit</th>
-                                            <th className="text-center">Quantite</th>
-                                            <th className="text-center">Perte</th>
+                                            <th>Product</th>
+                                            <th className="text-center">Quantity</th>
+                                            <th className="text-center">Waste</th>
                                             <th>Note</th>
                                             <th></th>
                                         </tr>
@@ -656,8 +656,8 @@ export default function StockProductionPage() {
                                                                 value={item.selectedUnit}
                                                                 onChange={(e) => updateUnit(item.productId, e.target.value)}
                                                                 className="unit-select"
-                                                                title="Sélectionner l'unité"
-                                                                aria-label="Sélectionner l'unité"
+                                                                title="Select unit"
+                                                                aria-label="Select unit"
                                                             >
                                                                 {item.availableUnits.map(u => (
                                                                     <option key={u.name} value={u.name}>
@@ -688,7 +688,7 @@ export default function StockProductionPage() {
                                                     {item.wasted > 0 && (
                                                         <input
                                                             type="text"
-                                                            placeholder="Raison..."
+                                                            placeholder="Reason..."
                                                             value={item.wasteReason}
                                                             onChange={(e) => updateReason(item.productId, e.target.value)}
                                                             className="waste-reason-input"
@@ -696,7 +696,7 @@ export default function StockProductionPage() {
                                                     )}
                                                 </td>
                                                 <td>
-                                                    <button onClick={() => removeItem(item.productId)} className="btn-remove" title="Supprimer la ligne" aria-label="Supprimer la ligne">
+                                                    <button onClick={() => removeItem(item.productId)} className="btn-remove" title="Delete row" aria-label="Delete row">
                                                         <Trash2 size={18} />
                                                     </button>
                                                 </td>
@@ -708,8 +708,8 @@ export default function StockProductionPage() {
                         ) : (
                             <div className="production-items-empty">
                                 <Package size={40} />
-                                <p>Aucun produit ajoute</p>
-                                <span>Recherchez un produit pour l'ajouter a la production</span>
+                                <p>No product added</p>
+                                <span>Search for a product to add to production</span>
                             </div>
                         )}
 
@@ -721,7 +721,7 @@ export default function StockProductionPage() {
                                     disabled={isSaving}
                                     className="btn-cancel"
                                 >
-                                    Annuler
+                                    Cancel
                                 </button>
                                 <button
                                     onClick={handleSave}
@@ -729,7 +729,7 @@ export default function StockProductionPage() {
                                     className="btn-save"
                                 >
                                     <Save size={18} />
-                                    {isSaving ? 'Enregistrement...' : 'Enregistrer'}
+                                    {isSaving ? 'Saving...' : 'Save'}
                                 </button>
                             </div>
                         )}
@@ -739,15 +739,15 @@ export default function StockProductionPage() {
                     <div className="production-sidebar">
                         {/* Summary Card */}
                         <div className="summary-card">
-                            <h3>Resume du jour</h3>
+                            <h3>Today's summary</h3>
                             <div className="summary-grid">
                                 <div className="summary-item produced">
                                     <div className="summary-value">{formatNumber(totalProduced)}</div>
-                                    <div className="summary-label">Produit</div>
+                                    <div className="summary-label">Produced</div>
                                 </div>
                                 <div className="summary-item waste">
                                     <div className="summary-value">{formatNumber(totalWaste)}</div>
-                                    <div className="summary-label">Perte</div>
+                                    <div className="summary-label">Waste</div>
                                 </div>
                             </div>
                         </div>
@@ -755,11 +755,11 @@ export default function StockProductionPage() {
                         {/* History Card */}
                         <div className="history-card">
                             <div className="history-header">
-                                <h3>Production du jour ({todayHistory.length})</h3>
+                                <h3>Today's production ({todayHistory.length})</h3>
                                 {!isAdmin && (
                                     <div className="read-only-badge">
                                         <Eye size={14} />
-                                        Lecture seule
+                                        Read-only
                                     </div>
                                 )}
                             </div>
@@ -772,7 +772,7 @@ export default function StockProductionPage() {
                                                 <div className="history-product">{record.product?.name}</div>
                                                 <div className="history-time">
                                                     <Clock size={12} />
-                                                    {record.created_at ? new Date(record.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : ''}
+                                                    {record.created_at ? new Date(record.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ''}
                                                 </div>
                                             </div>
                                             <div className="history-item-actions">
@@ -788,7 +788,7 @@ export default function StockProductionPage() {
                                                     <button
                                                         onClick={() => handleDeleteRecord(record.id)}
                                                         className="btn-delete-record"
-                                                        title="Supprimer"
+                                                        title="Delete"
                                                     >
                                                         <Trash2 size={14} />
                                                     </button>
@@ -799,7 +799,7 @@ export default function StockProductionPage() {
                                 ) : (
                                     <div className="history-empty">
                                         <Clock size={32} />
-                                        <p>Aucune production enregistree</p>
+                                        <p>No production recorded</p>
                                     </div>
                                 )}
                             </div>
@@ -807,7 +807,7 @@ export default function StockProductionPage() {
                             {!isAdmin && todayHistory.length > 0 && (
                                 <div className="admin-notice">
                                     <Lock size={16} />
-                                    <span>Seul un administrateur peut modifier les entrees</span>
+                                    <span>Only an administrator can modify entries</span>
                                 </div>
                             )}
                         </div>

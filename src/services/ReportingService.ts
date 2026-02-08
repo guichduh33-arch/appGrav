@@ -269,6 +269,29 @@ export const ReportingService = {
     },
 
     /**
+     * Get Inventory Items with stock details
+     */
+    async getInventoryItems(): Promise<any[]> {
+        const { data, error } = await supabase
+            .from('products')
+            .select(`
+                id,
+                name,
+                sku,
+                current_stock,
+                unit,
+                cost_price,
+                price,
+                category:categories(name)
+            `)
+            .eq('is_active', true)
+            .order('name');
+
+        if (error) throw error;
+        return data || [];
+    },
+
+    /**
      * Get Audit Logs
      */
     async getAuditLogs(limit = 50): Promise<AuditLogEntry[]> {

@@ -241,18 +241,19 @@ export function ProfitLossTab() {
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Coût</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Marge Brute</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Marge %</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">TVA Collectée</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center">
+                  <td colSpan={7} className="px-6 py-8 text-center">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
                   </td>
                 </tr>
               ) : data?.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
                     Aucune donnée
                   </td>
                 </tr>
@@ -275,6 +276,7 @@ export function ProfitLossTab() {
                         {row.margin_percentage.toFixed(1)}%
                       </span>
                     </td>
+                    <td className="px-6 py-4 text-sm text-gray-600 text-right">{formatCurrency(row.tax_collected || 0)}</td>
                   </tr>
                 ))
               )}

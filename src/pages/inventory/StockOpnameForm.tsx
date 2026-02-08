@@ -73,7 +73,7 @@ export default function StockOpnameForm() {
             }
         } catch (error) {
             console.error('Error loading session:', error)
-            alert('Erreur chargement session')
+            alert('Error loading session')
         } finally {
             setStatus('ready')
         }
@@ -147,33 +147,35 @@ export default function StockOpnameForm() {
 
             if (error) throw error
 
-            alert('Brouillon sauvegardé')
+            alert('Draft saved')
         } catch (e) {
-            alert('Erreur sauvegarde: ' + (e instanceof Error ? e.message : 'Erreur inconnue'))
+            alert('Save error: ' + (e instanceof Error ? e.message : 'Unknown error'))
         } finally {
             setStatus('ready')
         }
     }
 
     async function finalizeCount() {
-        if (!confirm("Attention: Cette action est irréversible.\nLes écarts de stock seront appliqués immédiatement.")) return
+        if (!confirm("Warning: This action is irreversible.\nStock variances will be applied immediately.")) return
 
         setStatus('saving')
         try {
+            // First save the draft to ensure all counted_quantity values are persisted
             await saveDraft()
 
-            // Update status to completed
+            // Call the database function to finalize and create stock movements
+            // Note: User identity is securely determined server-side via auth.uid()
             const { error } = await supabase
-                .from('inventory_counts')
-                .update({ status: 'completed' })
-                .eq('id', id!)
+                .rpc('finalize_inventory_count', {
+                    count_uuid: id!
+                })
 
             if (error) throw error
 
-            alert('Inventaire validé et stocks mis à jour !')
+            alert('Inventory validated and stock updated!')
             navigate('/inventory/stock-opname')
         } catch (e) {
-            alert('Erreur validation: ' + (e instanceof Error ? e.message : 'Erreur inconnue'))
+            alert('Validation error: ' + (e instanceof Error ? e.message : 'Unknown error'))
             setStatus('ready')
         }
     }
@@ -183,7 +185,7 @@ export default function StockOpnameForm() {
         i.product.sku.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
-    if (!session) return <div className="opname-container"><div className="p-8 text-center text-gray-500">Chargement...</div></div>
+    if (!session) return <div className="opname-container"><div className="p-8 text-center text-gray-500">Loading...</div></div>
 
     const isLocked = session.status !== 'draft'
 
@@ -191,7 +193,7 @@ export default function StockOpnameForm() {
         <div className="opname-container">
             <header className="opname-header sticky top-0 z-10">
                 <div className="flex items-center gap-4">
-                    <button onClick={() => navigate('/inventory/stock-opname')} className="btn-back" aria-label="Retour">
+                    <button onClick={() => navigate('/inventory/stock-opname')} className="btn-back" aria-label="Back">
                         <ArrowLeft size={20} />
                     </button>
                     <div>
@@ -213,14 +215,14 @@ export default function StockOpnameForm() {
                                 disabled={status === 'saving'}
                                 className="btn btn-secondary"
                             >
-                                <Save size={16} /> Enregistrer
+                                <Save size={16} /> Save
                             </button>
                             <button
                                 onClick={finalizeCount}
                                 disabled={status === 'saving'}
                                 className="btn btn-primary"
                             >
-                                <CheckCheck size={16} /> Finaliser
+                                <CheckCheck size={16} /> Finalize
                             </button>
                         </>
                     )}
@@ -235,7 +237,7 @@ export default function StockOpnameForm() {
                         <Search className="search-icon" size={18} />
                         <input
                             className="search-input"
-                            placeholder="Rechercher un produit..."
+                            placeholder="Search for a product..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
                         />
@@ -248,7 +250,7 @@ export default function StockOpnameForm() {
                                 className={`btn btn-sm ${blindMode ? 'btn-primary' : 'btn-secondary'}`}
                             >
                                 {blindMode ? <EyeOff size={16} /> : <Eye size={16} />}
-                                {blindMode ? 'Mode Aveugle (ON)' : 'Mode Aveugle (OFF)'}
+                                {blindMode ? 'Blind Mode (ON)' : 'Blind Mode (OFF)'}
                             </button>
                         </label>
                     </div>
@@ -259,10 +261,10 @@ export default function StockOpnameForm() {
                     <table className="opname-table">
                         <thead>
                             <tr>
-                                <th>Produit</th>
-                                <th className="text-right">Stock Système</th>
-                                <th className="text-right real-stock-col">Réel (Physique)</th>
-                                <th className="text-right">Ecart</th>
+                                <th>Product</th>
+                                <th className="text-right">System Stock</th>
+                                <th className="text-right real-stock-col">Actual (Physical)</th>
+                                <th className="text-right">Variance</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -274,7 +276,7 @@ export default function StockOpnameForm() {
                                     </td>
                                     <td className="text-right">
                                         {blindMode && !isLocked ? (
-                                            <span className="text-muted italic">Masqué</span>
+                                            <span className="text-muted italic">Hidden</span>
                                         ) : (
                                             <span className="font-medium">{item.system_quantity} {item.unit}</span>
                                         )}
@@ -315,11 +317,11 @@ export default function StockOpnameForm() {
 function StatusBadge({ status }: { status: string }) {
     switch (status) {
         case 'draft':
-            return <span className="status-badge draft">Brouillon</span>
+            return <span className="status-badge draft">Draft</span>
         case 'completed':
-            return <span className="status-badge completed">Validé</span>
+            return <span className="status-badge completed">Validated</span>
         case 'cancelled':
-            return <span className="status-badge cancelled">Annulé</span>
+            return <span className="status-badge cancelled">Cancelled</span>
         default:
             return <span className="status-badge">{status}</span>
     }

@@ -283,17 +283,17 @@ const OrdersPage = () => {
 
     const formatTime = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     };
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+        return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
     };
 
     const formatFullDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('fr-FR', {
+        return date.toLocaleDateString('en-US', {
             day: '2-digit',
             month: 'long',
             year: 'numeric',
@@ -304,9 +304,9 @@ const OrdersPage = () => {
 
     const getOrderTypeLabel = (type: string) => {
         switch (type) {
-            case 'dine_in': return 'Sur place';
-            case 'takeaway': return 'À emporter';
-            case 'delivery': return 'Livraison';
+            case 'dine_in': return 'Dine In';
+            case 'takeaway': return 'Takeaway';
+            case 'delivery': return 'Delivery';
             case 'b2b': return 'B2B';
             default: return type;
         }
@@ -324,11 +324,11 @@ const OrdersPage = () => {
 
     const getStatusLabel = (status: string) => {
         switch (status) {
-            case 'pending': return 'En attente';
-            case 'preparing': return 'En prépa.';
-            case 'ready': return 'Prêt';
-            case 'completed': return 'Terminé';
-            case 'cancelled': return 'Annulé';
+            case 'pending': return 'Pending';
+            case 'preparing': return 'Preparing';
+            case 'ready': return 'Ready';
+            case 'completed': return 'Completed';
+            case 'cancelled': return 'Cancelled';
             default: return status;
         }
     };
@@ -345,18 +345,18 @@ const OrdersPage = () => {
 
     const getPaymentMethodLabel = (method: string | null) => {
         switch (method) {
-            case 'cash': return 'Espèces';
+            case 'cash': return 'Cash';
             case 'qris': return 'QRIS';
-            case 'card': return 'Carte';
+            case 'card': return 'Card';
             case 'edc': return 'EDC';
-            case 'transfer': return 'Virement';
+            case 'transfer': return 'Transfer';
             default: return method || '-';
         }
     };
 
     const handleExport = () => {
         // Export filtered orders as CSV
-        const headers = ['N° Commande', 'Date', 'Type', 'Client', 'Montant', 'Statut', 'Paiement', 'Méthode'];
+        const headers = ['Order #', 'Date', 'Type', 'Customer', 'Amount', 'Status', 'Payment', 'Method'];
         const rows = filteredOrders.map(order => [
             order.order_number,
             formatFullDate(order.created_at),
@@ -364,7 +364,7 @@ const OrdersPage = () => {
             order.customer_name || '-',
             order.total,
             getStatusLabel(order.status),
-            order.payment_status === 'paid' ? 'Payé' : 'Impayé',
+            order.payment_status === 'paid' ? 'Paid' : 'Unpaid',
             getPaymentMethodLabel(order.payment_method)
         ]);
 
@@ -373,7 +373,7 @@ const OrdersPage = () => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `commandes_${dateFrom}_${dateTo}.csv`;
+        link.download = `orders_${dateFrom}_${dateTo}.csv`;
         link.click();
         URL.revokeObjectURL(url);
     };
@@ -381,7 +381,7 @@ const OrdersPage = () => {
     return (
         <div className="orders-page">
             <header className="orders-page__header">
-                <h1 className="orders-page__title">Commandes en Direct</h1>
+                <h1 className="orders-page__title">Live Orders</h1>
                 <div className="orders-page__actions">
                     <button
                         className="btn-secondary"
@@ -389,11 +389,11 @@ const OrdersPage = () => {
                         disabled={isFetching}
                     >
                         <RefreshCw size={18} className={isFetching ? 'spinning' : ''} />
-                        Actualiser
+                        Refresh
                     </button>
                     <button className="btn-secondary" onClick={handleExport}>
                         <Download size={18} />
-                        Exporter
+                        Export
                     </button>
                 </div>
             </header>
@@ -401,22 +401,22 @@ const OrdersPage = () => {
             {/* Stats Summary */}
             <div className="orders-stats">
                 <div className="orders-stat">
-                    <span className="orders-stat__label">Total commandes</span>
+                    <span className="orders-stat__label">Total Orders</span>
                     <span className="orders-stat__value">{stats.total}</span>
                 </div>
                 <div className="orders-stat">
-                    <span className="orders-stat__label">Montant total</span>
+                    <span className="orders-stat__label">Total Amount</span>
                     <span className="orders-stat__value">{formatCurrency(stats.totalAmount)}</span>
                 </div>
                 <div className="orders-stat orders-stat--success">
                     <Check size={16} />
-                    <span className="orders-stat__label">Payées</span>
+                    <span className="orders-stat__label">Paid</span>
                     <span className="orders-stat__value">{stats.paid}</span>
                     <span className="orders-stat__amount">{formatCurrency(stats.paidAmount)}</span>
                 </div>
                 <div className="orders-stat orders-stat--warning">
                     <Clock size={16} />
-                    <span className="orders-stat__label">Impayées</span>
+                    <span className="orders-stat__label">Unpaid</span>
                     <span className="orders-stat__value">{stats.unpaid}</span>
                     <span className="orders-stat__amount">{formatCurrency(stats.unpaidAmount)}</span>
                 </div>
@@ -425,12 +425,12 @@ const OrdersPage = () => {
             {/* Filters */}
             <div className="orders-filters">
                 <div className="filter-group">
-                    <label className="filter-group__label">Rechercher</label>
+                    <label className="filter-group__label">Search</label>
                     <div className="filter-group__search-wrapper">
                         <input
                             type="text"
                             className="filter-group__input filter-group__input--with-icon"
-                            placeholder="N° commande, client..."
+                            placeholder="Order #, customer..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -440,7 +440,7 @@ const OrdersPage = () => {
 
                 <div className="filter-group">
                     <label className="filter-group__label" htmlFor="date-from">
-                        <Calendar size={12} /> Date début
+                        <Calendar size={12} /> Start Date
                     </label>
                     <input
                         id="date-from"
@@ -453,7 +453,7 @@ const OrdersPage = () => {
 
                 <div className="filter-group">
                     <label className="filter-group__label" htmlFor="date-to">
-                        <Calendar size={12} /> Date fin
+                        <Calendar size={12} /> End Date
                     </label>
                     <input
                         id="date-to"
@@ -474,17 +474,17 @@ const OrdersPage = () => {
                         value={typeFilter}
                         onChange={(e) => setTypeFilter(e.target.value as OrderType)}
                     >
-                        <option value="all">Tous</option>
-                        <option value="dine_in">Sur place</option>
-                        <option value="takeaway">À emporter</option>
-                        <option value="delivery">Livraison</option>
+                        <option value="all">All</option>
+                        <option value="dine_in">Dine In</option>
+                        <option value="takeaway">Takeaway</option>
+                        <option value="delivery">Delivery</option>
                         <option value="b2b">B2B</option>
                     </select>
                 </div>
 
                 <div className="filter-group">
                     <label className="filter-group__label" htmlFor="payment-status">
-                        <CreditCard size={12} /> Paiement
+                        <CreditCard size={12} /> Payment
                     </label>
                     <select
                         id="payment-status"
@@ -492,9 +492,9 @@ const OrdersPage = () => {
                         value={paymentFilter}
                         onChange={(e) => setPaymentFilter(e.target.value as PaymentStatus)}
                     >
-                        <option value="all">Tous</option>
-                        <option value="paid">Payé</option>
-                        <option value="unpaid">Impayé</option>
+                        <option value="all">All</option>
+                        <option value="paid">Paid</option>
+                        <option value="unpaid">Unpaid</option>
                     </select>
                 </div>
             </div>
@@ -507,7 +507,7 @@ const OrdersPage = () => {
                         className={`status-pill ${statusFilter === status ? 'is-active' : ''}`}
                         onClick={() => setStatusFilter(status)}
                     >
-                        {status === 'all' ? 'Tous' : getStatusLabel(status)}
+                        {status === 'all' ? 'All' : getStatusLabel(status)}
                     </button>
                 ))}
             </div>
@@ -517,21 +517,21 @@ const OrdersPage = () => {
                 {isLoading ? (
                     <div className="orders-loading">
                         <RefreshCw size={32} className="spinning" />
-                        <p>Chargement des commandes...</p>
+                        <p>Loading orders...</p>
                     </div>
                 ) : paginatedOrders.length > 0 ? (
                     <>
                         <table className="orders-table">
                             <thead>
                                 <tr>
-                                    <th>N° Commande</th>
-                                    <th>Heure</th>
+                                    <th>Order #</th>
+                                    <th>Time</th>
                                     <th>Type</th>
-                                    <th>Client</th>
-                                    <th>Articles</th>
-                                    <th>Montant</th>
-                                    <th>Statut</th>
-                                    <th>Paiement</th>
+                                    <th>Customer</th>
+                                    <th>Items</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Payment</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -564,7 +564,7 @@ const OrdersPage = () => {
                                         </td>
                                         <td>
                                             <span className="order-items-count">
-                                                {order.items.reduce((sum, item) => sum + item.quantity, 0)} articles
+                                                {order.items.reduce((sum, item) => sum + item.quantity, 0)} items
                                             </span>
                                         </td>
                                         <td>
@@ -579,9 +579,9 @@ const OrdersPage = () => {
                                             <div className="payment-info">
                                                 <span className={`payment-status ${order.payment_status}`}>
                                                     {order.payment_status === 'paid' ? (
-                                                        <><Check size={14} /> Payé</>
+                                                        <><Check size={14} /> Paid</>
                                                     ) : (
-                                                        <><Clock size={14} /> Impayé</>
+                                                        <><Clock size={14} /> Unpaid</>
                                                     )}
                                                 </span>
                                                 {order.payment_status === 'paid' && order.payment_method && (
@@ -600,7 +600,7 @@ const OrdersPage = () => {
                                                     setSelectedOrder(order);
                                                 }}
                                             >
-                                                <Eye size={14} /> Détails
+                                                <Eye size={14} /> Details
                                             </button>
                                         </td>
                                     </tr>
@@ -611,14 +611,14 @@ const OrdersPage = () => {
                         {/* Pagination */}
                         <div className="orders-pagination">
                             <div className="pagination-info">
-                                Affichage {((currentPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredOrders.length)} sur {filteredOrders.length} commandes
+                                Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredOrders.length)} of {filteredOrders.length} orders
                             </div>
                             <div className="pagination-buttons">
                                 <button
                                     className="pagination-btn"
                                     disabled={currentPage === 1}
                                     onClick={() => setCurrentPage(p => p - 1)}
-                                    aria-label="Page précédente"
+                                    aria-label="Previous Page"
                                 >
                                     <ChevronLeft size={18} />
                                 </button>
@@ -647,7 +647,7 @@ const OrdersPage = () => {
                                     className="pagination-btn"
                                     disabled={currentPage === totalPages}
                                     onClick={() => setCurrentPage(p => p + 1)}
-                                    aria-label="Page suivante"
+                                    aria-label="Next Page"
                                 >
                                     <ChevronRight size={18} />
                                 </button>
@@ -657,8 +657,8 @@ const OrdersPage = () => {
                 ) : (
                     <div className="orders-empty">
                         <div className="orders-empty__icon">📋</div>
-                        <div className="orders-empty__text">Aucune commande trouvée</div>
-                        <div className="orders-empty__subtext">Modifiez vos filtres pour voir plus de résultats</div>
+                        <div className="orders-empty__text">No orders found</div>
+                        <div className="orders-empty__subtext">Adjust your filters to see more results</div>
                     </div>
                 )}
             </div>
@@ -671,7 +671,7 @@ const OrdersPage = () => {
                             <div className="order-detail__title-group">
                                 <h2 className="order-detail__title">
                                     <Hash size={20} />
-                                    Commande #{selectedOrder.order_number}
+                                    Order #{selectedOrder.order_number}
                                 </h2>
                                 <span className={`order-status ${selectedOrder.status}`}>
                                     {getStatusLabel(selectedOrder.status)}
@@ -686,13 +686,13 @@ const OrdersPage = () => {
                             {/* Order Info */}
                             <div className="order-detail__info-grid">
                                 <div className="order-detail__info-item">
-                                    <span className="order-detail__info-label">ID Transaction</span>
+                                    <span className="order-detail__info-label">Transaction ID</span>
                                     <span className="order-detail__info-value order-detail__info-value--mono">
                                         {selectedOrder.id.slice(0, 8)}...
                                     </span>
                                 </div>
                                 <div className="order-detail__info-item">
-                                    <span className="order-detail__info-label">Date & Heure</span>
+                                    <span className="order-detail__info-label">Date & Time</span>
                                     <span className="order-detail__info-value">
                                         {formatFullDate(selectedOrder.created_at)}
                                     </span>
@@ -707,7 +707,7 @@ const OrdersPage = () => {
                                 {selectedOrder.customer_name && (
                                     <div className="order-detail__info-item">
                                         <span className="order-detail__info-label">
-                                            <User size={12} /> Client
+                                            <User size={12} /> Customer
                                         </span>
                                         <span className="order-detail__info-value">
                                             {selectedOrder.customer_name}
@@ -715,18 +715,18 @@ const OrdersPage = () => {
                                     </div>
                                 )}
                                 <div className="order-detail__info-item">
-                                    <span className="order-detail__info-label">Statut Paiement</span>
+                                    <span className="order-detail__info-label">Payment Status</span>
                                     <span className={`payment-status ${selectedOrder.payment_status}`}>
                                         {selectedOrder.payment_status === 'paid' ? (
-                                            <><Check size={14} /> Payé</>
+                                            <><Check size={14} /> Paid</>
                                         ) : (
-                                            <><Clock size={14} /> Impayé</>
+                                            <><Clock size={14} /> Unpaid</>
                                         )}
                                     </span>
                                 </div>
                                 {selectedOrder.payment_method && (
                                     <div className="order-detail__info-item">
-                                        <span className="order-detail__info-label">Méthode Paiement</span>
+                                        <span className="order-detail__info-label">Payment Method</span>
                                         <span className="order-detail__info-value">
                                             {getPaymentIcon(selectedOrder.payment_method)}
                                             {getPaymentMethodLabel(selectedOrder.payment_method)}
@@ -735,7 +735,7 @@ const OrdersPage = () => {
                                 )}
                                 {selectedOrder.completed_at && (
                                     <div className="order-detail__info-item">
-                                        <span className="order-detail__info-label">Heure Paiement</span>
+                                        <span className="order-detail__info-label">Payment Time</span>
                                         <span className="order-detail__info-value">
                                             {formatFullDate(selectedOrder.completed_at)}
                                         </span>
@@ -747,7 +747,7 @@ const OrdersPage = () => {
                             <div className="order-detail__items">
                                 <div className="order-detail__items-header">
                                     <ShoppingBag size={16} />
-                                    <span>Articles ({selectedOrder.items.length})</span>
+                                    <span>Items ({selectedOrder.items.length})</span>
                                 </div>
                                 <div className="order-detail__items-list">
                                     {selectedOrder.items.map(item => (
@@ -778,17 +778,17 @@ const OrdersPage = () => {
                             {/* Order Totals */}
                             <div className="order-detail__totals">
                                 <div className="order-detail__total-row">
-                                    <span>Sous-total</span>
+                                    <span>Subtotal</span>
                                     <span>{formatCurrency(selectedOrder.subtotal)}</span>
                                 </div>
                                 {selectedOrder.discount_amount > 0 && (
                                     <div className="order-detail__total-row order-detail__total-row--discount">
-                                        <span>Remise</span>
+                                        <span>Discount</span>
                                         <span>-{formatCurrency(selectedOrder.discount_amount)}</span>
                                     </div>
                                 )}
                                 <div className="order-detail__total-row">
-                                    <span>TVA (10%)</span>
+                                    <span>Tax (10%)</span>
                                     <span>{formatCurrency(selectedOrder.tax_amount)}</span>
                                 </div>
                                 <div className="order-detail__total-row order-detail__total-row--final">
@@ -798,11 +798,11 @@ const OrdersPage = () => {
                                 {selectedOrder.payment_method === 'cash' && selectedOrder.cash_received && (
                                     <>
                                         <div className="order-detail__total-row">
-                                            <span>Espèces reçues</span>
+                                            <span>Cash Received</span>
                                             <span>{formatCurrency(selectedOrder.cash_received)}</span>
                                         </div>
                                         <div className="order-detail__total-row">
-                                            <span>Rendu</span>
+                                            <span>Change</span>
                                             <span>{formatCurrency(selectedOrder.change_given || 0)}</span>
                                         </div>
                                     </>

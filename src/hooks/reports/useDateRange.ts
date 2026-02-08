@@ -12,6 +12,8 @@ import {
   subDays,
   subWeeks,
   subMonths,
+  subYears,
+  differenceInDays,
   format,
   parseISO,
   isValid,
@@ -34,6 +36,8 @@ export type PresetKey =
   | 'lastMonth'
   | 'thisYear'
   | 'custom';
+
+export type ComparisonType = 'previous' | 'last_year' | 'custom' | null;
 
 export interface DatePreset {
   key: PresetKey;
@@ -128,6 +132,8 @@ export interface UseDateRangeOptions {
   urlParamFrom?: string;
   urlParamTo?: string;
   urlParamPreset?: string;
+  /** Enable comparison mode */
+  enableComparison?: boolean;
 }
 
 export interface UseDateRangeReturn {
@@ -139,6 +145,41 @@ export interface UseDateRangeReturn {
   formatDate: (date: Date) => string;
   formatRange: () => string;
   isCustomRange: boolean;
+  /** Comparison features */
+  comparisonRange: DateRange | null;
+  comparisonType: ComparisonType;
+  setComparisonType: (type: ComparisonType) => void;
+  setCustomComparisonRange: (range: DateRange) => void;
+  isComparisonEnabled: boolean;
+}
+
+/**
+ * Calculate comparison range based on type
+ */
+function calculateComparisonRange(
+  currentRange: DateRange,
+  comparisonType: ComparisonType
+): DateRange | null {
+  if (!comparisonType || comparisonType === 'custom') return null;
+
+  const days = differenceInDays(currentRange.to, currentRange.from);
+
+  if (comparisonType === 'previous') {
+    // Previous period: same duration, just before
+    const prevTo = subDays(currentRange.from, 1);
+    const prevFrom = subDays(prevTo, days);
+    return { from: startOfDay(prevFrom), to: endOfDay(prevTo) };
+  }
+
+  if (comparisonType === 'last_year') {
+    // Same period last year
+    return {
+      from: startOfDay(subYears(currentRange.from, 1)),
+      to: endOfDay(subYears(currentRange.to, 1)),
+    };
+  }
+
+  return null;
 }
 
 export function useDateRange(options: UseDateRangeOptions = {}): UseDateRangeReturn {
@@ -148,10 +189,15 @@ export function useDateRange(options: UseDateRangeOptions = {}): UseDateRangeRet
     urlParamFrom = 'from',
     urlParamTo = 'to',
     urlParamPreset = 'preset',
+    enableComparison = false,
   } = options;
 
   const [searchParams, setSearchParams] = useSearchParams();
   const presets = useMemo(() => getPresets(), []);
+
+  // Comparison state
+  const [comparisonType, setComparisonTypeState] = useState<ComparisonType>(null);
+  const [customComparisonRange, setCustomComparisonRangeState] = useState<DateRange | null>(null);
 
   // Parse dates from URL or use default preset
   const getInitialRange = useCallback((): { range: DateRange; preset: PresetKey } => {
@@ -183,12 +229,30 @@ export function useDateRange(options: UseDateRangeOptions = {}): UseDateRangeRet
     return { range: preset.getRange(), preset: defaultPreset };
   }, [searchParams, syncWithUrl, urlParamFrom, urlParamTo, urlParamPreset, presets, defaultPreset]);
 
+  // Parse comparison from URL
+  const getInitialComparison = useCallback((): ComparisonType => {
+    if (!syncWithUrl || !enableComparison) return null;
+    const compareParam = searchParams.get('compare') as ComparisonType;
+    if (compareParam === 'previous' || compareParam === 'last_year' || compareParam === 'custom') {
+      return compareParam;
+    }
+    return null;
+  }, [searchParams, syncWithUrl, enableComparison]);
+
   const initial = useMemo(() => getInitialRange(), [getInitialRange]);
+  const initialComparison = useMemo(() => getInitialComparison(), [getInitialComparison]);
   const [dateRange, setDateRangeState] = useState<DateRange>(initial.range);
   const [activePreset, setActivePreset] = useState<PresetKey>(initial.preset);
 
+  // Initialize comparison type from URL
+  useState(() => {
+    if (initialComparison) {
+      setComparisonTypeState(initialComparison);
+    }
+  });
+
   const updateUrlParams = useCallback(
-    (range: DateRange, preset: PresetKey) => {
+    (range: DateRange, preset: PresetKey, comparison: ComparisonType = comparisonType) => {
       if (!syncWithUrl) return;
 
       setSearchParams((prev) => {
@@ -202,10 +266,18 @@ export function useDateRange(options: UseDateRangeOptions = {}): UseDateRangeRet
           newParams.delete(urlParamFrom);
           newParams.delete(urlParamTo);
         }
+        // Handle comparison params
+        if (comparison && enableComparison) {
+          newParams.set('compare', comparison);
+        } else {
+          newParams.delete('compare');
+          newParams.delete('compareFrom');
+          newParams.delete('compareTo');
+        }
         return newParams;
       }, { replace: true });
     },
-    [syncWithUrl, setSearchParams, urlParamFrom, urlParamTo, urlParamPreset]
+    [syncWithUrl, setSearchParams, urlParamFrom, urlParamTo, urlParamPreset, comparisonType, enableComparison]
   );
 
   const setDateRange = useCallback(
@@ -230,6 +302,41 @@ export function useDateRange(options: UseDateRangeOptions = {}): UseDateRangeRet
     [presets, updateUrlParams]
   );
 
+  const setComparisonType = useCallback(
+    (type: ComparisonType) => {
+      setComparisonTypeState(type);
+      if (type === null) {
+        setCustomComparisonRangeState(null);
+      }
+      updateUrlParams(dateRange, activePreset, type);
+    },
+    [dateRange, activePreset, updateUrlParams]
+  );
+
+  const setCustomComparisonRange = useCallback(
+    (range: DateRange) => {
+      setCustomComparisonRangeState(range);
+      setComparisonTypeState('custom');
+      if (syncWithUrl && enableComparison) {
+        setSearchParams((prev) => {
+          const newParams = new URLSearchParams(prev);
+          newParams.set('compare', 'custom');
+          newParams.set('compareFrom', format(range.from, DATE_FORMAT));
+          newParams.set('compareTo', format(range.to, DATE_FORMAT));
+          return newParams;
+        }, { replace: true });
+      }
+    },
+    [syncWithUrl, enableComparison, setSearchParams]
+  );
+
+  // Calculate comparison range based on type
+  const comparisonRange = useMemo((): DateRange | null => {
+    if (!comparisonType) return null;
+    if (comparisonType === 'custom') return customComparisonRange;
+    return calculateComparisonRange(dateRange, comparisonType);
+  }, [dateRange, comparisonType, customComparisonRange]);
+
   const formatDate = useCallback((date: Date): string => {
     return format(date, 'dd MMM yyyy', { locale: fr });
   }, []);
@@ -247,5 +354,11 @@ export function useDateRange(options: UseDateRangeOptions = {}): UseDateRangeRet
     formatDate,
     formatRange,
     isCustomRange: activePreset === 'custom',
+    // Comparison
+    comparisonRange,
+    comparisonType,
+    setComparisonType,
+    setCustomComparisonRange,
+    isComparisonEnabled: comparisonType !== null,
   };
 }
