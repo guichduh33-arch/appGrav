@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Plus,
   Edit2,
@@ -22,9 +22,7 @@ import { toast } from 'sonner';
 
 interface TaxRateFormData {
   code: string;
-  name_fr: string;
-  name_en: string;
-  name_id: string;
+  name: string;
   rate: number;
   is_inclusive: boolean;
   is_default: boolean;
@@ -33,9 +31,7 @@ interface TaxRateFormData {
 
 const emptyForm: TaxRateFormData = {
   code: '',
-  name_fr: '',
-  name_en: '',
-  name_id: '',
+  name: '',
   rate: 0,
   is_inclusive: true,
   is_default: false,
@@ -58,6 +54,17 @@ const TaxSettingsPage = () => {
   // Use English
   const nameKey = 'name_en' as const;
 
+  // Initialize settingValues when settings are loaded
+  useEffect(() => {
+    if (settings) {
+      const initialValues: Record<string, unknown> = {};
+      settings.forEach((setting) => {
+        initialValues[setting.key] = setting.value;
+      });
+      setSettingValues(initialValues);
+    }
+  }, [settings]);
+
   // Open create modal
   const openCreateModal = () => {
     setEditingRate(null);
@@ -70,9 +77,7 @@ const TaxSettingsPage = () => {
     setEditingRate(rate);
     setFormData({
       code: rate.code,
-      name_fr: rate.name_fr,
-      name_en: rate.name_en,
-      name_id: rate.name_id,
+      name: rate.name_en || rate.name_fr || '',
       rate: rate.rate,
       is_inclusive: rate.is_inclusive ?? false,
       is_default: rate.is_default ?? false,
@@ -83,25 +88,39 @@ const TaxSettingsPage = () => {
 
   // Handle save
   const handleSave = async () => {
-    if (!formData.code || !formData.name_fr) {
+    if (!formData.code || !formData.name) {
       toast.error('Code and name are required');
       return;
     }
+
+    // Copy name to all language columns for DB compatibility
+    const dataToSave = {
+      code: formData.code,
+      name_fr: formData.name,
+      name_en: formData.name,
+      name_id: formData.name,
+      rate: formData.rate,
+      is_inclusive: formData.is_inclusive,
+      is_default: formData.is_default,
+      is_active: formData.is_active,
+    };
 
     try {
       if (editingRate) {
         await updateTaxRate.mutateAsync({
           id: editingRate.id,
-          updates: formData,
+          updates: dataToSave,
         });
         toast.success('Tax rate updated');
       } else {
-        await createTaxRate.mutateAsync(formData as Omit<TaxRate, 'id' | 'created_at' | 'updated_at'>);
+        await createTaxRate.mutateAsync(dataToSave as Omit<TaxRate, 'id' | 'created_at' | 'updated_at'>);
         toast.success('Tax rate created');
       }
       setShowModal(false);
     } catch (error) {
-      toast.error('Error saving');
+      const message = error instanceof Error ? error.message : 'Error saving tax rate';
+      console.error('Tax rate save error:', error);
+      toast.error(message);
     }
   };
 
@@ -118,7 +137,9 @@ const TaxSettingsPage = () => {
       await deleteTaxRate.mutateAsync(rate.id);
       toast.success('Tax rate deleted');
     } catch (error) {
-      toast.error('Error deleting');
+      const message = error instanceof Error ? error.message : 'Error deleting tax rate';
+      console.error('Tax rate delete error:', error);
+      toast.error(message);
     }
   };
 
@@ -148,7 +169,9 @@ const TaxSettingsPage = () => {
 
       toast.success(`${rate[nameKey]} set as default`);
     } catch (error) {
-      toast.error('Error updating');
+      const message = error instanceof Error ? error.message : 'Error setting default tax rate';
+      console.error('Set default tax rate error:', error);
+      toast.error(message);
     }
   };
 
@@ -158,7 +181,9 @@ const TaxSettingsPage = () => {
       await updateSetting.mutateAsync({ key, value });
       toast.success('Setting saved');
     } catch (error) {
-      toast.error('Error saving');
+      const message = error instanceof Error ? error.message : 'Error saving setting';
+      console.error('Setting save error:', error);
+      toast.error(message);
     }
   };
 
@@ -336,37 +361,14 @@ const TaxSettingsPage = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Name (French) *</label>
+                <label className="form-label">Name *</label>
                 <input
                   type="text"
                   className="form-input"
-                  value={formData.name_fr}
-                  onChange={(e) => setFormData({ ...formData, name_fr: e.target.value })}
-                  placeholder="PPN 10%"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="VAT 10%"
                 />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Name (English)</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={formData.name_en}
-                    onChange={(e) => setFormData({ ...formData, name_en: e.target.value })}
-                    placeholder="VAT 10%"
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Name (Indonesian)</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={formData.name_id}
-                    onChange={(e) => setFormData({ ...formData, name_id: e.target.value })}
-                    placeholder="PPN 10%"
-                  />
-                </div>
               </div>
 
               <div className="form-group">

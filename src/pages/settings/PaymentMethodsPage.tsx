@@ -12,6 +12,9 @@ import {
   Building,
   Wallet,
   QrCode,
+  Smartphone,
+  Globe,
+  DollarSign,
 } from 'lucide-react';
 import {
   usePaymentMethods,
@@ -24,23 +27,19 @@ import { toast } from 'sonner';
 
 interface PaymentMethodFormData {
   code: string;
-  name_fr: string;
-  name_en: string;
-  name_id: string;
+  name: string;
   payment_type: PaymentType;
   icon: string;
   is_active: boolean;
   is_default: boolean;
   requires_reference: boolean;
   sort_order: number;
-  settings: object;
+  settings: Record<string, unknown>;
 }
 
 const emptyForm: PaymentMethodFormData = {
   code: '',
-  name_fr: '',
-  name_en: '',
-  name_id: '',
+  name: '',
   payment_type: 'cash',
   icon: 'Banknote',
   is_active: true,
@@ -69,6 +68,9 @@ const getPaymentIcon = (iconName: string) => {
     case 'Building': return <Building size={20} />;
     case 'Wallet': return <Wallet size={20} />;
     case 'QrCode': return <QrCode size={20} />;
+    case 'Smartphone': return <Smartphone size={20} />;
+    case 'Globe': return <Globe size={20} />;
+    case 'DollarSign': return <DollarSign size={20} />;
     default: return <Wallet size={20} />;
   }
 };
@@ -101,41 +103,59 @@ const PaymentMethodsPage = () => {
     setEditingMethod(method);
     setFormData({
       code: method.code,
-      name_fr: method.name_fr,
-      name_en: method.name_en,
-      name_id: method.name_id,
+      name: method.name_en || method.name_fr || '',
       payment_type: method.payment_type as PaymentType,
       icon: method.icon ?? '',
       is_active: method.is_active ?? true,
       is_default: method.is_default ?? false,
       requires_reference: method.requires_reference ?? false,
       sort_order: method.sort_order ?? 0,
-      settings: method.settings as object ?? {},
+      settings: (method.settings as Record<string, unknown>) ?? {},
     });
     setShowModal(true);
   };
 
   // Handle save
   const handleSave = async () => {
-    if (!formData.code || !formData.name_fr) {
+    if (!formData.code || !formData.name) {
       toast.error('Code and name are required');
       return;
     }
+
+    // Build save data - include all required fields for the PaymentMethod type
+    const dataToSave = {
+      code: formData.code,
+      payment_type: formData.payment_type,
+      icon: formData.icon,
+      is_active: formData.is_active,
+      is_default: formData.is_default,
+      requires_reference: formData.requires_reference,
+      sort_order: formData.sort_order,
+      settings: formData.settings as Record<string, unknown> | null,
+      // Copy name to all language columns for DB compatibility
+      name: formData.name, // Legacy field
+      name_fr: formData.name,
+      name_en: formData.name,
+      name_id: formData.name,
+      type: formData.payment_type, // Legacy field mirrors payment_type
+    };
 
     try {
       if (editingMethod) {
         await updateMethod.mutateAsync({
           id: editingMethod.id,
-          updates: formData as never,
+          updates: dataToSave as Partial<PaymentMethod>,
         });
         toast.success('Payment method updated');
       } else {
-        await createMethod.mutateAsync(formData as never);
+        await createMethod.mutateAsync(dataToSave as Omit<PaymentMethod, 'id' | 'created_at' | 'updated_at'>);
         toast.success('Payment method created');
       }
       setShowModal(false);
     } catch (error) {
-      toast.error('Error saving');
+      const message = error instanceof Error ? error.message : 'Error saving payment method';
+      console.error('Payment method save error:', error);
+      toast.error(message);
     }
   };
 
@@ -152,7 +172,9 @@ const PaymentMethodsPage = () => {
       await deleteMethod.mutateAsync(method.id);
       toast.success('Payment method deleted');
     } catch (error) {
-      toast.error('Error deleting');
+      const message = error instanceof Error ? error.message : 'Error deleting payment method';
+      console.error('Payment method delete error:', error);
+      toast.error(message);
     }
   };
 
@@ -163,9 +185,11 @@ const PaymentMethodsPage = () => {
         id: method.id,
         updates: { is_active: !method.is_active },
       });
-      toast.success(method.is_active ? 'Disabled' : 'Enabled');
+      toast.success(method.is_active ? 'Payment method disabled' : 'Payment method enabled');
     } catch (error) {
-      toast.error('Error');
+      const message = error instanceof Error ? error.message : 'Error toggling status';
+      console.error('Payment method toggle error:', error);
+      toast.error(message);
     }
   };
 
@@ -189,7 +213,9 @@ const PaymentMethodsPage = () => {
 
       toast.success(`${method[nameKey]} set as default`);
     } catch (error) {
-      toast.error('Error');
+      const message = error instanceof Error ? error.message : 'Error setting default';
+      console.error('Set default payment method error:', error);
+      toast.error(message);
     }
   };
 
@@ -355,37 +381,14 @@ const PaymentMethodsPage = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Name (French) *</label>
+                <label className="form-label">Name *</label>
                 <input
                   type="text"
                   className="form-input"
-                  value={formData.name_fr}
-                  onChange={(e) => setFormData({ ...formData, name_fr: e.target.value })}
-                  placeholder="Espèces"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Cash"
                 />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Name (English)</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={formData.name_en}
-                    onChange={(e) => setFormData({ ...formData, name_en: e.target.value })}
-                    placeholder="Cash"
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Name (Indonesian)</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={formData.name_id}
-                    onChange={(e) => setFormData({ ...formData, name_id: e.target.value })}
-                    placeholder="Tunai"
-                  />
-                </div>
               </div>
 
               <div className="form-group">

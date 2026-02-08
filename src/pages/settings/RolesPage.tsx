@@ -73,9 +73,7 @@ export default function RolesPage() {
   // Form state
   const [formData, setFormData] = useState({
     code: '',
-    name_fr: '',
-    name_en: '',
-    name_id: '',
+    name: '',
     description: '',
     hierarchy_level: 50,
     is_system: false,
@@ -176,9 +174,7 @@ export default function RolesPage() {
     setSelectedRole(null);
     setFormData({
       code: '',
-      name_fr: '',
-      name_en: '',
-      name_id: '',
+      name: '',
       description: '',
       hierarchy_level: 50,
       is_system: false,
@@ -192,9 +188,7 @@ export default function RolesPage() {
     setSelectedRole(role);
     setFormData({
       code: role.code,
-      name_fr: role.name_fr || '',
-      name_en: role.name_en || '',
-      name_id: role.name_id || '',
+      name: role.name_en || role.name_fr || '',
       description: role.description || '',
       hierarchy_level: role.hierarchy_level || 50,
       is_system: role.is_system || false,
@@ -205,18 +199,19 @@ export default function RolesPage() {
   };
 
   const handleSave = async () => {
-    if (!formData.code.trim() || !formData.name_fr.trim()) {
-      toast.error('Le code et le nom sont requis');
+    if (!formData.code.trim() || !formData.name.trim()) {
+      toast.error('Code and name are required');
       return;
     }
 
     setIsSaving(true);
     try {
+      // Copy name to all language columns for DB compatibility
       const roleData = {
         code: formData.code.toUpperCase(),
-        name_fr: formData.name_fr,
-        name_en: formData.name_en || formData.name_fr,
-        name_id: formData.name_id || formData.name_fr,
+        name_fr: formData.name,
+        name_en: formData.name,
+        name_id: formData.name,
         description: formData.description,
         hierarchy_level: formData.hierarchy_level,
         is_system: formData.is_system,
@@ -262,7 +257,7 @@ export default function RolesPage() {
         if (permError) throw permError;
       }
 
-      toast.success(selectedRole ? 'Rôle mis à jour' : 'Rôle créé');
+      toast.success(selectedRole ? 'Role updated' : 'Role created');
       setShowModal(false);
       loadData();
     } catch (error) {
@@ -280,7 +275,7 @@ export default function RolesPage() {
     }
 
     if ((role.user_count || 0) > 0) {
-      toast.error('Ce rôle est assigné à des utilisateurs');
+      toast.error('This role is assigned to users');
       return;
     }
 
@@ -301,7 +296,7 @@ export default function RolesPage() {
 
       if (error) throw error;
 
-      toast.success('Rôle supprimé');
+      toast.success('Role deleted');
       loadData();
     } catch (error) {
       console.error('Error deleting role:', error);
@@ -350,8 +345,8 @@ export default function RolesPage() {
     if (level >= 90) return { label: 'Super Admin', color: 'section-badge--warehouse' };
     if (level >= 70) return { label: 'Admin', color: 'section-badge--production' };
     if (level >= 50) return { label: 'Manager', color: 'section-badge--sales' };
-    if (level >= 30) return { label: 'Employé', color: 'section-badge' };
-    return { label: 'Lecteur', color: 'section-badge' };
+    if (level >= 30) return { label: 'Employee', color: 'section-badge' };
+    return { label: 'Viewer', color: 'section-badge' };
   };
 
   if (isLoading) {
@@ -433,7 +428,7 @@ export default function RolesPage() {
                     </div>
                     {role.is_system && (
                       <span className="section-badge section-badge--sales">
-                        Système
+                        System
                       </span>
                     )}
                   </div>
@@ -458,14 +453,14 @@ export default function RolesPage() {
                   {/* Hierarchy Badge + Actions */}
                   <div className="flex items-center justify-between">
                     <span className={`section-badge ${hierarchy.color}`}>
-                      Niveau {role.hierarchy_level} - {hierarchy.label}
+                      Level {role.hierarchy_level} - {hierarchy.label}
                     </span>
 
                     <div className="flex gap-2">
                       <button
                         className="btn-icon"
                         onClick={() => openEditModal(role)}
-                        title="Modifier"
+                        title="Edit"
                       >
                         <Edit2 size={16} />
                       </button>
@@ -473,7 +468,7 @@ export default function RolesPage() {
                         <button
                           className="btn-icon btn-icon--danger"
                           onClick={() => handleDelete(role)}
-                          title="Supprimer"
+                          title="Delete"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -497,13 +492,13 @@ export default function RolesPage() {
             {/* Modal Header */}
             <div className="settings-modal__header">
               <h2 className="settings-modal__title">
-                {selectedRole ? 'Modifier le rôle' : 'Nouveau rôle'}
+                {selectedRole ? 'Edit Role' : 'New Role'}
               </h2>
               <button
                 type="button"
                 className="settings-modal__close"
                 onClick={() => setShowModal(false)}
-                title="Fermer"
+                title="Close"
               >
                 <X size={20} />
               </button>
@@ -514,7 +509,7 @@ export default function RolesPage() {
               {selectedRole?.is_system && (
                 <div className="flex items-center gap-3 p-4 bg-amber-500/10 rounded-lg mb-6 text-amber-600 text-sm">
                   <AlertTriangle size={18} />
-                  <span>Rôle système - modification limitée</span>
+                  <span>System role - limited modification</span>
                 </div>
               )}
 
@@ -522,7 +517,7 @@ export default function RolesPage() {
                 {/* Left: Role Info */}
                 <div>
                   <h3 className="text-sm font-semibold text-[var(--color-brun-chocolat)] mb-4">
-                    Informations du rôle
+                    Role Information
                   </h3>
 
                   <div className="form-group">
@@ -538,37 +533,14 @@ export default function RolesPage() {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Nom (Français) *</label>
+                    <label className="form-label">Name *</label>
                     <input
                       type="text"
                       className="form-input"
-                      value={formData.name_fr}
-                      onChange={(e) => setFormData({ ...formData, name_fr: e.target.value })}
-                      placeholder="Gérant"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Manager"
                     />
-                  </div>
-
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label className="form-label">Nom (English)</label>
-                      <input
-                        type="text"
-                        className="form-input"
-                        value={formData.name_en}
-                        onChange={(e) => setFormData({ ...formData, name_en: e.target.value })}
-                        placeholder="Manager"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Nama (Indonesia)</label>
-                      <input
-                        type="text"
-                        className="form-input"
-                        value={formData.name_id}
-                        onChange={(e) => setFormData({ ...formData, name_id: e.target.value })}
-                        placeholder="Manajer"
-                      />
-                    </div>
                   </div>
 
                   <div className="form-group">
@@ -583,7 +555,7 @@ export default function RolesPage() {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Niveau hiérarchique</label>
+                    <label className="form-label">Hierarchy Level</label>
                     <div className="flex items-center gap-4">
                       <input
                         type="range"
@@ -593,8 +565,8 @@ export default function RolesPage() {
                         onChange={(e) => setFormData({ ...formData, hierarchy_level: parseInt(e.target.value) })}
                         className="flex-1"
                         disabled={selectedRole?.is_system}
-                        title="Niveau hiérarchique"
-                        aria-label="Niveau hiérarchique"
+                        title="Hierarchy level"
+                        aria-label="Hierarchy level"
                       />
                       <span
                         className={`section-badge ${getHierarchyLabel(formData.hierarchy_level).color} min-w-[50px] text-center`}
@@ -603,7 +575,7 @@ export default function RolesPage() {
                       </span>
                     </div>
                     <p className="form-hint">
-                      Plus le niveau est élevé, plus le rôle a d'autorité
+                      Higher level = more authority
                     </p>
                   </div>
                 </div>
@@ -651,7 +623,7 @@ export default function RolesPage() {
                                 }}
                                 className={`section-badge cursor-pointer border-0 ${allSelected ? 'section-badge--sales' : ''}`}
                               >
-                                {allSelected ? 'Tout désél.' : 'Tout sél.'}
+                                {allSelected ? 'Deselect all' : 'Select all'}
                               </button>
                             </div>
                           </button>
@@ -675,7 +647,7 @@ export default function RolesPage() {
                                     </span>
                                     {perm.is_sensitive && (
                                       <span className="ml-2 text-[10px] px-1.5 py-0.5 bg-red-500/10 text-red-600 rounded">
-                                        Sensible
+                                        Sensitive
                                       </span>
                                     )}
                                   </div>
@@ -697,7 +669,7 @@ export default function RolesPage() {
                 className="btn-secondary"
                 onClick={() => setShowModal(false)}
               >
-                Annuler
+                Cancel
               </button>
               <button
                 className="btn-primary"
@@ -707,12 +679,12 @@ export default function RolesPage() {
                 {isSaving ? (
                   <>
                     <RefreshCw size={16} className="spinning" />
-                    Enregistrement...
+                    Saving...
                   </>
                 ) : (
                   <>
                     <Save size={16} />
-                    Enregistrer
+                    Save
                   </>
                 )}
               </button>
