@@ -15,7 +15,7 @@ export function useCategories() {
                 const { data, error } = await supabase
                     .from('categories')
                     .select('*')
-                    .eq('is_raw_material', false)
+                    .eq('show_in_pos', true)
                     .eq('is_active', true)
                     .order('sort_order')
 

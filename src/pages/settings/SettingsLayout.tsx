@@ -19,6 +19,7 @@ import {
   Grid,
   Wallet,
   Wifi,
+  Tags,
 } from 'lucide-react';
 import { useSettingsCategories, useInitializeSettings } from '../../hooks/settings';
 import './SettingsPage.css';
@@ -43,6 +44,7 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 const EXTRA_TABS = [
   { code: 'payments', path: 'payments', icon: <Wallet size={18} /> },
   { code: 'hours', path: 'hours', icon: <Clock size={18} /> },
+  { code: 'categories', path: 'categories', icon: <Tags size={18} /> },
   { code: 'sections', path: 'sections', icon: <Layers size={18} /> },
   { code: 'floorplan', path: 'floorplan', icon: <Grid size={18} /> },
   { code: 'kds', path: 'kds', icon: <ChefHat size={18} /> },
@@ -53,6 +55,7 @@ const EXTRA_TABS = [
 const EXTRA_TAB_NAMES: Record<string, { fr: string; en: string; id: string }> = {
   payments: { fr: 'Méthodes de Paiement', en: 'Payment Methods', id: 'Metode Pembayaran' },
   hours: { fr: 'Horaires', en: 'Business Hours', id: 'Jam Buka' },
+  categories: { fr: 'Catégories', en: 'Categories', id: 'Kategori' },
   sections: { fr: 'Sections', en: 'Sections', id: 'Bagian' },
   floorplan: { fr: 'Plan de Salle', en: 'Floor Plan', id: 'Denah Lantai' },
   kds: { fr: 'Stations KDS', en: 'KDS Stations', id: 'Stasiun KDS' },

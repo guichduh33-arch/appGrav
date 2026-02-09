@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Save, CheckCheck, Search, Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import type { InventoryCount, Product } from '../../types/database'
+import type { InventoryCount, Product, ISection } from '../../types/database'
 import './StockOpname.css'
 
 // Extended item type for UI (adds product relation and computed unit)
@@ -19,12 +19,16 @@ interface CountItemWithProduct {
     unit?: string // Computed from product
 }
 
+interface InventoryCountWithSection extends InventoryCount {
+    section?: ISection | null
+}
+
 export default function StockOpnameForm() {
     const { id } = useParams<{ id: string }>()
     const navigate = useNavigate()
 
     // Header Data
-    const [session, setSession] = useState<InventoryCount | null>(null)
+    const [session, setSession] = useState<InventoryCountWithSection | null>(null)
     const [status, setStatus] = useState<'loading' | 'ready' | 'saving'>('loading')
 
     // Items Data
@@ -42,14 +46,14 @@ export default function StockOpnameForm() {
         if (!id) return
         setStatus('loading')
         try {
-            // 1. Get Session Info
+            // 1. Get Session Info with section
             const { data: sess, error: sErr } = await supabase
                 .from('inventory_counts')
-                .select('*')
+                .select('*, section:sections(*)')
                 .eq('id', id)
-                .single<InventoryCount>()
+                .single()
             if (sErr) throw sErr
-            setSession(sess)
+            setSession(sess as InventoryCountWithSection)
 
             // 2. Get Items
             const { data: existingItems, error: iErr } = await supabase
@@ -61,7 +65,7 @@ export default function StockOpnameForm() {
 
             // 3. If Draft and No items, initialize items from Product Snapshots
             if (sess.status === 'draft' && (!existingItems || existingItems.length === 0)) {
-                await initializeItems(id)
+                await initializeItems(id, sess.section_id)
             } else {
                 // Add unit from product to each item
                 const rawItems = existingItems as unknown as Array<CountItemWithProduct & { product?: Product }>;
@@ -79,13 +83,38 @@ export default function StockOpnameForm() {
         }
     }
 
-    async function initializeItems(sessionId: string) {
-        const { data: products } = await supabase
-            .from('products')
-            .select('*')
-            .neq('is_active', false)
+    async function initializeItems(sessionId: string, sectionId: string | null) {
+        let products: Product[] = []
 
-        if (!products) return
+        if (sectionId) {
+            // Get product IDs that belong to this section via product_sections junction table
+            const { data: productSections } = await supabase
+                .from('product_sections')
+                .select('product_id')
+                .eq('section_id', sectionId)
+
+            if (productSections && productSections.length > 0) {
+                const productIds = productSections.map(ps => ps.product_id)
+
+                // Fetch the actual products
+                const { data: sectionProducts } = await supabase
+                    .from('products')
+                    .select('*')
+                    .in('id', productIds)
+                    .neq('is_active', false)
+
+                products = sectionProducts || []
+            }
+        } else {
+            // Fallback: get all active products if no section specified
+            const { data } = await supabase
+                .from('products')
+                .select('*')
+                .neq('is_active', false)
+            products = data || []
+        }
+
+        if (!products || products.length === 0) return
 
         const records = products.map(p => ({
             count_id: sessionId,
@@ -200,6 +229,11 @@ export default function StockOpnameForm() {
                         <div className="flex items-center gap-2">
                             <h1 className="text-xl font-bold">{session.count_number ?? ''}</h1>
                             <StatusBadge status={session.status ?? 'draft'} />
+                            {session.section && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                    {session.section.name}
+                                </span>
+                            )}
                         </div>
                         <p className="opname-subtitle">
                             {session.created_at ? new Date(session.created_at).toLocaleDateString() : ''}

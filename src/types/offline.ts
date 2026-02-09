@@ -458,6 +458,9 @@ export interface IOfflineCategory {
   /** Whether category is for raw materials (excluded from POS) */
   is_raw_material: boolean;
 
+  /** Whether category is shown in POS */
+  show_in_pos?: boolean;
+
   /** ISO 8601 timestamp of last update */
   updated_at: string | null;
 }

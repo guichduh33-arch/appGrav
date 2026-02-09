@@ -9,6 +9,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { lanHub } from '@/services/lan/lanHub';
 import { useLanStore } from '@/stores/lanStore';
+import { generateUUID } from '@/lib/utils';
 
 /**
  * Hook configuration options
@@ -94,8 +95,8 @@ function generateDeviceId(): string {
     return store.deviceId;
   }
 
-  // Generate new ID
-  return `pos-${crypto.randomUUID().slice(0, 8)}`;
+  // Generate new ID using utility with fallback
+  return `pos-${generateUUID().slice(0, 8)}`;
 }
 
 /**

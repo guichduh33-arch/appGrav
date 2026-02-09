@@ -237,7 +237,7 @@ export function useProduction() {
                 const netChange = item.quantity - item.wasted
 
                 if (item.quantity > 0) {
-                    await supabase
+                    const { error: movementError } = await supabase
                         .from('stock_movements')
                         .insert({
                             movement_id: generateUUID(),
@@ -249,13 +249,18 @@ export function useProduction() {
                             unit: item.unit,
                             reason: `Production ${selectedSection?.name || ''} - ${dateStr}`,
                             reference_id: prodRecord.id,
+                            reference_type: 'production',
                             staff_id: user?.id
                         })
+                    if (movementError) {
+                        console.error('Error creating production_in movement:', movementError)
+                        throw new Error(`Failed to create stock movement: ${movementError.message}`)
+                    }
                 }
 
                 if (item.wasted > 0) {
                     const stockAfterProduction = currentStock + item.quantity
-                    await supabase
+                    const { error: wasteError } = await supabase
                         .from('stock_movements')
                         .insert({
                             movement_id: generateUUID(),
@@ -267,8 +272,13 @@ export function useProduction() {
                             unit: item.unit,
                             reason: item.wasteReason || `Production waste ${dateStr}`,
                             reference_id: prodRecord.id,
+                            reference_type: 'production',
                             staff_id: user?.id
                         })
+                    if (wasteError) {
+                        console.error('Error creating waste movement:', wasteError)
+                        throw new Error(`Failed to create waste movement: ${wasteError.message}`)
+                    }
                 }
 
                 await supabase
@@ -292,7 +302,7 @@ export function useProduction() {
                         const qtyToDeduct = recipe.quantity * item.quantity
 
                         const materialStock = material.current_stock || 0
-                        await supabase
+                        const { error: ingredientError } = await supabase
                             .from('stock_movements')
                             .insert({
                                 movement_id: generateUUID(),
@@ -304,8 +314,13 @@ export function useProduction() {
                                 unit: recipe.unit || 'pcs',
                                 reason: `Used for: ${item.name} (×${item.quantity}) - ${dateStr}`,
                                 reference_id: prodRecord.id,
+                                reference_type: 'production',
                                 staff_id: user?.id
                             })
+                        if (ingredientError) {
+                            console.error('Error creating production_out movement:', ingredientError)
+                            throw new Error(`Failed to create ingredient movement: ${ingredientError.message}`)
+                        }
 
                         await supabase
                             .from('products')

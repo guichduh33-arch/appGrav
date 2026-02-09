@@ -34,6 +34,7 @@ function mapOfflineToCategory(c: IOfflineCategory): Category {
     dispatch_station: c.dispatch_station,
     is_active: c.is_active,
     is_raw_material: c.is_raw_material,
+    show_in_pos: c.show_in_pos ?? true, // Default to true if not set
     updated_at: c.updated_at,
     created_at: null, // Not cached
   };

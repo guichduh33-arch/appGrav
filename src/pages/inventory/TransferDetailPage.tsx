@@ -212,12 +212,18 @@ export default function TransferDetailPage() {
       <div className="transfer-detail-route">
         <div className="route-location from">
           <span className="route-label">From</span>
-          <span className="route-name">{transfer.from_location?.name ?? 'Unknown'}</span>
+          <span className="route-name">
+            {transfer.from_section?.icon && `${transfer.from_section.icon} `}
+            {transfer.from_section?.name ?? transfer.from_location?.name ?? 'Unknown'}
+          </span>
         </div>
         <ArrowRightLeft size={32} className="route-arrow" />
         <div className="route-location to">
           <span className="route-label">To</span>
-          <span className="route-name">{transfer.to_location?.name ?? 'Unknown'}</span>
+          <span className="route-name">
+            {transfer.to_section?.icon && `${transfer.to_section.icon} `}
+            {transfer.to_section?.name ?? transfer.to_location?.name ?? 'Unknown'}
+          </span>
         </div>
       </div>
 

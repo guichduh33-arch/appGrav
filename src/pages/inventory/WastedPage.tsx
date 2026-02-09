@@ -18,12 +18,14 @@ import './WastedPage.css'
 interface WasteRecord {
     id: string
     product_id: string
-    product: { id: string; name: string; sku: string; unit: string } | null
+    product: { id: string; name: string; sku: string; unit: string; cost_price: number | null } | null
     quantity: number
-    reason: string
-    notes: string | null
-    created_by: string | null
-    created_by_name: string | null
+    reason: string | null
+    unit: string | null
+    stock_before: number | null
+    stock_after: number | null
+    staff_id: string | null
+    staff_name: string | null
     created_at: string
     unit_cost: number | null
 }
@@ -76,11 +78,14 @@ export default function WastedPage() {
                 .select(`
                     id,
                     product_id,
-                    product:products(id, name, sku, unit),
+                    product:products(id, name, sku, unit, cost_price),
                     quantity,
-                    notes,
-                    created_by,
-                    created_by_name,
+                    reason,
+                    unit,
+                    stock_before,
+                    stock_after,
+                    staff_id,
+                    staff:user_profiles!fk_stock_movements_staff(display_name),
                     created_at,
                     unit_cost
                 `)
@@ -103,15 +108,18 @@ export default function WastedPage() {
             const { data: wasteData, error: wasteError } = await query
 
             if (wasteError) throw wasteError
-            // Map data to WasteRecord format - extract reason from notes if present
+            // Map data to WasteRecord format
             const rawData = wasteData as unknown as Array<{
                 id: string;
                 product_id: string;
-                product: { id: string; name: string; sku: string; unit: string } | null;
+                product: { id: string; name: string; sku: string; unit: string; cost_price: number | null } | null;
                 quantity: number;
-                notes?: string | null;
-                created_by?: string | null;
-                created_by_name?: string | null;
+                reason?: string | null;
+                unit?: string | null;
+                stock_before?: number | null;
+                stock_after?: number | null;
+                staff_id?: string | null;
+                staff?: { display_name: string } | null;
                 created_at: string;
                 unit_cost?: number | null;
             }>;
@@ -120,12 +128,14 @@ export default function WastedPage() {
                 product_id: r.product_id,
                 product: r.product,
                 quantity: r.quantity,
-                reason: r.notes?.split(':')[0] || 'other',
-                notes: r.notes ?? null,
-                created_by: r.created_by ?? null,
-                created_by_name: r.created_by_name ?? null,
+                reason: r.reason ?? 'other',
+                unit: r.unit ?? r.product?.unit ?? null,
+                stock_before: r.stock_before ?? null,
+                stock_after: r.stock_after ?? null,
+                staff_id: r.staff_id ?? null,
+                staff_name: r.staff?.display_name ?? null,
                 created_at: r.created_at,
-                unit_cost: r.unit_cost ?? null
+                unit_cost: r.unit_cost ?? r.product?.cost_price ?? null
             }))
             setWasteRecords(mappedData)
 
@@ -153,7 +163,7 @@ export default function WastedPage() {
         totalCost: wasteRecords.reduce((sum, r) => sum + (Math.abs(r.quantity) * (r.unit_cost || 0)), 0),
         byReason: WASTE_REASONS.map(r => ({
             reason: r.value,
-            count: wasteRecords.filter(wr => wr.reason === r.value).length
+            count: wasteRecords.filter(wr => wr.reason?.toLowerCase().startsWith(r.label.toLowerCase())).length
         }))
     }
 
@@ -164,7 +174,7 @@ export default function WastedPage() {
             return (
                 record.product?.name.toLowerCase().includes(search) ||
                 record.product?.sku.toLowerCase().includes(search) ||
-                record.reason.toLowerCase().includes(search)
+                (record.reason?.toLowerCase().includes(search) ?? false)
             )
         }
         return true
@@ -192,7 +202,7 @@ export default function WastedPage() {
         setIsSaving(true)
         try {
             const movementId = `MV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
-            const combinedNotes = `${reason}${notes ? ': ' + notes : ''}`
+            const combinedReason = `${getReasonLabel(reason)}${notes ? ': ' + notes : ''}`
 
             const { error } = await supabase
                 .from('stock_movements')
@@ -201,9 +211,13 @@ export default function WastedPage() {
                     product_id: selectedProduct.id,
                     movement_type: 'waste',
                     quantity: -qty, // Negative for waste
-                    notes: combinedNotes,
-                    created_by: user?.id,
-                    unit_cost: selectedProduct.cost_price || 0
+                    reason: combinedReason,
+                    unit: selectedProduct.unit || 'pcs',
+                    stock_before: currentStock,
+                    stock_after: currentStock - qty,
+                    staff_id: user?.id,
+                    unit_cost: selectedProduct.cost_price || 0,
+                    reference_type: 'manual_waste'
                 } as never)
 
             if (error) throw error
@@ -239,6 +253,14 @@ export default function WastedPage() {
     const getReasonLabel = (reasonValue: string) => {
         const found = WASTE_REASONS.find(r => r.value === reasonValue)
         return found ? found.label : reasonValue
+    }
+
+    // Extract reason type from full reason string (e.g., "Expired: some notes" -> "expired")
+    const getReasonType = (reason: string | null): string => {
+        if (!reason) return 'other'
+        const lowerReason = reason.toLowerCase()
+        const found = WASTE_REASONS.find(r => lowerReason.startsWith(r.label.toLowerCase()))
+        return found ? found.value : 'other'
     }
 
     return (
@@ -362,18 +384,18 @@ export default function WastedPage() {
                                         </span>
                                     </td>
                                     <td className="cell-reason">
-                                        <span className={`reason-badge reason-${record.reason}`}>
-                                            {getReasonLabel(record.reason)}
+                                        <span className={`reason-badge reason-${getReasonType(record.reason)}`}>
+                                            {record.reason?.split(':')[0] || 'Other'}
                                         </span>
                                     </td>
                                     <td className="cell-cost">
                                         {formatCurrency(Math.abs(record.quantity) * (record.unit_cost || 0))}
                                     </td>
                                     <td className="cell-user">
-                                        {record.created_by_name || '-'}
+                                        {record.staff_name || '-'}
                                     </td>
                                     <td className="cell-notes">
-                                        {record.notes || '-'}
+                                        {record.reason || '-'}
                                     </td>
                                 </tr>
                             ))}

@@ -10,6 +10,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { lanClient } from '@/services/lan/lanClient';
 import { useLanStore, TLanConnectionStatus } from '@/stores/lanStore';
 import type { TDeviceType } from '@/services/lan/lanProtocol';
+import { generateUUID } from '@/lib/utils';
 
 interface IUseLanClientOptions {
   deviceType: TDeviceType;
@@ -70,7 +71,7 @@ export function useLanClient(options: IUseLanClientOptions): IUseLanClientResult
         // localStorage not available (e.g., private browsing)
       }
 
-      const deviceId = storedId || `${deviceType}-${crypto.randomUUID().slice(0, 8)}`;
+      const deviceId = storedId || `${deviceType}-${generateUUID().slice(0, 8)}`;
 
       // Persist device ID if new
       if (!storedId) {

@@ -14,10 +14,12 @@ export interface IStockMovement {
   product_cost: number
   movement_type: string
   quantity: number
+  unit: string | null  // Unit stored on the movement itself
   stock_before: number | null
   stock_after: number | null
   reason: string | null
   reference_id: string | null
+  reference_type: string | null
   created_at: string
   staff_name: string | null
 }
@@ -44,7 +46,7 @@ export function useStockMovements(filters: IStockMovementsFilter = {}) {
         .select(`
           *,
           product:products(name, sku, unit, cost_price),
-          staff:user_profiles!stock_movements_staff_id_fkey(display_name)
+          staff:user_profiles!fk_stock_movements_staff(display_name)
         `)
         .order('created_at', { ascending: false })
         .limit(limit)
@@ -82,14 +84,16 @@ export function useStockMovements(filters: IStockMovementsFilter = {}) {
           product_id: m.product_id as string,
           product_name: product?.name as string || 'Unknown',
           product_sku: product?.sku as string || '',
-          product_unit: product?.unit as string || 'pcs',
+          product_unit: (m.unit as string) || (product?.unit as string) || 'pcs',
           product_cost: product?.cost_price as number || 0,
           movement_type: m.movement_type as string,
           quantity: m.quantity as number,
+          unit: m.unit as string | null,
           stock_before: m.stock_before as number | null,
           stock_after: m.stock_after as number | null,
           reason: m.reason as string | null,
           reference_id: m.reference_id as string | null,
+          reference_type: m.reference_type as string | null,
           created_at: m.created_at as string,
           staff_name: staff?.display_name as string | null
         }
@@ -112,7 +116,7 @@ export function useProductStockMovements(productId: string | null) {
         .select(`
           *,
           product:products(name, sku, unit, cost_price),
-          staff:user_profiles!stock_movements_staff_id_fkey(display_name)
+          staff:user_profiles!fk_stock_movements_staff(display_name)
         `)
         .eq('product_id', productId)
         .order('created_at', { ascending: false })
@@ -131,14 +135,16 @@ export function useProductStockMovements(productId: string | null) {
           product_id: m.product_id as string,
           product_name: product?.name as string || 'Unknown',
           product_sku: product?.sku as string || '',
-          product_unit: product?.unit as string || 'pcs',
+          product_unit: (m.unit as string) || (product?.unit as string) || 'pcs',
           product_cost: product?.cost_price as number || 0,
           movement_type: m.movement_type as string,
           quantity: m.quantity as number,
+          unit: m.unit as string | null,
           stock_before: m.stock_before as number | null,
           stock_after: m.stock_after as number | null,
           reason: m.reason as string | null,
           reference_id: m.reference_id as string | null,
+          reference_type: m.reference_type as string | null,
           created_at: m.created_at as string,
           staff_name: staff?.display_name as string | null
         }

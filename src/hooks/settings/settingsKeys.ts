@@ -12,4 +12,8 @@ export const settingsKeys = {
   printers: () => [...settingsKeys.all, 'printers'] as const,
   emailTemplates: () => [...settingsKeys.all, 'emailTemplates'] as const,
   receiptTemplates: () => [...settingsKeys.all, 'receiptTemplates'] as const,
+  roles: () => [...settingsKeys.all, 'roles'] as const,
+  role: (id: string) => [...settingsKeys.roles(), id] as const,
+  permissions: () => [...settingsKeys.all, 'permissions'] as const,
+  rolePermissions: (roleId: string) => [...settingsKeys.roles(), roleId, 'permissions'] as const,
 }

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { IPosTerminal, TPosTerminalStatus } from '../types/database';
+import { generateUUID } from '../lib/utils';
 
 // =====================================================
 // Constants
@@ -83,7 +84,7 @@ export const useTerminalStore = create<TTerminalStore>()(
       // =====================================================
 
       generateDeviceId: () => {
-        return crypto.randomUUID();
+        return generateUUID();
       },
 
       // =====================================================

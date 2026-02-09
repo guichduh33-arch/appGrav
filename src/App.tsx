@@ -82,6 +82,7 @@ const SyncStatusPage = lazy(() => import('./pages/settings/SyncStatusPage'))
 const PrintingSettingsPage = lazy(() => import('./pages/settings/PrintingSettingsPage'))
 const NotificationSettingsPage = lazy(() => import('./pages/settings/NotificationSettingsPage'))
 const LanMonitoringPage = lazy(() => import('./pages/settings/LanMonitoringPage'))
+const CategoriesPage = lazy(() => import('./pages/settings/CategoriesPage'))
 
 // Profile
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
@@ -361,6 +362,7 @@ function App() {
                             {/* Specialized pages */}
                             <Route path="payments" element={<PaymentMethodsPage />} />
                             <Route path="hours" element={<BusinessHoursPage />} />
+                            <Route path="categories" element={<CategoriesPage />} />
                             <Route path="history" element={<SettingsHistoryPage />} />
                             {/* Legacy pages from old settings (still accessible) */}
                             <Route path="sections" element={<SettingsPage />} />
