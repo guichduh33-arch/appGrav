@@ -11,10 +11,10 @@ import { OrderItemStatusBadge, type TItemStatus } from '../OrderItemStatusBadge'
 
 describe('OrderItemStatusBadge', () => {
   const statuses: Array<{ status: TItemStatus; expectedLabel: string; expectedClass: string }> = [
-    { status: 'new', expectedLabel: 'Nouveau', expectedClass: 'order-item-badge--new' },
-    { status: 'preparing', expectedLabel: 'En prépa.', expectedClass: 'order-item-badge--preparing' },
-    { status: 'ready', expectedLabel: 'Prêt', expectedClass: 'order-item-badge--ready' },
-    { status: 'served', expectedLabel: 'Servi', expectedClass: 'order-item-badge--served' },
+    { status: 'new', expectedLabel: 'New', expectedClass: 'order-item-badge--new' },
+    { status: 'preparing', expectedLabel: 'Preparing', expectedClass: 'order-item-badge--preparing' },
+    { status: 'ready', expectedLabel: 'Ready', expectedClass: 'order-item-badge--ready' },
+    { status: 'served', expectedLabel: 'Served', expectedClass: 'order-item-badge--served' },
   ];
 
   it.each(statuses)('should render $status status with correct label and class', ({ status, expectedLabel, expectedClass }) => {

@@ -67,7 +67,7 @@ export async function getCachedReport(
 
   // Check if we have all dates in range
   const dates: string[] = [];
-  let current = new Date(dateRange.from);
+  const current = new Date(dateRange.from);
   while (current <= dateRange.to) {
     dates.push(format(current, DATE_FORMAT));
     current.setDate(current.getDate() + 1);

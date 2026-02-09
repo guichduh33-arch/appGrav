@@ -128,7 +128,7 @@ describe('PrintingSettingsPage', () => {
 
             render(<PrintingSettingsPage />, { wrapper: createWrapper() });
 
-            expect(screen.getByText(/Aucune imprimante configurée/i)).toBeInTheDocument();
+            expect(screen.getByText(/No printers configured/i)).toBeInTheDocument();
         });
 
         it('should show loading state', () => {
@@ -139,7 +139,7 @@ describe('PrintingSettingsPage', () => {
 
             render(<PrintingSettingsPage />, { wrapper: createWrapper() });
 
-            expect(screen.getByText(/Chargement/i)).toBeInTheDocument();
+            expect(screen.getByText(/Loading/i)).toBeInTheDocument();
         });
     });
 
@@ -149,12 +149,12 @@ describe('PrintingSettingsPage', () => {
             render(<PrintingSettingsPage />, { wrapper: createWrapper() });
 
             // Open modal
-            fireEvent.click(screen.getByRole('button', { name: /Nouvelle Imprimante/i }));
+            fireEvent.click(screen.getByRole('button', { name: /New Printer/i }));
 
-            expect(screen.getByRole('heading', { name: 'Nouvelle Imprimante' })).toBeInTheDocument();
+            expect(screen.getByRole('heading', { name: 'New Printer' })).toBeInTheDocument();
 
             // Fill form
-            fireEvent.change(screen.getByPlaceholderText(/Ex: Imprimante Caisse/i), {
+            fireEvent.change(screen.getByPlaceholderText(/Cash Register Printer/i), {
                 target: { value: 'New Test Printer' },
             });
             fireEvent.change(screen.getByPlaceholderText(/192.168.1.100:9100/i), {
@@ -162,7 +162,7 @@ describe('PrintingSettingsPage', () => {
             });
 
             // Submit
-            fireEvent.click(screen.getByRole('button', { name: /Créer/i }));
+            fireEvent.click(screen.getByRole('button', { name: /Create/i }));
 
             await waitFor(() => {
                 expect(mockCreateMutate).toHaveBeenCalledWith(expect.objectContaining({
@@ -171,19 +171,19 @@ describe('PrintingSettingsPage', () => {
                 }));
             });
 
-            expect(toast.success).toHaveBeenCalledWith('Imprimante créée');
+            expect(toast.success).toHaveBeenCalledWith('Printer created');
         });
 
         it('should validate required fields', async () => {
             render(<PrintingSettingsPage />, { wrapper: createWrapper() });
 
-            fireEvent.click(screen.getByRole('button', { name: /Nouvelle Imprimante/i }));
+            fireEvent.click(screen.getByRole('button', { name: /New Printer/i }));
 
             // Submit empty
-            fireEvent.click(screen.getByRole('button', { name: /Créer/i }));
+            fireEvent.click(screen.getByRole('button', { name: /Create/i }));
 
             await waitFor(() => {
-                expect(toast.error).toHaveBeenCalledWith(expect.stringMatching(/nom.*requis/i));
+                expect(toast.error).toHaveBeenCalledWith(expect.stringMatching(/name.*required/i));
             });
 
             expect(mockCreateMutate).not.toHaveBeenCalled();
@@ -196,19 +196,19 @@ describe('PrintingSettingsPage', () => {
             render(<PrintingSettingsPage />, { wrapper: createWrapper() });
 
             // Click edit button for the first printer
-            const editButtons = screen.getAllByTitle('Modifier');
+            const editButtons = screen.getAllByTitle('Edit');
             fireEvent.click(editButtons[0]);
 
-            expect(screen.getByText('Modifier l\'Imprimante')).toBeInTheDocument();
+            expect(screen.getByText('Edit Printer')).toBeInTheDocument();
 
-            const nameInput = screen.getByPlaceholderText(/Ex: Imprimante Caisse/i) as HTMLInputElement;
+            const nameInput = screen.getByPlaceholderText(/Cash Register Printer/i) as HTMLInputElement;
             expect(nameInput.value).toBe('Main Receipt Printer');
 
             // Change name
             fireEvent.change(nameInput, { target: { value: 'Updated Receipt Printer' } });
 
             // Submit
-            fireEvent.click(screen.getByRole('button', { name: /Mettre à jour/i }));
+            fireEvent.click(screen.getByRole('button', { name: /Update/i }));
 
             await waitFor(() => {
                 expect(mockUpdateMutate).toHaveBeenCalledWith(expect.objectContaining({
@@ -219,7 +219,7 @@ describe('PrintingSettingsPage', () => {
                 }));
             });
 
-            expect(toast.success).toHaveBeenCalledWith('Imprimante mise à jour');
+            expect(toast.success).toHaveBeenCalledWith('Printer updated');
         });
     });
 
@@ -230,7 +230,7 @@ describe('PrintingSettingsPage', () => {
 
             render(<PrintingSettingsPage />, { wrapper: createWrapper() });
 
-            const deleteButtons = screen.getAllByTitle('Supprimer');
+            const deleteButtons = screen.getAllByTitle('Delete');
             fireEvent.click(deleteButtons[0]);
 
             expect(window.confirm).toHaveBeenCalled();
@@ -239,7 +239,7 @@ describe('PrintingSettingsPage', () => {
                 expect(mockDeleteMutate).toHaveBeenCalledWith('1');
             });
 
-            expect(toast.success).toHaveBeenCalledWith('Imprimante supprimée');
+            expect(toast.success).toHaveBeenCalledWith('Printer deleted');
         });
 
         it('should not delete if not confirmed', () => {
@@ -247,7 +247,7 @@ describe('PrintingSettingsPage', () => {
 
             render(<PrintingSettingsPage />, { wrapper: createWrapper() });
 
-            const deleteButtons = screen.getAllByTitle('Supprimer');
+            const deleteButtons = screen.getAllByTitle('Delete');
             fireEvent.click(deleteButtons[0]);
 
             expect(mockDeleteMutate).not.toHaveBeenCalled();
@@ -262,12 +262,12 @@ describe('PrintingSettingsPage', () => {
 
             render(<PrintingSettingsPage />, { wrapper: createWrapper() });
 
-            expect(screen.queryByRole('button', { name: /Nouvelle Imprimante/i })).not.toBeInTheDocument();
-            expect(screen.queryByTitle('Modifier')).not.toBeInTheDocument();
-            expect(screen.queryByTitle('Supprimer')).not.toBeInTheDocument();
+            expect(screen.queryByRole('button', { name: /New Printer/i })).not.toBeInTheDocument();
+            expect(screen.queryByTitle('Edit')).not.toBeInTheDocument();
+            expect(screen.queryByTitle('Delete')).not.toBeInTheDocument();
 
             // Test Print should still Bbe visible even if can't update (read-only diagnostics)
-            expect(screen.getAllByTitle("Test d'impression")[0]).toBeInTheDocument();
+            expect(screen.getAllByTitle("Test print")[0]).toBeInTheDocument();
         });
     });
 
@@ -280,7 +280,7 @@ describe('PrintingSettingsPage', () => {
 
             render(<PrintingSettingsPage />, { wrapper: createWrapper() });
 
-            const testButtons = screen.getAllByTitle("Test d'impression");
+            const testButtons = screen.getAllByTitle("Test print");
             fireEvent.click(testButtons[0]);
 
             // Verify health check call
@@ -294,7 +294,7 @@ describe('PrintingSettingsPage', () => {
             });
 
             await waitFor(() => {
-                expect(toast.success).toHaveBeenCalledWith(expect.stringMatching(/Test d'impression réussi/i));
+                expect(toast.success).toHaveBeenCalledWith(expect.stringMatching(/Print test successful/i));
             });
         });
 
@@ -303,11 +303,11 @@ describe('PrintingSettingsPage', () => {
 
             render(<PrintingSettingsPage />, { wrapper: createWrapper() });
 
-            const testButtons = screen.getAllByTitle("Test d'impression");
+            const testButtons = screen.getAllByTitle("Test print");
             fireEvent.click(testButtons[0]);
 
             await waitFor(() => {
-                expect(toast.error).toHaveBeenCalledWith(expect.stringMatching(/Serveur d'impression inaccessible/i));
+                expect(toast.error).toHaveBeenCalledWith(expect.stringMatching(/Print server unreachable/i));
             });
         });
     });

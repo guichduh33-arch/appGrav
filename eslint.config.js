@@ -5,7 +5,7 @@ import pluginReact from "eslint-plugin-react";
 
 export default [
   {
-    ignores: ["dist/**", "node_modules/**", "*.config.js", "*.config.ts", "**/*.backup.ts"]
+    ignores: ["dist/**", "node_modules/**", "*.config.js", "*.config.ts", "**/*.backup.ts", "_legacy/**", "print-server/**", "artifacts/**", "scripts/**", "supabase/functions/**"]
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
