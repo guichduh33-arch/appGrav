@@ -4083,42 +4083,54 @@ export type Database = {
       purchase_order_items: {
         Row: {
           created_at: string | null
+          description: string | null
+          discount_amount: number | null
+          discount_percentage: number | null
           id: string
+          line_total: number
           product_id: string
           product_name: string | null
           purchase_order_id: string
           quantity: number
           quantity_received: number | null
           quantity_returned: number | null
-          total: number
+          tax_rate: number | null
           unit: string | null
           unit_price: number
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          description?: string | null
+          discount_amount?: number | null
+          discount_percentage?: number | null
           id?: string
+          line_total: number
           product_id: string
           product_name?: string | null
           purchase_order_id: string
           quantity: number
           quantity_received?: number | null
           quantity_returned?: number | null
-          total: number
+          tax_rate?: number | null
           unit?: string | null
           unit_price: number
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          description?: string | null
+          discount_amount?: number | null
+          discount_percentage?: number | null
           id?: string
+          line_total?: number
           product_id?: string
           product_name?: string | null
           purchase_order_id?: string
           quantity?: number
           quantity_received?: number | null
           quantity_returned?: number | null
-          total?: number
+          tax_rate?: number | null
           unit?: string | null
           unit_price?: number
           updated_at?: string | null
@@ -4177,60 +4189,72 @@ export type Database = {
       }
       purchase_orders: {
         Row: {
+          actual_delivery_date: string | null
           created_at: string | null
           created_by: string | null
-          expected_date: string | null
+          discount_amount: number | null
+          discount_percentage: number | null
+          expected_delivery_date: string | null
           expense_type: Database["public"]["Enums"]["expense_type"] | null
           id: string
           notes: string | null
           order_date: string
+          payment_date: string | null
+          payment_status: string | null
           po_number: string
           received_by: string | null
-          received_date: string | null
           status: Database["public"]["Enums"]["po_status"] | null
           subtotal: number | null
           supplier_id: string
           tax_amount: number | null
           tax_rate: number | null
-          total: number | null
+          total_amount: number | null
           updated_at: string | null
         }
         Insert: {
+          actual_delivery_date?: string | null
           created_at?: string | null
           created_by?: string | null
-          expected_date?: string | null
+          discount_amount?: number | null
+          discount_percentage?: number | null
+          expected_delivery_date?: string | null
           expense_type?: Database["public"]["Enums"]["expense_type"] | null
           id?: string
           notes?: string | null
           order_date?: string
+          payment_date?: string | null
+          payment_status?: string | null
           po_number: string
           received_by?: string | null
-          received_date?: string | null
           status?: Database["public"]["Enums"]["po_status"] | null
           subtotal?: number | null
           supplier_id: string
           tax_amount?: number | null
           tax_rate?: number | null
-          total?: number | null
+          total_amount?: number | null
           updated_at?: string | null
         }
         Update: {
+          actual_delivery_date?: string | null
           created_at?: string | null
           created_by?: string | null
-          expected_date?: string | null
+          discount_amount?: number | null
+          discount_percentage?: number | null
+          expected_delivery_date?: string | null
           expense_type?: Database["public"]["Enums"]["expense_type"] | null
           id?: string
           notes?: string | null
           order_date?: string
+          payment_date?: string | null
+          payment_status?: string | null
           po_number?: string
           received_by?: string | null
-          received_date?: string | null
           status?: Database["public"]["Enums"]["po_status"] | null
           subtotal?: number | null
           supplier_id?: string
           tax_amount?: number | null
           tax_rate?: number | null
-          total?: number | null
+          total_amount?: number | null
           updated_at?: string | null
         }
         Relationships: [
