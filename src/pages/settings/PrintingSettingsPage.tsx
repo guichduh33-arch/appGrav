@@ -166,8 +166,14 @@ const PrintingSettingsPage = () => {
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Print test failed');
+                let errorMessage = 'Print test failed';
+                try {
+                    const error = await response.json();
+                    errorMessage = error.message || errorMessage;
+                } catch {
+                    // Response body may not be JSON
+                }
+                throw new Error(errorMessage);
             }
 
             toast.success('Print test successful');

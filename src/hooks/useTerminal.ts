@@ -77,7 +77,7 @@ export function useTerminal() {
       .from('pos_terminals')
       .select('*')
       .eq('device_id', deviceId)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       // Update existing terminal
