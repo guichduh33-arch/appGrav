@@ -12,7 +12,7 @@ import {
 import {
   useModuleSettings,
   useUpdateModuleSetting,
-} from '../../hooks/useSettings';
+} from '../../hooks/settings';
 import type { ModuleSettings } from '../../types/settings';
 
 interface ModuleCardProps {

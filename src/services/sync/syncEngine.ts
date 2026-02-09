@@ -6,6 +6,11 @@
  * Manages automatic synchronization of offline transactions when internet returns.
  * Processes queue items in FIFO order with exponential backoff for retries.
  * Provides background automatic sync at configurable intervals.
+ *
+ * Architecture note: A V2 sync engine existed with improved patterns (dependency
+ * ordering, ID remapping, processor-based dispatch) but was never integrated.
+ * It was removed as dead code. See git history (commit before 2026-02-09) for
+ * reference if refactoring this engine in the future.
  */
 
 import { supabase } from '@/lib/supabase';

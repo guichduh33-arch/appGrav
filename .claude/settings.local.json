@@ -119,7 +119,12 @@
       "mcp__plugin_github_github__update_pull_request",
       "Bash(supabase migration:*)",
       "Bash(del \"c:\\\\Users\\\\guich\\\\Lastapp\\\\appGrav\\\\supabase\\\\migrations\\\\20260206_full_schema.sql\")",
-      "Bash(Remove-Item \"supabase\\\\migrations\\\\20260206_full_schema.sql\" -Force)"
+      "Bash(Remove-Item \"supabase\\\\migrations\\\\20260206_full_schema.sql\" -Force)",
+      "Bash(supabase db diff:*)",
+      "Bash(start:*)",
+      "Bash(\"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\data\\\\_extract.ps1\" << 'HEREDOC'\n$lines = Get-Content 'C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\hooks\\\\useProducts.ts'\n$mockLines = $lines[169..2858]\n$mockLines[$mockLines.Count - 1] = '] as ProductWithCategory[];'\n$header = @\\(\n    \"import type { ProductWithCategory } from '../types/database';\"\n    ''\n    '// Mock products for demo mode \\(matches CSV files\\)'\n\\)\n$output = $header + $mockLines\nSet-Content -Path 'C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\data\\\\mockProducts.ts' -Value $output -Encoding UTF8\nWrite-Host \"Done. Output file has $\\($output.Count\\) lines.\"\nHEREDOC)",
+      "Bash(del \"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\services\\\\sync\\\\syncEngineV2.ts\")",
+      "Bash(del \"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\services\\\\sync\\\\__tests__\\\\syncEngineV2.test.ts\")"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -107,7 +107,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
             setVariantGroups(Object.values(groups))
         } catch (error) {
             console.error('Error loading variants:', error)
-            toast.error('Erreur lors du chargement des variants')
+            toast.error('Error loading variants')
         } finally {
             setLoading(false)
         }
@@ -115,7 +115,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
 
     async function handleAddGroup() {
         if (!newGroupName.trim()) {
-            toast.error('Nom de catégorie requis')
+            toast.error('Category name is required')
             return
         }
 
@@ -139,7 +139,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
 
             if (error) throw error
 
-            toast.success('Catégorie ajoutée')
+            toast.success('Category added')
             setNewGroupName('')
             setNewGroupType('single')
             setNewGroupRequired(false)
@@ -147,7 +147,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
             loadVariants()
         } catch (error) {
             console.error('Error adding variant group:', error)
-            toast.error('Erreur lors de l\'ajout de la catégorie')
+            toast.error('Error adding category')
         }
     }
 
@@ -175,16 +175,16 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
 
             if (error) throw error
 
-            toast.success('Option ajoutée')
+            toast.success('Option added')
             loadVariants()
         } catch (error) {
             console.error('Error adding option:', error)
-            toast.error('Erreur lors de l\'ajout de l\'option')
+            toast.error('Error adding option')
         }
     }
 
     async function handleDeleteOption(optionId: string) {
-        if (!confirm('Supprimer cette option ?')) return
+        if (!confirm('Delete this option?')) return
 
         try {
             const { error } = await supabase
@@ -194,16 +194,16 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
 
             if (error) throw error
 
-            toast.success('Option supprimée')
+            toast.success('Option deleted')
             loadVariants()
         } catch (error) {
             console.error('Error deleting option:', error)
-            toast.error('Erreur lors de la suppression')
+            toast.error('Error deleting option')
         }
     }
 
     async function handleDeleteGroup(groupName: string) {
-        if (!confirm('Supprimer toute la catégorie et ses options ?')) return
+        if (!confirm('Delete this entire category and all its options?')) return
 
         try {
             const { error } = await supabase
@@ -214,11 +214,11 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
 
             if (error) throw error
 
-            toast.success('Catégorie supprimée')
+            toast.success('Category deleted')
             loadVariants()
         } catch (error) {
             console.error('Error deleting group:', error)
-            toast.error('Erreur lors de la suppression')
+            toast.error('Error deleting category')
         }
     }
 
@@ -243,7 +243,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
             if (error) throw error
         } catch (error) {
             console.error('Error updating option:', error)
-            toast.error('Erreur lors de la mise à jour')
+            toast.error('Error updating option')
             // Reload to get correct state on error
             loadVariants()
         }
@@ -296,16 +296,16 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
     }
 
     if (loading) {
-        return <div style={{ padding: '2rem', textAlign: 'center' }}>Chargement...</div>
+        return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>
     }
 
     return (
         <div style={{ padding: '1.5rem' }}>
             <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                    <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600 }}>Variants du produit</h2>
+                    <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600 }}>Product Variants</h2>
                     <p style={{ margin: '0.5rem 0 0', color: '#6B7280', fontSize: '0.875rem' }}>
-                        Créez des catégories de variants avec plusieurs ingrédients par option
+                        Create variant categories with multiple ingredients per option
                     </p>
                 </div>
                 <button
@@ -324,7 +324,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                     }}
                 >
                     <Plus size={18} />
-                    Nouvelle catégorie
+                    New Category
                 </button>
             </div>
 
@@ -347,18 +347,18 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                         maxWidth: '500px'
                     }}>
                         <h3 style={{ margin: '0 0 1.5rem', fontSize: '1.125rem', fontWeight: 600 }}>
-                            Nouvelle catégorie de variants
+                            New Variant Category
                         </h3>
 
                         <div style={{ marginBottom: '1rem' }}>
                             <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
-                                Nom de la catégorie *
+                                Category Name *
                             </label>
                             <input
                                 type="text"
                                 value={newGroupName}
                                 onChange={(e) => setNewGroupName(e.target.value)}
-                                placeholder="Ex: Lait, Taille, Topping..."
+                                placeholder="e.g. Milk, Size, Topping..."
                                 style={{
                                     width: '100%',
                                     padding: '0.75rem',
@@ -371,7 +371,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
 
                         <div style={{ marginBottom: '1rem' }}>
                             <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
-                                Type de sélection
+                                Selection Type
                             </label>
                             <select
                                 value={newGroupType}
@@ -384,8 +384,8 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                     fontSize: '0.875rem'
                                 }}
                             >
-                                <option value="single">Choix unique</option>
-                                <option value="multiple">Choix multiple</option>
+                                <option value="single">Single Choice</option>
+                                <option value="multiple">Multiple Choice</option>
                             </select>
                         </div>
 
@@ -396,7 +396,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                     checked={newGroupRequired}
                                     onChange={(e) => setNewGroupRequired(e.target.checked)}
                                 />
-                                <span style={{ fontSize: '0.875rem' }}>Obligatoire</span>
+                                <span style={{ fontSize: '0.875rem' }}>Required</span>
                             </label>
                         </div>
 
@@ -418,7 +418,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                     fontWeight: 500
                                 }}
                             >
-                                Annuler
+                                Cancel
                             </button>
                             <button
                                 onClick={handleAddGroup}
@@ -433,7 +433,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                     fontWeight: 500
                                 }}
                             >
-                                Créer
+                                Create
                             </button>
                         </div>
                     </div>
@@ -450,10 +450,10 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                     border: '1px dashed #D1D5DB'
                 }}>
                     <p style={{ color: '#6B7280', marginBottom: '1rem' }}>
-                        Aucune catégorie de variant définie
+                        No variant categories defined
                     </p>
                     <p style={{ color: '#9CA3AF', fontSize: '0.875rem' }}>
-                        Cliquez sur "Nouvelle catégorie" pour commencer
+                        Click "New Category" to get started
                     </p>
                 </div>
             ) : (
@@ -490,7 +490,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                             borderRadius: '12px',
                                             fontWeight: 500
                                         }}>
-                                            {group.group_type === 'single' ? 'Choix unique' : 'Choix multiple'}
+                                            {group.group_type === 'single' ? 'Single Choice' : 'Multiple Choice'}
                                         </span>
                                         {group.group_required && (
                                             <span style={{
@@ -501,7 +501,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                                 borderRadius: '12px',
                                                 fontWeight: 500
                                             }}>
-                                                Obligatoire
+                                                Required
                                             </span>
                                         )}
                                     </div>
@@ -516,7 +516,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                         cursor: 'pointer',
                                         borderRadius: '4px'
                                     }}
-                                    title="Supprimer la catégorie"
+                                    title="Delete category"
                                 >
                                     <Trash2 size={18} />
                                 </button>
@@ -569,7 +569,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                                     checked={option.is_default}
                                                     onChange={(e) => handleUpdateOption(option.id!, 'is_default', e.target.checked)}
                                                 />
-                                                Défaut
+                                                Default
                                             </label>
                                             <button
                                                 onClick={() => handleDeleteOption(option.id!)}
@@ -580,7 +580,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                                     color: '#EF4444',
                                                     cursor: 'pointer'
                                                 }}
-                                                title="Supprimer l'option"
+                                                title="Delete option"
                                             >
                                                 <Trash2 size={16} />
                                             </button>
@@ -599,7 +599,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                                 marginBottom: '0.5rem'
                                             }}>
                                                 <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6B7280' }}>
-                                                    Ingrédients à déduire
+                                                    Ingredients to Deduct
                                                 </span>
                                                 <button
                                                     onClick={() => handleAddMaterial(group.group_name, option.id!)}
@@ -618,7 +618,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                                     }}
                                                 >
                                                     <Plus size={14} />
-                                                    Ajouter
+                                                    Add
                                                 </button>
                                             </div>
 
@@ -630,7 +630,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                                     fontStyle: 'italic',
                                                     margin: '0.5rem 0'
                                                 }}>
-                                                    Aucun ingrédient configuré
+                                                    No ingredients configured
                                                 </p>
                                             ) : (
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -666,7 +666,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                                                         fontSize: '0.75rem'
                                                                     }}
                                                                 >
-                                                                    <option value="">Sélectionner un produit...</option>
+                                                                    <option value="">Select a product...</option>
                                                                     {availableProducts.map(prod => (
                                                                         <option key={prod.id} value={prod.id}>
                                                                             {prod.name} ({prod.sku})
@@ -715,7 +715,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                                                         color: '#EF4444',
                                                                         cursor: 'pointer'
                                                                     }}
-                                                                    title="Supprimer l'ingrédient"
+                                                                    title="Remove ingredient"
                                                                 >
                                                                     <X size={14} />
                                                                 </button>
@@ -747,7 +747,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                     }}
                                 >
                                     <Plus size={16} />
-                                    Ajouter une option
+                                    Add an option
                                 </button>
                             </div>
                         </div>

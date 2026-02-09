@@ -11,7 +11,7 @@ import {
     useNotificationSettings,
     useUpdateNotificationSetting,
     useSendTestEmail,
-} from '../../hooks/useSettings';
+} from '../../hooks/settings';
 import type { NotificationSettings } from '../../types/settings';
 
 interface ToggleProps {

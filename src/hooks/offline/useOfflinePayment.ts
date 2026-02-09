@@ -13,6 +13,7 @@ import { useCartStore } from '@/stores/cartStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useNetworkStatus } from './useNetworkStatus';
 import { createOfflineOrder } from '@/services/offline/offlineOrderService';
+import { updateOfflineOrderStatus } from '@/services/offline/ordersCacheService';
 import {
   saveOfflinePayment,
   saveOfflinePayments,
@@ -225,6 +226,10 @@ export function useOfflinePayment(): IUseOfflinePaymentResult {
           session_id: sessionId ?? null,
         });
 
+        // 2.5. Update order status to 'completed' to trigger stock deduction
+        // The database trigger tr_deduct_stock_on_sale fires when status changes to 'completed'
+        await updateOfflineOrderStatus(order.id, 'completed');
+
         // 3. Dispatch order to kitchen (Story 3.7)
         // This happens AFTER payment is confirmed
         // Dispatch will queue locally if LAN is unavailable
@@ -343,6 +348,10 @@ export function useOfflinePayment(): IUseOfflinePaymentResult {
         }));
 
         const payments = await saveOfflinePayments(order.id, paymentInputs);
+
+        // 2.5. Update order status to 'completed' to trigger stock deduction
+        // The database trigger tr_deduct_stock_on_sale fires when status changes to 'completed'
+        await updateOfflineOrderStatus(order.id, 'completed');
 
         // 3. Dispatch order to kitchen
         const { dispatched, queued } = await dispatchOrderToKitchen(order, items);

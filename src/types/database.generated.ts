@@ -3214,6 +3214,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_default: boolean | null
+          materials: Record<string, unknown>[] | null
           option_icon: string | null
           option_id: string
           option_label: string
@@ -3231,6 +3232,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_default?: boolean | null
+          materials?: Record<string, unknown>[] | null
           option_icon?: string | null
           option_id: string
           option_label: string
@@ -3248,6 +3250,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_default?: boolean | null
+          materials?: Record<string, unknown>[] | null
           option_icon?: string | null
           option_id?: string
           option_label?: string

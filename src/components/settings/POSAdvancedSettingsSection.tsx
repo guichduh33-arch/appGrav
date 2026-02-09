@@ -11,7 +11,7 @@ import {
 import {
   usePOSAdvancedSettings,
   useUpdatePOSAdvancedSetting,
-} from '../../hooks/useSettings';
+} from '../../hooks/settings';
 import type { POSAdvancedSettings, RoundingMethod, SoundType } from '../../types/settings';
 
 interface ToggleProps {

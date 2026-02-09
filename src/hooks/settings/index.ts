@@ -46,3 +46,47 @@ export {
   useReceiptTemplates,
   useUpdateReceiptTemplate,
 } from './useBusinessSettings'
+
+// POS advanced settings
+export {
+  usePOSAdvancedSettings,
+  useUpdatePOSAdvancedSetting,
+} from './usePOSAdvancedSettings'
+
+// Module settings
+export {
+  useModuleSettings,
+  useUpdateModuleSetting,
+  useIsModuleEnabled,
+} from './useModuleSettings'
+
+// Notification settings
+export {
+  useNotificationSettings,
+  useUpdateNotificationSetting,
+  useSendTestEmail,
+} from './useNotificationSettings'
+
+// Terminal settings
+export {
+  useTerminalSettings,
+  useUpdateTerminalSettings,
+  useTerminalSettingOverrides,
+  useSetTerminalSettingOverride,
+} from './useTerminalSettings'
+
+// Settings profiles
+export {
+  useSettingsProfiles,
+  useSettingsProfile,
+  useCreateSettingsProfile,
+  useUpdateSettingsProfile,
+  useDeleteSettingsProfile,
+  useApplySettingsProfile,
+} from './useSettingsProfiles'
+
+// Sound assets
+export {
+  useSoundAssets,
+  useSoundAssetsByCategory,
+} from './useSoundAssets'

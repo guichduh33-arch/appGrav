@@ -16,4 +16,11 @@ export const settingsKeys = {
   role: (id: string) => [...settingsKeys.roles(), id] as const,
   permissions: () => [...settingsKeys.all, 'permissions'] as const,
   rolePermissions: (roleId: string) => [...settingsKeys.roles(), roleId, 'permissions'] as const,
+  posAdvanced: () => [...settingsKeys.all, 'posAdvanced'] as const,
+  modules: () => [...settingsKeys.all, 'modules'] as const,
+  terminalSettings: (terminalId: string) => [...settingsKeys.all, 'terminal', terminalId] as const,
+  profiles: () => [...settingsKeys.all, 'profiles'] as const,
+  profile: (id: string) => [...settingsKeys.profiles(), id] as const,
+  soundAssets: () => [...settingsKeys.all, 'soundAssets'] as const,
+  notifications: () => [...settingsKeys.all, 'notifications'] as const,
 }

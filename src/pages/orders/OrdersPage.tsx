@@ -10,7 +10,7 @@ import { supabase } from '../../lib/supabase';
 import { formatCurrency } from '../../utils/helpers';
 import { playOrderReadySound } from '../../utils/audio';
 import { useKdsStatusListener } from '../../hooks/pos/useKdsStatusListener';
-import { useModuleSettings } from '../../hooks/useSettings';
+import { useModuleSettings } from '../../hooks/settings';
 import { OrderItemStatusBadge, type TItemStatus } from '../../components/orders/OrderItemStatusBadge';
 import type { TKitchenStation } from '../../types/offline';
 import './OrdersPage.css';

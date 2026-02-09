@@ -106,6 +106,7 @@ export interface ProductModifier {
     is_default: boolean;
     option_sort_order: number;
     is_active: boolean;
+    materials: Array<{ material_id: string; quantity: number }> | null;
     created_at: string;
 }
 

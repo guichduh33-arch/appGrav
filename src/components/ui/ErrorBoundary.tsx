@@ -24,7 +24,7 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught:', error, errorInfo);
     
-    // TODO: Envoyer à un service de monitoring (Sentry)
+    // TODO: Send to monitoring service (Sentry)
     this.setState({ error, errorInfo });
   }
 
@@ -49,10 +49,10 @@ export class ErrorBoundary extends Component<Props, State> {
               </div>
               <div>
                 <h2 className="text-xl font-bold text-gray-900">
-                  Quelque chose s'est mal passé
+                  Something went wrong
                 </h2>
                 <p className="text-sm text-gray-500">
-                  Une erreur inattendue s'est produite
+                  An unexpected error occurred
                 </p>
               </div>
             </div>
@@ -60,7 +60,7 @@ export class ErrorBoundary extends Component<Props, State> {
             {this.state.error && (
               <details className="mb-4 p-3 bg-gray-50 rounded border border-gray-200">
                 <summary className="cursor-pointer font-medium text-sm text-gray-700">
-                  Détails de l'erreur
+                  Error details
                 </summary>
                 <pre className="mt-2 text-xs text-red-600 overflow-auto">
                   {this.state.error.message}
@@ -78,18 +78,18 @@ export class ErrorBoundary extends Component<Props, State> {
                 onClick={this.handleReset}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
               >
-                Réessayer
+                Retry
               </button>
               <button
                 onClick={() => window.location.href = '/'}
                 className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition"
               >
-                Retour à l'accueil
+                Back to home
               </button>
             </div>
 
             <p className="mt-4 text-xs text-gray-500 text-center">
-              Si le problème persiste, contactez le support technique
+              If the problem persists, contact technical support
             </p>
           </div>
         </div>

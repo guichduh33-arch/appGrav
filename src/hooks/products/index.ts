@@ -16,4 +16,5 @@ export {
 export { usePOSCombos } from './useCombos'
 
 // Re-export mock data for backward compatibility
-export { MOCK_CATEGORIES, MOCK_PRODUCTS } from '../useProducts'
+export { MOCK_CATEGORIES } from '../../data/mockCategories'
+export { MOCK_PRODUCTS } from '../../data/mockProducts'
