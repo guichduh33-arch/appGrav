@@ -87,7 +87,8 @@ interface CartState {
     updateItem: (itemId: string, modifiers: CartModifier[], notes: string) => void
     updateItemQuantity: (itemId: string, quantity: number) => void
     removeItem: (itemId: string) => void
-    clearCart: () => void
+    clearCart: () => boolean
+    forceClearCart: () => void
     setOrderType: (type: 'dine_in' | 'takeaway' | 'delivery') => void
     setTableNumber: (table: string | null) => void
     setCustomer: (id: string | null, name: string | null) => void
@@ -299,7 +300,40 @@ export const useCartStore = create<CartState>()(
     },
 
     clearCart: () => {
-        // Clear persisted cart from localStorage (Story 3.2)
+        // Prevent clearing if there are locked items (sent to kitchen)
+        // Caller must use forceClearCart() after PIN verification
+        const state = get()
+        if (state.lockedItemIds.length > 0) {
+            console.warn('Cannot clear cart: locked items present. Use forceClearCart() after PIN verification.')
+            return false
+        }
+        clearPersistedCart()
+        set({
+            items: [],
+            tableNumber: null,
+            customerId: null,
+            customerName: null,
+            customerCategorySlug: null,
+            discountType: null,
+            discountValue: 0,
+            discountReason: null,
+            orderNotes: '',
+            lockedItemIds: [],
+            activeOrderId: null,
+            activeOrderNumber: null,
+            promotionDiscounts: [],
+            promotionTotalDiscount: 0,
+            appliedPromotions: [],
+            subtotal: 0,
+            discountAmount: 0,
+            total: 0,
+            itemCount: 0,
+        })
+        return true
+    },
+
+    forceClearCart: () => {
+        // Force clear all items including locked ones (call after PIN verification)
         clearPersistedCart()
         set({
             items: [],

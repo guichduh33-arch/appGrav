@@ -7,6 +7,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders, handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
+import { validateSessionToken } from '../_shared/session-auth.ts';
 
 interface CreateUserRequest {
   action: 'create';
@@ -61,11 +62,13 @@ serve(async (req: Request) => {
 
   try {
     const body: UserManagementRequest = await req.json();
-    const requestingUserId = req.headers.get('x-user-id');
 
-    if (!requestingUserId) {
-      return errorResponse('User ID header required', 401);
+    // Validate session token (SEC-005: replaces spoofable x-user-id)
+    const session = await validateSessionToken(req);
+    if (!session) {
+      return errorResponse('Valid session token required', 401, req);
     }
+    const requestingUserId = session.userId;
 
     // Create Supabase client with service role
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -132,7 +135,7 @@ serve(async (req: Request) => {
           const { data: hashedPin } = await supabase.rpc('hash_pin', { p_pin: pin });
           await supabase
             .from('user_profiles')
-            .update({ pin_hash: hashedPin, pin_code: pin }) // Keep pin_code for legacy
+            .update({ pin_hash: hashedPin })
             .eq('id', newUser.id);
         }
 

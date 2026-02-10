@@ -38,8 +38,8 @@ export const securityHeaders = {
 };
 
 export const corsHeaders = {
-    'Access-Control-Allow-Origin': '*', // Will be overridden by getCorsHeaders
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Origin': 'https://thebreakery.app',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-session-token',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Credentials': 'true',
 };
@@ -64,8 +64,9 @@ export function handleCors(req: Request): Response | null {
 }
 
 // Helper to create JSON response with CORS
+// req is required for proper origin-based CORS; fallback uses restricted default
 export function jsonResponse(data: unknown, status = 200, req?: Request): Response {
-    const headers = req ? getCorsHeaders(req) : corsHeaders;
+    const headers = req ? getCorsHeaders(req) : { ...corsHeaders, ...securityHeaders };
     return new Response(JSON.stringify(data), {
         status,
         headers: {

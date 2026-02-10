@@ -289,6 +289,7 @@ const NotificationSettingsPage = () => {
 
     try {
       const { error } = await supabase.functions.invoke('send-test-email', {
+        headers: { 'x-session-token': sessionStorage.getItem('breakery-session-token') || '' },
         body: {
           smtp_host: formData.smtp_host,
           smtp_port: formData.smtp_port,

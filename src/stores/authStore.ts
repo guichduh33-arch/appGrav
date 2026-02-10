@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type { UserProfile } from '../types/database';
 import type { Role, EffectivePermission } from '../types/auth';
 import { authService } from '../services/authService';
@@ -296,6 +296,7 @@ export const useAuthStore = create<IAuthState>()(
     }),
     {
       name: 'breakery-auth',
+      storage: createJSONStorage(() => sessionStorage),
       // Only persist essential data, not session token (security)
       partialize: (state) => ({
         user: state.user,

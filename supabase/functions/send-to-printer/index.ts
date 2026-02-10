@@ -4,6 +4,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { corsHeaders, handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 import { supabaseAdmin } from '../_shared/supabase-client.ts';
+import { requireSession } from '../_shared/session-auth.ts';
 
 interface PrintJob {
     type: 'receipt' | 'kitchen' | 'label';
@@ -195,6 +196,10 @@ serve(async (req) => {
     // Handle CORS
     const corsResponse = handleCors(req);
     if (corsResponse) return corsResponse;
+
+    // Require authenticated session (SEC-006)
+    const session = await requireSession(req);
+    if (session instanceof Response) return session;
 
     try {
         const job: PrintJob = await req.json();

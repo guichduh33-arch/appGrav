@@ -72,6 +72,7 @@ export function useSendTestEmail() {
     mutationFn: async (recipientEmail: string) => {
       const { data, error } = await supabase.functions.invoke('send-test-email', {
         body: { email: recipientEmail },
+        headers: { 'x-session-token': sessionStorage.getItem('breakery-session-token') || '' },
       })
 
       if (error) throw error

@@ -14,6 +14,38 @@ const displayTemplate = require('../templates/display');
 
 const router = express.Router();
 
+// Input validation helpers (SEC-012)
+const MAX_STRING_LENGTH = 500;
+const MAX_NOTES_LENGTH = 2000;
+const MAX_ITEMS = 200;
+
+function sanitizeString(val, maxLen = MAX_STRING_LENGTH) {
+    if (typeof val !== 'string') return '';
+    return val.substring(0, maxLen);
+}
+
+function validateOrder(order) {
+    if (!order || typeof order !== 'object') return 'Missing or invalid order data';
+    if (order.order_number && typeof order.order_number !== 'string') return 'Invalid order_number';
+    return null;
+}
+
+function validateItems(items) {
+    if (!Array.isArray(items)) return 'items must be an array';
+    if (items.length === 0) return 'items cannot be empty';
+    if (items.length > MAX_ITEMS) return `items exceeds maximum (${MAX_ITEMS})`;
+    for (const item of items) {
+        if (!item || typeof item !== 'object') return 'Invalid item in array';
+        if (item.name && typeof item.name === 'string' && item.name.length > MAX_STRING_LENGTH) {
+            return `Item name exceeds ${MAX_STRING_LENGTH} chars`;
+        }
+        if (item.notes && typeof item.notes === 'string' && item.notes.length > MAX_NOTES_LENGTH) {
+            return `Item notes exceeds ${MAX_NOTES_LENGTH} chars`;
+        }
+    }
+    return null;
+}
+
 /**
  * POST /print
  * Generic print endpoint (used by Edge Function)
@@ -30,6 +62,11 @@ router.post('/', async (req, res) => {
                 success: false,
                 error: 'Missing content'
             });
+        }
+
+        // Validate content length (SEC-012)
+        if (typeof content === 'string' && content.length > 50000) {
+            return res.status(400).json({ success: false, error: 'Content too large' });
         }
 
         let printData;
@@ -83,11 +120,9 @@ router.post('/receipt', async (req, res) => {
     try {
         const { order } = req.body;
 
-        if (!order) {
-            return res.status(400).json({
-                success: false,
-                error: 'Missing order data'
-            });
+        const orderErr = validateOrder(order);
+        if (orderErr) {
+            return res.status(400).json({ success: false, error: orderErr });
         }
 
         // Build ESC/POS data
@@ -130,11 +165,13 @@ router.post('/kitchen', async (req, res) => {
     try {
         const { order, items } = req.body;
 
-        if (!order || !items || items.length === 0) {
-            return res.status(400).json({
-                success: false,
-                error: 'Missing order or items data'
-            });
+        const orderErr = validateOrder(order);
+        if (orderErr) {
+            return res.status(400).json({ success: false, error: orderErr });
+        }
+        const itemsErr = validateItems(items);
+        if (itemsErr) {
+            return res.status(400).json({ success: false, error: itemsErr });
         }
 
         // Filter kitchen items only
@@ -186,11 +223,13 @@ router.post('/barista', async (req, res) => {
     try {
         const { order, items } = req.body;
 
-        if (!order || !items || items.length === 0) {
-            return res.status(400).json({
-                success: false,
-                error: 'Missing order or items data'
-            });
+        const orderErr = validateOrder(order);
+        if (orderErr) {
+            return res.status(400).json({ success: false, error: orderErr });
+        }
+        const itemsErr = validateItems(items);
+        if (itemsErr) {
+            return res.status(400).json({ success: false, error: itemsErr });
         }
 
         // Filter barista items only
@@ -242,11 +281,13 @@ router.post('/display', async (req, res) => {
     try {
         const { order, items } = req.body;
 
-        if (!order || !items || items.length === 0) {
-            return res.status(400).json({
-                success: false,
-                error: 'Missing order or items data'
-            });
+        const orderErr = validateOrder(order);
+        if (orderErr) {
+            return res.status(400).json({ success: false, error: orderErr });
+        }
+        const itemsErr = validateItems(items);
+        if (itemsErr) {
+            return res.status(400).json({ success: false, error: itemsErr });
         }
 
         // Filter display items only

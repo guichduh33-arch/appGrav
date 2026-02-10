@@ -37,40 +37,28 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, navigate]);
 
-  // Demo users fallback - ONLY enabled in development mode
-  // In production, this should be empty to prevent credential exposure
-  const isDevelopment = import.meta.env.DEV;
-  const DEMO_USERS: UserProfile[] = isDevelopment ? [
-    { id: 'a1110000-0000-0000-0000-000000000001', name: 'Apni', role: 'cashier', pin_code: import.meta.env.VITE_DEMO_PIN_CASHIER || '', is_active: true } as UserProfile,
-    { id: 'a1110000-0000-0000-0000-000000000002', name: 'Dani', role: 'manager', pin_code: import.meta.env.VITE_DEMO_PIN_MANAGER || '', is_active: true } as UserProfile,
-    { id: 'a1110000-0000-0000-0000-000000000004', name: 'Bayu', role: 'barista', pin_code: import.meta.env.VITE_DEMO_PIN_BARISTA || '', is_active: true } as UserProfile,
-    { id: 'a1110000-0000-0000-0000-000000000005', name: 'Admin', role: 'admin', pin_code: import.meta.env.VITE_DEMO_PIN_ADMIN || '', is_active: true } as UserProfile,
-  ] : [];
-
-  // Load real users from Supabase (with demo fallback)
+  // Load users from Supabase
   useEffect(() => {
     async function loadUsers() {
       try {
         const { data, error } = await supabase
           .from('user_profiles')
-          .select('id, name, display_name, role, is_active, avatar_url, employee_code, pin_code')
+          .select('id, name, display_name, role, is_active, avatar_url, employee_code')
           .eq('is_active', true)
           .order('name');
 
         if (error) throw error;
 
-        // If Supabase returns empty (RLS blocking), use demo users
         if (data && data.length > 0) {
           setUsers(data as UserProfile[]);
         } else {
-          console.warn('No users from Supabase, using demo fallback');
-          setUsers(DEMO_USERS);
+          console.warn('No users returned from database');
+          setUsers([]);
         }
       } catch (err) {
         console.error('Error loading users:', err);
-        // Fallback to demo users on error
-        setUsers(DEMO_USERS);
-        toast.error('Demo mode activated (database inaccessible)');
+        setUsers([]);
+        toast.error('Cannot load users (database inaccessible)');
       }
     }
     loadUsers();
@@ -165,34 +153,8 @@ export default function LoginPage() {
     }
   };
 
-  // Demo login fallback - only for when bcrypt RPC is unavailable
-  const handleDemoLogin = async (user: UserProfile) => {
-    // Try to get plaintext PIN from demo users
-    const demoUser = DEMO_USERS.find(u =>
-      u.name.toLowerCase() === user?.name?.toLowerCase() ||
-      u.id === user.id
-    );
-
-    if (!demoUser?.pin_code) {
-      setError('No PIN set (demo mode)');
-      return;
-    }
-
-    if (demoUser.pin_code !== pin) {
-      setError('Invalid PIN');
-      return;
-    }
-
-    // Demo login successful - load basic permissions
-    const { login } = useAuthStore.getState();
-    login(user);
-    toast.success(`Welcome, ${user.display_name || user.name}! (Demo)`);
-    navigate('/pos');
-  };
-
-  // Legacy login for demo mode or when Edge Functions are unavailable
+  // Legacy login - when Edge Functions are unavailable, use RPC
   const handleLegacyLogin = async () => {
-    // First check if we have PIN in current users list
     const user = users.find(u => u.id === selectedUser);
 
     if (!user) {
@@ -200,7 +162,7 @@ export default function LoginPage() {
       return;
     }
 
-    // Use secure bcrypt verification via RPC (preferred method)
+    // Use secure bcrypt verification via RPC
     try {
       const { data: isValid, error: verifyError } = await supabase.rpc('verify_user_pin', {
         p_user_id: selectedUser,
@@ -209,8 +171,7 @@ export default function LoginPage() {
 
       if (verifyError) {
         console.error('PIN verification error:', verifyError);
-        // Fall back to plaintext check for demo mode
-        await handleDemoLogin(user);
+        setError('Authentication service unavailable');
         return;
       }
 
@@ -219,8 +180,8 @@ export default function LoginPage() {
         return;
       }
     } catch (rpcError) {
-      console.error('RPC error, falling back to demo:', rpcError);
-      await handleDemoLogin(user);
+      console.error('RPC error:', rpcError);
+      setError('Authentication service unavailable');
       return;
     }
 
@@ -426,12 +387,6 @@ export default function LoginPage() {
           {isLoading || authLoading ? 'Loading...' : 'Sign in'}
         </button>
 
-        {/* Demo hint - only shown in development */}
-        {isDevelopment && import.meta.env.VITE_SHOW_DEMO_HINT === 'true' && (
-          <p className="login-hint">
-            Demo mode - check .env for PINs
-          </p>
-        )}
       </div>
     </div>
   );

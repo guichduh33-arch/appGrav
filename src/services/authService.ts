@@ -2,6 +2,7 @@
 // Handles communication with auth Edge Functions
 
 import { supabase } from '@/lib/supabase';
+import logger from '@/utils/logger';
 import type {
   Role,
   EffectivePermission,
@@ -10,6 +11,11 @@ import type {
 } from '@/types/auth';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SESSION_TOKEN_KEY = 'breakery-session-token';
+
+function getSessionToken(): string {
+  return sessionStorage.getItem(SESSION_TOKEN_KEY) || '';
+}
 
 interface AuthResponse {
   success: boolean;
@@ -108,7 +114,7 @@ export const authService = {
             console.error('Supabase Auth session creation failed:', authError);
             // Continue anyway - the app will work but RLS might not
           } else {
-            console.log('[Auth] Supabase Auth session created successfully');
+            logger.debug('[Auth] Supabase Auth session created successfully');
           }
         } catch (authErr) {
           console.error('Error creating Supabase Auth session:', authErr);
@@ -140,7 +146,7 @@ export const authService = {
       // 1. Sign out from Supabase Auth
       try {
         await supabase.auth.signOut();
-        console.log('[Auth] Supabase Auth session ended');
+        logger.debug('[Auth] Supabase Auth session ended');
       } catch (authErr) {
         console.error('Supabase Auth signOut error:', authErr);
         // Continue anyway
@@ -229,7 +235,7 @@ export const authService = {
     newPin: string,
     currentPin?: string,
     adminOverride?: boolean,
-    requestingUserId?: string
+    _requestingUserId?: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await fetch(`${SUPABASE_URL}/functions/v1/auth-change-pin`, {
@@ -237,7 +243,7 @@ export const authService = {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          'x-user-id': requestingUserId || userId,
+          'x-session-token': getSessionToken(),
         },
         body: JSON.stringify({
           user_id: userId,
@@ -278,7 +284,7 @@ export const authService = {
       role_ids: string[];
       primary_role_id: string;
     },
-    requestingUserId: string
+    _requestingUserId?: string
   ): Promise<{ success: boolean; user?: UserProfileExtended; error?: string }> {
     try {
       const response = await fetch(`${SUPABASE_URL}/functions/v1/auth-user-management`, {
@@ -286,7 +292,7 @@ export const authService = {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          'x-user-id': requestingUserId,
+          'x-session-token': getSessionToken(),
         },
         body: JSON.stringify({
           action: 'create',
@@ -326,7 +332,7 @@ export const authService = {
       role_ids?: string[];
       primary_role_id?: string;
     },
-    requestingUserId: string
+    _requestingUserId?: string
   ): Promise<{ success: boolean; user?: UserProfileExtended; error?: string }> {
     try {
       const response = await fetch(`${SUPABASE_URL}/functions/v1/auth-user-management`, {
@@ -334,7 +340,7 @@ export const authService = {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          'x-user-id': requestingUserId,
+          'x-session-token': getSessionToken(),
         },
         body: JSON.stringify({
           action: 'update',
@@ -364,7 +370,7 @@ export const authService = {
    */
   async deleteUser(
     userId: string,
-    requestingUserId: string
+    _requestingUserId?: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await fetch(`${SUPABASE_URL}/functions/v1/auth-user-management`, {
@@ -372,7 +378,7 @@ export const authService = {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          'x-user-id': requestingUserId,
+          'x-session-token': getSessionToken(),
         },
         body: JSON.stringify({
           action: 'delete',
@@ -401,7 +407,7 @@ export const authService = {
   async toggleUserActive(
     userId: string,
     isActive: boolean,
-    requestingUserId: string
+    _requestingUserId?: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
       const response = await fetch(`${SUPABASE_URL}/functions/v1/auth-user-management`, {
@@ -409,7 +415,7 @@ export const authService = {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          'x-user-id': requestingUserId,
+          'x-session-token': getSessionToken(),
         },
         body: JSON.stringify({
           action: 'toggle_active',

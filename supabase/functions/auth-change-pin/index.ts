@@ -5,6 +5,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders, handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
+import { validateSessionToken } from '../_shared/session-auth.ts';
 
 interface ChangePinRequest {
   user_id: string;
@@ -25,11 +26,13 @@ serve(async (req: Request) => {
 
   try {
     const { user_id, current_pin, new_pin, admin_override }: ChangePinRequest = await req.json();
-    const requestingUserId = req.headers.get('x-user-id');
 
-    if (!requestingUserId) {
-      return errorResponse('User ID header required', 401);
+    // Validate session token (SEC-005: replaces spoofable x-user-id)
+    const session = await validateSessionToken(req);
+    if (!session) {
+      return errorResponse('Valid session token required', 401, req);
     }
+    const requestingUserId = session.userId;
 
     // Validate input
     if (!user_id || !new_pin) {

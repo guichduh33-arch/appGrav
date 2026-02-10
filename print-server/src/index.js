@@ -20,15 +20,31 @@ const server = createServer(app);
 // MIDDLEWARE
 // =====================
 
-// CORS - allow all origins for local network access
+// CORS - restrict to configured origins (SEC-007)
 app.use(cors({
-    origin: '*',
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key']
 }));
 
 // JSON body parsing
 app.use(express.json({ limit: '1mb' }));
+
+// API Key authentication middleware (SEC-007)
+const apiKeyAuth = (req, res, next) => {
+    // Health check is public
+    if (req.path === '/health' || req.path === '/') return next();
+    const apiKey = req.headers['x-api-key'];
+    if (!process.env.PRINT_API_KEY) {
+        // If no API key configured, allow all (development mode)
+        return next();
+    }
+    if (apiKey !== process.env.PRINT_API_KEY) {
+        return res.status(401).json({ success: false, error: 'Unauthorized' });
+    }
+    next();
+};
+app.use(apiKeyAuth);
 
 // Request logging
 app.use((req, res, next) => {

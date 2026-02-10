@@ -4,6 +4,7 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { getCorsHeaders, handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts'
+import { requireSession } from '../_shared/session-auth.ts'
 
 // Types
 interface ClaudeMessage {
@@ -59,6 +60,10 @@ serve(async (req: Request) => {
     if (req.method !== 'POST') {
         return errorResponse('Method not allowed', 405, req)
     }
+
+    // Require authenticated session (SEC-006)
+    const session = await requireSession(req)
+    if (session instanceof Response) return session
 
     try {
         // Get API key from environment
