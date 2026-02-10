@@ -28,6 +28,7 @@ import type {
   TDispatchStatus,
   IDispatchQueueItem,
 } from '@/types/offline';
+import logger from '@/utils/logger';
 
 /**
  * Dispatch status for a specific order
@@ -92,7 +93,7 @@ export function useKitchenDispatch(): UseKitchenDispatchResult {
     const handleAck = async (message: { payload: IKdsOrderAckPayload }) => {
       const { order_id, station, device_id, timestamp } = message.payload;
       await markStationDispatched(order_id, station);
-      console.log(
+      logger.debug(
         `[useKitchenDispatch] Order ${order_id} acknowledged by ${station} (device: ${device_id}) at ${timestamp}`
       );
     };
@@ -114,7 +115,7 @@ export function useKitchenDispatch(): UseKitchenDispatchResult {
       const timeoutId = setTimeout(() => {
         processDispatchQueue().then(({ processed, failed }) => {
           if (processed > 0) {
-            console.log(`[useKitchenDispatch] Processed ${processed} pending dispatches`);
+            logger.debug(`[useKitchenDispatch] Processed ${processed} pending dispatches`);
           }
           if (failed > 0) {
             console.warn(`[useKitchenDispatch] ${failed} dispatches failed`);
@@ -160,13 +161,13 @@ export function useKitchenDispatch(): UseKitchenDispatchResult {
       const { dispatched, queued } = await dispatchOrderToKitchen(order, items);
 
       if (queued.length > 0) {
-        console.log(
+        logger.debug(
           `[useKitchenDispatch] Queued ${queued.length} station(s) for later: ${queued.join(', ')}`
         );
       }
 
       if (dispatched.length > 0) {
-        console.log(
+        logger.debug(
           `[useKitchenDispatch] Dispatched to ${dispatched.length} station(s): ${dispatched.join(', ')}`
         );
       }

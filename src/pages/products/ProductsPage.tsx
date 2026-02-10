@@ -100,7 +100,7 @@ export default function ProductsPage() {
             } else {
                 toast.error(result.error || 'Error during export')
             }
-        } catch (error) {
+        } catch {
             toast.error('Error during export')
         } finally {
             setExporting(false)
@@ -116,7 +116,7 @@ export default function ProductsPage() {
             } else {
                 toast.error(result.error || 'Error during recipes export')
             }
-        } catch (error) {
+        } catch {
             toast.error('Error during recipes export')
         } finally {
             setExportingRecipes(false)
@@ -139,7 +139,7 @@ export default function ProductsPage() {
             } else {
                 toast.error(result.errors[0]?.error || 'Error during synchronization')
             }
-        } catch (error) {
+        } catch {
             toast.dismiss(loadingToast)
             toast.error('Unexpected error during synchronization')
         } finally {

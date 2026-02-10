@@ -3,30 +3,25 @@ import {
     Store, Printer, Bell, Shield, Save, Plus, Settings, RefreshCw, Layers,
     Edit2, Trash2, X, ShoppingCart, Factory, Warehouse, ChefHat, Coffee, Monitor, Grid, Wifi, Sliders, Package
 } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
-import { saveCategory } from '../../services/products/catalogSyncService';
-import FloorPlanEditor from '../../components/settings/FloorPlanEditor';
-import TerminalSettingsSection from '../../components/settings/TerminalSettingsSection';
-import POSAdvancedSettingsSection from '../../components/settings/POSAdvancedSettingsSection';
-import ModuleSettingsSection from '../../components/settings/ModuleSettingsSection';
-import NotificationSettingsSection from '../../components/settings/NotificationSettingsSection';
+import { saveCategory } from '@/services/products/catalogSyncService';
+import {
+    useSettingsSections,
+    useSaveSection,
+    useDeleteSection,
+    useKdsCategories,
+    type ISettingsSection,
+} from '@/hooks/settings/useSections';
+import { toast } from 'sonner';
+import FloorPlanEditor from '@/components/settings/FloorPlanEditor';
+import TerminalSettingsSection from '@/components/settings/TerminalSettingsSection';
+import POSAdvancedSettingsSection from '@/components/settings/POSAdvancedSettingsSection';
+import ModuleSettingsSection from '@/components/settings/ModuleSettingsSection';
+import NotificationSettingsSection from '@/components/settings/NotificationSettingsSection';
 import './SettingsPage.css';
 
 type SettingsTab = 'general' | 'terminal' | 'pos_advanced' | 'modules' | 'printers' | 'notifications' | 'security' | 'sections' | 'kds' | 'floorplan';
 
 type TSectionType = 'warehouse' | 'production' | 'sales';
-
-interface Section {
-    id: string;
-    name: string;
-    code: string;
-    description: string | null;
-    section_type: TSectionType | null;
-    icon: string | null;
-    is_active: boolean;
-    sort_order: number;
-    created_at: string;
-}
 
 interface Category {
     id: string;
@@ -45,17 +40,18 @@ const DISPATCH_STATIONS = [
 
 const SettingsPage = () => {
     const [activeTab, setActiveTab] = useState<SettingsTab>('general');
-    const [sections, setSections] = useState<Section[]>([]);
-    const [loadingSections, setLoadingSections] = useState(false);
 
-    // KDS Categories state
+    // Sections & KDS via hooks
+    const { data: sections = [], isLoading: loadingSections } = useSettingsSections();
+    const { data: kdsCategories = [], isLoading: loadingCategories } = useKdsCategories();
+    const saveSectionMutation = useSaveSection();
+    const deleteSectionMutation = useDeleteSection();
     const [categories, setCategories] = useState<Category[]>([]);
-    const [loadingCategories, setLoadingCategories] = useState(false);
     const [savingCategory, setSavingCategory] = useState<string | null>(null);
 
     // Section modal state
     const [showSectionModal, setShowSectionModal] = useState(false);
-    const [editingSection, setEditingSection] = useState<Section | null>(null);
+    const [editingSection, setEditingSection] = useState<ISettingsSection | null>(null);
     const [sectionForm, setSectionForm] = useState({
         name: '',
         code: '',
@@ -81,69 +77,12 @@ const SettingsPage = () => {
         autoLogout: true,
     });
 
+    // Sync kdsCategories hook data to local categories state
     useEffect(() => {
-        if (activeTab === 'sections') {
-            fetchSections();
+        if (kdsCategories.length > 0) {
+            setCategories(kdsCategories as Category[]);
         }
-        if (activeTab === 'kds') {
-            fetchCategories();
-        }
-    }, [activeTab]);
-
-    const fetchSections = async () => {
-        setLoadingSections(true);
-        try {
-            const { data, error } = await supabase
-                .from('sections')
-                .select('*')
-                .eq('is_active', true)
-                .order('sort_order');
-            if (error) throw error;
-            if (data) {
-                // Map database fields to interface
-                const mapped = data.map((s) => ({
-                    id: s.id,
-                    name: s.name,
-                    code: s.code || '',
-                    description: s.description || null,
-                    section_type: s.section_type as TSectionType | null,
-                    icon: s.icon || null,
-                    is_active: s.is_active ?? true,
-                    sort_order: s.sort_order ?? 0,
-                    created_at: s.created_at,
-                }));
-                setSections(mapped);
-            }
-        } catch (error) {
-            console.error('Error fetching sections:', error);
-        } finally {
-            setLoadingSections(false);
-        }
-    };
-
-    const fetchCategories = async () => {
-        setLoadingCategories(true);
-        try {
-            const { data, error } = await supabase
-                .from('categories')
-                .select('id, name, icon, dispatch_station, is_active')
-                .eq('is_active', true)
-                .order('name');
-            if (error) throw error;
-            if (data) {
-                const mapped = data.map(c => ({
-                    ...c,
-                    icon: c.icon || '',
-                    is_active: c.is_active ?? true,
-                }));
-                setCategories(mapped as Category[]);
-            }
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-        } finally {
-            setLoadingCategories(false);
-        }
-    };
+    }, [kdsCategories]);
 
     const updateCategoryStation = async (categoryId: string, newStation: string) => {
         setSavingCategory(categoryId);
@@ -165,7 +104,7 @@ const SettingsPage = () => {
             ));
         } catch (error) {
             console.error('Error updating category station:', error);
-            alert('Error updating station');
+            toast.error('Error updating station');
         } finally {
             setSavingCategory(null);
         }
@@ -192,7 +131,7 @@ const SettingsPage = () => {
         setShowSectionModal(true);
     };
 
-    const openEditModal = (section: Section) => {
+    const openEditModal = (section: ISettingsSection) => {
         setEditingSection(section);
         setSectionForm({
             name: section.name,
@@ -214,72 +153,49 @@ const SettingsPage = () => {
 
     const handleSaveSection = async () => {
         if (!sectionForm.name.trim()) {
-            alert('Section name is required');
+            toast.warning('Section name is required');
             return;
         }
 
         setSavingSection(true);
         try {
-            // Map interface fields to database schema
-            const sectionData = {
+            await saveSectionMutation.mutateAsync({
+                id: editingSection?.id,
                 name: sectionForm.name,
                 code: sectionForm.code || generateCode(sectionForm.name),
                 description: sectionForm.description || null,
                 section_type: sectionForm.section_type,
                 icon: sectionForm.icon || null,
-                is_active: true,
-            };
-
-            if (editingSection) {
-                const { error } = await supabase
-                    .from('sections')
-                    .update(sectionData)
-                    .eq('id', editingSection.id);
-
-                if (error) throw error;
-            } else {
-                // Get max sort_order for new sections
-                const { data: maxSortData } = await supabase
-                    .from('sections')
-                    .select('sort_order')
-                    .order('sort_order', { ascending: false })
-                    .limit(1);
-
-                const nextSortOrder = (maxSortData?.[0]?.sort_order ?? 0) + 1;
-
-                const { error } = await supabase
-                    .from('sections')
-                    .insert({ ...sectionData, sort_order: nextSortOrder });
-
-                if (error) throw error;
-            }
+            });
 
             setShowSectionModal(false);
-            fetchSections();
         } catch (error) {
             console.error('Error saving section:', error);
-            alert('Error saving section: ' + (error instanceof Error ? error.message : 'Unknown error'));
+            toast.error('Error saving section: ' + (error instanceof Error ? error.message : 'Unknown error'));
         } finally {
             setSavingSection(false);
         }
     };
 
-    const handleDeleteSection = async (section: Section) => {
-        if (!confirm(`Are you sure you want to delete section "${section.name}"?\n\nThis action is irreversible and may affect products linked to this section.`)) {
+    const handleDeleteSection = async (section: ISettingsSection) => {
+        if (!confirm(`Are you sure you want to delete section "${section.name}"?\n\nThis action is irreversible.`)) {
             return;
         }
 
         try {
-            const { error } = await supabase
-                .from('sections')
-                .delete()
-                .eq('id', section.id);
-
-            if (error) throw error;
-            fetchSections();
+            await deleteSectionMutation.mutateAsync(section.id);
         } catch (error) {
-            console.error('Error deleting section:', error);
-            alert('Error deleting section: ' + (error instanceof Error ? error.message : 'Unknown error'));
+            const msg = error instanceof Error ? error.message : 'Unknown error';
+            if (msg.startsWith('PRODUCTS_LINKED:')) {
+                const count = msg.split(':')[1];
+                toast.error(`Cannot delete "${section.name}". ${count} product(s) linked. Reassign them first.`);
+            } else if (msg.startsWith('STOCK_LINKED:')) {
+                const count = msg.split(':')[1];
+                toast.error(`Cannot delete "${section.name}". ${count} stock record(s) exist. Clear stock first.`);
+            } else {
+                console.error('Error deleting section:', error);
+                toast.error('Error deleting section: ' + msg);
+            }
         }
     };
 

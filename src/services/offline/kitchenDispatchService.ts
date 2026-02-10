@@ -9,6 +9,7 @@
  */
 
 import { db } from '@/lib/db';
+import logger from '@/utils/logger';
 import { lanHub } from '@/services/lan/lanHub';
 import { useLanStore } from '@/stores/lanStore';
 import { LAN_MESSAGE_TYPES } from '@/services/lan/lanProtocol';
@@ -165,7 +166,7 @@ export async function dispatchOrderToKitchen(
       try {
         await lanHub.broadcast(LAN_MESSAGE_TYPES.KDS_NEW_ORDER, payload);
         dispatched.push(station);
-        console.log(`[kitchenDispatch] Dispatched to ${station}:`, order.order_number);
+        logger.debug(`[kitchenDispatch] Dispatched to ${station}:`, order.order_number);
       } catch (error) {
         console.error(`[kitchenDispatch] Failed to dispatch to ${station}:`, error);
         await addToDispatchQueue(order, station, stationItems);
@@ -175,7 +176,7 @@ export async function dispatchOrderToKitchen(
       // LAN not connected, queue for later
       await addToDispatchQueue(order, station, stationItems);
       queued.push(station);
-      console.log(`[kitchenDispatch] Queued for ${station} (LAN unavailable):`, order.order_number);
+      logger.debug(`[kitchenDispatch] Queued for ${station} (LAN unavailable):`, order.order_number);
     }
   }
 
@@ -209,7 +210,7 @@ export async function markStationDispatched(
     await updateOrderDispatchStatus(orderId, 'dispatched', new Date().toISOString());
   }
 
-  console.log(`[kitchenDispatch] Station ${station} acknowledged order ${orderId}`);
+  logger.debug(`[kitchenDispatch] Station ${station} acknowledged order ${orderId}`);
 }
 
 /**
@@ -277,7 +278,7 @@ export async function processDispatchQueue(): Promise<{
       await db.offline_dispatch_queue.delete(item.id!);
       processed++;
 
-      console.log(`[kitchenDispatch] Processed queued dispatch for ${order.order_number} to ${item.station}`);
+      logger.debug(`[kitchenDispatch] Processed queued dispatch for ${order.order_number} to ${item.station}`);
     } catch (error) {
       const attempts = item.attempts + 1;
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';

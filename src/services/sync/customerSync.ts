@@ -10,6 +10,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import logger from '@/utils/logger';
 import { db, type IOfflineCustomer } from '@/lib/db';
 
 // Re-export interface for consumers
@@ -83,7 +84,7 @@ export async function syncCustomersToOffline(): Promise<number> {
   }
 
   if (!customersData || customersData.length === 0) {
-    console.log('[CustomerSync] No new customers to sync');
+    logger.debug('[CustomerSync] No new customers to sync');
     return 0;
   }
 
@@ -141,7 +142,7 @@ export async function syncCustomersToOffline(): Promise<number> {
     const toRemove = existingIds.filter(id => !newIds.has(id));
     if (toRemove.length > 0) {
       await db.offline_customers.bulkDelete(toRemove);
-      console.log(`[CustomerSync] Full sync: Removed ${toRemove.length} stale customers from cache`);
+      logger.debug(`[CustomerSync] Full sync: Removed ${toRemove.length} stale customers from cache`);
     }
   } else {
     // Incremental sync - query ALL inactive customers and remove them from cache
@@ -161,7 +162,7 @@ export async function syncCustomersToOffline(): Promise<number> {
 
       if (existingInactive.length > 0) {
         await db.offline_customers.bulkDelete(existingInactive);
-        console.log(`[CustomerSync] Removed ${existingInactive.length} inactive customers from cache`);
+        logger.debug(`[CustomerSync] Removed ${existingInactive.length} inactive customers from cache`);
       }
     }
   }
@@ -171,7 +172,7 @@ export async function syncCustomersToOffline(): Promise<number> {
   const totalCount = await db.offline_customers.count();
   await updateSyncMeta(latestTimestamp, totalCount);
 
-  console.log(`[CustomerSync] Synced ${offlineCustomers.length} customers`);
+  logger.debug(`[CustomerSync] Synced ${offlineCustomers.length} customers`);
   return offlineCustomers.length;
 }
 
@@ -299,5 +300,5 @@ export async function getCustomersSyncMeta(): Promise<{
 export async function clearOfflineCustomerData(): Promise<void> {
   await db.offline_customers.clear();
   await db.offline_sync_meta.delete(SYNC_META_ENTITY);
-  console.log('[CustomerSync] Cleared all offline customer data');
+  logger.debug('[CustomerSync] Cleared all offline customer data');
 }

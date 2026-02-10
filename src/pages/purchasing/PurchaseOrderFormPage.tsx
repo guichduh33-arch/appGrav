@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Plus, Trash2, Save, Send, Percent, WifiOff } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
 import { formatCurrency } from '@/utils/helpers'
 import { useNetworkStatus } from '@/hooks/useNetworkStatus'
 import { useSuppliers } from '@/hooks/purchasing/useSuppliers'
+import { useRawMaterials } from '@/hooks/purchasing/useRawMaterials'
 import {
     usePurchaseOrder,
     useCreatePurchaseOrder,
@@ -14,14 +14,6 @@ import {
 } from '@/hooks/purchasing/usePurchaseOrders'
 import { toast } from 'sonner'
 import './PurchaseOrderFormPage.css'
-
-interface Product {
-    id: string
-    name: string
-    cost_price: number | null
-    unit: string | null
-    product_type?: string | null
-}
 
 const DEFAULT_ITEM: IPOItem = {
     product_id: null,
@@ -49,9 +41,8 @@ export default function PurchaseOrderFormPage() {
     const createMutation = useCreatePurchaseOrder()
     const updateMutation = useUpdatePurchaseOrder()
 
-    // Local state for products (raw materials only)
-    const [products, setProducts] = useState<Product[]>([])
-    const [productsLoading, setProductsLoading] = useState(true)
+    // Raw materials from hook
+    const { data: products = [], isLoading: productsLoading } = useRawMaterials()
 
     const [formData, setFormData] = useState({
         supplier_id: '',
@@ -74,34 +65,6 @@ export default function PurchaseOrderFormPage() {
             }
         }
     }, [isOnline])
-
-    // Load products (raw materials only)
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const { data, error } = await supabase
-                    .from('products')
-                    .select('id, name, cost_price, product_type, unit')
-                    .neq('is_active', false)
-                    .order('name')
-
-                if (error) throw error
-
-                // Filter raw materials in JavaScript
-                if (data && data.length > 0) {
-                    const filtered = data.filter(p => p.product_type === 'raw_material')
-                    setProducts(filtered as Product[])
-                } else if (data) {
-                    setProducts(data as Product[])
-                }
-            } catch (error) {
-                console.error('Error fetching products:', error)
-            } finally {
-                setProductsLoading(false)
-            }
-        }
-        fetchProducts()
-    }, [])
 
     // Populate form when editing
     useEffect(() => {
@@ -359,7 +322,7 @@ export default function PurchaseOrderFormPage() {
                                                     disabled={!isOnline}
                                                     aria-label="Select product"
                                                 >
-                                                    <option value="">Produit personnalisé</option>
+                                                    <option value="">Custom product</option>
                                                     {products.map(product => (
                                                         <option key={product.id} value={product.id}>
                                                             {product.name}
@@ -369,7 +332,7 @@ export default function PurchaseOrderFormPage() {
                                                 {!item.product_id && (
                                                     <input
                                                         type="text"
-                                                        placeholder="Nom du produit"
+                                                        placeholder="Product name"
                                                         value={item.product_name}
                                                         onChange={e => handleItemChange(index, 'product_name', e.target.value)}
                                                         style={{ marginTop: '4px' }}
@@ -402,7 +365,7 @@ export default function PurchaseOrderFormPage() {
                                                 <select
                                                     value={item.unit}
                                                     onChange={e => handleItemChange(index, 'unit', e.target.value)}
-                                                    aria-label="Unité"
+                                                    aria-label="Unit"
                                                     disabled={!isOnline}
                                                 >
                                                     <option value="kg">kg</option>

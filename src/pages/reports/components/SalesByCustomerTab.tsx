@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { Users, DollarSign, ShoppingCart, Calendar, Loader2 } from 'lucide-react';
+import { Users, DollarSign, ShoppingCart, Calendar } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -40,7 +41,7 @@ export function SalesByCustomerTab() {
     const sorted = [...data].sort((a, b) => (b.total_spent || 0) - (a.total_spent || 0));
     const top8 = sorted.slice(0, 8);
     return top8.map((c) => ({
-      name: c.customer_name || 'Client inconnu',
+      name: c.customer_name || 'Unknown Customer',
       value: c.total_spent || 0,
     }));
   }, [data]);
@@ -49,28 +50,28 @@ export function SalesByCustomerTab() {
   const exportConfig: ExportConfig<ISalesByCustomerReport> = useMemo(() => ({
     data: data || [],
     columns: [
-      { key: 'customer_name', header: 'Client' },
-      { key: 'company_name', header: 'Société' },
-      { key: 'phone', header: 'Téléphone' },
+      { key: 'customer_name', header: 'Customer' },
+      { key: 'company_name', header: 'Company' },
+      { key: 'phone', header: 'Phone' },
       { key: 'customer_type', header: 'Type' },
-      { key: 'order_count', header: 'Commandes', align: 'right' as const },
-      { key: 'total_spent', header: 'CA Total', align: 'right' as const, format: (v) => formatCurrencyPdf(v) },
-      { key: 'avg_basket', header: 'Panier Moyen', align: 'right' as const, format: (v) => formatCurrencyPdf(v) },
-      { key: 'last_order_at', header: 'Dernière Commande', format: (v) => v ? new Date(v as string).toLocaleDateString('fr-FR') : '-' },
-      { key: 'days_since_last_order', header: 'Jours depuis', align: 'right' as const },
+      { key: 'order_count', header: 'Orders', align: 'right' as const },
+      { key: 'total_spent', header: 'Total Revenue', align: 'right' as const, format: (v) => formatCurrencyPdf(v) },
+      { key: 'avg_basket', header: 'Avg Basket', align: 'right' as const, format: (v) => formatCurrencyPdf(v) },
+      { key: 'last_order_at', header: 'Last Order', format: (v) => v ? new Date(v as string).toLocaleDateString('en-US') : '-' },
+      { key: 'days_since_last_order', header: 'Days Since', align: 'right' as const },
     ],
-    filename: 'ventes_par_client',
-    title: 'Ventes par Client',
+    filename: 'sales-by-customer',
+    title: 'Sales by Customer',
     dateRange,
     summaries: [
-      { label: 'Clients actifs', value: totals.totalCustomers },
-      { label: 'CA Total', value: formatCurrencyPdf(totals.totalRevenue) },
-      { label: 'Commandes', value: totals.totalOrders },
+      { label: 'Active Customers', value: totals.totalCustomers },
+      { label: 'Total Revenue', value: formatCurrencyPdf(totals.totalRevenue) },
+      { label: 'Orders', value: totals.totalOrders },
     ],
   }), [data, dateRange, totals]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   if (error) {
@@ -79,6 +80,10 @@ export function SalesByCustomerTab() {
         Error loading data
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <ReportSkeleton />;
   }
 
   return (
@@ -96,10 +101,10 @@ export function SalesByCustomerTab() {
             <div className="p-2 bg-blue-50 rounded-lg">
               <Users className="w-5 h-5 text-blue-600" />
             </div>
-            <span className="text-sm text-gray-600">Clients actifs</span>
+            <span className="text-sm text-gray-600">Active Customers</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : totals.totalCustomers}
+            {totals.totalCustomers}
           </p>
         </div>
 
@@ -108,10 +113,10 @@ export function SalesByCustomerTab() {
             <div className="p-2 bg-green-50 rounded-lg">
               <DollarSign className="w-5 h-5 text-green-600" />
             </div>
-            <span className="text-sm text-gray-600">CA Total</span>
+            <span className="text-sm text-gray-600">Total Revenue</span>
           </div>
           <p className="text-2xl font-bold text-green-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(totals.totalRevenue)}
+            {formatCurrency(totals.totalRevenue)}
           </p>
         </div>
 
@@ -120,10 +125,10 @@ export function SalesByCustomerTab() {
             <div className="p-2 bg-purple-50 rounded-lg">
               <ShoppingCart className="w-5 h-5 text-purple-600" />
             </div>
-            <span className="text-sm text-gray-600">Total commandes</span>
+            <span className="text-sm text-gray-600">Total Orders</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : totals.totalOrders}
+            {totals.totalOrders}
           </p>
         </div>
 
@@ -132,10 +137,10 @@ export function SalesByCustomerTab() {
             <div className="p-2 bg-orange-50 rounded-lg">
               <Calendar className="w-5 h-5 text-orange-600" />
             </div>
-            <span className="text-sm text-gray-600">Panier moyen</span>
+            <span className="text-sm text-gray-600">Avg Basket</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(totals.avgBasket)}
+            {formatCurrency(totals.avgBasket)}
           </p>
         </div>
       </div>
@@ -143,14 +148,10 @@ export function SalesByCustomerTab() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Pie Chart */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Top 8 Clients</h3>
-          {isLoading ? (
-            <div className="h-64 flex items-center justify-center">
-              <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-            </div>
-          ) : pieData.length === 0 ? (
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Top 8 Customers</h3>
+          {pieData.length === 0 ? (
             <div className="h-64 flex items-center justify-center text-gray-500">
-              Aucune donnée
+              No data
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={280}>
@@ -179,38 +180,32 @@ export function SalesByCustomerTab() {
         {/* Data Table */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Détail par client</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Customer Detail</h3>
           </div>
           <div className="overflow-x-auto max-h-[400px]">
             <table className="w-full">
               <thead className="bg-gray-50 sticky top-0">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Commandes</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">CA Total</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Panier moy.</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Inactif</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Orders</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Revenue</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Avg Basket</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Inactive</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center">
-                      <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                    </td>
-                  </tr>
-                ) : data?.length === 0 ? (
+                {data?.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                      Aucun client
+                      No customers
                     </td>
                   </tr>
                 ) : (
                   data?.slice(0, 20).map((row) => (
                     <tr key={row.customer_id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
-                        <div className="text-sm font-medium text-gray-900">{row.customer_name || 'Client inconnu'}</div>
+                        <div className="text-sm font-medium text-gray-900">{row.customer_name || 'Unknown Customer'}</div>
                         {row.company_name && <div className="text-xs text-gray-500">{row.company_name}</div>}
                       </td>
                       <td className="px-4 py-3">

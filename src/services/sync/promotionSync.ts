@@ -10,6 +10,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import logger from '@/utils/logger';
 import {
   db,
   type IOfflinePromotion,
@@ -208,7 +209,7 @@ export async function syncPromotionsToOffline(): Promise<number> {
   const totalCount = await db.offline_promotions.count();
   await updateSyncMeta(latestTimestamp, totalCount);
 
-  console.log(`[PromotionSync] Synced ${offlinePromotions.length} promotions`);
+  logger.debug(`[PromotionSync] Synced ${offlinePromotions.length} promotions`);
   return offlinePromotions.length;
 }
 
@@ -283,7 +284,7 @@ async function cleanupExpiredPromotions(): Promise<void> {
       .delete();
   }
 
-  console.log(`[PromotionSync] Removed ${uniqueExpiredIds.length} expired/inactive promotions from cache`);
+  logger.debug(`[PromotionSync] Removed ${uniqueExpiredIds.length} expired/inactive promotions from cache`);
 }
 
 /**
@@ -421,5 +422,5 @@ export async function clearOfflinePromotionData(): Promise<void> {
   await db.offline_promotion_products.clear();
   await db.offline_promotion_free_products.clear();
   await db.offline_sync_meta.delete(SYNC_META_ENTITY);
-  console.log('[PromotionSync] Cleared all offline promotion data');
+  logger.debug('[PromotionSync] Cleared all offline promotion data');
 }

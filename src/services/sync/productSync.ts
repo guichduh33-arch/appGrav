@@ -11,6 +11,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import logger from '@/utils/logger';
 import { db } from '@/lib/db';
 import type { IOfflineModifier as IOfficialModifier } from '@/types/offline';
 
@@ -107,7 +108,7 @@ export async function syncProductsToOffline(): Promise<number> {
   }
 
   if (!data || data.length === 0) {
-    console.log('[ProductSync] No new products to sync');
+    logger.debug('[ProductSync] No new products to sync');
     return 0;
   }
 
@@ -137,7 +138,7 @@ export async function syncProductsToOffline(): Promise<number> {
   const latestTimestamp = data[0].updated_at ?? new Date().toISOString();
   setLastSyncTimestamp(SYNC_TIMESTAMPS.PRODUCTS, latestTimestamp);
 
-  console.log(`[ProductSync] Synced ${officialProducts.length} products`);
+  logger.debug(`[ProductSync] Synced ${officialProducts.length} products`);
   return officialProducts.length;
 }
 
@@ -202,7 +203,7 @@ export async function syncCategoriesToOffline(): Promise<number> {
   }
 
   if (!data || data.length === 0) {
-    console.log('[ProductSync] No categories to sync');
+    logger.debug('[ProductSync] No categories to sync');
     return 0;
   }
 
@@ -227,7 +228,7 @@ export async function syncCategoriesToOffline(): Promise<number> {
   // Update last sync timestamp
   setLastSyncTimestamp(SYNC_TIMESTAMPS.CATEGORIES, new Date().toISOString());
 
-  console.log(`[ProductSync] Synced ${officialCategories.length} categories`);
+  logger.debug(`[ProductSync] Synced ${officialCategories.length} categories`);
   return officialCategories.length;
 }
 
@@ -269,7 +270,7 @@ export async function syncModifiersToOffline(): Promise<number> {
   }
 
   if (!data || data.length === 0) {
-    console.log('[ProductSync] No modifiers to sync');
+    logger.debug('[ProductSync] No modifiers to sync');
     return 0;
   }
 
@@ -299,7 +300,7 @@ export async function syncModifiersToOffline(): Promise<number> {
 
   setLastSyncTimestamp(SYNC_TIMESTAMPS.MODIFIERS, new Date().toISOString());
 
-  console.log(`[ProductSync] Synced ${officialModifiers.length} modifiers`);
+  logger.debug(`[ProductSync] Synced ${officialModifiers.length} modifiers`);
   return officialModifiers.length;
 }
 
@@ -371,5 +372,5 @@ export async function clearOfflineProductData(): Promise<void> {
   localStorage.removeItem(SYNC_TIMESTAMPS.CATEGORIES);
   localStorage.removeItem(SYNC_TIMESTAMPS.MODIFIERS);
 
-  console.log('[ProductSync] Cleared all offline product data');
+  logger.debug('[ProductSync] Cleared all offline product data');
 }

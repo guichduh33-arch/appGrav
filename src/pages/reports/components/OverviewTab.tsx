@@ -2,13 +2,16 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp, TrendingDown, DollarSign, ShoppingBag,
-  BarChart3, Receipt, Star, AlertTriangle, Loader2,
+  BarChart3, Receipt, Star, AlertTriangle, Landmark,
 } from 'lucide-react';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
 import { useDateRange } from '@/hooks/reports/useDateRange';
 import { formatCurrency } from '@/utils/helpers';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
+import { ComparisonToggle } from '@/components/reports/ComparisonToggle';
+import { ComparisonKpiCard, ComparisonKpiGrid } from '@/components/reports/ComparisonKpiCard';
 
 interface KpiRow { label: string; value: string; trend: string }
 
@@ -43,16 +46,21 @@ function KpiCard({
 }
 
 export function OverviewTab() {
-  const { dateRange } = useDateRange({ defaultPreset: 'last7days' });
+  const {
+    dateRange, comparisonRange, comparisonType, setComparisonType, isComparisonEnabled,
+  } = useDateRange({ defaultPreset: 'last7days', enableComparison: true });
 
-  // Calculate previous period (same duration, immediately before current)
+  // Use comparison range from hook if comparison enabled, otherwise default to previous period
   const previousPeriod = useMemo(() => {
+    if (isComparisonEnabled && comparisonRange) {
+      return comparisonRange;
+    }
     const durationMs = dateRange.to.getTime() - dateRange.from.getTime();
     return {
       from: new Date(dateRange.from.getTime() - durationMs),
       to: new Date(dateRange.from.getTime()),
     };
-  }, [dateRange]);
+  }, [dateRange, comparisonRange, isComparisonEnabled]);
 
   const {
     data: comparisonData, isLoading: comparisonLoading, error: comparisonError,
@@ -120,84 +128,143 @@ export function OverviewTab() {
     );
   }
 
-  const LoadingValue = () => <Loader2 className="w-6 h-6 animate-spin" />;
+  if (isLoading) {
+    return <ReportSkeleton variant="kpi" />;
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <DateRangePicker defaultPreset="last7days" />
-        <ExportButtons config={exportConfig} />
+        <div className="flex items-center gap-3">
+          <ComparisonToggle
+            comparisonType={comparisonType}
+            comparisonRange={comparisonRange}
+            onComparisonTypeChange={setComparisonType}
+          />
+          <ExportButtons config={exportConfig} />
+        </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <KpiCard
-          icon={<DollarSign className="w-5 h-5 text-blue-600" />}
-          iconBg="bg-blue-50" label="Revenue"
-          trend={isLoading ? undefined : revenueTrend}
-        >
-          <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <LoadingValue /> : formatCurrency(current?.total_revenue ?? 0)}
-          </p>
-        </KpiCard>
+      {/* KPI Cards - Use ComparisonKpiCard when comparison is active */}
+      {isComparisonEnabled ? (
+        <ComparisonKpiGrid columns={3}>
+          <ComparisonKpiCard
+            label="Revenue"
+            currentValue={current?.total_revenue ?? 0}
+            previousValue={previous?.total_revenue ?? null}
+            format="currency"
+            icon={<DollarSign className="w-5 h-5 text-blue-600" />}
+          />
+          <ComparisonKpiCard
+            label="Orders"
+            currentValue={current?.transaction_count ?? 0}
+            previousValue={previous?.transaction_count ?? null}
+            format="number"
+            icon={<ShoppingBag className="w-5 h-5 text-indigo-600" />}
+          />
+          <ComparisonKpiCard
+            label="Avg Transaction Value"
+            currentValue={current?.avg_basket ?? 0}
+            previousValue={previous?.avg_basket ?? null}
+            format="currency"
+            icon={<BarChart3 className="w-5 h-5 text-purple-600" />}
+          />
+          <ComparisonKpiCard
+            label="Net Revenue (excl. Tax)"
+            currentValue={current?.net_revenue ?? 0}
+            previousValue={previous?.net_revenue ?? null}
+            format="currency"
+            icon={<Receipt className="w-5 h-5 text-green-600" />}
+          />
+          <ComparisonKpiCard
+            label="Total Tax (10%)"
+            currentValue={totalTax}
+            previousValue={previousTax}
+            format="currency"
+            icon={<Landmark className="w-5 h-5 text-amber-600" />}
+          />
+        </ComparisonKpiGrid>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <KpiCard
+            icon={<DollarSign className="w-5 h-5 text-blue-600" />}
+            iconBg="bg-blue-50" label="Revenue"
+            trend={revenueTrend}
+          >
+            <p className="text-2xl font-bold text-gray-900">
+              {formatCurrency(current?.total_revenue ?? 0)}
+            </p>
+          </KpiCard>
 
-        <KpiCard
-          icon={<ShoppingBag className="w-5 h-5 text-indigo-600" />}
-          iconBg="bg-indigo-50" label="Orders"
-          trend={isLoading ? undefined : ordersTrend}
-        >
-          <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <LoadingValue /> : (current?.transaction_count ?? 0).toLocaleString()}
-          </p>
-        </KpiCard>
+          <KpiCard
+            icon={<ShoppingBag className="w-5 h-5 text-indigo-600" />}
+            iconBg="bg-indigo-50" label="Orders"
+            trend={ordersTrend}
+          >
+            <p className="text-2xl font-bold text-gray-900">
+              {(current?.transaction_count ?? 0).toLocaleString()}
+            </p>
+          </KpiCard>
 
-        <KpiCard
-          icon={<BarChart3 className="w-5 h-5 text-purple-600" />}
-          iconBg="bg-purple-50" label="Avg Transaction Value"
-          trend={isLoading ? undefined : atvTrend}
-        >
-          <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <LoadingValue /> : formatCurrency(current?.avg_basket ?? 0)}
-          </p>
-        </KpiCard>
+          <KpiCard
+            icon={<BarChart3 className="w-5 h-5 text-purple-600" />}
+            iconBg="bg-purple-50" label="Avg Transaction Value"
+            trend={atvTrend}
+          >
+            <p className="text-2xl font-bold text-gray-900">
+              {formatCurrency(current?.avg_basket ?? 0)}
+            </p>
+          </KpiCard>
 
-        <KpiCard
-          icon={<Receipt className="w-5 h-5 text-green-600" />}
-          iconBg="bg-green-50" label="Net Revenue (excl. Tax)"
-          trend={isLoading ? undefined : netRevenueTrend}
-        >
-          <p className="text-2xl font-bold text-green-600">
-            {isLoading ? <LoadingValue /> : formatCurrency(current?.net_revenue ?? 0)}
-          </p>
-        </KpiCard>
+          <KpiCard
+            icon={<Receipt className="w-5 h-5 text-green-600" />}
+            iconBg="bg-green-50" label="Net Revenue (excl. Tax)"
+            trend={netRevenueTrend}
+          >
+            <p className="text-2xl font-bold text-green-600">
+              {formatCurrency(current?.net_revenue ?? 0)}
+            </p>
+          </KpiCard>
 
-        <KpiCard
-          icon={<Star className="w-5 h-5 text-yellow-600" />}
-          iconBg="bg-yellow-50" label="Top Product"
-        >
-          {isLoading ? <LoadingValue /> : summaryData?.top_product ? (
-            <>
-              <p className="text-lg font-bold text-gray-900 truncate">{summaryData.top_product.name}</p>
-              <p className="text-sm text-gray-500">{summaryData.top_product.qty} units sold</p>
-            </>
-          ) : (
-            <p className="text-lg text-gray-400">No data</p>
-          )}
-        </KpiCard>
+          <KpiCard
+            icon={<Landmark className="w-5 h-5 text-amber-600" />}
+            iconBg="bg-amber-50" label="Total Tax (10%)"
+            trend={taxTrend}
+          >
+            <p className="text-2xl font-bold text-amber-600">
+              {formatCurrency(totalTax)}
+            </p>
+          </KpiCard>
 
-        <KpiCard
-          icon={<AlertTriangle className="w-5 h-5 text-red-600" />}
-          iconBg="bg-red-50" label="Low Stock Alerts"
-        >
-          <p className={`text-2xl font-bold ${(summaryData?.low_stock_alerts ?? 0) > 0 ? 'text-red-600' : 'text-gray-900'}`}>
-            {isLoading ? <LoadingValue /> : summaryData?.low_stock_alerts ?? 0}
-          </p>
-          {!isLoading && (summaryData?.low_stock_alerts ?? 0) > 0 && (
-            <p className="text-sm text-red-500 mt-1">Items need restocking</p>
-          )}
-        </KpiCard>
-      </div>
+          <KpiCard
+            icon={<Star className="w-5 h-5 text-yellow-600" />}
+            iconBg="bg-yellow-50" label="Top Product"
+          >
+            {summaryData?.top_product ? (
+              <>
+                <p className="text-lg font-bold text-gray-900 truncate">{summaryData.top_product.name}</p>
+                <p className="text-sm text-gray-500">{summaryData.top_product.qty} units sold</p>
+              </>
+            ) : (
+              <p className="text-lg text-gray-400">No data</p>
+            )}
+          </KpiCard>
+
+          <KpiCard
+            icon={<AlertTriangle className="w-5 h-5 text-red-600" />}
+            iconBg="bg-red-50" label="Low Stock Alerts"
+          >
+            <p className={`text-2xl font-bold ${(summaryData?.low_stock_alerts ?? 0) > 0 ? 'text-red-600' : 'text-gray-900'}`}>
+              {summaryData?.low_stock_alerts ?? 0}
+            </p>
+            {(summaryData?.low_stock_alerts ?? 0) > 0 && (
+              <p className="text-sm text-red-500 mt-1">Items need restocking</p>
+            )}
+          </KpiCard>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,0 +1,10 @@
+# pack-refs with: peeled fully-peeled sorted 
+f3740c955e54b4601a5afc13b633d4825d2eef9e refs/heads/claude/add-claude-documentation-iRI13
+2b65c8c5c60cd0313396c0f62f245e80d78b48c0 refs/heads/claude/cleanup-reorganize-files-vmEns
+3c658bdb8316ce1275889b6a2139121af2c7797d refs/heads/claude/fix-todo-comment-Zjljt
+cdd2fa67945edf7e566116494a9a1407ba241aa9 refs/heads/claude/update-claude-md-TxJ08
+40cda586dcb55492068aebba80dfafa007430a20 refs/heads/claude/verify-supabase-sync-3CoMJ
+ae1b611971efdd765413b8afad577119e0fe6c3b refs/heads/master
+f3740c955e54b4601a5afc13b633d4825d2eef9e refs/pull/1/head
+cdd2fa67945edf7e566116494a9a1407ba241aa9 refs/pull/2/head
+23c2362c6dc16d78b3e581897d95514ed0c67cfb refs/pull/2/merge

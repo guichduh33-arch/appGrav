@@ -8,6 +8,7 @@
  */
 
 import { db } from '@/lib/db';
+import logger from '@/utils/logger';
 import type { IOfflinePeriod } from '@/types/offline';
 
 // Re-export interface for consumers
@@ -30,7 +31,7 @@ export async function startOfflinePeriod(): Promise<string> {
   };
 
   await db.offline_periods.add(period);
-  console.log(`[OfflinePeriod] Started tracking period: ${period.id}`);
+  logger.debug(`[OfflinePeriod] Started tracking period: ${period.id}`);
   return period.id;
 }
 
@@ -62,7 +63,7 @@ export async function endOfflinePeriod(periodId: string): Promise<IOfflinePeriod
   });
 
   const updatedPeriod = await db.offline_periods.get(periodId);
-  console.log(`[OfflinePeriod] Ended period ${periodId}, duration: ${Math.round(durationMs / 1000)}s`);
+  logger.debug(`[OfflinePeriod] Ended period ${periodId}, duration: ${Math.round(durationMs / 1000)}s`);
   return updatedPeriod || null;
 }
 
@@ -91,7 +92,7 @@ export async function updatePeriodSyncStats(
     transactions_failed: failedCount,
     sync_report_generated: true,
   });
-  console.log(`[OfflinePeriod] Updated sync stats for ${periodId}: ${syncedCount} synced, ${failedCount} failed`);
+  logger.debug(`[OfflinePeriod] Updated sync stats for ${periodId}: ${syncedCount} synced, ${failedCount} failed`);
 }
 
 /**
@@ -144,7 +145,7 @@ export async function cleanupOldPeriods(keepCount = 100): Promise<number> {
   const ids = periodsToDelete.map((p) => p.id);
   await db.offline_periods.bulkDelete(ids);
 
-  console.log(`[OfflinePeriod] Cleaned up ${ids.length} old periods`);
+  logger.debug(`[OfflinePeriod] Cleaned up ${ids.length} old periods`);
   return ids.length;
 }
 

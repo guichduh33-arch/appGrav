@@ -1,42 +1,21 @@
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, CheckCircle, Clock, XCircle, ArrowRight, X } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
 import { useSections } from '@/hooks/inventory/useSections'
-import type { InventoryCount, ISection } from '../../types/database'
+import { useInventoryCounts, useCreateInventoryCount } from '@/hooks/inventory/useStockOpname'
+import { toast } from 'sonner'
 import './StockOpname.css'
-
-interface InventoryCountWithSection extends InventoryCount {
-    section?: ISection | null
-}
 
 export default function StockOpnameList() {
     const navigate = useNavigate()
-    const [counts, setCounts] = useState<InventoryCountWithSection[]>([])
-    const [loading, setLoading] = useState(true)
     const [showSectionDialog, setShowSectionDialog] = useState(false)
     const [selectedSection, setSelectedSection] = useState<string | null>(null)
-    const [creating, setCreating] = useState(false)
 
+    const { data: counts = [], isLoading: loading } = useInventoryCounts()
     const { data: sections = [], isLoading: sectionsLoading } = useSections({ isActive: true })
-
-    useEffect(() => {
-        fetchCounts()
-    }, [])
-
-    async function fetchCounts() {
-        setLoading(true)
-        const { data, error } = await supabase
-            .from('inventory_counts')
-            .select('*, section:sections(*)')
-            .order('created_at', { ascending: false })
-
-        if (!error && data) {
-            setCounts(data as InventoryCountWithSection[])
-        }
-        setLoading(false)
-    }
+    const createCountMutation = useCreateInventoryCount()
+    const creating = createCountMutation.isPending
 
     function openSectionDialog() {
         setSelectedSection(null)
@@ -45,35 +24,18 @@ export default function StockOpnameList() {
 
     async function createNewSession() {
         if (!selectedSection) {
-            alert('Please select a section')
+            toast.error('Please select a section')
             return
         }
 
-        setCreating(true)
         try {
-            // Create a new draft session with unique count number
-            const countNumber = `INV-${Date.now()}`
-            const sessionData = {
-                count_number: countNumber,
-                notes: 'New inventory',
-                status: 'draft' as const,
-                section_id: selectedSection
-            }
-            const { data, error } = await supabase
-                .from('inventory_counts')
-                .insert(sessionData)
-                .select()
-                .single()
-
-            if (error) throw error
+            const data = await createCountMutation.mutateAsync(selectedSection)
             if (data) {
                 setShowSectionDialog(false)
                 navigate(`/inventory/stock-opname/${data.id}`)
             }
         } catch (error: unknown) {
-            alert('Error: ' + (error instanceof Error ? error.message : String(error)))
-        } finally {
-            setCreating(false)
+            toast.error('Error: ' + (error instanceof Error ? error.message : String(error)))
         }
     }
 

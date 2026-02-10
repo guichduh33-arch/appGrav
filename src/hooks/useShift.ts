@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/authStore'
 import { toast } from 'sonner'
+import logger from '@/utils/logger'
 
 export interface PosSession {
     id: string
@@ -172,7 +173,7 @@ export function useShift() {
                 if (!error && data) {
                     const userShift = Array.isArray(data) ? data[0] : data
                     if (userShift) {
-                        console.log('Auto-recovered shift for logged-in user:', userShift.id)
+                        logger.debug('Auto-recovered shift for logged-in user:', userShift.id)
                         setActiveShiftUserId(user.id)
                     }
                 }
@@ -247,7 +248,7 @@ export function useShift() {
 
             if (!checkError && existingShift) {
                 // User already has an open shift - recover it
-                console.log('Found existing shift for user, recovering:', existingShift.id)
+                logger.debug('Found existing shift for user, recovering:', existingShift.id)
                 setActiveShiftUserId(userId)
                 return { recovered: true, userName, session: existingShift }
             }
@@ -270,7 +271,7 @@ export function useShift() {
                 const retryShift = Array.isArray(retryData) ? retryData[0] : retryData
 
                 if (retryShift) {
-                    console.log('Found existing shift on retry:', retryShift.id)
+                    logger.debug('Found existing shift on retry:', retryShift.id)
                     setActiveShiftUserId(userId)
                     return { recovered: true, userName, session: retryShift }
                 }
@@ -380,13 +381,13 @@ export function useShift() {
 
     // Manual recovery: find and activate any open shift for a user using RPC (bypasses RLS)
     const recoverShift = useCallback(async (userId: string) => {
-        console.log('Attempting to recover shift for user:', userId)
+        logger.debug('Attempting to recover shift for user:', userId)
 
         const { data, error } = await supabase.rpc('get_user_open_shift', {
             p_user_id: userId
         })
 
-        console.log('Recovery RPC result:', { data, error })
+        logger.debug('Recovery RPC result:', { data, error })
 
         if (error) {
             console.error('Error recovering shift:', error)

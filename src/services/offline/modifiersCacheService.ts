@@ -17,6 +17,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import logger from '@/utils/logger';
 import { db } from '@/lib/db';
 import type { IOfflineModifier, ISyncMeta } from '@/types/offline';
 import type { ModifierGroup } from '@/hooks/products/useProductModifiers';
@@ -90,7 +91,7 @@ export async function cacheAllModifiers(): Promise<void> {
     recordCount: modifiers.length,
   });
 
-  console.log(`[ModifiersCache] Cached ${modifiers.length} modifiers`);
+  logger.debug(`[ModifiersCache] Cached ${modifiers.length} modifiers`);
 }
 
 /**
@@ -388,7 +389,7 @@ export async function clearModifiersCache(): Promise<void> {
   try {
     await db.offline_modifiers.clear();
     await db.offline_sync_meta.delete('modifiers');
-    console.log('[ModifiersCache] Cache cleared');
+    logger.debug('[ModifiersCache] Cache cleared');
   } catch (error) {
     console.error('[ModifiersCache] Error clearing cache:', error);
   }

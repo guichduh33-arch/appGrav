@@ -17,6 +17,7 @@ import {
   type IKdsItemReadyPayload,
 } from '@/services/lan/lanProtocol';
 import type { TKitchenStation } from '@/types/offline';
+import logger from '@/utils/logger';
 
 /**
  * Options for useKdsStatusListener hook
@@ -68,7 +69,7 @@ export function useKdsStatusListener(
   const handlePreparing = useCallback(
     (message: ILanMessage<IKdsItemPreparingPayload>) => {
       const { order_id, item_ids, station } = message.payload;
-      console.log(`[POS] Items preparing for order ${order_id} from ${station}`);
+      logger.debug(`[POS] Items preparing for order ${order_id} from ${station}`);
       onItemPreparing?.(order_id, item_ids, station);
     },
     [onItemPreparing]
@@ -77,7 +78,7 @@ export function useKdsStatusListener(
   const handleReady = useCallback(
     (message: ILanMessage<IKdsItemReadyPayload>) => {
       const { order_id, item_ids, station, prepared_at } = message.payload;
-      console.log(`[POS] Items ready for order ${order_id} from ${station}`);
+      logger.debug(`[POS] Items ready for order ${order_id} from ${station}`);
       onItemReady?.(order_id, item_ids, station, prepared_at);
     },
     [onItemReady]

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { DollarSign, TrendingUp, TrendingDown, Calendar, Loader2, User, Package } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, Calendar, User, Package } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { supabase } from '@/lib/supabase';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -86,13 +87,13 @@ async function getPriceChanges(from: Date, to: Date): Promise<PriceChange[]> {
     return {
       id: d.id,
       product_id: d.entity_id,
-      product_name: product?.name || 'Produit inconnu',
+      product_name: product?.name || 'Unknown Product',
       sku: product?.sku || null,
       old_retail_price: (oldVal.retail_price as number) || 0,
       new_retail_price: (newVal.retail_price as number) || 0,
       old_cost_price: (oldVal.cost_price as number) || 0,
       new_cost_price: (newVal.cost_price as number) || 0,
-      changed_by: userMap.get(d.user_id || '') || 'Inconnu',
+      changed_by: userMap.get(d.user_id || '') || 'Unknown',
       changed_at: d.created_at,
       reason: null,
     };
@@ -133,26 +134,26 @@ export function PriceChangesTab() {
   const exportConfig: ExportConfig<PriceChange> = useMemo(() => ({
     data: data || [],
     columns: [
-      { key: 'product_name', header: 'Produit' },
+      { key: 'product_name', header: 'Product' },
       { key: 'sku', header: 'SKU', format: (v) => (v as string) || '-' },
-      { key: 'old_retail_price', header: 'Ancien prix', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
-      { key: 'new_retail_price', header: 'Nouveau prix', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
-      { key: 'changed_by', header: 'Modifié par' },
-      { key: 'changed_at', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('fr-FR') },
-      { key: 'reason', header: 'Raison', format: (v) => (v as string) || '-' },
+      { key: 'old_retail_price', header: 'Old Price', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'new_retail_price', header: 'New Price', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'changed_by', header: 'Modified By' },
+      { key: 'changed_at', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('en-US') },
+      { key: 'reason', header: 'Reason', format: (v) => (v as string) || '-' },
     ],
-    filename: 'changements_prix',
-    title: 'Historique des Changements de Prix',
+    filename: 'price-changes',
+    title: 'Price Change History',
     dateRange,
     summaries: [
-      { label: 'Total changements', value: summary.totalChanges.toString() },
-      { label: 'Augmentations', value: summary.priceIncreases.toString() },
-      { label: 'Diminutions', value: summary.priceDecreases.toString() },
+      { label: 'Total Changes', value: summary.totalChanges.toString() },
+      { label: 'Increases', value: summary.priceIncreases.toString() },
+      { label: 'Decreases', value: summary.priceDecreases.toString() },
     ],
   }), [data, dateRange, summary]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   const getPriceChangeBadge = (oldPrice: number, newPrice: number) => {
@@ -190,6 +191,10 @@ export function PriceChangesTab() {
     );
   }
 
+  if (isLoading) {
+    return <ReportSkeleton />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -205,10 +210,10 @@ export function PriceChangesTab() {
             <div className="p-2 bg-blue-50 rounded-lg">
               <DollarSign className="w-5 h-5 text-blue-600" />
             </div>
-            <span className="text-sm text-gray-600">Total changements</span>
+            <span className="text-sm text-gray-600">Total Changes</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : summary.totalChanges}
+            {summary.totalChanges}
           </p>
         </div>
 
@@ -217,10 +222,10 @@ export function PriceChangesTab() {
             <div className="p-2 bg-green-50 rounded-lg">
               <TrendingUp className="w-5 h-5 text-green-600" />
             </div>
-            <span className="text-sm text-gray-600">Augmentations</span>
+            <span className="text-sm text-gray-600">Increases</span>
           </div>
           <p className="text-2xl font-bold text-green-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : summary.priceIncreases}
+            {summary.priceIncreases}
           </p>
         </div>
 
@@ -229,10 +234,10 @@ export function PriceChangesTab() {
             <div className="p-2 bg-red-50 rounded-lg">
               <TrendingDown className="w-5 h-5 text-red-600" />
             </div>
-            <span className="text-sm text-gray-600">Diminutions</span>
+            <span className="text-sm text-gray-600">Decreases</span>
           </div>
           <p className="text-2xl font-bold text-red-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : summary.priceDecreases}
+            {summary.priceDecreases}
           </p>
         </div>
       </div>
@@ -240,28 +245,22 @@ export function PriceChangesTab() {
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Historique des changements</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Change History</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produit</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ancien prix</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Nouveau prix</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Variation</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Modifié par</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Old Price</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">New Price</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Change</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Modified By</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  </td>
-                </tr>
-              ) : data && data.length > 0 ? (
+              {data && data.length > 0 ? (
                 data.map((row) => (
                   <tr key={row.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
@@ -293,7 +292,7 @@ export function PriceChangesTab() {
                     <td className="px-6 py-4 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-3 h-3" />
-                        {new Date(row.changed_at).toLocaleDateString('fr-FR', {
+                        {new Date(row.changed_at).toLocaleDateString('en-US', {
                           day: '2-digit',
                           month: '2-digit',
                           year: 'numeric',
@@ -307,7 +306,7 @@ export function PriceChangesTab() {
               ) : (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    Aucun changement de prix sur cette période
+                    No price changes in this period
                   </td>
                 </tr>
               )}

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { DollarSign, AlertTriangle, CheckCircle, Clock, Loader2, User } from 'lucide-react';
+import { DollarSign, AlertTriangle, CheckCircle, Clock, User } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -38,27 +39,27 @@ export function SessionCashBalanceTab() {
     data: data || [],
     columns: [
       { key: 'terminal_id', header: 'Terminal', format: (v) => (v as string) || 'Principal' },
-      { key: 'cashier_name', header: 'Caissier' },
-      { key: 'started_at', header: 'Ouverture', format: (v) => new Date(v as string).toLocaleString('fr-FR') },
-      { key: 'ended_at', header: 'Fermeture', format: (v) => v ? new Date(v as string).toLocaleString('fr-FR') : 'En cours' },
-      { key: 'opening_cash', header: 'Fond de caisse', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
-      { key: 'cash_received', header: 'Espèces reçues', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
-      { key: 'expected_cash', header: 'Attendu', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
-      { key: 'closing_cash', header: 'Compté', align: 'right' as const, format: (v) => v ? formatCurrencyPdf(v as number) : '-' },
-      { key: 'cash_difference', header: 'Écart', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'cashier_name', header: 'Cashier' },
+      { key: 'started_at', header: 'Opened', format: (v) => new Date(v as string).toLocaleString('en-US') },
+      { key: 'ended_at', header: 'Closed', format: (v) => v ? new Date(v as string).toLocaleString('en-US') : 'In Progress' },
+      { key: 'opening_cash', header: 'Opening Cash', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'cash_received', header: 'Cash Received', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'expected_cash', header: 'Expected', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'closing_cash', header: 'Counted', align: 'right' as const, format: (v) => v ? formatCurrencyPdf(v as number) : '-' },
+      { key: 'cash_difference', header: 'Variance', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
     ],
-    filename: 'balance_caisse',
-    title: 'Balance de Caisse',
+    filename: 'cash-balance',
+    title: 'Cash Balance',
     dateRange,
     summaries: [
       { label: 'Sessions', value: summary.totalSessions.toString() },
-      { label: 'CA Total', value: formatCurrencyPdf(summary.totalRevenue) },
-      { label: 'Sessions avec écart', value: summary.sessionsWithDiff.toString() },
+      { label: 'Total Revenue', value: formatCurrencyPdf(summary.totalRevenue) },
+      { label: 'Sessions with Variance', value: summary.sessionsWithDiff.toString() },
     ],
   }), [data, dateRange, summary]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   const getDifferenceBadge = (diff: number) => {
@@ -92,13 +93,13 @@ export function SessionCashBalanceTab() {
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">
           <Clock className="w-3 h-3" />
-          En cours
+          In Progress
         </span>
       );
     }
     return (
       <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">
-        Fermée
+        Closed
       </span>
     );
   };
@@ -109,6 +110,10 @@ export function SessionCashBalanceTab() {
         Error loading data
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <ReportSkeleton />;
   }
 
   return (
@@ -129,7 +134,7 @@ export function SessionCashBalanceTab() {
             <span className="text-sm text-gray-600">Sessions</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : summary.totalSessions}
+            {summary.totalSessions}
           </p>
         </div>
 
@@ -138,10 +143,10 @@ export function SessionCashBalanceTab() {
             <div className="p-2 bg-green-50 rounded-lg">
               <DollarSign className="w-5 h-5 text-green-600" />
             </div>
-            <span className="text-sm text-gray-600">CA Total</span>
+            <span className="text-sm text-gray-600">Total Revenue</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(summary.totalRevenue)}
+            {formatCurrency(summary.totalRevenue)}
           </p>
         </div>
 
@@ -150,10 +155,10 @@ export function SessionCashBalanceTab() {
             <div className="p-2 bg-orange-50 rounded-lg">
               <AlertTriangle className="w-5 h-5 text-orange-600" />
             </div>
-            <span className="text-sm text-gray-600">Écarts cumulés</span>
+            <span className="text-sm text-gray-600">Total Variance</span>
           </div>
           <p className="text-2xl font-bold text-orange-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(summary.totalDifference)}
+            {formatCurrency(summary.totalDifference)}
           </p>
         </div>
 
@@ -162,10 +167,10 @@ export function SessionCashBalanceTab() {
             <div className="p-2 bg-red-50 rounded-lg">
               <AlertTriangle className="w-5 h-5 text-red-600" />
             </div>
-            <span className="text-sm text-gray-600">Sessions avec écart</span>
+            <span className="text-sm text-gray-600">Sessions with Variance</span>
           </div>
           <p className="text-2xl font-bold text-red-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : summary.sessionsWithDiff}
+            {summary.sessionsWithDiff}
           </p>
         </div>
       </div>
@@ -173,32 +178,26 @@ export function SessionCashBalanceTab() {
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Sessions de caisse</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Cash Sessions</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Caissier</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ouverture</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fermeture</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Commandes</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">CA</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Espèces</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Attendu</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Compté</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Écart</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Statut</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cashier</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Opened</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Closed</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Orders</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Revenue</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Cash</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Expected</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Counted</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Variance</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={10} className="px-6 py-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  </td>
-                </tr>
-              ) : data && data.length > 0 ? (
+              {data && data.length > 0 ? (
                 data.map((row) => (
                   <tr key={row.session_id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
@@ -208,7 +207,7 @@ export function SessionCashBalanceTab() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      {new Date(row.started_at).toLocaleString('fr-FR', {
+                      {new Date(row.started_at).toLocaleString('en-US', {
                         day: '2-digit',
                         month: '2-digit',
                         hour: '2-digit',
@@ -217,13 +216,13 @@ export function SessionCashBalanceTab() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {row.ended_at
-                        ? new Date(row.ended_at).toLocaleString('fr-FR', {
+                        ? new Date(row.ended_at).toLocaleString('en-US', {
                             day: '2-digit',
                             month: '2-digit',
                             hour: '2-digit',
                             minute: '2-digit',
                           })
-                        : <span className="text-blue-600 italic">En cours</span>
+                        : <span className="text-blue-600 italic">In Progress</span>
                       }
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900 text-right">{row.order_count}</td>
@@ -250,7 +249,7 @@ export function SessionCashBalanceTab() {
               ) : (
                 <tr>
                   <td colSpan={10} className="px-6 py-8 text-center text-gray-500">
-                    Aucune session sur cette période
+                    No sessions in this period
                   </td>
                 </tr>
               )}

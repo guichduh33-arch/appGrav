@@ -12,12 +12,15 @@ import {
   Line,
 } from 'recharts';
 import { Package, Loader2, ArrowLeft, TrendingUp, DollarSign, ShoppingCart } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
 import { ReportBreadcrumb } from '@/components/reports/ReportBreadcrumb';
+import { ReportFilters } from '@/components/reports/ReportFilters';
 import { useDateRange } from '@/hooks/reports/useDateRange';
 import { useDrillDown } from '@/hooks/reports/useDrillDown';
+import { useReportFilters } from '@/hooks/reports/useReportFilters';
 import { formatCurrency } from '@/utils/helpers';
 import { supabase } from '@/lib/supabase';
 import type { ProductPerformanceStat } from '@/types/reporting';
@@ -73,6 +76,11 @@ async function getProductSalesHistory(productId: string, from: Date, to: Date): 
 
 export const ProductPerformanceTab = () => {
   const { dateRange } = useDateRange({ defaultPreset: 'last30days' });
+  const filtersState = useReportFilters({
+    enabledFilters: ['category', 'order_type'],
+    syncWithUrl: true,
+  });
+  const { filters } = filtersState;
   const { isDrilledIn, currentParams, drillInto, drillReset, breadcrumbLevels } = useDrillDown({
     baseLevelName: 'Product Performance',
     syncWithUrl: true,
@@ -80,8 +88,11 @@ export const ProductPerformanceTab = () => {
 
   // Main data query
   const { data: products = [], isLoading, error } = useQuery({
-    queryKey: ['productPerformance', dateRange.from, dateRange.to],
-    queryFn: () => ReportingService.getProductPerformance(dateRange.from, dateRange.to),
+    queryKey: ['productPerformance', dateRange.from, dateRange.to, filters.category, filters.order_type],
+    queryFn: () => ReportingService.getProductPerformance(
+      dateRange.from, dateRange.to,
+      { categoryId: filters.category, orderType: filters.order_type }
+    ),
     staleTime: 5 * 60 * 1000,
     enabled: !isDrilledIn,
   });
@@ -158,6 +169,10 @@ export const ProductPerformanceTab = () => {
         Error loading product performance data. Please try again.
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <ReportSkeleton />;
   }
 
   // Drill-down view: Product sales history
@@ -310,14 +325,16 @@ export const ProductPerformanceTab = () => {
         <ExportButtons config={exportConfig} />
       </div>
 
+      {/* Filters */}
+      <ReportFilters
+        filtersState={filtersState}
+        enabledFilters={['category', 'order_type']}
+      />
+
       {/* Chart - Top 10 */}
       <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Top 10 Products by Revenue</h3>
-        {isLoading ? (
-          <div className="h-80 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-          </div>
-        ) : top10.length === 0 ? (
+        {top10.length === 0 ? (
           <div className="h-80 flex items-center justify-center text-gray-500">
             No data available for this period.
           </div>
@@ -368,13 +385,7 @@ export const ProductPerformanceTab = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {isLoading ? (
-              <tr>
-                <td colSpan={6} className="px-6 py-8 text-center">
-                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                </td>
-              </tr>
-            ) : products.length === 0 ? (
+            {products.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
                   No data available.

@@ -11,6 +11,7 @@ import { lanHub } from '@/services/lan/lanHub';
 import { lanClient } from '@/services/lan/lanClient';
 import { useLanStore } from '@/stores/lanStore';
 import { LAN_MESSAGE_TYPES } from '@/services/lan/lanProtocol';
+import logger from '@/utils/logger';
 
 /**
  * Cart update payload for display
@@ -162,7 +163,7 @@ let debounceTimer: ReturnType<typeof setTimeout> | null = null;
  */
 export function startCartBroadcast(): void {
   if (unsubscribeFromCart) {
-    console.log('[DisplayBroadcast] Already broadcasting');
+    logger.debug('[DisplayBroadcast] Already broadcasting');
     return;
   }
 
@@ -191,7 +192,7 @@ export function startCartBroadcast(): void {
     }
   );
 
-  console.log('[DisplayBroadcast] Started cart broadcasting');
+  logger.debug('[DisplayBroadcast] Started cart broadcasting');
 }
 
 /**
@@ -208,7 +209,7 @@ export function stopCartBroadcast(): void {
     debounceTimer = null;
   }
 
-  console.log('[DisplayBroadcast] Stopped cart broadcasting');
+  logger.debug('[DisplayBroadcast] Stopped cart broadcasting');
 }
 
 /**

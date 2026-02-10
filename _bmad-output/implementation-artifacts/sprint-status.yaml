@@ -170,17 +170,17 @@ development_status:
   # 8.0 DONE (migration already deployed). 8.1 REWRITTEN (cleanup+skeleton only).
   # 6 original "legacy" tabs were already Pattern B — stories 8.1/8.2/8.4/8.6 reduced in scope.
   # New dependency chain: {8.1, 8.2, 8.3, 8.4} → {8.5, 8.6, 8.7} → 8.8 → 8.9
-  epic-8: in-progress
+  epic-8: done  # 2026-02-10 - All 10 stories completed (8.0-8.9)
   8-0-reports-db-foundation: done  # 2026-02-07 - Migration 20260206120000 already deployed (8 views + 2 RPCs + system_alerts)
-  8-1-report-framework-base: ready-for-dev  # 2026-02-07 - REVISED: Cleanup mockup + placeholders + skeleton screens (tabs already Pattern B)
-  8-2-sales-reports-suite: ready-for-dev  # 2026-02-07 - REVISED: Tax KPI + top 10 + heatmap + filters (no Pattern migration needed)
-  8-3-inventory-reports-suite: ready-for-dev  # 2026-02-06 - Enrich StockMovementTab + InventoryTab (true Legacy tabs)
-  8-4-financial-reports-suite: ready-for-dev  # 2026-02-07 - REVISED: DiscountsVoids tab + normalize 2 purchase Legacy tabs (ProfitLossTab already Pattern B)
-  8-5-report-drill-down: ready-for-dev  # 2026-02-06 - Breadcrumb + useDrillDown + 3 tabs
-  8-6-report-export-csv-pdf: ready-for-dev  # 2026-02-07 - REVISED: Polish pass only (progress indicator + naming + perf)
-  8-7-period-comparison: ready-for-dev  # 2026-02-06 - DateRangePicker compare mode + dual-series charts
-  8-8-reports-offline-cache-7-days: ready-for-dev  # 2026-02-06 - Dexie cache + sync + useOfflineReports
-  8-9-audit-trail-alerts: ready-for-dev  # 2026-02-06 - AuditTab refonte + AlertsDashboard + triggers
+  8-1-report-framework-base: done  # 2026-02-10 - All AC met: SalesReportsPage removed, ReportPlaceholder + ReportSkeleton created, ExpensesTab hidden
+  8-2-sales-reports-suite: done  # 2026-02-10 - Tax KPI card added, top 10 + margin done, heatmap done, order_type filter added, French strings migrated to English
+  8-3-inventory-reports-suite: done  # 2026-02-10 - All AC met: StockMovementTab + InventoryTab fully enriched with DatePicker, exports, KPIs, search, sort
+  8-4-financial-reports-suite: done  # 2026-02-10 - All 5 tabs migrated to English (ProfitLoss, DiscountsVoids, PurchaseBySupplier, PurchaseDetails, OutstandingPayment)
+  8-5-report-drill-down: done  # 2026-02-10 - ReportBreadcrumb + useDrillDown already integrated in ProductPerformance, SalesByCategory, StockMovement tabs
+  8-6-report-export-csv-pdf: done  # 2026-02-10 - All 26 tabs have ExportButtons, filenames standardized to kebab-case
+  8-7-period-comparison: done  # 2026-02-10 - ComparisonToggle integrated in OverviewTab, DailySalesTab, SalesByHourTab, ProfitLossTab + French→English migration
+  8-8-reports-offline-cache-7-days: done  # 2026-02-10 - Dexie table registered, offlineReportCache service, useOfflineReports hook, OfflineReportBanner integrated in ReportsPage
+  8-9-audit-trail-alerts: done  # 2026-02-10 - AuditTab (pagination, filters, expandable rows, export) + AlertsDashboardTab (KPI counts, resolve, anomaly detection) + anomalyAlerts service
   epic-8-retrospective: optional
 
   # Epic 9: Comptabilité & Fiscalité — Journal, Grand Livre, États Financiers, TVA

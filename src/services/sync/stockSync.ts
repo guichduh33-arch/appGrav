@@ -10,6 +10,7 @@
 
 import { supabase } from '@/lib/supabase';
 import { db } from '@/lib/db';
+import logger from '@/utils/logger';
 import type { IOfflineStockLevel } from '@/types/offline';
 
 // Re-export interface for consumers
@@ -87,7 +88,7 @@ export async function syncStockLevelsToOffline(): Promise<number> {
   }
 
   if (!data || data.length === 0) {
-    console.log('[StockSync] No stock levels to sync');
+    logger.debug('[StockSync] No stock levels to sync');
     return 0;
   }
 
@@ -107,7 +108,7 @@ export async function syncStockLevelsToOffline(): Promise<number> {
   // Update last sync timestamp (in IndexedDB for useLiveQuery reactivity)
   await setLastStockSyncTime(new Date().toISOString(), offlineData.length);
 
-  console.log(`[StockSync] Synced ${offlineData.length} stock levels`);
+  logger.debug(`[StockSync] Synced ${offlineData.length} stock levels`);
   return offlineData.length;
 }
 
@@ -169,5 +170,5 @@ export async function clearOfflineStockData(): Promise<void> {
   await db.offline_stock_levels.clear();
   await db.offline_sync_meta.delete(STOCK_SYNC_META_ENTITY);
   localStorage.removeItem(LEGACY_SYNC_TIMESTAMP_KEY);
-  console.log('[StockSync] Cleared all offline stock data');
+  logger.debug('[StockSync] Cleared all offline stock data');
 }

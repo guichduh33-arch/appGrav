@@ -22,7 +22,7 @@ export default function TableSelectionModal({ onSelectTable, onClose: _onClose }
     const [selectedSection, setSelectedSection] = useState<string>('all')
     const [selectedTable, setSelectedTable] = useState<string | null>(null)
     const [tables, setTables] = useState<Table[]>([])
-    const [_loading, setLoading] = useState(true)
+    const [, setLoading] = useState(true)
 
     useEffect(() => {
         fetchTables()

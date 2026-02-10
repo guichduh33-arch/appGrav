@@ -9,6 +9,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import logger from '@/utils/logger';
 import { db } from '@/lib/db';
 import type { IOfflineCategory, ISyncMeta } from '@/types/offline';
 import {
@@ -48,7 +49,7 @@ export async function cacheAllCategories(): Promise<void> {
     recordCount: data.length,
   });
 
-  console.log(`[CategoriesCache] Cached ${data.length} categories`);
+  logger.debug(`[CategoriesCache] Cached ${data.length} categories`);
 }
 
 /**
@@ -187,5 +188,5 @@ export async function refreshCategoriesCacheIfNeeded(
 export async function clearCategoriesCache(): Promise<void> {
   await db.offline_categories.clear();
   await db.offline_sync_meta.delete('categories');
-  console.log('[CategoriesCache] Cache cleared');
+  logger.debug('[CategoriesCache] Cache cleared');
 }

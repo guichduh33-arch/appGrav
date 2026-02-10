@@ -10,6 +10,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { lanHub } from '@/services/lan/lanHub';
 import { useLanStore } from '@/stores/lanStore';
 import { generateUUID } from '@/lib/utils';
+import logger from '@/utils/logger';
 
 /**
  * Hook configuration options
@@ -149,7 +150,7 @@ export function useLanHub(options: IUseLanHubOptions = {}): IUseLanHubResult {
       setError(null);
       const deviceId = generateDeviceId();
 
-      console.log('[useLanHub] Starting hub with device ID:', deviceId);
+      logger.debug('[useLanHub] Starting hub with device ID:', deviceId);
 
       const success = await lanHub.start({
         deviceId,
@@ -165,7 +166,7 @@ export function useLanHub(options: IUseLanHubOptions = {}): IUseLanHubResult {
         setError('Failed to start LAN hub');
         console.error('[useLanHub] Failed to start hub');
       } else {
-        console.log('[useLanHub] Hub started successfully');
+        logger.debug('[useLanHub] Hub started successfully');
       }
 
       return success;
@@ -181,7 +182,7 @@ export function useLanHub(options: IUseLanHubOptions = {}): IUseLanHubResult {
    * Stop the hub
    */
   const stop = useCallback(async (): Promise<void> => {
-    console.log('[useLanHub] Stopping hub');
+    logger.debug('[useLanHub] Stopping hub');
     await lanHub.stop();
     setIsRunning(false);
     setStatus(lanHub.getStatus());
@@ -199,7 +200,7 @@ export function useLanHub(options: IUseLanHubOptions = {}): IUseLanHubResult {
   useEffect(() => {
     return () => {
       if (lanHub.isActive()) {
-        console.log('[useLanHub] Cleanup: stopping hub on unmount');
+        logger.debug('[useLanHub] Cleanup: stopping hub on unmount');
         lanHub.stop();
       }
     };

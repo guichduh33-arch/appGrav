@@ -10,7 +10,8 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
-import { Building2, DollarSign, TrendingUp, Loader2 } from 'lucide-react';
+import { Building2, DollarSign, TrendingUp } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -48,29 +49,29 @@ export const PurchaseBySupplierTab = () => {
   const exportConfig: ExportConfig<SupplierData> = useMemo(() => ({
     data,
     columns: [
-      { key: 'supplier_name', header: 'Fournisseur' },
+      { key: 'supplier_name', header: 'Supplier' },
       { key: 'transaction_count', header: 'Transactions', align: 'right' as const },
-      { key: 'total_quantity', header: 'Quantité Totale', align: 'right' as const },
-      { key: 'total_value', header: 'Valeur Totale', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'total_quantity', header: 'Total Quantity', align: 'right' as const },
+      { key: 'total_value', header: 'Total Value', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
       {
         key: 'total_value',
-        header: '% Total',
+        header: '% of Total',
         align: 'right' as const,
         format: (v) => kpis.totalValue > 0 ? `${((v as number / kpis.totalValue) * 100).toFixed(1)}%` : '0%',
       },
     ],
-    filename: 'achats_par_fournisseur',
-    title: 'Achats par Fournisseur',
+    filename: 'purchases-by-supplier',
+    title: 'Purchases by Supplier',
     dateRange,
     summaries: [
-      { label: 'Total Achats', value: formatCurrencyPdf(kpis.totalValue) },
+      { label: 'Total Purchases', value: formatCurrencyPdf(kpis.totalValue) },
       { label: 'Transactions', value: kpis.totalTransactions.toString() },
-      { label: 'Top Fournisseur', value: kpis.topSupplier?.supplier_name || '-' },
+      { label: 'Top Supplier', value: kpis.topSupplier?.supplier_name || '-' },
     ],
   }), [data, dateRange, kpis]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   if (error) {
@@ -79,6 +80,10 @@ export const PurchaseBySupplierTab = () => {
         Error loading data
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <ReportSkeleton />;
   }
 
   return (
@@ -96,10 +101,10 @@ export const PurchaseBySupplierTab = () => {
             <div className="p-2 bg-blue-50 rounded-lg">
               <DollarSign className="w-5 h-5 text-blue-600" />
             </div>
-            <span className="text-sm text-gray-600">Total Achats</span>
+            <span className="text-sm text-gray-600">Total Purchases</span>
           </div>
           <p className="text-2xl font-bold text-blue-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(kpis.totalValue)}
+            {formatCurrency(kpis.totalValue)}
           </p>
         </div>
 
@@ -111,7 +116,7 @@ export const PurchaseBySupplierTab = () => {
             <span className="text-sm text-gray-600">Transactions</span>
           </div>
           <p className="text-2xl font-bold text-green-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : kpis.totalTransactions}
+            {kpis.totalTransactions}
           </p>
         </div>
 
@@ -120,10 +125,10 @@ export const PurchaseBySupplierTab = () => {
             <div className="p-2 bg-purple-50 rounded-lg">
               <Building2 className="w-5 h-5 text-purple-600" />
             </div>
-            <span className="text-sm text-gray-600">Fournisseurs Actifs</span>
+            <span className="text-sm text-gray-600">Active Suppliers</span>
           </div>
           <p className="text-2xl font-bold text-purple-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : kpis.supplierCount}
+            {kpis.supplierCount}
           </p>
         </div>
 
@@ -132,10 +137,10 @@ export const PurchaseBySupplierTab = () => {
             <div className="p-2 bg-yellow-50 rounded-lg">
               <TrendingUp className="w-5 h-5 text-yellow-600" />
             </div>
-            <span className="text-sm text-gray-600">Top Fournisseur</span>
+            <span className="text-sm text-gray-600">Top Supplier</span>
           </div>
           <p className="text-lg font-bold text-gray-900 truncate">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : kpis.topSupplier?.supplier_name || '-'}
+            {kpis.topSupplier?.supplier_name || '-'}
           </p>
           {kpis.topSupplier && (
             <p className="text-xs text-gray-500">{formatCurrency(kpis.topSupplier.total_value)}</p>
@@ -145,14 +150,10 @@ export const PurchaseBySupplierTab = () => {
 
       {/* Chart */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Achats par Fournisseur</h3>
-        {isLoading ? (
-          <div className="h-80 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-          </div>
-        ) : data.length === 0 ? (
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Purchases by Supplier</h3>
+        {data.length === 0 ? (
           <div className="h-80 flex items-center justify-center text-gray-500">
-            Aucune donnée pour cette période
+            No data for this period
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={320}>
@@ -165,7 +166,7 @@ export const PurchaseBySupplierTab = () => {
               <XAxis type="number" tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`} tick={{ fontSize: 12 }} />
               <YAxis dataKey="supplier_name" type="category" width={120} tick={{ fontSize: 12 }} />
               <Tooltip formatter={(value) => formatCurrency(value as number)} />
-              <Bar dataKey="total_value" name="Valeur Totale" radius={[0, 4, 4, 0]}>
+              <Bar dataKey="total_value" name="Total Value" radius={[0, 4, 4, 0]}>
                 {data.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
@@ -178,30 +179,24 @@ export const PurchaseBySupplierTab = () => {
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Détail par fournisseur</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Supplier Detail</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fournisseur</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supplier</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Transactions</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantité</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Valeur Totale</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">% Total</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Value</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">% of Total</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  </td>
-                </tr>
-              ) : data.length === 0 ? (
+              {data.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                    Aucune donnée
+                    No data
                   </td>
                 </tr>
               ) : (

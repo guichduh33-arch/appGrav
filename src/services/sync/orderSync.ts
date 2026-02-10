@@ -8,6 +8,7 @@
  */
 
 import { db } from '@/lib/db';
+import logger from '@/utils/logger';
 import type {
   ILegacyOfflineOrder,
   ILegacyOfflineOrderItem,
@@ -125,7 +126,7 @@ export async function saveOrderOffline(params: {
   // Add to sync queue
   await addToSyncQueue(offlineOrder);
 
-  console.log(`[OrderSync] Order ${orderNumber} saved offline`);
+  logger.debug(`[OrderSync] Order ${orderNumber} saved offline`);
   return offlineOrder;
 }
 
@@ -144,7 +145,7 @@ async function addToSyncQueue(order: IOfflineOrder): Promise<void> {
   };
 
   await db.offline_legacy_sync_queue.add(syncItem);
-  console.log(`[OrderSync] Added order ${order.order_number} to sync queue`);
+  logger.debug(`[OrderSync] Added order ${order.order_number} to sync queue`);
 }
 
 /**
@@ -189,7 +190,7 @@ export async function markOrderSynced(orderId: string, serverOrderId?: string): 
     .equals(`sync-${orderId}`)
     .modify({ status: 'synced' });
 
-  console.log(`[OrderSync] Order ${orderId} marked as synced`);
+  logger.debug(`[OrderSync] Order ${orderId} marked as synced`);
 }
 
 /**
@@ -258,7 +259,7 @@ export async function clearSyncedItems(): Promise<number> {
   const ids = synced.map((item) => item.id);
   await db.offline_legacy_sync_queue.bulkDelete(ids);
 
-  console.log(`[OrderSync] Cleared ${ids.length} synced items from queue`);
+  logger.debug(`[OrderSync] Cleared ${ids.length} synced items from queue`);
   return ids.length;
 }
 

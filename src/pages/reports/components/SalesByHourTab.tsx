@@ -1,21 +1,33 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { Clock, DollarSign, ShoppingCart, TrendingUp, Loader2 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
+import { Clock, DollarSign, ShoppingCart, TrendingUp } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
 import { HourlyHeatmap } from '@/components/reports/HourlyHeatmap';
+import { ComparisonToggle } from '@/components/reports/ComparisonToggle';
 import { useDateRange } from '@/hooks/reports/useDateRange';
 import { formatCurrency as formatCurrencyPdf } from '@/services/reports/pdfExport';
 
 export function SalesByHourTab() {
-  const { dateRange } = useDateRange({ defaultPreset: 'last7days' });
+  const {
+    dateRange, comparisonRange, comparisonType, setComparisonType, isComparisonEnabled,
+  } = useDateRange({ defaultPreset: 'last7days', enableComparison: true });
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['sales-by-hour', dateRange.from, dateRange.to],
     queryFn: () => ReportingService.getSalesByHour(dateRange.from, dateRange.to),
     staleTime: 5 * 60 * 1000,
+  });
+
+  // Comparison data
+  const { data: comparisonRawData } = useQuery({
+    queryKey: ['sales-by-hour-comparison', comparisonRange?.from, comparisonRange?.to],
+    queryFn: () => ReportingService.getSalesByHour(comparisonRange!.from, comparisonRange!.to),
+    staleTime: 5 * 60 * 1000,
+    enabled: isComparisonEnabled && !!comparisonRange,
   });
 
   // Aggregate by hour across all days
@@ -49,6 +61,37 @@ export function SalesByHourTab() {
 
     return result;
   }, [data]);
+
+  // Aggregate comparison data by hour
+  const comparisonHourlyData = useMemo(() => {
+    if (!comparisonRawData || !isComparisonEnabled) return [];
+    const hourMap = new Map<number, { orders: number; revenue: number; count: number }>();
+    comparisonRawData.forEach((d) => {
+      const hour = d.hour_of_day;
+      const existing = hourMap.get(hour) || { orders: 0, revenue: 0, count: 0 };
+      hourMap.set(hour, {
+        orders: existing.orders + (d.order_count || 0),
+        revenue: existing.revenue + (d.total_revenue || 0),
+        count: existing.count + 1,
+      });
+    });
+    const result = [];
+    for (let h = 0; h < 24; h++) {
+      const hd = hourMap.get(h) || { orders: 0, revenue: 0, count: 0 };
+      result.push({ hour: h, label: `${h.toString().padStart(2, '0')}:00`, orders: hd.orders, revenue: hd.revenue });
+    }
+    return result;
+  }, [comparisonRawData, isComparisonEnabled]);
+
+  // Grouped bar chart data (current vs previous)
+  const groupedData = useMemo(() => {
+    if (!isComparisonEnabled || comparisonHourlyData.length === 0) return [];
+    return hourlyData.map((h, i) => ({
+      label: h.label,
+      current: h.revenue,
+      previous: comparisonHourlyData[i]?.revenue ?? 0,
+    }));
+  }, [hourlyData, comparisonHourlyData, isComparisonEnabled]);
 
   // Find peak hours
   const peakHours = useMemo(() => {
@@ -91,21 +134,21 @@ export function SalesByHourTab() {
   const exportConfig: ExportConfig<{ hour: number; label: string; orders: number; revenue: number }> = useMemo(() => ({
     data: hourlyData,
     columns: [
-      { key: 'label', header: 'Heure' },
-      { key: 'orders', header: 'Commandes', align: 'right' as const },
-      { key: 'revenue', header: 'CA', align: 'right' as const, format: (v) => formatCurrencyPdf(v) },
+      { key: 'label', header: 'Hour' },
+      { key: 'orders', header: 'Orders', align: 'right' as const },
+      { key: 'revenue', header: 'Revenue', align: 'right' as const, format: (v) => formatCurrencyPdf(v) },
     ],
-    filename: 'ventes_par_heure',
-    title: 'Ventes par Heure',
+    filename: 'sales-by-hour',
+    title: 'Sales by Hour',
     dateRange,
     summaries: [
-      { label: 'Heure de pointe', value: `${peakHours.peakHour.toString().padStart(2, '0')}:00` },
-      { label: 'CA Total', value: formatCurrencyPdf(totals.totalRevenue) },
+      { label: 'Peak Hour', value: `${peakHours.peakHour.toString().padStart(2, '0')}:00` },
+      { label: 'Total Revenue', value: formatCurrencyPdf(totals.totalRevenue) },
     ],
   }), [hourlyData, dateRange, peakHours, totals]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   // Color based on revenue intensity
@@ -127,12 +170,23 @@ export function SalesByHourTab() {
     );
   }
 
+  if (isLoading) {
+    return <ReportSkeleton />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <DateRangePicker defaultPreset="last7days" />
-        <ExportButtons config={exportConfig} />
+        <div className="flex items-center gap-3">
+          <ComparisonToggle
+            comparisonType={comparisonType}
+            comparisonRange={comparisonRange}
+            onComparisonTypeChange={setComparisonType}
+          />
+          <ExportButtons config={exportConfig} />
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -142,10 +196,10 @@ export function SalesByHourTab() {
             <div className="p-2 bg-green-50 rounded-lg">
               <Clock className="w-5 h-5 text-green-600" />
             </div>
-            <span className="text-sm text-gray-600">Heure de pointe</span>
+            <span className="text-sm text-gray-600">Peak Hour</span>
           </div>
           <p className="text-2xl font-bold text-green-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : `${peakHours.peakHour.toString().padStart(2, '0')}:00`}
+            {`${peakHours.peakHour.toString().padStart(2, '0')}:00`}
           </p>
         </div>
 
@@ -154,10 +208,10 @@ export function SalesByHourTab() {
             <div className="p-2 bg-blue-50 rounded-lg">
               <TrendingUp className="w-5 h-5 text-blue-600" />
             </div>
-            <span className="text-sm text-gray-600">CA Heure pointe</span>
+            <span className="text-sm text-gray-600">Peak Hour Revenue</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(peakHours.peakRevenue)}
+            {formatCurrency(peakHours.peakRevenue)}
           </p>
         </div>
 
@@ -166,10 +220,10 @@ export function SalesByHourTab() {
             <div className="p-2 bg-purple-50 rounded-lg">
               <DollarSign className="w-5 h-5 text-purple-600" />
             </div>
-            <span className="text-sm text-gray-600">CA Total</span>
+            <span className="text-sm text-gray-600">Total Revenue</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(totals.totalRevenue)}
+            {formatCurrency(totals.totalRevenue)}
           </p>
         </div>
 
@@ -178,80 +232,97 @@ export function SalesByHourTab() {
             <div className="p-2 bg-orange-50 rounded-lg">
               <ShoppingCart className="w-5 h-5 text-orange-600" />
             </div>
-            <span className="text-sm text-gray-600">Total Commandes</span>
+            <span className="text-sm text-gray-600">Total Orders</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : totals.totalOrders}
+            {totals.totalOrders}
           </p>
         </div>
       </div>
 
       {/* Chart */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">Distribution des ventes par heure</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">Sales Distribution by Hour</h3>
 
-        {isLoading ? (
-          <div className="h-80 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-          </div>
-        ) : (
-          <ResponsiveContainer width="100%" height={320}>
+        <ResponsiveContainer width="100%" height={320}>
             <BarChart data={hourlyData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="label" tick={{ fontSize: 11 }} interval={1} />
               <YAxis tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`} tick={{ fontSize: 12 }} />
               <Tooltip
-                formatter={(value) => [formatCurrency(value as number), 'CA']}
-                labelFormatter={(label) => `Heure: ${label}`}
+                formatter={(value) => [formatCurrency(value as number), 'Revenue']}
+                labelFormatter={(label) => `Hour: ${label}`}
               />
-              <Bar dataKey="revenue" name="CA" radius={[4, 4, 0, 0]}>
+              <Bar dataKey="revenue" name="Revenue" radius={[4, 4, 0, 0]}>
                 {hourlyData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={getBarColor(entry.revenue, maxRevenue)} />
                 ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-        )}
 
         {/* Legend */}
         <div className="flex flex-wrap items-center justify-center gap-4 mt-4 pt-4 border-t border-gray-200">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded bg-green-500"></div>
-            <span className="text-sm text-gray-600">Pointe (80%+)</span>
+            <span className="text-sm text-gray-600">Peak (80%+)</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded bg-blue-500"></div>
-            <span className="text-sm text-gray-600">Élevé (50-80%)</span>
+            <span className="text-sm text-gray-600">High (50-80%)</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded bg-orange-500"></div>
-            <span className="text-sm text-gray-600">Moyen (20-50%)</span>
+            <span className="text-sm text-gray-600">Medium (20-50%)</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded bg-gray-400"></div>
-            <span className="text-sm text-gray-600">Faible (&lt;20%)</span>
+            <span className="text-sm text-gray-600">Low (&lt;20%)</span>
           </div>
         </div>
       </div>
 
+      {/* Comparison Grouped Bar Chart */}
+      {isComparisonEnabled && groupedData.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">
+            Hourly Comparison: Current vs {comparisonType === 'last_year' ? 'Last Year' : 'Previous Period'}
+          </h3>
+          <ResponsiveContainer width="100%" height={320}>
+            <BarChart data={groupedData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+              <XAxis dataKey="label" tick={{ fontSize: 11 }} interval={1} />
+              <YAxis tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`} tick={{ fontSize: 12 }} />
+              <Tooltip
+                formatter={(value, name) => [formatCurrency(value as number), name === 'current' ? 'Current' : 'Previous']}
+                labelFormatter={(label) => `Hour: ${label}`}
+              />
+              <Legend formatter={(value) => value === 'current' ? 'Current Period' : 'Previous Period'} />
+              <Bar dataKey="current" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="previous" fill="#9CA3AF" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
       {/* Heatmap */}
-      {!isLoading && heatmapData.length > 0 && (
+      {heatmapData.length > 0 && (
         <HourlyHeatmap data={heatmapData} />
       )}
 
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Détail par heure</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Hourly Breakdown</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Heure</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Commandes</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">CA</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">% du Total</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hour</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Orders</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Revenue</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">% of Total</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">

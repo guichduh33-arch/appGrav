@@ -11,6 +11,7 @@ import { lanClient } from '@/services/lan/lanClient';
 import { useLanStore, TLanConnectionStatus } from '@/stores/lanStore';
 import type { TDeviceType } from '@/services/lan/lanProtocol';
 import { generateUUID } from '@/lib/utils';
+import logger from '@/utils/logger';
 
 interface IUseLanClientOptions {
   deviceType: TDeviceType;
@@ -88,7 +89,7 @@ export function useLanClient(options: IUseLanClientOptions): IUseLanClientResult
         : deviceName || `${deviceType.toUpperCase()} Device`;
 
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[useLanClient] Connecting as ${deviceType} with ID ${deviceId}`);
+        logger.debug(`[useLanClient] Connecting as ${deviceType} with ID ${deviceId}`);
       }
 
       const success = await lanClient.connect({

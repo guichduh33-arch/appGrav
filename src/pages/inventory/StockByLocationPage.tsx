@@ -1,68 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { MapPin, Search, Package, AlertTriangle } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
-import { toast } from 'sonner'
+import {
+    useStockLocations,
+    useStockBalances,
+    type IStockBalance as StockBalance,
+} from '@/hooks/inventory/useStockByLocation'
 import './StockByLocationPage.css'
 
-interface StockBalance {
-    product_id: string
-    product_name: string
-    sku: string
-    location_id: string
-    location_name: string
-    location_code: string
-    location_type: string
-    current_stock: number
-    stock_unit: string
-    stock_value: number
-}
-
-interface Location {
-    id: string
-    name: string
-    code: string
-    location_type: string
-}
-
 export default function StockByLocationPage() {
-    const [balances, setBalances] = useState<StockBalance[]>([])
-    const [locations, setLocations] = useState<Location[]>([])
-    const [loading, setLoading] = useState(true)
+    const { data: balances = [], isLoading: loading } = useStockBalances()
+    const { data: locations = [] } = useStockLocations()
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedLocation, setSelectedLocation] = useState<string>('all')
-
-    useEffect(() => {
-        fetchLocations()
-        fetchBalances()
-    }, [])
-
-    const fetchLocations = async () => {
-        const { data } = await supabase
-            .from('stock_locations')
-            .select('*')
-            .neq('is_active', false)
-            .order('name')
-        if (data) setLocations(data)
-    }
-
-    const fetchBalances = async () => {
-        setLoading(true)
-        try {
-            const { data, error } = await supabase
-                .from('stock_balances')
-                .select('*')
-                .order('location_name')
-                .order('product_name')
-
-            if (error) throw error
-            setBalances((data ?? []) as unknown as StockBalance[])
-        } catch (error) {
-            console.error('Error fetching balances:', error)
-            toast.error('Erreur lors du chargement')
-        } finally {
-            setLoading(false)
-        }
-    }
 
     const filteredBalances = balances.filter(b => {
         const matchesSearch = searchTerm === '' ||
@@ -90,10 +39,10 @@ export default function StockByLocationPage() {
                 <div>
                     <h1 className="stock-location-title">
                         <MapPin size={28} />
-                        Stock par Emplacement
+                        Stock by Location
                     </h1>
                     <p className="stock-location-subtitle">
-                        Vue en temps réel du stock de chaque emplacement
+                        Real-time view of stock at each location
                     </p>
                 </div>
             </header>
@@ -104,7 +53,7 @@ export default function StockByLocationPage() {
                     <Search size={20} />
                     <input
                         type="text"
-                        placeholder="Rechercher un produit..."
+                        placeholder="Search for a product..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -113,9 +62,9 @@ export default function StockByLocationPage() {
                     value={selectedLocation}
                     onChange={(e) => setSelectedLocation(e.target.value)}
                     className="location-select"
-                    aria-label="Filtrer par emplacement"
+                    aria-label="Filter by location"
                 >
-                    <option value="all">Tous les emplacements</option>
+                    <option value="all">All locations</option>
                     {locations.map(loc => (
                         <option key={loc.id} value={loc.id}>{loc.name}</option>
                     ))}
@@ -124,12 +73,12 @@ export default function StockByLocationPage() {
 
             {/* Stock by Location */}
             {loading ? (
-                <div className="stock-location-loading">Chargement...</div>
+                <div className="stock-location-loading">Loading...</div>
             ) : Object.keys(groupedByLocation).length === 0 ? (
                 <div className="stock-location-empty">
                     <Package size={64} />
-                    <h3>Aucun stock</h3>
-                    <p>Aucun produit en stock dans les emplacements</p>
+                    <h3>No stock</h3>
+                    <p>No products in stock at any location</p>
                 </div>
             ) : (
                 <div className="locations-grid">
@@ -147,28 +96,28 @@ export default function StockByLocationPage() {
                                     <div className="location-stats">
                                         <div className="stat-badge">
                                             <Package size={16} />
-                                            {items.length} produits
+                                            {items.length} products
                                         </div>
                                         {lowStockCount > 0 && (
                                             <div className="stat-badge warning">
                                                 <AlertTriangle size={16} />
-                                                {lowStockCount} faibles
+                                                {lowStockCount} low
                                             </div>
                                         )}
                                     </div>
                                 </div>
 
                                 <div className="location-card__value">
-                                    Valeur totale: <strong>€{totalValue.toFixed(2)}</strong>
+                                    Total value: <strong>IDR {totalValue.toLocaleString()}</strong>
                                 </div>
 
                                 <div className="location-card__items">
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th>Produit</th>
+                                                <th>Product</th>
                                                 <th>Stock</th>
-                                                <th>Valeur</th>
+                                                <th>Value</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -189,7 +138,7 @@ export default function StockByLocationPage() {
                                                             <span className="stock-zero">0</span>
                                                         )}
                                                     </td>
-                                                    <td>€{item.stock_value.toFixed(2)}</td>
+                                                    <td>IDR {item.stock_value.toLocaleString()}</td>
                                                 </tr>
                                             ))}
                                         </tbody>

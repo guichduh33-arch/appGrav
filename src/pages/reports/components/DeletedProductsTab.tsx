@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Trash2, Calendar, Loader2, User, Package, DollarSign } from 'lucide-react';
+import { Trash2, Calendar, User, Package, DollarSign } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { supabase } from '@/lib/supabase';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -63,12 +64,12 @@ async function getDeletedProducts(from: Date, to: Date): Promise<DeletedProduct[
     const oldVal = d.old_values || {};
     return {
       id: d.id,
-      product_name: (oldVal.name as string) || 'Produit inconnu',
+      product_name: (oldVal.name as string) || 'Unknown Product',
       sku: (oldVal.sku as string) || null,
       category_name: (oldVal.category_name as string) || null,
       retail_price: (oldVal.retail_price as number) || 0,
       cost_price: (oldVal.cost_price as number) || 0,
-      deleted_by: userMap.get(d.user_id || '') || 'Inconnu',
+      deleted_by: userMap.get(d.user_id || '') || 'Unknown',
       deleted_at: d.created_at,
       reason: null,
     };
@@ -100,24 +101,24 @@ export function DeletedProductsTab() {
   const exportConfig: ExportConfig<DeletedProduct> = useMemo(() => ({
     data: data || [],
     columns: [
-      { key: 'product_name', header: 'Produit' },
+      { key: 'product_name', header: 'Product' },
       { key: 'sku', header: 'SKU', format: (v) => (v as string) || '-' },
-      { key: 'category_name', header: 'Catégorie', format: (v) => (v as string) || '-' },
-      { key: 'retail_price', header: 'Prix vente', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
-      { key: 'deleted_by', header: 'Supprimé par' },
-      { key: 'deleted_at', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('fr-FR') },
-      { key: 'reason', header: 'Raison', format: (v) => (v as string) || '-' },
+      { key: 'category_name', header: 'Category', format: (v) => (v as string) || '-' },
+      { key: 'retail_price', header: 'Retail Price', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'deleted_by', header: 'Deleted By' },
+      { key: 'deleted_at', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('en-US') },
+      { key: 'reason', header: 'Reason', format: (v) => (v as string) || '-' },
     ],
-    filename: 'produits_supprimes',
-    title: 'Produits Supprimés',
+    filename: 'deleted-products',
+    title: 'Deleted Products',
     dateRange,
     summaries: [
-      { label: 'Total supprimés', value: summary.totalDeleted.toString() },
+      { label: 'Total Deleted', value: summary.totalDeleted.toString() },
     ],
   }), [data, dateRange, summary]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   if (error) {
@@ -126,6 +127,10 @@ export function DeletedProductsTab() {
         Error loading data
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <ReportSkeleton />;
   }
 
   return (
@@ -143,10 +148,10 @@ export function DeletedProductsTab() {
             <div className="p-2 bg-red-50 rounded-lg">
               <Trash2 className="w-5 h-5 text-red-600" />
             </div>
-            <span className="text-sm text-gray-600">Produits supprimés</span>
+            <span className="text-sm text-gray-600">Deleted Products</span>
           </div>
           <p className="text-2xl font-bold text-red-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : summary.totalDeleted}
+            {summary.totalDeleted}
           </p>
         </div>
 
@@ -155,10 +160,10 @@ export function DeletedProductsTab() {
             <div className="p-2 bg-purple-50 rounded-lg">
               <DollarSign className="w-5 h-5 text-purple-600" />
             </div>
-            <span className="text-sm text-gray-600">Valeur cumulée</span>
+            <span className="text-sm text-gray-600">Cumulative Value</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(summary.totalValue)}
+            {formatCurrency(summary.totalValue)}
           </p>
         </div>
       </div>
@@ -166,28 +171,22 @@ export function DeletedProductsTab() {
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Liste des produits supprimés</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Deleted Products List</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produit</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Catégorie</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Prix vente</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supprimé par</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Retail Price</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deleted By</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Raison</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  </td>
-                </tr>
-              ) : data && data.length > 0 ? (
+              {data && data.length > 0 ? (
                 data.map((row) => (
                   <tr key={row.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
@@ -214,7 +213,7 @@ export function DeletedProductsTab() {
                     <td className="px-6 py-4 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-3 h-3" />
-                        {new Date(row.deleted_at).toLocaleDateString('fr-FR', {
+                        {new Date(row.deleted_at).toLocaleDateString('en-US', {
                           day: '2-digit',
                           month: '2-digit',
                           year: 'numeric',
@@ -237,7 +236,7 @@ export function DeletedProductsTab() {
               ) : (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    Aucun produit supprimé sur cette période
+                    No products deleted in this period
                   </td>
                 </tr>
               )}

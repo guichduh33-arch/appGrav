@@ -14,6 +14,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import logger from '@/utils/logger';
 import {
   getSyncQueueItems,
   getRetryableItems,
@@ -145,7 +146,7 @@ async function syncOrder(item: ISyncQueueItem): Promise<void> {
     await markOrderSynced(offlineOrderId, order.id);
   }
 
-  console.log(`[SyncEngine] Order ${orderPayload.order_number} synced as ${order.id}`);
+  logger.debug(`[SyncEngine] Order ${orderPayload.order_number} synced as ${order.id}`);
 }
 
 /**
@@ -154,7 +155,7 @@ async function syncOrder(item: ISyncQueueItem): Promise<void> {
 async function syncPayment(_item: ISyncQueueItem): Promise<void> {
   // Payment sync logic - would depend on payment structure
   // For now, payments are part of orders
-  console.log('[SyncEngine] Payment sync not yet implemented (part of order sync)');
+  logger.debug('[SyncEngine] Payment sync not yet implemented (part of order sync)');
 }
 
 /**
@@ -183,7 +184,7 @@ async function syncStockMovement(item: ISyncQueueItem): Promise<void> {
     throw new Error(`Failed to sync stock movement: ${error.message}`);
   }
 
-  console.log('[SyncEngine] Stock movement synced');
+  logger.debug('[SyncEngine] Stock movement synced');
 }
 
 /**
@@ -194,7 +195,7 @@ async function syncProduct(item: ISyncQueueItem): Promise<void> {
   if (error) {
     throw new Error(`Failed to sync product: ${error.message}`);
   }
-  console.log(`[SyncEngine] Product ${item.entityId || 'unknown'} synced`);
+  logger.debug(`[SyncEngine] Product ${item.entityId || 'unknown'} synced`);
 }
 
 /**
@@ -205,7 +206,7 @@ async function syncCategory(item: ISyncQueueItem): Promise<void> {
   if (error) {
     throw new Error(`Failed to sync category: ${error.message}`);
   }
-  console.log(`[SyncEngine] Category ${item.entityId || 'unknown'} synced`);
+  logger.debug(`[SyncEngine] Category ${item.entityId || 'unknown'} synced`);
 }
 
 /**
@@ -216,7 +217,7 @@ async function syncProductCategoryPrice(item: ISyncQueueItem): Promise<void> {
   if (error) {
     throw new Error(`Failed to sync product category price: ${error.message}`);
   }
-  console.log(`[SyncEngine] Product category price ${item.entityId || 'unknown'} synced`);
+  logger.debug(`[SyncEngine] Product category price ${item.entityId || 'unknown'} synced`);
 }
 
 /**
@@ -269,7 +270,7 @@ export async function runSyncEngine(): Promise<{
   failed: number;
 }> {
   if (engineState.isRunning) {
-    console.log('[SyncEngine] Already running');
+    logger.debug('[SyncEngine] Already running');
     return { synced: 0, failed: 0 };
   }
 
@@ -282,12 +283,12 @@ export async function runSyncEngine(): Promise<{
   syncStore.setIsSyncing(true);
   syncStore.setSyncStatus('syncing');
 
-  console.log('[SyncEngine] Starting sync...');
+  logger.debug('[SyncEngine] Starting sync...');
 
   try {
     // Get pending items
     const pendingItems = await getSyncQueueItems('pending');
-    console.log(`[SyncEngine] Found ${pendingItems.length} pending items`);
+    logger.debug(`[SyncEngine] Found ${pendingItems.length} pending items`);
 
     // Process pending items
     for (const item of pendingItems) {
@@ -298,7 +299,7 @@ export async function runSyncEngine(): Promise<{
 
     // Get retryable failed items
     const retryableItems = await getRetryableItems();
-    console.log(`[SyncEngine] Found ${retryableItems.length} retryable items`);
+    logger.debug(`[SyncEngine] Found ${retryableItems.length} retryable items`);
 
     // Process retryable items
     for (const item of retryableItems) {
@@ -316,7 +317,7 @@ export async function runSyncEngine(): Promise<{
     syncStore.setSyncStatus(finalStatus);
     syncStore.setLastSyncAt(engineState.lastSyncAt);
 
-    console.log(
+    logger.debug(
       `[SyncEngine] Sync complete: ${engineState.itemsSynced} synced, ${engineState.itemsFailed} failed`
     );
 
@@ -344,7 +345,7 @@ export function startSyncWithDelay(): void {
     clearTimeout(startDelayTimeoutId);
   }
 
-  console.log(`[SyncEngine] Will start sync in ${SYNC_START_DELAY / 1000}s`);
+  logger.debug(`[SyncEngine] Will start sync in ${SYNC_START_DELAY / 1000}s`);
   startDelayTimeoutId = setTimeout(() => {
     startDelayTimeoutId = null;
     runSyncEngine().catch((err) => {
@@ -369,7 +370,7 @@ export function stopSyncEngine(): void {
   stopBackgroundSync();
 
   engineState.isRunning = false;
-  console.log('[SyncEngine] Stopped');
+  logger.debug('[SyncEngine] Stopped');
 }
 
 /**
@@ -377,7 +378,7 @@ export function stopSyncEngine(): void {
  */
 export function setAutoSyncEnabled(enabled: boolean): void {
   autoSyncEnabled = enabled;
-  console.log(`[SyncEngine] Auto-sync ${enabled ? 'enabled' : 'disabled'}`);
+  logger.debug(`[SyncEngine] Auto-sync ${enabled ? 'enabled' : 'disabled'}`);
 
   if (enabled) {
     startBackgroundSync();
@@ -399,28 +400,28 @@ export function isAutoSyncEnabled(): boolean {
  */
 export function startBackgroundSync(): void {
   if (backgroundSyncIntervalId) {
-    console.log('[SyncEngine] Background sync already running');
+    logger.debug('[SyncEngine] Background sync already running');
     return;
   }
 
-  console.log(`[SyncEngine] Starting background sync (every ${BACKGROUND_SYNC_INTERVAL / 1000}s)`);
+  logger.debug(`[SyncEngine] Starting background sync (every ${BACKGROUND_SYNC_INTERVAL / 1000}s)`);
 
   backgroundSyncIntervalId = setInterval(async () => {
     // Only sync if online and auto-sync is enabled
     const isOnline = useNetworkStore.getState().isOnline;
 
     if (!isOnline) {
-      console.log('[SyncEngine] Skipping background sync - offline');
+      logger.debug('[SyncEngine] Skipping background sync - offline');
       return;
     }
 
     if (!autoSyncEnabled) {
-      console.log('[SyncEngine] Skipping background sync - disabled');
+      logger.debug('[SyncEngine] Skipping background sync - disabled');
       return;
     }
 
     if (engineState.isRunning) {
-      console.log('[SyncEngine] Skipping background sync - already running');
+      logger.debug('[SyncEngine] Skipping background sync - already running');
       return;
     }
 
@@ -431,7 +432,7 @@ export function startBackgroundSync(): void {
       return;
     }
 
-    console.log(`[SyncEngine] Background sync triggered - ${pendingItems.length} pending items`);
+    logger.debug(`[SyncEngine] Background sync triggered - ${pendingItems.length} pending items`);
     await runSyncEngine();
   }, BACKGROUND_SYNC_INTERVAL);
 }
@@ -443,7 +444,7 @@ export function stopBackgroundSync(): void {
   if (backgroundSyncIntervalId) {
     clearInterval(backgroundSyncIntervalId);
     backgroundSyncIntervalId = null;
-    console.log('[SyncEngine] Background sync stopped');
+    logger.debug('[SyncEngine] Background sync stopped');
   }
 }
 
@@ -452,7 +453,7 @@ export function stopBackgroundSync(): void {
  * Should be called once when the app starts
  */
 export function initializeSyncEngine(): void {
-  console.log('[SyncEngine] Initializing...');
+  logger.debug('[SyncEngine] Initializing...');
 
   // Start background sync
   startBackgroundSync();
@@ -461,10 +462,10 @@ export function initializeSyncEngine(): void {
   useNetworkStore.subscribe((state, prevState) => {
     if (state.isOnline && !prevState.isOnline) {
       // Coming back online
-      console.log('[SyncEngine] Network restored - scheduling sync');
+      logger.debug('[SyncEngine] Network restored - scheduling sync');
       startSyncWithDelay();
     }
   });
 
-  console.log('[SyncEngine] Initialized');
+  logger.debug('[SyncEngine] Initialized');
 }

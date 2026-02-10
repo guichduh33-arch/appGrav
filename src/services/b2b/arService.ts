@@ -75,6 +75,7 @@ export async function getOutstandingOrders(): Promise<IOutstandingOrder[]> {
     return (data || []).map(order => {
         const dueDate = order.delivery_date ? new Date(order.delivery_date) : null
         const daysOverdue = dueDate ? Math.max(0, Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24))) : 0
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const customer = order.customer as any
 
         return {

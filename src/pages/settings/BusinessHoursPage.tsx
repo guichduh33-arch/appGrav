@@ -70,7 +70,7 @@ const BusinessHoursPage = () => {
               break_end: hours.break_end,
             },
           });
-        } catch (error) {
+        } catch {
           errors.push(dayOfWeek);
         }
       }

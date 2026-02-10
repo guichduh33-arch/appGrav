@@ -49,7 +49,7 @@ export function ComparisonKpiCard({
         return `${value.toFixed(1)}%`;
       case 'number':
       default:
-        return value.toLocaleString('fr-FR');
+        return value.toLocaleString('en-US');
     }
   };
 

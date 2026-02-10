@@ -16,12 +16,10 @@ import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { db } from '@/lib/db';
 import type { ISyncMeta } from '@/types/offline';
 import type {
-  IOfflineSetting as _IOfflineSetting,
   IOfflineTaxRate,
   IOfflinePaymentMethod,
   IOfflineBusinessHours,
 } from '@/types/offline';
-// IOfflineSetting unused but kept for documentation
 import type { TaxRate, PaymentMethod, BusinessHours } from '@/types/settings';
 
 // =====================================================

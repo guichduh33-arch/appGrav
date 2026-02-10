@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import type { Category } from '../../types/database'
+import logger from '@/utils/logger'
 
 // Query keys for category settings
 export const categorySettingsKeys = {
@@ -113,7 +114,7 @@ export function useUpdateCategory() {
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<CategoryFormData> }): Promise<Category> => {
-      console.log('[useUpdateCategory] Updating category:', id, updates)
+      logger.debug('[useUpdateCategory] Updating category:', id, updates)
 
       const { data, error } = await supabase
         .from('categories')
@@ -129,7 +130,7 @@ export function useUpdateCategory() {
         .eq('id', id)
         .select()
 
-      console.log('[useUpdateCategory] Response:', { data, error })
+      logger.debug('[useUpdateCategory] Response:', { data, error })
 
       if (error) throw error
       if (!data || data.length === 0) {

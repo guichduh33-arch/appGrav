@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
-import { X, Search, QrCode, User, Crown, Star, Building2, UserCheck, Check, UserPlus, Phone, Mail, Save, WifiOff, Heart, History, ShoppingBag, RotateCcw, ChevronLeft, Package, AlertTriangle, Clock } from 'lucide-react'
+import { X, Search, QrCode, User, Crown, Star, Building2, UserCheck, Check, UserPlus, Phone, Mail, Save, WifiOff, Heart, History, AlertTriangle, Clock } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
 import { useNetworkStore } from '../../../stores/networkStore'
 import { searchCustomersOffline, syncCustomersToOffline, IOfflineCustomer } from '../../../services/sync/customerSync'
 import { useCustomersLastSync } from '@/hooks/customers/useCustomersOffline'
-import { formatPrice } from '../../../utils/helpers'
 import { TIER_COLORS, TIER_DISCOUNTS } from '@/constants/loyalty'
+import CustomerDetailView from './CustomerDetailView'
 import './CustomerSearchModal.css'
 
 interface CustomerCategory {
@@ -93,7 +93,7 @@ export default function CustomerSearchModal({
 }: CustomerSearchModalProps) {
     const isOnline = useNetworkStore((state) => state.isOnline)
     // Story 6.1: Track cache freshness for stale data indicator
-    const { lastSyncAt: _lastSyncAt, isStale, ageDisplay } = useCustomersLastSync()
+    const { isStale, ageDisplay } = useCustomersLastSync()
     const [searchTerm, setSearchTerm] = useState('')
     const [customers, setCustomers] = useState<Customer[]>([])
     const [loading, setLoading] = useState(false)
@@ -553,17 +553,6 @@ export default function CustomerSearchModal({
         }
     }
 
-    const formatDate = (dateStr: string) => {
-        const date = new Date(dateStr)
-        return date.toLocaleDateString('fr-FR', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        })
-    }
-
     // Render customer card
     const renderCustomerCard = (customer: Customer, showFavoriteButton = true) => {
         const isFavorite = favoriteIds.includes(customer.id)
@@ -665,137 +654,20 @@ export default function CustomerSearchModal({
         )
     }
 
-    // Render customer detail view (Story 7.4, 7.5)
-    const renderDetailView = () => {
-        if (!selectedDetailCustomer) return null
-
-        return (
-            <div className="customer-detail">
-                <div className="customer-detail__header">
-                    <button
-                        type="button"
-                        className="btn-back"
-                        onClick={() => setSelectedDetailCustomer(null)}
-                    >
-                        <ChevronLeft size={20} />
-                        Retour
-                    </button>
-                    <button
-                        type="button"
-                        className="btn btn-primary btn-select-customer"
-                        onClick={() => handleSelectCustomer(selectedDetailCustomer)}
-                    >
-                        <Check size={16} />
-                        Select
-                    </button>
-                </div>
-
-                <div className="customer-detail__profile">
-                    <div
-                        className="customer-detail__avatar"
-                        style={{
-                            backgroundColor: selectedDetailCustomer.category?.color || TIER_COLORS[selectedDetailCustomer.loyalty_tier] || '#6366f1'
-                        }}
-                    >
-                        {(selectedDetailCustomer.company_name || selectedDetailCustomer.name)[0].toUpperCase()}
-                    </div>
-                    <div className="customer-detail__info">
-                        <h3>{selectedDetailCustomer.company_name || selectedDetailCustomer.name}</h3>
-                        {selectedDetailCustomer.phone && <p><Phone size={14} /> {selectedDetailCustomer.phone}</p>}
-                        {selectedDetailCustomer.email && <p><Mail size={14} /> {selectedDetailCustomer.email}</p>}
-                    </div>
-                    <div className="customer-detail__loyalty">
-                        <span
-                            className="tier-badge tier-badge--large"
-                            style={{ backgroundColor: TIER_COLORS[selectedDetailCustomer.loyalty_tier] }}
-                        >
-                            <Crown size={14} />
-                            {selectedDetailCustomer.loyalty_tier}
-                        </span>
-                        <span className="points-large">
-                            {selectedDetailCustomer.loyalty_points.toLocaleString()} pts
-                        </span>
-                        {(selectedDetailCustomer.category?.discount_percentage ?? TIER_DISCOUNTS[selectedDetailCustomer.loyalty_tier]) > 0 && (
-                            <span className="discount-badge discount-badge--large">
-                                -{selectedDetailCustomer.category?.discount_percentage || TIER_DISCOUNTS[selectedDetailCustomer.loyalty_tier]}% discount
-                            </span>
-                        )}
-                    </div>
-                </div>
-
-                {loadingHistory ? (
-                    <div className="customer-detail__loading">
-                        <div className="spinner"></div>
-                        <span>Loading history...</span>
-                    </div>
-                ) : (
-                    <>
-                        {/* Frequent products (Story 7.5) */}
-                        {frequentProducts.length > 0 && (
-                            <div className="customer-detail__section">
-                                <h4><Package size={16} /> Produits préférés</h4>
-                                <div className="frequent-products">
-                                    {frequentProducts.map(product => (
-                                        <div key={product.product_id} className="frequent-product">
-                                            <span className="frequent-product__name">{product.product_name}</span>
-                                            <span className="frequent-product__count">×{product.times_ordered}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Order history (Story 7.4) */}
-                        <div className="customer-detail__section">
-                            <h4><ShoppingBag size={16} /> Order History</h4>
-                            {orderHistory.length === 0 ? (
-                                <p className="no-history">No previous orders</p>
-                            ) : (
-                                <div className="order-history">
-                                    {orderHistory.map(order => (
-                                        <div key={order.id} className="order-history__item">
-                                            <div className="order-history__header">
-                                                <span className="order-history__number">{order.order_number}</span>
-                                                <span className="order-history__date">{formatDate(order.created_at)}</span>
-                                                <span className="order-history__total">{formatPrice(order.total)}</span>
-                                            </div>
-                                            <div className="order-history__items">
-                                                {order.items.slice(0, 3).map(item => (
-                                                    <span key={item.id} className="order-history__product">
-                                                        {item.quantity}× {item.product_name}
-                                                    </span>
-                                                ))}
-                                                {order.items.length > 3 && (
-                                                    <span className="order-history__more">
-                                                        +{order.items.length - 3} autres
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <button
-                                                type="button"
-                                                className="btn-reorder"
-                                                onClick={() => handleReorder(order)}
-                                            >
-                                                <RotateCcw size={14} />
-                                                Recommander
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </>
-                )}
-            </div>
-        )
-    }
-
     return (
         <div className="customer-search-modal-overlay" onClick={onClose}>
             <div className="customer-search-modal" onClick={e => e.stopPropagation()}>
                 {/* Customer Detail View */}
                 {selectedDetailCustomer ? (
-                    renderDetailView()
+                    <CustomerDetailView
+                        customer={selectedDetailCustomer}
+                        orderHistory={orderHistory}
+                        frequentProducts={frequentProducts}
+                        loadingHistory={loadingHistory}
+                        onBack={() => setSelectedDetailCustomer(null)}
+                        onSelectCustomer={handleSelectCustomer}
+                        onReorder={handleReorder}
+                    />
                 ) : (
                     <>
                         {/* Header */}

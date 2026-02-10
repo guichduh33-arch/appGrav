@@ -8,6 +8,7 @@
 
 import { supabase } from '@/lib/supabase';
 import { useLanStore } from '@/stores/lanStore';
+import logger from '@/utils/logger';
 import {
   ILanMessage,
   TLanMessageType,
@@ -58,7 +59,7 @@ class LanClient {
    */
   async connect(config: IClientConfig): Promise<boolean> {
     if (this.isConnected) {
-      console.log('[LanClient] Already connected');
+      logger.debug('[LanClient] Already connected');
       return true;
     }
 
@@ -101,7 +102,7 @@ class LanClient {
           this.handleRealtimeMessage(payload.payload as ILanMessage);
         })
         .subscribe((status) => {
-          console.log('[LanClient] Realtime channel status:', status);
+          logger.debug('[LanClient] Realtime channel status:', status);
           if (status === 'SUBSCRIBED') {
             this.onConnected();
           } else if (status === 'CHANNEL_ERROR') {
@@ -117,7 +118,7 @@ class LanClient {
       // Update store
       store.setDeviceInfo(config.deviceId, config.deviceType, config.deviceName);
 
-      console.log('[LanClient] Connecting...');
+      logger.debug('[LanClient] Connecting...');
       return true;
     } catch (error) {
       console.error('[LanClient] Connect error:', error);
@@ -171,7 +172,7 @@ class LanClient {
     this.isConnected = false;
     this.startTime = null;
 
-    console.log('[LanClient] Disconnected');
+    logger.debug('[LanClient] Disconnected');
   }
 
   /**
@@ -258,7 +259,7 @@ class LanClient {
       return;
     }
 
-    console.log(`[LanClient] Received ${message.type} from ${message.from}`);
+    logger.debug(`[LanClient] Received ${message.type} from ${message.from}`);
 
     // Notify handlers
     const handlers = this.handlers.get(message.type);
@@ -295,14 +296,14 @@ class LanClient {
     // Send any pending messages
     const pending = store.pendingMessages;
     if (pending.length > 0) {
-      console.log(`[LanClient] Sending ${pending.length} pending messages`);
+      logger.debug(`[LanClient] Sending ${pending.length} pending messages`);
       store.clearPendingMessages();
       pending.forEach(msg => {
         this.send(msg.type, msg.payload, msg.to);
       });
     }
 
-    console.log('[LanClient] Connected');
+    logger.debug('[LanClient] Connected');
   }
 
   /**
@@ -336,7 +337,7 @@ class LanClient {
       60000
     );
 
-    console.log(`[LanClient] Reconnecting in ${backoff}ms (attempt ${attempts + 1})`);
+    logger.debug(`[LanClient] Reconnecting in ${backoff}ms (attempt ${attempts + 1})`);
     store.incrementReconnectAttempts();
 
     this.reconnectTimer = setTimeout(() => {
@@ -350,7 +351,7 @@ class LanClient {
   private async reconnect(): Promise<void> {
     if (!this.config) return;
 
-    console.log('[LanClient] Attempting reconnect...');
+    logger.debug('[LanClient] Attempting reconnect...');
     useLanStore.getState().setConnectionStatus('connecting');
 
     // Close existing channels

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { AlertTriangle, AlertCircle, XCircle, Package, Loader2, TrendingDown } from 'lucide-react';
+import { AlertTriangle, AlertCircle, XCircle, Package, TrendingDown } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ReportingService } from '@/services/ReportingService';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
 import { formatCurrency as formatCurrencyPdf } from '@/services/reports/pdfExport';
@@ -39,25 +40,25 @@ export function StockWarningTab() {
     data: data || [],
     columns: [
       { key: 'sku', header: 'SKU', format: (v) => (v as string) || '-' },
-      { key: 'product_name', header: 'Produit' },
-      { key: 'category_name', header: 'Catégorie', format: (v) => (v as string) || '-' },
-      { key: 'current_stock', header: 'Stock actuel', align: 'right' as const },
-      { key: 'min_stock_level', header: 'Stock min', align: 'right' as const },
-      { key: 'alert_level', header: 'Alerte', format: (v) => getAlertLabel(v as string) },
-      { key: 'suggested_reorder', header: 'À commander', align: 'right' as const },
-      { key: 'value_at_risk', header: 'Valeur à risque', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'product_name', header: 'Product' },
+      { key: 'category_name', header: 'Category', format: (v) => (v as string) || '-' },
+      { key: 'current_stock', header: 'Current Stock', align: 'right' as const },
+      { key: 'min_stock_level', header: 'Min Stock', align: 'right' as const },
+      { key: 'alert_level', header: 'Alert', format: (v) => getAlertLabel(v as string) },
+      { key: 'suggested_reorder', header: 'To Order', align: 'right' as const },
+      { key: 'value_at_risk', header: 'At-Risk Value', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
     ],
-    filename: 'alerte_stock',
-    title: 'Rapport d\'Alerte Stock',
+    filename: 'stock-warnings',
+    title: 'Stock Alert Report',
     summaries: [
-      { label: 'Ruptures', value: alertStats.outOfStock.toString() },
-      { label: 'Critiques', value: alertStats.critical.toString() },
-      { label: 'Valeur à risque', value: formatCurrencyPdf(alertStats.totalValue) },
+      { label: 'Out of Stock', value: alertStats.outOfStock.toString() },
+      { label: 'Critical', value: alertStats.critical.toString() },
+      { label: 'At-Risk Value', value: formatCurrencyPdf(alertStats.totalValue) },
     ],
   }), [data, alertStats]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   const getAlertBadge = (level: string) => {
@@ -66,21 +67,21 @@ export function StockWarningTab() {
         return (
           <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
             <XCircle className="w-3 h-3" />
-            Rupture
+            Out of Stock
           </span>
         );
       case 'critical':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-orange-100 text-orange-700 rounded-full">
             <AlertCircle className="w-3 h-3" />
-            Critique
+            Critical
           </span>
         );
       case 'warning':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-700 rounded-full">
             <AlertTriangle className="w-3 h-3" />
-            Attention
+            Warning
           </span>
         );
       default:
@@ -96,11 +97,15 @@ export function StockWarningTab() {
     );
   }
 
+  if (isLoading) {
+    return <ReportSkeleton />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-lg font-semibold text-gray-900">Alertes de Stock</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Stock Alerts</h2>
         <ExportButtons config={exportConfig} />
       </div>
 
@@ -111,10 +116,10 @@ export function StockWarningTab() {
             <div className="p-2 bg-red-50 rounded-lg">
               <XCircle className="w-5 h-5 text-red-600" />
             </div>
-            <span className="text-sm text-gray-600">Ruptures de stock</span>
+            <span className="text-sm text-gray-600">Out of Stock</span>
           </div>
           <p className="text-2xl font-bold text-red-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : alertStats.outOfStock}
+            {alertStats.outOfStock}
           </p>
         </div>
 
@@ -123,10 +128,10 @@ export function StockWarningTab() {
             <div className="p-2 bg-orange-50 rounded-lg">
               <AlertCircle className="w-5 h-5 text-orange-600" />
             </div>
-            <span className="text-sm text-gray-600">Niveau critique</span>
+            <span className="text-sm text-gray-600">Critical Level</span>
           </div>
           <p className="text-2xl font-bold text-orange-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : alertStats.critical}
+            {alertStats.critical}
           </p>
         </div>
 
@@ -135,10 +140,10 @@ export function StockWarningTab() {
             <div className="p-2 bg-yellow-50 rounded-lg">
               <AlertTriangle className="w-5 h-5 text-yellow-600" />
             </div>
-            <span className="text-sm text-gray-600">Stock bas</span>
+            <span className="text-sm text-gray-600">Low Stock</span>
           </div>
           <p className="text-2xl font-bold text-yellow-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : alertStats.warning}
+            {alertStats.warning}
           </p>
         </div>
 
@@ -147,10 +152,10 @@ export function StockWarningTab() {
             <div className="p-2 bg-purple-50 rounded-lg">
               <TrendingDown className="w-5 h-5 text-purple-600" />
             </div>
-            <span className="text-sm text-gray-600">Valeur à risque</span>
+            <span className="text-sm text-gray-600">At-Risk Value</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(alertStats.totalValue)}
+            {formatCurrency(alertStats.totalValue)}
           </p>
         </div>
       </div>
@@ -158,29 +163,23 @@ export function StockWarningTab() {
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Produits en alerte</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Products on Alert</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produit</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Catégorie</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Stock</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Stock Min</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Alerte</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">À commander</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Valeur risque</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Min Stock</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Alert</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">To Order</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Risk Value</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  </td>
-                </tr>
-              ) : data && data.length > 0 ? (
+              {data && data.length > 0 ? (
                 data.map((row) => (
                   <tr key={row.product_id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
@@ -217,7 +216,7 @@ export function StockWarningTab() {
               ) : (
                 <tr>
                   <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                    Aucune alerte de stock
+                    No stock alerts
                   </td>
                 </tr>
               )}
@@ -231,9 +230,9 @@ export function StockWarningTab() {
 
 function getAlertLabel(level: string): string {
   switch (level) {
-    case 'out_of_stock': return 'Rupture';
-    case 'critical': return 'Critique';
-    case 'warning': return 'Attention';
+    case 'out_of_stock': return 'Out of Stock';
+    case 'critical': return 'Critical';
+    case 'warning': return 'Warning';
     default: return level;
   }
 }

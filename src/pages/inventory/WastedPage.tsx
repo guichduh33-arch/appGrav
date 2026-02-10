@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
     Trash2,
     Plus,
@@ -9,35 +9,17 @@ import {
     X,
     Save
 } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../stores/authStore'
 import { formatCurrency, formatDateTime } from '../../utils/helpers'
 import { toast } from 'sonner'
+import {
+    useWasteRecords,
+    useWasteProducts,
+    useCreateWasteRecord,
+    type IWasteProduct as Product,
+    type TWasteDateFilter,
+} from '@/hooks/inventory/useWasteRecords'
 import './WastedPage.css'
-
-interface WasteRecord {
-    id: string
-    product_id: string
-    product: { id: string; name: string; sku: string; unit: string; cost_price: number | null } | null
-    quantity: number
-    reason: string | null
-    unit: string | null
-    stock_before: number | null
-    stock_after: number | null
-    staff_id: string | null
-    staff_name: string | null
-    created_at: string
-    unit_cost: number | null
-}
-
-interface Product {
-    id: string
-    name: string
-    sku: string
-    unit: string | null
-    cost_price: number | null
-    current_stock: number | null
-}
 
 const WASTE_REASONS = [
     { value: 'expired', label: 'Expired' },
@@ -50,12 +32,9 @@ const WASTE_REASONS = [
 
 export default function WastedPage() {
     const { user } = useAuthStore()
-    const [wasteRecords, setWasteRecords] = useState<WasteRecord[]>([])
-    const [products, setProducts] = useState<Product[]>([])
-    const [isLoading, setIsLoading] = useState(true)
     const [showModal, setShowModal] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
-    const [dateFilter, setDateFilter] = useState<'today' | 'week' | 'month' | 'all'>('week')
+    const [dateFilter, setDateFilter] = useState<TWasteDateFilter>('week')
 
     // Form state
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
@@ -63,98 +42,12 @@ export default function WastedPage() {
     const [reason, setReason] = useState('expired')
     const [notes, setNotes] = useState('')
     const [productSearch, setProductSearch] = useState('')
-    const [isSaving, setIsSaving] = useState(false)
 
-    useEffect(() => {
-        loadData()
-    }, [dateFilter])
-
-    const loadData = async () => {
-        setIsLoading(true)
-        try {
-            // Load waste records
-            let query = supabase
-                .from('stock_movements')
-                .select(`
-                    id,
-                    product_id,
-                    product:products(id, name, sku, unit, cost_price),
-                    quantity,
-                    reason,
-                    unit,
-                    stock_before,
-                    stock_after,
-                    staff_id,
-                    staff:user_profiles!fk_stock_movements_staff(display_name),
-                    created_at,
-                    unit_cost
-                `)
-                .eq('movement_type', 'waste')
-                .order('created_at', { ascending: false })
-
-            // Apply date filter
-            const now = new Date()
-            if (dateFilter === 'today') {
-                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString()
-                query = query.gte('created_at', today)
-            } else if (dateFilter === 'week') {
-                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
-                query = query.gte('created_at', weekAgo)
-            } else if (dateFilter === 'month') {
-                const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
-                query = query.gte('created_at', monthAgo)
-            }
-
-            const { data: wasteData, error: wasteError } = await query
-
-            if (wasteError) throw wasteError
-            // Map data to WasteRecord format
-            const rawData = wasteData as unknown as Array<{
-                id: string;
-                product_id: string;
-                product: { id: string; name: string; sku: string; unit: string; cost_price: number | null } | null;
-                quantity: number;
-                reason?: string | null;
-                unit?: string | null;
-                stock_before?: number | null;
-                stock_after?: number | null;
-                staff_id?: string | null;
-                staff?: { display_name: string } | null;
-                created_at: string;
-                unit_cost?: number | null;
-            }>;
-            const mappedData: WasteRecord[] = rawData.map((r) => ({
-                id: r.id,
-                product_id: r.product_id,
-                product: r.product,
-                quantity: r.quantity,
-                reason: r.reason ?? 'other',
-                unit: r.unit ?? r.product?.unit ?? null,
-                stock_before: r.stock_before ?? null,
-                stock_after: r.stock_after ?? null,
-                staff_id: r.staff_id ?? null,
-                staff_name: r.staff?.display_name ?? null,
-                created_at: r.created_at,
-                unit_cost: r.unit_cost ?? r.product?.cost_price ?? null
-            }))
-            setWasteRecords(mappedData)
-
-            // Load products for the form (include null is_active as active)
-            const { data: productsData, error: productsError } = await supabase
-                .from('products')
-                .select('id, name, sku, unit, cost_price, current_stock')
-                .neq('is_active', false)
-                .order('name')
-
-            if (productsError) throw productsError
-            setProducts(productsData || [])
-        } catch (err) {
-            console.error('Error loading data:', err)
-            toast.error('Error loading data')
-        } finally {
-            setIsLoading(false)
-        }
-    }
+    // React Query hooks
+    const { data: wasteRecords = [], isLoading } = useWasteRecords(dateFilter)
+    const { data: products = [] } = useWasteProducts()
+    const createWasteMutation = useCreateWasteRecord()
+    const isSaving = createWasteMutation.isPending
 
     // Calculate stats
     const stats = {
@@ -199,46 +92,25 @@ export default function WastedPage() {
             return
         }
 
-        setIsSaving(true)
         try {
-            const movementId = `MV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
             const combinedReason = `${getReasonLabel(reason)}${notes ? ': ' + notes : ''}`
 
-            const { error } = await supabase
-                .from('stock_movements')
-                .insert({
-                    movement_id: movementId,
-                    product_id: selectedProduct.id,
-                    movement_type: 'waste',
-                    quantity: -qty, // Negative for waste
-                    reason: combinedReason,
-                    unit: selectedProduct.unit || 'pcs',
-                    stock_before: currentStock,
-                    stock_after: currentStock - qty,
-                    staff_id: user?.id,
-                    unit_cost: selectedProduct.cost_price || 0,
-                    reference_type: 'manual_waste'
-                } as never)
-
-            if (error) throw error
-
-            // Update product stock
-            const { error: updateError } = await supabase
-                .from('products')
-                .update({ current_stock: currentStock - qty })
-                .eq('id', selectedProduct.id)
-
-            if (updateError) throw updateError
+            await createWasteMutation.mutateAsync({
+                productId: selectedProduct.id,
+                quantity: qty,
+                reason: combinedReason,
+                unit: selectedProduct.unit || 'pcs',
+                currentStock,
+                costPrice: selectedProduct.cost_price || 0,
+                staffId: user?.id,
+            })
 
             toast.success('Waste recorded successfully')
             setShowModal(false)
             resetForm()
-            loadData()
         } catch (err) {
             console.error('Error saving waste:', err)
             toast.error('Error saving waste record')
-        } finally {
-            setIsSaving(false)
         }
     }
 

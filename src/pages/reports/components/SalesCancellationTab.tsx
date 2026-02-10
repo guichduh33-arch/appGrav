@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { XCircle, DollarSign, AlertTriangle, Loader2, Calendar } from 'lucide-react';
+import { XCircle, DollarSign, AlertTriangle, Calendar } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -27,7 +28,7 @@ export function SalesCancellationTab() {
     const reasonMap = new Map<string, { count: number; value: number }>();
 
     data.forEach((d) => {
-      const reason = d.cancel_reason || 'Non spécifié';
+      const reason = d.cancel_reason || 'Not Specified';
       const existing = reasonMap.get(reason) || { count: 0, value: 0 };
       reasonMap.set(reason, {
         count: existing.count + 1,
@@ -63,24 +64,24 @@ export function SalesCancellationTab() {
   const exportConfig: ExportConfig<ICancellationsReport> = useMemo(() => ({
     data: data || [],
     columns: [
-      { key: 'order_number', header: 'N° Commande' },
-      { key: 'cancelled_at', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('fr-FR') },
-      { key: 'cashier_name', header: 'Caissier', format: (v) => (v as string) || '-' },
-      { key: 'order_total', header: 'Montant', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
-      { key: 'cancel_reason', header: 'Raison', format: (v) => (v as string) || 'Non spécifié' },
-      { key: 'items_count', header: 'Articles', align: 'right' as const },
+      { key: 'order_number', header: 'Order #' },
+      { key: 'cancelled_at', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('en-US') },
+      { key: 'cashier_name', header: 'Cashier', format: (v) => (v as string) || '-' },
+      { key: 'order_total', header: 'Amount', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'cancel_reason', header: 'Reason', format: (v) => (v as string) || 'Not Specified' },
+      { key: 'items_count', header: 'Items', align: 'right' as const },
     ],
-    filename: 'annulations',
-    title: 'Rapport des Annulations',
+    filename: 'cancellations',
+    title: 'Cancellation Report',
     dateRange,
     summaries: [
-      { label: 'Total annulé', value: formatCurrencyPdf(summary.totalValue) },
-      { label: 'Nombre d\'annulations', value: summary.totalCancelled.toString() },
+      { label: 'Total Cancelled', value: formatCurrencyPdf(summary.totalValue) },
+      { label: 'Number of Cancellations', value: summary.totalCancelled.toString() },
     ],
   }), [data, dateRange, summary]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   if (error) {
@@ -89,6 +90,10 @@ export function SalesCancellationTab() {
         Error loading data
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <ReportSkeleton />;
   }
 
   return (
@@ -106,10 +111,10 @@ export function SalesCancellationTab() {
             <div className="p-2 bg-red-50 rounded-lg">
               <XCircle className="w-5 h-5 text-red-600" />
             </div>
-            <span className="text-sm text-gray-600">Annulations</span>
+            <span className="text-sm text-gray-600">Cancellations</span>
           </div>
           <p className="text-2xl font-bold text-red-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : summary.totalCancelled}
+            {summary.totalCancelled}
           </p>
         </div>
 
@@ -118,10 +123,10 @@ export function SalesCancellationTab() {
             <div className="p-2 bg-orange-50 rounded-lg">
               <DollarSign className="w-5 h-5 text-orange-600" />
             </div>
-            <span className="text-sm text-gray-600">Valeur annulée</span>
+            <span className="text-sm text-gray-600">Cancelled Value</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(summary.totalValue)}
+            {formatCurrency(summary.totalValue)}
           </p>
         </div>
 
@@ -130,10 +135,10 @@ export function SalesCancellationTab() {
             <div className="p-2 bg-yellow-50 rounded-lg">
               <AlertTriangle className="w-5 h-5 text-yellow-600" />
             </div>
-            <span className="text-sm text-gray-600">Moyenne / annulation</span>
+            <span className="text-sm text-gray-600">Avg / Cancellation</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(summary.avgValue)}
+            {formatCurrency(summary.avgValue)}
           </p>
         </div>
       </div>
@@ -142,15 +147,11 @@ export function SalesCancellationTab() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Pie Chart by Reason */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Annulations par raison</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">Cancellations by Reason</h3>
 
-          {isLoading ? (
-            <div className="h-64 flex items-center justify-center">
-              <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-            </div>
-          ) : reasonData.length === 0 ? (
+          {reasonData.length === 0 ? (
             <div className="h-64 flex items-center justify-center text-gray-500">
-              Aucune annulation sur cette période
+              No cancellations in this period
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={280}>
@@ -172,7 +173,7 @@ export function SalesCancellationTab() {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value) => [formatCurrency(value as number), 'Valeur']}
+                  formatter={(value) => [formatCurrency(value as number), 'Value']}
                 />
                 <Legend />
               </PieChart>
@@ -183,15 +184,15 @@ export function SalesCancellationTab() {
         {/* Reason Breakdown Table */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Détail par raison</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Breakdown by Reason</h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Raison</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Nombre</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Valeur</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Count</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Value</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -221,35 +222,29 @@ export function SalesCancellationTab() {
       {/* Detailed Cancellations Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Liste des annulations</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Cancellation List</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">N° Commande</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order #</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Caissier</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Articles</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Montant</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Raison</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cashier</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Items</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  </td>
-                </tr>
-              ) : data && data.length > 0 ? (
+              {data && data.length > 0 ? (
                 data.map((row) => (
                   <tr key={row.order_id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">{row.order_number}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-gray-400" />
-                        {new Date(row.cancelled_at).toLocaleDateString('fr-FR', {
+                        {new Date(row.cancelled_at).toLocaleDateString('en-US', {
                           day: '2-digit',
                           month: '2-digit',
                           year: 'numeric',
@@ -265,7 +260,7 @@ export function SalesCancellationTab() {
                     </td>
                     <td className="px-6 py-4">
                       <span className="inline-flex px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">
-                        {row.cancel_reason || 'Non spécifié'}
+                        {row.cancel_reason || 'Not Specified'}
                       </span>
                     </td>
                   </tr>
@@ -273,7 +268,7 @@ export function SalesCancellationTab() {
               ) : (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    Aucune annulation sur cette période
+                    No cancellations in this period
                   </td>
                 </tr>
               )}

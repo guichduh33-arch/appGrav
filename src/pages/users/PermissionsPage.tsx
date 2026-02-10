@@ -10,33 +10,13 @@ import {
     Shield, ChevronDown, ChevronRight, Check, X,
     Save, RefreshCw, Search, Info
 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
+import {
+    usePermissionsMatrix,
+    useSavePermissions,
+    type IPermission as Permission,
+} from '@/hooks/usePermissionsData'
 import './PermissionsPage.css'
-
-interface Role {
-    id: string
-    code: string
-    name_fr: string
-    name_en: string
-    name_id: string
-    hierarchy_level: number
-}
-
-interface Permission {
-    id: string
-    code: string
-    name_fr: string
-    name_en: string
-    name_id: string
-    module: string
-    description: string | null
-}
-
-interface RolePermission {
-    role_id: string
-    permission_id: string
-}
 
 // Group permissions by module
 const MODULE_ORDER = [
@@ -60,49 +40,28 @@ const MODULE_LABELS: Record<string, { fr: string; en: string; id: string }> = {
 }
 
 export default function PermissionsPage() {
-    const [roles, setRoles] = useState<Role[]>([])
-    const [permissions, setPermissions] = useState<Permission[]>([])
+    // React Query hooks
+    const { data: matrixData, isLoading: loading } = usePermissionsMatrix()
+    const savePermissionsMutation = useSavePermissions()
+
+    const roles = matrixData?.roles ?? []
+    const permissions = (matrixData?.permissions ?? []) as Permission[]
+
     const [rolePermissions, setRolePermissions] = useState<Map<string, Set<string>>>(new Map())
-    const [loading, setLoading] = useState(true)
-    const [saving, setSaving] = useState(false)
     const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set(MODULE_ORDER))
     const [searchTerm, setSearchTerm] = useState('')
     const [hasChanges, setHasChanges] = useState(false)
     const [originalRolePermissions, setOriginalRolePermissions] = useState<Map<string, Set<string>>>(new Map())
 
+    // Sync hook data into local state for editing
     useEffect(() => {
-        loadData()
-    }, [])
-
-    const loadData = async () => {
-        try {
-            const [rolesRes, permsRes, rolePermsRes] = await Promise.all([
-                supabase.from('roles').select('*').order('hierarchy_level'),
-                supabase.from('permissions').select('*').order('module, code'),
-                supabase.from('role_permissions').select('role_id, permission_id')
-            ])
-
-            if (rolesRes.data) setRoles(rolesRes.data as Role[])
-            if (permsRes.data) setPermissions(permsRes.data)
-
-            if (rolePermsRes.data) {
-                const permMap = new Map<string, Set<string>>()
-                for (const rp of rolePermsRes.data as RolePermission[]) {
-                    if (!permMap.has(rp.role_id)) {
-                        permMap.set(rp.role_id, new Set())
-                    }
-                    permMap.get(rp.role_id)!.add(rp.permission_id)
-                }
-                setRolePermissions(permMap)
-                setOriginalRolePermissions(new Map([...permMap].map(([k, v]) => [k, new Set(v)])))
-            }
-        } catch (error) {
-            console.error('Error loading permissions:', error)
-            toast.error('Loading error')
-        } finally {
-            setLoading(false)
+        if (matrixData?.rolePermissions) {
+            const cloned = new Map([...matrixData.rolePermissions].map(([k, v]) => [k, new Set(v)]))
+            setRolePermissions(cloned)
+            setOriginalRolePermissions(new Map([...matrixData.rolePermissions].map(([k, v]) => [k, new Set(v)])))
+            setHasChanges(false)
         }
-    }
+    }, [matrixData])
 
     const getLocalizedName = (item: { name_fr: string; name_en: string; name_id: string }) => {
         return item.name_en
@@ -165,54 +124,21 @@ export default function PermissionsPage() {
         setHasChanges(true)
     }
 
+    const saving = savePermissionsMutation.isPending
+
     const handleSave = async () => {
-        setSaving(true)
         try {
-            // Find changes
-            const toInsert: RolePermission[] = []
-            const toDelete: RolePermission[] = []
-
-            for (const role of roles) {
-                const current = rolePermissions.get(role.id) || new Set()
-                const original = originalRolePermissions.get(role.id) || new Set()
-
-                // New permissions to add
-                for (const permId of current) {
-                    if (!original.has(permId)) {
-                        toInsert.push({ role_id: role.id, permission_id: permId })
-                    }
-                }
-
-                // Permissions to remove
-                for (const permId of original) {
-                    if (!current.has(permId)) {
-                        toDelete.push({ role_id: role.id, permission_id: permId })
-                    }
-                }
-            }
-
-            // Delete removed permissions
-            for (const rp of toDelete) {
-                await supabase
-                    .from('role_permissions')
-                    .delete()
-                    .eq('role_id', rp.role_id)
-                    .eq('permission_id', rp.permission_id)
-            }
-
-            // Insert new permissions
-            if (toInsert.length > 0) {
-                await supabase.from('role_permissions').insert(toInsert)
-            }
-
+            await savePermissionsMutation.mutateAsync({
+                roles,
+                current: rolePermissions,
+                original: originalRolePermissions,
+            })
             setOriginalRolePermissions(new Map([...rolePermissions].map(([k, v]) => [k, new Set(v)])))
             setHasChanges(false)
             toast.success('Permissions saved')
         } catch (error) {
             console.error('Error saving permissions:', error)
             toast.error('Error saving')
-        } finally {
-            setSaving(false)
         }
     }
 

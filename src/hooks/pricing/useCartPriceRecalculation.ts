@@ -15,6 +15,7 @@ import { useCartStore, type CartItem } from '@/stores/cartStore';
 import { calculateCustomerPrice } from '@/services/sync/customerPricingService';
 import type { IOfflineProduct } from '@/lib/db';
 import type { TPriceType } from '@/types/offline';
+import logger from '@/utils/logger';
 
 /**
  * Hook that automatically recalculates cart prices when customer category changes
@@ -75,13 +76,13 @@ export function useCartPriceRecalculation(): void {
 
     // Only recalculate if category actually changed and there are items
     if (prevCategory !== customerCategorySlug && items.length > 0) {
-      console.log(
+      logger.debug(
         `[CartPriceRecalculation] Customer category changed from ${prevCategory} to ${customerCategorySlug}, recalculating prices...`
       );
 
       // Recalculate all product prices
       recalculateAllPrices(priceCalculator).then(() => {
-        console.log('[CartPriceRecalculation] Price recalculation complete');
+        logger.debug('[CartPriceRecalculation] Price recalculation complete');
       });
     }
 

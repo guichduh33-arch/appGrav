@@ -12,7 +12,10 @@ import {
   LineChart,
   Line,
 } from 'recharts';
-import { TrendingUp, TrendingDown, DollarSign, Percent, Loader2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Percent } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
+import { ComparisonToggle } from '@/components/reports/ComparisonToggle';
+import { ComparisonKpiCard, ComparisonKpiGrid } from '@/components/reports/ComparisonKpiCard';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -21,13 +24,23 @@ import { formatCurrency as formatCurrencyPdf } from '@/services/reports/pdfExpor
 import type { IProfitLossReport } from '@/types/reporting';
 
 export function ProfitLossTab() {
-  const { dateRange } = useDateRange({ defaultPreset: 'last30days' });
+  const {
+    dateRange, comparisonRange, comparisonType, setComparisonType, isComparisonEnabled,
+  } = useDateRange({ defaultPreset: 'last30days', enableComparison: true });
   const [chartView, setChartView] = useState<'bar' | 'line'>('bar');
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['profit-loss', dateRange.from, dateRange.to],
     queryFn: () => ReportingService.getProfitLoss(dateRange.from, dateRange.to),
     staleTime: 5 * 60 * 1000,
+  });
+
+  // Comparison period data
+  const { data: comparisonPLData } = useQuery({
+    queryKey: ['profit-loss-comparison', comparisonRange?.from, comparisonRange?.to],
+    queryFn: () => ReportingService.getProfitLoss(comparisonRange!.from, comparisonRange!.to),
+    staleTime: 5 * 60 * 1000,
+    enabled: isComparisonEnabled && !!comparisonRange,
   });
 
   // Calculate totals
@@ -53,13 +66,23 @@ export function ProfitLossTab() {
     return { grossRevenue, cogs, grossProfit, marginPercentage, taxCollected, totalDiscounts };
   }, [data]);
 
+  // Comparison period totals
+  const prevTotals = useMemo(() => {
+    if (!comparisonPLData || comparisonPLData.length === 0 || !isComparisonEnabled) return null;
+    const grossRevenue = comparisonPLData.reduce((sum, d) => sum + (d.gross_revenue || 0), 0);
+    const cogs = comparisonPLData.reduce((sum, d) => sum + (d.cogs || 0), 0);
+    const grossProfit = comparisonPLData.reduce((sum, d) => sum + (d.gross_profit || 0), 0);
+    const marginPercentage = grossRevenue > 0 ? (grossProfit / grossRevenue) * 100 : 0;
+    return { grossRevenue, cogs, grossProfit, marginPercentage };
+  }, [comparisonPLData, isComparisonEnabled]);
+
   // Format for chart
   const chartData = useMemo(() => {
     if (!data) return [];
     return [...data]
       .sort((a, b) => new Date(a.report_date).getTime() - new Date(b.report_date).getTime())
       .map((d) => ({
-        date: new Date(d.report_date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+        date: new Date(d.report_date).toLocaleDateString('en-US', { day: '2-digit', month: 'short' }),
         revenue: d.gross_revenue,
         cogs: d.cogs,
         profit: d.gross_profit,
@@ -71,26 +94,26 @@ export function ProfitLossTab() {
   const exportConfig: ExportConfig<IProfitLossReport> = useMemo(() => ({
     data: data || [],
     columns: [
-      { key: 'report_date', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('fr-FR') },
-      { key: 'order_count', header: 'Commandes', align: 'right' as const },
-      { key: 'gross_revenue', header: 'CA Brut', align: 'right' as const, format: (v) => formatCurrencyPdf(v) },
-      { key: 'cogs', header: 'Coût', align: 'right' as const, format: (v) => formatCurrencyPdf(v) },
-      { key: 'gross_profit', header: 'Marge Brute', align: 'right' as const, format: (v) => formatCurrencyPdf(v) },
-      { key: 'margin_percentage', header: 'Marge %', align: 'right' as const, format: (v) => `${Number(v).toFixed(1)}%` },
-      { key: 'tax_collected', header: 'TVA', align: 'right' as const, format: (v) => formatCurrencyPdf(v) },
+      { key: 'report_date', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('en-US') },
+      { key: 'order_count', header: 'Orders', align: 'right' as const },
+      { key: 'gross_revenue', header: 'Gross Revenue', align: 'right' as const, format: (v) => formatCurrencyPdf(v) },
+      { key: 'cogs', header: 'Cost', align: 'right' as const, format: (v) => formatCurrencyPdf(v) },
+      { key: 'gross_profit', header: 'Gross Profit', align: 'right' as const, format: (v) => formatCurrencyPdf(v) },
+      { key: 'margin_percentage', header: 'Margin %', align: 'right' as const, format: (v) => `${Number(v).toFixed(1)}%` },
+      { key: 'tax_collected', header: 'Tax', align: 'right' as const, format: (v) => formatCurrencyPdf(v) },
     ],
-    filename: 'profit_loss',
-    title: 'Rapport Profit & Perte',
+    filename: 'profit-loss',
+    title: 'Profit & Loss Report',
     dateRange,
     summaries: [
-      { label: 'CA Total', value: formatCurrencyPdf(totals.grossRevenue) },
-      { label: 'Marge Brute', value: formatCurrencyPdf(totals.grossProfit) },
-      { label: 'Marge %', value: `${totals.marginPercentage.toFixed(1)}%` },
+      { label: 'Total Revenue', value: formatCurrencyPdf(totals.grossRevenue) },
+      { label: 'Gross Profit', value: formatCurrencyPdf(totals.grossProfit) },
+      { label: 'Margin %', value: `${totals.marginPercentage.toFixed(1)}%` },
     ],
   }), [data, dateRange, totals]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   if (error) {
@@ -101,69 +124,114 @@ export function ProfitLossTab() {
     );
   }
 
+  if (isLoading) {
+    return <ReportSkeleton />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <DateRangePicker defaultPreset="last30days" />
-        <ExportButtons config={exportConfig} />
+        <div className="flex items-center gap-3">
+          <ComparisonToggle
+            comparisonType={comparisonType}
+            comparisonRange={comparisonRange}
+            onComparisonTypeChange={setComparisonType}
+          />
+          <ExportButtons config={exportConfig} />
+        </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-50 rounded-lg">
-              <DollarSign className="w-5 h-5 text-blue-600" />
+      {isComparisonEnabled && prevTotals ? (
+        <ComparisonKpiGrid columns={4}>
+          <ComparisonKpiCard
+            label="Gross Revenue"
+            currentValue={totals.grossRevenue}
+            previousValue={prevTotals.grossRevenue}
+            format="currency"
+            icon={<DollarSign className="w-5 h-5 text-blue-600" />}
+          />
+          <ComparisonKpiCard
+            label="Cost of Sales"
+            currentValue={totals.cogs}
+            previousValue={prevTotals.cogs}
+            format="currency"
+            invertColors
+            icon={<TrendingDown className="w-5 h-5 text-red-600" />}
+          />
+          <ComparisonKpiCard
+            label="Gross Profit"
+            currentValue={totals.grossProfit}
+            previousValue={prevTotals.grossProfit}
+            format="currency"
+            icon={<TrendingUp className="w-5 h-5 text-green-600" />}
+          />
+          <ComparisonKpiCard
+            label="Margin %"
+            currentValue={totals.marginPercentage}
+            previousValue={prevTotals.marginPercentage}
+            format="percent"
+            icon={<Percent className="w-5 h-5 text-purple-600" />}
+          />
+        </ComparisonKpiGrid>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <DollarSign className="w-5 h-5 text-blue-600" />
+              </div>
+              <span className="text-sm text-gray-600">Gross Revenue</span>
             </div>
-            <span className="text-sm text-gray-600">CA Brut</span>
+            <p className="text-2xl font-bold text-gray-900">
+              {formatCurrency(totals.grossRevenue)}
+            </p>
           </div>
-          <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(totals.grossRevenue)}
-          </p>
-        </div>
 
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-red-50 rounded-lg">
-              <TrendingDown className="w-5 h-5 text-red-600" />
+          <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-red-50 rounded-lg">
+                <TrendingDown className="w-5 h-5 text-red-600" />
+              </div>
+              <span className="text-sm text-gray-600">Cost of Sales</span>
             </div>
-            <span className="text-sm text-gray-600">Coût des Ventes</span>
+            <p className="text-2xl font-bold text-gray-900">
+              {formatCurrency(totals.cogs)}
+            </p>
           </div>
-          <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(totals.cogs)}
-          </p>
-        </div>
 
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-green-50 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-green-600" />
+          <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-green-50 rounded-lg">
+                <TrendingUp className="w-5 h-5 text-green-600" />
+              </div>
+              <span className="text-sm text-gray-600">Gross Profit</span>
             </div>
-            <span className="text-sm text-gray-600">Marge Brute</span>
+            <p className="text-2xl font-bold text-green-600">
+              {formatCurrency(totals.grossProfit)}
+            </p>
           </div>
-          <p className="text-2xl font-bold text-green-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(totals.grossProfit)}
-          </p>
-        </div>
 
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-purple-50 rounded-lg">
-              <Percent className="w-5 h-5 text-purple-600" />
+          <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-purple-50 rounded-lg">
+                <Percent className="w-5 h-5 text-purple-600" />
+              </div>
+              <span className="text-sm text-gray-600">Margin %</span>
             </div>
-            <span className="text-sm text-gray-600">Marge %</span>
+            <p className="text-2xl font-bold text-purple-600">
+              {`${totals.marginPercentage.toFixed(1)}%`}
+            </p>
           </div>
-          <p className="text-2xl font-bold text-purple-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : `${totals.marginPercentage.toFixed(1)}%`}
-          </p>
         </div>
-      </div>
+      )}
 
       {/* Chart */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Évolution Profit/Perte</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Profit/Loss Trend</h3>
           <div className="flex gap-2">
             <button
               onClick={() => setChartView('bar')}
@@ -171,7 +239,7 @@ export function ProfitLossTab() {
                 chartView === 'bar' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
-              Barres
+              Bars
             </button>
             <button
               onClick={() => setChartView('line')}
@@ -179,18 +247,14 @@ export function ProfitLossTab() {
                 chartView === 'line' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
-              Ligne
+              Line
             </button>
           </div>
         </div>
 
-        {isLoading ? (
-          <div className="h-80 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-          </div>
-        ) : chartData.length === 0 ? (
+        {chartData.length === 0 ? (
           <div className="h-80 flex items-center justify-center text-gray-500">
-            Aucune donnée pour cette période
+            No data for this period
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={320}>
@@ -200,13 +264,13 @@ export function ProfitLossTab() {
                 <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                 <YAxis tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`} tick={{ fontSize: 12 }} />
                 <Tooltip
-                  formatter={(value, name) => [formatCurrency(value as number), name === 'revenue' ? 'CA' : name === 'cogs' ? 'Coût' : 'Profit']}
+                  formatter={(value, name) => [formatCurrency(value as number), name === 'revenue' ? 'Revenue' : name === 'cogs' ? 'Cost' : 'Profit']}
                   labelStyle={{ fontWeight: 'bold' }}
                 />
                 <Legend />
-                <Bar dataKey="revenue" name="CA Brut" fill="#3B82F6" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="cogs" name="Coût" fill="#EF4444" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="profit" name="Marge" fill="#10B981" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="revenue" name="Gross Revenue" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="cogs" name="Cost" fill="#EF4444" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="profit" name="Profit" fill="#10B981" radius={[4, 4, 0, 0]} />
               </BarChart>
             ) : (
               <LineChart data={chartData}>
@@ -214,12 +278,12 @@ export function ProfitLossTab() {
                 <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                 <YAxis tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`} tick={{ fontSize: 12 }} />
                 <Tooltip
-                  formatter={(value, name) => [formatCurrency(value as number), name === 'revenue' ? 'CA' : name === 'cogs' ? 'Coût' : 'Profit']}
+                  formatter={(value, name) => [formatCurrency(value as number), name === 'revenue' ? 'Revenue' : name === 'cogs' ? 'Cost' : 'Profit']}
                 />
                 <Legend />
-                <Line type="monotone" dataKey="revenue" name="CA Brut" stroke="#3B82F6" strokeWidth={2} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="cogs" name="Coût" stroke="#EF4444" strokeWidth={2} dot={{ r: 3 }} />
-                <Line type="monotone" dataKey="profit" name="Marge" stroke="#10B981" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="revenue" name="Gross Revenue" stroke="#3B82F6" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="cogs" name="Cost" stroke="#EF4444" strokeWidth={2} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="profit" name="Profit" stroke="#10B981" strokeWidth={2} dot={{ r: 3 }} />
               </LineChart>
             )}
           </ResponsiveContainer>
@@ -229,39 +293,33 @@ export function ProfitLossTab() {
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Détail par jour</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Daily Breakdown</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Commandes</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">CA Brut</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Coût</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Marge Brute</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Marge %</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">TVA Collectée</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Orders</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Gross Revenue</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Cost</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Gross Profit</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Margin %</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Tax Collected</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  </td>
-                </tr>
-              ) : data?.length === 0 ? (
+              {data?.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                    Aucune donnée
+                    No data
                   </td>
                 </tr>
               ) : (
                 data?.map((row) => (
                   <tr key={row.report_date} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm text-gray-900">
-                      {new Date(row.report_date).toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: 'short' })}
+                      {new Date(row.report_date).toLocaleDateString('en-US', { weekday: 'short', day: '2-digit', month: 'short' })}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 text-right">{row.order_count}</td>
                     <td className="px-6 py-4 text-sm text-gray-900 text-right font-medium">{formatCurrency(row.gross_revenue)}</td>

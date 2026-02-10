@@ -18,9 +18,8 @@ export function usePOSOrders(): IUsePOSOrdersReturn {
         itemCount,
         clearCart,
         activeOrderId,
-        activeOrderNumber: _activeOrderNumber,
+        activeOrderNumber,
         restoreCartState,
-        lockedItemIds: _lockedItemIds,
         subtotal,
         discountAmount,
         total,
@@ -62,7 +61,7 @@ export function usePOSOrders(): IUsePOSOrdersReturn {
                 discountAmount,
                 total,
                 'En cuisine',
-                _activeOrderNumber || undefined,
+                activeOrderNumber || undefined,
                 activeOrderId,
                 true, // sentToKitchen
                 items.map(i => i.id) // lock all items
@@ -88,7 +87,7 @@ export function usePOSOrders(): IUsePOSOrdersReturn {
     }, [
         itemCount,
         activeOrderId,
-        _activeOrderNumber,
+        activeOrderNumber,
         items,
         subtotal,
         discountAmount,

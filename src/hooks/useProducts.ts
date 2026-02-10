@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import type { Category, Product, ProductWithCategory } from '../types/database'
 import { useNetworkStore } from '../stores/networkStore'
+import logger from '@/utils/logger'
 import {
     syncCategoriesToOffline,
     getCategoriesFromOffline,
@@ -25,7 +26,7 @@ export function useCategories() {
         queryFn: async (): Promise<Category[]> => {
             // If offline, use IndexedDB data
             if (!isOnline) {
-                console.log('[useCategories] Offline mode - loading from IndexedDB')
+                logger.debug('[useCategories] Offline mode - loading from IndexedDB')
                 try {
                     const offlineCategories = await getCategoriesFromOffline()
                     if (offlineCategories.length > 0) {
@@ -81,7 +82,7 @@ export function useProducts(categoryId: string | null = null) {
         queryFn: async (): Promise<ProductWithCategory[]> => {
             // If offline, use IndexedDB data
             if (!isOnline) {
-                console.log('[useProducts] Offline mode - loading from IndexedDB')
+                logger.debug('[useProducts] Offline mode - loading from IndexedDB')
                 try {
                     const offlineProducts = await getProductsFromOffline(categoryId)
                     if (offlineProducts.length > 0) {

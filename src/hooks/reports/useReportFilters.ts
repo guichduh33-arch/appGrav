@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import type { Category, Product, Customer } from '@/types/database';
 
-export type FilterType = 'category' | 'product' | 'staff' | 'payment_method' | 'customer';
+export type FilterType = 'category' | 'product' | 'staff' | 'payment_method' | 'customer' | 'order_type';
 
 export interface FilterOption {
   value: string;
@@ -24,6 +24,7 @@ export interface ReportFiltersState {
   staff?: string;
   payment_method?: string;
   customer?: string;
+  order_type?: string;
 }
 
 export interface UseReportFiltersOptions {
@@ -44,6 +45,7 @@ export interface UseReportFiltersReturn {
   staffOptions: FilterOption[];
   paymentMethodOptions: FilterOption[];
   customerOptions: FilterOption[];
+  orderTypeOptions: FilterOption[];
   // Loading states
   isLoadingOptions: boolean;
 }
@@ -54,7 +56,15 @@ const FILTER_URL_PARAMS: Record<FilterType, string> = {
   staff: 'staff',
   payment_method: 'payment',
   customer: 'customer',
+  order_type: 'order_type',
 };
+
+const ORDER_TYPE_OPTIONS: FilterOption[] = [
+  { value: 'dine_in', label: 'Dine In' },
+  { value: 'takeaway', label: 'Takeaway' },
+  { value: 'delivery', label: 'Delivery' },
+  { value: 'b2b', label: 'B2B' },
+];
 
 export function useReportFilters(options: UseReportFiltersOptions = {}): UseReportFiltersReturn {
   const {
@@ -179,7 +189,7 @@ export function useReportFilters(options: UseReportFiltersOptions = {}): UseRepo
   );
 
   const staffOptions: FilterOption[] = useMemo(
-    () => staff.map((s) => ({ value: s.id, label: s.display_name || s.name || 'Sans nom', sublabel: s.role || undefined })),
+    () => staff.map((s) => ({ value: s.id, label: s.display_name || s.name || 'Unnamed', sublabel: s.role || undefined })),
     [staff]
   );
 
@@ -189,9 +199,11 @@ export function useReportFilters(options: UseReportFiltersOptions = {}): UseRepo
   );
 
   const customerOptions: FilterOption[] = useMemo(
-    () => customers.map((c) => ({ value: c.id, label: c.name || 'Client anonyme', sublabel: c.phone || undefined })),
+    () => customers.map((c) => ({ value: c.id, label: c.name || 'Anonymous customer', sublabel: c.phone || undefined })),
     [customers]
   );
+
+  const orderTypeOptions = ORDER_TYPE_OPTIONS;
 
   // Get label for a filter value
   const getLabelForFilter = useCallback(
@@ -207,11 +219,13 @@ export function useReportFilters(options: UseReportFiltersOptions = {}): UseRepo
           return paymentMethodOptions.find((o) => o.value === value)?.label || value;
         case 'customer':
           return customerOptions.find((o) => o.value === value)?.label || value;
+        case 'order_type':
+          return orderTypeOptions.find((o) => o.value === value)?.label || value;
         default:
           return value;
       }
     },
-    [categoryOptions, productOptions, staffOptions, paymentMethodOptions, customerOptions]
+    [categoryOptions, productOptions, staffOptions, paymentMethodOptions, customerOptions, orderTypeOptions]
   );
 
   // Active filters array for display
@@ -286,6 +300,7 @@ export function useReportFilters(options: UseReportFiltersOptions = {}): UseRepo
     staffOptions,
     paymentMethodOptions,
     customerOptions,
+    orderTypeOptions,
     isLoadingOptions,
   };
 }

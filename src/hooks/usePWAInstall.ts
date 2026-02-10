@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import logger from '@/utils/logger';
 
 interface IBeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -84,7 +85,7 @@ export function usePWAInstall(): IPWAInstallState & IPWAInstallActions {
     const handleAppInstalled = () => {
       setIsInstalled(true);
       setDeferredPrompt(null);
-      console.log('[PWA] App was installed');
+      logger.debug('[PWA] App was installed');
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -127,10 +128,10 @@ export function usePWAInstall(): IPWAInstallState & IPWAInstallActions {
       setDeferredPrompt(null);
 
       if (outcome === 'accepted') {
-        console.log('[PWA] User accepted the install prompt');
+        logger.debug('[PWA] User accepted the install prompt');
         return true;
       } else {
-        console.log('[PWA] User dismissed the install prompt');
+        logger.debug('[PWA] User dismissed the install prompt');
         return false;
       }
     } catch (error) {

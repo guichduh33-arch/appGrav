@@ -8,6 +8,7 @@ import { useNetworkAlerts } from '../../hooks/useNetworkAlerts'
 import { useSyncReport } from '../../hooks/useSyncReport'
 import { useLanHub } from '../../hooks/lan'
 import { useCartPriceRecalculation } from '../../hooks/pricing'
+import logger from '@/utils/logger'
 import { usePOSModals, usePOSShift, usePOSOrders, useCartPromotions } from '../../hooks/pos'
 import { PostOfflineSyncReport } from '../../components/sync/PostOfflineSyncReport'
 import CategoryNav from '../../components/pos/CategoryNav'
@@ -59,7 +60,7 @@ export default function POSMainPage() {
     }, [lanHubError])
 
     useEffect(() => {
-        console.log('[POS] LAN Hub running:', lanHubRunning)
+        logger.debug('[POS] LAN Hub running:', lanHubRunning)
     }, [lanHubRunning])
 
     // Cart state

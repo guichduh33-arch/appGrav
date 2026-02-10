@@ -1,41 +1,47 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Plus, Search, Edit2, Trash2, Building2, Phone, Mail, MapPin, CheckCircle, XCircle } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
+import { toast } from 'sonner'
+import { useSuppliers, type ISupplier } from '@/hooks/purchasing/useSuppliers'
+import {
+    useCreateSupplier,
+    useUpdateSupplier,
+    useDeleteSupplier,
+    useToggleSupplierActive,
+} from '@/hooks/purchasing/useSuppliersCrud'
+import type { ISupplierFormData } from '@/hooks/purchasing/useSuppliersCrud'
 import './SuppliersPage.css'
 
-interface Supplier {
-    id: string
-    name: string
+// Extended supplier type for the page (the DB returns all columns via select('*'))
+interface Supplier extends ISupplier {
     contact_person: string | null
-    email: string | null
-    phone: string | null
-    address: string | null
     city: string | null
     postal_code: string | null
     country: string | null
     tax_id: string | null
     payment_terms: string | null
     notes: string | null
-    is_active: boolean
-    created_at: string
-    updated_at: string
 }
 
 // Helper function to format payment terms for display
 const formatPaymentTerms = (term: string | null): string => {
     if (!term) return ''
     const termMap: Record<string, string> = {
-        'cod': 'Comptant (COD)',
-        'net15': 'Net 15 jours',
-        'net30': 'Net 30 jours',
-        'net60': 'Net 60 jours'
+        'cod': 'Cash on Delivery (COD)',
+        'net15': 'Net 15 days',
+        'net30': 'Net 30 days',
+        'net60': 'Net 60 days'
     }
     return termMap[term] || term
 }
 
 export default function SuppliersPage() {
-    const [suppliers, setSuppliers] = useState<Supplier[]>([])
-    const [loading, setLoading] = useState(true)
+    // React Query hooks
+    const { data: suppliers = [], isLoading: loading } = useSuppliers()
+    const createSupplierMutation = useCreateSupplier()
+    const updateSupplierMutation = useUpdateSupplier()
+    const deleteSupplierMutation = useDeleteSupplier()
+    const toggleActiveMutation = useToggleSupplierActive()
+
     const [searchTerm, setSearchTerm] = useState('')
     const [showModal, setShowModal] = useState(false)
     const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null)
@@ -47,34 +53,12 @@ export default function SuppliersPage() {
         address: '',
         city: '',
         postal_code: '',
-        country: 'France',
+        country: 'Indonesia',
         tax_id: '',
         payment_terms: 'net30',
         notes: '',
         is_active: true
     })
-
-    useEffect(() => {
-        fetchSuppliers()
-    }, [])
-
-    const fetchSuppliers = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('suppliers')
-                .select('*')
-                .order('name')
-
-            if (error) throw error
-            if (data) {
-                setSuppliers(data)
-            }
-        } catch (error) {
-            console.error('Error fetching suppliers:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
 
     const handleOpenModal = (supplier?: Supplier) => {
         if (supplier) {
@@ -90,7 +74,7 @@ export default function SuppliersPage() {
                 address: '',
                 city: '',
                 postal_code: '',
-                country: 'France',
+                country: 'Indonesia',
                 tax_id: '',
                 payment_terms: 'net30',
                 notes: '',
@@ -110,69 +94,43 @@ export default function SuppliersPage() {
 
         try {
             if (editingSupplier) {
-                // Update existing supplier
-                const { error } = await supabase
-                    .from('suppliers')
-                    .update(formData as never)
-                    .eq('id', editingSupplier.id)
-
-                if (error) throw error
+                await updateSupplierMutation.mutateAsync({
+                    id: editingSupplier.id,
+                    data: formData as ISupplierFormData,
+                })
             } else {
-                // Create new supplier - ensure required fields
-                const insertData = {
-                    ...formData,
-                    name: formData.name || 'Nouveau fournisseur'
-                }
-                const { error } = await supabase
-                    .from('suppliers')
-                    .insert([insertData] as never)
-
-                if (error) throw error
+                await createSupplierMutation.mutateAsync(formData as ISupplierFormData)
             }
-
-            await fetchSuppliers()
             handleCloseModal()
         } catch (error: any) {
             console.error('Error saving supplier:', error)
-            const errorMessage = error?.message || error?.error_description || 'Erreur inconnue'
-            alert(`Erreur lors de l'enregistrement du fournisseur:\n${errorMessage}`)
+            const errorMessage = error?.message || error?.error_description || 'Unknown error'
+            toast.error(`Error saving supplier: ${errorMessage}`)
         }
     }
 
     const handleDelete = async (id: string) => {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer ce fournisseur ?')) {
+        if (!confirm('Are you sure you want to delete this supplier?')) {
             return
         }
 
         try {
-            const { error } = await supabase
-                .from('suppliers')
-                .delete()
-                .eq('id', id)
-
-            if (error) throw error
-            await fetchSuppliers()
+            await deleteSupplierMutation.mutateAsync(id)
         } catch (error) {
             console.error('Error deleting supplier:', error)
-            alert('Erreur lors de la suppression du fournisseur')
+            toast.error('Error deleting supplier')
         }
     }
 
     const handleToggleActive = async (supplier: Supplier) => {
         try {
-            const { error } = await supabase
-                .from('suppliers')
-                .update({ is_active: !supplier.is_active })
-                .eq('id', supplier.id)
-
-            if (error) throw error
-            await fetchSuppliers()
+            await toggleActiveMutation.mutateAsync({ id: supplier.id, isActive: supplier.is_active })
         } catch (error) {
             console.error('Error toggling supplier status:', error)
         }
     }
 
-    const filteredSuppliers = suppliers.filter(supplier =>
+    const filteredSuppliers = (suppliers as Supplier[]).filter(supplier =>
         supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         supplier.contact_person?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         supplier.email?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -188,15 +146,15 @@ export default function SuppliersPage() {
                 <div>
                     <h1 className="suppliers-page__title">
                         <Building2 size={32} />
-                        Fournisseurs
+                        Suppliers
                     </h1>
                     <p className="suppliers-page__subtitle">
-                        Gérez vos fournisseurs et leurs informations de contact
+                        Manage your suppliers and their contact information
                     </p>
                 </div>
                 <button className="btn btn-primary" onClick={() => handleOpenModal()}>
                     <Plus size={20} />
-                    Nouveau Fournisseur
+                    New Supplier
                 </button>
             </div>
 
@@ -208,7 +166,7 @@ export default function SuppliersPage() {
                     </div>
                     <div className="suppliers-stat__content">
                         <div className="suppliers-stat__value">{suppliers.length}</div>
-                        <div className="suppliers-stat__label">Total Fournisseurs</div>
+                        <div className="suppliers-stat__label">Total Suppliers</div>
                     </div>
                 </div>
                 <div className="suppliers-stat">
@@ -217,7 +175,7 @@ export default function SuppliersPage() {
                     </div>
                     <div className="suppliers-stat__content">
                         <div className="suppliers-stat__value">{activeSuppliers.length}</div>
-                        <div className="suppliers-stat__label">Actifs</div>
+                        <div className="suppliers-stat__label">Active</div>
                     </div>
                 </div>
                 <div className="suppliers-stat">
@@ -226,7 +184,7 @@ export default function SuppliersPage() {
                     </div>
                     <div className="suppliers-stat__content">
                         <div className="suppliers-stat__value">{inactiveSuppliers.length}</div>
-                        <div className="suppliers-stat__label">Inactifs</div>
+                        <div className="suppliers-stat__label">Inactive</div>
                     </div>
                 </div>
             </div>
@@ -236,24 +194,24 @@ export default function SuppliersPage() {
                 <Search size={20} />
                 <input
                     type="text"
-                    placeholder="Rechercher un fournisseur..."
+                    placeholder="Search for a supplier..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    aria-label="Rechercher"
+                    aria-label="Search"
                 />
             </div>
 
             {/* Suppliers List */}
             {loading ? (
-                <div className="suppliers-loading">Chargement...</div>
+                <div className="suppliers-loading">Loading...</div>
             ) : filteredSuppliers.length === 0 ? (
                 <div className="suppliers-empty">
                     <Building2 size={48} />
-                    <h3>Aucun fournisseur</h3>
-                    <p>Commencez par ajouter votre premier fournisseur</p>
+                    <h3>No suppliers</h3>
+                    <p>Start by adding your first supplier</p>
                     <button className="btn btn-primary" onClick={() => handleOpenModal()}>
                         <Plus size={20} />
-                        Nouveau Fournisseur
+                        New Supplier
                     </button>
                 </div>
             ) : (
@@ -269,22 +227,22 @@ export default function SuppliersPage() {
                                     <button
                                         className="btn-icon"
                                         onClick={() => handleToggleActive(supplier)}
-                                        title={supplier.is_active ? 'Désactiver' : 'Activer'}
-                                        aria-label={supplier.is_active ? 'Désactiver' : 'Activer'}
+                                        title={supplier.is_active ? 'Deactivate' : 'Activate'}
+                                        aria-label={supplier.is_active ? 'Deactivate' : 'Activate'}
                                     >
                                         {supplier.is_active ? <CheckCircle size={18} /> : <XCircle size={18} />}
                                     </button>
                                     <button
                                         className="btn-icon"
                                         onClick={() => handleOpenModal(supplier)}
-                                        aria-label="Modifier"
+                                        aria-label="Edit"
                                     >
                                         <Edit2 size={18} />
                                     </button>
                                     <button
                                         className="btn-icon btn-icon--danger"
                                         onClick={() => handleDelete(supplier.id)}
-                                        aria-label="Supprimer"
+                                        aria-label="Delete"
                                     >
                                         <Trash2 size={18} />
                                     </button>
@@ -317,7 +275,7 @@ export default function SuppliersPage() {
                                 )}
                                 {supplier.payment_terms && (
                                     <div className="supplier-card__info">
-                                        <strong>Conditions:</strong> {formatPaymentTerms(supplier.payment_terms)}
+                                        <strong>Terms:</strong> {formatPaymentTerms(supplier.payment_terms)}
                                     </div>
                                 )}
                             </div>
@@ -332,7 +290,7 @@ export default function SuppliersPage() {
                     <div className="modal modal-lg is-active" onClick={e => e.stopPropagation()}>
                         <div className="modal__header">
                             <h2 className="modal__title">
-                                {editingSupplier ? 'Modifier Fournisseur' : 'Nouveau Fournisseur'}
+                                {editingSupplier ? 'Edit Supplier' : 'New Supplier'}
                             </h2>
                         </div>
 
@@ -341,25 +299,25 @@ export default function SuppliersPage() {
                                 <div className="supplier-form">
                                     {/* Basic Info */}
                                     <div className="supplier-form__section">
-                                        <h3>Informations de base</h3>
+                                        <h3>Basic Information</h3>
                                         <div className="supplier-form__grid">
                                             <div className="form-group form-group--full">
-                                                <label>Nom du fournisseur *</label>
+                                                <label>Supplier Name *</label>
                                                 <input
                                                     type="text"
                                                     required
                                                     value={formData.name}
                                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                                    aria-label="Nom du fournisseur"
+                                                    aria-label="Supplier name"
                                                 />
                                             </div>
                                             <div className="form-group">
-                                                <label>Personne de contact</label>
+                                                <label>Contact Person</label>
                                                 <input
                                                     type="text"
                                                     value={formData.contact_person || ''}
                                                     onChange={e => setFormData({ ...formData, contact_person: e.target.value })}
-                                                    aria-label="Personne de contact"
+                                                    aria-label="Contact person"
                                                 />
                                             </div>
                                             <div className="form-group">
@@ -372,12 +330,12 @@ export default function SuppliersPage() {
                                                 />
                                             </div>
                                             <div className="form-group">
-                                                <label>Téléphone</label>
+                                                <label>Phone</label>
                                                 <input
                                                     type="tel"
                                                     value={formData.phone || ''}
                                                     onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                                    aria-label="Téléphone"
+                                                    aria-label="Phone"
                                                 />
                                             </div>
                                         </div>
@@ -385,42 +343,42 @@ export default function SuppliersPage() {
 
                                     {/* Address */}
                                     <div className="supplier-form__section">
-                                        <h3>Adresse</h3>
+                                        <h3>Address</h3>
                                         <div className="supplier-form__grid">
                                             <div className="form-group form-group--full">
-                                                <label>Adresse</label>
+                                                <label>Address</label>
                                                 <input
                                                     type="text"
                                                     value={formData.address || ''}
                                                     onChange={e => setFormData({ ...formData, address: e.target.value })}
-                                                    aria-label="Adresse"
+                                                    aria-label="Address"
                                                 />
                                             </div>
                                             <div className="form-group">
-                                                <label>Ville</label>
+                                                <label>City</label>
                                                 <input
                                                     type="text"
                                                     value={formData.city || ''}
                                                     onChange={e => setFormData({ ...formData, city: e.target.value })}
-                                                    aria-label="Ville"
+                                                    aria-label="City"
                                                 />
                                             </div>
                                             <div className="form-group">
-                                                <label>Code Postal</label>
+                                                <label>Postal Code</label>
                                                 <input
                                                     type="text"
                                                     value={formData.postal_code || ''}
                                                     onChange={e => setFormData({ ...formData, postal_code: e.target.value })}
-                                                    aria-label="Code Postal"
+                                                    aria-label="Postal Code"
                                                 />
                                             </div>
                                             <div className="form-group">
-                                                <label>Pays</label>
+                                                <label>Country</label>
                                                 <input
                                                     type="text"
                                                     value={formData.country || ''}
                                                     onChange={e => setFormData({ ...formData, country: e.target.value })}
-                                                    aria-label="Pays"
+                                                    aria-label="Country"
                                                 />
                                             </div>
                                         </div>
@@ -428,28 +386,28 @@ export default function SuppliersPage() {
 
                                     {/* Business Info */}
                                     <div className="supplier-form__section">
-                                        <h3>Informations commerciales</h3>
+                                        <h3>Business Information</h3>
                                         <div className="supplier-form__grid">
                                             <div className="form-group">
-                                                <label>Numéro de TVA</label>
+                                                <label>Tax ID</label>
                                                 <input
                                                     type="text"
                                                     value={formData.tax_id || ''}
                                                     onChange={e => setFormData({ ...formData, tax_id: e.target.value })}
-                                                    aria-label="Numéro de TVA"
+                                                    aria-label="Tax ID"
                                                 />
                                             </div>
                                             <div className="form-group">
-                                                <label>Conditions de paiement</label>
+                                                <label>Payment Terms</label>
                                                 <select
                                                     value={formData.payment_terms || ''}
                                                     onChange={e => setFormData({ ...formData, payment_terms: e.target.value })}
-                                                    aria-label="Conditions de paiement"
+                                                    aria-label="Payment terms"
                                                 >
-                                                    <option value="cod">Comptant (COD)</option>
-                                                    <option value="net15">Net 15 jours</option>
-                                                    <option value="net30">Net 30 jours</option>
-                                                    <option value="net60">Net 60 jours</option>
+                                                    <option value="cod">Cash on Delivery (COD)</option>
+                                                    <option value="net15">Net 15 days</option>
+                                                    <option value="net30">Net 30 days</option>
+                                                    <option value="net60">Net 60 days</option>
                                                 </select>
                                             </div>
                                             <div className="form-group form-group--full">
@@ -468,7 +426,7 @@ export default function SuppliersPage() {
                                                         checked={formData.is_active}
                                                         onChange={e => setFormData({ ...formData, is_active: e.target.checked })}
                                                     />
-                                                    Fournisseur actif
+                                                    Supplier active
                                                 </label>
                                             </div>
                                         </div>
@@ -478,10 +436,10 @@ export default function SuppliersPage() {
 
                             <div className="modal__footer">
                                 <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
-                                    Annuler
+                                    Cancel
                                 </button>
                                 <button type="submit" className="btn btn-primary">
-                                    {editingSupplier ? 'Enregistrer' : 'Créer Fournisseur'}
+                                    {editingSupplier ? 'Save' : 'Create Supplier'}
                                 </button>
                             </div>
                         </form>

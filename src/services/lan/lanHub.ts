@@ -12,6 +12,7 @@
 
 import { supabase } from '@/lib/supabase';
 import { useLanStore } from '@/stores/lanStore';
+import logger from '@/utils/logger';
 import {
   ILanMessage,
   TLanMessageType,
@@ -52,7 +53,7 @@ class LanHub {
    */
   async start(config: IHubConfig): Promise<boolean> {
     if (this.isRunning) {
-      console.log('[LanHub] Already running');
+      logger.debug('[LanHub] Already running');
       return true;
     }
 
@@ -93,7 +94,7 @@ class LanHub {
           this.handleRealtimeMessage(payload.payload as ILanMessage);
         })
         .subscribe((status) => {
-          console.log('[LanHub] Realtime channel status:', status);
+          logger.debug('[LanHub] Realtime channel status:', status);
           if (status === 'SUBSCRIBED') {
             useLanStore.getState().setConnectionStatus('connected');
           }
@@ -118,7 +119,7 @@ class LanHub {
       this.isRunning = true;
       this.startTime = new Date();
 
-      console.log('[LanHub] Started successfully');
+      logger.debug('[LanHub] Started successfully');
       return true;
     } catch (error) {
       console.error('[LanHub] Start error:', error);
@@ -168,7 +169,7 @@ class LanHub {
     this.isRunning = false;
     this.startTime = null;
 
-    console.log('[LanHub] Stopped');
+    logger.debug('[LanHub] Stopped');
   }
 
   /**
@@ -246,7 +247,7 @@ class LanHub {
       return;
     }
 
-    console.log(`[LanHub] Received ${message.type} from ${message.from} via ${source}`);
+    logger.debug(`[LanHub] Received ${message.type} from ${message.from} via ${source}`);
 
     switch (message.type) {
       case LAN_MESSAGE_TYPES.NODE_REGISTER:
@@ -284,7 +285,7 @@ class LanHub {
       registeredAt: message.timestamp,
     });
 
-    console.log(`[LanHub] Device registered: ${message.from}`);
+    logger.debug(`[LanHub] Device registered: ${message.from}`);
   }
 
   /**
@@ -304,7 +305,7 @@ class LanHub {
 
     // Remove from store
     store.removeConnectedDevice(message.from);
-    console.log(`[LanHub] Device deregistered: ${message.from}`);
+    logger.debug(`[LanHub] Device deregistered: ${message.from}`);
 
     // Notify other devices about this disconnection (AC3 requirement)
     await this.broadcast(LAN_MESSAGE_TYPES.NODE_DEREGISTER, {

@@ -10,6 +10,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import logger from '@/utils/logger';
 import { db, type IOfflineCustomerCategory } from '@/lib/db';
 
 // Re-export interface for consumers
@@ -74,7 +75,7 @@ export async function syncCustomerCategoriesToOffline(): Promise<number> {
   }
 
   if (!categoriesData || categoriesData.length === 0) {
-    console.log('[CustomerCategorySync] No new customer categories to sync');
+    logger.debug('[CustomerCategorySync] No new customer categories to sync');
     return 0;
   }
 
@@ -102,7 +103,7 @@ export async function syncCustomerCategoriesToOffline(): Promise<number> {
     if (inactiveCategories && inactiveCategories.length > 0) {
       const inactiveIds = inactiveCategories.map((c) => c.id);
       await db.offline_customer_categories.bulkDelete(inactiveIds);
-      console.log(`[CustomerCategorySync] Removed ${inactiveIds.length} inactive categories from cache`);
+      logger.debug(`[CustomerCategorySync] Removed ${inactiveIds.length} inactive categories from cache`);
     }
   }
 
@@ -111,7 +112,7 @@ export async function syncCustomerCategoriesToOffline(): Promise<number> {
   const totalCount = await db.offline_customer_categories.count();
   await updateSyncMeta(latestTimestamp, totalCount);
 
-  console.log(`[CustomerCategorySync] Synced ${offlineCategories.length} customer categories`);
+  logger.debug(`[CustomerCategorySync] Synced ${offlineCategories.length} customer categories`);
   return offlineCategories.length;
 }
 
@@ -201,5 +202,5 @@ export async function getCustomerCategoriesSyncMeta(): Promise<{
 export async function clearOfflineCustomerCategoryData(): Promise<void> {
   await db.offline_customer_categories.clear();
   await db.offline_sync_meta.delete(SYNC_META_ENTITY);
-  console.log('[CustomerCategorySync] Cleared all offline customer category data');
+  logger.debug('[CustomerCategorySync] Cleared all offline customer category data');
 }

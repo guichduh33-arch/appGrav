@@ -36,6 +36,7 @@ import {
   getLastRecipesSyncAt,
 } from './recipesCacheService';
 import { PRODUCTS_REFRESH_INTERVAL_MS } from '@/types/offline';
+import logger from '@/utils/logger';
 
 let refreshIntervalId: ReturnType<typeof setInterval> | null = null;
 let isInitialized = false;
@@ -67,35 +68,35 @@ export async function initProductsCache(
     const refreshPromises: Promise<void>[] = [];
 
     if (needsProductsRefresh) {
-      console.log('[DataCache] Refreshing products cache...');
+      logger.debug('[DataCache] Refreshing products cache...');
       refreshPromises.push(cacheAllProducts());
     } else {
       const lastSync = await getLastProductsSyncAt();
-      console.log(`[DataCache] Products cache is fresh (last sync: ${lastSync})`);
+      logger.debug(`[DataCache] Products cache is fresh (last sync: ${lastSync})`);
     }
 
     if (needsCategoriesRefresh) {
-      console.log('[DataCache] Refreshing categories cache...');
+      logger.debug('[DataCache] Refreshing categories cache...');
       refreshPromises.push(cacheAllCategories());
     } else {
       const lastSync = await getLastCategoriesSyncAt();
-      console.log(`[DataCache] Categories cache is fresh (last sync: ${lastSync})`);
+      logger.debug(`[DataCache] Categories cache is fresh (last sync: ${lastSync})`);
     }
 
     if (needsModifiersRefresh) {
-      console.log('[DataCache] Refreshing modifiers cache...');
+      logger.debug('[DataCache] Refreshing modifiers cache...');
       refreshPromises.push(cacheAllModifiers());
     } else {
       const lastSync = await getLastModifiersSyncAt();
-      console.log(`[DataCache] Modifiers cache is fresh (last sync: ${lastSync})`);
+      logger.debug(`[DataCache] Modifiers cache is fresh (last sync: ${lastSync})`);
     }
 
     if (needsRecipesRefresh) {
-      console.log('[DataCache] Refreshing recipes cache...');
+      logger.debug('[DataCache] Refreshing recipes cache...');
       refreshPromises.push(cacheAllRecipes());
     } else {
       const lastSync = await getLastRecipesSyncAt();
-      console.log(`[DataCache] Recipes cache is fresh (last sync: ${lastSync})`);
+      logger.debug(`[DataCache] Recipes cache is fresh (last sync: ${lastSync})`);
     }
 
     // Refresh all in parallel - use allSettled to handle partial failures
@@ -107,9 +108,9 @@ export async function initProductsCache(
         failures.forEach((failure, idx) => {
           console.error(`[DataCache] Cache refresh failed for entity ${idx}:`, failure.reason);
         });
-        console.log(`[DataCache] Cache refresh completed with ${failures.length} failure(s)`);
+        logger.debug(`[DataCache] Cache refresh completed with ${failures.length} failure(s)`);
       } else {
-        console.log('[DataCache] Cache refresh completed successfully');
+        logger.debug('[DataCache] Cache refresh completed successfully');
       }
     }
 
@@ -143,7 +144,7 @@ function startHourlyRefresh(): void {
     try {
       // Check if we're online (navigator.onLine)
       if (!navigator.onLine) {
-        console.log('[DataCache] Offline, skipping hourly refresh');
+        logger.debug('[DataCache] Offline, skipping hourly refresh');
         return;
       }
 
@@ -160,22 +161,22 @@ function startHourlyRefresh(): void {
       const refreshPromises: Promise<void>[] = [];
 
       if (needsProductsRefresh) {
-        console.log('[DataCache] Hourly products refresh triggered');
+        logger.debug('[DataCache] Hourly products refresh triggered');
         refreshPromises.push(cacheAllProducts());
       }
 
       if (needsCategoriesRefresh) {
-        console.log('[DataCache] Hourly categories refresh triggered');
+        logger.debug('[DataCache] Hourly categories refresh triggered');
         refreshPromises.push(cacheAllCategories());
       }
 
       if (needsModifiersRefresh) {
-        console.log('[DataCache] Hourly modifiers refresh triggered');
+        logger.debug('[DataCache] Hourly modifiers refresh triggered');
         refreshPromises.push(cacheAllModifiers());
       }
 
       if (needsRecipesRefresh) {
-        console.log('[DataCache] Hourly recipes refresh triggered');
+        logger.debug('[DataCache] Hourly recipes refresh triggered');
         refreshPromises.push(cacheAllRecipes());
       }
 
@@ -186,16 +187,16 @@ function startHourlyRefresh(): void {
         failures.forEach((failure) => {
           console.error('[DataCache] Hourly refresh failed for entity:', failure.reason);
         });
-        console.log(`[DataCache] Hourly refresh completed with ${failures.length} failure(s)`);
+        logger.debug(`[DataCache] Hourly refresh completed with ${failures.length} failure(s)`);
       } else {
-        console.log('[DataCache] Hourly refresh completed successfully');
+        logger.debug('[DataCache] Hourly refresh completed successfully');
       }
     } catch (error) {
       console.error('[DataCache] Hourly refresh error:', error);
     }
   }, PRODUCTS_REFRESH_INTERVAL_MS);
 
-  console.log('[DataCache] Hourly refresh scheduled');
+  logger.debug('[DataCache] Hourly refresh scheduled');
 }
 
 /**
@@ -209,7 +210,7 @@ export function stopProductsCacheRefresh(): void {
     refreshIntervalId = null;
   }
   isInitialized = false;
-  console.log('[DataCache] Refresh stopped');
+  logger.debug('[DataCache] Refresh stopped');
 }
 
 /**

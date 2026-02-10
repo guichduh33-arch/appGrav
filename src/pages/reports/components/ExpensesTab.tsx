@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Receipt, Calendar, Loader2, DollarSign, TrendingDown } from 'lucide-react';
+import { Receipt, Calendar, DollarSign, TrendingDown } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 // import { supabase } from '@/lib/supabase'; // TODO: uncomment when expenses table is created
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -89,7 +90,7 @@ export function ExpensesTab() {
     return Array.from(dayMap.entries())
       .sort(([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime()) // Sort by ISO date first
       .map(([date, amount]) => ({
-        date: new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+        date: new Date(date).toLocaleDateString('en-US', { day: '2-digit', month: 'short' }),
         amount,
       }));
   }, [data]);
@@ -113,24 +114,24 @@ export function ExpensesTab() {
   const exportConfig: ExportConfig<Expense> = useMemo(() => ({
     data: data || [],
     columns: [
-      { key: 'expense_date', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('fr-FR') },
-      { key: 'category', header: 'Catégorie' },
+      { key: 'expense_date', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('en-US') },
+      { key: 'category', header: 'Category' },
       { key: 'description', header: 'Description' },
-      { key: 'amount', header: 'Montant', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
-      { key: 'payment_method', header: 'Mode paiement' },
-      { key: 'created_by', header: 'Créé par' },
+      { key: 'amount', header: 'Amount', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'payment_method', header: 'Payment Method' },
+      { key: 'created_by', header: 'Created By' },
     ],
-    filename: 'depenses',
-    title: 'Rapport des Dépenses',
+    filename: 'expenses',
+    title: 'Expenses Report',
     dateRange,
     summaries: [
-      { label: 'Total dépenses', value: formatCurrencyPdf(summary.totalAmount) },
-      { label: 'Nombre de dépenses', value: summary.totalExpenses.toString() },
+      { label: 'Total Expenses', value: formatCurrencyPdf(summary.totalAmount) },
+      { label: 'Number of Expenses', value: summary.totalExpenses.toString() },
     ],
   }), [data, dateRange, summary]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   if (error) {
@@ -139,6 +140,10 @@ export function ExpensesTab() {
         Error loading data
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <ReportSkeleton />;
   }
 
   // Show feature not available message
@@ -177,10 +182,10 @@ export function ExpensesTab() {
             <div className="p-2 bg-red-50 rounded-lg">
               <TrendingDown className="w-5 h-5 text-red-600" />
             </div>
-            <span className="text-sm text-gray-600">Total dépenses</span>
+            <span className="text-sm text-gray-600">Total Expenses</span>
           </div>
           <p className="text-2xl font-bold text-red-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(summary.totalAmount)}
+            {formatCurrency(summary.totalAmount)}
           </p>
         </div>
 
@@ -189,10 +194,10 @@ export function ExpensesTab() {
             <div className="p-2 bg-blue-50 rounded-lg">
               <Receipt className="w-5 h-5 text-blue-600" />
             </div>
-            <span className="text-sm text-gray-600">Nombre de dépenses</span>
+            <span className="text-sm text-gray-600">Number of Expenses</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : summary.totalExpenses}
+            {summary.totalExpenses}
           </p>
         </div>
 
@@ -201,10 +206,10 @@ export function ExpensesTab() {
             <div className="p-2 bg-purple-50 rounded-lg">
               <DollarSign className="w-5 h-5 text-purple-600" />
             </div>
-            <span className="text-sm text-gray-600">Moyenne / dépense</span>
+            <span className="text-sm text-gray-600">Average per Expense</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(summary.avgExpense)}
+            {formatCurrency(summary.avgExpense)}
           </p>
         </div>
       </div>
@@ -213,15 +218,11 @@ export function ExpensesTab() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Daily Bar Chart */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Dépenses par jour</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">Daily Expenses</h3>
 
-          {isLoading ? (
-            <div className="h-64 flex items-center justify-center">
-              <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-            </div>
-          ) : dailyData.length === 0 ? (
+          {dailyData.length === 0 ? (
             <div className="h-64 flex items-center justify-center text-gray-500">
-              Aucune dépense sur cette période
+              No expenses in this period
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={280}>
@@ -229,7 +230,7 @@ export function ExpensesTab() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                 <YAxis tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 12 }} />
-                <Tooltip formatter={(value) => [formatCurrency(value as number), 'Dépenses']} />
+                <Tooltip formatter={(value) => [formatCurrency(value as number), 'Expenses']} />
                 <Bar dataKey="amount" fill="#EF4444" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -238,15 +239,11 @@ export function ExpensesTab() {
 
         {/* Category Pie Chart */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Répartition par catégorie</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">Distribution by Category</h3>
 
-          {isLoading ? (
-            <div className="h-64 flex items-center justify-center">
-              <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-            </div>
-          ) : categoryData.length === 0 ? (
+          {categoryData.length === 0 ? (
             <div className="h-64 flex items-center justify-center text-gray-500">
-              Aucune dépense sur cette période
+              No expenses in this period
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={280}>
@@ -267,7 +264,7 @@ export function ExpensesTab() {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => [formatCurrency(value as number), 'Montant']} />
+                <Tooltip formatter={(value) => [formatCurrency(value as number), 'Amount']} />
               </PieChart>
             </ResponsiveContainer>
           )}
@@ -277,33 +274,27 @@ export function ExpensesTab() {
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Détail des dépenses</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Expense Details</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Catégorie</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Montant</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paiement</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  </td>
-                </tr>
-              ) : data && data.length > 0 ? (
+              {data && data.length > 0 ? (
                 data.map((row) => (
                   <tr key={row.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-3 h-3" />
-                        {new Date(row.expense_date).toLocaleDateString('fr-FR')}
+                        {new Date(row.expense_date).toLocaleDateString('en-US')}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -321,7 +312,7 @@ export function ExpensesTab() {
               ) : (
                 <tr>
                   <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                    Aucune dépense sur cette période
+                    No expenses in this period
                   </td>
                 </tr>
               )}

@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
-import { Loader2 } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -74,6 +74,10 @@ export const PaymentMethodTab = () => {
     );
   }
 
+  if (isLoading) {
+    return <ReportSkeleton />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header: DateRangePicker + ExportButtons */}
@@ -85,11 +89,7 @@ export const PaymentMethodTab = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* BarChart */}
         <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm h-80">
-          {isLoading ? (
-            <div className="h-full flex items-center justify-center">
-              <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-            </div>
-          ) : data.length === 0 ? (
+          {data.length === 0 ? (
             <div className="h-full flex items-center justify-center text-gray-500">
               No data available.
             </div>
@@ -120,26 +120,16 @@ export const PaymentMethodTab = () => {
           <div className="bg-purple-50 p-4 rounded-lg">
             <p className="text-sm text-purple-600 font-medium">Total Revenue</p>
             <p className="text-2xl font-bold text-purple-900">
-              {isLoading ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
-              ) : (
-                formatCurrency(totalRevenue)
-              )}
+              {formatCurrency(totalRevenue)}
             </p>
           </div>
           <div className="bg-indigo-50 p-4 rounded-lg">
             <p className="text-sm text-indigo-600 font-medium">Top Payment Method</p>
             <p className="text-lg font-bold text-indigo-900">
-              {isLoading ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
-              ) : data.length > 0 ? (
-                data[0].payment_method
-              ) : (
-                '-'
-              )}
+              {data.length > 0 ? data[0].payment_method : '-'}
             </p>
             <p className="text-xs text-indigo-700">
-              {!isLoading && data.length > 0 ? formatCurrency(data[0].total_revenue) : ''}
+              {data.length > 0 ? formatCurrency(data[0].total_revenue) : ''}
             </p>
           </div>
         </div>
@@ -157,13 +147,7 @@ export const PaymentMethodTab = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {isLoading ? (
-              <tr>
-                <td colSpan={4} className="px-6 py-8 text-center">
-                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                </td>
-              </tr>
-            ) : data.length === 0 ? (
+            {data.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-6 py-12 text-center text-gray-400">
                   No data available.

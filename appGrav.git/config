@@ -1,0 +1,13 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = true
+	symlinks = false
+	ignorecase = true
+[remote "origin"]
+	url = https://github.com/guichduh33-arch/appGrav
+	tagOpt = --no-tags
+	fetch = +refs/*:refs/*
+	mirror = true
+[branch "master"]
+	gk-last-accessed = 2026-02-10T08:01:27.972Z

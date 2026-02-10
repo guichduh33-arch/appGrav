@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { GitCompare, ChevronDown, Check } from 'lucide-react';
 import { ComparisonType, DateRange } from '@/hooks/reports/useDateRange';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 export interface ComparisonToggleProps {
   comparisonType: ComparisonType;
@@ -35,7 +35,7 @@ export function ComparisonToggle({
 
   const formatComparisonRange = (): string => {
     if (!comparisonRange) return '';
-    return `${format(comparisonRange.from, 'dd MMM', { locale: fr })} - ${format(comparisonRange.to, 'dd MMM yyyy', { locale: fr })}`;
+    return `${format(comparisonRange.from, 'dd MMM', { locale: enUS })} - ${format(comparisonRange.to, 'dd MMM yyyy', { locale: enUS })}`;
   };
 
   return (
@@ -167,7 +167,7 @@ export function ComparisonBadge({
       {label}
       {comparisonRange && (
         <span className="text-blue-500">
-          ({format(comparisonRange.from, 'dd/MM', { locale: fr })} - {format(comparisonRange.to, 'dd/MM', { locale: fr })})
+          ({format(comparisonRange.from, 'dd/MM', { locale: enUS })} - {format(comparisonRange.to, 'dd/MM', { locale: enUS })})
         </span>
       )}
       {onClear && (

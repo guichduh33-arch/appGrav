@@ -105,13 +105,23 @@ export const ReportingService = {
     /**
      * Get Product Performance
      */
-    async getProductPerformance(startDate: Date, endDate: Date): Promise<ProductPerformanceStat[]> {
-        const { data, error } = await supabase
+    async getProductPerformance(
+        startDate: Date,
+        endDate: Date,
+        filters?: { categoryId?: string; orderType?: string }
+    ): Promise<ProductPerformanceStat[]> {
+        let query = supabase
             .from('order_items')
-            .select('product_id, product_name, quantity, total_price, product:products(cost_price, category:categories(name))')
+            .select('product_id, product_name, quantity, total_price, product:products(cost_price, category_id, category:categories(name)), order:orders!inner(order_type)')
             .gte('created_at', startDate.toISOString())
             .lte('created_at', endDate.toISOString())
             .eq('item_status', 'served');
+
+        if (filters?.orderType) {
+            query = query.eq('order.order_type', filters.orderType);
+        }
+
+        const { data, error } = await query;
 
         if (error) throw error;
 
@@ -122,10 +132,14 @@ export const ReportingService = {
             product_name: string;
             quantity: number;
             total_price: number;
-            product?: { cost_price?: number; category?: { name?: string } };
+            product?: { cost_price?: number; category_id?: string; category?: { name?: string } };
+            order?: { order_type?: string };
         };
         const rawData = data as unknown as OrderItemRow[];
-        rawData?.forEach((item) => {
+        const filteredData = filters?.categoryId
+            ? rawData?.filter((item) => item.product?.category_id === filters.categoryId)
+            : rawData;
+        filteredData?.forEach((item) => {
             const key = item.product_id ?? item.product_name;
             if (!map.has(key)) {
                 map.set(key, {

@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { useNetworkStore } from '../stores/networkStore';
 import { startSyncWithDelay } from '../services/sync/syncEngine';
 import { startOfflinePeriod, endOfflinePeriod } from '../services/sync/offlinePeriod';
+import logger from '@/utils/logger';
 
 /**
  * Hook that monitors network status and shows alerts on transitions.
@@ -92,7 +93,7 @@ export function useNetworkAlerts(): void {
         endOfflinePeriod(currentPeriodIdRef.current)
           .then((period) => {
             if (period) {
-              console.log(`[useNetworkAlerts] Offline period ended: ${period.transactions_created} transactions created`);
+              logger.debug(`[useNetworkAlerts] Offline period ended: ${period.transactions_created} transactions created`);
             }
             currentPeriodIdRef.current = null;
           })

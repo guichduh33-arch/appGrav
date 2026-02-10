@@ -14,6 +14,7 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { Loader2, ArrowLeft, Package } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -165,6 +166,10 @@ export const SalesByCategoryTab = () => {
     );
   }
 
+  if (isLoading) {
+    return <ReportSkeleton />;
+  }
+
   // Drill-down view: Products in category
   if (isDrilledIn && categoryId) {
     const categoryTotal = products.reduce((s, p) => s + p.total_revenue, 0);
@@ -293,11 +298,7 @@ export const SalesByCategoryTab = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* PieChart */}
         <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm h-80">
-          {isLoading ? (
-            <div className="h-full flex items-center justify-center">
-              <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-            </div>
-          ) : data.length === 0 ? (
+          {data.length === 0 ? (
             <div className="h-full flex items-center justify-center text-gray-500">
               No data available for this period.
             </div>
@@ -341,26 +342,16 @@ export const SalesByCategoryTab = () => {
           <div className="bg-blue-50 p-4 rounded-lg">
             <p className="text-sm text-blue-600 font-medium">Total Revenue</p>
             <p className="text-2xl font-bold text-blue-900">
-              {isLoading ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
-              ) : (
-                formatCurrency(totalRevenue)
-              )}
+              {formatCurrency(totalRevenue)}
             </p>
           </div>
           <div className="bg-green-50 p-4 rounded-lg">
             <p className="text-sm text-green-600 font-medium">Top Category</p>
             <p className="text-lg font-bold text-green-900">
-              {isLoading ? (
-                <Loader2 className="w-6 h-6 animate-spin" />
-              ) : data.length > 0 ? (
-                data[0].category_name
-              ) : (
-                '-'
-              )}
+              {data.length > 0 ? data[0].category_name : '-'}
             </p>
             <p className="text-xs text-green-700">
-              {!isLoading && data.length > 0 ? formatCurrency(data[0].total_revenue) : ''}
+              {data.length > 0 ? formatCurrency(data[0].total_revenue) : ''}
             </p>
           </div>
         </div>
@@ -382,13 +373,7 @@ export const SalesByCategoryTab = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {isLoading ? (
-              <tr>
-                <td colSpan={4} className="px-6 py-8 text-center">
-                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                </td>
-              </tr>
-            ) : data.length === 0 ? (
+            {data.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-6 py-12 text-center text-gray-400">
                   No data available.

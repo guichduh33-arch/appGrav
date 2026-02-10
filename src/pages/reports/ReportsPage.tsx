@@ -1,5 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronRight, ArrowLeft, Download } from 'lucide-react';
+import { OfflineReportBanner } from '@/components/reports/OfflineReportBanner';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { getLastSyncTime } from '@/services/reports/offlineReportCache';
 import { OverviewTab } from './components/OverviewTab';
 import { SalesTab } from './components/SalesTab';
 import { InventoryTab } from './components/InventoryTab';
@@ -39,6 +42,12 @@ import './ReportsPage.css';
 const ReportsPage = () => {
     const [activeCategoryId, setActiveCategoryId] = useState<string>('sales');
     const [activeReportId, setActiveReportId] = useState<string | null>(null);
+    const { isOnline } = useNetworkStatus();
+    const [lastSyncDate, setLastSyncDate] = useState<Date | null>(null);
+
+    useEffect(() => {
+        getLastSyncTime('daily_kpis').then(setLastSyncDate);
+    }, []);
 
     const activeCategory = REPORT_CATEGORIES.find(c => c.id === activeCategoryId) || REPORT_CATEGORIES[0];
     const activeReport = activeCategory.reports.find(r => r.id === activeReportId);
@@ -187,6 +196,13 @@ const ReportsPage = () => {
                         )}
                     </div>
                 </header>
+
+                {/* Offline Banner */}
+                <OfflineReportBanner
+                    isOffline={!isOnline}
+                    lastSyncDate={lastSyncDate}
+                    className="mx-6 mt-4"
+                />
 
                 {/* Content Body */}
                 <div className="reports-content">

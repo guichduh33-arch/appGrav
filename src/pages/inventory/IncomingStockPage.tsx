@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from 'react'
+import { useState, Fragment } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     TruckIcon,
@@ -13,77 +13,18 @@ import {
     ChevronDown,
     ChevronRight
 } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
+import { useIncomingStock } from '@/hooks/inventory/useIncomingStock'
 import { formatCurrency, formatDate } from '../../utils/helpers'
 import './IncomingStockPage.css'
-
-interface PurchaseOrderWithItems {
-    id: string
-    po_number: string
-    supplier: { id: string; name: string } | null
-    status: string
-    order_date: string
-    expected_delivery_date: string | null
-    actual_delivery_date: string | null
-    total_amount: number
-    notes: string | null
-    purchase_order_items: {
-        id: string
-        product: { id: string; name: string; sku: string } | null
-        quantity: number
-        quantity_received: number
-        unit_price: number
-    }[]
-}
 
 type FilterStatus = 'all' | 'pending' | 'partial' | 'received'
 
 export default function IncomingStockPage() {
     const navigate = useNavigate()
-    const [orders, setOrders] = useState<PurchaseOrderWithItems[]>([])
-    const [isLoading, setIsLoading] = useState(true)
+    const { data: orders = [], isLoading } = useIncomingStock()
     const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
     const [searchTerm, setSearchTerm] = useState('')
     const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set())
-
-    // Load purchase orders
-    useEffect(() => {
-        loadOrders()
-    }, [])
-
-    const loadOrders = async () => {
-        setIsLoading(true)
-        try {
-            const { data, error } = await supabase
-                .from('purchase_orders')
-                .select(`
-                    id,
-                    po_number,
-                    supplier:suppliers(id, name),
-                    status,
-                    order_date,
-                    expected_delivery_date,
-                    actual_delivery_date,
-                    total_amount,
-                    notes,
-                    purchase_order_items(
-                        id,
-                        product:products(id, name, sku),
-                        quantity,
-                        quantity_received,
-                        unit_price
-                    )
-                `)
-                .order('order_date', { ascending: false })
-
-            if (error) throw error
-            setOrders((data ?? []) as unknown as PurchaseOrderWithItems[])
-        } catch (err) {
-            console.error('Error loading orders:', err)
-        } finally {
-            setIsLoading(false)
-        }
-    }
 
     // Calculate stats
     const stats = {
@@ -272,7 +213,7 @@ export default function IncomingStockPage() {
                                                     type="button"
                                                     className="btn-expand"
                                                     onClick={() => toggleExpanded(order.id)}
-                                                    title={isExpanded ? 'Réduire' : 'Voir les produits'}
+                                                    title={isExpanded ? 'Collapse' : 'View products'}
                                                 >
                                                     {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                                                 </button>

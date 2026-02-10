@@ -9,6 +9,7 @@
  */
 
 import { db } from '@/lib/db';
+import logger from '@/utils/logger';
 import type {
   ILegacySyncQueueItem,
   TLegacySyncQueueType,
@@ -62,7 +63,7 @@ export async function addToSyncQueue(
     if (newCount >= OFFLINE_CONSTANTS.MAX_QUEUE_SIZE) {
       throw new Error(`Sync queue full (max: ${OFFLINE_CONSTANTS.MAX_QUEUE_SIZE})`);
     }
-    console.log(`[SyncQueue] Cleaned ${cleaned} items, queue now has ${newCount} items`);
+    logger.debug(`[SyncQueue] Cleaned ${cleaned} items, queue now has ${newCount} items`);
   }
 
   const item: ISyncQueueItem = {
@@ -76,7 +77,7 @@ export async function addToSyncQueue(
   };
 
   await db.offline_legacy_sync_queue.add(item);
-  console.log(`[SyncQueue] Added ${type} item: ${item.id}`);
+  logger.debug(`[SyncQueue] Added ${type} item: ${item.id}`);
   return item.id;
 }
 
@@ -129,7 +130,7 @@ export async function getPendingSyncCount(): Promise<number> {
  */
 export async function clearSyncQueue(): Promise<void> {
   await db.offline_legacy_sync_queue.clear();
-  console.log('[SyncQueue] Queue cleared');
+  logger.debug('[SyncQueue] Queue cleared');
 }
 
 /**
@@ -147,7 +148,7 @@ export async function cleanupSyncedItems(): Promise<number> {
   const ids = syncedItems.map((item) => item.id);
   await db.offline_legacy_sync_queue.bulkDelete(ids);
 
-  console.log(`[SyncQueue] Cleaned up ${ids.length} synced items`);
+  logger.debug(`[SyncQueue] Cleaned up ${ids.length} synced items`);
   return ids.length;
 }
 
@@ -167,7 +168,7 @@ export async function markSynced(itemId: string): Promise<void> {
   await db.offline_legacy_sync_queue.update(itemId, {
     status: 'synced' as TSyncQueueStatus,
   });
-  console.log(`[SyncQueue] Item ${itemId} synced successfully`);
+  logger.debug(`[SyncQueue] Item ${itemId} synced successfully`);
 }
 
 /**
@@ -183,7 +184,7 @@ export async function markFailed(itemId: string, error: string): Promise<void> {
     attempts: item.attempts + 1,
     lastError: error,
   });
-  console.log(`[SyncQueue] Item ${itemId} failed (attempt ${item.attempts + 1}): ${error}`);
+  logger.debug(`[SyncQueue] Item ${itemId} failed (attempt ${item.attempts + 1}): ${error}`);
 }
 
 /**
@@ -251,5 +252,5 @@ export async function resetToPending(itemId: string): Promise<void> {
     status: 'pending' as TSyncQueueStatus,
     lastError: null,
   });
-  console.log(`[SyncQueue] Item ${itemId} reset to pending`);
+  logger.debug(`[SyncQueue] Item ${itemId} reset to pending`);
 }

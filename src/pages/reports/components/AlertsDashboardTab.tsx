@@ -9,6 +9,7 @@ import {
   Filter,
   X,
 } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import {
   getSystemAlerts,
   getAlertCounts,
@@ -148,6 +149,10 @@ export function AlertsDashboardTab() {
     );
   }
 
+  if (countsLoading && alertsLoading) {
+    return <ReportSkeleton />;
+  }
+
   return (
     <div className="space-y-6">
       {/* KPI Cards */}
@@ -160,7 +165,7 @@ export function AlertsDashboardTab() {
             <span className="text-sm text-gray-600">Critical</span>
           </div>
           <p className="text-2xl font-bold text-red-600">
-            {countsLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : counts?.critical || 0}
+            {counts?.critical || 0}
           </p>
         </div>
 
@@ -172,7 +177,7 @@ export function AlertsDashboardTab() {
             <span className="text-sm text-gray-600">Warning</span>
           </div>
           <p className="text-2xl font-bold text-orange-600">
-            {countsLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : counts?.warning || 0}
+            {counts?.warning || 0}
           </p>
         </div>
 
@@ -184,7 +189,7 @@ export function AlertsDashboardTab() {
             <span className="text-sm text-gray-600">Unread</span>
           </div>
           <p className="text-2xl font-bold text-blue-600">
-            {countsLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : counts?.unread || 0}
+            {counts?.unread || 0}
           </p>
         </div>
 
@@ -196,7 +201,7 @@ export function AlertsDashboardTab() {
             <span className="text-sm text-gray-600">Total Unresolved</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {countsLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : counts?.total || 0}
+            {counts?.total || 0}
           </p>
         </div>
       </div>
@@ -250,11 +255,7 @@ export function AlertsDashboardTab() {
         </div>
 
         <div className="divide-y divide-gray-100">
-          {alertsLoading ? (
-            <div className="p-8 text-center">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-            </div>
-          ) : sortedAlerts.length === 0 ? (
+          {sortedAlerts.length === 0 ? (
             <div className="p-8 text-center text-gray-400">
               <CheckCircle className="w-12 h-12 mx-auto mb-4 text-green-500" />
               <p>No alerts to display.</p>

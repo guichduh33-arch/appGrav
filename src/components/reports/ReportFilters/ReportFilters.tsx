@@ -1,4 +1,4 @@
-import { Filter, X, Layers, Package, User, CreditCard, Users } from 'lucide-react';
+import { Filter, X, Layers, Package, User, CreditCard, Users, ShoppingBag } from 'lucide-react';
 import {
   FilterType,
   UseReportFiltersReturn,
@@ -21,29 +21,34 @@ const FILTER_CONFIGS: Record<
   }
 > = {
   category: {
-    label: 'Catégorie',
+    label: 'Category',
     icon: <Layers className="w-4 h-4" />,
-    placeholder: 'Toutes les catégories',
+    placeholder: 'All categories',
   },
   product: {
-    label: 'Produit',
+    label: 'Product',
     icon: <Package className="w-4 h-4" />,
-    placeholder: 'Tous les produits',
+    placeholder: 'All products',
   },
   staff: {
-    label: 'Employé',
+    label: 'Staff',
     icon: <User className="w-4 h-4" />,
-    placeholder: 'Tous les employés',
+    placeholder: 'All staff',
   },
   payment_method: {
-    label: 'Paiement',
+    label: 'Payment',
     icon: <CreditCard className="w-4 h-4" />,
-    placeholder: 'Tous les modes',
+    placeholder: 'All methods',
   },
   customer: {
-    label: 'Client',
+    label: 'Customer',
     icon: <Users className="w-4 h-4" />,
-    placeholder: 'Tous les clients',
+    placeholder: 'All customers',
+  },
+  order_type: {
+    label: 'Order Type',
+    icon: <ShoppingBag className="w-4 h-4" />,
+    placeholder: 'All types',
   },
 };
 
@@ -65,6 +70,7 @@ export function ReportFilters({
     staffOptions,
     paymentMethodOptions,
     customerOptions,
+    orderTypeOptions,
     isLoadingOptions,
   } = filtersState;
 
@@ -80,6 +86,8 @@ export function ReportFilters({
         return paymentMethodOptions;
       case 'customer':
         return customerOptions;
+      case 'order_type':
+        return orderTypeOptions;
       default:
         return [];
     }
@@ -91,7 +99,7 @@ export function ReportFilters({
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex items-center gap-2 text-gray-500 pb-2">
           <Filter className="w-4 h-4" />
-          <span className="text-sm font-medium">Filtres</span>
+          <span className="text-sm font-medium">Filters</span>
         </div>
 
         {enabledFilters.map((filterType) => {
@@ -122,7 +130,7 @@ export function ReportFilters({
             "
           >
             <X className="w-4 h-4" />
-            Effacer tout
+            Clear all
           </button>
         )}
       </div>

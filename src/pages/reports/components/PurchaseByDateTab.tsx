@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ShoppingCart, Calendar, Loader2, DollarSign, Package } from 'lucide-react';
+import { ShoppingCart, Calendar, DollarSign, Package } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { supabase } from '@/lib/supabase';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -93,7 +94,7 @@ export function PurchaseByDateTab() {
   const chartData = useMemo(() => {
     if (!data) return [];
     return data.map((d) => ({
-      date: new Date(d.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+      date: new Date(d.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short' }),
       amount: d.total_amount,
       orders: d.order_count,
     }));
@@ -116,22 +117,22 @@ export function PurchaseByDateTab() {
   const exportConfig: ExportConfig<PurchaseByDate> = useMemo(() => ({
     data: data || [],
     columns: [
-      { key: 'date', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('fr-FR') },
-      { key: 'order_count', header: 'Commandes', align: 'right' as const },
-      { key: 'items_count', header: 'Articles', align: 'right' as const },
-      { key: 'total_amount', header: 'Montant', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'date', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('en-US') },
+      { key: 'order_count', header: 'Orders', align: 'right' as const },
+      { key: 'items_count', header: 'Items', align: 'right' as const },
+      { key: 'total_amount', header: 'Amount', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
     ],
-    filename: 'achats_par_date',
-    title: 'Achats par Date',
+    filename: 'purchases-by-date',
+    title: 'Purchases by Date',
     dateRange,
     summaries: [
-      { label: 'Total commandes', value: summary.totalOrders.toString() },
-      { label: 'Total achats', value: formatCurrencyPdf(summary.totalAmount) },
+      { label: 'Total Orders', value: summary.totalOrders.toString() },
+      { label: 'Total Purchases', value: formatCurrencyPdf(summary.totalAmount) },
     ],
   }), [data, dateRange, summary]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   if (error) {
@@ -140,6 +141,10 @@ export function PurchaseByDateTab() {
         Error loading data
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <ReportSkeleton />;
   }
 
   return (
@@ -157,10 +162,10 @@ export function PurchaseByDateTab() {
             <div className="p-2 bg-blue-50 rounded-lg">
               <ShoppingCart className="w-5 h-5 text-blue-600" />
             </div>
-            <span className="text-sm text-gray-600">Total commandes</span>
+            <span className="text-sm text-gray-600">Total Orders</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : summary.totalOrders}
+            {summary.totalOrders}
           </p>
         </div>
 
@@ -169,10 +174,10 @@ export function PurchaseByDateTab() {
             <div className="p-2 bg-green-50 rounded-lg">
               <DollarSign className="w-5 h-5 text-green-600" />
             </div>
-            <span className="text-sm text-gray-600">Total achats</span>
+            <span className="text-sm text-gray-600">Total Purchases</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(summary.totalAmount)}
+            {formatCurrency(summary.totalAmount)}
           </p>
         </div>
 
@@ -181,25 +186,21 @@ export function PurchaseByDateTab() {
             <div className="p-2 bg-purple-50 rounded-lg">
               <Package className="w-5 h-5 text-purple-600" />
             </div>
-            <span className="text-sm text-gray-600">Total articles</span>
+            <span className="text-sm text-gray-600">Total Items</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : summary.totalItems}
+            {summary.totalItems}
           </p>
         </div>
       </div>
 
       {/* Chart */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">Évolution des achats</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">Purchase Trends</h3>
 
-        {isLoading ? (
-          <div className="h-80 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-          </div>
-        ) : chartData.length === 0 ? (
+        {chartData.length === 0 ? (
           <div className="h-80 flex items-center justify-center text-gray-500">
-            Aucun achat sur cette période
+            No purchases in this period
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={320}>
@@ -207,7 +208,7 @@ export function PurchaseByDateTab() {
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="date" tick={{ fontSize: 11 }} />
               <YAxis tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`} tick={{ fontSize: 12 }} />
-              <Tooltip formatter={(value) => [formatCurrency(value as number), 'Achats']} />
+              <Tooltip formatter={(value) => [formatCurrency(value as number), 'Purchases']} />
               <Bar dataKey="amount" fill="#3B82F6" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -217,32 +218,26 @@ export function PurchaseByDateTab() {
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Détail par date</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Details by Date</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Commandes</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Articles</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Montant</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Orders</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Items</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  </td>
-                </tr>
-              ) : data && data.length > 0 ? (
+              {data && data.length > 0 ? (
                 data.map((row) => (
                   <tr key={row.date} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-gray-400" />
-                        {new Date(row.date).toLocaleDateString('fr-FR', {
+                        {new Date(row.date).toLocaleDateString('en-US', {
                           weekday: 'short',
                           day: '2-digit',
                           month: 'short',
@@ -260,7 +255,7 @@ export function PurchaseByDateTab() {
               ) : (
                 <tr>
                   <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
-                    Aucun achat sur cette période
+                    No purchases in this period
                   </td>
                 </tr>
               )}

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Package, DollarSign, TrendingUp, Loader2 } from 'lucide-react';
+import { Search, Package, DollarSign, TrendingUp } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -66,26 +67,26 @@ export const PurchaseDetailsTab = () => {
   const exportConfig: ExportConfig<PurchaseDetail> = useMemo(() => ({
     data: filteredData,
     columns: [
-      { key: 'created_at', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('fr-FR') },
-      { key: 'product', header: 'Produit', format: (v) => (v as { name?: string })?.name || 'Inconnu' },
+      { key: 'created_at', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('en-US') },
+      { key: 'product', header: 'Product', format: (v) => (v as { name?: string })?.name || 'Unknown' },
       { key: 'product', header: 'SKU', format: (v) => (v as { sku?: string })?.sku || '-' },
-      { key: 'supplier', header: 'Fournisseur', format: (v) => (v as { name?: string })?.name || '-' },
-      { key: 'reference_id', header: 'Référence (PO#)' },
-      { key: 'quantity', header: 'Quantité', align: 'right' as const },
-      { key: 'product', header: 'Coût Unitaire', align: 'right' as const, format: (v) => formatCurrencyPdf((v as { cost_price?: number })?.cost_price || 0) },
+      { key: 'supplier', header: 'Supplier', format: (v) => (v as { name?: string })?.name || '-' },
+      { key: 'reference_id', header: 'Reference (PO#)' },
+      { key: 'quantity', header: 'Quantity', align: 'right' as const },
+      { key: 'product', header: 'Unit Cost', align: 'right' as const, format: (v) => formatCurrencyPdf((v as { cost_price?: number })?.cost_price || 0) },
     ],
-    filename: 'achats_details',
-    title: 'Détail des Achats',
+    filename: 'purchase-details',
+    title: 'Purchase Details',
     dateRange,
     summaries: [
-      { label: 'Total Achats', value: formatCurrencyPdf(kpis.totalCost) },
-      { label: 'Articles', value: kpis.itemCount.toString() },
-      { label: 'Produits Uniques', value: kpis.uniqueProducts.toString() },
+      { label: 'Total Purchases', value: formatCurrencyPdf(kpis.totalCost) },
+      { label: 'Items', value: kpis.itemCount.toString() },
+      { label: 'Unique Products', value: kpis.uniqueProducts.toString() },
     ],
   }), [filteredData, dateRange, kpis]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   if (error) {
@@ -94,6 +95,10 @@ export const PurchaseDetailsTab = () => {
         Error loading data
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <ReportSkeleton />;
   }
 
   return (
@@ -111,10 +116,10 @@ export const PurchaseDetailsTab = () => {
             <div className="p-2 bg-blue-50 rounded-lg">
               <DollarSign className="w-5 h-5 text-blue-600" />
             </div>
-            <span className="text-sm text-gray-600">Valeur Totale (Est.)</span>
+            <span className="text-sm text-gray-600">Total Value (Est.)</span>
           </div>
           <p className="text-2xl font-bold text-blue-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(kpis.totalCost)}
+            {formatCurrency(kpis.totalCost)}
           </p>
         </div>
 
@@ -123,10 +128,10 @@ export const PurchaseDetailsTab = () => {
             <div className="p-2 bg-green-50 rounded-lg">
               <TrendingUp className="w-5 h-5 text-green-600" />
             </div>
-            <span className="text-sm text-gray-600">Quantité Totale</span>
+            <span className="text-sm text-gray-600">Total Quantity</span>
           </div>
           <p className="text-2xl font-bold text-green-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : kpis.totalQuantity.toLocaleString()}
+            {kpis.totalQuantity.toLocaleString()}
           </p>
         </div>
 
@@ -135,10 +140,10 @@ export const PurchaseDetailsTab = () => {
             <div className="p-2 bg-purple-50 rounded-lg">
               <Package className="w-5 h-5 text-purple-600" />
             </div>
-            <span className="text-sm text-gray-600">Articles</span>
+            <span className="text-sm text-gray-600">Items</span>
           </div>
           <p className="text-2xl font-bold text-purple-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : kpis.itemCount}
+            {kpis.itemCount}
           </p>
         </div>
 
@@ -147,10 +152,10 @@ export const PurchaseDetailsTab = () => {
             <div className="p-2 bg-orange-50 rounded-lg">
               <Package className="w-5 h-5 text-orange-600" />
             </div>
-            <span className="text-sm text-gray-600">Produits Uniques</span>
+            <span className="text-sm text-gray-600">Unique Products</span>
           </div>
           <p className="text-2xl font-bold text-orange-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : kpis.uniqueProducts}
+            {kpis.uniqueProducts}
           </p>
         </div>
       </div>
@@ -161,7 +166,7 @@ export const PurchaseDetailsTab = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Rechercher produit, SKU, fournisseur ou référence..."
+            placeholder="Search product, SKU, supplier, or reference..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -172,34 +177,28 @@ export const PurchaseDetailsTab = () => {
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Historique des achats entrants</h3>
-          <p className="text-sm text-gray-500">Mouvements de stock marqués comme achat</p>
+          <h3 className="text-lg font-semibold text-gray-900">Incoming Purchase History</h3>
+          <p className="text-sm text-gray-500">Stock movements marked as purchase</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produit</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fournisseur</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Référence (PO#)</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantité</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Coût Unit. (Est.)</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Valeur Totale</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supplier</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reference (PO#)</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Unit Cost (Est.)</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Value</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Staff</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  </td>
-                </tr>
-              ) : filteredData.length === 0 ? (
+              {filteredData.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
-                    Aucune donnée
+                    No data
                   </td>
                 </tr>
               ) : (
@@ -209,13 +208,13 @@ export const PurchaseDetailsTab = () => {
                   return (
                     <tr key={row.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 text-sm text-gray-600">
-                        {new Date(row.created_at).toLocaleDateString('fr-FR')}
+                        {new Date(row.created_at).toLocaleDateString('en-US')}
                         <div className="text-xs text-gray-400">
-                          {new Date(row.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(row.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                        {row.product?.name || 'Produit Inconnu'}
+                        {row.product?.name || 'Unknown Product'}
                         <div className="text-xs text-gray-400 font-mono">{row.product?.sku}</div>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">{row.supplier?.name || '-'}</td>

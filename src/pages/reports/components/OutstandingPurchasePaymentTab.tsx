@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { DollarSign, AlertTriangle, Clock, Loader2, Building2, Calendar, FileText } from 'lucide-react';
+import { DollarSign, AlertTriangle, Clock, Building2, Calendar, FileText } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { supabase } from '@/lib/supabase';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
 import { formatCurrency as formatCurrencyPdf } from '@/services/reports/pdfExport';
@@ -61,7 +62,7 @@ async function getOutstandingPayments(): Promise<OutstandingPayment[]> {
       return {
         id: po.id,
         po_number: po.po_number || '-',
-        supplier_name: (Array.isArray(po.supplier) ? po.supplier[0]?.name : po.supplier?.name) || 'Inconnu',
+        supplier_name: (Array.isArray(po.supplier) ? po.supplier[0]?.name : po.supplier?.name) || 'Unknown',
         order_date: po.order_date,
         total: po.total_amount || 0,
         amount_paid: amountPaid,
@@ -103,24 +104,24 @@ export function OutstandingPurchasePaymentTab() {
   const exportConfig: ExportConfig<OutstandingPayment> = useMemo(() => ({
     data: data || [],
     columns: [
-      { key: 'po_number', header: 'N° Commande' },
-      { key: 'supplier_name', header: 'Fournisseur' },
-      { key: 'order_date', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('fr-FR') },
+      { key: 'po_number', header: 'Order #' },
+      { key: 'supplier_name', header: 'Supplier' },
+      { key: 'order_date', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('en-US') },
       { key: 'total', header: 'Total', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
-      { key: 'amount_paid', header: 'Payé', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
-      { key: 'amount_due', header: 'Dû', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
-      { key: 'days_outstanding', header: 'Jours', align: 'right' as const },
+      { key: 'amount_paid', header: 'Paid', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'amount_due', header: 'Due', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'days_outstanding', header: 'Days', align: 'right' as const },
     ],
-    filename: 'paiements_en_attente',
-    title: 'Paiements Fournisseurs en Attente',
+    filename: 'outstanding-payments',
+    title: 'Outstanding Supplier Payments',
     summaries: [
-      { label: 'Total dû', value: formatCurrencyPdf(summary.totalOutstanding) },
-      { label: 'Commandes en retard', value: summary.overdueOrders.toString() },
+      { label: 'Total due', value: formatCurrencyPdf(summary.totalOutstanding) },
+      { label: 'Overdue orders', value: summary.overdueOrders.toString() },
     ],
   }), [data, summary]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   const getDaysBadge = (days: number) => {
@@ -128,7 +129,7 @@ export function OutstandingPurchasePaymentTab() {
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
           <AlertTriangle className="w-3 h-3" />
-          {days}j
+          {days}d
         </span>
       );
     }
@@ -136,20 +137,20 @@ export function OutstandingPurchasePaymentTab() {
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-orange-100 text-orange-700 rounded-full">
           <Clock className="w-3 h-3" />
-          {days}j
+          {days}d
         </span>
       );
     }
     if (days > 14) {
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-700 rounded-full">
-          {days}j
+          {days}d
         </span>
       );
     }
     return (
       <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">
-        {days}j
+        {days}d
       </span>
     );
   };
@@ -162,11 +163,15 @@ export function OutstandingPurchasePaymentTab() {
     );
   }
 
+  if (isLoading) {
+    return <ReportSkeleton />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-lg font-semibold text-gray-900">Paiements Fournisseurs en Attente</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Outstanding Supplier Payments</h2>
         <ExportButtons config={exportConfig} />
       </div>
 
@@ -177,10 +182,10 @@ export function OutstandingPurchasePaymentTab() {
             <div className="p-2 bg-blue-50 rounded-lg">
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
-            <span className="text-sm text-gray-600">Commandes en attente</span>
+            <span className="text-sm text-gray-600">Pending orders</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : summary.totalOrders}
+            {summary.totalOrders}
           </p>
         </div>
 
@@ -189,10 +194,10 @@ export function OutstandingPurchasePaymentTab() {
             <div className="p-2 bg-purple-50 rounded-lg">
               <DollarSign className="w-5 h-5 text-purple-600" />
             </div>
-            <span className="text-sm text-gray-600">Total dû</span>
+            <span className="text-sm text-gray-600">Total due</span>
           </div>
           <p className="text-2xl font-bold text-purple-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(summary.totalOutstanding)}
+            {formatCurrency(summary.totalOutstanding)}
           </p>
         </div>
 
@@ -201,10 +206,10 @@ export function OutstandingPurchasePaymentTab() {
             <div className="p-2 bg-red-50 rounded-lg">
               <AlertTriangle className="w-5 h-5 text-red-600" />
             </div>
-            <span className="text-sm text-gray-600">En retard (&gt;30j)</span>
+            <span className="text-sm text-gray-600">Overdue (&gt;30d)</span>
           </div>
           <p className="text-2xl font-bold text-red-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : summary.overdueOrders}
+            {summary.overdueOrders}
           </p>
         </div>
 
@@ -213,10 +218,10 @@ export function OutstandingPurchasePaymentTab() {
             <div className="p-2 bg-orange-50 rounded-lg">
               <Clock className="w-5 h-5 text-orange-600" />
             </div>
-            <span className="text-sm text-gray-600">Moy. jours en attente</span>
+            <span className="text-sm text-gray-600">Avg days pending</span>
           </div>
           <p className="text-2xl font-bold text-orange-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : `${summary.avgDaysOutstanding}j`}
+            {`${summary.avgDaysOutstanding}d`}
           </p>
         </div>
       </div>
@@ -226,10 +231,10 @@ export function OutstandingPurchasePaymentTab() {
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-amber-800">Montants partiels estimés</p>
+            <p className="text-sm font-medium text-amber-800">Partial amounts estimated</p>
             <p className="text-sm text-amber-700">
-              Les paiements partiels sont estimés à 50% du total. Les montants réels seront disponibles
-              lorsque le module de paiements fournisseurs sera implémenté.
+              Partial payments are estimated at 50% of the total. Actual amounts will be available
+              when the supplier payments module is implemented.
             </p>
           </div>
         </div>
@@ -238,29 +243,23 @@ export function OutstandingPurchasePaymentTab() {
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Commandes avec paiement en attente</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Orders with pending payment</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">N° Commande</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fournisseur</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order #</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supplier</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Payé</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Dû</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Attente</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Paid</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Due</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Pending</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  </td>
-                </tr>
-              ) : data && data.length > 0 ? (
+              {data && data.length > 0 ? (
                 data.map((row) => (
                   <tr key={row.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">{row.po_number}</td>
@@ -273,7 +272,7 @@ export function OutstandingPurchasePaymentTab() {
                     <td className="px-6 py-4 text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-3 h-3" />
-                        {new Date(row.order_date).toLocaleDateString('fr-FR')}
+                        {new Date(row.order_date).toLocaleDateString('en-US')}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 text-right">
@@ -285,7 +284,7 @@ export function OutstandingPurchasePaymentTab() {
                         {row.is_estimated && (
                           <span
                             className="inline-flex items-center justify-center w-4 h-4 text-xs text-amber-700 bg-amber-100 rounded-full cursor-help"
-                            title="Montant estimé à 50% - les paiements partiels réels ne sont pas encore trackés dans le système"
+                            title="Amount estimated at 50% - actual partial payments are not yet tracked in the system"
                           >
                             ~
                           </span>
@@ -303,7 +302,7 @@ export function OutstandingPurchasePaymentTab() {
               ) : (
                 <tr>
                   <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                    Aucun paiement en attente
+                    No pending payments
                   </td>
                 </tr>
               )}

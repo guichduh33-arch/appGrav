@@ -16,6 +16,7 @@ import { useEffect, useCallback, useRef } from 'react';
 import { lanClient } from '@/services/lan/lanClient';
 import { LAN_MESSAGE_TYPES, ILanMessage } from '@/services/lan/lanProtocol';
 import type { IKdsNewOrderPayload, TKitchenStation } from '@/types/offline';
+import logger from '@/utils/logger';
 
 /**
  * Options for the useKdsOrderReceiver hook
@@ -100,7 +101,7 @@ export function useKdsOrderReceiver(options: IUseKdsOrderReceiverOptions): IUseK
       // 'all' station receives all orders (waiter station)
       // Otherwise, only receive orders for our specific station
       if (station !== 'all' && payload.station !== station) {
-        console.log(
+        logger.debug(
           `[useKdsOrderReceiver] Ignoring order for station ${payload.station}, we are ${station}`
         );
         return;
@@ -108,13 +109,13 @@ export function useKdsOrderReceiver(options: IUseKdsOrderReceiverOptions): IUseK
 
       // Duplicate detection - skip if order already exists
       if (existingOrderIdsRef.current?.has(payload.order_id)) {
-        console.log(
+        logger.debug(
           `[useKdsOrderReceiver] Ignoring duplicate order ${payload.order_number} (${payload.order_id})`
         );
         return;
       }
 
-      console.log(
+      logger.debug(
         `[useKdsOrderReceiver] Received order ${payload.order_number} for station ${payload.station}`
       );
 
@@ -145,7 +146,7 @@ export function useKdsOrderReceiver(options: IUseKdsOrderReceiverOptions): IUseK
         station: ackStation,
         acknowledged_at: new Date().toISOString(),
       });
-      console.log(`[useKdsOrderReceiver] ACK sent for order ${orderId}`);
+      logger.debug(`[useKdsOrderReceiver] ACK sent for order ${orderId}`);
     } catch (error) {
       console.error('[useKdsOrderReceiver] Failed to send ACK:', error);
     }
@@ -160,12 +161,12 @@ export function useKdsOrderReceiver(options: IUseKdsOrderReceiverOptions): IUseK
     );
 
     isListeningRef.current = true;
-    console.log(`[useKdsOrderReceiver] Listening for orders on station: ${station}`);
+    logger.debug(`[useKdsOrderReceiver] Listening for orders on station: ${station}`);
 
     return () => {
       unsubscribe();
       isListeningRef.current = false;
-      console.log(`[useKdsOrderReceiver] Stopped listening on station: ${station}`);
+      logger.debug(`[useKdsOrderReceiver] Stopped listening on station: ${station}`);
     };
   }, [handleNewOrder, station]);
 

@@ -11,12 +11,17 @@ import {
   Legend,
 } from 'recharts';
 import { DollarSign, ShoppingCart, TrendingUp, ArrowLeft, Loader2 } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
 import { ReportBreadcrumb } from '@/components/reports/ReportBreadcrumb';
+import { ReportFilters } from '@/components/reports/ReportFilters';
+import { ComparisonToggle } from '@/components/reports/ComparisonToggle';
+import { DualSeriesLineChart, prepareDualSeriesData } from '@/components/reports/DualSeriesLineChart';
 import { useDateRange } from '@/hooks/reports/useDateRange';
 import { useDrillDown } from '@/hooks/reports/useDrillDown';
+import { useReportFilters } from '@/hooks/reports/useReportFilters';
 import { formatCurrency } from '@/utils/helpers';
 import { supabase } from '@/lib/supabase';
 import type { DailySalesStat } from '@/types/reporting';
@@ -78,7 +83,13 @@ async function getOrdersForDate(date: string): Promise<OrderDetail[]> {
 }
 
 export const DailySalesTab = () => {
-  const { dateRange } = useDateRange({ defaultPreset: 'last30days' });
+  const {
+    dateRange, comparisonRange, comparisonType, setComparisonType, isComparisonEnabled,
+  } = useDateRange({ defaultPreset: 'last30days', enableComparison: true });
+  const filtersState = useReportFilters({
+    enabledFilters: ['category', 'order_type'],
+    syncWithUrl: true,
+  });
   const { isDrilledIn, currentParams, drillInto, drillReset, breadcrumbLevels } = useDrillDown({
     baseLevelName: 'Daily Sales',
     syncWithUrl: true,
@@ -91,6 +102,25 @@ export const DailySalesTab = () => {
     staleTime: 5 * 60 * 1000,
     enabled: !isDrilledIn,
   });
+
+  // Comparison period data query
+  const { data: comparisonData = [] } = useQuery({
+    queryKey: ['dailySales-comparison', comparisonRange?.from, comparisonRange?.to],
+    queryFn: () => ReportingService.getDailySales(comparisonRange!.from, comparisonRange!.to),
+    staleTime: 5 * 60 * 1000,
+    enabled: isComparisonEnabled && !!comparisonRange && !isDrilledIn,
+  });
+
+  // Prepare dual series data for comparison chart
+  const dualSeriesData = useMemo(() => {
+    if (!isComparisonEnabled || comparisonData.length === 0) return [];
+    return prepareDualSeriesData<DailySalesStat>(data, comparisonData, {
+      valueKey: 'total_sales',
+      labelKey: 'date',
+      currentDateKey: 'date',
+      previousDateKey: 'date',
+    });
+  }, [data, comparisonData, isComparisonEnabled]);
 
   // Drill-down data query
   const drillDate = currentParams?.date;
@@ -161,6 +191,10 @@ export const DailySalesTab = () => {
         Error loading daily sales data. Please try again.
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <ReportSkeleton />;
   }
 
   // Drill-down view: Orders for specific date
@@ -259,30 +293,55 @@ export const DailySalesTab = () => {
   // Main view: Daily Sales
   return (
     <div className="space-y-6">
-      {/* Header: DateRangePicker + ExportButtons */}
+      {/* Header: DateRangePicker + ComparisonToggle + ExportButtons */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <DateRangePicker defaultPreset="last30days" />
-        <ExportButtons config={exportConfig} />
+        <div className="flex items-center gap-3">
+          <ComparisonToggle
+            comparisonType={comparisonType}
+            comparisonRange={comparisonRange}
+            onComparisonTypeChange={setComparisonType}
+          />
+          <ExportButtons config={exportConfig} />
+        </div>
       </div>
+
+      {/* Filters */}
+      <ReportFilters
+        filtersState={filtersState}
+        enabledFilters={['category', 'order_type']}
+      />
 
       {/* KPI Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard icon={<DollarSign className="w-5 h-5 text-blue-600" />} bg="bg-blue-50"
-          label="Total Revenue" value={isLoading ? null : formatCurrency(totals.revenue)} />
+          label="Total Revenue" value={formatCurrency(totals.revenue)} />
         <KpiCard icon={<ShoppingCart className="w-5 h-5 text-green-600" />} bg="bg-green-50"
-          label="Total Orders" value={isLoading ? null : totals.orders.toLocaleString()} />
+          label="Total Orders" value={totals.orders.toLocaleString()} />
         <KpiCard icon={<TrendingUp className="w-5 h-5 text-purple-600" />} bg="bg-purple-50"
-          label="Avg Daily Revenue" value={isLoading ? null : formatCurrency(totals.avgDaily)} />
+          label="Avg Daily Revenue" value={formatCurrency(totals.avgDaily)} />
         <KpiCard icon={<DollarSign className="w-5 h-5 text-amber-600" />} bg="bg-amber-50"
-          label="Avg Basket" value={isLoading ? null : formatCurrency(totals.avgBasket)} />
+          label="Avg Basket" value={formatCurrency(totals.avgBasket)} />
       </div>
+
+      {/* Comparison Chart */}
+      {isComparisonEnabled && dualSeriesData.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Period Comparison</h3>
+          <DualSeriesLineChart
+            data={dualSeriesData}
+            currentLabel="Current period"
+            previousLabel={comparisonType === 'last_year' ? 'Same period last year' : 'Previous period'}
+            format="currency"
+            height={300}
+          />
+        </div>
+      )}
 
       {/* Chart */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Daily Sales Performance</h3>
-        {isLoading ? (
-          <div className="h-80 animate-pulse bg-gray-100 rounded-lg" />
-        ) : data.length === 0 ? (
+        {data.length === 0 ? (
           <div className="h-80 flex items-center justify-center text-gray-500">
             No data available for this period.
           </div>
@@ -329,17 +388,7 @@ export const DailySalesTab = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {isLoading ? (
-                Array.from({ length: 7 }).map((_, i) => (
-                  <tr key={i}>
-                    <td className="px-6 py-4"><div className="h-4 w-24 bg-gray-200 rounded animate-pulse" /></td>
-                    <td className="px-6 py-4 text-right"><div className="h-4 w-12 bg-gray-200 rounded animate-pulse ml-auto" /></td>
-                    <td className="px-6 py-4 text-right"><div className="h-4 w-20 bg-gray-200 rounded animate-pulse ml-auto" /></td>
-                    <td className="px-6 py-4 text-right"><div className="h-4 w-20 bg-gray-200 rounded animate-pulse ml-auto" /></td>
-                    <td className="px-6 py-4 text-right"><div className="h-4 w-16 bg-gray-200 rounded animate-pulse ml-auto" /></td>
-                  </tr>
-                ))
-              ) : data.length === 0 ? (
+              {data.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-gray-400">
                     No data available.

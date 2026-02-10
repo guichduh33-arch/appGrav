@@ -18,7 +18,7 @@ import {
   parseISO,
   isValid,
 } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 export interface DateRange {
   from: Date;
@@ -53,7 +53,7 @@ function getPresets(): DatePreset[] {
   return [
     {
       key: 'today',
-      label: "Aujourd'hui",
+      label: 'Today',
       getRange: () => ({
         from: startOfDay(now),
         to: endOfDay(now),
@@ -61,7 +61,7 @@ function getPresets(): DatePreset[] {
     },
     {
       key: 'yesterday',
-      label: 'Hier',
+      label: 'Yesterday',
       getRange: () => ({
         from: startOfDay(subDays(now, 1)),
         to: endOfDay(subDays(now, 1)),
@@ -69,7 +69,7 @@ function getPresets(): DatePreset[] {
     },
     {
       key: 'last7days',
-      label: '7 derniers jours',
+      label: 'Last 7 days',
       getRange: () => ({
         from: startOfDay(subDays(now, 6)),
         to: endOfDay(now),
@@ -77,7 +77,7 @@ function getPresets(): DatePreset[] {
     },
     {
       key: 'last30days',
-      label: '30 derniers jours',
+      label: 'Last 30 days',
       getRange: () => ({
         from: startOfDay(subDays(now, 29)),
         to: endOfDay(now),
@@ -85,23 +85,23 @@ function getPresets(): DatePreset[] {
     },
     {
       key: 'thisWeek',
-      label: 'Cette semaine',
+      label: 'This week',
       getRange: () => ({
-        from: startOfWeek(now, { locale: fr }),
-        to: endOfWeek(now, { locale: fr }),
+        from: startOfWeek(now, { locale: enUS }),
+        to: endOfWeek(now, { locale: enUS }),
       }),
     },
     {
       key: 'lastWeek',
-      label: 'Semaine dernière',
+      label: 'Last week',
       getRange: () => ({
-        from: startOfWeek(subWeeks(now, 1), { locale: fr }),
-        to: endOfWeek(subWeeks(now, 1), { locale: fr }),
+        from: startOfWeek(subWeeks(now, 1), { locale: enUS }),
+        to: endOfWeek(subWeeks(now, 1), { locale: enUS }),
       }),
     },
     {
       key: 'thisMonth',
-      label: 'Ce mois',
+      label: 'This month',
       getRange: () => ({
         from: startOfMonth(now),
         to: endOfMonth(now),
@@ -109,7 +109,7 @@ function getPresets(): DatePreset[] {
     },
     {
       key: 'lastMonth',
-      label: 'Mois dernier',
+      label: 'Last month',
       getRange: () => ({
         from: startOfMonth(subMonths(now, 1)),
         to: endOfMonth(subMonths(now, 1)),
@@ -117,7 +117,7 @@ function getPresets(): DatePreset[] {
     },
     {
       key: 'thisYear',
-      label: 'Cette année',
+      label: 'This year',
       getRange: () => ({
         from: startOfYear(now),
         to: endOfYear(now),
@@ -338,7 +338,7 @@ export function useDateRange(options: UseDateRangeOptions = {}): UseDateRangeRet
   }, [dateRange, comparisonType, customComparisonRange]);
 
   const formatDate = useCallback((date: Date): string => {
-    return format(date, 'dd MMM yyyy', { locale: fr });
+    return format(date, 'dd MMM yyyy', { locale: enUS });
   }, []);
 
   const formatRange = useCallback((): string => {

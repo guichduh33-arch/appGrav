@@ -176,7 +176,7 @@ export const offlineAuthService = {
 
       const cachedTime = new Date(cached.cached_at).getTime();
       return Date.now() - cachedTime;
-    } catch (error) {
+    } catch {
       return -1;
     }
   },

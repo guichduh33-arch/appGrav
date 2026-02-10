@@ -110,7 +110,7 @@ const PrintingSettingsPage = () => {
                 toast.success('Printer created');
             }
             setShowModal(false);
-        } catch (error) {
+        } catch {
             toast.error('Error saving printer');
         }
     };
@@ -122,7 +122,7 @@ const PrintingSettingsPage = () => {
         try {
             await deletePrinter.mutateAsync(printer.id);
             toast.success('Printer deleted');
-        } catch (error) {
+        } catch {
             toast.error('Error deleting printer');
         }
     };

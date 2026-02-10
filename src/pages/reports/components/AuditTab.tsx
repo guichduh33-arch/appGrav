@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { AlertCircle, ChevronDown, ChevronUp, Filter, Loader2, Search } from 'lucide-react';
+import { AlertCircle, ChevronDown, ChevronUp, Filter, Search } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { supabase } from '@/lib/supabase';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -159,6 +160,10 @@ export const AuditTab = () => {
     );
   }
 
+  if (isLoading) {
+    return <ReportSkeleton />;
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -177,7 +182,7 @@ export const AuditTab = () => {
             <span className="text-sm text-gray-600">Total Entries</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : kpis.total}
+            {kpis.total}
           </p>
         </div>
 
@@ -189,7 +194,7 @@ export const AuditTab = () => {
             <span className="text-sm text-gray-600">Critical</span>
           </div>
           <p className="text-2xl font-bold text-red-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : kpis.critical}
+            {kpis.critical}
           </p>
         </div>
 
@@ -201,7 +206,7 @@ export const AuditTab = () => {
             <span className="text-sm text-gray-600">Warning</span>
           </div>
           <p className="text-2xl font-bold text-orange-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : kpis.warning}
+            {kpis.warning}
           </p>
         </div>
 
@@ -213,7 +218,7 @@ export const AuditTab = () => {
             <span className="text-sm text-gray-600">Info</span>
           </div>
           <p className="text-2xl font-bold text-blue-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : kpis.info}
+            {kpis.info}
           </p>
         </div>
       </div>
@@ -278,11 +283,7 @@ export const AuditTab = () => {
         </div>
 
         <div className="divide-y divide-gray-100">
-          {isLoading ? (
-            <div className="p-8 text-center">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-            </div>
-          ) : paginatedLogs.length === 0 ? (
+          {paginatedLogs.length === 0 ? (
             <div className="p-8 text-center text-gray-400">
               No audit entries found for this period.
             </div>

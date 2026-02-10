@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { DollarSign, Users, AlertTriangle, Clock, Loader2, Building2, Phone } from 'lucide-react';
+import { DollarSign, Users, AlertTriangle, Clock, Building2, Phone } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ReportingService } from '@/services/ReportingService';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
 import { formatCurrency as formatCurrencyPdf } from '@/services/reports/pdfExport';
@@ -37,31 +38,31 @@ export function B2BReceivablesTab() {
     data: data?.filter((c) => c.outstanding_amount > 0) || [],
     columns: [
       { key: 'customer_name', header: 'Client' },
-      { key: 'company_name', header: 'Entreprise', format: (v) => (v as string) || '-' },
-      { key: 'phone', header: 'Téléphone', format: (v) => (v as string) || '-' },
-      { key: 'credit_limit', header: 'Limite crédit', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
-      { key: 'outstanding_amount', header: 'Encours', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
-      { key: 'unpaid_order_count', header: 'Factures', align: 'right' as const },
-      { key: 'days_overdue', header: 'Jours de retard', align: 'right' as const },
+      { key: 'company_name', header: 'Company', format: (v) => (v as string) || '-' },
+      { key: 'phone', header: 'Phone', format: (v) => (v as string) || '-' },
+      { key: 'credit_limit', header: 'Credit Limit', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'outstanding_amount', header: 'Outstanding', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'unpaid_order_count', header: 'Invoices', align: 'right' as const },
+      { key: 'days_overdue', header: 'Days Overdue', align: 'right' as const },
     ],
-    filename: 'creances_b2b',
-    title: 'Créances B2B',
+    filename: 'b2b-receivables',
+    title: 'B2B Receivables',
     summaries: [
-      { label: 'Clients avec encours', value: summary.totalCustomers.toString() },
-      { label: 'Encours total', value: formatCurrencyPdf(summary.totalOutstanding) },
-      { label: 'Clients en retard', value: summary.overdueCustomers.toString() },
+      { label: 'Clients with Balance', value: summary.totalCustomers.toString() },
+      { label: 'Total Outstanding', value: formatCurrencyPdf(summary.totalOutstanding) },
+      { label: 'Overdue Clients', value: summary.overdueCustomers.toString() },
     ],
   }), [data, summary]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   const getOverdueBadge = (days: number) => {
     if (days <= 0) {
       return (
         <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">
-          À jour
+          Current
         </span>
       );
     }
@@ -69,7 +70,7 @@ export function B2BReceivablesTab() {
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-700 rounded-full">
           <Clock className="w-3 h-3" />
-          {days}j
+          {days}d
         </span>
       );
     }
@@ -77,14 +78,14 @@ export function B2BReceivablesTab() {
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-orange-100 text-orange-700 rounded-full">
           <AlertTriangle className="w-3 h-3" />
-          {days}j
+          {days}d
         </span>
       );
     }
     return (
       <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
         <AlertTriangle className="w-3 h-3" />
-        {days}j
+        {days}d
       </span>
     );
   };
@@ -102,13 +103,17 @@ export function B2BReceivablesTab() {
     );
   }
 
+  if (isLoading) {
+    return <ReportSkeleton />;
+  }
+
   const customersWithDebt = data?.filter((c) => c.outstanding_amount > 0) || [];
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-lg font-semibold text-gray-900">Créances B2B</h2>
+        <h2 className="text-lg font-semibold text-gray-900">B2B Receivables</h2>
         <ExportButtons config={exportConfig} />
       </div>
 
@@ -119,10 +124,10 @@ export function B2BReceivablesTab() {
             <div className="p-2 bg-blue-50 rounded-lg">
               <Users className="w-5 h-5 text-blue-600" />
             </div>
-            <span className="text-sm text-gray-600">Clients avec encours</span>
+            <span className="text-sm text-gray-600">Clients with Balance</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : summary.totalCustomers}
+            {summary.totalCustomers}
           </p>
         </div>
 
@@ -131,10 +136,10 @@ export function B2BReceivablesTab() {
             <div className="p-2 bg-purple-50 rounded-lg">
               <DollarSign className="w-5 h-5 text-purple-600" />
             </div>
-            <span className="text-sm text-gray-600">Encours total</span>
+            <span className="text-sm text-gray-600">Total Outstanding</span>
           </div>
           <p className="text-2xl font-bold text-purple-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(summary.totalOutstanding)}
+            {formatCurrency(summary.totalOutstanding)}
           </p>
         </div>
 
@@ -143,10 +148,10 @@ export function B2BReceivablesTab() {
             <div className="p-2 bg-red-50 rounded-lg">
               <AlertTriangle className="w-5 h-5 text-red-600" />
             </div>
-            <span className="text-sm text-gray-600">Clients en retard (&gt;30j)</span>
+            <span className="text-sm text-gray-600">Overdue Clients (&gt;30d)</span>
           </div>
           <p className="text-2xl font-bold text-red-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : summary.overdueCustomers}
+            {summary.overdueCustomers}
           </p>
         </div>
 
@@ -155,10 +160,10 @@ export function B2BReceivablesTab() {
             <div className="p-2 bg-orange-50 rounded-lg">
               <Clock className="w-5 h-5 text-orange-600" />
             </div>
-            <span className="text-sm text-gray-600">Moy. jours de retard</span>
+            <span className="text-sm text-gray-600">Avg. Days Overdue</span>
           </div>
           <p className="text-2xl font-bold text-orange-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : `${summary.avgDaysOverdue}j`}
+            {`${summary.avgDaysOverdue}d`}
           </p>
         </div>
       </div>
@@ -166,7 +171,7 @@ export function B2BReceivablesTab() {
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Clients B2B avec encours</h3>
+          <h3 className="text-lg font-semibold text-gray-900">B2B Clients with Outstanding Balance</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -174,21 +179,15 @@ export function B2BReceivablesTab() {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Limite crédit</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Encours</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Utilisation</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Factures</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Retard</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Credit Limit</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Outstanding</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Usage</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Invoices</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Overdue</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  </td>
-                </tr>
-              ) : customersWithDebt.length > 0 ? (
+              {customersWithDebt.length > 0 ? (
                 customersWithDebt.map((row) => {
                   const usage = getCreditUsage(row.outstanding_amount, row.credit_limit);
                   return (
@@ -243,7 +242,7 @@ export function B2BReceivablesTab() {
               ) : (
                 <tr>
                   <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                    Aucun encours client B2B
+                    No B2B client outstanding balance
                   </td>
                 </tr>
               )}

@@ -1,20 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   FileText, Search, RefreshCw, Calendar, User,
   ChevronLeft, ChevronRight, Eye, X, Download
 } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
-import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-import type { AuditLog } from '../../types/auth';
-
-interface AuditLogWithUser extends AuditLog {
-  user_profiles?: {
-    name: string;
-    display_name?: string;
-    avatar_url?: string;
-  };
-}
+import { useAuditLogs, useAuditUsers, type IAuditLogWithUser } from '@/hooks/useAuditLogs';
 
 const ACTION_COLORS: Record<string, string> = {
   login: 'bg-green-100 text-green-700',
@@ -42,14 +33,11 @@ const TABLE_LABELS: Record<string, string> = {
 };
 
 export default function AuditPage() {
-  const [logs, setLogs] = useState<AuditLogWithUser[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLog, setSelectedLog] = useState<AuditLogWithUser | null>(null);
+  const [selectedLog, setSelectedLog] = useState<IAuditLogWithUser | null>(null);
 
   // Filters
   const [filterAction, setFilterAction] = useState('');
-  const [filterTable] = useState('');
   const [filterUser, setFilterUser] = useState('');
   const [dateRange, setDateRange] = useState<'today' | '7days' | '30days' | 'custom'>('7days');
   const [customStart, setCustomStart] = useState('');
@@ -57,93 +45,27 @@ export default function AuditPage() {
 
   // Pagination
   const [page, setPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
   const perPage = 50;
-
-  // Users for filter
-  const [users, setUsers] = useState<{ id: string; name: string }[]>([]);
 
   // Use English locale for date formatting
   const getLocale = () => enUS;
 
-  useEffect(() => {
-    loadUsers();
-  }, []);
+  // Data via hooks
+  const { data: usersData = [] } = useAuditUsers();
+  const { data: logsData, isLoading, refetch: refetchLogs } = useAuditLogs({
+    page,
+    perPage,
+    filterAction,
+    filterTable: '',
+    filterUser,
+    dateRange,
+    customStart,
+    customEnd,
+  });
 
-  useEffect(() => {
-    loadLogs();
-  }, [page, filterAction, filterTable, filterUser, dateRange, customStart, customEnd]);
-
-  const loadUsers = async () => {
-    const { data } = await supabase
-      .from('user_profiles')
-      .select('id, name, display_name')
-      .order('name');
-
-    if (data) {
-      setUsers(data.map(u => ({ id: u.id, name: u.display_name || u.name })));
-    }
-  };
-
-  const loadLogs = async () => {
-    setIsLoading(true);
-    try {
-      // Calculate date range
-      let startDate: Date;
-      let endDate = endOfDay(new Date());
-
-      switch (dateRange) {
-        case 'today':
-          startDate = startOfDay(new Date());
-          break;
-        case '7days':
-          startDate = startOfDay(subDays(new Date(), 7));
-          break;
-        case '30days':
-          startDate = startOfDay(subDays(new Date(), 30));
-          break;
-        case 'custom':
-          startDate = customStart ? startOfDay(new Date(customStart)) : startOfDay(subDays(new Date(), 7));
-          endDate = customEnd ? endOfDay(new Date(customEnd)) : endOfDay(new Date());
-          break;
-        default:
-          startDate = startOfDay(subDays(new Date(), 7));
-      }
-
-      // Build query
-      let query = supabase
-        .from('audit_logs')
-        .select(`
-          *,
-          user_profiles!audit_logs_user_id_fkey(name, display_name, avatar_url)
-        `, { count: 'exact' })
-        .gte('created_at', startDate.toISOString())
-        .lte('created_at', endDate.toISOString())
-        .order('created_at', { ascending: false })
-        .range((page - 1) * perPage, page * perPage - 1);
-
-      if (filterAction) {
-        query = query.eq('action', filterAction);
-      }
-      if (filterTable) {
-        query = query.eq('table_name', filterTable);
-      }
-      if (filterUser) {
-        query = query.eq('user_id', filterUser);
-      }
-
-      const { data, error, count } = await query;
-
-      if (error) throw error;
-
-      setLogs((data || []) as AuditLogWithUser[]);
-      setTotalCount(count || 0);
-    } catch (error) {
-      console.error('Error loading audit logs:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const logs = logsData?.logs ?? [];
+  const totalCount = logsData?.totalCount ?? 0;
+  const users = usersData;
 
   const exportToCSV = () => {
     const headers = ['Date', 'Utilisateur', 'Action', 'Table', 'Record ID', 'IP'];
@@ -301,7 +223,7 @@ export default function AuditPage() {
           {/* Refresh */}
           <button
             type="button"
-            onClick={loadLogs}
+            onClick={() => refetchLogs()}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             title="Refresh"
             aria-label="Refresh"

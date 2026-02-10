@@ -1,6 +1,6 @@
 import { WifiOff, RefreshCw, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 export interface OfflineReportBannerProps {
   /** Whether the app is offline */
@@ -87,7 +87,7 @@ export function OfflineReportBanner({
             <p className="text-xs text-yellow-600">
               {lastSyncDate ? (
                 <>
-                  Data as of {format(lastSyncDate, 'dd MMM yyyy HH:mm', { locale: fr })}
+                  Data as of {format(lastSyncDate, 'dd MMM yyyy HH:mm', { locale: enUS })}
                 </>
               ) : (
                 'No cached data available'

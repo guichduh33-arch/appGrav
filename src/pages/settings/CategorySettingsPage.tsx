@@ -59,7 +59,7 @@ const CategorySettingsPage = () => {
         next.delete(key);
         return next;
       });
-    } catch (error) {
+    } catch {
       toast.error('Error resetting setting');
     }
   };
@@ -78,7 +78,7 @@ const CategorySettingsPage = () => {
             key,
             value: formValues[key],
           });
-        } catch (error) {
+        } catch {
           errors.push(key);
         }
       }

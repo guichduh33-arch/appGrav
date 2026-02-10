@@ -412,8 +412,8 @@ export async function pushLocalProductsToCloud(): Promise<IImportResult> {
 
                 if (catError) throw catError
                 if (syncedCat) categoryMap.set(cat.id, syncedCat.id)
-            } catch (err: any) {
-                result.errors.push({ row: 0, sku: 'CAT', error: `Category ${cat.name}: ${err.message}` })
+            } catch (err: unknown) {
+                result.errors.push({ row: 0, sku: 'CAT', error: `Category ${cat.name}: ${err instanceof Error ? err.message : String(err)}` })
             }
         }
 
@@ -444,13 +444,13 @@ export async function pushLocalProductsToCloud(): Promise<IImportResult> {
 
                 if (prodError) throw prodError
                 result.created++ // Count as created/updated since it's an upsert
-            } catch (err: any) {
-                result.errors.push({ row: 0, sku: prod.sku || 'N/A', error: err.message })
+            } catch (err: unknown) {
+                result.errors.push({ row: 0, sku: prod.sku || 'N/A', error: err instanceof Error ? err.message : String(err) })
             }
         }
-    } catch (err: any) {
+    } catch (err: unknown) {
         result.success = false
-        result.errors.push({ row: 0, sku: 'GLOBAL', error: err.message })
+        result.errors.push({ row: 0, sku: 'GLOBAL', error: err instanceof Error ? err.message : String(err) })
     }
 
     return result

@@ -14,43 +14,22 @@ import {
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
-import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/authStore';
 import { usePermissions } from '../../hooks/usePermissions';
 import { PermissionGuard } from '../../components/auth/PermissionGuard';
 import { authService } from '../../services/authService';
 import { toast } from 'sonner';
+import { useUsersWithRoles, type IUserWithRoles } from '@/hooks/useUsers';
 import type { Role } from '../../types/auth';
 import './UsersPage.css';
 
-interface UserWithRoles {
-  id: string;
-  name: string;
-  display_name: string | null;
-  first_name: string | null;
-  last_name: string | null;
-  employee_code: string | null;
-  phone: string | null;
-  avatar_url: string | null;
-  role: string;
-  is_active: boolean;
-  last_login_at: string | null;
-  created_at: string;
-  user_roles: Array<{
-    id: string;
-    is_primary: boolean;
-    role: Role;
-  }>;
-}
+type UserWithRoles = IUserWithRoles;
 
 const UsersPage = () => {
   const { user: currentUser } = useAuthStore();
   const { isAdmin } = usePermissions();
   void isAdmin; // Suppress unused variable warning
 
-  const [users, setUsers] = useState<UserWithRoles[]>([]);
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRole, setFilterRole] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -61,64 +40,18 @@ const UsersPage = () => {
   const [editingUser, setEditingUser] = useState<UserWithRoles | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
-  // Load users and roles
+  // React Query hooks
+  const { data: users = [], isLoading, refetch: refetchUsers } = useUsersWithRoles({ showInactive });
+
+  // Load roles via authService (still needed for the form modal and filter dropdown)
+  const [roles, setRoles] = useState<Role[]>([]);
   useEffect(() => {
-    loadData();
-  }, [showInactive]);
+    authService.getRoles().then(r => setRoles(r)).catch(() => {});
+  }, []);
 
-  const loadData = async () => {
-    setIsLoading(true);
-    try {
-      // Load roles
-      const rolesData = await authService.getRoles();
-      setRoles(rolesData);
-
-      // Load users with roles
-      // Note: Use !user_roles_user_id_fkey to specify which FK to use
-      // (there are 2 FKs from user_roles to user_profiles: user_id and assigned_by)
-      let query = supabase
-        .from('user_profiles')
-        .select(`
-          id,
-          name,
-          display_name,
-          first_name,
-          last_name,
-          employee_code,
-          phone,
-          avatar_url,
-          role,
-          is_active,
-          last_login_at,
-          created_at,
-          user_roles!user_roles_user_id_fkey (
-            id,
-            is_primary,
-            role:roles (
-              id,
-              code,
-              name_fr,
-              name_en,
-              name_id,
-              hierarchy_level
-            )
-          )
-        `)
-        .order('name');
-
-      if (!showInactive) {
-        query = query.eq('is_active', true);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      setUsers((data as unknown as UserWithRoles[]) || []);
-    } catch (error) {
-      console.error('Error loading users:', error);
-      toast.error('Loading error');
-    } finally {
-      setIsLoading(false);
-    }
+  const loadData = () => {
+    refetchUsers();
+    authService.getRoles().then(r => setRoles(r)).catch(() => {});
   };
 
   // Filter users

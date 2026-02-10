@@ -10,6 +10,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import logger from '@/utils/logger';
 import { db, type IOfflineProductCategoryPrice } from '@/lib/db';
 
 // Re-export interface for consumers
@@ -73,7 +74,7 @@ export async function syncProductCategoryPricesToOffline(): Promise<number> {
   }
 
   if (!pricesData || pricesData.length === 0) {
-    console.log('[ProductCategoryPriceSync] No new product category prices to sync');
+    logger.debug('[ProductCategoryPriceSync] No new product category prices to sync');
     return 0;
   }
 
@@ -101,7 +102,7 @@ export async function syncProductCategoryPricesToOffline(): Promise<number> {
     if (inactivePrices && inactivePrices.length > 0) {
       const inactiveIds = inactivePrices.map((p) => p.id);
       await db.offline_product_category_prices.bulkDelete(inactiveIds);
-      console.log(`[ProductCategoryPriceSync] Removed ${inactiveIds.length} inactive prices from cache`);
+      logger.debug(`[ProductCategoryPriceSync] Removed ${inactiveIds.length} inactive prices from cache`);
     }
   }
 
@@ -110,7 +111,7 @@ export async function syncProductCategoryPricesToOffline(): Promise<number> {
   const totalCount = await db.offline_product_category_prices.count();
   await updateSyncMeta(latestTimestamp, totalCount);
 
-  console.log(`[ProductCategoryPriceSync] Synced ${offlinePrices.length} product category prices`);
+  logger.debug(`[ProductCategoryPriceSync] Synced ${offlinePrices.length} product category prices`);
   return offlinePrices.length;
 }
 
@@ -217,5 +218,5 @@ export async function getProductCategoryPricesSyncMeta(): Promise<{
 export async function clearOfflineProductCategoryPriceData(): Promise<void> {
   await db.offline_product_category_prices.clear();
   await db.offline_sync_meta.delete(SYNC_META_ENTITY);
-  console.log('[ProductCategoryPriceSync] Cleared all offline product category price data');
+  logger.debug('[ProductCategoryPriceSync] Cleared all offline product category price data');
 }

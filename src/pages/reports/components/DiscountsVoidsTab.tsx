@@ -10,7 +10,8 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { Percent, XCircle, RotateCcw, TrendingDown, Search, Loader2 } from 'lucide-react';
+import { Percent, XCircle, RotateCcw, TrendingDown, Search } from 'lucide-react';
+import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { supabase } from '@/lib/supabase';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
@@ -163,7 +164,7 @@ export function DiscountsVoidsTab() {
     const dayMap: Record<string, DailyData> = {};
 
     for (const entry of entries) {
-      const date = new Date(entry.created_at).toLocaleDateString('fr-FR', {
+      const date = new Date(entry.created_at).toLocaleDateString('en-US', {
         day: '2-digit',
         month: 'short',
       });
@@ -192,35 +193,35 @@ export function DiscountsVoidsTab() {
   const exportConfig: ExportConfig<DiscountVoidEntry> = useMemo(() => ({
     data: filteredData,
     columns: [
-      { key: 'created_at', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('fr-FR') },
-      { key: 'order_number', header: 'Commande' },
-      { key: 'type', header: 'Type', format: (v) => v === 'discount' ? 'Remise' : v === 'void' ? 'Annulation' : 'Remboursement' },
-      { key: 'amount', header: 'Montant', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
-      { key: 'reason', header: 'Raison' },
+      { key: 'created_at', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('en-US') },
+      { key: 'order_number', header: 'Order' },
+      { key: 'type', header: 'Type', format: (v) => v === 'discount' ? 'Discount' : v === 'void' ? 'Void' : 'Refund' },
+      { key: 'amount', header: 'Amount', align: 'right' as const, format: (v) => formatCurrencyPdf(v as number) },
+      { key: 'reason', header: 'Reason' },
       { key: 'staff_name', header: 'Staff' },
     ],
-    filename: 'discounts_voids',
-    title: 'Rapport Remises & Annulations',
+    filename: 'discounts-voids',
+    title: 'Discounts & Voids Report',
     dateRange,
     summaries: [
-      { label: 'Total Remises', value: formatCurrencyPdf(kpis.totalDiscounts) },
-      { label: 'Total Annulations', value: formatCurrencyPdf(kpis.totalVoids) },
-      { label: 'Total Remboursements', value: formatCurrencyPdf(kpis.totalRefunds) },
+      { label: 'Total Discounts', value: formatCurrencyPdf(kpis.totalDiscounts) },
+      { label: 'Total Voids', value: formatCurrencyPdf(kpis.totalVoids) },
+      { label: 'Total Refunds', value: formatCurrencyPdf(kpis.totalRefunds) },
     ],
   }), [filteredData, dateRange, kpis]);
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(value) + ' IDR';
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
   const getTypeBadge = (type: string) => {
     switch (type) {
       case 'discount':
-        return <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Remise</span>;
+        return <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Discount</span>;
       case 'void':
-        return <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Annulation</span>;
+        return <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Void</span>;
       case 'refund':
-        return <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">Remboursement</span>;
+        return <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">Refund</span>;
       default:
         return <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">{type}</span>;
     }
@@ -232,6 +233,10 @@ export function DiscountsVoidsTab() {
         Error loading data
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <ReportSkeleton />;
   }
 
   return (
@@ -249,12 +254,12 @@ export function DiscountsVoidsTab() {
             <div className="p-2 bg-yellow-50 rounded-lg">
               <Percent className="w-5 h-5 text-yellow-600" />
             </div>
-            <span className="text-sm text-gray-600">Total Remises</span>
+            <span className="text-sm text-gray-600">Total Discounts</span>
           </div>
           <p className="text-2xl font-bold text-yellow-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(kpis.totalDiscounts)}
+            {formatCurrency(kpis.totalDiscounts)}
           </p>
-          <p className="text-xs text-gray-500 mt-1">{kpis.discountCount} remises</p>
+          <p className="text-xs text-gray-500 mt-1">{kpis.discountCount} discounts</p>
         </div>
 
         <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
@@ -262,12 +267,12 @@ export function DiscountsVoidsTab() {
             <div className="p-2 bg-red-50 rounded-lg">
               <XCircle className="w-5 h-5 text-red-600" />
             </div>
-            <span className="text-sm text-gray-600">Total Annulations</span>
+            <span className="text-sm text-gray-600">Total Voids</span>
           </div>
           <p className="text-2xl font-bold text-red-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(kpis.totalVoids)}
+            {formatCurrency(kpis.totalVoids)}
           </p>
-          <p className="text-xs text-gray-500 mt-1">{kpis.voidCount} annulations</p>
+          <p className="text-xs text-gray-500 mt-1">{kpis.voidCount} voids</p>
         </div>
 
         <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
@@ -275,12 +280,12 @@ export function DiscountsVoidsTab() {
             <div className="p-2 bg-purple-50 rounded-lg">
               <RotateCcw className="w-5 h-5 text-purple-600" />
             </div>
-            <span className="text-sm text-gray-600">Total Remboursements</span>
+            <span className="text-sm text-gray-600">Total Refunds</span>
           </div>
           <p className="text-2xl font-bold text-purple-600">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(kpis.totalRefunds)}
+            {formatCurrency(kpis.totalRefunds)}
           </p>
-          <p className="text-xs text-gray-500 mt-1">{kpis.refundCount} remboursements</p>
+          <p className="text-xs text-gray-500 mt-1">{kpis.refundCount} refunds</p>
         </div>
 
         <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
@@ -288,24 +293,20 @@ export function DiscountsVoidsTab() {
             <div className="p-2 bg-gray-100 rounded-lg">
               <TrendingDown className="w-5 h-5 text-gray-600" />
             </div>
-            <span className="text-sm text-gray-600">Perte Totale</span>
+            <span className="text-sm text-gray-600">Total Loss</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : formatCurrency(kpis.totalLoss)}
+            {formatCurrency(kpis.totalLoss)}
           </p>
         </div>
       </div>
 
       {/* Chart */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Pertes par jour</h3>
-        {isLoading ? (
-          <div className="h-80 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-          </div>
-        ) : chartData.length === 0 ? (
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Losses by Day</h3>
+        {chartData.length === 0 ? (
           <div className="h-80 flex items-center justify-center text-gray-500">
-            Aucune donnée pour cette période
+            No data for this period
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={320}>
@@ -316,13 +317,13 @@ export function DiscountsVoidsTab() {
               <Tooltip
                 formatter={(value, name) => [
                   formatCurrency(value as number),
-                  name === 'discounts' ? 'Remises' : name === 'voids' ? 'Annulations' : 'Remboursements'
+                  name === 'discounts' ? 'Discounts' : name === 'voids' ? 'Voids' : 'Refunds'
                 ]}
               />
               <Legend />
-              <Bar dataKey="discounts" name="Remises" stackId="a" fill="#EAB308" />
-              <Bar dataKey="voids" name="Annulations" stackId="a" fill="#EF4444" />
-              <Bar dataKey="refunds" name="Remboursements" stackId="a" fill="#A855F7" />
+              <Bar dataKey="discounts" name="Discounts" stackId="a" fill="#EAB308" />
+              <Bar dataKey="voids" name="Voids" stackId="a" fill="#EF4444" />
+              <Bar dataKey="refunds" name="Refunds" stackId="a" fill="#A855F7" />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -334,7 +335,7 @@ export function DiscountsVoidsTab() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Rechercher commande, staff..."
+            placeholder="Search order, staff..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -345,40 +346,34 @@ export function DiscountsVoidsTab() {
       {/* Data Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Détail des pertes</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Loss Details</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Commande</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Montant</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Raison</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Staff</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-gray-400" />
-                  </td>
-                </tr>
-              ) : filteredData.length === 0 ? (
+              {filteredData.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    Aucune donnée
+                    No data
                   </td>
                 </tr>
               ) : (
                 filteredData.map((row) => (
                   <tr key={row.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      {new Date(row.created_at).toLocaleDateString('fr-FR')}
+                      {new Date(row.created_at).toLocaleDateString('en-US')}
                       <div className="text-xs text-gray-400">
-                        {new Date(row.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(row.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">{row.order_number}</td>

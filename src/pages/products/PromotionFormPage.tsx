@@ -105,7 +105,7 @@ export default function PromotionFormPage() {
 
             if (error) throw error
             if (data) setProducts(data)
-        } catch (error) {
+        } catch {
             toast.error('Error loading products')
         }
     }
@@ -168,7 +168,7 @@ export default function PromotionFormPage() {
                     setFreeProducts(rawFreeData.map((pp) => pp.product).filter((p): p is Product => p !== null))
                 }
             }
-        } catch (error) {
+        } catch {
             toast.error('Error loading promotion')
         } finally {
             setLoading(false)
