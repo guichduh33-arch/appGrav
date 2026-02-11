@@ -16,6 +16,7 @@ Last updated: 2026-02-12
 | Epic 9 | Accounting & Tax Compliance - Chart of accounts, journals, financial statements, VAT | **Complete** |
 | Epic 10 Phase 1 | Settings Expansion Foundation - Categories, settings rows, typed hooks | **Complete** |
 | Epic 10 Phase 2 | Custom Settings UI Pages - 9 specialized pages with rich editors | **Complete** |
+| Epic 10 Phase 3 | Migrate hardcoded constants to settings store - 17 files, ~40 constants | **Complete** |
 
 ## Epics Overview
 
@@ -28,7 +29,7 @@ Last updated: 2026-02-12
 - **Epic 7** (Multi-Device): Done - Customer display, mobile app (Capacitor), print server, LAN monitoring
 - **Epic 8** (Analytics): Done - All 10 stories (8.0-8.9) complete: report framework, 27 report tabs, period comparison, offline cache, audit trail, alerts dashboard
 - **Epic 9** (Accounting): Done - Chart of accounts (30 Indonesian SME accounts), auto-generated journals from sales/purchases, general ledger, trial balance, balance sheet, income statement, VAT (PPN 10%) management with DJP export, fiscal periods
-- **Epic 10** (Settings Expansion): Phase 1+2 Done - 8 new categories, 65 configurable settings, 10 typed hooks, 9 custom UI pages with rich editors
+- **Epic 10** (Settings Expansion): Phase 1+2+3 Done - 8 new categories, 65 configurable settings, 10 typed hooks, 9 custom UI pages, ~40 hardcoded constants migrated across 17 files
 
 ## Security Improvements (Sprint 4)
 
@@ -234,6 +235,53 @@ Replaces generic `CategorySettingsPage` with 9 specialized pages featuring rich 
 - 0 new TypeScript errors (only pre-existing casing/mockProducts issues)
 - 20 settings hooks tests pass
 - All routes configured and functional
+
+## Epic 10 Phase 3: Migrate Hardcoded Constants (2026-02-12)
+
+Replaces ~40 hardcoded operational constants across 17 files with configurable settings from the settings store.
+
+### Story 10.12 - POS Constants (6 files)
+| File | Constants Migrated | Hook/Pattern |
+|------|--------------------|-------------|
+| `OpenShiftModal.tsx` | QUICK_AMOUNTS | `usePOSConfigSettings().shiftOpeningCashPresets` |
+| `PaymentModal.tsx` | QUICK_AMOUNTS | `usePOSConfigSettings().quickPaymentAmounts` |
+| `DiscountModal.tsx` | quickPercentages, max 100%, allowedRoles | `usePOSConfigSettings()` |
+| `VoidModal.tsx` | allowedRoles `['manager','admin']` | `usePOSConfigSettings().voidRequiredRoles` |
+| `RefundModal.tsx` | allowedRoles `['manager','admin']` | `usePOSConfigSettings().refundRequiredRoles` |
+| `paymentService.ts` | MAX_PAYMENT_AMOUNT, IDR_ROUNDING, REFERENCE_REQUIRED_METHODS | `getFinancialConfig()` via `useCoreSettingsStore.getState()` |
+
+### Story 10.13 - Inventory Constants (3 files)
+| File | Constants Migrated | Hook/Pattern |
+|------|--------------------|-------------|
+| `StockByLocationPage.tsx` | threshold 10 | `useInventoryConfigSettings().stockWarningThreshold` |
+| `InventoryTab.tsx` | thresholds 5/10 | `useInventoryConfigSettings().stockCriticalThreshold/stockWarningThreshold` |
+| `inventoryAlerts.ts` | lookback 30d, multiplier 2x, production 7d, priority 20/50% | `useCoreSettingsStore.getState()` + `INVENTORY_CONFIG_DEFAULTS` |
+
+### Story 10.14 - Loyalty/B2B Constants (2 files)
+| File | Constants Migrated | Hook/Pattern |
+|------|--------------------|-------------|
+| `b2bPosOrderService.ts` | payment_terms 30 days | `useCoreSettingsStore.getState().getSetting('b2b.default_payment_terms_days')` |
+| `constants/loyalty.ts` | Documented as fallback defaults | Comment added |
+
+### Story 10.15 - KDS/Display/Sync/Security (6 files)
+| File | Constants Migrated | Hook/Pattern |
+|------|--------------------|-------------|
+| `KDSOrderCard.tsx` | 300/600s thresholds, 5000ms autoRemove | `useKDSConfigSettings()` |
+| `KDSMainPage.tsx` | poll interval, urgent threshold | `useKDSConfigSettings()` |
+| `CustomerDisplayPage.tsx` | idle timeout, promo rotation | `useDisplaySettings()` |
+| `printService.ts` | localhost:3001, 5000ms/2000ms timeouts | `getPrintConfig()` via `useCoreSettingsStore.getState()` |
+| `rateLimitService.ts` | MAX_ATTEMPTS=3, COOLDOWN=15min | `getSecurityConfig()` via `useCoreSettingsStore.getState()` |
+| `PrintingSettingsPage.tsx` | Test connection integration | Updated |
+
+### Pattern Used
+- **React components**: Typed hooks (`usePOSConfigSettings()`, `useKDSConfigSettings()`, etc.)
+- **Non-React services**: `useCoreSettingsStore.getState().getSetting<T>('key') ?? DEFAULT_VALUE`
+- **Tax rates**: Intentionally NOT migrated (10% PPN is business-critical/legal, kept as constants)
+
+### Verification
+- 0 new TypeScript errors
+- 93 test files, 1,650 tests pass
+- 17 files changed, +168/-84 lines
 
 ## Known Issues
 
