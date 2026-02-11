@@ -353,9 +353,9 @@ export default function B2BOrderFormPage() {
             if (itemsError) throw itemsError
 
             navigate('/b2b/orders')
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error saving order:', error)
-            alert(`Error saving: ${error?.message || 'Unknown error'}`)
+            alert(`Error saving: ${error instanceof Error ? error.message : 'Unknown error'}`)
         } finally {
             setSaving(false)
         }

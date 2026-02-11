@@ -216,8 +216,8 @@ export default function ProductDetailPage() {
             }
 
             alert('Product updated successfully')
-        } catch (error: any) {
-            alert('Error saving product: ' + error.message)
+        } catch (error) {
+            alert('Error saving product: ' + (error instanceof Error ? error.message : 'Unknown error'))
         } finally {
             setSaving(false)
         }
@@ -245,8 +245,8 @@ export default function ProductDetailPage() {
 
             if (error) throw error
             if (data) setUoms([...uoms, data])
-        } catch (error: any) {
-            alert('Error adding unit: ' + error.message)
+        } catch (error) {
+            alert('Error adding unit: ' + (error instanceof Error ? error.message : 'Unknown error'))
         }
     }
 
@@ -256,8 +256,8 @@ export default function ProductDetailPage() {
             const { error } = await supabase.from('product_uoms').delete().eq('id', uomId)
             if (error) throw error
             setUoms(uoms.filter(u => u.id !== uomId))
-        } catch (error: any) {
-            alert('Error deleting unit: ' + error.message)
+        } catch (error) {
+            alert('Error deleting unit: ' + (error instanceof Error ? error.message : 'Unknown error'))
         }
     }
 

@@ -53,12 +53,12 @@
 
 ### SOUHAITABLE (Amelioration qualite)
 
-| # | Source | Description | Effort |
-|---|--------|-------------|--------|
+| # | Source | Description | Effort | Statut |
+|---|--------|-------------|--------|--------|
 | S1 | Architecture | 20+ fichiers > 400 lignes (refactoring) | XL |
-| S2 | Architecture | 13 `error: any` dans catch blocks | S |
+| S2 | Architecture | 13 `error: any` dans catch blocks | S | ~~FAIT~~ |
 | S3 | Architecture | 46 eslint-disable suppressions | M |
-| S4 | Architecture | Pas de vendor chunk splitting | S |
+| S4 | Architecture | Pas de vendor chunk splitting | S | ~~FAIT~~ |
 | S5 | Architecture | 84 CSS files alongside Tailwind | L |
 | S6 | Architecture | 413 inline styles | L |
 | S7 | Security | Pas de Content-Security-Policy | S |

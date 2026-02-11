@@ -188,7 +188,7 @@ export default function PurchaseOrderFormPage() {
             }
 
             navigate('/purchasing/purchase-orders')
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error saving purchase order:', error)
             toast.error(isEditing ? 'Failed to update purchase order' : 'Failed to create purchase order')
         }

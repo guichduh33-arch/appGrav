@@ -102,9 +102,9 @@ export default function SuppliersPage() {
                 await createSupplierMutation.mutateAsync(formData as ISupplierFormData)
             }
             handleCloseModal()
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error saving supplier:', error)
-            const errorMessage = error?.message || error?.error_description || 'Unknown error'
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error'
             toast.error(`Error saving supplier: ${errorMessage}`)
         }
     }

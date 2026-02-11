@@ -152,6 +152,9 @@ const NotificationSettingsPage = () => {
   const [isTesting, setIsTesting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [testResult, setTestResult] = useState<'success' | 'error' | null>(null);
+  // Track whether SMTP password was explicitly changed by user (never load actual password from server)
+  const [passwordChanged, setPasswordChanged] = useState(false);
+  const [hasExistingPassword, setHasExistingPassword] = useState(false);
 
   // Initialize form from settings
   useEffect(() => {
@@ -173,7 +176,12 @@ const NotificationSettingsPage = () => {
             newFormData.smtp_user = parseSettingValue(setting.value, '');
             break;
           case NOTIFICATION_SETTINGS_KEYS.smtpPassword:
-            newFormData.smtp_password = parseSettingValue(setting.value, '');
+            // SECURITY: Never load actual password into client state
+            // Only track whether a password exists server-side
+            if (setting.value && String(setting.value).length > 0) {
+              setHasExistingPassword(true);
+            }
+            newFormData.smtp_password = '';
             break;
           case NOTIFICATION_SETTINGS_KEYS.smtpSecure:
             newFormData.smtp_secure = parseSettingValue(setting.value, true);
@@ -219,6 +227,11 @@ const NotificationSettingsPage = () => {
     setIsDirty(true);
     setTestResult(null);
 
+    // Track password changes explicitly
+    if (field === 'smtp_password') {
+      setPasswordChanged(true);
+    }
+
     // Clear error for this field
     if (errors[field as keyof IValidationErrors]) {
       setErrors((prev) => {
@@ -241,13 +254,16 @@ const NotificationSettingsPage = () => {
     setIsSaving(true);
 
     try {
-      // Save all settings
+      // Save all settings (only include password if explicitly changed)
       const settingsToSave = [
         { key: NOTIFICATION_SETTINGS_KEYS.smtpEnabled, value: formData.smtp_enabled },
         { key: NOTIFICATION_SETTINGS_KEYS.smtpHost, value: formData.smtp_host },
         { key: NOTIFICATION_SETTINGS_KEYS.smtpPort, value: formData.smtp_port },
         { key: NOTIFICATION_SETTINGS_KEYS.smtpUser, value: formData.smtp_user },
-        { key: NOTIFICATION_SETTINGS_KEYS.smtpPassword, value: formData.smtp_password },
+        // SECURITY: Only save password if user explicitly typed a new one
+        ...(passwordChanged && formData.smtp_password
+          ? [{ key: NOTIFICATION_SETTINGS_KEYS.smtpPassword, value: formData.smtp_password }]
+          : []),
         { key: NOTIFICATION_SETTINGS_KEYS.smtpSecure, value: formData.smtp_secure },
         { key: NOTIFICATION_SETTINGS_KEYS.fromEmail, value: formData.from_email },
         { key: NOTIFICATION_SETTINGS_KEYS.fromName, value: formData.from_name },
@@ -268,6 +284,11 @@ const NotificationSettingsPage = () => {
 
       toast.success('Notification settings saved');
       setIsDirty(false);
+      if (passwordChanged && formData.smtp_password) {
+        setHasExistingPassword(true);
+      }
+      setPasswordChanged(false);
+      setFormData((prev) => ({ ...prev, smtp_password: '' }));
     } catch (error) {
       console.error('Save error:', error);
       toast.error('Failed to save settings');
@@ -294,7 +315,8 @@ const NotificationSettingsPage = () => {
           smtp_host: formData.smtp_host,
           smtp_port: formData.smtp_port,
           smtp_user: formData.smtp_user,
-          smtp_password: formData.smtp_password,
+          // Only send password if user typed a new one; Edge Function reads from DB otherwise
+          ...(passwordChanged && formData.smtp_password ? { smtp_password: formData.smtp_password } : { use_stored_password: true }),
           smtp_secure: formData.smtp_secure,
           from_email: formData.from_email,
           from_name: formData.from_name,
@@ -469,7 +491,7 @@ const NotificationSettingsPage = () => {
                       className="form-input"
                       value={formData.smtp_password}
                       onChange={(e) => handleChange('smtp_password', e.target.value)}
-                      placeholder="••••••••"
+                      placeholder={hasExistingPassword ? '••••••••  (saved)' : 'Enter password'}
                       disabled={!canEdit}
                     />
                     <button
@@ -481,7 +503,11 @@ const NotificationSettingsPage = () => {
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
-                  <span className="form-hint">For Gmail, use an App Password</span>
+                  <span className="form-hint">
+                    {hasExistingPassword && !passwordChanged
+                      ? 'Password is stored securely. Leave empty to keep current password.'
+                      : 'For Gmail, use an App Password'}
+                  </span>
                 </div>
 
                 {/* From Email */}

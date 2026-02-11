@@ -153,6 +153,18 @@ export default defineConfig(({ mode }) => ({
         minify: mode === 'production' ? 'esbuild' : false,
         // Source maps only in development
         sourcemap: mode !== 'production',
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (id.includes('node_modules')) {
+                        if (id.includes('react-dom') || id.includes('react-router')) return 'vendor-react'
+                        if (id.includes('@tanstack') || id.includes('tanstack')) return 'vendor-query'
+                        if (id.includes('@supabase') || id.includes('supabase')) return 'vendor-supabase'
+                        if (id.includes('lucide-react') || id.includes('lucide') || id.includes('sonner')) return 'vendor-ui'
+                    }
+                },
+            },
+        },
     },
     test: {
         globals: true,

@@ -117,9 +117,9 @@ export default function TransferDetailPage() {
       })
       toast.success('Transfer received successfully')
       navigate('/inventory/transfers')
-    } catch (err: any) {
+    } catch (err) {
       console.error('Reception error:', err)
-      const message = err?.message || 'Error receiving transfer'
+      const message = err instanceof Error ? err.message : 'Error receiving transfer'
       if (message.includes('already been received') || message.includes('another user')) {
         toast.error(message)
       } else {

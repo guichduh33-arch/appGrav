@@ -232,6 +232,12 @@ export type PermissionCode =
   | 'users.delete'
   | 'users.roles'
   | 'users.permissions'
+  // Accounting
+  | 'accounting.view'
+  | 'accounting.manage'
+  | 'accounting.journal.create'
+  | 'accounting.journal.update'
+  | 'accounting.vat.manage'
   // Settings
   | 'settings.view'
   | 'settings.update'

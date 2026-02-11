@@ -5,6 +5,7 @@ import { useCartStore, initCartPersistence } from './stores/cartStore'
 import { supabase } from './lib/supabase'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
 import { ModuleErrorBoundary } from './components/ui/ModuleErrorBoundary'
+import { RouteGuard } from './components/auth/PermissionGuard'
 import { initializeSyncEngine } from './services/sync/syncEngine'
 import { initProductsCache, stopProductsCacheRefresh } from './services/offline/productsCacheInit'
 import { loadCart, validateAndFilterCartItems } from './services/offline/cartPersistenceService'
@@ -149,7 +150,7 @@ function App() {
                 console.warn('Invalid demo-ID detected, forcing session clear')
                 await supabase.auth.signOut()
                 logout()
-                toast.success('Session mise à jour pour compatibilité base de données. Veuillez vous reconnecter.')
+                toast.success('Session updated for database compatibility. Please log in again.')
             }
         };
         checkAndRepairSession();
@@ -301,7 +302,7 @@ function App() {
                         }
                     >
                         {/* Inventory Module with Tabs */}
-                        <Route path="/inventory" element={<InventoryLayout />}>
+                        <Route path="/inventory" element={<RouteGuard permission="inventory.view"><InventoryLayout /></RouteGuard>}>
                             <Route index element={<StockPage />} />
                             <Route path="incoming" element={<IncomingStockPage />} />
                             <Route path="wasted" element={<WastedPage />} />
@@ -310,69 +311,69 @@ function App() {
                             <Route path="movements" element={<StockMovementsPage />} />
                         </Route>
                         {/* Inventory sub-pages outside layout */}
-                        <Route path="/inventory/product/:id" element={<ProductDetailPage />} />
-                        <Route path="/inventory/stock-opname/:id" element={<StockOpnameForm />} />
-                        <Route path="/inventory/transfers" element={<InternalTransfersPage />} />
-                        <Route path="/inventory/transfers/new" element={<TransferFormPage />} />
-                        <Route path="/inventory/transfers/:id" element={<TransferDetailPage />} />
-                        <Route path="/inventory/transfers/:id/edit" element={<TransferFormPage />} />
-                        <Route path="/inventory/stock-by-location" element={<StockByLocationPage />} />
+                        <Route path="/inventory/product/:id" element={<RouteGuard permission="inventory.view"><ProductDetailPage /></RouteGuard>} />
+                        <Route path="/inventory/stock-opname/:id" element={<RouteGuard permission="inventory.view"><StockOpnameForm /></RouteGuard>} />
+                        <Route path="/inventory/transfers" element={<RouteGuard permission="inventory.view"><InternalTransfersPage /></RouteGuard>} />
+                        <Route path="/inventory/transfers/new" element={<RouteGuard permission="inventory.create"><TransferFormPage /></RouteGuard>} />
+                        <Route path="/inventory/transfers/:id" element={<RouteGuard permission="inventory.view"><TransferDetailPage /></RouteGuard>} />
+                        <Route path="/inventory/transfers/:id/edit" element={<RouteGuard permission="inventory.update"><TransferFormPage /></RouteGuard>} />
+                        <Route path="/inventory/stock-by-location" element={<RouteGuard permission="inventory.view"><StockByLocationPage /></RouteGuard>} />
                         {/* Suppliers redirected to purchasing module */}
                         <Route path="/inventory/suppliers" element={<Navigate to="/purchasing/suppliers" replace />} />
 
                         <Route path="/stock" element={<Navigate to="/inventory" replace />} />
-                        <Route path="/orders" element={<OrdersPage />} />
+                        <Route path="/orders" element={<RouteGuard permission="sales.view"><OrdersPage /></RouteGuard>} />
                         <Route path="/production" element={<Navigate to="/inventory/production" replace />} />
 
                         {/* B2B Module Routes */}
-                        <Route path="/b2b" element={<B2BPage />} />
-                        <Route path="/b2b/orders" element={<B2BOrdersPage />} />
-                        <Route path="/b2b/orders/new" element={<B2BOrderFormPage />} />
-                        <Route path="/b2b/orders/:id" element={<B2BOrderDetailPage />} />
-                        <Route path="/b2b/orders/:id/edit" element={<B2BOrderFormPage />} />
-                        <Route path="/b2b/payments" element={<B2BPaymentsPage />} />
+                        <Route path="/b2b" element={<RouteGuard permission="sales.view"><B2BPage /></RouteGuard>} />
+                        <Route path="/b2b/orders" element={<RouteGuard permission="sales.view"><B2BOrdersPage /></RouteGuard>} />
+                        <Route path="/b2b/orders/new" element={<RouteGuard permission="sales.create"><B2BOrderFormPage /></RouteGuard>} />
+                        <Route path="/b2b/orders/:id" element={<RouteGuard permission="sales.view"><B2BOrderDetailPage /></RouteGuard>} />
+                        <Route path="/b2b/orders/:id/edit" element={<RouteGuard permission="sales.create"><B2BOrderFormPage /></RouteGuard>} />
+                        <Route path="/b2b/payments" element={<RouteGuard permission="sales.view"><B2BPaymentsPage /></RouteGuard>} />
 
                         {/* Legacy routes - redirect to new locations */}
                         <Route path="/purchases" element={<Navigate to="/purchasing/purchase-orders" replace />} />
                         <Route path="/internal-moves" element={<Navigate to="/inventory/transfers" replace />} />
 
                         {/* Purchase Order Module Routes */}
-                        <Route path="/purchasing/suppliers" element={<SuppliersPage />} />
-                        <Route path="/purchasing/purchase-orders" element={<PurchaseOrdersPage />} />
-                        <Route path="/purchasing/purchase-orders/new" element={<PurchaseOrderFormPage />} />
-                        <Route path="/purchasing/purchase-orders/:id" element={<PurchaseOrderDetailPage />} />
-                        <Route path="/purchasing/purchase-orders/:id/edit" element={<PurchaseOrderFormPage />} />
+                        <Route path="/purchasing/suppliers" element={<RouteGuard permission="inventory.view"><SuppliersPage /></RouteGuard>} />
+                        <Route path="/purchasing/purchase-orders" element={<RouteGuard permission="inventory.view"><PurchaseOrdersPage /></RouteGuard>} />
+                        <Route path="/purchasing/purchase-orders/new" element={<RouteGuard permission="inventory.create"><PurchaseOrderFormPage /></RouteGuard>} />
+                        <Route path="/purchasing/purchase-orders/:id" element={<RouteGuard permission="inventory.view"><PurchaseOrderDetailPage /></RouteGuard>} />
+                        <Route path="/purchasing/purchase-orders/:id/edit" element={<RouteGuard permission="inventory.update"><PurchaseOrderFormPage /></RouteGuard>} />
 
                         {/* Customers Module Routes */}
-                        <Route path="/customers" element={<CustomersPage />} />
-                        <Route path="/customers/new" element={<CustomerFormPage />} />
-                        <Route path="/customers/categories" element={<CustomerCategoriesPage />} />
-                        <Route path="/customers/:id" element={<CustomerDetailPage />} />
-                        <Route path="/customers/:id/edit" element={<CustomerFormPage />} />
+                        <Route path="/customers" element={<RouteGuard permission="customers.view"><CustomersPage /></RouteGuard>} />
+                        <Route path="/customers/new" element={<RouteGuard permission="customers.create"><CustomerFormPage /></RouteGuard>} />
+                        <Route path="/customers/categories" element={<RouteGuard permission="customers.view"><CustomerCategoriesPage /></RouteGuard>} />
+                        <Route path="/customers/:id" element={<RouteGuard permission="customers.view"><CustomerDetailPage /></RouteGuard>} />
+                        <Route path="/customers/:id/edit" element={<RouteGuard permission="customers.update"><CustomerFormPage /></RouteGuard>} />
 
                         {/* Products Module Routes with Layout */}
-                        <Route path="/products" element={<ProductsLayout />}>
+                        <Route path="/products" element={<RouteGuard permission="products.view"><ProductsLayout /></RouteGuard>}>
                             <Route index element={<ProductsPage />} />
                             <Route path="combos" element={<CombosPage />} />
                             <Route path="promotions" element={<PromotionsPage />} />
                         </Route>
                         {/* Product Form Route (outside layout for full page form) */}
-                        <Route path="/products/new" element={<ProductFormPage />} />
+                        <Route path="/products/new" element={<RouteGuard permission="products.create"><ProductFormPage /></RouteGuard>} />
                         {/* Combo Routes (outside layout for full page forms) */}
-                        <Route path="/products/combos/new" element={<ComboFormPage />} />
-                        <Route path="/products/combos/:id" element={<ComboFormPage />} />
-                        <Route path="/products/combos/:id/edit" element={<ComboFormPage />} />
+                        <Route path="/products/combos/new" element={<RouteGuard permission="products.create"><ComboFormPage /></RouteGuard>} />
+                        <Route path="/products/combos/:id" element={<RouteGuard permission="products.view"><ComboFormPage /></RouteGuard>} />
+                        <Route path="/products/combos/:id/edit" element={<RouteGuard permission="products.update"><ComboFormPage /></RouteGuard>} />
                         {/* Promotion Routes (outside layout for full page forms) */}
-                        <Route path="/products/promotions/new" element={<PromotionFormPage />} />
-                        <Route path="/products/promotions/:id" element={<PromotionFormPage />} />
-                        <Route path="/products/promotions/:id/edit" element={<PromotionFormPage />} />
+                        <Route path="/products/promotions/new" element={<RouteGuard permission="products.create"><PromotionFormPage /></RouteGuard>} />
+                        <Route path="/products/promotions/:id" element={<RouteGuard permission="products.view"><PromotionFormPage /></RouteGuard>} />
+                        <Route path="/products/promotions/:id/edit" element={<RouteGuard permission="products.update"><PromotionFormPage /></RouteGuard>} />
                         {/* Product Detail Routes */}
-                        <Route path="/products/:id" element={<ProductDetailPage />} />
-                        <Route path="/products/:id/edit" element={<ProductFormPage />} />
-                        <Route path="/products/:id/pricing" element={<ProductCategoryPricingPage />} />
+                        <Route path="/products/:id" element={<RouteGuard permission="products.view"><ProductDetailPage /></RouteGuard>} />
+                        <Route path="/products/:id/edit" element={<RouteGuard permission="products.update"><ProductFormPage /></RouteGuard>} />
+                        <Route path="/products/:id/pricing" element={<RouteGuard permission="products.pricing"><ProductCategoryPricingPage /></RouteGuard>} />
 
                         {/* Accounting Module Routes with Layout */}
-                        <Route path="/accounting" element={<AccountingLayout />}>
+                        <Route path="/accounting" element={<RouteGuard permission="accounting.view"><AccountingLayout /></RouteGuard>}>
                             <Route index element={<ChartOfAccountsPage />} />
                             <Route path="chart-of-accounts" element={<ChartOfAccountsPage />} />
                             <Route path="journal-entries" element={<JournalEntriesPage />} />
@@ -383,12 +384,12 @@ function App() {
                             <Route path="vat" element={<VATManagementPage />} />
                         </Route>
 
-                        <Route path="/reports" element={<ModuleErrorBoundary moduleName="Reports"><ReportsPage /></ModuleErrorBoundary>} />
-                        <Route path="/users" element={<UsersPage />} />
-                        <Route path="/users/permissions" element={<PermissionsPage />} />
+                        <Route path="/reports" element={<RouteGuard permission="reports.sales"><ModuleErrorBoundary moduleName="Reports"><ReportsPage /></ModuleErrorBoundary></RouteGuard>} />
+                        <Route path="/users" element={<RouteGuard permission="users.view"><UsersPage /></RouteGuard>} />
+                        <Route path="/users/permissions" element={<RouteGuard permission="users.roles"><PermissionsPage /></RouteGuard>} />
 
                         {/* Settings Module Routes with Layout */}
-                        <Route path="/settings" element={<ModuleErrorBoundary moduleName="Settings"><SettingsLayout /></ModuleErrorBoundary>}>
+                        <Route path="/settings" element={<RouteGuard permission="settings.view"><ModuleErrorBoundary moduleName="Settings"><SettingsLayout /></ModuleErrorBoundary></RouteGuard>}>
                             <Route index element={<CompanySettingsPage />} />
                             {/* Dynamic category pages */}
                             <Route path="company" element={<CompanySettingsPage />} />
@@ -424,9 +425,9 @@ function App() {
                             <Route path="lan" element={<LanMonitoringPage />} />
                         </Route>
                         {/* Settings sub-pages outside layout */}
-                        <Route path="/settings/roles" element={<RolesPage />} />
-                        <Route path="/settings/audit" element={<AuditPage />} />
-                        <Route path="/settings/sync" element={<SyncStatusPage />} />
+                        <Route path="/settings/roles" element={<RouteGuard permission="users.roles"><RolesPage /></RouteGuard>} />
+                        <Route path="/settings/audit" element={<RouteGuard permission="settings.view"><AuditPage /></RouteGuard>} />
+                        <Route path="/settings/sync" element={<RouteGuard permission="settings.view"><SyncStatusPage /></RouteGuard>} />
 
                         <Route path="/profile" element={<ProfilePage />} />
                     </Route>

@@ -86,8 +86,8 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
             setShowAddModal(false)
             setNewUOM({ uom_name: '', uom_code: '', conversion_factor: 1 })
             window.location.reload()
-        } catch (error: any) {
-            alert('Error: ' + error.message)
+        } catch (error) {
+            alert('Error: ' + (error instanceof Error ? error.message : 'Unknown error'))
         } finally {
             setSaving(false)
         }

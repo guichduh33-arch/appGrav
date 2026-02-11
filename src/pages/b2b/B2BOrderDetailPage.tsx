@@ -288,9 +288,9 @@ export default function B2BOrderDetailPage() {
 
             fetchOrder()
             fetchHistory()
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error updating status:', error)
-            alert(`Error updating status: ${error?.message || 'Unknown error'}`)
+            alert(`Error updating status: ${error instanceof Error ? error.message : 'Unknown error'}`)
         }
     }
 
@@ -335,9 +335,9 @@ export default function B2BOrderDetailPage() {
             fetchOrder()
             fetchPayments()
             fetchHistory()
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error adding payment:', error)
-            alert(`Error: ${error?.message || JSON.stringify(error)}`)
+            alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
         }
     }
 
