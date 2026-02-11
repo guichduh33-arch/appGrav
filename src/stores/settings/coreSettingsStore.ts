@@ -12,10 +12,6 @@ import type {
   LocalizationSettings,
 } from '../../types/settings';
 
-// =====================================================
-// State Interface
-// =====================================================
-
 interface CoreSettingsState {
   categories: SettingsCategory[];
   settings: Record<string, Setting>;
@@ -24,27 +20,19 @@ interface CoreSettingsState {
   error: string | null;
   appearance: AppearanceSettings;
   localization: LocalizationSettings;
-
   initialize: () => Promise<void>;
   loadCategories: () => Promise<void>;
   loadSettings: () => Promise<void>;
   loadSettingsByCategory: (categoryCode: string) => Promise<Setting[]>;
-
   getSetting: <T = unknown>(key: string) => T | null;
   getSettingsByCategory: (categoryCode: string) => Setting[];
-
   updateSetting: (key: string, value: unknown, reason?: string) => Promise<boolean>;
   updateSettings: (updates: Record<string, unknown>) => Promise<boolean>;
   resetSetting: (key: string) => Promise<boolean>;
   resetCategorySettings: (categoryCode: string) => Promise<number>;
-
   setAppearance: (updates: Partial<AppearanceSettings>) => void;
   setLocalization: (updates: Partial<LocalizationSettings>) => void;
 }
-
-// =====================================================
-// Default Values
-// =====================================================
 
 const defaultAppearance: AppearanceSettings = {
   theme: 'light',
@@ -68,10 +56,6 @@ const defaultLocalization: LocalizationSettings = {
   time_format: 'HH:mm',
 };
 
-// =====================================================
-// Helper: Parse setting value from JSONB
-// =====================================================
-
 function parseSettingValue<T>(value: unknown): T {
   if (typeof value === 'string') {
     try {
@@ -82,10 +66,6 @@ function parseSettingValue<T>(value: unknown): T {
   }
   return value as T;
 }
-
-// =====================================================
-// Store Implementation
-// =====================================================
 
 export const useCoreSettingsStore = create<CoreSettingsState>()(
   persist(
@@ -100,9 +80,7 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
 
       initialize: async () => {
         if (get().isInitialized) return;
-
         set({ isLoading: true, error: null });
-
         try {
           await Promise.all([
             get().loadCategories(),
@@ -111,12 +89,9 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
             usePaymentMethodStore.getState().loadPaymentMethods(),
             useBusinessHoursStore.getState().loadBusinessHours(),
           ]);
-
-          // Extract appearance and localization from loaded settings
           const settings = get().settings;
           const appearance = { ...defaultAppearance };
           const localization = { ...defaultLocalization };
-
           Object.entries(settings).forEach(([key, setting]) => {
             if (key.startsWith('appearance.')) {
               const propName = key.replace('appearance.', '') as keyof AppearanceSettings;
@@ -127,15 +102,7 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
               (localization as Record<string, unknown>)[propName] = parseSettingValue(setting.value);
             }
           });
-
-          set({
-            isLoading: false,
-            isInitialized: true,
-            appearance,
-            localization,
-          });
-
-          // Cache settings data for offline access (Story 1.5)
+          set({ isLoading: false, isInitialized: true, appearance, localization });
           cacheAllSettingsData()
             .then((result) => {
               if (result.success) {
@@ -162,7 +129,6 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
           .select('*')
           .eq('is_active', true)
           .order('sort_order');
-
         if (error) throw error;
         set({ categories: data || [] });
       },
@@ -172,21 +138,17 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
           .from('settings')
           .select('*')
           .order('sort_order');
-
         if (error) throw error;
-
         const settingsMap: Record<string, Setting> = {};
         (data || []).forEach((setting) => {
           settingsMap[setting.key] = setting;
         });
-
         set({ settings: settingsMap });
       },
 
       loadSettingsByCategory: async (categoryCode: string) => {
         const { data, error } = await supabase
           .rpc('get_settings_by_category', { p_category_code: categoryCode });
-
         if (error) throw error;
         return (data || []) as Setting[];
       },
@@ -200,7 +162,6 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
       getSettingsByCategory: (categoryCode: string) => {
         const category = get().categories.find((c) => c.code === categoryCode);
         if (!category) return [];
-
         return Object.values(get().settings)
           .filter((s) => s.category_id === category.id)
           .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
@@ -213,9 +174,7 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
             p_value: value,
             p_reason: reason,
           });
-
           if (error) throw error;
-
           const settings = { ...get().settings };
           if (settings[key]) {
             settings[key] = {
@@ -224,27 +183,15 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
               updated_at: new Date().toISOString(),
             };
             set({ settings });
-
             if (key.startsWith('appearance.')) {
               const propName = key.replace('appearance.', '') as keyof AppearanceSettings;
-              set({
-                appearance: {
-                  ...get().appearance,
-                  [propName]: parseSettingValue(value),
-                },
-              });
+              set({ appearance: { ...get().appearance, [propName]: parseSettingValue(value) } });
             }
             if (key.startsWith('localization.')) {
               const propName = key.replace('localization.', '') as keyof LocalizationSettings;
-              set({
-                localization: {
-                  ...get().localization,
-                  [propName]: parseSettingValue(value),
-                },
-              });
+              set({ localization: { ...get().localization, [propName]: parseSettingValue(value) } });
             }
           }
-
           return true;
         } catch (error) {
           console.error('Failed to update setting:', error);
@@ -257,11 +204,8 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
           const { data, error } = await supabase.rpc('update_settings_bulk', {
             p_settings: updates as Record<string, string>,
           });
-
           if (error) throw error;
-
           await get().loadSettings();
-
           return data > 0;
         } catch (error) {
           console.error('Failed to update settings:', error);
@@ -271,16 +215,9 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
 
       resetSetting: async (key: string) => {
         try {
-          const { data, error } = await supabase.rpc('reset_setting', {
-            p_key: key,
-          });
-
+          const { data, error } = await supabase.rpc('reset_setting', { p_key: key });
           if (error) throw error;
-
-          if (data) {
-            await get().loadSettings();
-          }
-
+          if (data) await get().loadSettings();
           return data;
         } catch (error) {
           console.error('Failed to reset setting:', error);
@@ -293,13 +230,8 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
           const { data, error } = await supabase.rpc('reset_category_settings', {
             p_category_code: categoryCode,
           });
-
           if (error) throw error;
-
-          if (data > 0) {
-            await get().loadSettings();
-          }
-
+          if (data > 0) await get().loadSettings();
           return data;
         } catch (error) {
           console.error('Failed to reset category settings:', error);
@@ -308,9 +240,7 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
       },
 
       setAppearance: (updates) => {
-        const newAppearance = { ...get().appearance, ...updates };
-        set({ appearance: newAppearance });
-
+        set({ appearance: { ...get().appearance, ...updates } });
         const dbUpdates: Record<string, unknown> = {};
         Object.entries(updates).forEach(([key, value]) => {
           dbUpdates[`appearance.${key}`] = value;
@@ -319,9 +249,7 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
       },
 
       setLocalization: (updates) => {
-        const newLocalization = { ...get().localization, ...updates };
-        set({ localization: newLocalization });
-
+        set({ localization: { ...get().localization, ...updates } });
         const dbUpdates: Record<string, unknown> = {};
         Object.entries(updates).forEach(([key, value]) => {
           dbUpdates[`localization.${key}`] = value;
@@ -339,10 +267,7 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
   )
 );
 
-// =====================================================
 // Selectors
-// =====================================================
-
 export const selectTheme = (state: CoreSettingsState) => state.appearance.theme;
 export const selectPrimaryColor = (state: CoreSettingsState) => state.appearance.primary_color;
 export const selectLanguage = (state: CoreSettingsState) => state.localization.default_language;

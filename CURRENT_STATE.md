@@ -1,6 +1,6 @@
 # Current State
 
-Last updated: 2026-02-10
+Last updated: 2026-02-11
 
 ## Sprint Status
 
@@ -67,6 +67,27 @@ Last updated: 2026-02-10
 - **Story 8.8**: Offline cache - Dexie offline_reports_cache table, useOfflineReports hook, OfflineReportBanner in ReportsPage
 - **Story 8.9**: Audit & alerts - AuditTab (pagination, filters, expandable rows) + AlertsDashboardTab (KPI counts, resolve, anomaly detection)
 - **French→English migration**: All 27 report tabs + useDateRange + 4 comparison components migrated from French to English
+
+## Architecture Improvements
+
+### settingsStore Split (2026-02-11)
+
+Monolithic `settingsStore.ts` (691 lines) split into 5 focused domain stores under `src/stores/settings/`:
+
+| Store | Lines | Responsibility |
+|-------|-------|----------------|
+| `coreSettingsStore.ts` | 280 | Categories, settings, appearance, localization, initialization orchestration |
+| `taxStore.ts` | 92 | Tax rates CRUD |
+| `paymentMethodStore.ts` | 92 | Payment methods CRUD |
+| `printerStore.ts` | 82 | Printer configurations CRUD |
+| `businessHoursStore.ts` | 45 | Business hours |
+| `index.ts` | 5 | Barrel re-export |
+| `settingsStore.ts` (facade) | 17 | Backward-compatible re-export |
+
+- All files under 300-line convention limit
+- 6 consumers updated to import from domain stores directly
+- Backward-compatible facade preserves `useSettingsStore` for any indirect consumers
+- 61 settings-related tests pass, build compiles cleanly
 
 ## Known Issues
 
