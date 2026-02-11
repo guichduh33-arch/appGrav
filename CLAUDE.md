@@ -40,7 +40,8 @@ npm run test:smoke       # POS smoke tests
 ### Key Directory Structure
 ```
 src/
-├── components/       # By feature (13 directories)
+├── components/       # By feature (14 directories)
+│   ├── accounting/  # Chart of accounts, journal entries, financial statements
 │   ├── auth/        # Authentication components
 │   ├── inventory/   # Stock management UI
 │   ├── kds/         # Kitchen Display System
@@ -56,7 +57,8 @@ src/
 │   └── ui/          # Shared UI components (shadcn/ui)
 ├── pages/           # Route-based pages (95+ pages)
 ├── stores/          # Zustand stores (see State Management)
-├── hooks/           # Custom hooks by module (~108 hooks)
+├── hooks/           # Custom hooks by module (~117 hooks)
+│   ├── accounting/  # useAccounts, useJournalEntries, useGeneralLedger, useTrialBalance, useBalanceSheet, useIncomeStatement, useVATManagement, useFiscalPeriods
 │   ├── customers/   # useCustomers, useCustomerCategories
 │   ├── inventory/   # useInventoryItems, useStockMovements, useStockAdjustment, useProductRecipe
 │   ├── kds/         # Kitchen display hooks
@@ -72,7 +74,8 @@ src/
 │   ├── shift/       # Shift management hooks
 │   ├── sync/        # Sync status hooks
 │   └── ...          # useOrders, usePermissions, useSyncQueue, useTerminal, usePWAInstall
-├── services/        # Business logic & external APIs (~71 services)
+├── services/        # Business logic & external APIs (~74 services)
+│   ├── accounting/  # accountingService, journalEntryValidation, vatService
 │   ├── b2b/         # B2B credit system
 │   ├── display/     # Customer display broadcast
 │   ├── financial/   # voidService, refundService, auditService
@@ -92,6 +95,7 @@ src/
 ├── types/           # TypeScript definitions
 │   ├── auth.ts      # Auth types
 │   ├── cart.ts      # Cart types
+│   ├── accounting.ts # Accounting types (accounts, journals, fiscal periods, VAT)
 │   ├── database.ts  # Full Supabase schema
 │   ├── database.generated.ts  # Auto-generated Supabase types
 │   ├── errors.ts    # Error types
@@ -106,7 +110,7 @@ src/
 └── locales/         # [SUSPENDED] Translation files exist but i18n is disabled
 
 supabase/
-├── migrations/      # SQL migrations (59, consolidated in Sprint 4)
+├── migrations/      # SQL migrations (62: 59 consolidated + 3 accounting)
 └── functions/       # Edge Functions (Deno, 13 functions)
 ```
 
@@ -189,6 +193,8 @@ Offline Mode:
 
 **Purchasing**: `purchase_orders`, `po_items`
 
+**Accounting**: `accounts` (chart of accounts, 30 seed), `journal_entries`, `journal_entry_lines`, `fiscal_periods`
+
 **System**: `user_profiles`, `roles`, `permissions`, `role_permissions`, `user_roles`, `user_permissions`, `audit_logs`, `settings`, `printer_configurations`
 
 **Key Views**: `view_daily_kpis`, `view_inventory_valuation`, `view_payment_method_stats`
@@ -200,6 +206,10 @@ is_admin(p_user_id UUID) → BOOLEAN
 get_customer_product_price(p_product_id UUID, p_customer_category_slug VARCHAR) → DECIMAL
 add_loyalty_points(p_customer_id UUID, p_points INTEGER, p_order_id UUID) → VOID
 redeem_loyalty_points(p_customer_id UUID, p_points INTEGER) → BOOLEAN
+get_account_balance(p_account_id UUID, p_end_date DATE) → DECIMAL
+calculate_vat_payable(p_year INT, p_month INT) → TABLE(collected, deductible, payable)
+create_sale_journal_entry() → TRIGGER (auto on orders.completed/voided)
+create_purchase_journal_entry() → TRIGGER (auto on purchase_orders.received)
 ```
 
 ### RLS Pattern (REQUIRED for new tables)
@@ -249,9 +259,10 @@ Used with `usePermissions` hook and `PermissionGuard` component:
 - **Products**: `products.view`, `products.create`, `products.update`, `products.pricing`
 - **Customers**: `customers.view`, `customers.create`, `customers.update`, `customers.loyalty`
 - **Reports**: `reports.sales`, `reports.inventory`, `reports.financial`
+- **Accounting**: `accounting.view`, `accounting.manage`, `accounting.journal.create`, `accounting.journal.update`, `accounting.vat.manage`
 - **Admin**: `users.view`, `users.create`, `users.roles`, `settings.view`, `settings.update`
 
-## Key Routes (~103 pages)
+## Key Routes (~111 pages)
 
 | Module | Base Route | Description |
 |--------|-----------|-------------|
@@ -264,6 +275,7 @@ Used with `usePermissions` hook and `PermissionGuard` component:
 | **Customers** | `/customers/*` | Customer CRUD, categories, loyalty |
 | **B2B** | `/b2b/*` | B2B orders, payments |
 | **Purchasing** | `/purchasing/*` | Purchase orders, suppliers |
+| **Accounting** | `/accounting/*` | Chart of accounts, journal entries, general ledger, trial balance, balance sheet, income statement, VAT management |
 | **Reports** | `/reports` | Analytics dashboard (20+ report tabs) |
 | **Settings** | `/settings/*` | Company, printing, notifications, sync, audit, tax, roles, payment methods |
 | **Users** | `/users/*` | User management, permissions |
@@ -355,6 +367,9 @@ Key test files:
 - `src/stores/terminalStore.test.ts` - Terminal state
 - `src/hooks/useNetworkStatus.test.ts` - Network hook
 - `src/hooks/useOfflineData.test.ts` - Offline data hook
+- `src/services/accounting/__tests__/accountingService.test.ts` - Account tree, balance utils
+- `src/services/accounting/__tests__/journalEntryValidation.test.ts` - Entry validation
+- `src/services/accounting/__tests__/vatService.test.ts` - VAT calculations, DJP export
 
 ## Documentation
 
@@ -383,12 +398,12 @@ Key test files:
 
 ## Project Statistics
 
-- **Components**: ~104 React components across 13 feature directories
-- **Pages**: 103 route-based pages
-- **Hooks**: ~108 custom hooks across 14 subdirectories
-- **Services**: ~71 business logic services across 15 subdirectories
+- **Components**: ~112 React components across 14 feature directories
+- **Pages**: 111 route-based pages
+- **Hooks**: ~117 custom hooks across 15 subdirectories
+- **Services**: ~74 business logic services across 16 subdirectories
 - **Stores**: 11 Zustand stores
-- **Migrations**: 59 SQL migrations (consolidated in Sprint 4)
+- **Migrations**: 62 SQL migrations (59 consolidated + 3 accounting)
 - **Edge Functions**: 13 Deno functions
-- **Test files**: 87 test files
-- **Codebase**: ~114,000 lines of TypeScript/React
+- **Test files**: 92 test files, ~1,630 tests
+- **Codebase**: ~118,000 lines of TypeScript/React
