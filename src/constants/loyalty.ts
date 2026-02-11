@@ -3,6 +3,7 @@
  *
  * Defines tier colors and discount percentages for the loyalty program.
  * Used by LoyaltyBadge, Cart, and CustomerSearchModal components.
+ * These serve as fallback defaults; runtime values come from useLoyaltySettings().
  *
  * @see Story 6.3: Loyalty Points Display (Read-Only)
  * @see CLAUDE.md#Business-Rules for tier definitions

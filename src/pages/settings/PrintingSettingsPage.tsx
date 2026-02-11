@@ -18,6 +18,7 @@ import {
     useUpdatePrinter,
     useDeletePrinter,
 } from '../../hooks/settings';
+import { usePrintingServerSettings } from '../../hooks/settings/useModuleConfigSettings';
 import { usePermissions } from '../../hooks/usePermissions';
 import type { PrinterConfiguration } from '../../types/settings';
 import { toast } from 'sonner';
@@ -54,6 +55,7 @@ const PrintingSettingsPage = () => {
     const [formData, setFormData] = useState<IPrinterFormData>(emptyForm);
     const [testingId, setTestingId] = useState<string | null>(null);
 
+    const printingConfig = usePrintingServerSettings();
     const canUpdate = hasPermission('settings.update') || isAdmin;
 
     // Open create modal
@@ -130,13 +132,12 @@ const PrintingSettingsPage = () => {
     // Test printer connection
     const handleTestPrint = async (printer: PrinterConfiguration) => {
         setTestingId(printer.id);
-        const PRINT_SERVER_URL = 'http://localhost:3001';
 
         try {
             // First check if print server is running
-            const healthCheck = await fetch(`${PRINT_SERVER_URL}/health`, {
+            const healthCheck = await fetch(`${printingConfig.serverUrl}/health`, {
                 method: 'GET',
-                signal: AbortSignal.timeout(3000), // 3s timeout
+                signal: AbortSignal.timeout(printingConfig.healthCheckTimeoutMs),
             });
 
             if (!healthCheck.ok) {
@@ -153,7 +154,7 @@ const PrintingSettingsPage = () => {
                         : '/print/receipt';
 
             // Send test print
-            const response = await fetch(`${PRINT_SERVER_URL}${endpoint}`, {
+            const response = await fetch(`${printingConfig.serverUrl}${endpoint}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -162,7 +163,7 @@ const PrintingSettingsPage = () => {
                     connection_string: printer.connection_string,
                     message: `Print test - ${new Date().toLocaleString()}`,
                 }),
-                signal: AbortSignal.timeout(5000), // 5s timeout
+                signal: AbortSignal.timeout(printingConfig.requestTimeoutMs),
             });
 
             if (!response.ok) {
@@ -180,7 +181,7 @@ const PrintingSettingsPage = () => {
         } catch (error) {
             console.error('Print test error:', error);
             if (error instanceof TypeError && (error.message.includes('fetch') || error.message.includes('Failed to fetch') || error.name === 'TypeError')) {
-                toast.error('Print server unreachable. Is it running on port 3001?');
+                toast.error(`Print server unreachable. Is it running at ${printingConfig.serverUrl}?`);
             } else if (error instanceof Error && error.name === 'TimeoutError') {
                 toast.error('Timeout. Print server is not responding.');
             } else {

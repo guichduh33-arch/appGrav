@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import PinVerificationModal from './PinVerificationModal';
 import { voidOrder } from '@/services/financial/voidService';
 import { useNetworkStore } from '@/stores/networkStore';
+import { usePOSConfigSettings } from '@/hooks/settings/useModuleConfigSettings';
 import { formatPrice } from '@/utils/helpers';
 import {
   VOID_REASON_OPTIONS,
@@ -42,6 +43,7 @@ export default function VoidModal({
   onClose,
 }: VoidModalProps) {
   const isOnline = useNetworkStore((state) => state.isOnline);
+  const posConfig = usePOSConfigSettings();
 
   // Form state
   const [reasonCode, setReasonCode] = useState<TVoidReasonCode | ''>('');
@@ -237,7 +239,7 @@ export default function VoidModal({
         <PinVerificationModal
           title="Manager Verification"
           message={`Enter manager PIN to void order ${orderNumber}`}
-          allowedRoles={['manager', 'admin']}
+          allowedRoles={posConfig.voidRequiredRoles}
           onVerify={handlePinVerified}
           onClose={() => setShowPinModal(false)}
         />

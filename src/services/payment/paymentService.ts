@@ -21,9 +21,10 @@ import {
   calculateChange as calculateChangeUtil,
   getOrderPaidAmount,
 } from '@/services/offline/offlinePaymentService';
+import { useCoreSettingsStore } from '@/stores/settings/coreSettingsStore';
 
 // =====================================================
-// Constants
+// Constants (fallback defaults)
 // =====================================================
 
 /** Maximum payment amount (10 billion IDR) */
@@ -32,8 +33,21 @@ const MAX_PAYMENT_AMOUNT = 10_000_000_000;
 /** IDR rounding threshold (100 IDR) */
 const IDR_ROUNDING = 100;
 
+/** Rounding tolerance (1 IDR) */
+const ROUNDING_TOLERANCE = 1;
+
 /** Payment methods that require reference number */
 const REFERENCE_REQUIRED_METHODS: TPaymentMethod[] = ['card', 'qris', 'edc', 'transfer'];
+
+function getFinancialConfig() {
+  const getSetting = useCoreSettingsStore.getState().getSetting;
+  return {
+    maxPaymentAmount: getSetting<number>('financial.max_payment_amount') ?? MAX_PAYMENT_AMOUNT,
+    currencyRoundingUnit: getSetting<number>('financial.currency_rounding_unit') ?? IDR_ROUNDING,
+    roundingTolerance: getSetting<number>('financial.rounding_tolerance') ?? ROUNDING_TOLERANCE,
+    referenceRequiredMethods: getSetting<TPaymentMethod[]>('financial.reference_required_methods') ?? REFERENCE_REQUIRED_METHODS,
+  };
+}
 
 // =====================================================
 // Validation
@@ -50,6 +64,7 @@ export function validatePayment(
   input: IPaymentInput,
   _orderTotal: number
 ): IValidationResult {
+  const config = getFinancialConfig();
   const errors: string[] = [];
 
   // Amount validation
@@ -57,8 +72,8 @@ export function validatePayment(
     errors.push('Payment amount must be greater than 0');
   }
 
-  if (input.amount > MAX_PAYMENT_AMOUNT) {
-    errors.push(`Payment amount exceeds maximum (${MAX_PAYMENT_AMOUNT.toLocaleString()} IDR)`);
+  if (input.amount > config.maxPaymentAmount) {
+    errors.push(`Payment amount exceeds maximum (${config.maxPaymentAmount.toLocaleString()} IDR)`);
   }
 
   // Cash validation
@@ -69,7 +84,7 @@ export function validatePayment(
   }
 
   // Reference validation for non-cash
-  if (REFERENCE_REQUIRED_METHODS.includes(input.method)) {
+  if (config.referenceRequiredMethods.includes(input.method)) {
     // Reference is optional during creation, validated during reconciliation
   }
 
@@ -106,10 +121,11 @@ export function validateSplitPayments(
   }
 
   // Validate total
+  const config = getFinancialConfig();
   const totalPaid = inputs.reduce((sum, p) => sum + p.amount, 0);
 
-  // Allow small rounding difference (1 IDR)
-  if (Math.abs(totalPaid - orderTotal) > 1) {
+  // Allow small rounding difference
+  if (Math.abs(totalPaid - orderTotal) > config.roundingTolerance) {
     if (totalPaid < orderTotal) {
       errors.push(
         `Total payments (${totalPaid.toLocaleString()} IDR) less than order total (${orderTotal.toLocaleString()} IDR)`
@@ -141,9 +157,9 @@ export function validateSplitPayments(
  * @returns Change to return (always >= 0, rounded to 100 IDR)
  */
 export function calculateChange(cashReceived: number, amount: number): number {
+  const config = getFinancialConfig();
   const rawChange = calculateChangeUtil(amount, cashReceived);
-  // Round down to nearest 100 IDR
-  return Math.floor(rawChange / IDR_ROUNDING) * IDR_ROUNDING;
+  return Math.floor(rawChange / config.currencyRoundingUnit) * config.currencyRoundingUnit;
 }
 
 // =====================================================
@@ -183,9 +199,9 @@ export function addPaymentToState(
   const newRemaining = Math.max(0, orderTotal - newTotalPaid);
 
   // Determine new status
-  // Allow 1 IDR rounding difference (newRemaining is already >= 0 from Math.max above)
+  const config = getFinancialConfig();
   let newStatus: ISplitPaymentState['status'];
-  if (newRemaining <= 1) {
+  if (newRemaining <= config.roundingTolerance) {
     newStatus = 'complete';
   } else {
     newStatus = 'adding';
@@ -267,8 +283,9 @@ export async function processPayment(
         };
       }
 
-      // C-2: Validate payment amount matches order total (with 1 IDR tolerance)
-      if (Math.abs(input.amount - orderTotal) > 1) {
+      // C-2: Validate payment amount matches order total
+      const config = getFinancialConfig();
+      if (Math.abs(input.amount - orderTotal) > config.roundingTolerance) {
         return {
           success: false,
           paymentId: '',

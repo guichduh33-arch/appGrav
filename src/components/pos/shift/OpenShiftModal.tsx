@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { X, Banknote, Clock } from 'lucide-react'
 import { formatPrice } from '../../../utils/helpers'
+import { usePOSConfigSettings } from '@/hooks/settings/useModuleConfigSettings'
 import './ShiftModals.css'
 
 interface OpenShiftModalProps {
@@ -9,9 +10,8 @@ interface OpenShiftModalProps {
     isLoading: boolean
 }
 
-const QUICK_AMOUNTS = [100000, 200000, 300000, 500000, 1000000]
-
 export default function OpenShiftModal({ onOpen, onClose, isLoading }: OpenShiftModalProps) {
+    const posConfig = usePOSConfigSettings()
     const [openingCash, setOpeningCash] = useState<number>(0)
     const [notes, setNotes] = useState('')
     const [inputValue, setInputValue] = useState('')
@@ -77,7 +77,7 @@ export default function OpenShiftModal({ onOpen, onClose, isLoading }: OpenShift
                     <div className="shift-form__quick-amounts">
                         <p className="shift-form__quick-label">Quick amounts</p>
                         <div className="shift-form__quick-grid">
-                            {QUICK_AMOUNTS.map((amount) => (
+                            {posConfig.shiftOpeningCashPresets.map((amount) => (
                                 <button
                                     key={amount}
                                     type="button"

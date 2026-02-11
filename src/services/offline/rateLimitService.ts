@@ -14,12 +14,19 @@
 
 import { db } from '@/lib/db';
 import type { IOfflineRateLimit } from '@/types/offline';
+import { useCoreSettingsStore } from '@/stores/settings/coreSettingsStore';
 
 /** Maximum failed attempts before rate limiting */
 const MAX_ATTEMPTS = 3;
 
-/** Cooldown duration in milliseconds (15 minutes per Story 1.2) */
-const COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes
+
+function getSecurityConfig() {
+  const getSetting = useCoreSettingsStore.getState().getSetting;
+  return {
+    maxAttempts: getSetting<number>('security.pin_max_attempts') ?? MAX_ATTEMPTS,
+    cooldownMs: (getSetting<number>('security.pin_cooldown_minutes') ?? 15) * 60 * 1000,
+  };
+}
 
 /**
  * Result of rate limit check
@@ -45,10 +52,11 @@ export const rateLimitService = {
    * @returns Rate limit check result with allowed status and wait time
    */
   async checkRateLimit(userId: string): Promise<IRateLimitCheck> {
+    const { maxAttempts, cooldownMs } = getSecurityConfig();
     const entry = await db.offline_rate_limits.get(userId);
 
     // No entry or under limit - allowed
-    if (!entry || entry.attempts < MAX_ATTEMPTS) {
+    if (!entry || entry.attempts < maxAttempts) {
       return { allowed: true };
     }
 
@@ -56,14 +64,14 @@ export const rateLimitService = {
     const lastAttemptTime = new Date(entry.last_attempt).getTime();
     const elapsed = Date.now() - lastAttemptTime;
 
-    if (elapsed >= COOLDOWN_MS) {
+    if (elapsed >= cooldownMs) {
       // Cooldown complete - reset and allow
       await db.offline_rate_limits.delete(userId);
       return { allowed: true };
     }
 
     // Still in cooldown - calculate remaining time
-    const remainingMs = COOLDOWN_MS - elapsed;
+    const remainingMs = cooldownMs - elapsed;
     const waitSeconds = Math.ceil(remainingMs / 1000);
 
     return { allowed: false, waitSeconds };
@@ -78,6 +86,7 @@ export const rateLimitService = {
    * @param userId - User UUID that failed authentication
    */
   async recordFailedAttempt(userId: string): Promise<void> {
+    const { maxAttempts } = getSecurityConfig();
     const existing = await db.offline_rate_limits.get(userId);
     const entry: IOfflineRateLimit = existing
       ? {
@@ -96,7 +105,7 @@ export const rateLimitService = {
     console.debug(
       '[rateLimit] Failed attempt recorded:',
       userId,
-      `(${entry.attempts}/${MAX_ATTEMPTS})`
+      `(${entry.attempts}/${maxAttempts})`
     );
   },
 
@@ -147,7 +156,8 @@ export const rateLimitService = {
    * Can be called periodically to free up storage
    */
   async cleanupExpired(): Promise<void> {
-    const cutoff = new Date(Date.now() - COOLDOWN_MS).toISOString();
+    const { cooldownMs } = getSecurityConfig();
+    const cutoff = new Date(Date.now() - cooldownMs).toISOString();
     const expired = await db.offline_rate_limits
       .where('last_attempt')
       .below(cutoff)

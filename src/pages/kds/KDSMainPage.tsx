@@ -9,6 +9,7 @@ import { markItemsPreparing, markItemsReady, completeOrder } from '../../service
 import { useLanClient } from '../../hooks/lan/useLanClient'
 import { useKdsOrderReceiver } from '../../hooks/kds/useKdsOrderReceiver'
 import { useKdsOrderQueue, type IKdsOrder, type IKdsOrderItem } from '../../hooks/kds/useKdsOrderQueue'
+import { useKDSConfigSettings } from '../../hooks/settings/useModuleConfigSettings'
 import { LanConnectionIndicator } from '../../components/lan/LanConnectionIndicator'
 import { playNewOrderSound } from '../../utils/audio'
 import type { IKdsNewOrderPayload, TKitchenStation } from '../../types/offline'
@@ -43,11 +44,9 @@ const STATION_CONFIG: Record<string, { name: string; icon: React.ReactNode; colo
     }
 }
 
-// KDS Configuration Constants
-// TODO: Make configurable via settings (Story 4.x)
-const KDS_URGENT_THRESHOLD_SECONDS = 600 // 10 minutes - orders older than this are marked urgent
 
 export default function KDSMainPage() {
+    const kdsConfig = useKDSConfigSettings()
     const { station } = useParams<{ station: string }>()
     const navigate = useNavigate()
     const [loading, setLoading] = useState(true)
@@ -70,7 +69,7 @@ export default function KDSMainPage() {
         updateOrderItem,
         removeOrder,
     } = useKdsOrderQueue({
-        urgentThresholdSeconds: KDS_URGENT_THRESHOLD_SECONDS,
+        urgentThresholdSeconds: kdsConfig.urgencyCriticalSeconds,
         onOrderBecameUrgent: () => {
             if (soundEnabled) {
                 playNewOrderSound()
@@ -266,8 +265,7 @@ export default function KDSMainPage() {
     useEffect(() => {
         fetchOrders()
 
-        // Poll every 5 seconds
-        refreshIntervalRef.current = setInterval(fetchOrders, 5000)
+        refreshIntervalRef.current = setInterval(fetchOrders, kdsConfig.pollIntervalMs)
 
         return () => {
             if (refreshIntervalRef.current) {

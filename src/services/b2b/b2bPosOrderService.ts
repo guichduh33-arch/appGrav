@@ -6,6 +6,7 @@
  */
 
 import { supabase } from '@/lib/supabase'
+import { useCoreSettingsStore } from '@/stores/settings/coreSettingsStore'
 import { addToCustomerBalance } from './creditService'
 import type { CartItem } from '@/stores/cartStore'
 
@@ -83,7 +84,8 @@ export async function createB2BPosOrder(input: IB2BPosOrderInput): Promise<IB2BP
         }
 
         const orderNumber = await getNextOrderNumber()
-        const paymentTermsDays = customer.payment_terms_days || 30
+        const defaultTermsDays = useCoreSettingsStore.getState().getSetting<number>('b2b.default_payment_terms_days') ?? 30
+        const paymentTermsDays = customer.payment_terms_days || defaultTermsDays
         const dueDate = new Date()
         dueDate.setDate(dueDate.getDate() + paymentTermsDays)
 
@@ -97,7 +99,7 @@ export async function createB2BPosOrder(input: IB2BPosOrderInput): Promise<IB2BP
                 status: 'confirmed',
                 subtotal: input.subtotal,
                 discount_amount: input.discountAmount,
-                tax_rate: 0.10,
+                tax_rate: 0.10, // Business-critical: 10% PPN, kept as constant to avoid accounting implications
                 tax_amount: Math.round(input.total * 10 / 110),
                 total: input.total,
                 paid_amount: 0,

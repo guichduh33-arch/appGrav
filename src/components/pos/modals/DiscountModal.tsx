@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X, Percent, DollarSign, Tag } from 'lucide-react'
 import { formatPrice } from '../../../utils/helpers'
 import PinVerificationModal from './PinVerificationModal'
+import { usePOSConfigSettings } from '@/hooks/settings/useModuleConfigSettings'
 import './DiscountModal.css'
 
 interface DiscountModalProps {
@@ -24,6 +25,7 @@ export default function DiscountModal({
     const [showPinModal, setShowPinModal] = useState(false)
     const [pendingDiscount, setPendingDiscount] = useState<{ amount: number; type: 'percentage' | 'fixed'; value: number } | null>(null)
 
+    const posConfig = usePOSConfigSettings()
     const isItemDiscount = !!itemName
 
     // Calculate discount amount
@@ -32,7 +34,7 @@ export default function DiscountModal({
         if (isNaN(value) || value <= 0) return 0
 
         if (discountType === 'percentage') {
-            const percentage = Math.min(value, 100) // Max 100%
+            const percentage = Math.min(value, posConfig.maxDiscountPercentage)
             return (totalPrice * percentage) / 100
         } else {
             // Fixed amount (IDR)
@@ -42,9 +44,6 @@ export default function DiscountModal({
 
     const discountAmount = calculateDiscountAmount()
     const finalPrice = totalPrice - discountAmount
-
-    // Quick percentage buttons
-    const quickPercentages = [5, 10, 15, 20, 25, 50]
 
     const handleQuickPercentage = (percentage: number) => {
         setDiscountType('percentage')
@@ -115,7 +114,7 @@ export default function DiscountModal({
                         {/* Quick Percentage Buttons */}
                         {discountType === 'percentage' && (
                             <div className="quick-percentages">
-                                {quickPercentages.map(pct => (
+                                {posConfig.quickDiscountPercentages.map(pct => (
                                     <button
                                         key={pct}
                                         className="quick-percentage-btn"
@@ -139,7 +138,7 @@ export default function DiscountModal({
                                 onChange={(e) => setDiscountValue(e.target.value)}
                                 placeholder={discountType === 'percentage' ? '0' : '0'}
                                 min="0"
-                                max={discountType === 'percentage' ? '100' : totalPrice.toString()}
+                                max={discountType === 'percentage' ? posConfig.maxDiscountPercentage.toString() : totalPrice.toString()}
                                 autoFocus
                             />
                         </div>
@@ -200,7 +199,7 @@ export default function DiscountModal({
                 <PinVerificationModal
                     title="Verification Required"
                     message="Enter your PIN to apply this discount"
-                    allowedRoles={['manager', 'admin']}
+                    allowedRoles={posConfig.voidRequiredRoles}
                     onVerify={handlePinVerify}
                     onClose={() => {
                         setShowPinModal(false)

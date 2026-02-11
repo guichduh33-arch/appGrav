@@ -8,6 +8,7 @@
  */
 
 import type { TPaymentMethod } from '@/types/payment';
+import { useCoreSettingsStore } from '@/stores/settings/coreSettingsStore';
 
 // =====================================================
 // Configuration
@@ -16,6 +17,15 @@ import type { TPaymentMethod } from '@/types/payment';
 const PRINT_SERVER_URL = 'http://localhost:3001';
 const PRINT_TIMEOUT_MS = 5000;
 const HEALTH_CHECK_TIMEOUT_MS = 2000;
+
+function getPrintConfig() {
+  const getSetting = useCoreSettingsStore.getState().getSetting;
+  return {
+    serverUrl: getSetting<string>('printing.server_url') ?? PRINT_SERVER_URL,
+    requestTimeout: getSetting<number>('printing.request_timeout_ms') ?? PRINT_TIMEOUT_MS,
+    healthCheckTimeout: getSetting<number>('printing.health_check_timeout_ms') ?? HEALTH_CHECK_TIMEOUT_MS,
+  };
+}
 
 // =====================================================
 // Types
@@ -97,10 +107,11 @@ export interface IPrintResult {
  */
 export async function checkPrintServer(): Promise<boolean> {
   try {
+    const config = getPrintConfig();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), HEALTH_CHECK_TIMEOUT_MS);
+    const timeoutId = setTimeout(() => controller.abort(), config.healthCheckTimeout);
 
-    const response = await fetch(`${PRINT_SERVER_URL}/health`, {
+    const response = await fetch(`${config.serverUrl}/health`, {
       signal: controller.signal,
     });
 
@@ -133,10 +144,11 @@ export async function printReceipt(orderData: IOrderPrintData): Promise<IPrintRe
   }
 
   try {
+    const config = getPrintConfig();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), PRINT_TIMEOUT_MS);
+    const timeoutId = setTimeout(() => controller.abort(), config.requestTimeout);
 
-    const response = await fetch(`${PRINT_SERVER_URL}/print/receipt`, {
+    const response = await fetch(`${config.serverUrl}/print/receipt`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(orderData),
@@ -186,10 +198,11 @@ export async function printKitchenTicket(ticketData: IKitchenTicketData): Promis
   }
 
   try {
+    const config = getPrintConfig();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), PRINT_TIMEOUT_MS);
+    const timeoutId = setTimeout(() => controller.abort(), config.requestTimeout);
 
-    const response = await fetch(`${PRINT_SERVER_URL}/print/kitchen`, {
+    const response = await fetch(`${config.serverUrl}/print/kitchen`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(ticketData),
@@ -239,10 +252,11 @@ export async function printBaristaTicket(ticketData: IKitchenTicketData): Promis
   }
 
   try {
+    const config = getPrintConfig();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), PRINT_TIMEOUT_MS);
+    const timeoutId = setTimeout(() => controller.abort(), config.requestTimeout);
 
-    const response = await fetch(`${PRINT_SERVER_URL}/print/barista`, {
+    const response = await fetch(`${config.serverUrl}/print/barista`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(ticketData),
@@ -291,10 +305,11 @@ export async function openCashDrawer(): Promise<IPrintResult> {
   }
 
   try {
+    const config = getPrintConfig();
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), PRINT_TIMEOUT_MS);
+    const timeoutId = setTimeout(() => controller.abort(), config.requestTimeout);
 
-    const response = await fetch(`${PRINT_SERVER_URL}/drawer/open`, {
+    const response = await fetch(`${config.serverUrl}/drawer/open`, {
       method: 'POST',
       signal: controller.signal,
     });

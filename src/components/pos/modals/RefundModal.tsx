@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import PinVerificationModal from './PinVerificationModal';
 import { processRefund } from '@/services/financial/refundService';
 import { useNetworkStore } from '@/stores/networkStore';
+import { usePOSConfigSettings } from '@/hooks/settings/useModuleConfigSettings';
 import { formatPrice } from '@/utils/helpers';
 import {
   REFUND_REASON_OPTIONS,
@@ -51,6 +52,7 @@ export default function RefundModal({
   onClose,
 }: RefundModalProps) {
   const isOnline = useNetworkStore((state) => state.isOnline);
+  const posConfig = usePOSConfigSettings();
 
   // Form state
   const [refundType, setRefundType] = useState<RefundType>('full');
@@ -322,7 +324,7 @@ export default function RefundModal({
         <PinVerificationModal
           title="Manager Verification"
           message={`Enter manager PIN to process ${formatPrice(amount)} refund`}
-          allowedRoles={['manager', 'admin']}
+          allowedRoles={posConfig.refundRequiredRoles}
           onVerify={handlePinVerified}
           onClose={() => setShowPinModal(false)}
         />

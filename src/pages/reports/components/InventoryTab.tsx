@@ -5,6 +5,7 @@ import { Search, ArrowUpDown, Package, DollarSign, Boxes } from 'lucide-react';
 import { ReportingService } from '@/services/ReportingService';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
 import { formatCurrency } from '@/utils/helpers';
+import { useInventoryConfigSettings } from '@/hooks/settings/useModuleConfigSettings';
 import type { InventoryValuation, StockWaste } from '@/types/reporting';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FF4444'];
@@ -29,6 +30,7 @@ export const InventoryTab = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState<SortField>('product_name');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
+  const invConfig = useInventoryConfigSettings();
 
   const { data: valuation, isLoading: loadingValuation } = useQuery<InventoryValuation>({
     queryKey: ['inventoryValuation'],
@@ -43,7 +45,7 @@ export const InventoryTab = () => {
   });
 
   const { data: stockItems = [], isLoading: loadingStock } = useQuery<ProductStock[]>({
-    queryKey: ['stockItems'],
+    queryKey: ['stockItems', invConfig.stockCriticalThreshold, invConfig.stockWarningThreshold],
     queryFn: async () => {
       const items = await ReportingService.getInventoryItems();
       return items.map((item: any) => ({
@@ -59,9 +61,9 @@ export const InventoryTab = () => {
         status:
           item.current_stock <= 0
             ? 'out'
-            : item.current_stock < 5
+            : item.current_stock < invConfig.stockCriticalThreshold
               ? 'critical'
-              : item.current_stock < 10
+              : item.current_stock < invConfig.stockWarningThreshold
                 ? 'low'
                 : 'ok',
       }));

@@ -11,6 +11,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useDisplayStore } from '@/stores/displayStore';
+import { useDisplaySettings } from '@/hooks/settings/useModuleConfigSettings';
 import { lanClient } from '@/services/lan/lanClient';
 import { LAN_MESSAGE_TYPES, type ILanMessage } from '@/services/lan/lanProtocol';
 import type { ICartDisplayPayload, IOrderStatusPayload } from '@/services/display/displayBroadcast';
@@ -44,15 +45,24 @@ export default function CustomerDisplayPage() {
     updateCart,
     updateOrderStatus,
     setConnected,
+    setIdleTimeout,
+    setPromoInterval,
     nextPromo,
     resetPromoIndex,
     checkIdle,
   } = useDisplayStore();
+  const displayConfig = useDisplaySettings();
 
   const [promotions, setPromotions] = useState<IDisplayPromotion[]>([]);
   const [isConnecting, setIsConnecting] = useState(true);
   const [newReadyOrder, setNewReadyOrder] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Sync display settings from settings store to display store
+  useEffect(() => {
+    setIdleTimeout(displayConfig.idleTimeoutSeconds);
+    setPromoInterval(displayConfig.promoRotationIntervalSeconds);
+  }, [displayConfig.idleTimeoutSeconds, displayConfig.promoRotationIntervalSeconds, setIdleTimeout, setPromoInterval]);
 
   /**
    * Load promotions from database

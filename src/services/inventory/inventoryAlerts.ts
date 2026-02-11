@@ -6,6 +6,8 @@
  */
 
 import { supabase } from '@/lib/supabase'
+import { useCoreSettingsStore } from '@/stores/settings/coreSettingsStore'
+import { INVENTORY_CONFIG_DEFAULTS } from '@/hooks/settings/useModuleConfigSettings'
 
 // ============================================
 // Types
@@ -66,6 +68,10 @@ export interface IProductionSuggestion {
 // ============================================
 
 export async function getLowStockItems(): Promise<ILowStockItem[]> {
+    const getSetting = useCoreSettingsStore.getState().getSetting
+    const pctCritical = getSetting<number>('inventory_config.stock_percentage_critical') ?? INVENTORY_CONFIG_DEFAULTS.stockPercentageCritical
+    const pctWarning = getSetting<number>('inventory_config.stock_percentage_warning') ?? INVENTORY_CONFIG_DEFAULTS.stockPercentageWarning
+
     // Note: max_stock_level doesn't exist in current schema, we'll use min_stock_level * 2 as default
     const { data, error } = await supabase
         .from('products')
@@ -112,7 +118,7 @@ export async function getLowStockItems(): Promise<ILowStockItem[]> {
             supplier_id: null,
             supplier_name: null,
             product_type: item.product_type || 'finished',
-            severity: stockPercentage <= 20 ? 'critical' : stockPercentage <= 50 ? 'warning' : 'normal',
+            severity: stockPercentage <= pctCritical ? 'critical' : stockPercentage <= pctWarning ? 'warning' : 'normal',
             stock_percentage: stockPercentage
         }
     })
@@ -123,6 +129,10 @@ export async function getLowStockItems(): Promise<ILowStockItem[]> {
 // ============================================
 
 export async function getReorderSuggestions(): Promise<IReorderSuggestion[]> {
+    const getSetting = useCoreSettingsStore.getState().getSetting
+    const lookbackDays = getSetting<number>('inventory_config.reorder_lookback_days') ?? INVENTORY_CONFIG_DEFAULTS.reorderLookbackDays
+    const maxMultiplier = getSetting<number>('inventory_config.max_stock_multiplier') ?? INVENTORY_CONFIG_DEFAULTS.maxStockMultiplier
+
     // Get low stock raw materials
     const { data: products, error: productsError } = await supabase
         .from('products')
@@ -145,9 +155,9 @@ export async function getReorderSuggestions(): Promise<IReorderSuggestion[]> {
         return []
     }
 
-    // Get average daily usage from stock movements (last 30 days)
-    const thirtyDaysAgo = new Date()
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    // Get average daily usage from stock movements
+    const lookbackDate = new Date()
+    lookbackDate.setDate(lookbackDate.getDate() - lookbackDays)
 
     const suggestions: IReorderSuggestion[] = []
 
@@ -169,10 +179,10 @@ export async function getReorderSuggestions(): Promise<IReorderSuggestion[]> {
             .select('quantity')
             .eq('product_id', product.id)
             .in('movement_type', ['sale_pos', 'sale_b2b'])
-            .gte('created_at', thirtyDaysAgo.toISOString())
+            .gte('created_at', lookbackDate.toISOString())
 
         const totalUsage = (movements || []).reduce((sum, m) => sum + Math.abs(m.quantity), 0)
-        const avgDailyUsage = totalUsage / 30
+        const avgDailyUsage = totalUsage / lookbackDays
 
         // Get last purchase price
         const { data: lastPO } = await supabase
@@ -184,8 +194,8 @@ export async function getReorderSuggestions(): Promise<IReorderSuggestion[]> {
 
         const lastPurchasePrice = lastPO?.[0]?.unit_price || costPrice
 
-        // Calculate suggested quantity (fill to max level = min * 2)
-        const maxLevel = minStockLevel * 2
+        // Calculate suggested quantity (fill to max level)
+        const maxLevel = minStockLevel * maxMultiplier
         const suggestedQuantity = Math.max(maxLevel - currentStock, 0)
 
         // Calculate days until stockout
@@ -220,6 +230,11 @@ export async function getReorderSuggestions(): Promise<IReorderSuggestion[]> {
 // ============================================
 
 export async function getProductionSuggestions(): Promise<IProductionSuggestion[]> {
+    const getSetting = useCoreSettingsStore.getState().getSetting
+    const productionLookbackDays = getSetting<number>('inventory_config.production_lookback_days') ?? INVENTORY_CONFIG_DEFAULTS.productionLookbackDays
+    const priorityHighThreshold = getSetting<number>('inventory_config.production_priority_high_threshold') ?? INVENTORY_CONFIG_DEFAULTS.productionPriorityHighThreshold
+    const priorityMediumThreshold = getSetting<number>('inventory_config.production_priority_medium_threshold') ?? INVENTORY_CONFIG_DEFAULTS.productionPriorityMediumThreshold
+
     // Get finished products that are low stock
     const { data: products, error: productsError } = await supabase
         .from('products')
@@ -301,26 +316,26 @@ export async function getProductionSuggestions(): Promise<IProductionSuggestion[
             }
         }
 
-        // Get average daily sales (last 7 days)
-        const sevenDaysAgo = new Date()
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+        // Get average daily sales
+        const productionLookbackDate = new Date()
+        productionLookbackDate.setDate(productionLookbackDate.getDate() - productionLookbackDays)
 
         const { data: sales } = await supabase
             .from('order_items')
             .select('quantity')
             .eq('product_id', typedProduct.id)
-            .gte('created_at', sevenDaysAgo.toISOString())
+            .gte('created_at', productionLookbackDate.toISOString())
 
         const totalSales = (sales || []).reduce((sum, s) => sum + s.quantity, 0)
-        const avgDailySales = totalSales / 7
+        const avgDailySales = totalSales / productionLookbackDays
 
         // Determine priority
         const stockPercentage = typedProduct.min_stock_level > 0
             ? (typedProduct.current_stock / typedProduct.min_stock_level) * 100
             : 0
         const priority: IProductionSuggestion['priority'] =
-            stockPercentage <= 20 ? 'high' :
-            stockPercentage <= 50 ? 'medium' : 'low'
+            stockPercentage <= priorityHighThreshold ? 'high' :
+            stockPercentage <= priorityMediumThreshold ? 'medium' : 'low'
 
         suggestions.push({
             product_id: typedProduct.id,
@@ -450,9 +465,13 @@ export async function createPoFromLowStock(
     items: Array<{ productId: string; quantity: number; unitPrice: number }>
 ): Promise<{ success: boolean; poId?: string; error?: string }> {
     try {
+        const getSetting = useCoreSettingsStore.getState().getSetting
+        const poLeadTimeDays = getSetting<number>('inventory_config.po_lead_time_days') ?? INVENTORY_CONFIG_DEFAULTS.poLeadTimeDays
+
         // Calculate totals
         const subtotal = items.reduce((sum, i) => sum + (i.quantity * i.unitPrice), 0)
-        const taxRate = 0.1 // 10% tax
+        // Tax rate is business-critical (10% PPN) - kept as constant to avoid accounting implications
+        const taxRate = 0.1
         const taxAmount = subtotal * taxRate
         const total = subtotal + taxAmount
 
@@ -470,7 +489,7 @@ export async function createPoFromLowStock(
                 tax_rate: taxRate,
                 tax_amount: taxAmount,
                 total: total,
-                expected_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days
+                expected_date: new Date(Date.now() + poLeadTimeDays * 24 * 60 * 60 * 1000).toISOString()
             })
             .select('id')
             .single()

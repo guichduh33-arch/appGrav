@@ -5,11 +5,13 @@ import {
     useStockBalances,
     type IStockBalance as StockBalance,
 } from '@/hooks/inventory/useStockByLocation'
+import { useInventoryConfigSettings } from '@/hooks/settings/useModuleConfigSettings'
 import './StockByLocationPage.css'
 
 export default function StockByLocationPage() {
     const { data: balances = [], isLoading: loading } = useStockBalances()
     const { data: locations = [] } = useStockLocations()
+    const invConfig = useInventoryConfigSettings()
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedLocation, setSelectedLocation] = useState<string>('all')
 
@@ -84,7 +86,7 @@ export default function StockByLocationPage() {
                 <div className="locations-grid">
                     {Object.entries(groupedByLocation).map(([locationId, { location_name, location_code, items }]) => {
                         const totalValue = items.reduce((sum, item) => sum + item.stock_value, 0)
-                        const lowStockCount = items.filter(item => item.current_stock < 10).length
+                        const lowStockCount = items.filter(item => item.current_stock < invConfig.stockWarningThreshold).length
 
                         return (
                             <div key={locationId} className="location-card">
@@ -122,7 +124,7 @@ export default function StockByLocationPage() {
                                         </thead>
                                         <tbody>
                                             {items.map(item => (
-                                                <tr key={item.product_id} className={item.current_stock < 10 ? 'low-stock' : ''}>
+                                                <tr key={item.product_id} className={item.current_stock < invConfig.stockWarningThreshold ? 'low-stock' : ''}>
                                                     <td>
                                                         <div className="product-cell">
                                                             <span className="product-name">{item.product_name}</span>

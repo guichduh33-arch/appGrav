@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Clock, CheckCircle, ChefHat, AlertTriangle, Pause, Play, Smartphone, Wifi } from 'lucide-react'
 import { useOrderAutoRemove } from '@/hooks/kds/useOrderAutoRemove'
+import { useKDSConfigSettings } from '@/hooks/settings/useModuleConfigSettings'
 import { KDSCountdownBar } from './KDSCountdownBar'
 import './KDSOrderCard.css'
 
@@ -56,6 +57,7 @@ export default function KDSOrderCard({
     onOrderComplete,
 }: KDSOrderCardProps) {
     const [elapsedTime, setElapsedTime] = useState(0)
+    const kdsConfig = useKDSConfigSettings()
 
     // Calculate elapsed time with cleanup to prevent setState on unmounted component
     useEffect(() => {
@@ -86,8 +88,8 @@ export default function KDSOrderCard({
 
     // Get urgency level based on elapsed time
     const getUrgencyLevel = () => {
-        if (elapsedTime > 600) return 'critical' // > 10 min
-        if (elapsedTime > 300) return 'warning'  // > 5 min
+        if (elapsedTime > kdsConfig.urgencyCriticalSeconds) return 'critical'
+        if (elapsedTime > kdsConfig.urgencyWarningSeconds) return 'warning'
         return 'normal'
     }
 
@@ -130,7 +132,7 @@ export default function KDSOrderCard({
         orderId,
         allItemsReady: allItemsReady && overallStatus === 'ready',
         isWaiterStation,
-        autoRemoveDelay: 5000, // 5 seconds
+        autoRemoveDelay: kdsConfig.autoRemoveDelayMs,
         onComplete: handleAutoRemoveComplete,
     })
 
@@ -289,7 +291,7 @@ export default function KDSOrderCard({
             {isCountingDown && (
                 <KDSCountdownBar
                     timeRemaining={timeRemaining}
-                    totalTime={5}
+                    totalTime={kdsConfig.autoRemoveDelayMs / 1000}
                     onCancel={cancelAutoRemove}
                 />
             )}

@@ -37,13 +37,12 @@ import { printReceipt, type IOrderPrintData } from '@/services/print/printServic
 import { useDisplayBroadcast } from '@/hooks/pos';
 import { calculateTaxAmount } from '@/services/offline/offlineOrderService';
 import { createB2BPosOrder } from '@/services/b2b/b2bPosOrderService';
+import { usePOSConfigSettings } from '@/hooks/settings/useModuleConfigSettings';
 import './PaymentModal.css';
 
 interface PaymentModalProps {
   onClose: () => void;
 }
-
-const QUICK_AMOUNTS = [50000, 100000, 150000, 200000, 500000];
 
 // Payment method config
 const PAYMENT_METHODS: Array<{
@@ -107,6 +106,9 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
 
   // Display broadcast for customer display
   const { broadcastOrderComplete, broadcastClear } = useDisplayBroadcast();
+
+  // POS config settings
+  const posConfig = usePOSConfigSettings();
 
   // Local state
   const [showSuccess, setShowSuccess] = useState(false);
@@ -576,7 +578,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                             >
                               Exact ({formatPrice(remainingAmount)})
                             </button>
-                            {QUICK_AMOUNTS.filter((a) => a >= remainingAmount * 0.5).map(
+                            {posConfig.quickPaymentAmounts.filter((a) => a >= remainingAmount * 0.5).map(
                               (amount) => (
                                 <button
                                   key={amount}
