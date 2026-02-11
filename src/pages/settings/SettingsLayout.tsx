@@ -20,6 +20,12 @@ import {
   Wallet,
   Wifi,
   Tags,
+  Banknote,
+  PackageSearch,
+  Heart,
+  Building,
+  Monitor,
+  RefreshCw,
 } from 'lucide-react';
 import { useSettingsCategories, useInitializeSettings } from '../../hooks/settings';
 import './SettingsPage.css';
@@ -38,6 +44,14 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   backup: <Database size={18} />,
   appearance: <Palette size={18} />,
   advanced: <Settings2 size={18} />,
+  pos_config: <ShoppingCart size={18} />,
+  financial: <Banknote size={18} />,
+  inventory_config: <PackageSearch size={18} />,
+  loyalty: <Heart size={18} />,
+  b2b: <Building size={18} />,
+  kds_config: <ChefHat size={18} />,
+  display: <Monitor size={18} />,
+  sync_advanced: <RefreshCw size={18} />,
 };
 
 // Additional static tabs not in categories

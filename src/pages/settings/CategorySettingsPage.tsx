@@ -180,7 +180,7 @@ const CategorySettingsPage = () => {
                 value={formValues[setting.key]}
                 onChange={(value) => handleChange(setting.key, value)}
                 onReset={() => handleReset(setting.key)}
-                disabled={(setting.is_readonly ?? false) || (setting.is_system ?? false)}
+                disabled={setting.is_readonly ?? false}
               />
             ))}
           </div>

@@ -3,6 +3,23 @@
 
 import type { Database } from './database.generated'
 
+// Re-export module config types (Epic 10)
+export type {
+  IPOSConfigSettings,
+  IFinancialSettings,
+  IInventoryConfigSettings,
+  ILoyaltySettings,
+  ILoyaltyTierMap,
+  ILoyaltyColorMap,
+  IAgingBucket,
+  IB2BSettings,
+  IKDSConfigSettings,
+  IDisplaySettings,
+  ISyncAdvancedSettings,
+  ISecurityPinSettings,
+  IPrintingServerSettings,
+} from './settingsModuleConfig'
+
 // Re-export database row types with aliases
 export type SettingsCategory = Database['public']['Tables']['settings_categories']['Row']
 export type Setting = Database['public']['Tables']['settings']['Row']
@@ -313,6 +330,15 @@ export interface AllSettings {
   backup: BackupSettings
   appearance: AppearanceSettings
   modules: ModuleSettings
+  // Epic 10: Module config settings
+  pos_config: import('./settingsModuleConfig').IPOSConfigSettings
+  financial: import('./settingsModuleConfig').IFinancialSettings
+  inventory_config: import('./settingsModuleConfig').IInventoryConfigSettings
+  loyalty: import('./settingsModuleConfig').ILoyaltySettings
+  b2b: import('./settingsModuleConfig').IB2BSettings
+  kds_config: import('./settingsModuleConfig').IKDSConfigSettings
+  display: import('./settingsModuleConfig').IDisplaySettings
+  sync_advanced: import('./settingsModuleConfig').ISyncAdvancedSettings
 }
 
 // =====================================================

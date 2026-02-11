@@ -90,3 +90,27 @@ export {
   useSoundAssets,
   useSoundAssetsByCategory,
 } from './useSoundAssets'
+
+// Module config settings (Epic 10)
+export {
+  usePOSConfigSettings,
+  useFinancialSettings,
+  useInventoryConfigSettings,
+  useLoyaltySettings,
+  useB2BSettings,
+  useKDSConfigSettings,
+  useDisplaySettings,
+  useSyncAdvancedSettings,
+  useSecurityPinSettings,
+  usePrintingServerSettings,
+  POS_CONFIG_DEFAULTS,
+  FINANCIAL_DEFAULTS,
+  INVENTORY_CONFIG_DEFAULTS,
+  LOYALTY_DEFAULTS,
+  B2B_DEFAULTS,
+  KDS_CONFIG_DEFAULTS,
+  DISPLAY_DEFAULTS,
+  SYNC_ADVANCED_DEFAULTS,
+  SECURITY_PIN_DEFAULTS,
+  PRINTING_SERVER_DEFAULTS,
+} from './useModuleConfigSettings'

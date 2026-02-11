@@ -381,6 +381,15 @@ function App() {
                             <Route path="backup" element={<CategorySettingsPage />} />
                             <Route path="appearance" element={<CategorySettingsPage />} />
                             <Route path="advanced" element={<CategorySettingsPage />} />
+                            {/* Epic 10: Module config category pages */}
+                            <Route path="pos_config" element={<CategorySettingsPage />} />
+                            <Route path="financial" element={<CategorySettingsPage />} />
+                            <Route path="inventory_config" element={<CategorySettingsPage />} />
+                            <Route path="loyalty" element={<CategorySettingsPage />} />
+                            <Route path="b2b" element={<CategorySettingsPage />} />
+                            <Route path="kds_config" element={<CategorySettingsPage />} />
+                            <Route path="display" element={<CategorySettingsPage />} />
+                            <Route path="sync_advanced" element={<CategorySettingsPage />} />
                             {/* Specialized pages */}
                             <Route path="payments" element={<PaymentMethodsPage />} />
                             <Route path="hours" element={<BusinessHoursPage />} />

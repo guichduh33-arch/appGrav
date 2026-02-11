@@ -14,6 +14,7 @@ Last updated: 2026-02-12
 | Sprint 5 | Analytics & Reports (Epic 8 complete), French→English migration | **Complete** |
 | Phase 2 Sprint 3 | Offline Improvements - Priority sync, idempotency, conflict resolution | **Complete** |
 | Epic 9 | Accounting & Tax Compliance - Chart of accounts, journals, financial statements, VAT | **Complete** |
+| Epic 10 Phase 1 | Settings Expansion Foundation - Categories, settings rows, typed hooks | **Complete** |
 
 ## Epics Overview
 
@@ -26,6 +27,7 @@ Last updated: 2026-02-12
 - **Epic 7** (Multi-Device): Done - Customer display, mobile app (Capacitor), print server, LAN monitoring
 - **Epic 8** (Analytics): Done - All 10 stories (8.0-8.9) complete: report framework, 27 report tabs, period comparison, offline cache, audit trail, alerts dashboard
 - **Epic 9** (Accounting): Done - Chart of accounts (30 Indonesian SME accounts), auto-generated journals from sales/purchases, general ledger, trial balance, balance sheet, income statement, VAT (PPN 10%) management with DJP export, fiscal periods
+- **Epic 10** (Settings Expansion): Phase 1 Done - 8 new categories, 65 configurable settings, 10 typed hooks with defaults, is_system bug fix
 
 ## Security Improvements (Sprint 4)
 
@@ -51,7 +53,7 @@ Last updated: 2026-02-12
 
 ## Test Coverage
 
-- **92 test files**, approximately **1,630 tests**
+- **93 test files**, approximately **1,650 tests**
 - Key additions in Sprint 4: `cartStore.test.ts`, `checkoutIntegration.test.ts`, `promotionEngine.test.ts`, `authService.test.ts`
 - Coverage configuration: V8 provider, thresholds at 60/50/60/60 (statements/branches/functions/lines)
 - Run with: `npm run test:coverage`
@@ -163,6 +165,48 @@ Full double-entry accounting module, online-only (no offline sync).
 
 ### Permissions
 `accounting.view`, `accounting.manage`, `accounting.journal.create`, `accounting.journal.update`, `accounting.vat.manage`
+
+## Epic 10 Phase 1: Settings Expansion Foundation (2026-02-12)
+
+Transforms ~65 hardcoded operational parameters into configurable settings via the Settings UI.
+
+### Bug Fix
+- `CategorySettingsPage.tsx:183`: `is_system` no longer disables editing (only `is_readonly` does). `is_system` now only prevents deletion (correct semantics).
+
+### Database (1 migration)
+| Change | Detail |
+|--------|--------|
+| 8 new categories | `pos_config`, `financial`, `inventory_config`, `loyalty`, `b2b`, `kds_config`, `display`, `sync_advanced` |
+| 65 settings rows | Across 10 categories (8 new + 2 existing: `security`, `printing`) |
+| All `is_system: true` | Editable but not deletable, `value = default_value` on insert |
+
+### Settings Breakdown
+| Category | Count | Examples |
+|----------|-------|---------|
+| `pos_config` | 9 | Quick payment amounts, discount percentages, void/refund required roles |
+| `financial` | 4 | Max payment amount, currency rounding unit, reference required methods |
+| `inventory_config` | 13 | Stock thresholds, reorder lookback, production priority thresholds |
+| `loyalty` | 5 | Tier discounts/thresholds/colors, points per IDR |
+| `b2b` | 4 | Payment terms, aging buckets, overdue threshold |
+| `kds_config` | 5 | Urgency thresholds, poll interval, auto-remove delay |
+| `display` | 4 | Idle timeout, promo rotation, broadcast debounce |
+| `security` | 4 | PIN min/max length, max attempts, cooldown |
+| `sync_advanced` | 14 | Startup delay, retry backoff, cache TTL, LAN heartbeat/reconnect |
+| `printing` | 3 | Server URL, request/health check timeouts |
+
+### Frontend
+| Category | Files |
+|----------|-------|
+| Types | `settingsModuleConfig.ts` (10 interfaces), `settings.ts` updated |
+| Hooks (10) | `usePOSConfigSettings`, `useFinancialSettings`, `useInventoryConfigSettings`, `useLoyaltySettings`, `useB2BSettings`, `useKDSConfigSettings`, `useDisplaySettings`, `useSyncAdvancedSettings`, `useSecurityPinSettings`, `usePrintingServerSettings` |
+| Routes | 8 new `CategorySettingsPage` routes in `App.tsx` |
+| Navigation | 6 new Lucide icons in `SettingsLayout.tsx` (`Banknote`, `PackageSearch`, `Heart`, `Building`, `Monitor`, `RefreshCw`) |
+| Tests | 20 tests (2 per hook: defaults + stored values) |
+
+### Verification
+- 93 test files, 1,650 tests pass
+- TypeScript compiles cleanly
+- ESLint: 0 errors, 122 warnings (unchanged)
 
 ## Known Issues
 
