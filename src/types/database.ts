@@ -439,6 +439,14 @@ export interface ModifierOption {
 }
 
 // ============================================================================
+// ACCOUNTING (Epic 9)
+// ============================================================================
+
+// Accounting types are defined in src/types/accounting.ts
+// Re-export for convenience
+export type { IAccount, IJournalEntry, IJournalEntryLine, IFiscalPeriod } from './accounting'
+
+// ============================================================================
 // HELPER TYPES
 // ============================================================================
 

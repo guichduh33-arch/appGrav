@@ -106,6 +106,16 @@ const CustomerFormPage = lazy(() => import('./pages/customers/CustomerFormPage')
 const CustomerDetailPage = lazy(() => import('./pages/customers/CustomerDetailPage'))
 const CustomerCategoriesPage = lazy(() => import('./pages/customers/CustomerCategoriesPage'))
 
+// Accounting Module
+const AccountingLayout = lazy(() => import('./pages/accounting/AccountingLayout'))
+const ChartOfAccountsPage = lazy(() => import('./pages/accounting/ChartOfAccountsPage'))
+const JournalEntriesPage = lazy(() => import('./pages/accounting/JournalEntriesPage'))
+const GeneralLedgerPage = lazy(() => import('./pages/accounting/GeneralLedgerPage'))
+const TrialBalancePage = lazy(() => import('./pages/accounting/TrialBalancePage'))
+const BalanceSheetPage = lazy(() => import('./pages/accounting/BalanceSheetPage'))
+const IncomeStatementPage = lazy(() => import('./pages/accounting/IncomeStatementPage'))
+const VATManagementPage = lazy(() => import('./pages/accounting/VATManagementPage'))
+
 // Products Module
 const ProductsLayout = lazy(() => import('./pages/products/ProductsLayout'))
 const ProductsPage = lazy(() => import('./pages/products/ProductsPage'))
@@ -338,6 +348,18 @@ function App() {
                         <Route path="/products/:id" element={<ProductDetailPage />} />
                         <Route path="/products/:id/edit" element={<ProductFormPage />} />
                         <Route path="/products/:id/pricing" element={<ProductCategoryPricingPage />} />
+
+                        {/* Accounting Module Routes with Layout */}
+                        <Route path="/accounting" element={<AccountingLayout />}>
+                            <Route index element={<ChartOfAccountsPage />} />
+                            <Route path="chart-of-accounts" element={<ChartOfAccountsPage />} />
+                            <Route path="journal-entries" element={<JournalEntriesPage />} />
+                            <Route path="general-ledger" element={<GeneralLedgerPage />} />
+                            <Route path="trial-balance" element={<TrialBalancePage />} />
+                            <Route path="balance-sheet" element={<BalanceSheetPage />} />
+                            <Route path="income-statement" element={<IncomeStatementPage />} />
+                            <Route path="vat" element={<VATManagementPage />} />
+                        </Route>
 
                         <Route path="/reports" element={<ReportsPage />} />
                         <Route path="/users" element={<UsersPage />} />
