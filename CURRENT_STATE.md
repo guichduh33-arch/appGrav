@@ -1,6 +1,6 @@
 # Current State
 
-Last updated: 2026-02-11
+Last updated: 2026-02-12
 
 ## Sprint Status
 
@@ -13,6 +13,7 @@ Last updated: 2026-02-11
 | Sprint 4 | Security hardening, DB fixes, Report foundation (Epic 8 partial) | **Complete** |
 | Sprint 5 | Analytics & Reports (Epic 8 complete), French→English migration | **Complete** |
 | Phase 2 Sprint 3 | Offline Improvements - Priority sync, idempotency, conflict resolution | **Complete** |
+| Epic 9 | Accounting & Tax Compliance - Chart of accounts, journals, financial statements, VAT | **Complete** |
 
 ## Epics Overview
 
@@ -24,7 +25,7 @@ Last updated: 2026-02-11
 - **Epic 6** (Clients & Marketing): Done - Customer pricing, loyalty display, promotions engine, combos, B2B orders/payments
 - **Epic 7** (Multi-Device): Done - Customer display, mobile app (Capacitor), print server, LAN monitoring
 - **Epic 8** (Analytics): Done - All 10 stories (8.0-8.9) complete: report framework, 27 report tabs, period comparison, offline cache, audit trail, alerts dashboard
-- **Epic 9** (Accounting): Ready for dev - Chart of accounts, journals, general ledger, financial statements, VAT
+- **Epic 9** (Accounting): Done - Chart of accounts (30 Indonesian SME accounts), auto-generated journals from sales/purchases, general ledger, trial balance, balance sheet, income statement, VAT (PPN 10%) management with DJP export, fiscal periods
 
 ## Security Improvements (Sprint 4)
 
@@ -50,7 +51,7 @@ Last updated: 2026-02-11
 
 ## Test Coverage
 
-- **84 test files**, approximately **1,560 tests**
+- **92 test files**, approximately **1,630 tests**
 - Key additions in Sprint 4: `cartStore.test.ts`, `checkoutIntegration.test.ts`, `promotionEngine.test.ts`, `authService.test.ts`
 - Coverage configuration: V8 provider, thresholds at 60/50/60/60 (statements/branches/functions/lines)
 - Run with: `npm run test:coverage`
@@ -126,9 +127,46 @@ Monolithic `settingsStore.ts` (691 lines) split into 5 focused domain stores und
 - Backward-compatible facade preserves `useSettingsStore` for any indirect consumers
 - 61 settings-related tests pass, build compiles cleanly
 
+## Epic 9: Accounting & Tax Compliance (2026-02-12)
+
+Full double-entry accounting module, online-only (no offline sync).
+
+### Database (3 migrations)
+| Table | Purpose |
+|-------|---------|
+| `accounts` | Chart of accounts with hierarchy, 30 Indonesian SME seed accounts |
+| `journal_entries` | Journal header with balanced debit=credit constraint |
+| `journal_entry_lines` | Journal lines with exactly one of debit/credit > 0 |
+| `fiscal_periods` | Monthly fiscal periods with open/closed/locked status |
+
+### Auto-Generation Triggers
+- **Sales**: `orders.status = 'completed'` → Debit Cash/Bank, Credit Sales + VAT Collected
+- **Purchases**: `purchase_orders.status = 'received'` → Debit Purchases + VAT Input, Credit AP
+- **Voids**: `orders.status = 'voided'` → Reversal entry created automatically
+
+### Functions
+- `get_account_balance(account_id, end_date)` → DECIMAL (respects balance_type)
+- `calculate_vat_payable(year, month)` → TABLE(collected, deductible, payable)
+
+### Frontend (35 new files, ~3,600 lines)
+| Category | Files |
+|----------|-------|
+| Types | `accounting.ts` (enums, interfaces, constants) |
+| Hooks (9) | `useAccounts`, `useJournalEntries`, `useGeneralLedger`, `useTrialBalance`, `useBalanceSheet`, `useIncomeStatement`, `useVATManagement`, `useFiscalPeriods` |
+| Services (3) | `accountingService` (tree builder, formatIDR), `journalEntryValidation`, `vatService` (PPN calc, DJP export) |
+| Components (8) | `AccountModal`, `AccountTree`, `AccountPicker`, `JournalEntryForm`, `JournalLineTable`, `FinancialStatementTable`, `VATSummaryCard`, `FiscalPeriodModal` |
+| Pages (8) | `AccountingLayout`, `ChartOfAccounts`, `JournalEntries`, `GeneralLedger`, `TrialBalance`, `BalanceSheet`, `IncomeStatement`, `VATManagement` |
+| Tests (3) | 29 tests (accountingService, journalEntryValidation, vatService) |
+
+### Routes
+`/accounting/*` with 7 sub-routes, accessible via Calculator icon in sidebar Admin section.
+
+### Permissions
+`accounting.view`, `accounting.manage`, `accounting.journal.create`, `accounting.journal.update`, `accounting.vat.manage`
+
 ## Known Issues
 
 - `StockAlerts.test.tsx > StaleDataWarning > renders nothing when data is fresh` is flaky (timing issue in full suite, passes alone)
-- Epic 9 (Accounting) not yet started
+- `useLanClient.test.ts > should handle localStorage not available` is flaky (pre-existing)
 - ExpensesTab disabled (feature flag false, `expenses` table does not exist)
 - Pre-existing TS errors in `authService.ts` (unused `requestingUserId` vars) and `authStore.ts` (type mismatch)
