@@ -35,6 +35,10 @@ vi.mock('@/services/offline/offlinePaymentService', () => ({
   calculateChange: vi.fn((total, received) => Math.max(0, received - total)),
 }));
 
+vi.mock('@/services/offline/ordersCacheService', () => ({
+  updateOfflineOrderStatus: vi.fn(() => Promise.resolve()),
+}));
+
 vi.mock('@/services/offline/kitchenDispatchService', () => ({
   dispatchOrderToKitchen: vi.fn(() => Promise.resolve({ dispatched: [], queued: [] })),
 }));

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
-import { useSettingsStore } from '../../stores/settingsStore'
+import { useTaxStore } from '../../stores/settings'
 import { settingsKeys } from './settingsKeys'
 import type { TaxRate } from '../../types/settings'
 
@@ -27,7 +27,7 @@ export function useTaxRates() {
  */
 export function useCreateTaxRate() {
   const queryClient = useQueryClient()
-  const createTaxRate = useSettingsStore((state) => state.createTaxRate)
+  const createTaxRate = useTaxStore((state) => state.createTaxRate)
 
   return useMutation({
     mutationFn: async (taxRate: Omit<TaxRate, 'id' | 'created_at' | 'updated_at'>) => {
@@ -46,7 +46,7 @@ export function useCreateTaxRate() {
  */
 export function useUpdateTaxRate() {
   const queryClient = useQueryClient()
-  const updateTaxRate = useSettingsStore((state) => state.updateTaxRate)
+  const updateTaxRate = useTaxStore((state) => state.updateTaxRate)
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<TaxRate> }) => {
@@ -65,7 +65,7 @@ export function useUpdateTaxRate() {
  */
 export function useDeleteTaxRate() {
   const queryClient = useQueryClient()
-  const deleteTaxRate = useSettingsStore((state) => state.deleteTaxRate)
+  const deleteTaxRate = useTaxStore((state) => state.deleteTaxRate)
 
   return useMutation({
     mutationFn: async (id: string) => {

@@ -250,7 +250,7 @@ function findApplicablePromotions(
 function calculateDiscount(
   item: CartItem,
   promo: IOfflinePromotion,
-  _freeProductMap: Map<string, IOfflinePromotionFreeProduct[]>
+  freeProductMap: Map<string, IOfflinePromotionFreeProduct[]>
 ): IItemPromotionDiscount | null {
   switch (promo.promotion_type) {
     case 'percentage':
@@ -263,9 +263,7 @@ function calculateDiscount(
       return calculateBuyXGetYDiscount(item, promo)
 
     case 'free_product':
-      // free_product promotions add a free item - handled at cart level, not as item discount
-      // For now, we skip these (they would need separate cart-level logic to add items)
-      return null
+      return calculateFreeProductDiscount(item, promo, freeProductMap)
 
     default:
       return null
@@ -356,6 +354,42 @@ function calculateBuyXGetYDiscount(
     discountAmount,
     discountType: 'buy_x_get_y',
     description: `Buy ${buyQty} Get ${getQty} Free`,
+  }
+}
+
+/**
+ * Calculate free product discount
+ * If the cart item matches a free product in the promotion,
+ * discount = min(free_quantity, item.quantity) * (unitPrice + modifiersTotal)
+ */
+function calculateFreeProductDiscount(
+  item: CartItem,
+  promo: IOfflinePromotion,
+  freeProductMap: Map<string, IOfflinePromotionFreeProduct[]>
+): IItemPromotionDiscount | null {
+  const freeProducts = freeProductMap.get(promo.id)
+  if (!freeProducts || freeProducts.length === 0) return null
+
+  const productId = item.product?.id
+  if (!productId) return null
+
+  // Check if this cart item is one of the free products
+  const match = freeProducts.find(fp => fp.free_product_id === productId)
+  if (!match) return null
+
+  // Free quantity is capped at both promotion quantity and cart item quantity
+  const freeQty = Math.min(match.quantity, item.quantity)
+  const unitPrice = item.unitPrice + item.modifiersTotal
+  const discountAmount = Math.round(unitPrice * freeQty)
+
+  return {
+    itemId: item.id,
+    promotionId: promo.id,
+    promotionName: promo.name,
+    promotionCode: promo.code,
+    discountAmount,
+    discountType: 'free_product',
+    description: `Free ${item.product?.name ?? 'product'} (x${freeQty})`,
   }
 }
 

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
-import { useSettingsStore } from '../../stores/settingsStore'
+import { usePaymentMethodStore } from '../../stores/settings'
 import { settingsKeys } from './settingsKeys'
 import type { PaymentMethod } from '../../types/settings'
 
@@ -27,7 +27,7 @@ export function usePaymentMethods() {
  */
 export function useCreatePaymentMethod() {
   const queryClient = useQueryClient()
-  const createPaymentMethod = useSettingsStore((state) => state.createPaymentMethod)
+  const createPaymentMethod = usePaymentMethodStore((state) => state.createPaymentMethod)
 
   return useMutation({
     mutationFn: async (method: Omit<PaymentMethod, 'id' | 'created_at' | 'updated_at'>) => {
@@ -46,7 +46,7 @@ export function useCreatePaymentMethod() {
  */
 export function useUpdatePaymentMethod() {
   const queryClient = useQueryClient()
-  const updatePaymentMethod = useSettingsStore((state) => state.updatePaymentMethod)
+  const updatePaymentMethod = usePaymentMethodStore((state) => state.updatePaymentMethod)
 
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<PaymentMethod> }) => {
@@ -65,7 +65,7 @@ export function useUpdatePaymentMethod() {
  */
 export function useDeletePaymentMethod() {
   const queryClient = useQueryClient()
-  const deletePaymentMethod = useSettingsStore((state) => state.deletePaymentMethod)
+  const deletePaymentMethod = usePaymentMethodStore((state) => state.deletePaymentMethod)
 
   return useMutation({
     mutationFn: async (id: string) => {

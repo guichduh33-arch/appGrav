@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
-import { useSettingsStore } from '../../stores/settingsStore'
+import { useCoreSettingsStore } from '../../stores/settings'
 import { settingsKeys } from './settingsKeys'
 import type { SettingsCategory, Setting, SettingHistory } from '../../types/settings'
 
@@ -9,8 +9,8 @@ import type { SettingsCategory, Setting, SettingHistory } from '../../types/sett
  * Initialize settings - call once at app start
  */
 export function useInitializeSettings() {
-  const initialize = useSettingsStore((state) => state.initialize)
-  const isInitialized = useSettingsStore((state) => state.isInitialized)
+  const initialize = useCoreSettingsStore((state) => state.initialize)
+  const isInitialized = useCoreSettingsStore((state) => state.isInitialized)
 
   useEffect(() => {
     if (!isInitialized) {
@@ -68,7 +68,7 @@ export function useSettingsByCategory(categoryCode: string) {
  * Fetch single setting by key
  */
 export function useSetting(key: string) {
-  const storeValue = useSettingsStore((state) => state.getSetting(key))
+  const storeValue = useCoreSettingsStore((state) => state.getSetting(key))
 
   return useQuery({
     queryKey: settingsKeys.setting(key),
@@ -92,7 +92,7 @@ export function useSetting(key: string) {
  */
 export function useUpdateSetting() {
   const queryClient = useQueryClient()
-  const updateStoreSetting = useSettingsStore((state) => state.updateSetting)
+  const updateStoreSetting = useCoreSettingsStore((state) => state.updateSetting)
 
   return useMutation({
     mutationFn: async ({
@@ -120,7 +120,7 @@ export function useUpdateSetting() {
  */
 export function useResetSetting() {
   const queryClient = useQueryClient()
-  const resetStoreSetting = useSettingsStore((state) => state.resetSetting)
+  const resetStoreSetting = useCoreSettingsStore((state) => state.resetSetting)
 
   return useMutation({
     mutationFn: async (key: string) => {
@@ -167,7 +167,7 @@ export function useSettingsHistory(settingId?: string) {
  * Get a typed setting value with default fallback
  */
 export function useSettingValue<T>(key: string, defaultValue: T): T {
-  const storeValue = useSettingsStore((state) => state.getSetting<T>(key))
+  const storeValue = useCoreSettingsStore((state) => state.getSetting<T>(key))
   return storeValue ?? defaultValue
 }
 
@@ -175,26 +175,26 @@ export function useSettingValue<T>(key: string, defaultValue: T): T {
  * Get appearance settings from store (instant, no loading)
  */
 export function useAppearance() {
-  return useSettingsStore((state) => state.appearance)
+  return useCoreSettingsStore((state) => state.appearance)
 }
 
 /**
  * Get localization settings from store (instant, no loading)
  */
 export function useLocalization() {
-  return useSettingsStore((state) => state.localization)
+  return useCoreSettingsStore((state) => state.localization)
 }
 
 /**
  * Set appearance settings (immediate + async sync)
  */
 export function useSetAppearance() {
-  return useSettingsStore((state) => state.setAppearance)
+  return useCoreSettingsStore((state) => state.setAppearance)
 }
 
 /**
  * Set localization settings (immediate + async sync)
  */
 export function useSetLocalization() {
-  return useSettingsStore((state) => state.setLocalization)
+  return useCoreSettingsStore((state) => state.setLocalization)
 }

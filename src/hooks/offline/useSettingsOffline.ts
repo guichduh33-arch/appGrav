@@ -11,7 +11,10 @@
 
 import { useMemo, useCallback } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useSettingsStore } from '@/stores/settingsStore';
+import { useCoreSettingsStore } from '@/stores/settings';
+import { useTaxStore } from '@/stores/settings';
+import { usePaymentMethodStore } from '@/stores/settings';
+import { useBusinessHoursStore } from '@/stores/settings';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { db } from '@/lib/db';
 import type { ISyncMeta } from '@/types/offline';
@@ -138,7 +141,10 @@ function toBusinessHours(offline: IOfflineBusinessHours): BusinessHours {
  */
 export function useSettingsOffline() {
   const { isOnline } = useNetworkStatus();
-  const store = useSettingsStore();
+  const coreStore = useCoreSettingsStore();
+  const taxStore = useTaxStore();
+  const paymentMethodStore = usePaymentMethodStore();
+  const businessHoursStore = useBusinessHoursStore();
 
   // ===== Offline Settings Query =====
   // Note: useLiveQuery returns undefined while loading, null/[] on empty
@@ -227,7 +233,7 @@ export function useSettingsOffline() {
   const getSetting = useMemo(() => {
     return <T = unknown>(key: string): T | null => {
       if (isOnline) {
-        return store.getSetting<T>(key);
+        return coreStore.getSetting<T>(key);
       }
 
       const setting = offlineSettings?.find((s) => s.key === key);
@@ -235,77 +241,77 @@ export function useSettingsOffline() {
 
       return parseSettingValue<T>(setting.value);
     };
-  }, [isOnline, store, offlineSettings]);
+  }, [isOnline, coreStore, offlineSettings]);
 
   /**
    * Get all tax rates (converted to standard format)
    */
   const taxRates = useMemo((): TaxRate[] => {
     if (isOnline) {
-      return store.taxRates;
+      return taxStore.taxRates;
     }
     return (offlineTaxRates || []).map(toTaxRate);
-  }, [isOnline, store.taxRates, offlineTaxRates]);
+  }, [isOnline, taxStore.taxRates, offlineTaxRates]);
 
   /**
    * Get active tax rates
    */
   const activeTaxRates = useMemo((): TaxRate[] => {
     if (isOnline) {
-      return store.getActiveTaxRates();
+      return taxStore.getActiveTaxRates();
     }
     return taxRates.filter((t) => t.is_active);
-  }, [isOnline, store, taxRates]);
+  }, [isOnline, taxStore, taxRates]);
 
   /**
    * Get default tax rate
    */
   const defaultTaxRate = useMemo((): TaxRate | null => {
     if (isOnline) {
-      return store.getDefaultTaxRate();
+      return taxStore.getDefaultTaxRate();
     }
     return taxRates.find((t) => t.is_active && t.is_default) || null;
-  }, [isOnline, store, taxRates]);
+  }, [isOnline, taxStore, taxRates]);
 
   /**
    * Get all payment methods (converted to standard format)
    */
   const paymentMethods = useMemo((): PaymentMethod[] => {
     if (isOnline) {
-      return store.paymentMethods;
+      return paymentMethodStore.paymentMethods;
     }
     return (offlinePaymentMethods || []).map(toPaymentMethod);
-  }, [isOnline, store.paymentMethods, offlinePaymentMethods]);
+  }, [isOnline, paymentMethodStore.paymentMethods, offlinePaymentMethods]);
 
   /**
    * Get active payment methods
    */
   const activePaymentMethods = useMemo((): PaymentMethod[] => {
     if (isOnline) {
-      return store.getActivePaymentMethods();
+      return paymentMethodStore.getActivePaymentMethods();
     }
     return paymentMethods.filter((p) => p.is_active);
-  }, [isOnline, store, paymentMethods]);
+  }, [isOnline, paymentMethodStore, paymentMethods]);
 
   /**
    * Get default payment method
    */
   const defaultPaymentMethod = useMemo((): PaymentMethod | null => {
     if (isOnline) {
-      return store.getDefaultPaymentMethod();
+      return paymentMethodStore.getDefaultPaymentMethod();
     }
     return paymentMethods.find((p) => p.is_active && p.is_default) || null;
-  }, [isOnline, store, paymentMethods]);
+  }, [isOnline, paymentMethodStore, paymentMethods]);
 
   /**
    * Get all business hours (converted to standard format)
    */
   const businessHours = useMemo((): BusinessHours[] => {
     if (isOnline) {
-      return store.businessHours;
+      return businessHoursStore.businessHours;
     }
     return (offlineBusinessHours || []).map(toBusinessHours);
-  }, [isOnline, store.businessHours, offlineBusinessHours]);
+  }, [isOnline, businessHoursStore.businessHours, offlineBusinessHours]);
 
   /**
    * Get last sync timestamp for settings (primary entity)
@@ -357,8 +363,8 @@ export function useSettingsOffline() {
     getSyncMetaFor,
 
     // Loading states (for compatibility)
-    isLoading: store.isLoading,
-    isInitialized: store.isInitialized,
+    isLoading: coreStore.isLoading,
+    isInitialized: coreStore.isInitialized,
   };
 }
 

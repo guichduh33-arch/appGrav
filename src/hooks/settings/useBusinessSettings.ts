@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
-import { useSettingsStore } from '../../stores/settingsStore'
+import { usePrinterStore, useBusinessHoursStore } from '../../stores/settings'
 import { settingsKeys } from './settingsKeys'
 import type {
   BusinessHours,
@@ -30,7 +30,7 @@ export function useBusinessHours() {
 
 export function useUpdateBusinessHours() {
   const queryClient = useQueryClient()
-  const updateBusinessHours = useSettingsStore((state) => state.updateBusinessHours)
+  const updateBusinessHours = useBusinessHoursStore((state) => state.updateBusinessHours)
 
   return useMutation({
     mutationFn: async ({
@@ -71,7 +71,7 @@ export function usePrinters() {
 
 export function useCreatePrinter() {
   const queryClient = useQueryClient()
-  const createPrinter = useSettingsStore((state) => state.createPrinter)
+  const createPrinter = usePrinterStore((state) => state.createPrinter)
 
   return useMutation({
     mutationFn: async (printer: Omit<PrinterConfiguration, 'id' | 'created_at' | 'updated_at'>) => {
@@ -87,7 +87,7 @@ export function useCreatePrinter() {
 
 export function useUpdatePrinter() {
   const queryClient = useQueryClient()
-  const updatePrinter = useSettingsStore((state) => state.updatePrinter)
+  const updatePrinter = usePrinterStore((state) => state.updatePrinter)
 
   return useMutation({
     mutationFn: async ({
@@ -109,7 +109,7 @@ export function useUpdatePrinter() {
 
 export function useDeletePrinter() {
   const queryClient = useQueryClient()
-  const deletePrinter = useSettingsStore((state) => state.deletePrinter)
+  const deletePrinter = usePrinterStore((state) => state.deletePrinter)
 
   return useMutation({
     mutationFn: async (id: string) => {

@@ -21,8 +21,8 @@ vi.mock('@/hooks/useNetworkStatus', () => ({
   }),
 }));
 
-// Mock settingsStore
-const mockStore = {
+// Mock stores
+const mockCoreStore = {
   getSetting: vi.fn((key: string) => {
     const settings: Record<string, unknown> = {
       'appearance.theme': 'dark',
@@ -30,6 +30,11 @@ const mockStore = {
     };
     return settings[key] ?? null;
   }),
+  isLoading: false,
+  isInitialized: true,
+};
+
+const mockTaxStore = {
   taxRates: [
     {
       id: 'tax-online-1',
@@ -43,10 +48,13 @@ const mockStore = {
       code: null,
     },
   ],
-  getActiveTaxRates: vi.fn(() => mockStore.taxRates.filter((t) => t.is_active)),
+  getActiveTaxRates: vi.fn(() => mockTaxStore.taxRates.filter((t) => t.is_active)),
   getDefaultTaxRate: vi.fn(() =>
-    mockStore.taxRates.find((t) => t.is_active && t.is_default) ?? null
+    mockTaxStore.taxRates.find((t) => t.is_active && t.is_default) ?? null
   ),
+};
+
+const mockPaymentMethodStore = {
   paymentMethods: [
     {
       id: 'pm-online-1',
@@ -66,11 +74,14 @@ const mockStore = {
     },
   ],
   getActivePaymentMethods: vi.fn(() =>
-    mockStore.paymentMethods.filter((p) => p.is_active)
+    mockPaymentMethodStore.paymentMethods.filter((p) => p.is_active)
   ),
   getDefaultPaymentMethod: vi.fn(() =>
-    mockStore.paymentMethods.find((p) => p.is_active && p.is_default) ?? null
+    mockPaymentMethodStore.paymentMethods.find((p) => p.is_active && p.is_default) ?? null
   ),
+};
+
+const mockBusinessHoursStore = {
   businessHours: [
     {
       id: 'bh-online-1',
@@ -84,12 +95,13 @@ const mockStore = {
       updated_at: '2024-01-01T00:00:00Z',
     },
   ],
-  isLoading: false,
-  isInitialized: true,
 };
 
-vi.mock('@/stores/settingsStore', () => ({
-  useSettingsStore: () => mockStore,
+vi.mock('@/stores/settings', () => ({
+  useCoreSettingsStore: () => mockCoreStore,
+  useTaxStore: () => mockTaxStore,
+  usePaymentMethodStore: () => mockPaymentMethodStore,
+  useBusinessHoursStore: () => mockBusinessHoursStore,
 }));
 
 // Import after mocks are set up

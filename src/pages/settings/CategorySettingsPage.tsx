@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Save, RotateCcw, AlertCircle } from 'lucide-react';
 import { useSettingsByCategory, useUpdateSetting, useResetSetting } from '../../hooks/settings';
-import { useSettingsStore } from '../../stores/settingsStore';
+import { useCoreSettingsStore } from '../../stores/settings';
 import SettingField from '../../components/settings/SettingField';
 import { toast } from 'sonner';
 
@@ -17,7 +17,7 @@ const CategorySettingsPage = () => {
   const { data: settings, isLoading, error } = useSettingsByCategory(category);
   const updateSettingMutation = useUpdateSetting();
   const resetSettingMutation = useResetSetting();
-  const categories = useSettingsStore((state) => state.categories);
+  const categories = useCoreSettingsStore((state) => state.categories);
 
   // Local state for form values
   const [formValues, setFormValues] = useState<Record<string, unknown>>({});
