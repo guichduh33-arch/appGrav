@@ -2,15 +2,11 @@
  * Sync Engine Service
  * Story 2.5 - Sync Queue Management
  * Story 3.5 - Automatic Sync Engine
+ * Sprint 3 - Priority sorting, idempotency, conflict detection
  *
  * Manages automatic synchronization of offline transactions when internet returns.
- * Processes queue items in FIFO order with exponential backoff for retries.
- * Provides background automatic sync at configurable intervals.
- *
- * Architecture note: A V2 sync engine existed with improved patterns (dependency
- * ordering, ID remapping, processor-based dispatch) but was never integrated.
- * It was removed as dead code. See git history (commit before 2026-02-09) for
- * reference if refactoring this engine in the future.
+ * Processes queue items sorted by priority with idempotency protection.
+ * Detects conflicts and stores them for user resolution instead of failing silently.
  */
 
 import { supabase } from '@/lib/supabase';
@@ -25,6 +21,9 @@ import {
   ISyncQueueItem,
 } from './syncQueue';
 import { markOrderSynced } from './orderSync';
+import { sortByPriority } from './syncPriority';
+import { generateKey, wrapWithIdempotency } from './idempotencyService';
+import { detectConflict, storeConflict, getPendingConflictCount } from './syncConflictService';
 import { useSyncStore } from '../../stores/syncStore';
 import { useNetworkStore } from '../../stores/networkStore';
 
@@ -45,51 +44,25 @@ const engineState: ISyncEngineState = {
   itemsFailed: 0,
 };
 
-/**
- * Delay for starting sync after going online (per Story 2.5: 5 seconds)
- */
 const SYNC_START_DELAY = 5000;
-
-/**
- * Minimum delay between processing items
- */
 const ITEM_PROCESS_DELAY = 100;
-
-/**
- * Background sync interval in milliseconds (Story 3.5: every 30 seconds)
- */
 const BACKGROUND_SYNC_INTERVAL = 30000;
 
-/**
- * Interval ID for background sync timer
- */
 let backgroundSyncIntervalId: ReturnType<typeof setInterval> | null = null;
-
-/**
- * C-5: Timeout ID for delayed sync start
- */
 let startDelayTimeoutId: ReturnType<typeof setTimeout> | null = null;
-
-/**
- * Flag to track if auto-sync is enabled
- */
 let autoSyncEnabled = true;
 
-/**
- * Get current sync engine state
- */
 export function getSyncEngineState(): ISyncEngineState {
   return { ...engineState };
 }
 
-/**
- * Sync a single order to Supabase
- */
+// =====================================================
+// Entity Sync Functions
+// =====================================================
+
 async function syncOrder(item: ISyncQueueItem): Promise<void> {
   const orderPayload = item.payload as Record<string, unknown>;
 
-  // Transform offline order to Supabase format
-  // Using explicit type assertion for dynamic sync payload
   const orderData = {
     order_number: orderPayload.order_number as string,
     order_type: orderPayload.order_type as 'dine_in' | 'takeaway' | 'delivery' | 'b2b',
@@ -106,7 +79,6 @@ async function syncOrder(item: ISyncQueueItem): Promise<void> {
     pos_terminal_id: orderPayload.pos_terminal_id as string | null,
   };
 
-  // Insert order
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert(orderData as never)
@@ -117,7 +89,6 @@ async function syncOrder(item: ISyncQueueItem): Promise<void> {
     throw new Error(`Failed to sync order: ${orderError.message}`);
   }
 
-  // Insert order items
   const items = orderPayload.items as Array<Record<string, unknown>>;
   if (items && items.length > 0) {
     const orderItems = items.map((orderItem) => ({
@@ -136,11 +107,9 @@ async function syncOrder(item: ISyncQueueItem): Promise<void> {
 
     if (itemsError) {
       console.error('[SyncEngine] Error inserting order items:', itemsError);
-      // Don't throw - order was created successfully
     }
   }
 
-  // Mark the offline order as synced
   const offlineOrderId = orderPayload.id as string;
   if (offlineOrderId) {
     await markOrderSynced(offlineOrderId, order.id);
@@ -149,22 +118,12 @@ async function syncOrder(item: ISyncQueueItem): Promise<void> {
   logger.debug(`[SyncEngine] Order ${orderPayload.order_number} synced as ${order.id}`);
 }
 
-/**
- * Sync a single payment to Supabase
- */
 async function syncPayment(_item: ISyncQueueItem): Promise<void> {
-  // Payment sync logic - would depend on payment structure
-  // For now, payments are part of orders
   logger.debug('[SyncEngine] Payment sync not yet implemented (part of order sync)');
 }
 
-/**
- * Sync a single stock movement to Supabase
- */
 async function syncStockMovement(item: ISyncQueueItem): Promise<void> {
   const movementPayload = item.payload as Record<string, unknown>;
-
-  // stock_movements requires movement_id, stock_before, stock_after
   const movementId = `OFF-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
   type MovementType = 'transfer' | 'purchase' | 'production_in' | 'production_out' | 'sale_pos' | 'sale_b2b' | 'adjustment_in' | 'adjustment_out' | 'waste';
@@ -187,9 +146,6 @@ async function syncStockMovement(item: ISyncQueueItem): Promise<void> {
   logger.debug('[SyncEngine] Stock movement synced');
 }
 
-/**
- * Sync a single product to Supabase
- */
 async function syncProduct(item: ISyncQueueItem): Promise<void> {
   const { error } = await supabase.from('products').upsert(item.payload as never);
   if (error) {
@@ -198,9 +154,6 @@ async function syncProduct(item: ISyncQueueItem): Promise<void> {
   logger.debug(`[SyncEngine] Product ${item.entityId || 'unknown'} synced`);
 }
 
-/**
- * Sync a single category to Supabase
- */
 async function syncCategory(item: ISyncQueueItem): Promise<void> {
   const { error } = await supabase.from('categories').upsert(item.payload as never);
   if (error) {
@@ -209,9 +162,6 @@ async function syncCategory(item: ISyncQueueItem): Promise<void> {
   logger.debug(`[SyncEngine] Category ${item.entityId || 'unknown'} synced`);
 }
 
-/**
- * Sync a single product category price to Supabase
- */
 async function syncProductCategoryPrice(item: ISyncQueueItem): Promise<void> {
   const { error } = await supabase.from('product_category_prices').upsert(item.payload as never);
   if (error) {
@@ -220,34 +170,56 @@ async function syncProductCategoryPrice(item: ISyncQueueItem): Promise<void> {
   logger.debug(`[SyncEngine] Product category price ${item.entityId || 'unknown'} synced`);
 }
 
+// =====================================================
+// Core sync dispatch
+// =====================================================
+
+async function dispatchSync(item: ISyncQueueItem): Promise<void> {
+  switch (item.type) {
+    case 'order':
+      await syncOrder(item);
+      break;
+    case 'payment':
+      await syncPayment(item);
+      break;
+    case 'stock_movement':
+      await syncStockMovement(item);
+      break;
+    case 'product':
+      await syncProduct(item);
+      break;
+    case 'category':
+      await syncCategory(item);
+      break;
+    case 'product_category_price':
+      await syncProductCategoryPrice(item);
+      break;
+    default:
+      console.warn(`[SyncEngine] Unknown item type: ${item.type}`);
+  }
+}
+
 /**
- * Process a single sync queue item
+ * Process a single sync queue item with idempotency + conflict detection
  */
 async function processItem(item: ISyncQueueItem): Promise<boolean> {
   try {
     await markSyncing(item.id);
 
-    switch (item.type) {
-      case 'order':
-        await syncOrder(item);
-        break;
-      case 'payment':
-        await syncPayment(item);
-        break;
-      case 'stock_movement':
-        await syncStockMovement(item);
-        break;
-      case 'product':
-        await syncProduct(item);
-        break;
-      case 'category':
-        await syncCategory(item);
-        break;
-      case 'product_category_price':
-        await syncProductCategoryPrice(item);
-        break;
-      default:
-        console.warn(`[SyncEngine] Unknown item type: ${item.type}`);
+    // Generate idempotency key from item metadata
+    const idempotencyKey =
+      item.idempotency_key ??
+      generateKey(item.type, item.entityId ?? item.id, item.action ?? 'create');
+
+    const { skipped } = await wrapWithIdempotency(
+      idempotencyKey,
+      item.type,
+      item.entityId ?? item.id,
+      () => dispatchSync(item)
+    );
+
+    if (skipped) {
+      logger.debug(`[SyncEngine] Item ${item.id} skipped (idempotent duplicate)`);
     }
 
     await markSynced(item.id);
@@ -255,15 +227,27 @@ async function processItem(item: ISyncQueueItem): Promise<boolean> {
     return true;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+    // Try to detect and store conflict instead of just failing
+    const conflict = detectConflict(item, error);
+    if (conflict) {
+      await storeConflict(conflict);
+      logger.debug(`[SyncEngine] Conflict detected for ${item.type}:${item.entityId}`);
+    }
+
     await markFailed(item.id, errorMessage);
     engineState.itemsFailed++;
     return false;
   }
 }
 
+// =====================================================
+// Engine Run
+// =====================================================
+
 /**
- * Run the sync engine
- * Processes all pending items in the queue
+ * Run the sync engine.
+ * Items are sorted by priority before processing.
  */
 export async function runSyncEngine(): Promise<{
   synced: number;
@@ -278,7 +262,6 @@ export async function runSyncEngine(): Promise<{
   engineState.itemsSynced = 0;
   engineState.itemsFailed = 0;
 
-  // Update sync store status (Story 3.5)
   const syncStore = useSyncStore.getState();
   syncStore.setIsSyncing(true);
   syncStore.setSyncStatus('syncing');
@@ -286,39 +269,39 @@ export async function runSyncEngine(): Promise<{
   logger.debug('[SyncEngine] Starting sync...');
 
   try {
-    // Get pending items
+    // Get pending + retryable items and sort by priority
     const pendingItems = await getSyncQueueItems('pending');
-    logger.debug(`[SyncEngine] Found ${pendingItems.length} pending items`);
-
-    // Process pending items
-    for (const item of pendingItems) {
-      await processItem(item);
-      // Small delay between items to avoid overwhelming the server
-      await new Promise((resolve) => setTimeout(resolve, ITEM_PROCESS_DELAY));
-    }
-
-    // Get retryable failed items
     const retryableItems = await getRetryableItems();
-    logger.debug(`[SyncEngine] Found ${retryableItems.length} retryable items`);
+    const allItems = sortByPriority([...pendingItems, ...retryableItems]);
 
-    // Process retryable items
-    for (const item of retryableItems) {
-      await processItem(item);
+    const totalItems = allItems.length;
+    logger.debug(`[SyncEngine] Processing ${totalItems} items (priority-sorted)`);
+
+    // Update progress
+    syncStore.setSyncProgress({ current: 0, total: totalItems });
+
+    for (let i = 0; i < allItems.length; i++) {
+      await processItem(allItems[i]);
+      syncStore.setSyncProgress({ current: i + 1, total: totalItems });
       await new Promise((resolve) => setTimeout(resolve, ITEM_PROCESS_DELAY));
     }
 
     // Cleanup synced items
     await cleanupSyncedItems();
 
+    // Update conflict count in store
+    const conflictCount = await getPendingConflictCount();
+    syncStore.setConflictCount(conflictCount);
+
     engineState.lastSyncAt = new Date();
 
-    // Update sync store with results (Story 3.5)
     const finalStatus = engineState.itemsFailed > 0 ? 'error' : 'complete';
     syncStore.setSyncStatus(finalStatus);
     syncStore.setLastSyncAt(engineState.lastSyncAt);
+    syncStore.setSyncProgress(null);
 
     logger.debug(
-      `[SyncEngine] Sync complete: ${engineState.itemsSynced} synced, ${engineState.itemsFailed} failed`
+      `[SyncEngine] Sync complete: ${engineState.itemsSynced} synced, ${engineState.itemsFailed} failed, ${conflictCount} conflicts`
     );
 
     return {
@@ -328,6 +311,7 @@ export async function runSyncEngine(): Promise<{
   } catch (error) {
     console.error('[SyncEngine] Error during sync:', error);
     syncStore.setSyncStatus('error');
+    syncStore.setSyncProgress(null);
     throw error;
   } finally {
     engineState.isRunning = false;
@@ -335,12 +319,11 @@ export async function runSyncEngine(): Promise<{
   }
 }
 
-/**
- * Start sync engine with delay (called when going online)
- * Per Story 2.5: Starts automatically within 5 seconds
- */
+// =====================================================
+// Lifecycle
+// =====================================================
+
 export function startSyncWithDelay(): void {
-  // C-5: Clear any existing delay timeout before starting new one
   if (startDelayTimeoutId) {
     clearTimeout(startDelayTimeoutId);
   }
@@ -354,32 +337,19 @@ export function startSyncWithDelay(): void {
   }, SYNC_START_DELAY);
 }
 
-/**
- * Stop the sync engine
- *
- * C-5: Properly cleans up all timers before stopping
- */
 export function stopSyncEngine(): void {
-  // C-5: Clear delay timeout if pending
   if (startDelayTimeoutId) {
     clearTimeout(startDelayTimeoutId);
     startDelayTimeoutId = null;
   }
-
-  // Stop background sync
   stopBackgroundSync();
-
   engineState.isRunning = false;
   logger.debug('[SyncEngine] Stopped');
 }
 
-/**
- * Enable or disable automatic sync (Story 3.5)
- */
 export function setAutoSyncEnabled(enabled: boolean): void {
   autoSyncEnabled = enabled;
   logger.debug(`[SyncEngine] Auto-sync ${enabled ? 'enabled' : 'disabled'}`);
-
   if (enabled) {
     startBackgroundSync();
   } else {
@@ -387,17 +357,10 @@ export function setAutoSyncEnabled(enabled: boolean): void {
   }
 }
 
-/**
- * Check if auto-sync is enabled
- */
 export function isAutoSyncEnabled(): boolean {
   return autoSyncEnabled;
 }
 
-/**
- * Start background sync interval (Story 3.5)
- * Runs sync automatically every BACKGROUND_SYNC_INTERVAL ms when online
- */
 export function startBackgroundSync(): void {
   if (backgroundSyncIntervalId) {
     logger.debug('[SyncEngine] Background sync already running');
@@ -407,39 +370,17 @@ export function startBackgroundSync(): void {
   logger.debug(`[SyncEngine] Starting background sync (every ${BACKGROUND_SYNC_INTERVAL / 1000}s)`);
 
   backgroundSyncIntervalId = setInterval(async () => {
-    // Only sync if online and auto-sync is enabled
     const isOnline = useNetworkStore.getState().isOnline;
+    if (!isOnline || !autoSyncEnabled || engineState.isRunning) return;
 
-    if (!isOnline) {
-      logger.debug('[SyncEngine] Skipping background sync - offline');
-      return;
-    }
-
-    if (!autoSyncEnabled) {
-      logger.debug('[SyncEngine] Skipping background sync - disabled');
-      return;
-    }
-
-    if (engineState.isRunning) {
-      logger.debug('[SyncEngine] Skipping background sync - already running');
-      return;
-    }
-
-    // Check if there are pending items before running
     const pendingItems = await getSyncQueueItems('pending');
-    if (pendingItems.length === 0) {
-      // No pending items, no need to sync
-      return;
-    }
+    if (pendingItems.length === 0) return;
 
     logger.debug(`[SyncEngine] Background sync triggered - ${pendingItems.length} pending items`);
     await runSyncEngine();
   }, BACKGROUND_SYNC_INTERVAL);
 }
 
-/**
- * Stop background sync interval
- */
 export function stopBackgroundSync(): void {
   if (backgroundSyncIntervalId) {
     clearInterval(backgroundSyncIntervalId);
@@ -448,20 +389,12 @@ export function stopBackgroundSync(): void {
   }
 }
 
-/**
- * Initialize the sync engine (Story 3.5)
- * Should be called once when the app starts
- */
 export function initializeSyncEngine(): void {
   logger.debug('[SyncEngine] Initializing...');
-
-  // Start background sync
   startBackgroundSync();
 
-  // Subscribe to network changes
   useNetworkStore.subscribe((state, prevState) => {
     if (state.isOnline && !prevState.isOnline) {
-      // Coming back online
       logger.debug('[SyncEngine] Network restored - scheduling sync');
       startSyncWithDelay();
     }

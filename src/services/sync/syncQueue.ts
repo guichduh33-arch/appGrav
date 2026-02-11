@@ -14,8 +14,10 @@ import type {
   ILegacySyncQueueItem,
   TLegacySyncQueueType,
   TLegacySyncQueueStatus,
+  TSyncPriority,
 } from '@/types/offline';
 import { OFFLINE_CONSTANTS } from '../../constants/offline';
+import { assignPriority } from './syncPriority';
 
 // Re-export types for backward compatibility
 export type ISyncQueueItem = ILegacySyncQueueItem;
@@ -46,13 +48,15 @@ export function getBackoffDelay(attempts: number): number {
  * Add an item to the sync queue
  * @param type - Type of transaction (order, payment, stock_movement)
  * @param payload - Transaction data to sync
+ * @param options - Optional priority and idempotency key
  * @returns The ID of the created queue item
  * @throws Error if queue is full (NFR-R4: 500 max)
  */
 export async function addToSyncQueue(
   type: TSyncQueueType,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  payload: Record<string, any>
+  payload: Record<string, any>,
+  options?: { priority?: TSyncPriority; idempotency_key?: string }
 ): Promise<string> {
   const queueCount = await db.offline_legacy_sync_queue.count();
 
@@ -73,11 +77,13 @@ export async function addToSyncQueue(
     status: 'pending',
     createdAt: new Date().toISOString(),
     attempts: 0,
-    lastError: null
+    lastError: null,
+    priority: options?.priority ?? assignPriority(type),
+    idempotency_key: options?.idempotency_key,
   };
 
   await db.offline_legacy_sync_queue.add(item);
-  logger.debug(`[SyncQueue] Added ${type} item: ${item.id}`);
+  logger.debug(`[SyncQueue] Added ${type} item: ${item.id} (priority: ${item.priority})`);
   return item.id;
 }
 

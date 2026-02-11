@@ -142,10 +142,11 @@ async function addToSyncQueue(order: IOfflineOrder): Promise<void> {
     createdAt: new Date().toISOString(),
     attempts: 0,
     lastError: null,
+    priority: 'high',
   };
 
   await db.offline_legacy_sync_queue.add(syncItem);
-  logger.debug(`[OrderSync] Added order ${order.order_number} to sync queue`);
+  logger.debug(`[OrderSync] Added order ${order.order_number} to sync queue (priority: high)`);
 }
 
 /**

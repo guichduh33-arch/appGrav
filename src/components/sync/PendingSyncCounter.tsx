@@ -11,11 +11,12 @@
  */
 
 import { useState } from 'react';
-import { Cloud, CloudOff, Loader2 } from 'lucide-react';
+import { Cloud, CloudOff, Loader2, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useSyncQueue } from '@/hooks/useSyncQueue';
+import { useSyncStore } from '@/stores/syncStore';
 import { PendingSyncPanel } from './PendingSyncPanel';
 
 interface PendingSyncCounterProps {
@@ -25,15 +26,17 @@ interface PendingSyncCounterProps {
 export function PendingSyncCounter({ className }: PendingSyncCounterProps) {
   const [panelOpen, setPanelOpen] = useState(false);
   const { pendingTotal, counts, isSyncing } = useSyncQueue();
+  const conflictCount = useSyncStore((s) => s.conflictCount);
 
-  // Don't render if no pending items (AC6)
-  if (pendingTotal === 0 && !isSyncing) {
+  // Don't render if no pending items and no conflicts (AC6)
+  if (pendingTotal === 0 && !isSyncing && conflictCount === 0) {
     return null;
   }
 
   // Determine badge variant based on state
+  const hasConflicts = conflictCount > 0;
   const hasFailed = counts.failed > 0;
-  const badgeVariant = hasFailed ? 'destructive' : 'secondary';
+  const badgeVariant = hasFailed || hasConflicts ? 'destructive' : 'secondary';
 
   return (
     <>
@@ -49,6 +52,8 @@ export function PendingSyncCounter({ className }: PendingSyncCounterProps) {
       >
         {isSyncing ? (
           <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+        ) : hasConflicts ? (
+          <AlertTriangle className="h-4 w-4 text-orange-500" />
         ) : hasFailed ? (
           <CloudOff className="h-4 w-4 text-orange-500" />
         ) : (
@@ -59,7 +64,7 @@ export function PendingSyncCounter({ className }: PendingSyncCounterProps) {
           variant={badgeVariant}
           className={cn(
             'min-w-[1.25rem] h-5 px-1.5 text-xs font-medium',
-            hasFailed && 'bg-orange-500 hover:bg-orange-500/80',
+            (hasFailed || hasConflicts) && 'bg-orange-500 hover:bg-orange-500/80',
             !hasFailed && 'bg-blue-100 text-blue-700 hover:bg-blue-100'
           )}
         >

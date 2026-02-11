@@ -38,6 +38,33 @@ export type TSyncAction = 'create' | 'update' | 'delete';
 export type TSyncStatus = 'pending' | 'syncing' | 'failed' | 'completed';
 
 /**
+ * Sync priority levels for queue ordering
+ * critical > high > normal > low
+ */
+export type TSyncPriority = 'critical' | 'high' | 'normal' | 'low';
+
+/**
+ * Resolution strategy for sync conflicts
+ */
+export type TSyncConflictResolution = 'keep_local' | 'keep_server' | 'merge' | 'skip';
+
+/**
+ * Sync conflict record stored in IndexedDB
+ */
+export interface ISyncConflict {
+  id: string;
+  queueItemId: string;
+  entityType: string;
+  entityId: string;
+  localData: Record<string, unknown>;
+  serverData: Record<string, unknown>;
+  conflictType: string;
+  detectedAt: string;
+  resolvedAt?: string;
+  resolution?: TSyncConflictResolution;
+}
+
+/**
  * Sync queue item structure
  *
  * Stored in Dexie table: offline_sync_queue
@@ -148,6 +175,12 @@ export interface ILegacySyncQueueItem {
 
   /** ISO 8601 timestamp of the last sync attempt (for backoff calculation) */
   lastAttemptAt?: string | null;
+
+  /** Sync priority level (critical syncs before low) */
+  priority?: TSyncPriority;
+
+  /** Idempotency key to prevent duplicate syncs on retry */
+  idempotency_key?: string;
 }
 
 // =====================================================

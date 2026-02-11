@@ -100,6 +100,34 @@ describe('syncQueue', () => {
       expect(id2).not.toBe(id3);
       expect(id1).not.toBe(id3);
     });
+
+    it('should auto-assign priority based on type', async () => {
+      const orderId = await addToSyncQueue('order', {});
+      const paymentId = await addToSyncQueue('payment', {});
+      const productId = await addToSyncQueue('product', {});
+
+      const orderItem = await db.offline_legacy_sync_queue.get(orderId);
+      const paymentItem = await db.offline_legacy_sync_queue.get(paymentId);
+      const productItem = await db.offline_legacy_sync_queue.get(productId);
+
+      expect(orderItem?.priority).toBe('high');
+      expect(paymentItem?.priority).toBe('critical');
+      expect(productItem?.priority).toBe('normal');
+    });
+
+    it('should accept explicit priority option', async () => {
+      const id = await addToSyncQueue('product', {}, { priority: 'critical' });
+      const item = await db.offline_legacy_sync_queue.get(id);
+      expect(item?.priority).toBe('critical');
+    });
+
+    it('should accept idempotency key option', async () => {
+      const id = await addToSyncQueue('order', {}, {
+        idempotency_key: 'order:123:create',
+      });
+      const item = await db.offline_legacy_sync_queue.get(id);
+      expect(item?.idempotency_key).toBe('order:123:create');
+    });
   });
 
   describe('getSyncQueueItems', () => {

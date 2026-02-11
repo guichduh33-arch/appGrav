@@ -5,7 +5,8 @@
  * Allows retry and delete actions on failed items.
  */
 
-import { RefreshCw, Loader2, Cloud, CheckCircle } from 'lucide-react';
+import { useState } from 'react';
+import { RefreshCw, Loader2, Cloud, CheckCircle, AlertTriangle } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -14,11 +15,14 @@ import {
   SheetDescription,
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { usePendingSyncItems } from '@/hooks/sync/usePendingSyncItems';
+import { useSyncConflicts } from '@/hooks/sync/useSyncConflicts';
 import { PendingSyncItem } from './PendingSyncItem';
-import type { TSyncEntity } from '@/types/offline';
+import { SyncConflictDialog } from './SyncConflictDialog';
+import type { TSyncEntity, ISyncConflict } from '@/types/offline';
 
 interface PendingSyncPanelProps {
   open: boolean;
@@ -64,6 +68,9 @@ export function PendingSyncPanel({ open, onOpenChange }: PendingSyncPanelProps) 
     retry,
     remove,
   } = usePendingSyncItems();
+
+  const { conflicts, resolveConflict } = useSyncConflicts();
+  const [selectedConflict, setSelectedConflict] = useState<ISyncConflict | null>(null);
 
   // Filter entities that have items
   const entitiesWithItems = ENTITY_ORDER.filter(
@@ -111,7 +118,41 @@ export function PendingSyncPanel({ open, onOpenChange }: PendingSyncPanelProps) 
         <Separator />
 
         <ScrollArea className="h-[calc(100vh-180px)] mt-4">
-          {totalCount === 0 ? (
+          {/* Conflicts section */}
+          {conflicts.length > 0 && (
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold text-orange-600 mb-2 px-1 flex items-center gap-1.5">
+                <AlertTriangle className="h-4 w-4" />
+                Conflicts ({conflicts.length})
+              </h3>
+              <div className="space-y-1">
+                {conflicts.map((conflict) => (
+                  <div
+                    key={conflict.id}
+                    className="flex items-center justify-between px-3 py-2 rounded-md border border-orange-200 bg-orange-50"
+                  >
+                    <div className="text-xs">
+                      <span className="font-medium">{conflict.entityType}</span>
+                      <Badge variant="outline" className="ml-2 text-[10px]">
+                        {conflict.conflictType}
+                      </Badge>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => setSelectedConflict(conflict)}
+                    >
+                      Resolve
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <Separator className="mt-4" />
+            </div>
+          )}
+
+          {totalCount === 0 && conflicts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <CheckCircle className="h-12 w-12 text-green-500 mb-4" />
               <p className="text-muted-foreground">No items pending</p>
@@ -145,6 +186,15 @@ export function PendingSyncPanel({ open, onOpenChange }: PendingSyncPanelProps) 
           )}
         </ScrollArea>
       </SheetContent>
+
+      <SyncConflictDialog
+        conflict={selectedConflict}
+        open={!!selectedConflict}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) setSelectedConflict(null);
+        }}
+        onResolve={resolveConflict}
+      />
     </Sheet>
   );
 }

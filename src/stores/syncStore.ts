@@ -1,6 +1,7 @@
 /**
  * Sync Store
  * Story 2.5 - Sync Queue Management
+ * Sprint 3 - Added conflictCount and syncProgress
  *
  * Zustand store for managing sync state across the application.
  */
@@ -9,6 +10,11 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type TSyncStatus = 'idle' | 'syncing' | 'error' | 'complete';
+
+interface ISyncProgress {
+  current: number;
+  total: number;
+}
 
 interface ISyncState {
   /** Current sync status */
@@ -19,6 +25,10 @@ interface ISyncState {
   pendingCount: number;
   /** Number of failed items */
   failedCount: number;
+  /** Number of unresolved sync conflicts */
+  conflictCount: number;
+  /** Sync progress (current/total items) */
+  syncProgress: ISyncProgress | null;
   /** Last error message */
   lastError: string | null;
   /** Is sync currently running */
@@ -29,6 +39,8 @@ interface ISyncState {
   setLastSyncAt: (date: Date | null) => void;
   setPendingCount: (count: number) => void;
   setFailedCount: (count: number) => void;
+  setConflictCount: (count: number) => void;
+  setSyncProgress: (progress: ISyncProgress | null) => void;
   setLastError: (error: string | null) => void;
   setIsSyncing: (syncing: boolean) => void;
   startSync: () => void;
@@ -44,6 +56,8 @@ export const useSyncStore = create<ISyncState>()(
       lastSyncAt: null,
       pendingCount: 0,
       failedCount: 0,
+      conflictCount: 0,
+      syncProgress: null,
       lastError: null,
       isSyncing: false,
 
@@ -54,6 +68,10 @@ export const useSyncStore = create<ISyncState>()(
       setPendingCount: (count) => set({ pendingCount: count }),
 
       setFailedCount: (count) => set({ failedCount: count }),
+
+      setConflictCount: (count) => set({ conflictCount: count }),
+
+      setSyncProgress: (progress) => set({ syncProgress: progress }),
 
       setLastError: (error) => set({ lastError: error }),
 
@@ -88,6 +106,8 @@ export const useSyncStore = create<ISyncState>()(
           lastSyncAt: null,
           pendingCount: 0,
           failedCount: 0,
+          conflictCount: 0,
+          syncProgress: null,
           lastError: null,
           isSyncing: false,
         }),
@@ -98,6 +118,7 @@ export const useSyncStore = create<ISyncState>()(
         lastSyncAt: state.lastSyncAt,
         pendingCount: state.pendingCount,
         failedCount: state.failedCount,
+        conflictCount: state.conflictCount,
       }),
     }
   )
