@@ -15,11 +15,13 @@ AppGrav is an ERP/POS system for "The Breakery," a French bakery in Lombok, Indo
 ```bash
 npm run dev              # Start development server (port 3000)
 npm run build            # TypeScript check + Vite build
-npm run lint             # ESLint check
+npm run lint             # ESLint check (--max-warnings 150)
+npm run preview          # Preview production build
 npx vitest run           # Run all tests
 npx vitest run src/path/to/test.test.ts  # Run single test
 npx vitest               # Tests in watch mode
 npm run test:claude      # Test Claude API integration
+npm run test:smoke       # POS smoke tests
 ```
 
 **Path Alias**: Use `@/` to import from `src/`
@@ -28,7 +30,7 @@ npm run test:claude      # Test Claude API integration
 
 ### Tech Stack
 - **Frontend**: React 18 + TypeScript + Vite
-- **State**: Zustand (12 stores) + @tanstack/react-query
+- **State**: Zustand (11 stores) + @tanstack/react-query
 - **Styling**: Tailwind CSS + shadcn/ui + Lucide React icons
 - **Backend**: Supabase (PostgreSQL + Auth + Realtime + Edge Functions)
 - **Offline**: Dexie (IndexedDB) + vite-plugin-pwa
@@ -38,53 +40,74 @@ npm run test:claude      # Test Claude API integration
 ### Key Directory Structure
 ```
 src/
-├── components/       # By feature
+├── components/       # By feature (13 directories)
 │   ├── auth/        # Authentication components
 │   ├── inventory/   # Stock management UI
 │   ├── kds/         # Kitchen Display System
+│   ├── lan/         # LAN device management
 │   ├── mobile/      # Mobile-specific components
+│   ├── orders/      # Order management UI
 │   ├── pos/         # Point of Sale UI (Cart, ProductGrid, etc.)
 │   ├── products/    # Product management
+│   ├── purchasing/  # Purchase orders UI
 │   ├── reports/     # Analytics & reports
 │   ├── settings/    # Configuration UI
 │   ├── sync/        # Offline/sync indicators
 │   └── ui/          # Shared UI components (shadcn/ui)
 ├── pages/           # Route-based pages (95+ pages)
 ├── stores/          # Zustand stores (see State Management)
-├── hooks/           # Custom hooks by module
-│   ├── products/    # useProducts, useProductSearch, useCategories, useProductModifiers...
-│   ├── inventory/   # useInventoryItems, useStockMovements, useStockAdjustment, useProductRecipe...
+├── hooks/           # Custom hooks by module (~108 hooks)
+│   ├── customers/   # useCustomers, useCustomerCategories
+│   ├── inventory/   # useInventoryItems, useStockMovements, useStockAdjustment, useProductRecipe
+│   ├── kds/         # Kitchen display hooks
+│   ├── lan/         # LAN device hooks
 │   ├── offline/     # useNetworkStatus, useOfflineAuth, useOfflinePermissions
+│   ├── pos/         # POS-specific hooks
+│   ├── pricing/     # Pricing logic hooks
+│   ├── products/    # useProducts, useProductSearch, useCategories, useProductModifiers
+│   ├── promotions/  # Promotion engine hooks
+│   ├── purchasing/  # Purchase order hooks
 │   ├── reports/     # useDateRange, useReportFilters, useReportPermissions
 │   ├── settings/    # useSettingsCore, useBusinessSettings, useTaxSettings, usePaymentSettings
 │   ├── shift/       # Shift management hooks
-│   └── ...          # useOrders, useShift, usePermissions, useSyncQueue, useSyncReport, useTerminal, useOfflineOrder, usePWAInstall
-├── services/        # Business logic & external APIs
-│   ├── offline/     # offlineAuthService, rateLimitService
-│   ├── sync/        # syncEngine, syncQueue, orderSync, productSync, customerSync, offlineDb, offlinePeriod, syncDeviceService
-│   ├── payment/     # paymentService (split payment, validation, change calculation)
-│   ├── financial/   # voidService, refundService, financialOperationService, auditService
-│   ├── print/       # printService (receipt, kitchen, barista tickets, cash drawer)
-│   ├── inventory/   # Stock management
-│   ├── products/    # Product import/export
+│   ├── sync/        # Sync status hooks
+│   └── ...          # useOrders, usePermissions, useSyncQueue, useTerminal, usePWAInstall
+├── services/        # Business logic & external APIs (~71 services)
 │   ├── b2b/         # B2B credit system
-│   ├── lan/         # LAN device discovery (lanClient, lanHub, lanProtocol)
 │   ├── display/     # Customer display broadcast
-│   └── ...          # ClaudeService, anthropicService, promotionService, ReportingService
+│   ├── financial/   # voidService, refundService, auditService
+│   ├── inventory/   # Stock management
+│   ├── kds/         # Kitchen display logic
+│   ├── lan/         # LAN device discovery (lanClient, lanHub, lanProtocol)
+│   ├── offline/     # offlineAuthService, rateLimitService
+│   ├── payment/     # paymentService (split payment, validation)
+│   ├── pos/         # POS business logic, promotionEngine
+│   ├── print/       # printService (receipt, kitchen, barista tickets)
+│   ├── products/    # Product import/export
+│   ├── reports/     # ReportingService
+│   ├── storage/     # File storage service
+│   ├── sync/        # syncEngine, syncQueue, orderSync, productSync
+│   └── ...          # ClaudeService, anthropicService
 
 ├── types/           # TypeScript definitions
+│   ├── auth.ts      # Auth types
+│   ├── cart.ts      # Cart types
 │   ├── database.ts  # Full Supabase schema
 │   ├── database.generated.ts  # Auto-generated Supabase types
+│   ├── errors.ts    # Error types
 │   ├── offline.ts   # Offline types (sync queue, cached data)
-│   └── auth.ts      # Auth types
+│   ├── offline/     # Detailed offline type modules
+│   ├── payment.ts   # Payment types
+│   ├── reporting.ts # Report types
+│   └── settings.ts  # Settings types
 ├── lib/
 │   ├── supabase.ts  # Supabase client
 │   └── db.ts        # Dexie IndexedDB client
 └── locales/         # [SUSPENDED] Translation files exist but i18n is disabled
 
 supabase/
-├── migrations/      # SQL migrations (113)
-└── functions/       # Edge Functions (Deno)
+├── migrations/      # SQL migrations (59, consolidated in Sprint 4)
+└── functions/       # Edge Functions (Deno, 13 functions)
 ```
 
 ### State Management (Zustand)
@@ -96,6 +119,7 @@ supabase/
 | **orderStore** | Order lifecycle management |
 | **settingsStore** | Application preferences |
 | **networkStore** | Online/offline connectivity state |
+| **paymentStore** | Payment state, split payments |
 | **syncStore** | Sync queue status, pending items count |
 | **displayStore** | Customer display content |
 | **mobileStore** | Mobile UI state |
@@ -227,77 +251,23 @@ Used with `usePermissions` hook and `PermissionGuard` component:
 - **Reports**: `reports.sales`, `reports.inventory`, `reports.financial`
 - **Admin**: `users.view`, `users.create`, `users.roles`, `settings.view`, `settings.update`
 
-## Key Routes
+## Key Routes (~103 pages)
 
-### Main Application
-- `/pos` - Main POS (fullscreen, touch-optimized)
-- `/kds` - Kitchen Display System station selector
-- `/kds/:station` - KDS by station (barista/kitchen/display)
-- `/display/customers` - Customer-facing display
-- `/orders` - Order history
-- `/production` - Production management
-
-### Products & Inventory
-- `/products` - Products management
-- `/products/new` - Create new product
-- `/products/:id` - Edit product
-- `/products/combos` - Combo deals
-- `/products/combos/new` - Create combo
-- `/products/promotions` - Promotions (time-based rules)
-- `/products/promotions/new` - Create promotion
-- `/products/category-pricing` - Category-based pricing
-- `/inventory` - Stock management (tabs: general, stock, recipe, modifiers, units, prices, costing, variants)
-- `/inventory/movements` - Stock movements history
-- `/inventory/transfers` - Internal transfers
-- `/inventory/transfers/new` - Create transfer
-- `/inventory/opname` - Stock opname list
-- `/inventory/opname/new` - New stock count
-- `/inventory/incoming` - Incoming stock
-- `/inventory/production` - Stock production
-- `/inventory/wasted` - Waste tracking
-- `/inventory/by-location` - Stock by location
-
-### Customers & B2B
-- `/customers` - Customer management with loyalty
-- `/customers/new` - Create customer
-- `/customers/:id` - Customer detail
-- `/customers/categories` - Customer categories
-- `/b2b` - B2B wholesale module
-- `/b2b/orders` - B2B orders
-- `/b2b/orders/new` - Create B2B order
-- `/b2b/orders/:id` - B2B order detail
-- `/b2b/payments` - B2B payments
-
-### Purchasing & Reports
-- `/purchasing/purchase-orders` - Purchase orders
-- `/purchasing/purchase-orders/new` - Create PO
-- `/purchasing/purchase-orders/:id` - PO detail
-- `/purchasing/suppliers` - Supplier management
-- `/reports` - Analytics dashboard (20+ report tabs)
-- `/profile` - User profile
-
-### Settings & Admin
-- `/settings` - General settings
-- `/settings/company` - Company info (name, NPWP, logo, address)
-- `/settings/printing` - Printer configuration (receipt, kitchen, barista)
-- `/settings/notifications` - Email/SMTP notification settings
-- `/settings/sync-status` - Sync queue status and management
-- `/settings/history` - Settings change history
-- `/settings/audit` - Audit log viewer with filters and CSV export
-- `/settings/business-hours` - Business hours
-- `/settings/categories` - Category settings
-- `/settings/payment-methods` - Payment methods
-- `/settings/tax` - Tax settings
-- `/settings/roles` - Role management
-- `/users` - User management
-- `/users/permissions` - Permissions management
-
-### Mobile (Capacitor)
-- `/mobile/login` - Mobile login
-- `/mobile/home` - Mobile home
-- `/mobile/catalog` - Product catalog
-- `/mobile/cart` - Shopping cart
-- `/mobile/orders` - Order history
+| Module | Base Route | Description |
+|--------|-----------|-------------|
+| **POS** | `/pos` | Main POS (fullscreen, touch-optimized) |
+| **KDS** | `/kds`, `/kds/:station` | Kitchen Display System (barista/kitchen/display) |
+| **Display** | `/display/customers` | Customer-facing display |
+| **Orders** | `/orders` | Order history |
+| **Products** | `/products/*` | CRUD, combos (`/combos`), promotions (`/promotions`), category-pricing |
+| **Inventory** | `/inventory/*` | Stock management, movements, transfers, opname, incoming, production, waste |
+| **Customers** | `/customers/*` | Customer CRUD, categories, loyalty |
+| **B2B** | `/b2b/*` | B2B orders, payments |
+| **Purchasing** | `/purchasing/*` | Purchase orders, suppliers |
+| **Reports** | `/reports` | Analytics dashboard (20+ report tabs) |
+| **Settings** | `/settings/*` | Company, printing, notifications, sync, audit, tax, roles, payment methods |
+| **Users** | `/users/*` | User management, permissions |
+| **Mobile** | `/mobile/*` | Login, home, catalog, cart, orders (Capacitor) |
 
 ## Environment Variables
 
@@ -349,33 +319,10 @@ The print server is a separate Node.js/Express application running on the POS PC
 
 ## Payment & Financial Services
 
-### Payment Service (`src/services/payment/paymentService.ts`)
-
-Unified payment processing with split payment support:
-
-| Function | Purpose |
-|----------|---------|
-| `validatePayment()` | Validate single payment (amount, method, cash received) |
-| `validateSplitPayments()` | Validate multiple payments total matches order |
-| `calculateChange()` | Calculate change rounded to 100 IDR |
-| `processPayment()` | Process single payment (online/offline) |
-| `processSplitPayment()` | Process multiple payments for one order |
-| `createSplitPaymentState()` | Initialize split payment state machine |
-
-### Financial Operations (`src/services/financial/`)
-
-Void and refund operations with audit trail:
-
-| Service | Purpose |
-|---------|---------|
-| `voidService.ts` | Cancel orders, queue for offline sync, conflict resolution |
-| `refundService.ts` | Process full/partial refunds, multiple payment methods |
-| `financialOperationService.ts` | Validation, conflict detection (`shouldRejectForConflict`) |
-| `auditService.ts` | Log critical operations (severity='critical') |
-
-**Conflict Resolution**: Offline voids/refunds check `order.updated_at < operation.created_at`. If server is newer, operation is rejected and user notified.
-
-**PIN Required**: All void/refund operations require manager PIN verification.
+- **Payment**: `src/services/payment/paymentService.ts` - Single & split payments, validation, change calculation (rounded to 100 IDR)
+- **Void/Refund**: `src/services/financial/` - `voidService`, `refundService`, `financialOperationService`, `auditService`
+- **Conflict Resolution**: Offline voids/refunds compare `order.updated_at < operation.created_at` - rejects if server is newer
+- **PIN Required**: All void/refund operations require manager PIN verification
 
 ## Mobile (Capacitor)
 
@@ -422,10 +369,12 @@ Key test files:
 
 ## Project Statistics
 
-- **Components**: 56 React components across 10 feature directories
-- **Pages**: 95+ route-based pages
-- **Hooks**: 49 custom hooks
-- **Services**: 40+ business logic services
-- **Stores**: 12 Zustand stores
-- **Migrations**: 113 SQL migrations
-- **Codebase**: ~84,500 lines of TypeScript/React
+- **Components**: ~104 React components across 13 feature directories
+- **Pages**: 103 route-based pages
+- **Hooks**: ~108 custom hooks across 14 subdirectories
+- **Services**: ~71 business logic services across 15 subdirectories
+- **Stores**: 11 Zustand stores
+- **Migrations**: 59 SQL migrations (consolidated in Sprint 4)
+- **Edge Functions**: 13 Deno functions
+- **Test files**: 87 test files
+- **Codebase**: ~114,000 lines of TypeScript/React
