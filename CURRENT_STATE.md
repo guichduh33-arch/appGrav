@@ -12,6 +12,7 @@ Last updated: 2026-02-11
 | Sprint 3 | Multi-Device (Epic 7) - Customer Display, Mobile, Print Server, LAN Hub | **Complete** |
 | Sprint 4 | Security hardening, DB fixes, Report foundation (Epic 8 partial) | **Complete** |
 | Sprint 5 | Analytics & Reports (Epic 8 complete), French→English migration | **Complete** |
+| Phase 2 Sprint 3 | Offline Improvements - Priority sync, idempotency, conflict resolution | **Complete** |
 
 ## Epics Overview
 
@@ -67,6 +68,42 @@ Last updated: 2026-02-11
 - **Story 8.8**: Offline cache - Dexie offline_reports_cache table, useOfflineReports hook, OfflineReportBanner in ReportsPage
 - **Story 8.9**: Audit & alerts - AuditTab (pagination, filters, expandable rows) + AlertsDashboardTab (KPI counts, resolve, anomaly detection)
 - **French→English migration**: All 27 report tabs + useDateRange + 4 comparison components migrated from French to English
+
+## Phase 2 Sprint 3: Offline Improvements (2026-02-11)
+
+Priority-based sync, idempotency protection, and conflict resolution UI for the offline sync engine.
+
+### New Services
+| Service | Lines | Purpose |
+|---------|-------|---------|
+| `syncPriority.ts` | 90 | Maps entity types to priority levels (critical/high/normal/low), sorts queue |
+| `idempotencyService.ts` | 95 | Generates deterministic keys, checks/registers in Supabase `idempotency_keys` table |
+| `syncConflictService.ts` | 120 | Detects conflicts from errors, stores in IndexedDB, applies resolution strategies |
+
+### Key Changes
+- **syncEngine.ts**: Refactored to sort items by priority before processing, wrap with idempotency, detect+store conflicts instead of silent failures
+- **syncQueue.ts**: `addToSyncQueue()` auto-assigns priority based on entity type, accepts optional `idempotency_key`
+- **syncStore.ts**: Added `conflictCount` and `syncProgress` state for UI feedback
+- **Dexie v19**: Added `priority` index on legacy sync queue, new `offline_sync_conflicts` table
+- **Supabase migration**: `idempotency_keys` table with RLS and expiration index
+
+### UI Components
+- `SyncConflictDialog`: Modal with side-by-side diff, Keep Local / Keep Server / Skip actions
+- `SyncConflictDiff`: Color-coded field comparison (local vs server data)
+- `PendingSyncPanel`: Now shows conflicts section with resolve buttons
+- `PendingSyncCounter`: Orange alert icon when unresolved conflicts exist
+
+### Priority Mapping
+| Priority | Entity Types |
+|----------|-------------|
+| Critical | void, refund, payment, session_close |
+| High | order, order_update |
+| Normal | product, stock_movement, category, customer |
+| Low | audit_log, settings |
+
+### Tests
+- 40 new tests across 4 new test files + 3 added to existing `syncQueue.test.ts`
+- All 242 sync-related tests pass, build compiles cleanly
 
 ## Architecture Improvements
 
