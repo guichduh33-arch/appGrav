@@ -15,6 +15,7 @@ Last updated: 2026-02-12
 | Phase 2 Sprint 3 | Offline Improvements - Priority sync, idempotency, conflict resolution | **Complete** |
 | Epic 9 | Accounting & Tax Compliance - Chart of accounts, journals, financial statements, VAT | **Complete** |
 | Epic 10 Phase 1 | Settings Expansion Foundation - Categories, settings rows, typed hooks | **Complete** |
+| Epic 10 Phase 2 | Custom Settings UI Pages - 9 specialized pages with rich editors | **Complete** |
 
 ## Epics Overview
 
@@ -27,7 +28,7 @@ Last updated: 2026-02-12
 - **Epic 7** (Multi-Device): Done - Customer display, mobile app (Capacitor), print server, LAN monitoring
 - **Epic 8** (Analytics): Done - All 10 stories (8.0-8.9) complete: report framework, 27 report tabs, period comparison, offline cache, audit trail, alerts dashboard
 - **Epic 9** (Accounting): Done - Chart of accounts (30 Indonesian SME accounts), auto-generated journals from sales/purchases, general ledger, trial balance, balance sheet, income statement, VAT (PPN 10%) management with DJP export, fiscal periods
-- **Epic 10** (Settings Expansion): Phase 1 Done - 8 new categories, 65 configurable settings, 10 typed hooks with defaults, is_system bug fix
+- **Epic 10** (Settings Expansion): Phase 1+2 Done - 8 new categories, 65 configurable settings, 10 typed hooks, 9 custom UI pages with rich editors
 
 ## Security Improvements (Sprint 4)
 
@@ -207,6 +208,32 @@ Transforms ~65 hardcoded operational parameters into configurable settings via t
 - 93 test files, 1,650 tests pass
 - TypeScript compiles cleanly
 - ESLint: 0 errors, 122 warnings (unchanged)
+
+## Epic 10 Phase 2: Custom Settings UI Pages (2026-02-12)
+
+Replaces generic `CategorySettingsPage` with 9 specialized pages featuring rich editors.
+
+### New Files (10 files, ~2,170 lines)
+| File | Story | Lines | Features |
+|------|-------|-------|----------|
+| `ArrayAmountEditor.tsx` | Shared | 119 | Reusable add/remove/reorder list editor for IDR amounts and percentages |
+| `POSConfigSettingsPage.tsx` | 10.3 | 173 | Quick payment amounts, shift presets, discount percentages, role multi-select |
+| `FinancialSettingsPage.tsx` | 10.4 | 183 | Max payment (IDR), rounding unit select, reference required methods |
+| `InventoryConfigSettingsPage.tsx` | 10.5 | 173 | Stock alert thresholds, analysis periods, supply parameters, query limits |
+| `LoyaltySettingsPage.tsx` | 10.6 | 226 | Editable tier table, color inputs with badge preview, points conversion |
+| `B2BSettingsPage.tsx` | 10.7 | 261 | Payment terms select, aging bucket editor with gap/overlap validation |
+| `KDSConfigSettingsPage.tsx` | 10.8 | ~200 | Urgency thresholds, live KDS card preview (normal/warning/critical colors) |
+| `DisplaySettingsPage.tsx` | 10.9 | ~200 | Customer display settings, print server config + test connection button |
+| `SecurityPinSettingsPage.tsx` | 10.10 | 184 | PIN policy (min/max length, attempts, cooldown) with coherence validation |
+| `SyncAdvancedSettingsPage.tsx` | 10.11 | ~250 | Warning banner, 3 presets (Stable/Unstable/Battery), 5 config sections |
+
+### Route Changes
+- `App.tsx`: 9 lazy imports added, 8 routes updated from generic `CategorySettingsPage` to custom pages, `security` route added
+
+### Verification
+- 0 new TypeScript errors (only pre-existing casing/mockProducts issues)
+- 20 settings hooks tests pass
+- All routes configured and functional
 
 ## Known Issues
 
