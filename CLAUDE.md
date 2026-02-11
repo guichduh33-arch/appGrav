@@ -358,14 +358,28 @@ Key test files:
 
 ## Documentation
 
-- `DEVELOPMENT_INSTRUCTIONS.md` - Detailed patterns and workflow (French)
-- `CURRENT_STATE.md` - Current project state
-- `DATABASE_SCHEMA.md` - Database schema reference
-- `docs/COMBOS_AND_PROMOTIONS.md` - Combos & promotions spec
+### Root Level
+- `CURRENT_STATE.md` - Sprint progress, epic status, known issues
+- `DATABASE_SCHEMA.md` - Database tables, views, functions, RLS patterns
+
+### Feature Specs (`docs/`)
+- `docs/index.md` - Full documentation index
+- `docs/COMBOS_AND_PROMOTIONS.md` - Combos & promotions overview
 - `docs/COMBO_CHOICE_GROUPS.md` - Choice groups with price adjustments
-- `docs/COMBO_POS_INTEGRATION.md` - POS integration
-- `docs/STOCK_MOVEMENTS_MODULE.md` - Stock module spec
+- `docs/COMBO_POS_INTEGRATION.md` - POS integration for combos
+- `docs/STOCK_MOVEMENTS_MODULE.md` - Stock movements specification
+- `docs/PAYMENT_SYSTEM.md` - Payment system (split payments)
+- `docs/FINANCIAL_OPERATIONS.md` - Void/refund with audit trail
+- `docs/VARIANTS_POS_INTEGRATION.md` - Product variants in POS
+
+### Architecture & Planning
+- `docs/architecture-main.md` - Main system architecture
+- `docs/adr/ADR-001-payment-system-refactor.md` - Payment ADR
+- `docs/audit/` - Strategic audit and improvement roadmap
 - `_bmad-output/` - Planning artifacts (architecture, epics, PRD)
+
+### Archive
+- `docs/_archive/` - Obsolete docs preserved for reference (12 files)
 
 ## Project Statistics
 
