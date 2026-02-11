@@ -84,6 +84,17 @@ const NotificationSettingsPage = lazy(() => import('./pages/settings/Notificatio
 const LanMonitoringPage = lazy(() => import('./pages/settings/LanMonitoringPage'))
 const CategoriesPage = lazy(() => import('./pages/settings/CategoriesPage'))
 
+// Epic 10 Phase 2: Custom settings pages
+const POSConfigSettingsPage = lazy(() => import('./pages/settings/POSConfigSettingsPage'))
+const FinancialSettingsPage = lazy(() => import('./pages/settings/FinancialSettingsPage'))
+const InventoryConfigSettingsPage = lazy(() => import('./pages/settings/InventoryConfigSettingsPage'))
+const LoyaltySettingsPage = lazy(() => import('./pages/settings/LoyaltySettingsPage'))
+const B2BSettingsPage = lazy(() => import('./pages/settings/B2BSettingsPage'))
+const KDSConfigSettingsPage = lazy(() => import('./pages/settings/KDSConfigSettingsPage'))
+const DisplaySettingsPage = lazy(() => import('./pages/settings/DisplaySettingsPage'))
+const SyncAdvancedSettingsPage = lazy(() => import('./pages/settings/SyncAdvancedSettingsPage'))
+const SecurityPinSettingsPage = lazy(() => import('./pages/settings/SecurityPinSettingsPage'))
+
 // Profile
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
 
@@ -376,20 +387,20 @@ function App() {
                             <Route path="printing" element={<PrintingSettingsPage />} />
                             <Route path="notifications" element={<NotificationSettingsPage />} />
                             <Route path="localization" element={<CategorySettingsPage />} />
-                            <Route path="security" element={<CategorySettingsPage />} />
                             <Route path="integrations" element={<CategorySettingsPage />} />
                             <Route path="backup" element={<CategorySettingsPage />} />
                             <Route path="appearance" element={<CategorySettingsPage />} />
                             <Route path="advanced" element={<CategorySettingsPage />} />
-                            {/* Epic 10: Module config category pages */}
-                            <Route path="pos_config" element={<CategorySettingsPage />} />
-                            <Route path="financial" element={<CategorySettingsPage />} />
-                            <Route path="inventory_config" element={<CategorySettingsPage />} />
-                            <Route path="loyalty" element={<CategorySettingsPage />} />
-                            <Route path="b2b" element={<CategorySettingsPage />} />
-                            <Route path="kds_config" element={<CategorySettingsPage />} />
-                            <Route path="display" element={<CategorySettingsPage />} />
-                            <Route path="sync_advanced" element={<CategorySettingsPage />} />
+                            {/* Epic 10 Phase 2: Custom settings pages */}
+                            <Route path="pos_config" element={<POSConfigSettingsPage />} />
+                            <Route path="financial" element={<FinancialSettingsPage />} />
+                            <Route path="inventory_config" element={<InventoryConfigSettingsPage />} />
+                            <Route path="loyalty" element={<LoyaltySettingsPage />} />
+                            <Route path="b2b" element={<B2BSettingsPage />} />
+                            <Route path="kds_config" element={<KDSConfigSettingsPage />} />
+                            <Route path="display" element={<DisplaySettingsPage />} />
+                            <Route path="sync_advanced" element={<SyncAdvancedSettingsPage />} />
+                            <Route path="security" element={<SecurityPinSettingsPage />} />
                             {/* Specialized pages */}
                             <Route path="payments" element={<PaymentMethodsPage />} />
                             <Route path="hours" element={<BusinessHoursPage />} />
