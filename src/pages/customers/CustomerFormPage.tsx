@@ -4,19 +4,15 @@ import {
     ArrowLeft, Save, User, Building2, Phone, Mail, MapPin,
     QrCode, Calendar, Star, Crown, Tag, Percent, Trash2
 } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
-import { toast } from 'sonner'
+import {
+    useCustomerCategories,
+    useCustomerById,
+    useCreateCustomer,
+    useUpdateCustomer,
+    useDeleteCustomer,
+    type ICustomerCategory,
+} from '@/hooks/customers'
 import './CustomerFormPage.css'
-
-interface CustomerCategory {
-    id: string
-    name: string
-    slug: string
-    color: string
-    price_modifier_type: string
-    discount_percentage: number | null
-    description: string | null
-}
 
 interface CustomerFormData {
     name: string
@@ -40,9 +36,14 @@ export default function CustomerFormPage() {
     const { id } = useParams()
     const isEditing = Boolean(id)
 
-    const [loading, setLoading] = useState(false)
-    const [saving, setSaving] = useState(false)
-    const [categories, setCategories] = useState<CustomerCategory[]>([])
+    const { data: categories = [] } = useCustomerCategories(true)
+    const { data: customer, isLoading: loading } = useCustomerById(id)
+    const createCustomer = useCreateCustomer()
+    const updateCustomer = useUpdateCustomer()
+    const deleteCustomer = useDeleteCustomer()
+
+    const saving = createCustomer.isPending || updateCustomer.isPending
+
     const [customerQR, setCustomerQR] = useState<string | null>(null)
     const [membershipNumber, setMembershipNumber] = useState<string | null>(null)
 
@@ -62,71 +63,40 @@ export default function CustomerFormPage() {
         credit_limit: 0
     })
 
+    // Populate form when customer data loads (edit mode)
     useEffect(() => {
-        fetchCategories()
-        if (id) {
-            fetchCustomer(id)
+        if (customer) {
+            // Cast to access fields not declared on ICustomerWithCategory
+            const raw = customer as unknown as Record<string, unknown>
+            setFormData({
+                name: customer.name || '',
+                company_name: customer.company_name || '',
+                phone: customer.phone || '',
+                email: customer.email || '',
+                address: customer.address || '',
+                customer_type: customer.customer_type || 'retail',
+                category_id: customer.category_id || '',
+                date_of_birth: (raw.date_of_birth as string) || '',
+                notes: (raw.notes as string) || '',
+                is_active: customer.is_active ?? true,
+                tax_id: (raw.tax_id as string) || '',
+                payment_terms: (raw.payment_terms as string) || 'cod',
+                credit_limit: (raw.credit_limit as number) || 0
+            })
+            setCustomerQR((raw.loyalty_qr_code as string) || null)
+            setMembershipNumber(customer.membership_number)
         }
-    }, [id])
+    }, [customer])
 
-    const fetchCategories = async () => {
-        const { data } = await supabase
-            .from('customer_categories')
-            .select('*')
-            .eq('is_active', true)
-            .order('name')
-        if (data) {
-            setCategories(data as CustomerCategory[])
-            // Set default category if creating new customer
-            if (!id && data.length > 0) {
-                const typedData = data as CustomerCategory[]
-                const standardCat = typedData.find(c => c.slug === 'standard')
-                if (standardCat) {
-                    setFormData(prev => ({ ...prev, category_id: standardCat.id }))
-                }
+    // Auto-select default category for new customers
+    useEffect(() => {
+        if (!id && categories.length > 0) {
+            const standardCat = categories.find((c: ICustomerCategory) => c.slug === 'standard')
+            if (standardCat) {
+                setFormData(prev => ({ ...prev, category_id: standardCat.id }))
             }
         }
-    }
-
-    const fetchCustomer = async (customerId: string) => {
-        setLoading(true)
-        try {
-            const { data, error } = await supabase
-                .from('customers')
-                .select('*')
-                .eq('id', customerId)
-                .single()
-
-            if (error) throw error
-
-            if (data) {
-                const customer = data as Record<string, unknown>
-                setFormData({
-                    name: (customer.name as string) || '',
-                    company_name: (customer.company_name as string) || '',
-                    phone: (customer.phone as string) || '',
-                    email: (customer.email as string) || '',
-                    address: (customer.address as string) || '',
-                    customer_type: (customer.customer_type as string) || 'retail',
-                    category_id: (customer.category_id as string) || '',
-                    date_of_birth: (customer.date_of_birth as string) || '',
-                    notes: (customer.notes as string) || '',
-                    is_active: (customer.is_active as boolean) ?? true,
-                    tax_id: (customer.tax_id as string) || '',
-                    payment_terms: (customer.payment_terms as string) || 'cod',
-                    credit_limit: (customer.credit_limit as number) || 0
-                })
-                setCustomerQR(customer.loyalty_qr_code as string | null)
-                setMembershipNumber(customer.membership_number as string | null)
-            }
-        } catch (error) {
-            console.error('Error fetching customer:', error)
-            toast.error('Error loading customer')
-            navigate('/customers')
-        } finally {
-            setLoading(false)
-        }
-    }
+    }, [categories, id])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target
@@ -137,7 +107,7 @@ export default function CustomerFormPage() {
     }
 
     const handleCategoryChange = (categoryId: string) => {
-        const category = categories.find(c => c.id === categoryId)
+        const category = categories.find((c: ICustomerCategory) => c.id === categoryId)
         setFormData(prev => ({
             ...prev,
             category_id: categoryId,
@@ -149,75 +119,41 @@ export default function CustomerFormPage() {
         e.preventDefault()
 
         if (!formData.name.trim()) {
-            toast.error('Name is required')
             return
         }
 
-        setSaving(true)
+        // Build customer data - only include category_id if it's a valid UUID
+        const customerData: Record<string, unknown> = {
+            name: formData.name.trim(),
+            company_name: formData.company_name.trim() || null,
+            phone: formData.phone.trim() || null,
+            email: formData.email.trim() || null,
+            address: formData.address.trim() || null,
+            customer_type: formData.customer_type,
+            date_of_birth: formData.date_of_birth || null,
+            notes: formData.notes.trim() || null,
+            is_active: formData.is_active,
+            tax_id: formData.tax_id.trim() || null,
+            payment_terms: formData.payment_terms || 'cod',  // ENUM: 'cod', 'net15', 'net30', 'net60'
+            credit_limit: formData.credit_limit || 0
+        }
+
+        // Only include category_id if it's a valid UUID
+        if (formData.category_id && formData.category_id.length === 36) {
+            customerData.category_id = formData.category_id
+        } else {
+            customerData.category_id = null
+        }
+
         try {
-            // Build customer data - only include category_id if it's a valid UUID
-            const customerData: Record<string, unknown> = {
-                name: formData.name.trim(),
-                company_name: formData.company_name.trim() || null,
-                phone: formData.phone.trim() || null,
-                email: formData.email.trim() || null,
-                address: formData.address.trim() || null,
-                customer_type: formData.customer_type,
-                date_of_birth: formData.date_of_birth || null,
-                notes: formData.notes.trim() || null,
-                is_active: formData.is_active,
-                tax_id: formData.tax_id.trim() || null,
-                payment_terms: formData.payment_terms || 'cod',  // ENUM: 'cod', 'net15', 'net30', 'net60'
-                credit_limit: formData.credit_limit || 0
-            }
-
-            // Only include category_id if it's a valid UUID
-            if (formData.category_id && formData.category_id.length === 36) {
-                customerData.category_id = formData.category_id
-            } else {
-                customerData.category_id = null
-            }
-
             if (isEditing) {
-                const { error } = await supabase
-                    .from('customers')
-                    .update(customerData)
-                    .eq('id', id as string)
-                    .select()
-
-                if (error) {
-                    console.error('Supabase update error:', error)
-                    throw new Error(error.message || 'Error updating customer')
-                }
-                toast.success('Customer updated successfully')
+                await updateCustomer.mutateAsync({ id: id as string, ...customerData })
             } else {
-                const { error } = await supabase
-                    .from('customers')
-                    .insert(customerData as never)
-                    .select()
-
-                if (error) {
-                    console.error('Supabase insert error:', error)
-                    // Handle specific errors
-                    if (error.code === '42501') {
-                        throw new Error('Permission denied. Please check RLS policies.')
-                    } else if (error.code === '23503') {
-                        throw new Error('Invalid category. Please select a valid category.')
-                    } else if (error.code === '23505') {
-                        throw new Error('A customer with this phone number or email already exists.')
-                    }
-                    throw new Error(error.message || 'Error creating customer')
-                }
-                toast.success('Customer created successfully')
+                await createCustomer.mutateAsync(customerData)
             }
-
             navigate('/customers')
-        } catch (error: unknown) {
-            console.error('Error saving customer:', error)
-            const errorMessage = error instanceof Error ? error.message : 'Error saving customer'
-            toast.error(errorMessage)
-        } finally {
-            setSaving(false)
+        } catch {
+            // Error toast is handled by the mutation hooks
         }
     }
 
@@ -229,21 +165,14 @@ export default function CustomerFormPage() {
         }
 
         try {
-            const { error } = await supabase
-                .from('customers')
-                .delete()
-                .eq('id', id)
-
-            if (error) throw error
-            toast.success('Customer deleted')
+            await deleteCustomer.mutateAsync(id)
             navigate('/customers')
-        } catch (error) {
-            console.error('Error deleting customer:', error)
-            toast.error('Error deleting customer')
+        } catch {
+            // Error toast is handled by the mutation hook
         }
     }
 
-    const selectedCategory = categories.find(c => c.id === formData.category_id)
+    const selectedCategory = categories.find((c: ICustomerCategory) => c.id === formData.category_id)
 
     if (loading) {
         return (

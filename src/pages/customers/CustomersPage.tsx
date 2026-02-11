@@ -1,47 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     Users, Plus, Search, Filter, Building2, Crown, UserCheck,
     Star, QrCode, Phone, Mail, TrendingUp, Eye, Edit
 } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
+import { useCustomers, useCustomerCategories } from '@/hooks/customers'
 import { formatCurrency } from '../../utils/helpers'
 import './CustomersPage.css'
-
-interface CustomerCategory {
-    id: string
-    name: string
-    slug: string
-    color: string
-    price_modifier_type: string
-    discount_percentage: number | null
-}
-
-interface Customer {
-    id: string
-    name: string
-    company_name: string | null
-    phone: string | null
-    email: string | null
-    customer_type: string
-    category_id: string | null
-    category?: CustomerCategory
-    loyalty_points: number
-    lifetime_points: number
-    loyalty_tier: string
-    total_spent: number
-    total_visits: number
-    is_active: boolean
-    membership_number: string | null
-    created_at: string
-}
-
-interface Stats {
-    totalCustomers: number
-    activeMembers: number
-    totalPointsIssued: number
-    averageSpent: number
-}
 
 const TIER_CONFIG: Record<string, { color: string; icon: React.ReactNode }> = {
     bronze: { color: '#cd7f32', icon: <Star size={14} /> },
@@ -52,68 +17,25 @@ const TIER_CONFIG: Record<string, { color: string; icon: React.ReactNode }> = {
 
 export default function CustomersPage() {
     const navigate = useNavigate()
-    const [customers, setCustomers] = useState<Customer[]>([])
-    const [categories, setCategories] = useState<CustomerCategory[]>([])
-    const [loading, setLoading] = useState(true)
+    const { data: customers = [], isLoading: loading } = useCustomers()
+    const { data: categories = [] } = useCustomerCategories(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [categoryFilter, setCategoryFilter] = useState<string>('all')
     const [tierFilter, setTierFilter] = useState<string>('all')
     const [statusFilter, setStatusFilter] = useState<string>('all')
-    const [stats, setStats] = useState<Stats>({
-        totalCustomers: 0,
-        activeMembers: 0,
-        totalPointsIssued: 0,
-        averageSpent: 0
-    })
 
-    useEffect(() => {
-        fetchCategories()
-        fetchCustomers()
-    }, [])
+    const stats = useMemo(() => {
+        const active = customers.filter(c => c.is_active)
+        const totalSpent = customers.reduce((sum, c) => sum + (c.total_spent || 0), 0)
+        const totalPoints = customers.reduce((sum, c) => sum + (c.lifetime_points || 0), 0)
 
-    const fetchCategories = async () => {
-        const { data } = await supabase
-            .from('customer_categories')
-            .select('*')
-            .eq('is_active', true)
-            .order('name')
-        if (data) setCategories(data as unknown as CustomerCategory[])
-    }
-
-    const fetchCustomers = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('customers')
-                .select(`
-                    *,
-                    category:customer_categories(id, name, slug, color, price_modifier_type, discount_percentage)
-                `)
-                .order('created_at', { ascending: false })
-
-            if (error) throw error
-
-            if (data) {
-                const typedData = data as unknown as Customer[]
-                setCustomers(typedData)
-
-                // Calculate stats
-                const active = typedData.filter(c => c.is_active)
-                const totalSpent = typedData.reduce((sum, c) => sum + (c.total_spent || 0), 0)
-                const totalPoints = typedData.reduce((sum, c) => sum + (c.lifetime_points || 0), 0)
-
-                setStats({
-                    totalCustomers: typedData.length,
-                    activeMembers: active.length,
-                    totalPointsIssued: totalPoints,
-                    averageSpent: typedData.length > 0 ? totalSpent / typedData.length : 0
-                })
-            }
-        } catch (error) {
-            console.error('Error fetching customers:', error)
-        } finally {
-            setLoading(false)
+        return {
+            totalCustomers: customers.length,
+            activeMembers: active.length,
+            totalPointsIssued: totalPoints,
+            averageSpent: customers.length > 0 ? totalSpent / customers.length : 0
         }
-    }
+    }, [customers])
 
     const filteredCustomers = customers.filter(customer => {
         const searchLower = searchTerm.toLowerCase()

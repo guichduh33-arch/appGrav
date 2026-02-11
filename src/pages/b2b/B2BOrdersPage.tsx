@@ -4,33 +4,9 @@ import {
     Plus, Search, FileText, Truck, CreditCard,
     Eye, Edit2, Clock, CheckCircle, Package, AlertCircle
 } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
+import { useB2BOrders } from '@/hooks/useB2BOrders'
 import { formatCurrency } from '../../utils/helpers'
 import './B2BOrdersPage.css'
-
-interface B2BOrder {
-    id: string
-    order_number: string
-    customer_id: string
-    customer?: {
-        name: string
-        company_name: string | null
-        phone: string | null
-    }
-    status: 'draft' | 'confirmed' | 'processing' | 'ready' | 'partially_delivered' | 'delivered' | 'cancelled'
-    order_date: string
-    requested_delivery_date: string | null
-    subtotal: number
-    discount_amount: number
-    tax_amount: number
-    total_amount: number
-    payment_status: 'unpaid' | 'partial' | 'paid'
-    payment_terms: string | null
-    due_date: string | null
-    amount_paid: number
-    amount_due: number
-    created_at: string
-}
 
 const STATUS_CONFIG = {
     draft: { label: 'Draft', color: 'gray', icon: FileText },
@@ -52,46 +28,11 @@ export default function B2BOrdersPage() {
     const navigate = useNavigate()
     const [searchParams, setSearchParams] = useSearchParams()
     const customerFilter = searchParams.get('customer')
-    const [orders, setOrders] = useState<B2BOrder[]>([])
-    const [loading, setLoading] = useState(true)
+    const { data: orders = [], isLoading: loading } = useB2BOrders()
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState<string>('all')
     const [paymentFilter, setPaymentFilter] = useState<string>('all')
     const [customerName, setCustomerName] = useState<string>('')
-
-    useEffect(() => {
-        fetchOrders()
-    }, [])
-
-    const fetchOrders = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('b2b_orders')
-                .select(`
-                    *,
-                    customer:customers(name, company_name, phone)
-                `)
-                .order('order_date', { ascending: false })
-
-            if (error) throw error
-            if (data) {
-                // Map database fields to UI expected fields
-                const mappedOrders = data.map(order => ({
-                    ...order,
-                    total_amount: order.total ?? 0,
-                    amount_paid: order.paid_amount ?? 0,
-                    amount_due: (order.total ?? 0) - (order.paid_amount ?? 0),
-                    requested_delivery_date: order.delivery_date,
-                    payment_status: order.payment_status ?? 'unpaid',
-                })) as unknown as B2BOrder[]
-                setOrders(mappedOrders)
-            }
-        } catch (error) {
-            console.error('Error fetching B2B orders:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
 
     // Resolve customer name for the filter banner
     useEffect(() => {

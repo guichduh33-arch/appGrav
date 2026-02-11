@@ -5,65 +5,17 @@ import {
     QrCode, Star, Crown, TrendingUp, ShoppingBag, Calendar,
     Gift, Plus, Minus, Clock, CreditCard, FileText, History
 } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
+import {
+    useCustomerById,
+    useCustomerOrders,
+    useLoyaltyTransactions,
+    useLoyaltyTiers,
+    useAddLoyaltyPoints,
+    useRedeemLoyaltyPoints,
+} from '@/hooks/customers'
 import { formatCurrency } from '../../utils/helpers'
 import { toast } from 'sonner'
 import './CustomerDetailPage.css'
-
-interface Customer {
-    id: string
-    name: string
-    company_name: string | null
-    phone: string | null
-    email: string | null
-    address: string | null
-    customer_type: string
-    category_id: string | null
-    category?: {
-        id: string
-        name: string
-        slug: string
-        color: string
-        price_modifier_type: string
-        discount_percentage: number | null
-    }
-    loyalty_points: number
-    lifetime_points: number
-    loyalty_tier: string
-    total_spent: number
-    total_visits: number
-    is_active: boolean
-    membership_number: string | null
-    loyalty_qr_code: string | null
-    date_of_birth: string | null
-    created_at: string
-    last_visit_at: string | null
-}
-
-interface LoyaltyTransaction {
-    id: string
-    transaction_type: string
-    points: number
-    description: string | null
-    created_at: string
-}
-
-interface Order {
-    id: string
-    order_number: string
-    total_amount: number
-    status: string
-    created_at: string
-}
-
-interface LoyaltyTier {
-    id: string
-    name: string
-    min_points: number
-    max_points: number | null
-    benefits: string | null
-    color: string
-}
 
 type TabType = 'overview' | 'history' | 'loyalty' | 'orders'
 
@@ -77,11 +29,13 @@ const TIER_CONFIG: Record<string, { color: string; gradient: string }> = {
 export default function CustomerDetailPage() {
     const navigate = useNavigate()
     const { id } = useParams()
-    const [customer, setCustomer] = useState<Customer | null>(null)
-    const [loyaltyTransactions, setLoyaltyTransactions] = useState<LoyaltyTransaction[]>([])
-    const [orders, setOrders] = useState<Order[]>([])
-    const [tiers, setTiers] = useState<LoyaltyTier[]>([])
-    const [loading, setLoading] = useState(true)
+    const { data: customer, isLoading } = useCustomerById(id)
+    const { data: orders = [] } = useCustomerOrders(id)
+    const { data: loyaltyTransactions = [] } = useLoyaltyTransactions(id)
+    const { data: tiers = [] } = useLoyaltyTiers()
+    const addPointsMutation = useAddLoyaltyPoints()
+    const redeemPointsMutation = useRedeemLoyaltyPoints()
+
     const [activeTab, setActiveTab] = useState<TabType>('overview')
     const [showPointsModal, setShowPointsModal] = useState(false)
     const [pointsAction, setPointsAction] = useState<'add' | 'redeem'>('add')
@@ -89,70 +43,11 @@ export default function CustomerDetailPage() {
     const [pointsDescription, setPointsDescription] = useState('')
 
     useEffect(() => {
-        if (id) {
-            fetchCustomer()
-            fetchLoyaltyTransactions()
-            fetchOrders()
-            fetchTiers()
-        }
-    }, [id])
-
-    const fetchCustomer = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('customers')
-                .select(`
-                    *,
-                    category:customer_categories(id, name, slug, color, price_modifier_type, discount_percentage)
-                `)
-                .eq('id', id as string)
-                .single()
-
-            if (error) throw error
-            setCustomer(data as unknown as Customer)
-        } catch (error) {
-            console.error('Error fetching customer:', error)
+        if (!isLoading && !customer && id) {
             toast.error('Customer not found')
             navigate('/customers')
-        } finally {
-            setLoading(false)
         }
-    }
-
-    const fetchLoyaltyTransactions = async () => {
-        const { data } = await supabase
-            .from('loyalty_transactions')
-            .select('*')
-            .eq('customer_id', id as string)
-            .order('created_at', { ascending: false })
-            .limit(50)
-        if (data) setLoyaltyTransactions(data as LoyaltyTransaction[])
-    }
-
-    const fetchOrders = async () => {
-        const { data } = await supabase
-            .from('orders')
-            .select('id, order_number, total, status, created_at')
-            .eq('customer_id', id as string)
-            .order('created_at', { ascending: false })
-            .limit(20)
-        if (data) setOrders(data.map(d => ({
-            id: d.id,
-            order_number: d.order_number ?? '',
-            total_amount: d.total ?? 0,
-            status: d.status ?? '',
-            created_at: d.created_at ?? ''
-        })) as Order[])
-    }
-
-    const fetchTiers = async () => {
-        const { data } = await supabase
-            .from('loyalty_tiers')
-            .select('*')
-            .eq('is_active', true)
-            .order('min_points')
-        if (data) setTiers(data as unknown as LoyaltyTier[])
-    }
+    }, [isLoading, customer, id, navigate])
 
     const handlePointsSubmit = async () => {
         if (!pointsAmount || Number(pointsAmount) <= 0) {
@@ -160,43 +55,29 @@ export default function CustomerDetailPage() {
             return
         }
 
-        try {
-            const points = Number(pointsAmount)
+        const points = Number(pointsAmount)
 
-            if (pointsAction === 'add') {
-                // Add points
-                const { error } = await supabase.rpc('add_loyalty_points' as never, {
-                    p_customer_id: id,
-                    p_points: points,
-                    p_description: pointsDescription || 'Manual points addition',
-                    p_order_id: null
-                } as never)
-                if (error) throw error
-                toast.success(`${points} points added`)
-            } else {
-                // Redeem points
-                if (customer && points > customer.loyalty_points) {
-                    toast.error('Insufficient points')
-                    return
-                }
-                const { error } = await supabase.rpc('redeem_loyalty_points' as never, {
-                    p_customer_id: id,
-                    p_points: points,
-                    p_description: pointsDescription || 'Manual points redemption'
-                } as never)
-                if (error) throw error
-                toast.success(`${points} points redeemed`)
+        if (pointsAction === 'add') {
+            await addPointsMutation.mutateAsync({
+                customerId: id!,
+                points,
+                description: pointsDescription || 'Manual points addition',
+            })
+        } else {
+            if (customer && points > customer.loyalty_points) {
+                toast.error('Insufficient points')
+                return
             }
-
-            setShowPointsModal(false)
-            setPointsAmount('')
-            setPointsDescription('')
-            fetchCustomer()
-            fetchLoyaltyTransactions()
-        } catch (error) {
-            console.error('Error updating points:', error)
-            toast.error('Error updating points')
+            await redeemPointsMutation.mutateAsync({
+                customerId: id!,
+                points,
+                description: pointsDescription || 'Manual points redemption',
+            })
         }
+
+        setShowPointsModal(false)
+        setPointsAmount('')
+        setPointsDescription('')
     }
 
     const formatDate = (dateString: string | null) => {
@@ -249,7 +130,7 @@ export default function CustomerDetailPage() {
         return Math.min(Math.max(progress, 0), 100)
     }
 
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="customer-detail-page">
                 <div className="customer-detail-loading">

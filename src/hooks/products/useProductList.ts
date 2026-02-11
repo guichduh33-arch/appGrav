@@ -51,3 +51,27 @@ export function useProducts(categoryId: string | null = null) {
 export function useProductList(categoryId: string | null = null) {
     return useProducts(categoryId)
 }
+
+export interface IProductListItem {
+    id: string
+    name: string
+    sku: string
+}
+
+/**
+ * Lightweight product list for filters/dropdowns (id, name, sku only).
+ */
+export function useProductListSimple() {
+    return useQuery({
+        queryKey: ['products-list-simple'],
+        queryFn: async (): Promise<IProductListItem[]> => {
+            const { data, error } = await supabase
+                .from('products')
+                .select('id, name, sku')
+                .order('name')
+
+            if (error) throw error
+            return data ?? []
+        },
+    })
+}

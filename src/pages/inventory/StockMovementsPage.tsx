@@ -1,10 +1,11 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import {
     Factory, ShoppingCart, Package, Trash2, ArrowUpCircle,
     Filter, TrendingUp, TrendingDown, Clock, Truck, ArrowRight,
     Search, Calendar, Download, X
 } from 'lucide-react'
 import { useStockMovements, type IStockMovement, type TMovementFilterType } from '@/hooks/inventory'
+import { useProductListSimple } from '@/hooks/products/useProductList'
 import { MOVEMENT_STYLES, getMovementStyle } from '@/constants/inventory'
 import { formatCurrency } from '@/utils/helpers'
 
@@ -13,7 +14,6 @@ const formatNumber = (num: number | null | undefined): string => {
     if (num === null || num === undefined) return '-'
     return num.toLocaleString('en-US')
 }
-import { supabase } from '@/lib/supabase'
 import * as XLSX from 'xlsx'
 import { toast } from 'sonner'
 import './StockMovementsPage.css'
@@ -45,22 +45,10 @@ export default function StockMovementsPage() {
     const [dateFrom, setDateFrom] = useState('')
     const [dateTo, setDateTo] = useState('')
     const [selectedProductId, setSelectedProductId] = useState<string>('')
-    const [products, setProducts] = useState<Array<{ id: string; name: string; sku: string }>>([])
     const [productSearch, setProductSearch] = useState('')
 
-    // Load products for filter
-    useEffect(() => {
-        loadProducts()
-    }, [])
-
-    async function loadProducts() {
-        const { data } = await supabase
-            .from('products')
-            .select('id, name, sku')
-            .order('name')
-
-        if (data) setProducts(data)
-    }
+    // Load products for filter dropdown
+    const { data: products = [] } = useProductListSimple()
 
     // Use the hook instead of direct Supabase call
     const { data: movements = [], isLoading } = useStockMovements({

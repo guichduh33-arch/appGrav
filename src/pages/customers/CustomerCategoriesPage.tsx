@@ -1,24 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     ArrowLeft, Plus, Tag, Edit, Trash2, Percent, DollarSign,
     Building2, Crown, Users, UserCheck, Save, X
 } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
+import {
+    useCustomerCategories,
+    useCreateCustomerCategory,
+    useUpdateCustomerCategory,
+    useDeleteCustomerCategory,
+    type ICustomerCategory,
+} from '@/hooks/customers'
 import { toast } from 'sonner'
 import './CustomerCategoriesPage.css'
-
-interface CustomerCategory {
-    id: string
-    name: string
-    slug: string
-    description: string | null
-    color: string
-    price_modifier_type: 'retail' | 'wholesale' | 'discount_percentage' | 'custom'
-    discount_percentage: number | null
-    is_active: boolean
-    created_at: string
-}
 
 interface CategoryFormData {
     name: string
@@ -57,33 +51,14 @@ const DEFAULT_FORM: CategoryFormData = {
 
 export default function CustomerCategoriesPage() {
     const navigate = useNavigate()
-    const [categories, setCategories] = useState<CustomerCategory[]>([])
-    const [loading, setLoading] = useState(true)
+    const { data: categories = [], isLoading: loading } = useCustomerCategories()
+    const createCategory = useCreateCustomerCategory()
+    const updateCategory = useUpdateCustomerCategory()
+    const deleteCategory = useDeleteCustomerCategory()
     const [showModal, setShowModal] = useState(false)
-    const [editingCategory, setEditingCategory] = useState<CustomerCategory | null>(null)
+    const [editingCategory, setEditingCategory] = useState<ICustomerCategory | null>(null)
     const [formData, setFormData] = useState<CategoryFormData>(DEFAULT_FORM)
-    const [saving, setSaving] = useState(false)
-
-    useEffect(() => {
-        fetchCategories()
-    }, [])
-
-    const fetchCategories = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('customer_categories')
-                .select('*')
-                .order('name')
-
-            if (error) throw error
-            if (data) setCategories(data as unknown as CustomerCategory[])
-        } catch (error) {
-            console.error('Error fetching categories:', error)
-            toast.error('Error loading categories')
-        } finally {
-            setLoading(false)
-        }
-    }
+    const saving = createCategory.isPending || updateCategory.isPending
 
     const openCreateModal = () => {
         setEditingCategory(null)
@@ -91,7 +66,7 @@ export default function CustomerCategoriesPage() {
         setShowModal(true)
     }
 
-    const openEditModal = (category: CustomerCategory) => {
+    const openEditModal = (category: ICustomerCategory) => {
         setEditingCategory(category)
         setFormData({
             name: category.name,
@@ -121,64 +96,31 @@ export default function CustomerCategoriesPage() {
             return
         }
 
-        setSaving(true)
-        try {
-            const categoryData = {
-                name: formData.name.trim(),
-                slug: formData.slug.trim().toLowerCase(),
-                description: formData.description.trim() || null,
-                color: formData.color,
-                price_modifier_type: formData.price_modifier_type,
-                discount_percentage: formData.price_modifier_type === 'discount_percentage' ? formData.discount_percentage : null,
-                is_active: formData.is_active
-            }
-
-            if (editingCategory) {
-                const { error } = await supabase
-                    .from('customer_categories')
-                    .update(categoryData as never)
-                    .eq('id', editingCategory.id)
-
-                if (error) throw error
-                toast.success('Category updated')
-            } else {
-                const { error } = await supabase
-                    .from('customer_categories')
-                    .insert(categoryData as never)
-
-                if (error) throw error
-                toast.success('Category created')
-            }
-
-            setShowModal(false)
-            fetchCategories()
-        } catch (error: unknown) {
-            console.error('Error saving category:', error)
-            const errorMessage = error instanceof Error ? error.message : 'Error saving category'
-            toast.error(errorMessage)
-        } finally {
-            setSaving(false)
+        const categoryData = {
+            name: formData.name.trim(),
+            slug: formData.slug.trim().toLowerCase(),
+            description: formData.description.trim() || null,
+            color: formData.color,
+            price_modifier_type: formData.price_modifier_type,
+            discount_percentage: formData.price_modifier_type === 'discount_percentage' ? formData.discount_percentage : null,
+            is_active: formData.is_active
         }
+
+        if (editingCategory) {
+            await updateCategory.mutateAsync({ id: editingCategory.id, ...categoryData })
+        } else {
+            await createCategory.mutateAsync(categoryData)
+        }
+
+        setShowModal(false)
     }
 
-    const handleDelete = async (category: CustomerCategory) => {
+    const handleDelete = async (category: ICustomerCategory) => {
         if (!confirm(`Delete category "${category.name}"?`)) {
             return
         }
 
-        try {
-            const { error } = await supabase
-                .from('customer_categories')
-                .delete()
-                .eq('id', category.id)
-
-            if (error) throw error
-            toast.success('Category deleted')
-            fetchCategories()
-        } catch (error) {
-            console.error('Error deleting category:', error)
-            toast.error('Error deleting category')
-        }
+        await deleteCategory.mutateAsync(category.id)
     }
 
     const getCategoryIcon = (slug: string) => {

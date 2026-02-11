@@ -4,10 +4,10 @@ import { useAuthStore } from '../../stores/authStore';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import './LoginPage.css';
-import { UserProfile } from '../../types/database';
 import type { Role } from '../../types/auth';
 // Offline authentication imports (Story 1.2)
 import { useNetworkStatus, useOfflineAuth } from '../../hooks/offline';
+import { useActiveUsers } from '@/hooks/useActiveUsers';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function LoginPage() {
     clearError: clearOfflineError,
   } = useOfflineAuth();
 
-  const [users, setUsers] = useState<UserProfile[]>([]);
+  const { data: users = [] } = useActiveUsers();
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [pin, setPin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,33 +36,6 @@ export default function LoginPage() {
       navigate('/pos');
     }
   }, [isAuthenticated, navigate]);
-
-  // Load users from Supabase
-  useEffect(() => {
-    async function loadUsers() {
-      try {
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('id, name, display_name, role, is_active, avatar_url, employee_code')
-          .eq('is_active', true)
-          .order('name');
-
-        if (error) throw error;
-
-        if (data && data.length > 0) {
-          setUsers(data as UserProfile[]);
-        } else {
-          console.warn('No users returned from database');
-          setUsers([]);
-        }
-      } catch (err) {
-        console.error('Error loading users:', err);
-        setUsers([]);
-        toast.error('Cannot load users (database inaccessible)');
-      }
-    }
-    loadUsers();
-  }, []);
 
   const handleNumpadKey = (key: string) => {
     setError('');
