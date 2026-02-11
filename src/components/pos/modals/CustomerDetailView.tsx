@@ -1,58 +1,16 @@
 import { ChevronLeft, Check, Phone, Mail, Crown, Package, ShoppingBag, RotateCcw } from 'lucide-react'
 import { formatPrice } from '../../../utils/helpers'
 import { TIER_COLORS, TIER_DISCOUNTS } from '@/constants/loyalty'
-
-interface Customer {
-    id: string
-    name: string
-    company_name: string | null
-    phone: string | null
-    email: string | null
-    customer_type: string
-    category_id: string | null
-    category?: {
-        name: string
-        slug: string
-        color: string
-        price_modifier_type: string
-        discount_percentage: number | null
-    }
-    loyalty_points: number
-    loyalty_tier: string
-    total_spent: number
-    membership_number: string | null
-    loyalty_qr_slug: string | null
-}
-
-interface OrderHistoryItem {
-    id: string
-    order_number: string
-    created_at: string
-    total: number
-    items: Array<{
-        id: string
-        product_id: string
-        product_name: string
-        quantity: number
-        unit_price: number
-    }>
-}
-
-interface FrequentProduct {
-    product_id: string
-    product_name: string
-    times_ordered: number
-    last_ordered: string
-}
+import { ICustomerSearchCustomer, IOrderHistoryItem, IFrequentProduct } from './customerSearchTypes'
 
 interface CustomerDetailViewProps {
-    customer: Customer
-    orderHistory: OrderHistoryItem[]
-    frequentProducts: FrequentProduct[]
+    customer: ICustomerSearchCustomer
+    orderHistory: IOrderHistoryItem[]
+    frequentProducts: IFrequentProduct[]
     loadingHistory: boolean
     onBack: () => void
-    onSelectCustomer: (customer: Customer) => void
-    onReorder: (order: OrderHistoryItem) => void
+    onSelectCustomer: (customer: ICustomerSearchCustomer) => void
+    onReorder: (order: IOrderHistoryItem) => void
 }
 
 const formatDate = (dateStr: string) => {
