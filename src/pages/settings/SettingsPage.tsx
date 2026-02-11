@@ -89,7 +89,7 @@ const SettingsPage = () => {
         try {
             const result = await saveCategory({
                 id: categoryId,
-                dispatch_station: newStation as any
+                dispatch_station: newStation as Category['dispatch_station']
             });
 
             if (!result.success) {

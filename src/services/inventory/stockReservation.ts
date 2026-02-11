@@ -5,7 +5,7 @@
  * Manages stock reservations for B2B orders
  */
 
-import { supabase } from '@/lib/supabase'
+import { supabase, untypedRpc } from '@/lib/supabase'
 
 export interface IStockReservation {
     id: string
@@ -56,8 +56,7 @@ export async function getActiveReservations(productId?: string): Promise<IStockR
 // Story 10.3: Get available stock (minus reservations)
 export async function getAvailableStock(productId: string): Promise<number> {
     // Try to use RPC if available, otherwise calculate manually
-    const { data: rpcData, error: rpcError } = await supabase
-        .rpc('get_available_stock' as never, { p_product_id: productId } as never) as { data: number | null; error: unknown }
+    const { data: rpcData, error: rpcError } = await untypedRpc('get_available_stock', { p_product_id: productId }) as { data: number | null; error: unknown }
 
     if (!rpcError && rpcData !== null) {
         return rpcData

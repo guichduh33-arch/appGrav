@@ -1,11 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { supabase } from '../../lib/supabase'
+import { untypedFrom } from '../../lib/supabase'
 import { settingsKeys } from './settingsKeys'
 import type { ISoundAsset } from '../../types/database'
-
-// Helper for tables not yet in generated types
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const untypedFrom = (table: string) => supabase.from(table as any)
 
 export function useSoundAssets() {
   return useQuery({

@@ -1,11 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '../../lib/supabase'
+import { untypedFrom, untypedRpc } from '../../lib/supabase'
 import { settingsKeys } from './settingsKeys'
 import type { ISettingsProfile } from '../../types/database'
-
-// Helper for tables not yet in generated types
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const untypedFrom = (table: string) => supabase.from(table as any)
 
 export function useSettingsProfiles() {
   return useQuery({
@@ -108,8 +104,7 @@ export function useApplySettingsProfile() {
   return useMutation({
     mutationFn: async (profileId: string) => {
       // Call the database function to apply profile
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase.rpc as any)('apply_settings_profile', { p_profile_id: profileId })
+      const { error } = await untypedRpc('apply_settings_profile', { p_profile_id: profileId })
       if (error) throw error
       return profileId
     },

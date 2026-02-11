@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase, untypedRpc, untypedFrom } from '../lib/supabase';
 import { StockMovement } from '../types/database';
 import {
     SalesComparison,
@@ -33,7 +33,7 @@ export const ReportingService = {
         previousStart: Date,
         previousEnd: Date
     ): Promise<SalesComparison[]> {
-        const { data, error } = await supabase.rpc('get_sales_comparison' as any, {
+        const { data, error } = await untypedRpc('get_sales_comparison', {
             current_start: currentStart.toISOString(),
             current_end: currentEnd.toISOString(),
             previous_start: previousStart.toISOString(),
@@ -51,7 +51,7 @@ export const ReportingService = {
         startDate: Date,
         endDate: Date
     ): Promise<DashboardSummary> {
-        const { data, error } = await supabase.rpc('get_reporting_dashboard_summary' as any, {
+        const { data, error } = await untypedRpc('get_reporting_dashboard_summary', {
             start_date: startDate.toISOString(),
             end_date: endDate.toISOString(),
         });
@@ -64,8 +64,7 @@ export const ReportingService = {
      * Get Payment Method Statistics
      */
     async getPaymentMethodStats(): Promise<PaymentMethodStat[]> {
-        const { data, error } = await supabase
-            .from('view_payment_method_stats' as never)
+        const { data, error } = await untypedFrom('view_payment_method_stats')
             .select('*') as { data: unknown[] | null; error: Error | null };
 
         if (error) throw error;
@@ -76,8 +75,7 @@ export const ReportingService = {
      * Get Daily Sales Statistics
      */
     async getDailySales(startDate: Date, endDate: Date): Promise<DailySalesStat[]> {
-        const { data, error } = await supabase
-            .from('view_daily_kpis' as never)
+        const { data, error } = await untypedFrom('view_daily_kpis')
             .select('*')
             .gte('date', startDate.toISOString())
             .lte('date', endDate.toISOString())
@@ -233,8 +231,7 @@ export const ReportingService = {
      * Get Stock Waste Report
      */
     async getStockWasteReport(): Promise<StockWaste[]> {
-        const { data, error } = await (supabase as any)
-            .from('view_stock_waste')
+        const { data, error } = await untypedFrom('view_stock_waste')
             .select('*')
             .order('waste_date', { ascending: false });
 
@@ -246,8 +243,7 @@ export const ReportingService = {
      * Get Session Discrepancies (Cashier Performance)
      */
     async getSessionDiscrepancies(): Promise<SessionDiscrepancy[]> {
-        const { data, error } = await (supabase as any)
-            .from('view_session_discrepancies')
+        const { data, error } = await untypedFrom('view_session_discrepancies')
             .select('*')
             .order('closed_at', { ascending: false });
 
@@ -285,7 +281,7 @@ export const ReportingService = {
     /**
      * Get Inventory Items with stock details
      */
-    async getInventoryItems(): Promise<any[]> {
+    async getInventoryItems() {
         const { data, error } = await supabase
             .from('products')
             .select(`
@@ -322,7 +318,7 @@ export const ReportingService = {
     /**
      * Get Purchase Details
      */
-    async getPurchaseDetails(startDate: Date, endDate: Date): Promise<any[]> {
+    async getPurchaseDetails(startDate: Date, endDate: Date) {
         const { data, error } = await supabase
             .from('stock_movements')
             .select(`
@@ -343,7 +339,7 @@ export const ReportingService = {
     /**
      * Get Purchase By Supplier
      */
-    async getPurchaseBySupplier(startDate: Date, endDate: Date): Promise<any[]> {
+    async getPurchaseBySupplier(startDate: Date, endDate: Date) {
         const { data, error } = await supabase
             .from('stock_movements')
             .select(`
@@ -395,8 +391,7 @@ export const ReportingService = {
      * Get Profit/Loss Report (FR35)
      */
     async getProfitLoss(startDate: Date, endDate: Date): Promise<IProfitLossReport[]> {
-        const { data, error } = await supabase
-            .from('view_profit_loss' as never)
+        const { data, error } = await untypedFrom('view_profit_loss')
             .select('*')
             .gte('report_date', startDate.toISOString().split('T')[0])
             .lte('report_date', endDate.toISOString().split('T')[0])
@@ -411,8 +406,7 @@ export const ReportingService = {
      */
     async getSalesByCustomer(startDate: Date, endDate: Date): Promise<ISalesByCustomerReport[]> {
         // Query from orders with customer join and filter by date
-        const { data, error } = await supabase
-            .from('view_sales_by_customer' as never)
+        const { data, error } = await untypedFrom('view_sales_by_customer')
             .select('*') as { data: unknown[] | null; error: Error | null };
 
         if (error) throw error;
@@ -430,8 +424,7 @@ export const ReportingService = {
      * Get Sales by Hour Report (FR37)
      */
     async getSalesByHour(startDate: Date, endDate: Date): Promise<ISalesByHourReport[]> {
-        const { data, error } = await supabase
-            .from('view_sales_by_hour' as never)
+        const { data, error } = await untypedFrom('view_sales_by_hour')
             .select('*')
             .gte('report_date', startDate.toISOString().split('T')[0])
             .lte('report_date', endDate.toISOString().split('T')[0])
@@ -445,8 +438,7 @@ export const ReportingService = {
      * Get Session Cash Balance Report (FR44)
      */
     async getSessionCashBalance(startDate: Date, endDate: Date): Promise<ISessionCashBalanceReport[]> {
-        const { data, error } = await supabase
-            .from('view_session_cash_balance' as never)
+        const { data, error } = await untypedFrom('view_session_cash_balance')
             .select('*')
             .gte('started_at', startDate.toISOString())
             .lte('started_at', endDate.toISOString())
@@ -460,8 +452,7 @@ export const ReportingService = {
      * Get B2B Receivables Report (FR45)
      */
     async getB2BReceivables(): Promise<IB2BReceivablesReport[]> {
-        const { data, error } = await supabase
-            .from('view_b2b_receivables' as never)
+        const { data, error } = await untypedFrom('view_b2b_receivables')
             .select('*')
             .gt('outstanding_amount', 0)
             .order('outstanding_amount', { ascending: false }) as { data: unknown[] | null; error: Error | null };
@@ -474,8 +465,7 @@ export const ReportingService = {
      * Get Stock Warning Report (FR40, FR41)
      */
     async getStockWarning(): Promise<IStockWarningReport[]> {
-        const { data, error } = await supabase
-            .from('view_stock_warning' as never)
+        const { data, error } = await untypedFrom('view_stock_warning')
             .select('*') as { data: unknown[] | null; error: Error | null };
 
         if (error) throw error;
@@ -486,8 +476,7 @@ export const ReportingService = {
      * Get Expired Stock Report (FR42)
      */
     async getExpiredStock(): Promise<IExpiredStockReport[]> {
-        const { data, error } = await supabase
-            .from('view_expired_stock' as never)
+        const { data, error } = await untypedFrom('view_expired_stock')
             .select('*')
             .in('expiry_status', ['expired', 'expiring_soon', 'expiring']) as { data: unknown[] | null; error: Error | null };
 
@@ -499,8 +488,7 @@ export const ReportingService = {
      * Get Unsold Products Report (FR43)
      */
     async getUnsoldProducts(daysSinceLastSale: number = 30): Promise<IUnsoldProductsReport[]> {
-        const { data, error } = await supabase
-            .from('view_unsold_products' as never)
+        const { data, error } = await untypedFrom('view_unsold_products')
             .select('*')
             .gte('days_since_sale', daysSinceLastSale)
             .order('days_since_sale', { ascending: false }) as { data: unknown[] | null; error: Error | null };

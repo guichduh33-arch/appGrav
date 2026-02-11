@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { saveProductCategoryPrice } from '@/services/products/catalogSyncService'
+import type { IOfflineProductCategoryPrice } from '@/types/offline'
 import { formatCurrency } from '../../utils/helpers'
 import { toast } from 'sonner'
 import './ProductCategoryPricingPage.css'
@@ -205,7 +206,7 @@ export default function ProductCategoryPricingPage() {
                         is_active: cp.is_active
                     }
 
-                    const result = await saveProductCategoryPrice(priceData as any)
+                    const result = await saveProductCategoryPrice(priceData as Partial<IOfflineProductCategoryPrice> & { id: string })
 
                     if (!result.success) {
                         throw new Error(result.error)

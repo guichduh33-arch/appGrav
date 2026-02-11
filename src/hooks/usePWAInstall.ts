@@ -28,6 +28,12 @@ interface IPWAInstallActions {
   promptInstall: () => Promise<boolean>;
 }
 
+/** Navigator with non-standard PWA properties */
+interface INavigatorStandalone extends Navigator {
+  standalone?: boolean;
+  getInstalledRelatedApps?: () => Promise<unknown[]>;
+}
+
 declare global {
   interface WindowEventMap {
     beforeinstallprompt: IBeforeInstallPromptEvent;
@@ -56,15 +62,13 @@ export function usePWAInstall(): IPWAInstallState & IPWAInstallActions {
   const isIOS =
     typeof navigator !== 'undefined' &&
     /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    !(window as any).MSStream;
+    !('MSStream' in window);
 
   // Check if running in standalone mode (installed PWA)
   const isStandalone =
     typeof window !== 'undefined' &&
     (window.matchMedia('(display-mode: standalone)').matches ||
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (window.navigator as any).standalone === true);
+      (window.navigator as INavigatorStandalone).standalone === true);
 
   useEffect(() => {
     // Already installed
@@ -92,9 +96,9 @@ export function usePWAInstall(): IPWAInstallState & IPWAInstallActions {
     window.addEventListener('appinstalled', handleAppInstalled);
 
     // Check if already installed using getInstalledRelatedApps (if supported)
-    if ('getInstalledRelatedApps' in navigator) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (navigator as any).getInstalledRelatedApps().then((apps: unknown[]) => {
+    const nav = navigator as INavigatorStandalone;
+    if (nav.getInstalledRelatedApps) {
+      nav.getInstalledRelatedApps().then((apps) => {
         if (apps.length > 0) {
           setIsInstalled(true);
         }

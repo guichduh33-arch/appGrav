@@ -6,7 +6,7 @@
  * for offline sync functionality.
  */
 
-import { supabase } from '@/lib/supabase';
+import { supabase, untypedFrom } from '@/lib/supabase';
 import type { ISyncDevice, TSyncDeviceType } from '@/types/database';
 
 /**
@@ -57,9 +57,7 @@ export async function registerSyncDevice(
     const { data: { user } } = await supabase.auth.getUser();
 
     // Insert device record
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
-      .from('sync_devices')
+    const { error } = await untypedFrom('sync_devices')
       .upsert(
         {
           device_id: deviceId,
@@ -96,13 +94,11 @@ export async function verifyDeviceToken(
   try {
     const tokenHash = await hashToken(token);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
-      .from('sync_devices')
+    const { data, error } = await untypedFrom('sync_devices')
       .select('token_hash')
       .eq('device_id', deviceId)
       .eq('is_active', true)
-      .single();
+      .single() as { data: { token_hash: string } | null; error: unknown };
 
     if (error || !data) {
       return false;
@@ -120,9 +116,7 @@ export async function verifyDeviceToken(
  */
 export async function updateDeviceLastSeen(deviceId: string): Promise<void> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
-      .from('sync_devices')
+    await untypedFrom('sync_devices')
       .update({ last_seen: new Date().toISOString() })
       .eq('device_id', deviceId);
   } catch (err) {
@@ -135,9 +129,7 @@ export async function updateDeviceLastSeen(deviceId: string): Promise<void> {
  */
 export async function getDeviceInfo(deviceId: string): Promise<ISyncDevice | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
-      .from('sync_devices')
+    const { data, error } = await untypedFrom('sync_devices')
       .select('*')
       .eq('device_id', deviceId)
       .single();
@@ -158,9 +150,7 @@ export async function getDeviceInfo(deviceId: string): Promise<ISyncDevice | nul
  */
 export async function deactivateDevice(deviceId: string): Promise<boolean> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
-      .from('sync_devices')
+    const { error } = await untypedFrom('sync_devices')
       .update({ is_active: false })
       .eq('device_id', deviceId);
 
@@ -182,9 +172,7 @@ export async function regenerateDeviceToken(
     const token = await generateDeviceToken(deviceId);
     const tokenHash = await hashToken(token);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
-      .from('sync_devices')
+    const { error } = await untypedFrom('sync_devices')
       .update({
         token_hash: tokenHash,
         last_seen: new Date().toISOString(),
@@ -207,9 +195,7 @@ export async function regenerateDeviceToken(
  */
 export async function getActiveDevices(): Promise<ISyncDevice[]> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
-      .from('sync_devices')
+    const { data, error } = await untypedFrom('sync_devices')
       .select('*')
       .eq('is_active', true)
       .order('last_seen', { ascending: false });
@@ -230,10 +216,8 @@ export async function getActiveDevices(): Promise<ISyncDevice[]> {
  */
 export async function getOfflineVersions(): Promise<Record<string, number>> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
-      .from('offline_versions')
-      .select('table_name, version');
+    const { data, error } = await untypedFrom('offline_versions')
+      .select('table_name, version') as { data: Array<{ table_name: string; version: number }> | null; error: unknown };
 
     if (error || !data) {
       return {};
@@ -261,9 +245,7 @@ export async function updateOfflineVersion(
   rowCount?: number
 ): Promise<boolean> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
-      .from('offline_versions')
+    const { error } = await untypedFrom('offline_versions')
       .upsert(
         {
           table_name: tableName,

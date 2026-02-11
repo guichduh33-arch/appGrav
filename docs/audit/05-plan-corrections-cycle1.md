@@ -37,8 +37,8 @@
 
 | # | Source | Description | Effort | Statut |
 |---|--------|-------------|--------|--------|
-| I1 | Architecture | 55+ `as any` casts | L | A FAIRE |
-| I2 | Architecture | 40+ `as unknown as X` unsafe casts | L | A FAIRE |
+| I1 | Architecture | 55+ `as any` casts | L | PARTIEL (44→22 prod, helpers centralises) |
+| I2 | Architecture | 40+ `as unknown as X` unsafe casts | L | ~~FAIT~~ (remplaces par types propres) |
 | I3 | Architecture | 17 appels Supabase directs dans pages/components | M | ~~FAIT~~ |
 | I4 | Architecture | 1 seul ErrorBoundary au root (crash POS = crash app) | S | ~~FAIT~~ |
 | I5 | Architecture | Code mort : `ProductionPage.tsx` (697 lignes, jamais importe) | XS | ~~FAIT~~ |

@@ -269,7 +269,7 @@ export default function ProfilePage() {
                   <h3 className="text-xl font-semibold text-gray-900">
                     {user.display_name || `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User'}
                   </h3>
-                  <p className="text-gray-500">{(user as any).employee_code || '-'}</p>
+                  <p className="text-gray-500">{user.employee_code || '-'}</p>
                 </div>
               </div>
 
@@ -498,7 +498,7 @@ export default function ProfilePage() {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">Employee Code</span>
-                <span className="font-mono">{(user as any).employee_code || '-'}</span>
+                <span className="font-mono">{user.employee_code || '-'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Created</span>

@@ -292,7 +292,7 @@ export function useShift() {
             queryClient.invalidateQueries({ queryKey: ['current-shift'] })
             queryClient.invalidateQueries({ queryKey: ['terminal-shifts'] })
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
             toast.error(error.message || 'Erreur lors de l\'ouverture du shift')
         }
     })
@@ -327,7 +327,7 @@ export function useShift() {
             queryClient.invalidateQueries({ queryKey: ['terminal-shifts'] })
             queryClient.invalidateQueries({ queryKey: ['shift-transactions'] })
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
             toast.error(error.message || 'Erreur lors de la fermeture du shift')
         }
     })

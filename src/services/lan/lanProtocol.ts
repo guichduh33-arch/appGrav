@@ -6,7 +6,7 @@
  * between POS devices, mobile apps, displays, and KDS.
  */
 
-import { supabase } from '@/lib/supabase';
+import { untypedFrom, untypedRpc } from '@/lib/supabase';
 import type { ILanNode, TSyncDeviceType, TLanNodeStatus } from '@/types/database';
 import type { TKitchenStation } from '@/types/offline';
 
@@ -175,8 +175,7 @@ export async function registerLanNode(
   isHub: boolean = false
 ): Promise<{ success: boolean; nodeId?: string; error?: string }> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any).rpc('register_lan_node', {
+    const { data, error } = await untypedRpc('register_lan_node', {
       p_device_id: deviceId,
       p_device_type: deviceType,
       p_device_name: deviceName || null,
@@ -202,8 +201,7 @@ export async function registerLanNode(
  */
 export async function sendHeartbeat(deviceId: string): Promise<boolean> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any).rpc('update_lan_node_heartbeat', {
+    const { error } = await untypedRpc('update_lan_node_heartbeat', {
       p_device_id: deviceId,
     });
 
@@ -219,9 +217,7 @@ export async function sendHeartbeat(deviceId: string): Promise<boolean> {
  */
 export async function deregisterLanNode(deviceId: string): Promise<boolean> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
-      .from('lan_nodes')
+    const { error } = await untypedFrom('lan_nodes')
       .update({ status: 'offline' })
       .eq('device_id', deviceId);
 
@@ -241,8 +237,7 @@ export async function deregisterLanNode(deviceId: string): Promise<boolean> {
  */
 export async function getOnlineNodes(): Promise<ILanNode[]> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any).rpc('get_online_lan_nodes');
+    const { data, error } = await untypedRpc('get_online_lan_nodes');
 
     if (error || !data) {
       return [];
@@ -260,8 +255,7 @@ export async function getOnlineNodes(): Promise<ILanNode[]> {
  */
 export async function getHubNode(): Promise<ILanNode | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any).rpc('get_lan_hub_node');
+    const { data, error } = await untypedRpc('get_lan_hub_node');
 
     if (error || !data || data.length === 0) {
       return null;
@@ -322,9 +316,7 @@ export async function getHubConnectionInfo(): Promise<IHubConnectionInfo> {
  */
 export async function getNodesByType(deviceType: TSyncDeviceType): Promise<ILanNode[]> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any)
-      .from('lan_nodes')
+    const { data, error } = await untypedFrom('lan_nodes')
       .select('*')
       .eq('device_type', deviceType)
       .eq('status', 'online')
@@ -346,8 +338,7 @@ export async function getNodesByType(deviceType: TSyncDeviceType): Promise<ILanN
  */
 export async function cleanupStaleNodes(timeoutSeconds: number = 60): Promise<number> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase as any).rpc('mark_stale_lan_nodes_offline', {
+    const { data, error } = await untypedRpc('mark_stale_lan_nodes_offline', {
       p_timeout_seconds: timeoutSeconds,
     });
 
@@ -377,9 +368,7 @@ export async function logMessage(
   payloadSize?: number
 ): Promise<boolean> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
-      .from('lan_messages_log')
+    const { error } = await untypedFrom('lan_messages_log')
       .insert({
         message_type: messageType,
         from_device: fromDevice,
@@ -405,9 +394,7 @@ export async function updateMessageStatus(
   errorMessage?: string
 ): Promise<boolean> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
-      .from('lan_messages_log')
+    const { error } = await untypedFrom('lan_messages_log')
       .update({
         status,
         error_message: errorMessage || null,

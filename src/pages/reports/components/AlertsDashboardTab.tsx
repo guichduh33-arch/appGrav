@@ -16,7 +16,10 @@ import {
   resolveAlert,
   markAlertAsRead,
   ISystemAlert,
+  AlertType,
 } from '@/services/reports/anomalyAlerts';
+
+type AlertSeverity = 'info' | 'warning' | 'critical';
 
 const ALERT_TYPES = [
   'all',
@@ -55,8 +58,8 @@ export function AlertsDashboardTab() {
     queryKey: ['systemAlerts', typeFilter, severityFilter, statusFilter],
     queryFn: () =>
       getSystemAlerts({
-        alertType: typeFilter !== 'all' ? (typeFilter as any) : undefined,
-        severity: severityFilter !== 'all' ? (severityFilter as any) : undefined,
+        alertType: typeFilter !== 'all' ? (typeFilter as AlertType) : undefined,
+        severity: severityFilter !== 'all' ? (severityFilter as AlertSeverity) : undefined,
         unresolvedOnly: statusFilter === 'unresolved',
       }),
     staleTime: 30 * 1000,

@@ -108,7 +108,7 @@ const PrintingSettingsPage = () => {
                 });
                 toast.success('Printer updated');
             } else {
-                await createPrinter.mutateAsync(formData as any);
+                await createPrinter.mutateAsync(formData as Omit<PrinterConfiguration, 'id' | 'created_at' | 'updated_at'>);
                 toast.success('Printer created');
             }
             setShowModal(false);

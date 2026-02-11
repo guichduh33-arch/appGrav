@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { untypedFrom } from '../lib/supabase';
 import { useTerminalStore, selectNeedsSyncToServer } from '../stores/terminalStore';
 import { useNetworkStatus } from './useNetworkStatus';
 import { addToSyncQueue } from '../services/sync/syncQueue';
@@ -63,7 +63,7 @@ export function useTerminal() {
 
   /**
    * Sync terminal to Supabase server
-   * Note: Uses 'as any' type cast until pos_terminals is in generated types
+   * Note: Uses untypedFrom helper until pos_terminals is in generated types
    */
   const syncToServer = async (
     deviceId: string,
@@ -72,18 +72,14 @@ export function useTerminal() {
     location?: string
   ) => {
     // Check if terminal already exists in database
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: existing } = await (supabase as any)
-      .from('pos_terminals')
+    const { data: existing } = await untypedFrom('pos_terminals')
       .select('*')
       .eq('device_id', deviceId)
       .maybeSingle();
 
     if (existing) {
       // Update existing terminal
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any)
-        .from('pos_terminals')
+      const { data, error } = await untypedFrom('pos_terminals')
         .update({
           terminal_name: terminalName,
           is_hub: isHub,
@@ -97,9 +93,7 @@ export function useTerminal() {
       store.setServerData(data as IPosTerminal);
     } else {
       // Create new terminal
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any)
-        .from('pos_terminals')
+      const { data, error } = await untypedFrom('pos_terminals')
         .insert({
           device_id: deviceId,
           terminal_name: terminalName,
@@ -124,9 +118,7 @@ export function useTerminal() {
 
       if (isOnline && store.deviceId) {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error } = await (supabase as any)
-            .from('pos_terminals')
+          const { error } = await untypedFrom('pos_terminals')
             .update({ terminal_name: name })
             .eq('device_id', store.deviceId);
 
@@ -150,9 +142,7 @@ export function useTerminal() {
 
       if (isOnline && store.deviceId) {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error } = await (supabase as any)
-            .from('pos_terminals')
+          const { error } = await untypedFrom('pos_terminals')
             .update({ is_hub: isHub })
             .eq('device_id', store.deviceId);
 
@@ -174,9 +164,7 @@ export function useTerminal() {
     if (!store.deviceId || !isOnline) return;
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any)
-        .from('pos_terminals')
+      const { data, error } = await untypedFrom('pos_terminals')
         .select('*')
         .eq('device_id', store.deviceId)
         .single();

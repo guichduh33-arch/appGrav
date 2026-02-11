@@ -3,6 +3,11 @@
  * Shared audio functions for notifications across the application
  */
 
+/** Window with webkit-prefixed AudioContext for Safari compatibility */
+interface WebkitWindow extends Window {
+  webkitAudioContext?: typeof AudioContext;
+}
+
 /**
  * Play a notification sound using Web Audio API
  * Used for KDS new orders, order ready notifications, etc.
@@ -19,7 +24,7 @@ export function playNotificationSound(
   try {
     const AudioContextClass =
       window.AudioContext ||
-      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      (window as WebkitWindow).webkitAudioContext;
 
     if (!AudioContextClass) {
       console.warn('[audio] Web Audio API not supported');

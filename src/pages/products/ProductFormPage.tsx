@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { saveProduct } from '@/services/products/catalogSyncService'
+import type { IOfflineProduct } from '@/types/offline'
 import { formatCurrency } from '@/utils/helpers'
 import { toast } from 'sonner'
 import './ProductFormPage.css'
@@ -207,7 +208,7 @@ export default function ProductFormPage() {
                 updated_at: new Date().toISOString()
             }
 
-            const result = await saveProduct(productData as any)
+            const result = await saveProduct(productData as Partial<IOfflineProduct> & { id: string })
 
             if (!result.success) {
                 throw new Error(result.error)
