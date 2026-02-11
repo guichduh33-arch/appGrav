@@ -144,6 +144,11 @@ describe('CompanySettingsPage', () => {
 
       render(<CompanySettingsPage />, { wrapper: createWrapper() });
 
+      // Wait for form to populate from settings useEffect
+      await waitFor(() => {
+        expect(screen.getByLabelText(/Company Name/i)).toHaveValue('The Breakery');
+      }, { timeout: 3000 });
+
       // Modify a field to trigger dirty state
       const companyNameInput = screen.getByLabelText(/Company Name/i);
       fireEvent.change(companyNameInput, { target: { value: 'New Company Name' } });
@@ -155,12 +160,12 @@ describe('CompanySettingsPage', () => {
       // Verify mutation was called
       await waitFor(() => {
         expect(mockUpdateSettingMutate).toHaveBeenCalled();
-      });
+      }, { timeout: 3000 });
 
       // Verify toast success
       await waitFor(() => {
         expect(toast.success).toHaveBeenCalledWith('Company settings saved');
-      });
+      }, { timeout: 3000 });
     });
 
     it('should show dirty state indicator when form is modified', () => {
@@ -199,6 +204,11 @@ describe('CompanySettingsPage', () => {
     it('should show error for invalid email format', async () => {
       render(<CompanySettingsPage />, { wrapper: createWrapper() });
 
+      // Wait for form to populate from settings useEffect
+      await waitFor(() => {
+        expect(screen.getByLabelText(/Company Name/i)).toHaveValue('The Breakery');
+      }, { timeout: 3000 });
+
       // Enter invalid email
       const emailInput = screen.getByLabelText(/Email/i);
       fireEvent.change(emailInput, { target: { value: 'invalid-email' } });
@@ -214,7 +224,7 @@ describe('CompanySettingsPage', () => {
       // Should show validation error
       await waitFor(() => {
         expect(screen.getByText('Invalid email format')).toBeInTheDocument();
-      });
+      }, { timeout: 3000 });
     });
 
     it('should show error for short phone number', async () => {

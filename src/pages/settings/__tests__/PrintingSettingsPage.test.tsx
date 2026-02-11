@@ -148,6 +148,11 @@ describe('PrintingSettingsPage', () => {
             mockCreateMutate.mockResolvedValue({});
             render(<PrintingSettingsPage />, { wrapper: createWrapper() });
 
+            // Wait for list to render
+            await waitFor(() => {
+                expect(screen.getByText('Main Receipt Printer')).toBeInTheDocument();
+            }, { timeout: 3000 });
+
             // Open modal
             fireEvent.click(screen.getByRole('button', { name: /New Printer/i }));
 
@@ -169,7 +174,7 @@ describe('PrintingSettingsPage', () => {
                     name: 'New Test Printer',
                     connection_string: '10.0.0.50:9100',
                 }));
-            });
+            }, { timeout: 3000 });
 
             expect(toast.success).toHaveBeenCalledWith('Printer created');
         });

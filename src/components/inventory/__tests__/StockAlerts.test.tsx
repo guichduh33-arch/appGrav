@@ -10,6 +10,7 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { calculateStockStatus } from '@/hooks/offline/useStockLevelsOffline';
 import { isDataStale, STALE_DATA_THRESHOLD_MS } from '@/types/offline';
+import { StaleDataWarning } from '../StaleDataWarning';
 
 // Mock the hooks
 vi.mock('@/hooks/offline/useStockLevelsOffline', async () => {
@@ -171,19 +172,18 @@ describe('StockAlertsBadge', () => {
 
 describe('StaleDataWarning', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  it('renders nothing when data is fresh', async () => {
+  it('renders nothing when data is fresh', () => {
     const now = Date.now();
     vi.setSystemTime(now);
     const recentSync = new Date(now - 1000).toISOString();
 
-    const { StaleDataWarning } = await import('../StaleDataWarning');
     const { container } = render(
       <TestWrapper>
         <StaleDataWarning lastSyncAt={recentSync} />
@@ -193,12 +193,11 @@ describe('StaleDataWarning', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('renders warning when data is stale', async () => {
+  it('renders warning when data is stale', () => {
     const now = Date.now();
     vi.setSystemTime(now);
     const oldSync = new Date(now - STALE_DATA_THRESHOLD_MS - 60000).toISOString();
 
-    const { StaleDataWarning } = await import('../StaleDataWarning');
     render(
       <TestWrapper>
         <StaleDataWarning lastSyncAt={oldSync} />
@@ -209,8 +208,7 @@ describe('StaleDataWarning', () => {
     expect(screen.getByRole('alert')).toBeInTheDocument();
   });
 
-  it('renders warning when lastSyncAt is null', async () => {
-    const { StaleDataWarning } = await import('../StaleDataWarning');
+  it('renders warning when lastSyncAt is null', () => {
     render(
       <TestWrapper>
         <StaleDataWarning lastSyncAt={null} />

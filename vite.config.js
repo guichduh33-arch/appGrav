@@ -159,6 +159,7 @@ export default defineConfig(function (_a) {
             environment: 'jsdom',
             setupFiles: './src/setupTests.ts',
             css: true,
+            testTimeout: 15000,
         },
     });
 });

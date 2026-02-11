@@ -211,7 +211,9 @@ export async function importProducts(
 
     const categoryMap = new Map<string, string>()
     for (const cat of categories || []) {
-        categoryMap.set(cat.name.toLowerCase(), cat.id)
+        if (cat.name) {
+            categoryMap.set(cat.name.toLowerCase(), cat.id)
+        }
     }
 
     // Get section mapping (only active sections)
@@ -222,8 +224,12 @@ export async function importProducts(
 
     const sectionMap = new Map<string, string>()
     for (const sec of sections || []) {
-        sectionMap.set(sec.slug.toLowerCase(), sec.id)
-        sectionMap.set(sec.name.toLowerCase(), sec.id) // Also map by name
+        if (sec.slug) {
+            sectionMap.set(sec.slug.toLowerCase(), sec.id)
+        }
+        if (sec.name) {
+            sectionMap.set(sec.name.toLowerCase(), sec.id) // Also map by name
+        }
     }
 
     for (let i = 0; i < rows.length; i++) {
