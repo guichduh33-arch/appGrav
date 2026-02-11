@@ -147,7 +147,7 @@ export default function InventoryAlertsPanel() {
         return (
             <div className="inventory-alerts-panel loading">
                 <RefreshCw className="spin" size={24} />
-                <span>Chargement des alertes...</span>
+                <span>Loading alerts...</span>
             </div>
         )
     }
@@ -161,7 +161,7 @@ export default function InventoryAlertsPanel() {
             <div className="alerts-panel__header">
                 <h2>
                     <AlertTriangle size={20} />
-                    Alertes Inventaire
+                    Inventory Alerts
                 </h2>
                 <button
                     className="btn-refresh"
@@ -176,12 +176,12 @@ export default function InventoryAlertsPanel() {
             <div className="alerts-panel__summary">
                 {criticalCount > 0 && (
                     <span className="summary-badge critical">
-                        {criticalCount} critique{criticalCount > 1 ? 's' : ''}
+                        {criticalCount} critical
                     </span>
                 )}
                 {warningCount > 0 && (
                     <span className="summary-badge warning">
-                        {warningCount} avertissement{warningCount > 1 ? 's' : ''}
+                        {warningCount} warning{warningCount > 1 ? 's' : ''}
                     </span>
                 )}
                 {criticalCount === 0 && warningCount === 0 && (
@@ -199,7 +199,7 @@ export default function InventoryAlertsPanel() {
                     onClick={() => setActiveTab('alerts')}
                 >
                     <AlertTriangle size={16} />
-                    Stock Bas
+                    Low Stock
                     {lowStockItems.length > 0 && (
                         <span className="tab-badge">{lowStockItems.length}</span>
                     )}
@@ -209,7 +209,7 @@ export default function InventoryAlertsPanel() {
                     onClick={() => setActiveTab('reorder')}
                 >
                     <ShoppingCart size={16} />
-                    Réappro
+                    Reorder
                     {reorderSuggestions.length > 0 && (
                         <span className="tab-badge">{reorderSuggestions.length}</span>
                     )}
@@ -234,7 +234,7 @@ export default function InventoryAlertsPanel() {
                         {lowStockItems.length === 0 ? (
                             <div className="empty-state">
                                 <CheckCircle size={40} />
-                                <p>Aucune alerte de stock bas</p>
+                                <p>No low stock alerts</p>
                             </div>
                         ) : (
                             lowStockItems.map(item => (
@@ -277,19 +277,19 @@ export default function InventoryAlertsPanel() {
                         {reorderSuggestions.length === 0 ? (
                             <div className="empty-state">
                                 <CheckCircle size={40} />
-                                <p>Aucune suggestion de réapprovisionnement</p>
+                                <p>No reorder suggestions</p>
                             </div>
                         ) : (
                             <>
                                 {selectedForPo.size > 0 && (
                                     <div className="reorder-actions">
-                                        <span>{selectedForPo.size} produit(s) sélectionné(s)</span>
+                                        <span>{selectedForPo.size} product(s) selected</span>
                                         <button
                                             className="btn-create-po"
                                             onClick={handleCreatePo}
                                             disabled={creatingPo}
                                         >
-                                            {creatingPo ? 'Création...' : 'Créer BC'}
+                                            {creatingPo ? 'Creating...' : 'Create PO'}
                                             <ExternalLink size={14} />
                                         </button>
                                     </div>
@@ -307,7 +307,7 @@ export default function InventoryAlertsPanel() {
                                         <div className="reorder-item__info">
                                             <span className="reorder-item__name">{suggestion.product_name}</span>
                                             <span className="reorder-item__supplier">
-                                                {suggestion.supplier_name || 'Fournisseur non défini'}
+                                                {suggestion.supplier_name || 'No supplier defined'}
                                             </span>
                                         </div>
                                         <div className="reorder-item__qty">
@@ -335,7 +335,7 @@ export default function InventoryAlertsPanel() {
                         {productionSuggestions.length === 0 ? (
                             <div className="empty-state">
                                 <CheckCircle size={40} />
-                                <p>Aucune suggestion de production</p>
+                                <p>No production suggestions</p>
                             </div>
                         ) : (
                             productionSuggestions.map(suggestion => (
@@ -364,12 +364,12 @@ export default function InventoryAlertsPanel() {
                                         {suggestion.ingredients_available ? (
                                             <span className="status-ok">
                                                 <CheckCircle size={14} />
-                                                Prêt
+                                                Ready
                                             </span>
                                         ) : (
                                             <span className="status-blocked">
                                                 <XCircle size={14} />
-                                                {suggestion.missing_ingredients.length} manquant(s)
+                                                {suggestion.missing_ingredients.length} missing
                                             </span>
                                         )}
                                     </div>

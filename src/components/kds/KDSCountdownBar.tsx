@@ -6,6 +6,7 @@
  * when an order is about to be auto-removed from the KDS display.
  */
 
+import { memo } from 'react';
 import { X, Clock } from 'lucide-react';
 import './KDSCountdownBar.css';
 
@@ -18,7 +19,7 @@ interface IKDSCountdownBarProps {
   onCancel: () => void;
 }
 
-export function KDSCountdownBar({
+export const KDSCountdownBar = memo(function KDSCountdownBar({
   timeRemaining,
   totalTime,
   onCancel,
@@ -49,6 +50,6 @@ export function KDSCountdownBar({
       </div>
     </div>
   );
-}
+});
 
 export default KDSCountdownBar;

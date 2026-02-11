@@ -33,19 +33,19 @@ interface B2BOrder {
 }
 
 const STATUS_CONFIG = {
-    draft: { label: 'Brouillon', color: 'gray', icon: FileText },
-    confirmed: { label: 'Confirmée', color: 'blue', icon: CheckCircle },
-    processing: { label: 'En préparation', color: 'yellow', icon: Clock },
-    ready: { label: 'Prête', color: 'purple', icon: Package },
-    partially_delivered: { label: 'Livr. partielle', color: 'orange', icon: Truck },
-    delivered: { label: 'Livrée', color: 'green', icon: CheckCircle },
-    cancelled: { label: 'Annulée', color: 'red', icon: AlertCircle }
+    draft: { label: 'Draft', color: 'gray', icon: FileText },
+    confirmed: { label: 'Confirmed', color: 'blue', icon: CheckCircle },
+    processing: { label: 'Processing', color: 'yellow', icon: Clock },
+    ready: { label: 'Ready', color: 'purple', icon: Package },
+    partially_delivered: { label: 'Partial Delivery', color: 'orange', icon: Truck },
+    delivered: { label: 'Delivered', color: 'green', icon: CheckCircle },
+    cancelled: { label: 'Cancelled', color: 'red', icon: AlertCircle }
 }
 
 const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-    unpaid: { label: 'Non payé', color: 'red' },
-    partial: { label: 'Partiel', color: 'orange' },
-    paid: { label: 'Payé', color: 'green' },
+    unpaid: { label: 'Unpaid', color: 'red' },
+    partial: { label: 'Partial', color: 'orange' },
+    paid: { label: 'Paid', color: 'green' },
 }
 
 export default function B2BOrdersPage() {
@@ -114,7 +114,7 @@ export default function B2BOrdersPage() {
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return '-'
-        return new Date(dateString).toLocaleDateString('fr-FR', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             day: '2-digit',
             month: 'short',
             year: 'numeric'
@@ -148,20 +148,20 @@ export default function B2BOrdersPage() {
                 <div className="b2b-orders-page__title-section">
                     <h1 className="b2b-orders-page__title">
                         <FileText size={28} />
-                        Commandes B2B
+                        B2B Orders
                     </h1>
                     <p className="b2b-orders-page__subtitle">
-                        Gérez vos commandes wholesale et suivez les livraisons
+                        Manage your wholesale orders and track deliveries
                     </p>
                 </div>
                 <div className="b2b-orders-page__actions">
                     <button className="btn btn-secondary" onClick={() => navigate('/b2b/payments')}>
                         <CreditCard size={18} />
-                        Paiements
+                        Payments
                     </button>
                     <button className="btn btn-primary" onClick={() => navigate('/b2b/orders/new')}>
                         <Plus size={18} />
-                        Nouvelle Commande
+                        New Order
                     </button>
                 </div>
             </div>
@@ -174,7 +174,7 @@ export default function B2BOrdersPage() {
                     </div>
                     <div className="b2b-stat-card__content">
                         <span className="b2b-stat-card__value">{stats.total}</span>
-                        <span className="b2b-stat-card__label">Total Commandes</span>
+                        <span className="b2b-stat-card__label">Total Orders</span>
                     </div>
                 </div>
                 <div className="b2b-stat-card">
@@ -183,7 +183,7 @@ export default function B2BOrdersPage() {
                     </div>
                     <div className="b2b-stat-card__content">
                         <span className="b2b-stat-card__value">{stats.pending}</span>
-                        <span className="b2b-stat-card__label">En cours</span>
+                        <span className="b2b-stat-card__label">In Progress</span>
                     </div>
                 </div>
                 <div className="b2b-stat-card">
@@ -192,7 +192,7 @@ export default function B2BOrdersPage() {
                     </div>
                     <div className="b2b-stat-card__content">
                         <span className="b2b-stat-card__value">{stats.toDeliver}</span>
-                        <span className="b2b-stat-card__label">À livrer</span>
+                        <span className="b2b-stat-card__label">To Deliver</span>
                     </div>
                 </div>
                 <div className="b2b-stat-card">
@@ -201,7 +201,7 @@ export default function B2BOrdersPage() {
                     </div>
                     <div className="b2b-stat-card__content">
                         <span className="b2b-stat-card__value">{formatCurrency(stats.totalDue)}</span>
-                        <span className="b2b-stat-card__label">À encaisser</span>
+                        <span className="b2b-stat-card__label">To Collect</span>
                     </div>
                 </div>
             </div>
@@ -212,7 +212,7 @@ export default function B2BOrdersPage() {
                     <Search size={20} />
                     <input
                         type="text"
-                        placeholder="Rechercher par n° commande ou client..."
+                        placeholder="Search by order # or customer..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -223,24 +223,24 @@ export default function B2BOrdersPage() {
                         onChange={(e) => setStatusFilter(e.target.value)}
                         className="b2b-orders-filter"
                     >
-                        <option value="all">Tous les statuts</option>
-                        <option value="draft">Brouillon</option>
-                        <option value="confirmed">Confirmée</option>
-                        <option value="processing">En préparation</option>
-                        <option value="ready">Prête</option>
-                        <option value="partially_delivered">Livr. partielle</option>
-                        <option value="delivered">Livrée</option>
-                        <option value="cancelled">Annulée</option>
+                        <option value="all">All statuses</option>
+                        <option value="draft">Draft</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="processing">Processing</option>
+                        <option value="ready">Ready</option>
+                        <option value="partially_delivered">Partial Delivery</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
                     </select>
                     <select
                         value={paymentFilter}
                         onChange={(e) => setPaymentFilter(e.target.value)}
                         className="b2b-orders-filter"
                     >
-                        <option value="all">Tous les paiements</option>
-                        <option value="unpaid">Non payé</option>
-                        <option value="partial">Partiel</option>
-                        <option value="paid">Payé</option>
+                        <option value="all">All payments</option>
+                        <option value="unpaid">Unpaid</option>
+                        <option value="partial">Partial</option>
+                        <option value="paid">Paid</option>
                     </select>
                 </div>
             </div>
@@ -249,16 +249,16 @@ export default function B2BOrdersPage() {
             {loading ? (
                 <div className="b2b-orders-loading">
                     <div className="spinner"></div>
-                    <span>Chargement des commandes...</span>
+                    <span>Loading orders...</span>
                 </div>
             ) : filteredOrders.length === 0 ? (
                 <div className="b2b-orders-empty">
                     <FileText size={48} />
-                    <h3>Aucune commande B2B</h3>
-                    <p>Créez votre première commande wholesale</p>
+                    <h3>No B2B orders</h3>
+                    <p>Create your first wholesale order</p>
                     <button className="btn btn-primary" onClick={() => navigate('/b2b/orders/new')}>
                         <Plus size={18} />
-                        Nouvelle Commande
+                        New Order
                     </button>
                 </div>
             ) : (
@@ -266,13 +266,13 @@ export default function B2BOrdersPage() {
                     <table className="b2b-orders-table">
                         <thead>
                             <tr>
-                                <th>N° Commande</th>
-                                <th>Client</th>
+                                <th>Order #</th>
+                                <th>Customer</th>
                                 <th>Date</th>
-                                <th>Livraison</th>
-                                <th>Montant</th>
-                                <th>Statut</th>
-                                <th>Paiement</th>
+                                <th>Delivery</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Payment</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -298,7 +298,7 @@ export default function B2BOrdersPage() {
                                         <div className="b2b-amount-cell">
                                             <span className="b2b-amount-total">{formatCurrency(order.total_amount)}</span>
                                             {order.amount_due > 0 && (
-                                                <span className="b2b-amount-due">Dû: {formatCurrency(order.amount_due)}</span>
+                                                <span className="b2b-amount-due">Due: {formatCurrency(order.amount_due)}</span>
                                             )}
                                         </div>
                                     </td>
@@ -309,7 +309,7 @@ export default function B2BOrdersPage() {
                                             <button
                                                 className="btn-icon"
                                                 onClick={() => navigate(`/b2b/orders/${order.id}`)}
-                                                title="Voir détails"
+                                                title="View details"
                                             >
                                                 <Eye size={18} />
                                             </button>
@@ -317,7 +317,7 @@ export default function B2BOrdersPage() {
                                                 <button
                                                     className="btn-icon"
                                                     onClick={() => navigate(`/b2b/orders/${order.id}/edit`)}
-                                                    title="Modifier"
+                                                    title="Edit"
                                                 >
                                                     <Edit2 size={18} />
                                                 </button>

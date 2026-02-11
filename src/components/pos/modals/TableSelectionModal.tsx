@@ -118,15 +118,15 @@ export default function TableSelectionModal({ onSelectTable, onClose: _onClose }
                     <div className="table-selection__legend">
                         <div className="legend-item">
                             <span className="legend-dot legend-dot--available"></span>
-                            Disponible
+                            Available
                         </div>
                         <div className="legend-item">
                             <span className="legend-dot legend-dot--occupied"></span>
-                            Occupée
+                            Occupied
                         </div>
                         <div className="legend-item">
                             <span className="legend-dot legend-dot--reserved"></span>
-                            Réservée
+                            Reserved
                         </div>
                     </div>
                 </div>
@@ -138,7 +138,7 @@ export default function TableSelectionModal({ onSelectTable, onClose: _onClose }
                         onClick={handleConfirm}
                         disabled={!selectedTable}
                     >
-                        Confirmer Table {selectedTable}
+                        Confirm Table {selectedTable}
                     </button>
                 </div>
             </div>

@@ -19,7 +19,7 @@ export function FilterDropdown({
   options,
   value,
   onChange,
-  placeholder = 'Sélectionner...',
+  placeholder = 'Select...',
   disabled = false,
   className = '',
 }: FilterDropdownProps) {
@@ -139,7 +139,7 @@ export function FilterDropdown({
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Rechercher..."
+                  placeholder="Search..."
                   className="
                     w-full pl-8 pr-3 py-2
                     text-sm border border-gray-200 rounded-md
@@ -154,7 +154,7 @@ export function FilterDropdown({
           <div className="max-h-60 overflow-y-auto">
             {filteredOptions.length === 0 ? (
               <div className="px-3 py-4 text-sm text-gray-500 text-center">
-                Aucun résultat
+                No results
               </div>
             ) : (
               filteredOptions.map((option) => (

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Tag, Percent } from 'lucide-react'
 import { formatPrice } from '@/utils/helpers'
 import { useCartStore } from '@/stores/cartStore'
@@ -9,7 +10,7 @@ interface CartTotalsProps {
     onDiscountClick: () => void
 }
 
-export function CartTotals({ subtotal, discountAmount, total, onDiscountClick }: CartTotalsProps) {
+export const CartTotals = memo(function CartTotals({ subtotal, discountAmount, total, onDiscountClick }: CartTotalsProps) {
     const promotionTotalDiscount = useCartStore(state => state.promotionTotalDiscount)
     const appliedPromotions = useCartStore(state => state.appliedPromotions)
 
@@ -53,4 +54,4 @@ export function CartTotals({ subtotal, discountAmount, total, onDiscountClick }:
             </div>
         </div>
     )
-}
+})

@@ -168,7 +168,7 @@ const UsersPage = () => {
         );
         loadData();
       } else {
-        toast.error(result.error || 'Erreur');
+        toast.error(result.error || 'Error');
       }
     } catch (error) {
       console.error('Toggle active error:', error);
@@ -803,7 +803,7 @@ function UserFormModal({
                         onChange={() => setFormData({ ...formData, primary_role_id: role.id })}
                         className="text-blue-600 focus:ring-blue-500"
                       />
-                      Principal
+                      Primary
                     </label>
                   )}
                 </label>

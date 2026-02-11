@@ -6,9 +6,9 @@ import { usePOSConfigSettings } from '@/hooks/settings/useModuleConfigSettings'
 import './DiscountModal.css'
 
 interface DiscountModalProps {
-    itemName?: string // Si défini, c'est un discount par item
+    itemName?: string
     itemPrice?: number
-    totalPrice: number // Le total de la commande ou le prix de l'item
+    totalPrice: number
     onApplyDiscount: (discountAmount: number, discountType: 'percentage' | 'fixed', discountValue: number) => void
     onClose: () => void
 }
@@ -100,14 +100,14 @@ export default function DiscountModal({
                                 onClick={() => setDiscountType('percentage')}
                             >
                                 <Percent size={20} />
-                                Pourcentage
+                                Percentage
                             </button>
                             <button
                                 className={`discount-type-btn ${discountType === 'fixed' ? 'is-active' : ''}`}
                                 onClick={() => setDiscountType('fixed')}
                             >
                                 <DollarSign size={20} />
-                                Montant Fixe (IDR)
+                                Fixed Amount (IDR)
                             </button>
                         </div>
 
@@ -129,7 +129,7 @@ export default function DiscountModal({
                         {/* Discount Input */}
                         <div className="discount-input-group">
                             <label className="discount-input-label">
-                                {discountType === 'percentage' ? 'Pourcentage (%)' : 'Montant (IDR)'}
+                                {discountType === 'percentage' ? 'Percentage (%)' : 'Amount (IDR)'}
                             </label>
                             <input
                                 type="number"
@@ -147,7 +147,7 @@ export default function DiscountModal({
                         <div className="discount-summary">
                             <div className="discount-summary-row">
                                 <span className="discount-summary-label">
-                                    {isItemDiscount ? 'Prix de l\'article' : 'Total de la commande'}
+                                    {isItemDiscount ? 'Item Price' : 'Order Total'}
                                 </span>
                                 <span className="discount-summary-value">{formatPrice(totalPrice)}</span>
                             </div>
@@ -155,14 +155,14 @@ export default function DiscountModal({
                                 <>
                                     <div className="discount-summary-row discount-row">
                                         <span className="discount-summary-label">
-                                            Remise ({discountType === 'percentage' ? `${discountValue}%` : 'fixe'})
+                                            Discount ({discountType === 'percentage' ? `${discountValue}%` : 'fixed'})
                                         </span>
                                         <span className="discount-summary-value text-danger">
                                             -{formatPrice(discountAmount)}
                                         </span>
                                     </div>
                                     <div className="discount-summary-row final-price-row">
-                                        <span className="discount-summary-label">Prix final</span>
+                                        <span className="discount-summary-label">Final Price</span>
                                         <span className="discount-summary-value final-price">
                                             {formatPrice(finalPrice)}
                                         </span>

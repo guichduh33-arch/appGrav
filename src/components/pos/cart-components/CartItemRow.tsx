@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Trash2, Tag, Plus, Minus, Lock, Percent } from 'lucide-react'
 import { formatPrice } from '@/utils/helpers'
 import { useCartStore, type CartItem } from '@/stores/cartStore'
@@ -12,7 +13,7 @@ interface CartItemRowProps {
     onDiscountClick: (item: CartItem) => void
 }
 
-export function CartItemRow({
+export const CartItemRow = memo(function CartItemRow({
     item,
     isLocked,
     onItemClick,
@@ -169,9 +170,9 @@ export function CartItemRow({
             </div>
         </div>
     )
-}
+})
 
-function PromotionBadge({ discount }: { discount: IItemPromotionDiscount }) {
+const PromotionBadge = memo(function PromotionBadge({ discount }: { discount: IItemPromotionDiscount }) {
     return (
         <span
             className="cart-item__promo-badge"
@@ -194,4 +195,4 @@ function PromotionBadge({ discount }: { discount: IItemPromotionDiscount }) {
             {discount.description}
         </span>
     )
-}
+})

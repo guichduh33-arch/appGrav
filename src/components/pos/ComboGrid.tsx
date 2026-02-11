@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { ProductCombo } from '../../types/database'
 import { formatPrice } from '../../utils/helpers'
 import './ProductGrid.css'
@@ -8,7 +9,7 @@ interface ComboGridProps {
     isLoading?: boolean
 }
 
-export default function ComboGrid({ combos, onComboClick, isLoading }: ComboGridProps) {
+export default memo(function ComboGrid({ combos, onComboClick, isLoading }: ComboGridProps) {
     if (isLoading) {
         return (
             <div className="products-grid">
@@ -45,4 +46,4 @@ export default function ComboGrid({ combos, onComboClick, isLoading }: ComboGrid
             ))}
         </div>
     )
-}
+})

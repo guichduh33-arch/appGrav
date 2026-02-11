@@ -1,6 +1,9 @@
 /**
  * useBalanceSheet Hook (Epic 9 - Story 9.7)
  * Assets = Liabilities + Equity
+ *
+ * Optimized: Uses get_balance_sheet_data RPC to fetch all account balances
+ * in a single query instead of N separate get_account_balance calls.
  */
 
 import { useQuery } from '@tanstack/react-query'
@@ -21,25 +24,20 @@ export function useBalanceSheet({ endDate }: IBalanceSheetParams = {}) {
     queryFn: async () => {
       const dateFilter = endDate || new Date().toISOString().split('T')[0]
 
-      // Get all active accounts with balances
-      const { data: accounts, error: accError } = await supabase
-        .from('accounts')
-        .select('id, code, name, account_type, balance_type')
-        .eq('is_active', true)
-        .in('account_type', ['asset', 'liability', 'equity'])
-        .order('code')
-      if (accError) throw accError
+      // Single RPC call replaces N separate get_account_balance calls
+      const { data, error } = await supabase.rpc('get_balance_sheet_data', {
+        p_end_date: dateFilter,
+      })
+      if (error) throw error
 
-      // Get balances for each account
-      const balances = await Promise.all(
-        (accounts ?? []).map(async (acc) => {
-          const { data } = await supabase.rpc('get_account_balance', {
-            p_account_id: acc.id,
-            p_end_date: dateFilter,
-          })
-          return { ...acc, amount: Number(data) || 0 }
-        })
-      )
+      const balances = (data ?? []) as Array<{
+        account_id: string
+        account_code: string
+        account_name: string
+        account_type: TAccountType
+        balance_type: string
+        amount: number
+      }>
 
       // Group by type
       const buildSection = (
@@ -47,11 +45,11 @@ export function useBalanceSheet({ endDate }: IBalanceSheetParams = {}) {
         type: TAccountType
       ): IBalanceSheetSection => {
         const accs: IFinancialStatementRow[] = balances
-          .filter(a => a.account_type === type && Math.abs(a.amount) >= 0.01)
+          .filter(a => a.account_type === type && Math.abs(Number(a.amount)) >= 0.01)
           .map(a => ({
-            account_code: a.code,
-            account_name: a.name,
-            amount: a.amount,
+            account_code: a.account_code,
+            account_name: a.account_name,
+            amount: Number(a.amount),
           }))
         return {
           title,

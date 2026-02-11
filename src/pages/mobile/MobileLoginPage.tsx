@@ -100,55 +100,39 @@ export default function MobileLoginPage() {
     setError(null);
 
     try {
-      // Search for user by PIN hash
-      const { data: users, error: queryError } = await supabase
-        .from('user_profiles')
-        .select('id, name, display_name, role, pin_hash, is_active')
-        .eq('is_active', true)
-        .not('pin_hash', 'is', null);
+      // Verify PIN server-side via RPC (never fetch pin_hash to client)
+      const { data: verifyResult, error: verifyError } = await supabase.rpc('verify_user_pin', {
+        p_pin: pin,
+      });
 
-      if (queryError) {
-        throw new Error(queryError.message);
+      if (verifyError) {
+        throw new Error(verifyError.message);
       }
 
-      // Find user with matching PIN using bcrypt comparison
-      let matchedUser = null;
-      for (const u of users || []) {
-        // For demo purposes, compare plain text PIN (in production, use proper bcrypt)
-        const { data: isValid } = await supabase.rpc('verify_user_pin', {
-          p_user_id: u.id,
-          p_pin: pin,
-        });
-        if (isValid) {
-          matchedUser = u;
-          break;
-        }
-      }
-
-      if (!matchedUser) {
+      if (!verifyResult || !verifyResult.user_id) {
         incrementLoginAttempts();
-        setError('PIN incorrect');
+        setError('Incorrect PIN');
         setPin('');
         return;
       }
 
-      const user = matchedUser;
+      const { user_id, name, display_name, role } = verifyResult;
 
       // Check if user has server/waiter role
-      const hasServerRole = ['admin', 'server', 'waiter', 'manager'].includes(user.role);
+      const hasServerRole = ['admin', 'server', 'waiter', 'manager'].includes(role);
       if (!hasServerRole) {
-        setError('Accès non autorisé');
+        setError('Unauthorized access');
         setPin('');
         return;
       }
 
       // Login successful
-      login(user.id, user.display_name || user.name || 'Serveur');
+      login(user_id, display_name || name || 'Server');
       navigate('/mobile');
     } catch (err) {
       console.error('[MobileLogin] Error:', err);
       incrementLoginAttempts();
-      setError('Erreur de connexion');
+      setError('Connection error');
       setPin('');
     } finally {
       setIsLoading(false);
@@ -169,7 +153,7 @@ export default function MobileLoginPage() {
         <div className="mobile-login__logo">
           <span className="mobile-login__logo-icon">🥐</span>
           <h1 className="mobile-login__title">The Breakery</h1>
-          <p className="mobile-login__subtitle">Application Serveur</p>
+          <p className="mobile-login__subtitle">Server App</p>
         </div>
 
         {/* PIN Display */}
@@ -195,7 +179,7 @@ export default function MobileLoginPage() {
           {lockoutRemaining > 0 && (
             <div className="mobile-login__lockout">
               <Lock size={16} />
-              <span>Réessayez dans {lockoutRemaining}s</span>
+              <span>Try again in {lockoutRemaining}s</span>
             </div>
           )}
         </div>
@@ -229,7 +213,7 @@ export default function MobileLoginPage() {
           {isLoading ? (
             <Loader2 size={24} className="animate-spin" />
           ) : (
-            'Connexion'
+            'Login'
           )}
         </button>
       </div>

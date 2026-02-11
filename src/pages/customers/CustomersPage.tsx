@@ -147,7 +147,7 @@ export default function CustomersPage() {
     }
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('fr-FR', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             day: '2-digit',
             month: 'short',
             year: 'numeric'
@@ -161,10 +161,10 @@ export default function CustomersPage() {
                 <div className="customers-header__info">
                     <h1 className="customers-header__title">
                         <Users size={28} />
-                        Gestion des Clients
+                        Customer Management
                     </h1>
                     <p className="customers-header__subtitle">
-                        Gérez vos clients, catégories et programme de fidélité
+                        Manage your customers, categories and loyalty program
                     </p>
                 </div>
                 <div className="customers-header__actions">
@@ -173,14 +173,14 @@ export default function CustomersPage() {
                         onClick={() => navigate('/customers/categories')}
                     >
                         <Filter size={18} />
-                        Catégories
+                        Categories
                     </button>
                     <button
                         className="btn btn-primary"
                         onClick={() => navigate('/customers/new')}
                     >
                         <Plus size={18} />
-                        Nouveau Client
+                        New Customer
                     </button>
                 </div>
             </header>
@@ -193,7 +193,7 @@ export default function CustomersPage() {
                     </div>
                     <div className="customer-stat-card__content">
                         <span className="customer-stat-card__value">{stats.totalCustomers}</span>
-                        <span className="customer-stat-card__label">Total Clients</span>
+                        <span className="customer-stat-card__label">Total Customers</span>
                     </div>
                 </div>
                 <div className="customer-stat-card">
@@ -202,7 +202,7 @@ export default function CustomersPage() {
                     </div>
                     <div className="customer-stat-card__content">
                         <span className="customer-stat-card__value">{stats.activeMembers}</span>
-                        <span className="customer-stat-card__label">Membres Actifs</span>
+                        <span className="customer-stat-card__label">Active Members</span>
                     </div>
                 </div>
                 <div className="customer-stat-card">
@@ -211,7 +211,7 @@ export default function CustomersPage() {
                     </div>
                     <div className="customer-stat-card__content">
                         <span className="customer-stat-card__value">{stats.totalPointsIssued.toLocaleString()}</span>
-                        <span className="customer-stat-card__label">Points Émis</span>
+                        <span className="customer-stat-card__label">Points Issued</span>
                     </div>
                 </div>
                 <div className="customer-stat-card">
@@ -222,7 +222,7 @@ export default function CustomersPage() {
                         <span className="customer-stat-card__value customer-stat-card__value--sm">
                             {formatCurrency(stats.averageSpent)}
                         </span>
-                        <span className="customer-stat-card__label">Panier Moyen</span>
+                        <span className="customer-stat-card__label">Average Basket</span>
                     </div>
                 </div>
             </div>
@@ -233,7 +233,7 @@ export default function CustomersPage() {
                     <Search size={20} />
                     <input
                         type="text"
-                        placeholder="Rechercher par nom, téléphone, email ou n° membre..."
+                        placeholder="Search by name, phone, email or member #..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -243,7 +243,7 @@ export default function CustomersPage() {
                     onChange={(e) => setCategoryFilter(e.target.value)}
                     className="customers-filter"
                 >
-                    <option value="all">Toutes catégories</option>
+                    <option value="all">All categories</option>
                     {categories.map(cat => (
                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                     ))}
@@ -253,7 +253,7 @@ export default function CustomersPage() {
                     onChange={(e) => setTierFilter(e.target.value)}
                     className="customers-filter"
                 >
-                    <option value="all">Tous niveaux</option>
+                    <option value="all">All tiers</option>
                     <option value="bronze">Bronze</option>
                     <option value="silver">Silver</option>
                     <option value="gold">Gold</option>
@@ -264,9 +264,9 @@ export default function CustomersPage() {
                     onChange={(e) => setStatusFilter(e.target.value)}
                     className="customers-filter"
                 >
-                    <option value="all">Tous statuts</option>
-                    <option value="active">Actifs</option>
-                    <option value="inactive">Inactifs</option>
+                    <option value="all">All statuses</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
                 </select>
             </div>
 
@@ -277,7 +277,7 @@ export default function CustomersPage() {
                     onClick={() => setCategoryFilter('all')}
                 >
                     <Users size={14} />
-                    Tous ({customers.length})
+                    All ({customers.length})
                 </button>
                 {categories.map(cat => {
                     const count = customers.filter(c => c.category_id === cat.id).length
@@ -299,21 +299,21 @@ export default function CustomersPage() {
             {loading ? (
                 <div className="customers-loading">
                     <div className="spinner"></div>
-                    <span>Chargement des clients...</span>
+                    <span>Loading customers...</span>
                 </div>
             ) : filteredCustomers.length === 0 ? (
                 <div className="customers-empty">
                     <Users size={64} />
-                    <h3>Aucun client trouvé</h3>
+                    <h3>No customer found</h3>
                     <p>
                         {searchTerm || categoryFilter !== 'all' || tierFilter !== 'all'
-                            ? 'Essayez de modifier vos filtres'
-                            : 'Commencez par ajouter votre premier client'}
+                            ? 'Try adjusting your filters'
+                            : 'Start by adding your first customer'}
                     </p>
                     {!searchTerm && categoryFilter === 'all' && (
                         <button className="btn btn-primary" onClick={() => navigate('/customers/new')}>
                             <Plus size={18} />
-                            Ajouter un client
+                            Add a customer
                         </button>
                     )}
                 </div>
@@ -388,7 +388,7 @@ export default function CustomersPage() {
                             <div className="customer-card__stats">
                                 <div className="stat">
                                     <span className="stat__value">{customer.total_visits}</span>
-                                    <span className="stat__label">Visites</span>
+                                    <span className="stat__label">Visits</span>
                                 </div>
                                 <div className="stat">
                                     <span className="stat__value">{customer.loyalty_points.toLocaleString()}</span>
@@ -404,10 +404,10 @@ export default function CustomersPage() {
 
                             <div className="customer-card__footer">
                                 <span className={`status-badge ${customer.is_active ? 'active' : 'inactive'}`}>
-                                    {customer.is_active ? 'Actif' : 'Inactif'}
+                                    {customer.is_active ? 'Active' : 'Inactive'}
                                 </span>
                                 <span className="customer-card__date">
-                                    Depuis {formatDate(customer.created_at)}
+                                    Since {formatDate(customer.created_at)}
                                 </span>
                             </div>
 
@@ -418,7 +418,7 @@ export default function CustomersPage() {
                                         e.stopPropagation()
                                         navigate(`/customers/${customer.id}`)
                                     }}
-                                    title="Voir détails"
+                                    title="View details"
                                 >
                                     <Eye size={16} />
                                 </button>
@@ -428,7 +428,7 @@ export default function CustomersPage() {
                                         e.stopPropagation()
                                         navigate(`/customers/${customer.id}/edit`)
                                     }}
-                                    title="Modifier"
+                                    title="Edit"
                                 >
                                     <Edit size={16} />
                                 </button>

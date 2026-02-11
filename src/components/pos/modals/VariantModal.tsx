@@ -267,7 +267,7 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                                     {group.group_required && <span style={{ color: '#EF4444', marginLeft: '0.25rem' }}>*</span>}
                                     {group.group_type === 'multiple' && (
                                         <span style={{ fontSize: '0.75rem', fontWeight: 'normal', marginLeft: '0.5rem', color: '#6B7280' }}>
-                                            (Choix multiples)
+                                            (Multiple choice)
                                         </span>
                                     )}
                                 </h4>
@@ -296,7 +296,7 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
 
                     {/* Selected Price Display */}
                     <div className="variant-price-display">
-                        <span>Prix total:</span>
+                        <span>Total price:</span>
                         <strong>{formatPrice(totalPrice)}</strong>
                     </div>
                 </div>
@@ -308,7 +308,7 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                         disabled={!isValidSelection}
                     >
                         <Check size={18} />
-                        Ajouter au panier • {formatPrice(totalPrice)}
+                        Add to cart • {formatPrice(totalPrice)}
                     </button>
                 </div>
             </div>

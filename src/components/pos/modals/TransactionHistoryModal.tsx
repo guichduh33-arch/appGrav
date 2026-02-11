@@ -124,32 +124,32 @@ export default function TransactionHistoryModal({
         switch (method) {
             case 'cash': return 'Cash'
             case 'qris': return 'QRIS'
-            case 'card': return 'Carte'
+            case 'card': return 'Card'
             case 'edc': return 'EDC'
-            case 'transfer': return 'Virement'
+            case 'transfer': return 'Transfer'
             default: return method || '-'
         }
     }
 
     const getOrderTypeLabel = (type: string) => {
         switch (type) {
-            case 'dine_in': return 'Sur place'
-            case 'takeaway': return 'À emporter'
-            case 'delivery': return 'Livraison'
+            case 'dine_in': return 'Dine In'
+            case 'takeaway': return 'Takeaway'
+            case 'delivery': return 'Delivery'
             case 'b2b': return 'B2B'
             default: return type
         }
     }
 
     const formatTime = (dateStr: string) => {
-        return new Date(dateStr).toLocaleTimeString('fr-FR', {
+        return new Date(dateStr).toLocaleTimeString('en-US', {
             hour: '2-digit',
             minute: '2-digit'
         })
     }
 
     const formatDate = (dateStr: string) => {
-        return new Date(dateStr).toLocaleDateString('fr-FR', {
+        return new Date(dateStr).toLocaleDateString('en-US', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric'
@@ -279,7 +279,7 @@ export default function TransactionHistoryModal({
                                             {/* Order Info */}
                                             <div className="transaction-card__info">
                                                 <div className="transaction-card__info-row">
-                                                    <span>ID Transaction</span>
+                                                    <span>Transaction ID</span>
                                                     <span className="transaction-card__id">{order.id.slice(0, 8)}...</span>
                                                 </div>
                                                 <div className="transaction-card__info-row">
@@ -287,18 +287,18 @@ export default function TransactionHistoryModal({
                                                     <span>{formatDate(order.created_at)}</span>
                                                 </div>
                                                 <div className="transaction-card__info-row">
-                                                    <span>Heure commande</span>
+                                                    <span>Order Time</span>
                                                     <span>{formatTime(order.created_at)}</span>
                                                 </div>
                                                 {order.completed_at && (
                                                     <div className="transaction-card__info-row">
-                                                        <span>Heure paiement</span>
+                                                        <span>Payment Time</span>
                                                         <span>{formatTime(order.completed_at)}</span>
                                                     </div>
                                                 )}
                                                 {order.customer_name && (
                                                     <div className="transaction-card__info-row">
-                                                        <span><User size={12} /> Client</span>
+                                                        <span><User size={12} /> Customer</span>
                                                         <span>{order.customer_name}</span>
                                                     </div>
                                                 )}
@@ -308,7 +308,7 @@ export default function TransactionHistoryModal({
                                             <div className="transaction-card__items">
                                                 <div className="transaction-card__items-header">
                                                     <ShoppingBag size={14} />
-                                                    <span>Articles ({order.items.length})</span>
+                                                    <span>Items ({order.items.length})</span>
                                                 </div>
                                                 {order.items.map(item => (
                                                     <div key={item.id} className="transaction-card__item">
@@ -335,17 +335,17 @@ export default function TransactionHistoryModal({
                                             {/* Order Totals */}
                                             <div className="transaction-card__totals">
                                                 <div className="transaction-card__total-row">
-                                                    <span>Sous-total</span>
+                                                    <span>Subtotal</span>
                                                     <span>{formatPrice(order.subtotal)}</span>
                                                 </div>
                                                 {order.discount_amount > 0 && (
                                                     <div className="transaction-card__total-row transaction-card__total-row--discount">
-                                                        <span>Remise</span>
+                                                        <span>Discount</span>
                                                         <span>-{formatPrice(order.discount_amount)}</span>
                                                     </div>
                                                 )}
                                                 <div className="transaction-card__total-row">
-                                                    <span>TVA (10%)</span>
+                                                    <span>Tax (10%)</span>
                                                     <span>{formatPrice(order.tax_amount)}</span>
                                                 </div>
                                                 <div className="transaction-card__total-row transaction-card__total-row--final">
@@ -355,11 +355,11 @@ export default function TransactionHistoryModal({
                                                 {order.payment_method === 'cash' && order.cash_received && (
                                                     <>
                                                         <div className="transaction-card__total-row">
-                                                            <span>Espèces reçues</span>
+                                                            <span>Cash Received</span>
                                                             <span>{formatPrice(order.cash_received)}</span>
                                                         </div>
                                                         <div className="transaction-card__total-row">
-                                                            <span>Rendu</span>
+                                                            <span>Change</span>
                                                             <span>{formatPrice(order.change_given || 0)}</span>
                                                         </div>
                                                     </>

@@ -128,7 +128,7 @@ const B2BPage = () => {
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+        return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
     };
 
     const getInitials = (name: string) => {
@@ -137,13 +137,13 @@ const B2BPage = () => {
 
     const getStatusLabel = (status: string) => {
         const labels: Record<string, string> = {
-            draft: 'Brouillon',
-            confirmed: 'Confirmée',
-            processing: 'En préparation',
-            ready: 'Prête',
-            partially_delivered: 'Livr. partielle',
-            delivered: 'Livrée',
-            cancelled: 'Annulée'
+            draft: 'Draft',
+            confirmed: 'Confirmed',
+            processing: 'Processing',
+            ready: 'Ready',
+            partially_delivered: 'Partial Delivery',
+            delivered: 'Delivered',
+            cancelled: 'Cancelled'
         };
         return labels[status] || status;
     };
@@ -153,16 +153,16 @@ const B2BPage = () => {
             <header className="b2b-page__header">
                 <div>
                     <h1 className="b2b-page__title">B2B / Wholesale</h1>
-                    <p className="b2b-page__subtitle">Gérez vos clients wholesale et commandes B2B</p>
+                    <p className="b2b-page__subtitle">Manage your wholesale customers and B2B orders</p>
                 </div>
                 <div className="b2b-page__actions">
                     <button type="button" className="btn-secondary" onClick={() => navigate('/b2b/payments')}>
                         <CreditCard size={18} />
-                        Paiements
+                        Payments
                     </button>
                     <button type="button" className="btn-primary" onClick={() => navigate('/b2b/orders/new')}>
                         <Plus size={18} />
-                        Nouvelle Commande
+                        New Order
                     </button>
                 </div>
             </header>
@@ -175,7 +175,7 @@ const B2BPage = () => {
                     </div>
                     <div className="b2b-stat-card__info">
                         <span className="b2b-stat-card__value">{stats.totalClients}</span>
-                        <span className="b2b-stat-card__label">Clients B2B</span>
+                        <span className="b2b-stat-card__label">B2B Clients</span>
                     </div>
                 </div>
                 <div className="b2b-stat-card" onClick={() => navigate('/b2b/orders')} style={{ cursor: 'pointer' }}>
@@ -184,7 +184,7 @@ const B2BPage = () => {
                     </div>
                     <div className="b2b-stat-card__info">
                         <span className="b2b-stat-card__value">{stats.totalOrders}</span>
-                        <span className="b2b-stat-card__label">Commandes</span>
+                        <span className="b2b-stat-card__label">Orders</span>
                     </div>
                 </div>
                 <div className="b2b-stat-card">
@@ -195,7 +195,7 @@ const B2BPage = () => {
                         <span className="b2b-stat-card__value b2b-stat-card__value--sm">
                             {formatCurrency(stats.totalRevenue)}
                         </span>
-                        <span className="b2b-stat-card__label">CA Total</span>
+                        <span className="b2b-stat-card__label">Total Revenue</span>
                     </div>
                 </div>
                 <div className="b2b-stat-card" onClick={() => navigate('/b2b/payments')} style={{ cursor: 'pointer' }}>
@@ -206,7 +206,7 @@ const B2BPage = () => {
                         <span className="b2b-stat-card__value b2b-stat-card__value--sm">
                             {formatCurrency(stats.unpaidAmount)}
                         </span>
-                        <span className="b2b-stat-card__label">À encaisser</span>
+                        <span className="b2b-stat-card__label">To Collect</span>
                     </div>
                 </div>
             </div>
@@ -218,8 +218,8 @@ const B2BPage = () => {
                         <FileText size={24} />
                     </div>
                     <div className="b2b-quick-action__content">
-                        <h3>Commandes B2B</h3>
-                        <p>Gérer toutes les commandes wholesale</p>
+                        <h3>B2B Orders</h3>
+                        <p>Manage all wholesale orders</p>
                     </div>
                     <ArrowRight size={20} />
                 </div>
@@ -228,8 +228,8 @@ const B2BPage = () => {
                         <CreditCard size={24} />
                     </div>
                     <div className="b2b-quick-action__content">
-                        <h3>Paiements</h3>
-                        <p>Suivre les encaissements et impayés</p>
+                        <h3>Payments</h3>
+                        <p>Track collections and outstanding balances</p>
                     </div>
                     <ArrowRight size={20} />
                 </div>
@@ -238,8 +238,8 @@ const B2BPage = () => {
                         <Plus size={24} />
                     </div>
                     <div className="b2b-quick-action__content">
-                        <h3>Nouvelle Commande</h3>
-                        <p>Créer une commande B2B</p>
+                        <h3>New Order</h3>
+                        <p>Create a B2B order</p>
                     </div>
                     <ArrowRight size={20} />
                 </div>
@@ -261,7 +261,7 @@ const B2BPage = () => {
                     onClick={() => setActiveTab('orders')}
                 >
                     <FileText size={16} className="tab-icon" />
-                    Commandes récentes
+                    Recent Orders
                 </button>
             </div>
 
@@ -269,12 +269,12 @@ const B2BPage = () => {
             {activeTab === 'clients' && (
                 <div className="clients-grid">
                     {loading ? (
-                        <div className="b2b-loading">Chargement...</div>
+                        <div className="b2b-loading">Loading...</div>
                     ) : customers.length === 0 ? (
                         <div className="b2b-empty">
                             <Building2 size={48} />
-                            <h3>Aucun client B2B</h3>
-                            <p>Ajoutez des clients wholesale dans la section Clients</p>
+                            <h3>No B2B clients</h3>
+                            <p>Add wholesale clients in the Clients section</p>
                         </div>
                     ) : (
                         customers.map(customer => (
@@ -284,7 +284,7 @@ const B2BPage = () => {
                                         {getInitials(customer.company_name || customer.name)}
                                     </div>
                                     <span className={`client-card__status ${customer.is_active ? 'active' : 'inactive'}`}>
-                                        {customer.is_active ? 'Actif' : 'Inactif'}
+                                        {customer.is_active ? 'Active' : 'Inactive'}
                                     </span>
                                 </div>
                                 <h3 className="client-card__name">{customer.company_name || customer.name}</h3>
@@ -295,20 +295,24 @@ const B2BPage = () => {
                                 <div className="client-card__stats">
                                     <div className="client-stat">
                                         <span className="client-stat__value">{customer.total_visits}</span>
-                                        <span className="client-stat__label">Commandes</span>
+                                        <span className="client-stat__label">Orders</span>
                                     </div>
                                     <div className="client-stat">
                                         <span className="client-stat__value client-stat__value--sm">
                                             {formatCurrency(customer.total_spent)}
                                         </span>
-                                        <span className="client-stat__label">CA Total</span>
+                                        <span className="client-stat__label">Total Revenue</span>
                                     </div>
                                 </div>
 
                                 <div className="client-card__actions">
-                                    <button type="button" className="btn-secondary client-card__btn">
+                                    <button
+                                        type="button"
+                                        className="btn-secondary client-card__btn"
+                                        onClick={() => navigate(`/b2b/orders?customer=${customer.id}`)}
+                                    >
                                         <Eye size={16} />
-                                        Voir
+                                        View
                                     </button>
                                     <button
                                         type="button"
@@ -316,7 +320,7 @@ const B2BPage = () => {
                                         onClick={() => navigate('/b2b/orders/new')}
                                     >
                                         <Plus size={16} />
-                                        Commander
+                                        Order
                                     </button>
                                 </div>
                             </div>
@@ -329,21 +333,21 @@ const B2BPage = () => {
             {activeTab === 'orders' && (
                 <div className="b2b-orders-section">
                     <div className="b2b-orders-header">
-                        <h3>Commandes récentes</h3>
+                        <h3>Recent Orders</h3>
                         <button type="button" className="btn-link" onClick={() => navigate('/b2b/orders')}>
-                            Voir tout <ArrowRight size={16} />
+                            View All <ArrowRight size={16} />
                         </button>
                     </div>
                     {loading ? (
-                        <div className="b2b-loading">Chargement...</div>
+                        <div className="b2b-loading">Loading...</div>
                     ) : recentOrders.length === 0 ? (
                         <div className="b2b-empty">
                             <FileText size={48} />
-                            <h3>Aucune commande B2B</h3>
-                            <p>Créez votre première commande wholesale</p>
+                            <h3>No B2B Orders</h3>
+                            <p>Create your first wholesale order</p>
                             <button type="button" className="btn-primary" onClick={() => navigate('/b2b/orders/new')}>
                                 <Plus size={18} />
-                                Nouvelle Commande
+                                New Order
                             </button>
                         </div>
                     ) : (
@@ -351,12 +355,12 @@ const B2BPage = () => {
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>N° Commande</th>
+                                        <th>Order #</th>
                                         <th>Client</th>
                                         <th>Date</th>
-                                        <th>Montant</th>
-                                        <th>Statut</th>
-                                        <th>Paiement</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Payment</th>
                                         <th aria-label="Actions"></th>
                                     </tr>
                                 </thead>
@@ -378,15 +382,15 @@ const B2BPage = () => {
                                             </td>
                                             <td>
                                                 <span className={`payment-badge ${order.payment_status}`}>
-                                                    {order.payment_status === 'paid' ? '✓ Payé' : order.payment_status === 'partial' ? '◐ Partiel' : '○ Impayé'}
+                                                    {order.payment_status === 'paid' ? '✓ Paid' : order.payment_status === 'partial' ? '◐ Partial' : '○ Unpaid'}
                                                 </span>
                                             </td>
                                             <td>
                                                 <button
                                                     type="button"
                                                     className="btn-secondary"
-                                                    title="Voir détail"
-                                                    aria-label="Voir détail de la commande"
+                                                    title="View details"
+                                                    aria-label="View order details"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         navigate(`/b2b/orders/${order.id}`);

@@ -8,10 +8,10 @@ import { useStockMovements, type IStockMovement, type TMovementFilterType } from
 import { MOVEMENT_STYLES, getMovementStyle } from '@/constants/inventory'
 import { formatCurrency } from '@/utils/helpers'
 
-// Format number with thousand separators (French locale)
+// Format number with thousand separators
 const formatNumber = (num: number | null | undefined): string => {
     if (num === null || num === undefined) return '-'
-    return num.toLocaleString('fr-FR')
+    return num.toLocaleString('en-US')
 }
 import { supabase } from '@/lib/supabase'
 import * as XLSX from 'xlsx'
@@ -130,37 +130,37 @@ export default function StockMovementsPage() {
                 const style = getMovementStyle(m.movement_type)
                 return {
                     'Date': date,
-                    'Heure': time,
-                    'Produit': m.product_name,
+                    'Time': time,
+                    'Product': m.product_name,
                     'SKU': m.product_sku,
                     'Type': style.label,
-                    'Quantité': m.quantity,
-                    'Unité': m.product_unit,
-                    'Prix Unitaire': m.product_cost,
-                    'Valeur': Math.abs(m.quantity * m.product_cost),
-                    'Stock Avant': m.stock_before || '-',
-                    'Stock Après': m.stock_after || '-',
-                    'Raison': m.reason || '',
-                    'Personnel': m.staff_name || ''
+                    'Quantity': m.quantity,
+                    'Unit': m.product_unit,
+                    'Unit Price': m.product_cost,
+                    'Value': Math.abs(m.quantity * m.product_cost),
+                    'Stock Before': m.stock_before || '-',
+                    'Stock After': m.stock_after || '-',
+                    'Reason': m.reason || '',
+                    'Staff': m.staff_name || ''
                 }
             })
 
             // Create workbook
             const ws = XLSX.utils.json_to_sheet(exportData)
             const wb = XLSX.utils.book_new()
-            XLSX.utils.book_append_sheet(wb, ws, 'Mouvements')
+            XLSX.utils.book_append_sheet(wb, ws, 'Movements')
 
             // Generate filename with date
             const now = new Date()
-            const filename = `mouvements_stock_${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}.xlsx`
+            const filename = `stock_movements_${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}.xlsx`
 
             // Save file
             XLSX.writeFile(wb, filename)
 
-            toast.success(`Export réussi: ${filteredMovements.length} mouvements exportés`)
+            toast.success(`Export successful: ${filteredMovements.length} movements exported`)
         } catch (error) {
             console.error('Error exporting to Excel:', error)
-            toast.error('Erreur lors de l\'export Excel')
+            toast.error('Error exporting to Excel')
         }
     }
 
@@ -259,7 +259,7 @@ export default function StockMovementsPage() {
                         <Package size={16} />
                         <input
                             type="text"
-                            placeholder="Filtrer par produit..."
+                            placeholder="Filter by product..."
                             value={selectedProductId ? products.find(p => p.id === selectedProductId)?.name || '' : productSearch}
                             onChange={(e) => {
                                 setProductSearch(e.target.value)
@@ -368,7 +368,7 @@ export default function StockMovementsPage() {
                         fontSize: '0.875rem',
                         whiteSpace: 'nowrap'
                     }}
-                    title="Exporter en Excel"
+                    title="Export to Excel"
                 >
                     <Download size={18} />
                     Excel
@@ -491,7 +491,7 @@ export default function StockMovementsPage() {
                                             background: '#F9FAFB',
                                             borderRadius: '4px'
                                         }}>
-                                            <span style={{ color: '#6B7280', fontSize: '0.75rem' }}>Stock avant:</span>
+                                            <span style={{ color: '#6B7280', fontSize: '0.75rem' }}>Stock before:</span>
                                             <span style={{ fontWeight: 600, color: '#374151' }}>
                                                 {movement.stock_before !== null && movement.stock_before !== undefined
                                                     ? `${formatNumber(movement.stock_before)} ${movement.product_unit}`
@@ -506,7 +506,7 @@ export default function StockMovementsPage() {
                                             background: isPositive ? '#ECFDF5' : '#FEF2F2',
                                             borderRadius: '4px'
                                         }}>
-                                            <span style={{ color: '#6B7280', fontSize: '0.75rem' }}>Stock après:</span>
+                                            <span style={{ color: '#6B7280', fontSize: '0.75rem' }}>Stock after:</span>
                                             <span style={{
                                                 fontWeight: 600,
                                                 color: isPositive ? '#059669' : '#DC2626'

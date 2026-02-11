@@ -145,7 +145,7 @@ export default function MobileCartPage() {
     } catch (error) {
       console.error('[MobileCart] Send error:', error);
       setSendStatus('error');
-      setErrorMessage('Erreur lors de l\'envoi de la commande');
+      setErrorMessage('Error sending order');
     } finally {
       setIsSending(false);
     }
@@ -157,13 +157,13 @@ export default function MobileCartPage() {
       <div className="mobile-cart mobile-cart--empty">
         <div className="mobile-cart__empty-content">
           <AlertCircle size={48} className="mobile-cart__empty-icon" />
-          <h2>Panier vide</h2>
-          <p>Ajoutez des produits pour commencer</p>
+          <h2>Empty cart</h2>
+          <p>Add products to get started</p>
           <button
             className="mobile-cart__empty-btn"
             onClick={() => navigate('/mobile/catalog')}
           >
-            Voir les produits
+            View products
           </button>
         </div>
       </div>
@@ -177,7 +177,7 @@ export default function MobileCartPage() {
         <button className="mobile-cart__back" onClick={() => navigate(-1)}>
           <ArrowLeft size={24} />
         </button>
-        <h1>Panier</h1>
+        <h1>Cart</h1>
         {currentOrder.tableNumber && (
           <span className="mobile-cart__table">
             <Table2 size={16} />
@@ -235,7 +235,7 @@ export default function MobileCartPage() {
       {/* Total */}
       <div className="mobile-cart__total">
         <div className="mobile-cart__total-row">
-          <span>Sous-total</span>
+          <span>Subtotal</span>
           <span>Rp {currentOrder.subtotal.toLocaleString('id-ID')}</span>
         </div>
         <div className="mobile-cart__total-row mobile-cart__total-row--final">
@@ -252,7 +252,7 @@ export default function MobileCartPage() {
           disabled={isSending}
         >
           <Trash2 size={20} />
-          <span>Vider</span>
+          <span>Clear</span>
         </button>
 
         <button
@@ -269,10 +269,10 @@ export default function MobileCartPage() {
           )}
           <span>
             {isSending
-              ? 'Envoi...'
+              ? 'Sending...'
               : sendStatus === 'success'
-              ? 'Envoyée!'
-              : 'Envoyer à la cuisine'}
+              ? 'Sent!'
+              : 'Send to kitchen'}
           </span>
         </button>
       </div>
@@ -281,7 +281,7 @@ export default function MobileCartPage() {
       {!isOnline && (
         <div className="mobile-cart__warning">
           <AlertCircle size={16} />
-          <span>Mode hors-ligne - La commande sera envoyée à la reconnexion</span>
+          <span>Offline mode - Order will be sent when reconnected</span>
         </div>
       )}
 

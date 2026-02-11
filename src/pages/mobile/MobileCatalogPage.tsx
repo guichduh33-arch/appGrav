@@ -208,7 +208,7 @@ export default function MobileCatalogPage() {
         <Search size={20} className="mobile-catalog__search-icon" />
         <input
           type="text"
-          placeholder="Rechercher un produit..."
+          placeholder="Search a product..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="mobile-catalog__search-input"
@@ -229,7 +229,7 @@ export default function MobileCatalogPage() {
           className={`mobile-catalog__category ${!selectedCategory ? 'mobile-catalog__category--active' : ''}`}
           onClick={() => setSelectedCategory(null)}
         >
-          Tout
+          All
         </button>
         {categories.map((cat) => (
           <button
@@ -245,9 +245,9 @@ export default function MobileCatalogPage() {
       {/* Products Grid */}
       <div className="mobile-catalog__products">
         {isLoading ? (
-          <div className="mobile-catalog__loading">Chargement...</div>
+          <div className="mobile-catalog__loading">Loading...</div>
         ) : filteredProducts.length === 0 ? (
-          <div className="mobile-catalog__empty">Aucun produit trouvé</div>
+          <div className="mobile-catalog__empty">No products found</div>
         ) : (
           filteredProducts.map((product) => (
             <div
@@ -312,7 +312,7 @@ export default function MobileCatalogPage() {
                       {(mod.price_adjustment || 0) > 0 ? '+' : ''}
                       {(mod.price_adjustment || 0) !== 0
                         ? `Rp ${(mod.price_adjustment || 0).toLocaleString('id-ID')}`
-                        : 'Gratuit'}
+                        : 'Free'}
                     </span>
                     {selectedModifiers.has(mod.id) && (
                       <Check size={16} className="mobile-catalog__modifier-check" />
@@ -327,7 +327,7 @@ export default function MobileCatalogPage() {
               <label>Notes</label>
               <input
                 type="text"
-                placeholder="Instructions spéciales..."
+                placeholder="Special instructions..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
               />
@@ -350,7 +350,7 @@ export default function MobileCatalogPage() {
             {/* Add Button */}
             <button className="mobile-catalog__add-btn" onClick={handleAddToOrder}>
               <Plus size={20} />
-              <span>Ajouter - Rp {calculateTotalPrice().toLocaleString('id-ID')}</span>
+              <span>Add - Rp {calculateTotalPrice().toLocaleString('id-ID')}</span>
             </button>
           </div>
         </div>

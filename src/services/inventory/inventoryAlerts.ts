@@ -126,6 +126,10 @@ export async function getLowStockItems(): Promise<ILowStockItem[]> {
 
 // ============================================
 // Story 9.2: Reorder Suggestions
+// Optimized: Uses get_reorder_suggestions_data RPC to batch all
+// stock_movements and purchase_order_items queries into a single call.
+// Before: 1 + 2N queries (1 products + N movements + N last prices)
+// After: 1 RPC call
 // ============================================
 
 export async function getReorderSuggestions(): Promise<IReorderSuggestion[]> {
@@ -133,100 +137,55 @@ export async function getReorderSuggestions(): Promise<IReorderSuggestion[]> {
     const lookbackDays = getSetting<number>('inventory_config.reorder_lookback_days') ?? INVENTORY_CONFIG_DEFAULTS.reorderLookbackDays
     const maxMultiplier = getSetting<number>('inventory_config.max_stock_multiplier') ?? INVENTORY_CONFIG_DEFAULTS.maxStockMultiplier
 
-    // Get low stock raw materials
-    const { data: products, error: productsError } = await supabase
-        .from('products')
-        .select(`
-            id,
-            name,
-            sku,
-            current_stock,
-            min_stock_level,
-            product_type,
-            cost_price,
-            unit
-        `)
-        .eq('is_active', true)
-        .in('product_type', ['raw_material', 'semi_finished'])
-        .order('current_stock', { ascending: true })
+    // Single RPC call replaces 1 + 2N queries
+    const { data, error } = await supabase.rpc('get_reorder_suggestions_data', {
+        p_lookback_days: lookbackDays,
+        p_max_multiplier: maxMultiplier,
+    })
 
-    if (productsError) {
-        console.error('[inventoryAlerts] Error fetching products:', productsError)
+    if (error) {
+        console.error('[inventoryAlerts] Error fetching reorder suggestions:', error)
         return []
     }
 
-    // Get average daily usage from stock movements
-    const lookbackDate = new Date()
-    lookbackDate.setDate(lookbackDate.getDate() - lookbackDays)
-
-    const suggestions: IReorderSuggestion[] = []
-
-    // Filter for low stock items
-    const lowStockProducts = (products || []).filter((p) => {
-        const currentStock = p.current_stock || 0
-        const minStock = p.min_stock_level || 0
-        return currentStock < minStock
-    })
-
-    for (const product of lowStockProducts) {
-        const currentStock = product.current_stock || 0
-        const minStockLevel = product.min_stock_level || 0
-        const costPrice = product.cost_price || 0
-
-        // Get usage from stock movements (using sale_pos or sale_b2b types)
-        const { data: movements } = await supabase
-            .from('stock_movements')
-            .select('quantity')
-            .eq('product_id', product.id)
-            .in('movement_type', ['sale_pos', 'sale_b2b'])
-            .gte('created_at', lookbackDate.toISOString())
-
-        const totalUsage = (movements || []).reduce((sum, m) => sum + Math.abs(m.quantity), 0)
-        const avgDailyUsage = totalUsage / lookbackDays
-
-        // Get last purchase price
-        const { data: lastPO } = await supabase
-            .from('purchase_order_items')
-            .select('unit_price')
-            .eq('product_id', product.id)
-            .order('created_at', { ascending: false })
-            .limit(1)
-
-        const lastPurchasePrice = lastPO?.[0]?.unit_price || costPrice
-
-        // Calculate suggested quantity (fill to max level)
-        const maxLevel = minStockLevel * maxMultiplier
-        const suggestedQuantity = Math.max(maxLevel - currentStock, 0)
-
-        // Calculate days until stockout
-        const daysUntilStockout = avgDailyUsage > 0
-            ? Math.floor(currentStock / avgDailyUsage)
-            : 999
-
-        suggestions.push({
-            product_id: product.id,
-            product_name: product.name,
-            sku: product.sku,
-            current_stock: currentStock,
-            min_stock_level: minStockLevel,
-            max_stock_level: maxLevel,
-            suggested_quantity: Math.ceil(suggestedQuantity),
-            unit_name: product.unit || 'unit',
-            supplier_id: null,
-            supplier_name: null,
-            estimated_cost: suggestedQuantity * lastPurchasePrice,
-            last_purchase_price: lastPurchasePrice,
-            avg_daily_usage: avgDailyUsage,
-            days_until_stockout: daysUntilStockout
-        })
-    }
-
-    // Sort by days until stockout (most urgent first)
-    return suggestions.sort((a, b) => a.days_until_stockout - b.days_until_stockout)
+    return (data ?? []).map((row: {
+        product_id: string
+        product_name: string
+        sku: string
+        current_stock: number
+        min_stock_level: number
+        max_stock_level: number
+        cost_price: number
+        unit: string
+        avg_daily_usage: number
+        last_purchase_price: number
+        days_until_stockout: number
+        suggested_quantity: number
+    }) => ({
+        product_id: row.product_id,
+        product_name: row.product_name,
+        sku: row.sku,
+        current_stock: Number(row.current_stock),
+        min_stock_level: Number(row.min_stock_level),
+        max_stock_level: Number(row.max_stock_level),
+        suggested_quantity: Math.ceil(Number(row.suggested_quantity)),
+        unit_name: row.unit || 'unit',
+        supplier_id: null,
+        supplier_name: null,
+        estimated_cost: Number(row.suggested_quantity) * Number(row.last_purchase_price),
+        last_purchase_price: Number(row.last_purchase_price),
+        avg_daily_usage: Number(row.avg_daily_usage),
+        days_until_stockout: Number(row.days_until_stockout),
+    }))
 }
 
 // ============================================
 // Story 9.4: Production Suggestions
+// Optimized: Uses get_production_suggestions_data RPC for base data
+// (products, avg sales, priority) in a single call. Recipe ingredient
+// checking is done with a single batched query using .in() filter.
+// Before: 1 + 2N queries (1 products + N recipes + N order_items)
+// After: 1 RPC + 1 batch recipes query (2 total)
 // ============================================
 
 export async function getProductionSuggestions(): Promise<IProductionSuggestion[]> {
@@ -235,65 +194,83 @@ export async function getProductionSuggestions(): Promise<IProductionSuggestion[
     const priorityHighThreshold = getSetting<number>('inventory_config.production_priority_high_threshold') ?? INVENTORY_CONFIG_DEFAULTS.productionPriorityHighThreshold
     const priorityMediumThreshold = getSetting<number>('inventory_config.production_priority_medium_threshold') ?? INVENTORY_CONFIG_DEFAULTS.productionPriorityMediumThreshold
 
-    // Get finished products that are low stock
-    const { data: products, error: productsError } = await supabase
-        .from('products')
-        .select(`
-            id,
-            name,
-            current_stock,
-            min_stock_level
-        `)
-        .eq('is_active', true)
-        .eq('product_type', 'finished')
-        .lt('current_stock', 'min_stock_level')
-        .order('current_stock', { ascending: true })
+    // Single RPC call for base data (replaces 1 + N order_items queries)
+    const { data: rpcData, error: rpcError } = await supabase.rpc('get_production_suggestions_data', {
+        p_lookback_days: productionLookbackDays,
+        p_priority_high_threshold: priorityHighThreshold,
+        p_priority_medium_threshold: priorityMediumThreshold,
+    })
 
-    if (productsError) {
-        console.error('[inventoryAlerts] Error fetching products:', productsError)
+    if (rpcError) {
+        console.error('[inventoryAlerts] Error fetching production suggestions:', rpcError)
         return []
     }
 
-    const suggestions: IProductionSuggestion[] = []
+    const baseData = (rpcData ?? []) as Array<{
+        product_id: string
+        product_name: string
+        current_stock: number
+        min_stock_level: number
+        suggested_quantity: number
+        recipe_id: string | null
+        avg_daily_sales: number
+        stock_percentage: number
+        priority: 'high' | 'medium' | 'low'
+    }>
 
-    for (const product of products || []) {
-        const typedProduct = product as {
-            id: string
-            name: string
-            current_stock: number
-            min_stock_level: number
+    if (baseData.length === 0) return []
+
+    // Get all product IDs that have recipes, then batch-fetch recipe ingredients
+    const productIds = baseData.map(d => d.product_id)
+
+    // Single batch query for all recipes + ingredients (replaces N individual recipe queries)
+    const { data: recipes } = await supabase
+        .from('recipes')
+        .select(`
+            id,
+            product_id,
+            output_quantity,
+            recipe_ingredients (
+                ingredient_id,
+                quantity,
+                products:ingredient_id (name, current_stock)
+            )
+        `)
+        .in('product_id', productIds)
+        .eq('is_active', true)
+
+    // Index recipes by product_id for O(1) lookup
+    const recipeByProduct = new Map<string, {
+        id: string
+        output_quantity: number
+        recipe_ingredients: Array<{
+            ingredient_id: string
+            quantity: number
+            products: { name: string; current_stock: number } | null
+        }>
+    }>()
+
+    for (const recipe of ((recipes ?? []) as unknown as Array<{
+        id: string
+        product_id: string
+        output_quantity: number
+        recipe_ingredients: Array<{
+            ingredient_id: string
+            quantity: number
+            products: { name: string; current_stock: number } | null
+        }>
+    }>)) {
+        // Use first recipe per product (same as original logic)
+        if (!recipeByProduct.has(recipe.product_id)) {
+            recipeByProduct.set(recipe.product_id, recipe)
         }
+    }
 
-        // Get recipe for this product
-        const { data: recipes } = await supabase
-            .from('recipes')
-            .select(`
-                id,
-                output_quantity,
-                recipe_ingredients (
-                    ingredient_id,
-                    quantity,
-                    products:ingredient_id (name, current_stock)
-                )
-            `)
-            .eq('product_id', typedProduct.id)
-            .eq('is_active', true)
-            .limit(1)
+    // Build suggestions with ingredient availability checks
+    const suggestions: IProductionSuggestion[] = baseData.map((item) => {
+        const suggestedQuantity = Math.ceil(Number(item.suggested_quantity))
+        const recipe = recipeByProduct.get(item.product_id)
 
-        const recipe = recipes?.[0] as {
-            id: string
-            output_quantity: number
-            recipe_ingredients: Array<{
-                ingredient_id: string
-                quantity: number
-                products: { name: string; current_stock: number } | null
-            }>
-        } | undefined
-
-        // Calculate suggested production quantity
-        const suggestedQuantity = typedProduct.min_stock_level - typedProduct.current_stock
-
-        // Check ingredient availability
         const missingIngredients: IProductionSuggestion['missing_ingredients'] = []
         let ingredientsAvailable = true
 
@@ -310,46 +287,25 @@ export async function getProductionSuggestions(): Promise<IProductionSuggestion[
                         id: ingredient.ingredient_id,
                         name: ingredient.products?.name || 'Unknown',
                         needed,
-                        available
+                        available,
                     })
                 }
             }
         }
 
-        // Get average daily sales
-        const productionLookbackDate = new Date()
-        productionLookbackDate.setDate(productionLookbackDate.getDate() - productionLookbackDays)
-
-        const { data: sales } = await supabase
-            .from('order_items')
-            .select('quantity')
-            .eq('product_id', typedProduct.id)
-            .gte('created_at', productionLookbackDate.toISOString())
-
-        const totalSales = (sales || []).reduce((sum, s) => sum + s.quantity, 0)
-        const avgDailySales = totalSales / productionLookbackDays
-
-        // Determine priority
-        const stockPercentage = typedProduct.min_stock_level > 0
-            ? (typedProduct.current_stock / typedProduct.min_stock_level) * 100
-            : 0
-        const priority: IProductionSuggestion['priority'] =
-            stockPercentage <= priorityHighThreshold ? 'high' :
-            stockPercentage <= priorityMediumThreshold ? 'medium' : 'low'
-
-        suggestions.push({
-            product_id: typedProduct.id,
-            product_name: typedProduct.name,
-            current_stock: typedProduct.current_stock,
-            min_stock_level: typedProduct.min_stock_level,
-            suggested_quantity: Math.ceil(suggestedQuantity),
-            recipe_id: recipe?.id || null,
+        return {
+            product_id: item.product_id,
+            product_name: item.product_name,
+            current_stock: Number(item.current_stock),
+            min_stock_level: Number(item.min_stock_level),
+            suggested_quantity: suggestedQuantity,
+            recipe_id: recipe?.id || item.recipe_id,
             ingredients_available: ingredientsAvailable,
             missing_ingredients: missingIngredients,
-            avg_daily_sales: avgDailySales,
-            priority
-        })
-    }
+            avg_daily_sales: Number(item.avg_daily_sales),
+            priority: item.priority,
+        }
+    })
 
     // Sort by priority (high first)
     const priorityOrder = { high: 0, medium: 1, low: 2 }

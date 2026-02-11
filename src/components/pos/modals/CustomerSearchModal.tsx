@@ -445,7 +445,7 @@ export default function CustomerSearchModal({
 
             if (error || !data) {
                 setQrInput('')
-                setQrError('Client non trouvé avec ce code QR')
+                setQrError('Customer not found with this QR code')
                 return
             }
 
@@ -453,7 +453,7 @@ export default function CustomerSearchModal({
             onClose()
         } catch (error) {
             console.error('Error scanning QR:', error)
-            setQrError('Erreur lors de la recherche')
+            setQrError('Error during search')
             setQrInput('')
         } finally {
             setLoading(false)
@@ -492,7 +492,7 @@ export default function CustomerSearchModal({
 
     const handleCreateCustomer = async () => {
         if (!newCustomerName.trim()) {
-            setFormError('Le nom est obligatoire')
+            setFormError('Name is required')
             return
         }
 
@@ -527,9 +527,9 @@ export default function CustomerSearchModal({
         } catch (error: unknown) {
             console.error('Error creating customer:', error)
             if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
-                setFormError('Un client avec ce téléphone ou email existe déjà')
+                setFormError('A customer with this phone or email already exists')
             } else {
-                setFormError('Erreur lors de la création du client')
+                setFormError('Error creating customer')
             }
         } finally {
             setSaving(false)
@@ -631,7 +631,7 @@ export default function CustomerSearchModal({
                                 e.stopPropagation()
                                 toggleFavorite(customer.id)
                             }}
-                            title={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                            title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                         >
                             <Heart size={16} fill={isFavorite ? 'currentColor' : 'none'} />
                         </button>
@@ -644,7 +644,7 @@ export default function CustomerSearchModal({
                                 e.stopPropagation()
                                 handleShowDetail(customer)
                             }}
-                            title="Voir l'historique"
+                            title="View history"
                         >
                             <History size={16} />
                         </button>
@@ -708,14 +708,14 @@ export default function CustomerSearchModal({
                                 onClick={() => setMode('search')}
                             >
                                 <Search size={16} />
-                                Rechercher
+                                Search
                             </button>
                             <button
                                 className={`mode-btn mode-btn--favorites ${mode === 'favorites' ? 'active' : ''}`}
                                 onClick={() => setMode('favorites')}
                             >
                                 <Heart size={16} />
-                                Favoris
+                                Favorites
                                 {favoriteIds.length > 0 && (
                                     <span className="mode-btn__badge">{favoriteIds.length}</span>
                                 )}
@@ -724,7 +724,7 @@ export default function CustomerSearchModal({
                                 className={`mode-btn ${mode === 'scan' ? 'active' : ''} ${!isOnline ? 'disabled' : ''}`}
                                 onClick={() => isOnline && setMode('scan')}
                                 disabled={!isOnline}
-                                title={!isOnline ? 'Nécessite une connexion internet' : ''}
+                                title={!isOnline ? 'Requires internet connection' : ''}
                             >
                                 <QrCode size={16} />
                                 QR
@@ -733,10 +733,10 @@ export default function CustomerSearchModal({
                                 className={`mode-btn mode-btn--create ${mode === 'create' ? 'active' : ''} ${!isOnline ? 'disabled' : ''}`}
                                 onClick={() => { if (isOnline) { setMode('create'); resetCreateForm() } }}
                                 disabled={!isOnline}
-                                title={!isOnline ? 'Nécessite une connexion internet' : ''}
+                                title={!isOnline ? 'Requires internet connection' : ''}
                             >
                                 <UserPlus size={16} />
-                                Nouveau
+                                New
                             </button>
                         </div>
 
@@ -754,13 +754,13 @@ export default function CustomerSearchModal({
                                     <div className="form-group">
                                         <label>
                                             <User size={16} />
-                                            Nom *
+                                            Name *
                                         </label>
                                         <input
                                             type="text"
                                             value={newCustomerName}
                                             onChange={(e) => setNewCustomerName(e.target.value)}
-                                            placeholder="Nom du client"
+                                            placeholder="Customer name"
                                             autoFocus
                                         />
                                     </div>
@@ -768,7 +768,7 @@ export default function CustomerSearchModal({
                                     <div className="form-group">
                                         <label>
                                             <Phone size={16} />
-                                            Téléphone
+                                            Phone
                                         </label>
                                         <input
                                             type="tel"
@@ -787,14 +787,14 @@ export default function CustomerSearchModal({
                                             type="email"
                                             value={newCustomerEmail}
                                             onChange={(e) => setNewCustomerEmail(e.target.value)}
-                                            placeholder="email@exemple.com"
+                                            placeholder="email@example.com"
                                         />
                                     </div>
 
                                     <div className="form-group">
                                         <label>
                                             <Crown size={16} />
-                                            Catégorie
+                                            Category
                                         </label>
                                         <div className="category-selector">
                                             <button
@@ -858,7 +858,7 @@ export default function CustomerSearchModal({
                                         value={qrInput}
                                         onChange={(e) => setQrInput(e.target.value)}
                                         onKeyDown={handleQrKeyDown}
-                                        placeholder="Code QR ou N° Membre..."
+                                        placeholder="QR Code or Member #..."
                                         autoFocus
                                     />
                                     <button
@@ -866,7 +866,7 @@ export default function CustomerSearchModal({
                                         onClick={handleQrScan}
                                         disabled={!qrInput.trim() || loading}
                                     >
-                                        {loading ? 'Recherche...' : 'Valider'}
+                                        {loading ? 'Searching...' : 'Submit'}
                                     </button>
                                 </div>
                             ) : mode === 'favorites' ? (
@@ -879,9 +879,9 @@ export default function CustomerSearchModal({
                                     ) : favoriteCustomers.length === 0 ? (
                                         <div className="customer-list__empty">
                                             <Heart size={40} />
-                                            <p>Aucun client favori</p>
+                                            <p>No favorite customers</p>
                                             <span className="customer-list__hint">
-                                                Cliquez sur le ♥ pour ajouter des favoris
+                                                Click the heart to add favorites
                                             </span>
                                         </div>
                                     ) : (
@@ -896,7 +896,7 @@ export default function CustomerSearchModal({
                                             type="text"
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
-                                            placeholder="Rechercher par nom, téléphone, email..."
+                                            placeholder="Search by name, phone, email..."
                                             autoFocus
                                         />
                                     </div>
@@ -907,7 +907,7 @@ export default function CustomerSearchModal({
                                             onClick={handleRemoveCustomer}
                                         >
                                             <X size={16} />
-                                            Retirer le client sélectionné
+                                            Remove selected customer
                                         </button>
                                     )}
 
@@ -922,8 +922,8 @@ export default function CustomerSearchModal({
                                                 <User size={40} />
                                                 <p>
                                                     {searchTerm
-                                                        ? 'Aucun client trouvé'
-                                                        : 'Aucun client récent'}
+                                                        ? 'No customer found'
+                                                        : 'No recent customers'}
                                                 </p>
                                             </div>
                                         ) : (

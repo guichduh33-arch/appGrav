@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { DayPicker, DateRange as DayPickerRange } from 'react-day-picker';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { Calendar, ChevronDown, X } from 'lucide-react';
 import { DateRange, PresetKey, useDateRange, UseDateRangeOptions } from '@/hooks/reports/useDateRange';
 import { DatePresets } from './DatePresets';
@@ -92,7 +92,7 @@ export function DateRangePicker({
 
   const displayText = isCustomRange
     ? `${formatDate(dateRange.from)} - ${formatDate(dateRange.to)}`
-    : presets.find((p) => p.key === activePreset)?.label || 'Sélectionner une période';
+    : presets.find((p) => p.key === activePreset)?.label || 'Select a period';
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -144,7 +144,7 @@ export function DateRangePicker({
           <div className="p-4">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium text-gray-700">
-                Période personnalisée
+                Custom Period
               </span>
               {tempRange && (
                 <button
@@ -153,7 +153,7 @@ export function DateRangePicker({
                   className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1"
                 >
                   <X className="w-3 h-3" />
-                  Effacer
+                  Clear
                 </button>
               )}
             </div>
@@ -162,7 +162,7 @@ export function DateRangePicker({
               mode="range"
               selected={tempRange}
               onSelect={handleRangeSelect}
-              locale={fr}
+              locale={enUS}
               numberOfMonths={2}
               disabled={[
                 ...(minDate ? [{ before: minDate }] : []),
@@ -203,18 +203,18 @@ export function DateRangePicker({
                   tempRange.to ? (
                     <>
                       <span className="font-medium">
-                        {format(tempRange.from, 'dd MMM yyyy', { locale: fr })}
+                        {format(tempRange.from, 'dd MMM yyyy', { locale: enUS })}
                       </span>
                       {' → '}
                       <span className="font-medium">
-                        {format(tempRange.to, 'dd MMM yyyy', { locale: fr })}
+                        {format(tempRange.to, 'dd MMM yyyy', { locale: enUS })}
                       </span>
                     </>
                   ) : (
-                    <span>Sélectionnez la date de fin</span>
+                    <span>Select the end date</span>
                   )
                 ) : (
-                  <span>Sélectionnez une période</span>
+                  <span>Select a period</span>
                 )}
               </div>
               <button
@@ -228,7 +228,7 @@ export function DateRangePicker({
                   transition-colors
                 "
               >
-                Appliquer
+                Apply
               </button>
             </div>
           </div>

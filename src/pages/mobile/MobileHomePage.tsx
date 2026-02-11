@@ -73,8 +73,8 @@ export default function MobileHomePage() {
     <div className="mobile-home">
       {/* Welcome Section */}
       <section className="mobile-home__welcome">
-        <h1>Bonjour, {userName}</h1>
-        <p>Prêt à prendre des commandes ?</p>
+        <h1>Hello, {userName}</h1>
+        <p>Ready to take orders?</p>
       </section>
 
       {/* Ready Orders Alert */}
@@ -85,7 +85,7 @@ export default function MobileHomePage() {
         >
           <Bell size={20} className="mobile-home__alert-icon" />
           <span>
-            {readyOrders.length} commande{readyOrders.length > 1 ? 's' : ''} prête{readyOrders.length > 1 ? 's' : ''}
+            {readyOrders.length} order{readyOrders.length > 1 ? 's' : ''} ready
           </span>
           <ChevronRight size={20} />
         </section>
@@ -95,7 +95,7 @@ export default function MobileHomePage() {
       <section className="mobile-home__actions">
         <button className="mobile-home__action mobile-home__action--primary" onClick={handleNewOrder}>
           <Plus size={24} />
-          <span>Nouvelle Commande</span>
+          <span>New Order</span>
         </button>
 
         {currentOrder && currentOrder.items.length > 0 && (
@@ -104,7 +104,7 @@ export default function MobileHomePage() {
             onClick={() => navigate('/mobile/cart')}
           >
             <ShoppingCart size={24} />
-            <span>Panier ({currentOrder.items.length})</span>
+            <span>Cart ({currentOrder.items.length})</span>
           </button>
         )}
 
@@ -113,7 +113,7 @@ export default function MobileHomePage() {
           onClick={() => navigate('/mobile/orders')}
         >
           <Clock size={24} />
-          <span>Mes Commandes ({sentOrders.length})</span>
+          <span>My Orders ({sentOrders.length})</span>
         </button>
       </section>
 
@@ -121,7 +121,7 @@ export default function MobileHomePage() {
       {currentOrder && currentOrder.items.length > 0 && (
         <section className="mobile-home__current-order">
           <div className="mobile-home__section-header">
-            <h2>Commande en cours</h2>
+            <h2>Current Order</h2>
             {currentOrder.tableNumber && (
               <span className="mobile-home__table-badge">
                 <Table2 size={14} /> Table {currentOrder.tableNumber}
@@ -130,7 +130,7 @@ export default function MobileHomePage() {
           </div>
 
           <div className="mobile-home__order-summary">
-            <span>{currentOrder.items.length} article{currentOrder.items.length > 1 ? 's' : ''}</span>
+            <span>{currentOrder.items.length} item{currentOrder.items.length > 1 ? 's' : ''}</span>
             <span className="mobile-home__order-total">
               Rp {currentOrder.total.toLocaleString('id-ID')}
             </span>
@@ -140,7 +140,7 @@ export default function MobileHomePage() {
             className="mobile-home__continue-btn"
             onClick={() => navigate('/mobile/cart')}
           >
-            Continuer la commande
+            Continue order
             <ChevronRight size={20} />
           </button>
         </section>
@@ -150,9 +150,9 @@ export default function MobileHomePage() {
       {sentOrders.length > 0 && (
         <section className="mobile-home__recent">
           <div className="mobile-home__section-header">
-            <h2>Dernières commandes</h2>
+            <h2>Recent Orders</h2>
             <button onClick={() => navigate('/mobile/orders')}>
-              Voir tout <ChevronRight size={16} />
+              View all <ChevronRight size={16} />
             </button>
           </div>
 
@@ -166,9 +166,9 @@ export default function MobileHomePage() {
                   )}
                 </div>
                 <span className={`mobile-home__order-status mobile-home__order-status--${order.status}`}>
-                  {order.status === 'sent' && 'Envoyée'}
-                  {order.status === 'preparing' && 'En préparation'}
-                  {order.status === 'ready' && 'Prête'}
+                  {order.status === 'sent' && 'Sent'}
+                  {order.status === 'preparing' && 'Preparing'}
+                  {order.status === 'ready' && 'Ready'}
                 </span>
               </div>
             ))}
@@ -180,7 +180,7 @@ export default function MobileHomePage() {
       {showTablePicker && (
         <div className="mobile-modal" onClick={() => setShowTablePicker(false)}>
           <div className="mobile-modal__content" onClick={(e) => e.stopPropagation()}>
-            <h2>Choisir une table</h2>
+            <h2>Choose a table</h2>
             <div className="mobile-home__table-grid">
               {tables.map((table) => (
                 <button
@@ -197,7 +197,7 @@ export default function MobileHomePage() {
                 onClick={() => handleTableSelect('')}
               >
                 <ShoppingCart size={24} />
-                <span>À emporter</span>
+                <span>Takeaway</span>
               </button>
             </div>
           </div>

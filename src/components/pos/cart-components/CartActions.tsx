@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { SendHorizontal, CreditCard } from 'lucide-react'
 
 interface CartActionsProps {
@@ -8,7 +9,7 @@ interface CartActionsProps {
     onCheckout: () => void
 }
 
-export function CartActions({
+export const CartActions = memo(function CartActions({
     hasLockedItems,
     hasUnlockedItems,
     itemCount,
@@ -38,4 +39,4 @@ export function CartActions({
             </button>
         </div>
     )
-}
+})

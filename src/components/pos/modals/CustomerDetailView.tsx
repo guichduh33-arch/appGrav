@@ -57,7 +57,7 @@ interface CustomerDetailViewProps {
 
 const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
-    return date.toLocaleDateString('fr-FR', {
+    return date.toLocaleDateString('en-US', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -84,7 +84,7 @@ export default function CustomerDetailView({
                     onClick={onBack}
                 >
                     <ChevronLeft size={20} />
-                    Retour
+                    Back
                 </button>
                 <button
                     type="button"
@@ -139,7 +139,7 @@ export default function CustomerDetailView({
                     {/* Frequent products (Story 7.5) */}
                     {frequentProducts.length > 0 && (
                         <div className="customer-detail__section">
-                            <h4><Package size={16} /> Produits preferres</h4>
+                            <h4><Package size={16} /> Favorite Products</h4>
                             <div className="frequent-products">
                                 {frequentProducts.map(product => (
                                     <div key={product.product_id} className="frequent-product">
@@ -173,7 +173,7 @@ export default function CustomerDetailView({
                                             ))}
                                             {order.items.length > 3 && (
                                                 <span className="order-history__more">
-                                                    +{order.items.length - 3} autres
+                                                    +{order.items.length - 3} more
                                                 </span>
                                             )}
                                         </div>
@@ -183,7 +183,7 @@ export default function CustomerDetailView({
                                             onClick={() => onReorder(order)}
                                         >
                                             <RotateCcw size={14} />
-                                            Recommander
+                                            Reorder
                                         </button>
                                     </div>
                                 ))}

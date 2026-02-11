@@ -19,17 +19,17 @@ const ACTION_COLORS: Record<string, string> = {
 };
 
 const TABLE_LABELS: Record<string, string> = {
-  user_profiles: 'Utilisateurs',
-  roles: 'Rôles',
+  user_profiles: 'Users',
+  roles: 'Roles',
   permissions: 'Permissions',
-  user_roles: 'Rôles utilisateur',
-  user_permissions: 'Permissions utilisateur',
+  user_roles: 'User Roles',
+  user_permissions: 'User Permissions',
   user_sessions: 'Sessions',
-  products: 'Produits',
-  orders: 'Commandes',
-  customers: 'Clients',
-  stock_movements: 'Mouvements stock',
-  pos_sessions: 'Sessions caisse',
+  products: 'Products',
+  orders: 'Orders',
+  customers: 'Customers',
+  stock_movements: 'Stock Movements',
+  pos_sessions: 'POS Sessions',
 };
 
 export default function AuditPage() {
@@ -68,7 +68,7 @@ export default function AuditPage() {
   const users = usersData;
 
   const exportToCSV = () => {
-    const headers = ['Date', 'Utilisateur', 'Action', 'Table', 'Record ID', 'IP'];
+    const headers = ['Date', 'User', 'Action', 'Table', 'Record ID', 'IP'];
     const rows = logs.map(log => [
       format(new Date(log.created_at), 'yyyy-MM-dd HH:mm:ss'),
       log.user_profiles?.display_name || log.user_profiles?.name || '-',
@@ -370,7 +370,7 @@ export default function AuditPage() {
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
                 className="p-2 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                title="Page précédente"
+                title="Previous page"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -382,7 +382,7 @@ export default function AuditPage() {
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
                 className="p-2 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                title="Page suivante"
+                title="Next page"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>

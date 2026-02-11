@@ -112,7 +112,7 @@ export default function CustomerDetailPage() {
             setCustomer(data as unknown as Customer)
         } catch (error) {
             console.error('Error fetching customer:', error)
-            toast.error('Client non trouvé')
+            toast.error('Customer not found')
             navigate('/customers')
         } finally {
             setLoading(false)
@@ -156,7 +156,7 @@ export default function CustomerDetailPage() {
 
     const handlePointsSubmit = async () => {
         if (!pointsAmount || Number(pointsAmount) <= 0) {
-            toast.error('Veuillez entrer un montant valide')
+            toast.error('Please enter a valid amount')
             return
         }
 
@@ -168,24 +168,24 @@ export default function CustomerDetailPage() {
                 const { error } = await supabase.rpc('add_loyalty_points' as never, {
                     p_customer_id: id,
                     p_points: points,
-                    p_description: pointsDescription || 'Ajout manuel de points',
+                    p_description: pointsDescription || 'Manual points addition',
                     p_order_id: null
                 } as never)
                 if (error) throw error
-                toast.success(`${points} points ajoutés`)
+                toast.success(`${points} points added`)
             } else {
                 // Redeem points
                 if (customer && points > customer.loyalty_points) {
-                    toast.error('Points insuffisants')
+                    toast.error('Insufficient points')
                     return
                 }
                 const { error } = await supabase.rpc('redeem_loyalty_points' as never, {
                     p_customer_id: id,
                     p_points: points,
-                    p_description: pointsDescription || 'Échange manuel de points'
+                    p_description: pointsDescription || 'Manual points redemption'
                 } as never)
                 if (error) throw error
-                toast.success(`${points} points utilisés`)
+                toast.success(`${points} points redeemed`)
             }
 
             setShowPointsModal(false)
@@ -195,13 +195,13 @@ export default function CustomerDetailPage() {
             fetchLoyaltyTransactions()
         } catch (error) {
             console.error('Error updating points:', error)
-            toast.error('Erreur lors de la mise à jour des points')
+            toast.error('Error updating points')
         }
     }
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return '-'
-        return new Date(dateString).toLocaleDateString('fr-FR', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             day: '2-digit',
             month: 'short',
             year: 'numeric'
@@ -209,7 +209,7 @@ export default function CustomerDetailPage() {
     }
 
     const formatDateTime = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('fr-FR', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             day: '2-digit',
             month: 'short',
             year: 'numeric',
@@ -220,11 +220,11 @@ export default function CustomerDetailPage() {
 
     const getStatusLabel = (status: string) => {
         const labels: Record<string, string> = {
-            pending: 'En attente',
-            preparing: 'En préparation',
-            ready: 'Prête',
-            completed: 'Complétée',
-            cancelled: 'Annulée'
+            pending: 'Pending',
+            preparing: 'Preparing',
+            ready: 'Ready',
+            completed: 'Completed',
+            cancelled: 'Cancelled'
         }
         return labels[status] || status
     }
@@ -254,7 +254,7 @@ export default function CustomerDetailPage() {
             <div className="customer-detail-page">
                 <div className="customer-detail-loading">
                     <div className="spinner"></div>
-                    <span>Chargement...</span>
+                    <span>Loading...</span>
                 </div>
             </div>
         )
@@ -301,7 +301,7 @@ export default function CustomerDetailPage() {
                                 {customer.loyalty_tier}
                             </span>
                             <span className={`status-badge ${customer.is_active ? 'active' : 'inactive'}`}>
-                                {customer.is_active ? 'Actif' : 'Inactif'}
+                                {customer.is_active ? 'Active' : 'Inactive'}
                             </span>
                         </div>
                     </div>
@@ -311,7 +311,7 @@ export default function CustomerDetailPage() {
                     onClick={() => navigate(`/customers/${id}/edit`)}
                 >
                     <Edit size={18} />
-                    Modifier
+                    Edit
                 </button>
             </header>
 
@@ -332,18 +332,18 @@ export default function CustomerDetailPage() {
                 <div className="loyalty-card__points">
                     <div className="points-current">
                         <span className="points-value">{customer.loyalty_points.toLocaleString()}</span>
-                        <span className="points-label">Points disponibles</span>
+                        <span className="points-label">Available points</span>
                     </div>
                     <div className="points-lifetime">
                         <span className="points-value">{customer.lifetime_points.toLocaleString()}</span>
-                        <span className="points-label">Points cumulés</span>
+                        <span className="points-label">Lifetime points</span>
                     </div>
                 </div>
                 {nextTier && (
                     <div className="loyalty-card__progress">
                         <div className="progress-info">
-                            <span>Prochain niveau: {nextTier.name}</span>
-                            <span>{nextTier.min_points - customer.lifetime_points} pts restants</span>
+                            <span>Next tier: {nextTier.name}</span>
+                            <span>{nextTier.min_points - customer.lifetime_points} pts remaining</span>
                         </div>
                         <div className="progress-bar">
                             <div
@@ -359,7 +359,7 @@ export default function CustomerDetailPage() {
                         onClick={() => { setPointsAction('add'); setShowPointsModal(true) }}
                     >
                         <Plus size={16} />
-                        Ajouter points
+                        Add points
                     </button>
                     <button
                         className="btn btn-loyalty"
@@ -367,7 +367,7 @@ export default function CustomerDetailPage() {
                         disabled={customer.loyalty_points <= 0}
                     >
                         <Gift size={16} />
-                        Utiliser points
+                        Redeem points
                     </button>
                 </div>
             </div>
@@ -378,14 +378,14 @@ export default function CustomerDetailPage() {
                     <ShoppingBag size={24} />
                     <div>
                         <span className="stat-value">{customer.total_visits}</span>
-                        <span className="stat-label">Visites</span>
+                        <span className="stat-label">Visits</span>
                     </div>
                 </div>
                 <div className="customer-stat">
                     <TrendingUp size={24} />
                     <div>
                         <span className="stat-value stat-value--sm">{formatCurrency(customer.total_spent)}</span>
-                        <span className="stat-label">Total dépensé</span>
+                        <span className="stat-label">Total spent</span>
                     </div>
                 </div>
                 <div className="customer-stat">
@@ -396,14 +396,14 @@ export default function CustomerDetailPage() {
                                 ? formatCurrency(customer.total_spent / customer.total_visits)
                                 : formatCurrency(0)}
                         </span>
-                        <span className="stat-label">Panier moyen</span>
+                        <span className="stat-label">Average basket</span>
                     </div>
                 </div>
                 <div className="customer-stat">
                     <Calendar size={24} />
                     <div>
                         <span className="stat-value stat-value--date">{formatDate(customer.last_visit_at)}</span>
-                        <span className="stat-label">Dernière visite</span>
+                        <span className="stat-label">Last visit</span>
                     </div>
                 </div>
             </div>
@@ -415,21 +415,21 @@ export default function CustomerDetailPage() {
                     onClick={() => setActiveTab('overview')}
                 >
                     <User size={16} />
-                    Infos
+                    Info
                 </button>
                 <button
                     className={`customer-tab ${activeTab === 'loyalty' ? 'active' : ''}`}
                     onClick={() => setActiveTab('loyalty')}
                 >
                     <Star size={16} />
-                    Fidélité ({loyaltyTransactions.length})
+                    Loyalty ({loyaltyTransactions.length})
                 </button>
                 <button
                     className={`customer-tab ${activeTab === 'orders' ? 'active' : ''}`}
                     onClick={() => setActiveTab('orders')}
                 >
                     <FileText size={16} />
-                    Commandes ({orders.length})
+                    Orders ({orders.length})
                 </button>
             </div>
 
@@ -438,7 +438,7 @@ export default function CustomerDetailPage() {
                 {activeTab === 'overview' && (
                     <div className="customer-overview">
                         <div className="info-section">
-                            <h3>Coordonnées</h3>
+                            <h3>Contact Information</h3>
                             <div className="info-grid">
                                 {customer.phone && (
                                     <div className="info-item">
@@ -461,13 +461,13 @@ export default function CustomerDetailPage() {
                                 {customer.date_of_birth && (
                                     <div className="info-item">
                                         <Calendar size={16} />
-                                        <span>Anniversaire: {formatDate(customer.date_of_birth)}</span>
+                                        <span>Birthday: {formatDate(customer.date_of_birth)}</span>
                                     </div>
                                 )}
                             </div>
                         </div>
                         <div className="info-section">
-                            <h3>Membre depuis</h3>
+                            <h3>Member since</h3>
                             <p className="member-since">
                                 <Clock size={16} />
                                 {formatDate(customer.created_at)}
@@ -475,7 +475,7 @@ export default function CustomerDetailPage() {
                         </div>
                         {customer.category && (
                             <div className="info-section">
-                                <h3>Tarification</h3>
+                                <h3>Pricing</h3>
                                 <div className="pricing-info">
                                     <span
                                         className="pricing-badge"
@@ -484,11 +484,11 @@ export default function CustomerDetailPage() {
                                         {customer.category.name}
                                     </span>
                                     <span className="pricing-type">
-                                        {customer.category.price_modifier_type === 'retail' && 'Prix standard'}
-                                        {customer.category.price_modifier_type === 'wholesale' && 'Prix de gros'}
+                                        {customer.category.price_modifier_type === 'retail' && 'Standard price'}
+                                        {customer.category.price_modifier_type === 'wholesale' && 'Wholesale price'}
                                         {customer.category.price_modifier_type === 'discount_percentage' &&
-                                            `${customer.category.discount_percentage}% de réduction`}
-                                        {customer.category.price_modifier_type === 'custom' && 'Prix personnalisé'}
+                                            `${customer.category.discount_percentage}% discount`}
+                                        {customer.category.price_modifier_type === 'custom' && 'Custom price'}
                                     </span>
                                 </div>
                             </div>
@@ -501,8 +501,8 @@ export default function CustomerDetailPage() {
                         {loyaltyTransactions.length === 0 ? (
                             <div className="empty-state">
                                 <Star size={48} />
-                                <h3>Aucune transaction fidélité</h3>
-                                <p>Les transactions de points apparaîtront ici</p>
+                                <h3>No loyalty transactions</h3>
+                                <p>Points transactions will appear here</p>
                             </div>
                         ) : (
                             <div className="transactions-list">
@@ -515,7 +515,7 @@ export default function CustomerDetailPage() {
                                         </div>
                                         <div className="transaction-info">
                                             <span className="transaction-desc">
-                                                {tx.description || (tx.transaction_type === 'earn' ? 'Points gagnés' : 'Points utilisés')}
+                                                {tx.description || (tx.transaction_type === 'earn' ? 'Points earned' : 'Points redeemed')}
                                             </span>
                                             <span className="transaction-date">{formatDateTime(tx.created_at)}</span>
                                         </div>
@@ -534,8 +534,8 @@ export default function CustomerDetailPage() {
                         {orders.length === 0 ? (
                             <div className="empty-state">
                                 <FileText size={48} />
-                                <h3>Aucune commande</h3>
-                                <p>Les commandes du client apparaîtront ici</p>
+                                <h3>No orders</h3>
+                                <p>Customer orders will appear here</p>
                             </div>
                         ) : (
                             <div className="orders-list">
@@ -563,18 +563,18 @@ export default function CustomerDetailPage() {
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
                         <h2>
                             {pointsAction === 'add' ? (
-                                <><Plus size={20} /> Ajouter des points</>
+                                <><Plus size={20} /> Add Points</>
                             ) : (
-                                <><Gift size={20} /> Utiliser des points</>
+                                <><Gift size={20} /> Redeem Points</>
                             )}
                         </h2>
                         {pointsAction === 'redeem' && (
                             <p className="points-available">
-                                Points disponibles: <strong>{customer.loyalty_points.toLocaleString()}</strong>
+                                Available points: <strong>{customer.loyalty_points.toLocaleString()}</strong>
                             </p>
                         )}
                         <div className="form-group">
-                            <label>Nombre de points</label>
+                            <label>Number of points</label>
                             <input
                                 type="number"
                                 value={pointsAmount}
@@ -585,12 +585,12 @@ export default function CustomerDetailPage() {
                             />
                         </div>
                         <div className="form-group">
-                            <label>Description (optionnel)</label>
+                            <label>Description (optional)</label>
                             <input
                                 type="text"
                                 value={pointsDescription}
                                 onChange={(e) => setPointsDescription(e.target.value)}
-                                placeholder="Raison de l'ajustement"
+                                placeholder="Reason for adjustment"
                             />
                         </div>
                         <div className="modal-actions">
@@ -598,13 +598,13 @@ export default function CustomerDetailPage() {
                                 className="btn btn-secondary"
                                 onClick={() => setShowPointsModal(false)}
                             >
-                                Annuler
+                                Cancel
                             </button>
                             <button
                                 className="btn btn-primary"
                                 onClick={handlePointsSubmit}
                             >
-                                {pointsAction === 'add' ? 'Ajouter' : 'Utiliser'}
+                                {pointsAction === 'add' ? 'Add' : 'Redeem'}
                             </button>
                         </div>
                     </div>

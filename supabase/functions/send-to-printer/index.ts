@@ -112,7 +112,7 @@ function formatReceiptText(data: ReceiptData): string {
     if (data.discount_amount > 0) {
         lines.push(line('Discount:', `-Rp ${data.discount_amount.toLocaleString()}`));
     }
-    lines.push(line('Tax (11%):', `Rp ${data.tax_amount.toLocaleString()}`));
+    lines.push(line('Tax (10%):', `Rp ${data.tax_amount.toLocaleString()}`));
     lines.push('');
     lines.push(divider);
     lines.push(line('TOTAL:', `Rp ${data.total.toLocaleString()}`));

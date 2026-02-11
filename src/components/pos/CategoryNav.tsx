@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Menu } from 'lucide-react'
 import type { Category } from '../../types/database'
 import { NetworkIndicator } from '../ui/NetworkIndicator'
@@ -14,7 +15,7 @@ interface CategoryNavProps {
 }
 
 
-export default function CategoryNav({
+export default memo(function CategoryNav({
     categories,
     selectedCategory,
     onSelectCategory,
@@ -70,4 +71,4 @@ export default function CategoryNav({
             ))}
         </aside>
     )
-}
+})

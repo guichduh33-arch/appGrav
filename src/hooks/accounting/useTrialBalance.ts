@@ -1,6 +1,9 @@
 /**
  * useTrialBalance Hook (Epic 9 - Story 9.6)
  * Per-account summary with equilibrium check
+ *
+ * Optimized: Uses get_trial_balance_data RPC (now exists) which performs
+ * a single aggregation query instead of fetching all lines + client-side grouping.
  */
 
 import { useQuery } from '@tanstack/react-query'
@@ -22,18 +25,15 @@ export function useTrialBalance({ endDate }: ITrialBalanceParams = {}) {
     }> => {
       const dateFilter = endDate || new Date().toISOString().split('T')[0]
 
+      // Single RPC call does the aggregation server-side
       const { data, error } = await supabase.rpc('get_trial_balance_data', {
         p_end_date: dateFilter,
-      }).throwOnError()
+      })
+      if (error) throw error
 
-      // If RPC doesn't exist, fallback to manual calculation
-      if (error || !data) {
-        return await calculateTrialBalanceManually(dateFilter)
-      }
-
-      const rows = data as ITrialBalanceRow[]
-      const totalDebit = rows.reduce((sum, r) => sum + r.debit_total, 0)
-      const totalCredit = rows.reduce((sum, r) => sum + r.credit_total, 0)
+      const rows = (data ?? []) as ITrialBalanceRow[]
+      const totalDebit = rows.reduce((sum, r) => sum + Number(r.debit_total), 0)
+      const totalCredit = rows.reduce((sum, r) => sum + Number(r.credit_total), 0)
 
       return {
         rows,
@@ -43,61 +43,4 @@ export function useTrialBalance({ endDate }: ITrialBalanceParams = {}) {
       }
     },
   })
-}
-
-async function calculateTrialBalanceManually(endDate: string) {
-  // Get all active accounts
-  const { data: accounts, error: accError } = await supabase
-    .from('accounts')
-    .select('id, code, name, account_type, balance_type')
-    .eq('is_active', true)
-    .order('code')
-  if (accError) throw accError
-
-  // Get all posted journal lines up to end date
-  const { data: lines, error: lineError } = await supabase
-    .from('journal_entry_lines')
-    .select(`
-      account_id,
-      debit,
-      credit,
-      journal_entry:journal_entries!inner(entry_date, status)
-    `)
-    .in('journal_entry.status', ['posted', 'locked'])
-    .lte('journal_entry.entry_date', endDate)
-  if (lineError) throw lineError
-
-  // Aggregate by account
-  const totals = new Map<string, { debit: number; credit: number }>()
-  for (const line of lines ?? []) {
-    const existing = totals.get(line.account_id) || { debit: 0, credit: 0 }
-    existing.debit += Number(line.debit) || 0
-    existing.credit += Number(line.credit) || 0
-    totals.set(line.account_id, existing)
-  }
-
-  const rows: ITrialBalanceRow[] = (accounts ?? [])
-    .map(acc => {
-      const t = totals.get(acc.id) || { debit: 0, credit: 0 }
-      const netDebit = t.debit - t.credit
-      return {
-        account_id: acc.id,
-        account_code: acc.code,
-        account_name: acc.name,
-        account_type: acc.account_type,
-        debit_total: netDebit > 0 ? netDebit : 0,
-        credit_total: netDebit < 0 ? -netDebit : 0,
-      }
-    })
-    .filter(r => r.debit_total !== 0 || r.credit_total !== 0)
-
-  const totalDebit = rows.reduce((sum, r) => sum + r.debit_total, 0)
-  const totalCredit = rows.reduce((sum, r) => sum + r.credit_total, 0)
-
-  return {
-    rows,
-    totalDebit,
-    totalCredit,
-    isBalanced: Math.abs(totalDebit - totalCredit) < 0.01,
-  }
 }

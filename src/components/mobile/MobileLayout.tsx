@@ -51,23 +51,23 @@ export default function MobileLayout() {
   const navItems: INavItem[] = [
     {
       path: '/mobile',
-      label: 'Accueil',
+      label: 'Home',
       icon: <Home size={24} />,
     },
     {
       path: '/mobile/catalog',
-      label: 'Produits',
+      label: 'Products',
       icon: <ShoppingBag size={24} />,
     },
     {
       path: '/mobile/orders',
-      label: 'Commandes',
+      label: 'Orders',
       icon: <ClipboardList size={24} />,
       badge: readyOrdersCount > 0 ? readyOrdersCount : undefined,
     },
     {
       path: '/mobile/profile',
-      label: 'Profil',
+      label: 'Profile',
       icon: <User size={24} />,
     },
   ];

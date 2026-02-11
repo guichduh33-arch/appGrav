@@ -38,7 +38,7 @@ export function SessionCashBalanceTab() {
   const exportConfig: ExportConfig<ISessionCashBalanceReport> = useMemo(() => ({
     data: data || [],
     columns: [
-      { key: 'terminal_id', header: 'Terminal', format: (v) => (v as string) || 'Principal' },
+      { key: 'terminal_id', header: 'Terminal', format: (v) => (v as string) || 'Main' },
       { key: 'cashier_name', header: 'Cashier' },
       { key: 'started_at', header: 'Opened', format: (v) => new Date(v as string).toLocaleString('en-US') },
       { key: 'ended_at', header: 'Closed', format: (v) => v ? new Date(v as string).toLocaleString('en-US') : 'In Progress' },

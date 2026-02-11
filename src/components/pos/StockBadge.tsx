@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { TStockStatus } from '@/hooks/offline/useStockLevelsOffline'
 import {
     Tooltip,
@@ -36,7 +37,7 @@ const statusConfig: Record<TStockStatus, { color: string; bgColor: string; label
     },
 }
 
-export function StockBadge({ status, stockQuantity, minLevel, className = '' }: StockBadgeProps) {
+export const StockBadge = memo(function StockBadge({ status, stockQuantity, minLevel, className = '' }: StockBadgeProps) {
     if (!status) return null
 
     const config = statusConfig[status]
@@ -71,4 +72,4 @@ export function StockBadge({ status, stockQuantity, minLevel, className = '' }: 
             </Tooltip>
         </TooltipProvider>
     )
-}
+})

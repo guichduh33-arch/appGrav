@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { formatCurrency } from '../../utils/helpers'
+import { escapeHtml } from '../../utils/sanitize'
 import PinVerificationModal from '../../components/pos/modals/PinVerificationModal'
 import './B2BOrderDetailPage.css'
 
@@ -89,22 +90,22 @@ interface HistoryEntry {
 }
 
 const STATUS_CONFIG = {
-    draft: { label: 'Brouillon', color: 'gray', icon: FileText },
-    confirmed: { label: 'Confirmée', color: 'blue', icon: CheckCircle },
-    processing: { label: 'En préparation', color: 'yellow', icon: Clock },
-    ready: { label: 'Prête', color: 'purple', icon: Package },
-    partially_delivered: { label: 'Livr. partielle', color: 'orange', icon: Truck },
-    delivered: { label: 'Livrée', color: 'green', icon: CheckCircle },
-    cancelled: { label: 'Annulée', color: 'red', icon: AlertCircle }
+    draft: { label: 'Draft', color: 'gray', icon: FileText },
+    confirmed: { label: 'Confirmed', color: 'blue', icon: CheckCircle },
+    processing: { label: 'Processing', color: 'yellow', icon: Clock },
+    ready: { label: 'Ready', color: 'purple', icon: Package },
+    partially_delivered: { label: 'Partial Delivery', color: 'orange', icon: Truck },
+    delivered: { label: 'Delivered', color: 'green', icon: CheckCircle },
+    cancelled: { label: 'Cancelled', color: 'red', icon: AlertCircle }
 }
 
 const PAYMENT_METHODS = {
-    cash: 'Espèces',
-    transfer: 'Virement',
-    check: 'Chèque',
-    card: 'Carte',
+    cash: 'Cash',
+    transfer: 'Transfer',
+    check: 'Check',
+    card: 'Card',
     qris: 'QRIS',
-    credit: 'Crédit'
+    credit: 'Credit'
 }
 
 export default function B2BOrderDetailPage() {
@@ -289,17 +290,17 @@ export default function B2BOrderDetailPage() {
             fetchHistory()
         } catch (error: any) {
             console.error('Error updating status:', error)
-            alert(`Erreur lors de la mise à jour du statut: ${error?.message || 'Erreur inconnue'}`)
+            alert(`Error updating status: ${error?.message || 'Unknown error'}`)
         }
     }
 
     const handleAddPayment = async () => {
         if (!order) {
-            alert('Erreur: Commande non chargée')
+            alert('Error: Order not loaded')
             return
         }
         if (paymentForm.amount <= 0) {
-            alert('Erreur: Le montant doit être supérieur à 0')
+            alert('Error: Amount must be greater than 0')
             return
         }
 
@@ -336,13 +337,13 @@ export default function B2BOrderDetailPage() {
             fetchHistory()
         } catch (error: any) {
             console.error('Error adding payment:', error)
-            alert(`Erreur: ${error?.message || JSON.stringify(error)}`)
+            alert(`Error: ${error?.message || JSON.stringify(error)}`)
         }
     }
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return '-'
-        return new Date(dateString).toLocaleDateString('fr-FR', {
+        return new Date(dateString).toLocaleDateString('en-US', {
             day: '2-digit',
             month: 'short',
             year: 'numeric'
@@ -350,7 +351,7 @@ export default function B2BOrderDetailPage() {
     }
 
     const formatDateTime = (dateString: string) => {
-        return new Date(dateString).toLocaleString('fr-FR', {
+        return new Date(dateString).toLocaleString('en-US', {
             day: '2-digit',
             month: 'short',
             hour: '2-digit',
@@ -371,10 +372,10 @@ export default function B2BOrderDetailPage() {
 
     const getPaymentStatusBadge = (status: string) => {
         const config = {
-            unpaid: { label: 'Non payé', color: 'red' },
-            partial: { label: 'Partiel', color: 'orange' },
-            paid: { label: 'Payé', color: 'green' },
-            overdue: { label: 'En retard', color: 'red' }
+            unpaid: { label: 'Unpaid', color: 'red' },
+            partial: { label: 'Partial', color: 'orange' },
+            paid: { label: 'Paid', color: 'green' },
+            overdue: { label: 'Overdue', color: 'red' }
         }[status] || { label: status, color: 'gray' }
 
         return (
@@ -407,7 +408,7 @@ export default function B2BOrderDetailPage() {
 
         const printWindow = window.open('', '_blank')
         if (!printWindow) {
-            alert('Impossible d\'ouvrir la fenêtre d\'impression. Vérifiez que les popups ne sont pas bloqués.')
+            alert('Unable to open print window. Please check that popups are not blocked.')
             return
         }
 
@@ -415,7 +416,7 @@ export default function B2BOrderDetailPage() {
             <!DOCTYPE html>
             <html>
             <head>
-                <title>Commande ${order.order_number}</title>
+                <title>Order ${escapeHtml(order.order_number)}</title>
                 <style>
                     body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
                     h1 { font-size: 24px; margin-bottom: 5px; }
@@ -441,37 +442,37 @@ export default function B2BOrderDetailPage() {
                 </style>
             </head>
             <body>
-                <h1>Commande ${order.order_number}</h1>
+                <h1>Order ${escapeHtml(order.order_number)}</h1>
                 <p class="order-info">
-                    Créée le ${formatDate(order.order_date)} |
-                    Statut: <span class="status status-${order.status}">${STATUS_CONFIG[order.status]?.label || order.status}</span>
+                    Created on ${formatDate(order.order_date)} |
+                    Status: <span class="status status-${escapeHtml(order.status)}">${escapeHtml(STATUS_CONFIG[order.status]?.label || order.status)}</span>
                 </p>
 
                 <div class="grid">
                     <div class="card">
-                        <h3>Client</h3>
-                        <p><strong>${order.customer?.company_name || order.customer?.name || '-'}</strong></p>
-                        ${order.customer?.company_name ? `<p>${order.customer.name}</p>` : ''}
-                        ${order.customer?.phone ? `<p>Tél: ${order.customer.phone}</p>` : ''}
-                        ${order.customer?.email ? `<p>Email: ${order.customer.email}</p>` : ''}
+                        <h3>Customer</h3>
+                        <p><strong>${escapeHtml(order.customer?.company_name || order.customer?.name || '-')}</strong></p>
+                        ${order.customer?.company_name ? `<p>${escapeHtml(order.customer.name)}</p>` : ''}
+                        ${order.customer?.phone ? `<p>Phone: ${escapeHtml(order.customer.phone)}</p>` : ''}
+                        ${order.customer?.email ? `<p>Email: ${escapeHtml(order.customer.email)}</p>` : ''}
                     </div>
                     <div class="card">
-                        <h3>Livraison</h3>
-                        ${order.requested_delivery_date ? `<p>Date demandée: ${formatDate(order.requested_delivery_date)}</p>` : ''}
-                        ${order.actual_delivery_date ? `<p>Date livrée: ${formatDate(order.actual_delivery_date)}</p>` : ''}
-                        ${order.delivery_address ? `<p>Adresse: ${order.delivery_address}</p>` : ''}
+                        <h3>Delivery</h3>
+                        ${order.requested_delivery_date ? `<p>Requested date: ${formatDate(order.requested_delivery_date)}</p>` : ''}
+                        ${order.actual_delivery_date ? `<p>Delivered date: ${formatDate(order.actual_delivery_date)}</p>` : ''}
+                        ${order.delivery_address ? `<p>Address: ${escapeHtml(order.delivery_address)}</p>` : ''}
                     </div>
                 </div>
 
                 <div class="section">
-                    <div class="section-title">Articles</div>
+                    <div class="section-title">Items</div>
                     <table>
                         <thead>
                             <tr>
-                                <th>Produit</th>
-                                <th class="text-right">Qté</th>
-                                <th class="text-right">Prix Unit.</th>
-                                <th class="text-right">Remise</th>
+                                <th>Product</th>
+                                <th class="text-right">Qty</th>
+                                <th class="text-right">Unit Price</th>
+                                <th class="text-right">Discount</th>
                                 <th class="text-right">Total</th>
                             </tr>
                         </thead>
@@ -479,10 +480,10 @@ export default function B2BOrderDetailPage() {
                             ${items.map(item => `
                                 <tr>
                                     <td>
-                                        ${item.product_name}
-                                        ${item.product_sku ? `<br><small style="color:#666">${item.product_sku}</small>` : ''}
+                                        ${escapeHtml(item.product_name)}
+                                        ${item.product_sku ? `<br><small style="color:#666">${escapeHtml(item.product_sku)}</small>` : ''}
                                     </td>
-                                    <td class="text-right">${item.quantity} ${item.unit}</td>
+                                    <td class="text-right">${item.quantity} ${escapeHtml(item.unit)}</td>
                                     <td class="text-right">${formatCurrency(item.unit_price)}</td>
                                     <td class="text-right">${item.discount_percentage > 0 ? `${item.discount_percentage}%` : '-'}</td>
                                     <td class="text-right">${formatCurrency(item.line_total)}</td>
@@ -493,17 +494,17 @@ export default function B2BOrderDetailPage() {
 
                     <div class="summary">
                         <div class="summary-row">
-                            <span>Sous-total</span>
+                            <span>Subtotal</span>
                             <span>${formatCurrency(order.subtotal)}</span>
                         </div>
                         ${order.discount_amount > 0 ? `
                         <div class="summary-row">
-                            <span>Remise</span>
+                            <span>Discount</span>
                             <span>-${formatCurrency(order.discount_amount)}</span>
                         </div>
                         ` : ''}
                         <div class="summary-row">
-                            <span>TVA (${order.tax_rate}%)</span>
+                            <span>Tax (${order.tax_rate}%)</span>
                             <span>${formatCurrency(order.tax_amount)}</span>
                         </div>
                         <div class="summary-row total">
@@ -516,7 +517,7 @@ export default function B2BOrderDetailPage() {
                 ${order.notes ? `
                 <div class="section">
                     <div class="section-title">Notes</div>
-                    <p>${order.notes}</p>
+                    <p>${escapeHtml(order.notes)}</p>
                 </div>
                 ` : ''}
 
@@ -535,7 +536,7 @@ export default function B2BOrderDetailPage() {
         return (
             <div className="b2b-detail-loading">
                 <div className="spinner"></div>
-                <span>Chargement de la commande...</span>
+                <span>Loading order...</span>
             </div>
         )
     }
@@ -544,9 +545,9 @@ export default function B2BOrderDetailPage() {
         return (
             <div className="b2b-detail-error">
                 <AlertCircle size={48} />
-                <h3>Commande introuvable</h3>
+                <h3>Order not found</h3>
                 <button className="btn btn-primary" onClick={() => navigate('/b2b/orders')}>
-                    Retour aux commandes
+                    Back to orders
                 </button>
             </div>
         )
@@ -566,7 +567,7 @@ export default function B2BOrderDetailPage() {
                             {getStatusBadge(order.status)}
                         </div>
                         <p className="b2b-detail-header__date">
-                            Créée le {formatDate(order.order_date)}
+                            Created on {formatDate(order.order_date)}
                         </p>
                     </div>
                 </div>
@@ -575,35 +576,35 @@ export default function B2BOrderDetailPage() {
                     {order.status !== 'cancelled' && (
                         <button className="btn btn-secondary" onClick={handleEditClick}>
                             <Edit2 size={18} />
-                            Modifier
+                            Edit
                         </button>
                     )}
                     <button className="btn btn-secondary" onClick={handlePrint}>
                         <Printer size={18} />
-                        Imprimer
+                        Print
                     </button>
                     {order.status === 'draft' && (
                         <button className="btn btn-primary" onClick={() => updateOrderStatus('confirmed')}>
                             <CheckCircle size={18} />
-                            Confirmer
+                            Confirm
                         </button>
                     )}
                     {order.status === 'confirmed' && (
                         <button className="btn btn-primary" onClick={() => updateOrderStatus('processing')}>
                             <Clock size={18} />
-                            En préparation
+                            Processing
                         </button>
                     )}
                     {order.status === 'processing' && (
                         <button className="btn btn-primary" onClick={() => updateOrderStatus('ready')}>
                             <Package size={18} />
-                            Prêt
+                            Ready
                         </button>
                     )}
                     {(order.status === 'ready' || order.status === 'partially_delivered') && (
                         <button className="btn btn-primary" onClick={() => updateOrderStatus('delivered')}>
                             <Truck size={18} />
-                            Livré
+                            Delivered
                         </button>
                     )}
                 </div>
@@ -615,7 +616,7 @@ export default function B2BOrderDetailPage() {
                     {/* Customer & Delivery Info */}
                     <div className="b2b-detail-cards">
                         <div className="b2b-detail-card">
-                            <h3><User size={18} /> Client</h3>
+                            <h3><User size={18} /> Customer</h3>
                             <div className="b2b-detail-card__content">
                                 <p className="company-name">
                                     {order.customer?.company_name || order.customer?.name}
@@ -637,18 +638,18 @@ export default function B2BOrderDetailPage() {
                         </div>
 
                         <div className="b2b-detail-card">
-                            <h3><Truck size={18} /> Livraison</h3>
+                            <h3><Truck size={18} /> Delivery</h3>
                             <div className="b2b-detail-card__content">
                                 {order.requested_delivery_date && (
                                     <p className="delivery-date">
                                         <Calendar size={14} />
-                                        <span>Demandée: {formatDate(order.requested_delivery_date)}</span>
+                                        <span>Requested: {formatDate(order.requested_delivery_date)}</span>
                                     </p>
                                 )}
                                 {order.actual_delivery_date && (
                                     <p className="delivery-date delivered">
                                         <CheckCircle size={14} />
-                                        <span>Livrée: {formatDate(order.actual_delivery_date)}</span>
+                                        <span>Delivered: {formatDate(order.actual_delivery_date)}</span>
                                     </p>
                                 )}
                                 {order.delivery_address && (
@@ -664,28 +665,28 @@ export default function B2BOrderDetailPage() {
                         </div>
 
                         <div className="b2b-detail-card">
-                            <h3><CreditCard size={18} /> Paiement</h3>
+                            <h3><CreditCard size={18} /> Payment</h3>
                             <div className="b2b-detail-card__content">
                                 <div className="payment-status-row">
                                     {getPaymentStatusBadge(order.payment_status)}
                                 </div>
                                 {order.payment_terms && (
                                     <p className="payment-terms">
-                                        Conditions: {order.payment_terms === 'cod' ? 'Paiement à la livraison' : `Net ${order.payment_terms.replace('net', '')} jours`}
+                                        Terms: {order.payment_terms === 'cod' ? 'Cash on delivery' : `Net ${order.payment_terms.replace('net', '')} days`}
                                     </p>
                                 )}
                                 {order.due_date && (
                                     <p className="due-date">
-                                        Échéance: {formatDate(order.due_date)}
+                                        Due date: {formatDate(order.due_date)}
                                     </p>
                                 )}
                                 <div className="payment-amounts">
                                     <div className="payment-amount">
-                                        <span>Payé</span>
+                                        <span>Paid</span>
                                         <span className="amount paid">{formatCurrency(order.amount_paid)}</span>
                                     </div>
                                     <div className="payment-amount">
-                                        <span>Reste dû</span>
+                                        <span>Amount due</span>
                                         <span className="amount due">{formatCurrency(order.amount_due)}</span>
                                     </div>
                                 </div>
@@ -699,7 +700,7 @@ export default function B2BOrderDetailPage() {
                                         }}
                                     >
                                         <Plus size={16} />
-                                        Enregistrer un paiement
+                                        Record a payment
                                     </button>
                                 )}
                             </div>
@@ -713,28 +714,28 @@ export default function B2BOrderDetailPage() {
                             onClick={() => setActiveTab('items')}
                         >
                             <Package size={16} />
-                            Articles ({items.length})
+                            Items ({items.length})
                         </button>
                         <button
                             className={`b2b-detail-tab ${activeTab === 'payments' ? 'active' : ''}`}
                             onClick={() => setActiveTab('payments')}
                         >
                             <CreditCard size={16} />
-                            Paiements ({payments.length})
+                            Payments ({payments.length})
                         </button>
                         <button
                             className={`b2b-detail-tab ${activeTab === 'deliveries' ? 'active' : ''}`}
                             onClick={() => setActiveTab('deliveries')}
                         >
                             <Truck size={16} />
-                            Livraisons ({deliveries.length})
+                            Deliveries ({deliveries.length})
                         </button>
                         <button
                             className={`b2b-detail-tab ${activeTab === 'history' ? 'active' : ''}`}
                             onClick={() => setActiveTab('history')}
                         >
                             <Clock size={16} />
-                            Historique
+                            History
                         </button>
                     </div>
 
@@ -745,12 +746,12 @@ export default function B2BOrderDetailPage() {
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>Produit</th>
-                                            <th>Qté</th>
-                                            <th>Prix Unit.</th>
-                                            <th>Remise</th>
+                                            <th>Product</th>
+                                            <th>Qty</th>
+                                            <th>Unit Price</th>
+                                            <th>Discount</th>
                                             <th>Total</th>
-                                            <th>Livré</th>
+                                            <th>Delivered</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -790,18 +791,18 @@ export default function B2BOrderDetailPage() {
                                 {payments.length === 0 ? (
                                     <div className="empty-state">
                                         <CreditCard size={32} />
-                                        <p>Aucun paiement enregistré</p>
+                                        <p>No payments recorded</p>
                                     </div>
                                 ) : (
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th>N° Paiement</th>
+                                                <th>Payment #</th>
                                                 <th>Date</th>
-                                                <th>Méthode</th>
-                                                <th>Référence</th>
-                                                <th>Montant</th>
-                                                <th>Statut</th>
+                                                <th>Method</th>
+                                                <th>Reference</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -814,7 +815,7 @@ export default function B2BOrderDetailPage() {
                                                     <td><strong>{formatCurrency(payment.amount)}</strong></td>
                                                     <td>
                                                         <span className={`payment-badge payment-badge--${payment.status}`}>
-                                                            {payment.status === 'completed' ? 'Complété' : payment.status}
+                                                            {payment.status === 'completed' ? 'Completed' : payment.status}
                                                         </span>
                                                     </td>
                                                 </tr>
@@ -830,18 +831,18 @@ export default function B2BOrderDetailPage() {
                                 {deliveries.length === 0 ? (
                                     <div className="empty-state">
                                         <Truck size={32} />
-                                        <p>Aucune livraison enregistrée</p>
+                                        <p>No deliveries recorded</p>
                                     </div>
                                 ) : (
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th>N° Livraison</th>
-                                                <th>Prévue</th>
-                                                <th>Livrée</th>
-                                                <th>Chauffeur</th>
-                                                <th>Reçu par</th>
-                                                <th>Statut</th>
+                                                <th>Delivery #</th>
+                                                <th>Scheduled</th>
+                                                <th>Delivered</th>
+                                                <th>Driver</th>
+                                                <th>Received by</th>
+                                                <th>Status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -886,22 +887,22 @@ export default function B2BOrderDetailPage() {
                 {/* Sidebar - Summary */}
                 <div className="b2b-detail-sidebar">
                     <div className="b2b-detail-summary">
-                        <h3>Résumé</h3>
+                        <h3>Summary</h3>
 
                         <div className="summary-line">
-                            <span>Sous-total</span>
+                            <span>Subtotal</span>
                             <span>{formatCurrency(order.subtotal)}</span>
                         </div>
 
                         {order.discount_amount > 0 && (
                             <div className="summary-line summary-line--discount">
-                                <span>Remise {order.discount_type === 'percentage' ? `(${order.discount_value}%)` : ''}</span>
+                                <span>Discount {order.discount_type === 'percentage' ? `(${order.discount_value}%)` : ''}</span>
                                 <span>-{formatCurrency(order.discount_amount)}</span>
                             </div>
                         )}
 
                         <div className="summary-line">
-                            <span>TVA ({order.tax_rate}%)</span>
+                            <span>Tax ({order.tax_rate}%)</span>
                             <span>{formatCurrency(order.tax_amount)}</span>
                         </div>
 
@@ -921,7 +922,7 @@ export default function B2BOrderDetailPage() {
 
                         {order.internal_notes && (
                             <div className="summary-notes internal">
-                                <h4>Notes internes</h4>
+                                <h4>Internal Notes</h4>
                                 <p>{order.internal_notes}</p>
                             </div>
                         )}
@@ -934,20 +935,20 @@ export default function B2BOrderDetailPage() {
                 <div className="b2b-payment-modal-backdrop" onClick={(e) => e.target === e.currentTarget && setShowPaymentModal(false)}>
                     <div className="b2b-payment-modal">
                         <div className="modal__header">
-                            <h2 className="modal__title">Enregistrer un paiement</h2>
+                            <h2 className="modal__title">Record a payment</h2>
                             <button
                                 type="button"
                                 className="modal__close"
                                 onClick={() => setShowPaymentModal(false)}
-                                aria-label="Fermer"
-                                title="Fermer"
+                                aria-label="Close"
+                                title="Close"
                             >
                                 <X size={20} />
                             </button>
                         </div>
                         <div className="modal__body">
                             <div className="form-group">
-                                <label htmlFor="payment-amount">Montant *</label>
+                                <label htmlFor="payment-amount">Amount *</label>
                                 <input
                                     id="payment-amount"
                                     type="number"
@@ -957,27 +958,27 @@ export default function B2BOrderDetailPage() {
                                 />
                             </div>
                             <div className="form-group">
-                                <label htmlFor="payment-method">Méthode de paiement *</label>
+                                <label htmlFor="payment-method">Payment method *</label>
                                 <select
                                     id="payment-method"
                                     value={paymentForm.payment_method}
                                     onChange={(e) => setPaymentForm({ ...paymentForm, payment_method: e.target.value })}
                                 >
-                                    <option value="transfer">Virement</option>
-                                    <option value="cash">Espèces</option>
-                                    <option value="check">Chèque</option>
-                                    <option value="card">Carte</option>
+                                    <option value="transfer">Transfer</option>
+                                    <option value="cash">Cash</option>
+                                    <option value="check">Check</option>
+                                    <option value="card">Card</option>
                                     <option value="qris">QRIS</option>
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label htmlFor="payment-reference">Référence (optionnel)</label>
+                                <label htmlFor="payment-reference">Reference (optional)</label>
                                 <input
                                     id="payment-reference"
                                     type="text"
                                     value={paymentForm.reference_number}
                                     onChange={(e) => setPaymentForm({ ...paymentForm, reference_number: e.target.value })}
-                                    placeholder="N° de transaction, chèque..."
+                                    placeholder="Transaction #, check #..."
                                 />
                             </div>
                             <div className="form-group">
@@ -987,7 +988,7 @@ export default function B2BOrderDetailPage() {
                                     rows={2}
                                     value={paymentForm.notes}
                                     onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })}
-                                    placeholder="Notes optionnelles..."
+                                    placeholder="Optional notes..."
                                 />
                             </div>
                         </div>
@@ -997,7 +998,7 @@ export default function B2BOrderDetailPage() {
                                 className="btn btn-secondary"
                                 onClick={() => setShowPaymentModal(false)}
                             >
-                                Annuler
+                                Cancel
                             </button>
                             <button
                                 type="button"
@@ -1005,7 +1006,7 @@ export default function B2BOrderDetailPage() {
                                 onClick={handleAddPayment}
                             >
                                 <CreditCard size={18} />
-                                Enregistrer
+                                Save
                             </button>
                         </div>
                     </div>
@@ -1015,8 +1016,8 @@ export default function B2BOrderDetailPage() {
             {/* PIN Verification Modal for editing delivered orders */}
             {showPinModal && (
                 <PinVerificationModal
-                    title="Autorisation requise"
-                    message="Cette commande a déjà été livrée. Entrez un PIN manager pour modifier."
+                    title="Authorization required"
+                    message="This order has already been delivered. Enter a manager PIN to edit."
                     onVerify={handlePinVerify}
                     onClose={() => setShowPinModal(false)}
                     allowedRoles={['manager', 'admin']}

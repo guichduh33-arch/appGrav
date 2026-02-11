@@ -269,12 +269,12 @@ export default function B2BOrderFormPage() {
 
     const handleSubmit = async (status: 'draft' | 'confirmed' = 'draft') => {
         if (!formData.customer_id) {
-            alert('Veuillez sélectionner un client')
+            alert('Please select a customer')
             return
         }
 
         if (items.some(item => !item.product_name || item.quantity <= 0)) {
-            alert('Veuillez remplir tous les articles correctement')
+            alert('Please fill in all items correctly')
             return
         }
 
@@ -355,7 +355,7 @@ export default function B2BOrderFormPage() {
             navigate('/b2b/orders')
         } catch (error: any) {
             console.error('Error saving order:', error)
-            alert(`Erreur lors de l'enregistrement: ${error?.message || 'Erreur inconnue'}`)
+            alert(`Error saving: ${error?.message || 'Unknown error'}`)
         } finally {
             setSaving(false)
         }
@@ -372,7 +372,7 @@ export default function B2BOrderFormPage() {
         return (
             <div className="b2b-form-loading">
                 <div className="spinner"></div>
-                <span>Chargement de la commande...</span>
+                <span>Loading order...</span>
             </div>
         )
     }
@@ -383,10 +383,10 @@ export default function B2BOrderFormPage() {
             <div className="b2b-order-form__header">
                 <button className="btn btn-ghost" onClick={() => navigate('/b2b/orders')}>
                     <ArrowLeft size={20} />
-                    Retour
+                    Back
                 </button>
                 <h1 className="b2b-order-form__title">
-                    {isEditing ? 'Modifier la Commande' : 'Nouvelle Commande B2B'}
+                    {isEditing ? 'Edit Order' : 'New B2B Order'}
                 </h1>
             </div>
 
@@ -397,17 +397,17 @@ export default function B2BOrderFormPage() {
                     <div className="b2b-form-section">
                         <h2 className="b2b-form-section__title">
                             <User size={20} />
-                            Client
+                            Customer
                         </h2>
                         <div className="b2b-form-grid">
                             <div className="form-group form-group--full">
-                                <label>Client B2B *</label>
+                                <label>B2B Customer *</label>
                                 <select
                                     value={formData.customer_id}
                                     onChange={(e) => handleCustomerChange(e.target.value)}
                                     required
                                 >
-                                    <option value="">Sélectionner un client...</option>
+                                    <option value="">Select a customer...</option>
                                     {customers.map(customer => (
                                         <option key={customer.id} value={customer.id}>
                                             {customer.company_name || customer.name}
@@ -424,7 +424,7 @@ export default function B2BOrderFormPage() {
                                     </div>
                                     {selectedCustomer.phone && (
                                         <div className="b2b-customer-info__item">
-                                            <span className="label">Téléphone:</span>
+                                            <span className="label">Phone:</span>
                                             <span>{selectedCustomer.phone}</span>
                                         </div>
                                     )}
@@ -443,11 +443,11 @@ export default function B2BOrderFormPage() {
                     <div className="b2b-form-section">
                         <h2 className="b2b-form-section__title">
                             <Calendar size={20} />
-                            Livraison
+                            Delivery
                         </h2>
                         <div className="b2b-form-grid">
                             <div className="form-group">
-                                <label>Date de livraison souhaitée</label>
+                                <label>Requested delivery date</label>
                                 <input
                                     type="date"
                                     value={formData.requested_delivery_date}
@@ -455,34 +455,34 @@ export default function B2BOrderFormPage() {
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Conditions de paiement</label>
+                                <label>Payment terms</label>
                                 <select
                                     value={formData.payment_terms}
                                     onChange={(e) => setFormData({ ...formData, payment_terms: e.target.value as '' | 'cod' | 'net15' | 'net30' | 'net60' })}
                                 >
-                                    <option value="">Sélectionner...</option>
-                                    <option value="cod">Paiement à la livraison</option>
-                                    <option value="net15">Net 15 jours</option>
-                                    <option value="net30">Net 30 jours</option>
-                                    <option value="net60">Net 60 jours</option>
+                                    <option value="">Select...</option>
+                                    <option value="cod">Cash on delivery</option>
+                                    <option value="net15">Net 15 days</option>
+                                    <option value="net30">Net 30 days</option>
+                                    <option value="net60">Net 60 days</option>
                                 </select>
                             </div>
                             <div className="form-group form-group--full">
-                                <label>Adresse de livraison</label>
+                                <label>Delivery address</label>
                                 <textarea
                                     rows={2}
                                     value={formData.delivery_address}
                                     onChange={(e) => setFormData({ ...formData, delivery_address: e.target.value })}
-                                    placeholder="Adresse complète de livraison..."
+                                    placeholder="Full delivery address..."
                                 />
                             </div>
                             <div className="form-group form-group--full">
-                                <label>Instructions de livraison</label>
+                                <label>Delivery instructions</label>
                                 <textarea
                                     rows={2}
                                     value={formData.delivery_notes}
                                     onChange={(e) => setFormData({ ...formData, delivery_notes: e.target.value })}
-                                    placeholder="Instructions spéciales pour la livraison..."
+                                    placeholder="Special delivery instructions..."
                                 />
                             </div>
                         </div>
@@ -493,11 +493,11 @@ export default function B2BOrderFormPage() {
                         <div className="b2b-form-section__header">
                             <h2 className="b2b-form-section__title">
                                 <Package size={20} />
-                                Articles
+                                Items
                             </h2>
                             <button className="btn btn-secondary btn-sm" onClick={addItem}>
                                 <Plus size={16} />
-                                Ajouter
+                                Add
                             </button>
                         </div>
 
@@ -505,10 +505,10 @@ export default function B2BOrderFormPage() {
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Produit</th>
-                                        <th style={{ width: '80px' }}>Qté</th>
-                                        <th style={{ width: '100px' }}>Prix Unit.</th>
-                                        <th style={{ width: '80px' }}>Remise %</th>
+                                        <th>Product</th>
+                                        <th style={{ width: '80px' }}>Qty</th>
+                                        <th style={{ width: '100px' }}>Unit Price</th>
+                                        <th style={{ width: '80px' }}>Discount %</th>
                                         <th style={{ width: '120px' }}>Total</th>
                                         <th style={{ width: '50px' }}></th>
                                     </tr>
@@ -523,7 +523,7 @@ export default function B2BOrderFormPage() {
                                                         onClick={() => setShowProductSearch(showProductSearch === index ? null : index)}
                                                     >
                                                         {item.product_name || (
-                                                            <span className="placeholder">Rechercher un produit...</span>
+                                                            <span className="placeholder">Search a product...</span>
                                                         )}
                                                     </div>
                                                     {showProductSearch === index && (
@@ -532,7 +532,7 @@ export default function B2BOrderFormPage() {
                                                                 <Search size={16} />
                                                                 <input
                                                                     type="text"
-                                                                    placeholder="Rechercher..."
+                                                                    placeholder="Search..."
                                                                     value={productSearch}
                                                                     onChange={(e) => setProductSearch(e.target.value)}
                                                                     autoFocus
@@ -609,21 +609,21 @@ export default function B2BOrderFormPage() {
                         <h2 className="b2b-form-section__title">Notes</h2>
                         <div className="b2b-form-grid">
                             <div className="form-group">
-                                <label>Notes (visibles sur le bon de commande)</label>
+                                <label>Notes (visible on purchase order)</label>
                                 <textarea
                                     rows={3}
                                     value={formData.notes}
                                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                    placeholder="Notes pour le client..."
+                                    placeholder="Notes for the customer..."
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Notes internes</label>
+                                <label>Internal notes</label>
                                 <textarea
                                     rows={3}
                                     value={formData.internal_notes}
                                     onChange={(e) => setFormData({ ...formData, internal_notes: e.target.value })}
-                                    placeholder="Notes internes (non visibles par le client)..."
+                                    placeholder="Internal notes (not visible to customer)..."
                                 />
                             </div>
                         </div>
@@ -633,10 +633,10 @@ export default function B2BOrderFormPage() {
                 {/* Sidebar - Summary */}
                 <div className="b2b-order-form__sidebar">
                     <div className="b2b-order-summary">
-                        <h3>Résumé</h3>
+                        <h3>Summary</h3>
 
                         <div className="b2b-summary-line">
-                            <span>Sous-total</span>
+                            <span>Subtotal</span>
                             <span>{formatCurrency(totals.subtotal)}</span>
                         </div>
 
@@ -654,7 +654,7 @@ export default function B2BOrderFormPage() {
                                     className={`btn-chip ${formData.discount_type === 'fixed' ? 'active' : ''}`}
                                     onClick={() => setFormData({ ...formData, discount_type: 'fixed' })}
                                 >
-                                    Fixe
+                                    Fixed
                                 </button>
                                 {formData.discount_type && (
                                     <button
@@ -671,20 +671,20 @@ export default function B2BOrderFormPage() {
                                     min="0"
                                     value={formData.discount_value}
                                     onChange={(e) => setFormData({ ...formData, discount_value: parseFloat(e.target.value) || 0 })}
-                                    placeholder={formData.discount_type === 'percentage' ? '% remise' : 'Montant'}
+                                    placeholder={formData.discount_type === 'percentage' ? '% discount' : 'Amount'}
                                 />
                             )}
                         </div>
 
                         {totals.discountAmount > 0 && (
                             <div className="b2b-summary-line b2b-summary-line--discount">
-                                <span>Remise</span>
+                                <span>Discount</span>
                                 <span>-{formatCurrency(totals.discountAmount)}</span>
                             </div>
                         )}
 
                         <div className="b2b-summary-line">
-                            <span>TVA ({formData.tax_rate}%)</span>
+                            <span>Tax ({formData.tax_rate}%)</span>
                             <span>{formatCurrency(totals.taxAmount)}</span>
                         </div>
 
@@ -702,7 +702,7 @@ export default function B2BOrderFormPage() {
                                 disabled={saving}
                             >
                                 <Save size={18} />
-                                Enregistrer Brouillon
+                                Save Draft
                             </button>
                             <button
                                 className="btn btn-primary btn-block"
@@ -710,7 +710,7 @@ export default function B2BOrderFormPage() {
                                 disabled={saving}
                             >
                                 <Send size={18} />
-                                Confirmer Commande
+                                Confirm Order
                             </button>
                         </div>
                     </div>

@@ -130,7 +130,7 @@ export default function PurchaseOrderDetailPage() {
         action_type: 'payment_made',
         previous_status: purchaseOrder.payment_status,
         new_status: 'paid',
-        description: `Paiement complet effectué - ${formatCurrency(purchaseOrder.total_amount)}`,
+        description: `Full payment made - ${formatCurrency(purchaseOrder.total_amount)}`,
         metadata: {
           payment_amount: purchaseOrder.total_amount,
           previous_payment_status: purchaseOrder.payment_status,

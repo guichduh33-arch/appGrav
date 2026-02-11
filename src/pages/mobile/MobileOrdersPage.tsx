@@ -21,13 +21,13 @@ function formatTimeAgo(dateString: string): string {
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
 
-  if (diffMins < 1) return 'À l\'instant';
-  if (diffMins === 1) return 'Il y a 1 min';
-  if (diffMins < 60) return `Il y a ${diffMins} min`;
+  if (diffMins < 1) return 'Just now';
+  if (diffMins === 1) return '1 min ago';
+  if (diffMins < 60) return `${diffMins} min ago`;
 
   const diffHours = Math.floor(diffMins / 60);
-  if (diffHours === 1) return 'Il y a 1h';
-  return `Il y a ${diffHours}h`;
+  if (diffHours === 1) return '1h ago';
+  return `${diffHours}h ago`;
 }
 
 /**
@@ -88,13 +88,13 @@ export default function MobileOrdersPage() {
   return (
     <div className="mobile-orders">
       <div className="mobile-orders__header">
-        <h1>Mes Commandes</h1>
+        <h1>My Orders</h1>
         {sentOrders.length > 0 && (
           <button
             className="mobile-orders__clear-btn"
             onClick={clearCompletedOrders}
           >
-            Effacer terminées
+            Clear completed
           </button>
         )}
       </div>
@@ -102,8 +102,8 @@ export default function MobileOrdersPage() {
       {sentOrders.length === 0 ? (
         <div className="mobile-orders__empty">
           <Clock size={48} className="mobile-orders__empty-icon" />
-          <h2>Aucune commande</h2>
-          <p>Vos commandes envoyées apparaîtront ici</p>
+          <h2>No orders</h2>
+          <p>Your sent orders will appear here</p>
         </div>
       ) : (
         <div className="mobile-orders__list">
@@ -112,7 +112,7 @@ export default function MobileOrdersPage() {
             <section className="mobile-orders__section">
               <h2 className="mobile-orders__section-title mobile-orders__section-title--ready">
                 <CheckCircle size={20} />
-                Prêtes ({readyOrders.length})
+                Ready ({readyOrders.length})
               </h2>
               {readyOrders.map((order) => (
                 <div
@@ -131,7 +131,7 @@ export default function MobileOrdersPage() {
                   </div>
                   <div className="mobile-orders__card-details">
                     <span className="mobile-orders__items">
-                      {order.itemCount} article{order.itemCount > 1 ? 's' : ''}
+                      {order.itemCount} item{order.itemCount > 1 ? 's' : ''}
                     </span>
                     <span className="mobile-orders__time">
                       {formatTimeAgo(order.sentAt)}
@@ -140,13 +140,13 @@ export default function MobileOrdersPage() {
                   <div className="mobile-orders__card-status">
                     <span className="mobile-orders__status mobile-orders__status--ready">
                       <CheckCircle size={16} />
-                      Prête à servir
+                      Ready to serve
                     </span>
                     <button
                       className="mobile-orders__done-btn"
                       onClick={() => handleRemove(order.orderId)}
                     >
-                      Servie
+                      Served
                     </button>
                   </div>
                 </div>
@@ -159,7 +159,7 @@ export default function MobileOrdersPage() {
             <section className="mobile-orders__section">
               <h2 className="mobile-orders__section-title mobile-orders__section-title--preparing">
                 <Clock size={20} />
-                En préparation ({preparingOrders.length})
+                Preparing ({preparingOrders.length})
               </h2>
               {preparingOrders.map((order) => (
                 <div
@@ -178,7 +178,7 @@ export default function MobileOrdersPage() {
                   </div>
                   <div className="mobile-orders__card-details">
                     <span className="mobile-orders__items">
-                      {order.itemCount} article{order.itemCount > 1 ? 's' : ''}
+                      {order.itemCount} item{order.itemCount > 1 ? 's' : ''}
                     </span>
                     <span className="mobile-orders__time">
                       {formatTimeAgo(order.sentAt)}
@@ -187,7 +187,7 @@ export default function MobileOrdersPage() {
                   <div className="mobile-orders__card-status">
                     <span className="mobile-orders__status mobile-orders__status--preparing">
                       <Clock size={16} className="animate-pulse" />
-                      En préparation
+                      Preparing
                     </span>
                   </div>
                 </div>
@@ -200,7 +200,7 @@ export default function MobileOrdersPage() {
             <section className="mobile-orders__section">
               <h2 className="mobile-orders__section-title">
                 <AlertCircle size={20} />
-                Envoyées ({sentOnlyOrders.length})
+                Sent ({sentOnlyOrders.length})
               </h2>
               {sentOnlyOrders.map((order) => (
                 <div
@@ -219,7 +219,7 @@ export default function MobileOrdersPage() {
                   </div>
                   <div className="mobile-orders__card-details">
                     <span className="mobile-orders__items">
-                      {order.itemCount} article{order.itemCount > 1 ? 's' : ''}
+                      {order.itemCount} item{order.itemCount > 1 ? 's' : ''}
                     </span>
                     <span className="mobile-orders__time">
                       {formatTimeAgo(order.sentAt)}
@@ -227,7 +227,7 @@ export default function MobileOrdersPage() {
                   </div>
                   <div className="mobile-orders__card-status">
                     <span className="mobile-orders__status">
-                      Envoyée
+                      Sent
                     </span>
                     <button
                       className="mobile-orders__remove-btn"

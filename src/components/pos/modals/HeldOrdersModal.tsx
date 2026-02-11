@@ -117,8 +117,8 @@ export default function HeldOrdersModal({ onClose, onRestore }: HeldOrdersModalP
 
             {showPinModal && (
                 <PinVerificationModal
-                    title="Suppression de commande"
-                    message="Code PIN administrateur requis pour supprimer cette commande"
+                    title="Delete Order"
+                    message="Admin PIN required to delete this order"
                     allowedRoles={['admin']}
                     onVerify={handlePinVerify}
                     onClose={() => {

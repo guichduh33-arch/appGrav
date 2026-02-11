@@ -160,7 +160,8 @@ function calculateTotals(items: CartItem[], discountType: 'percent' | 'amount' |
     }
 
     // Promotion discount applied before manual discount
-    const total = Math.max(0, subtotal - promotionTotalDiscount - discountAmount)
+    // Round to nearest 100 IDR (Indonesian business convention)
+    const total = Math.round(Math.max(0, subtotal - promotionTotalDiscount - discountAmount) / 100) * 100
     const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
 
     return { subtotal, discountAmount, total, itemCount }

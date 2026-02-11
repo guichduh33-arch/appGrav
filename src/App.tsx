@@ -4,6 +4,7 @@ import { useAuthStore } from './stores/authStore'
 import { useCartStore, initCartPersistence } from './stores/cartStore'
 import { supabase } from './lib/supabase'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
+import { ModuleErrorBoundary } from './components/ui/ModuleErrorBoundary'
 import { initializeSyncEngine } from './services/sync/syncEngine'
 import { initProductsCache, stopProductsCacheRefresh } from './services/offline/productsCacheInit'
 import { loadCart, validateAndFilterCartItems } from './services/offline/cartPersistenceService'
@@ -263,20 +264,30 @@ function App() {
                     <Route
                         path="/pos"
                         element={
-                            isAuthenticated ? <POSMainPage /> : <Navigate to="/login" replace />
+                            isAuthenticated ? (
+                                <ModuleErrorBoundary moduleName="POS">
+                                    <POSMainPage />
+                                </ModuleErrorBoundary>
+                            ) : <Navigate to="/login" replace />
                         }
                     />
                     <Route
                         path="/kds"
                         element={
-                            isAuthenticated ? <KDSStationSelector /> : <Navigate to="/login" replace />
+                            isAuthenticated ? (
+                                <ModuleErrorBoundary moduleName="KDS">
+                                    <KDSStationSelector />
+                                </ModuleErrorBoundary>
+                            ) : <Navigate to="/login" replace />
                         }
                     />
                     <Route
                         path="/kds/:station"
                         element={
                             isAuthenticated ? (
-                                <KDSMainPage />
+                                <ModuleErrorBoundary moduleName="KDS">
+                                    <KDSMainPage />
+                                </ModuleErrorBoundary>
                             ) : (
                                 <Navigate to="/login" replace />
                             )
@@ -372,12 +383,12 @@ function App() {
                             <Route path="vat" element={<VATManagementPage />} />
                         </Route>
 
-                        <Route path="/reports" element={<ReportsPage />} />
+                        <Route path="/reports" element={<ModuleErrorBoundary moduleName="Reports"><ReportsPage /></ModuleErrorBoundary>} />
                         <Route path="/users" element={<UsersPage />} />
                         <Route path="/users/permissions" element={<PermissionsPage />} />
 
                         {/* Settings Module Routes with Layout */}
-                        <Route path="/settings" element={<SettingsLayout />}>
+                        <Route path="/settings" element={<ModuleErrorBoundary moduleName="Settings"><SettingsLayout /></ModuleErrorBoundary>}>
                             <Route index element={<CompanySettingsPage />} />
                             {/* Dynamic category pages */}
                             <Route path="company" element={<CompanySettingsPage />} />

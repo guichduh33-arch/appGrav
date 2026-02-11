@@ -31,10 +31,10 @@ interface CategoryFormData {
 }
 
 const PRICING_TYPES = [
-    { value: 'retail', label: 'Prix Standard', icon: <DollarSign size={16} />, desc: 'Prix de vente normal' },
-    { value: 'wholesale', label: 'Prix de Gros', icon: <Building2 size={16} />, desc: 'Prix wholesale défini sur les produits' },
-    { value: 'discount_percentage', label: 'Réduction %', icon: <Percent size={16} />, desc: 'Réduction sur le prix de vente' },
-    { value: 'custom', label: 'Prix Personnalisé', icon: <Tag size={16} />, desc: 'Prix défini par catégorie produit' }
+    { value: 'retail', label: 'Standard Price', icon: <DollarSign size={16} />, desc: 'Normal selling price' },
+    { value: 'wholesale', label: 'Wholesale Price', icon: <Building2 size={16} />, desc: 'Wholesale price defined on products' },
+    { value: 'discount_percentage', label: 'Discount %', icon: <Percent size={16} />, desc: 'Discount on selling price' },
+    { value: 'custom', label: 'Custom Price', icon: <Tag size={16} />, desc: 'Price defined by product category' }
 ]
 
 const COLOR_OPTIONS = [
@@ -79,7 +79,7 @@ export default function CustomerCategoriesPage() {
             if (data) setCategories(data as unknown as CustomerCategory[])
         } catch (error) {
             console.error('Error fetching categories:', error)
-            toast.error('Erreur lors du chargement')
+            toast.error('Error loading categories')
         } finally {
             setLoading(false)
         }
@@ -107,17 +107,17 @@ export default function CustomerCategoriesPage() {
 
     const handleSubmit = async () => {
         if (!formData.name.trim()) {
-            toast.error('Le nom est requis')
+            toast.error('Name is required')
             return
         }
 
         if (!formData.slug.trim()) {
-            toast.error('Le code est requis')
+            toast.error('Code is required')
             return
         }
 
         if (formData.price_modifier_type === 'discount_percentage' && formData.discount_percentage <= 0) {
-            toast.error('Veuillez définir un pourcentage de réduction')
+            toast.error('Please set a discount percentage')
             return
         }
 
@@ -140,21 +140,21 @@ export default function CustomerCategoriesPage() {
                     .eq('id', editingCategory.id)
 
                 if (error) throw error
-                toast.success('Catégorie mise à jour')
+                toast.success('Category updated')
             } else {
                 const { error } = await supabase
                     .from('customer_categories')
                     .insert(categoryData as never)
 
                 if (error) throw error
-                toast.success('Catégorie créée')
+                toast.success('Category created')
             }
 
             setShowModal(false)
             fetchCategories()
         } catch (error: unknown) {
             console.error('Error saving category:', error)
-            const errorMessage = error instanceof Error ? error.message : 'Erreur lors de l\'enregistrement'
+            const errorMessage = error instanceof Error ? error.message : 'Error saving category'
             toast.error(errorMessage)
         } finally {
             setSaving(false)
@@ -162,7 +162,7 @@ export default function CustomerCategoriesPage() {
     }
 
     const handleDelete = async (category: CustomerCategory) => {
-        if (!confirm(`Supprimer la catégorie "${category.name}" ?`)) {
+        if (!confirm(`Delete category "${category.name}"?`)) {
             return
         }
 
@@ -173,11 +173,11 @@ export default function CustomerCategoriesPage() {
                 .eq('id', category.id)
 
             if (error) throw error
-            toast.success('Catégorie supprimée')
+            toast.success('Category deleted')
             fetchCategories()
         } catch (error) {
             console.error('Error deleting category:', error)
-            toast.error('Erreur lors de la suppression')
+            toast.error('Error deleting category')
         }
     }
 
@@ -200,22 +200,22 @@ export default function CustomerCategoriesPage() {
             {/* Header */}
             <header className="categories-header">
                 <div className="categories-header__left">
-                    <button className="btn btn-ghost" onClick={() => navigate('/customers')} title="Retour" aria-label="Retour">
+                    <button className="btn btn-ghost" onClick={() => navigate('/customers')} title="Back" aria-label="Back">
                         <ArrowLeft size={20} />
                     </button>
                     <div>
                         <h1 className="categories-header__title">
                             <Tag size={28} />
-                            Catégories Clients
+                            Customer Categories
                         </h1>
                         <p className="categories-header__subtitle">
-                            Gérez les catégories et leur tarification
+                            Manage categories and their pricing
                         </p>
                     </div>
                 </div>
                 <button className="btn btn-primary" onClick={openCreateModal}>
                     <Plus size={18} />
-                    Nouvelle Catégorie
+                    New Category
                 </button>
             </header>
 
@@ -223,16 +223,16 @@ export default function CustomerCategoriesPage() {
             {loading ? (
                 <div className="categories-loading">
                     <div className="spinner"></div>
-                    <span>Chargement...</span>
+                    <span>Loading...</span>
                 </div>
             ) : categories.length === 0 ? (
                 <div className="categories-empty">
                     <Tag size={64} />
-                    <h3>Aucune catégorie</h3>
-                    <p>Créez des catégories pour organiser vos clients</p>
+                    <h3>No categories</h3>
+                    <p>Create categories to organize your customers</p>
                     <button className="btn btn-primary" onClick={openCreateModal}>
                         <Plus size={18} />
-                        Créer une catégorie
+                        Create a category
                     </button>
                 </div>
             ) : (
@@ -253,14 +253,14 @@ export default function CustomerCategoriesPage() {
                                     <button
                                         className="btn-icon"
                                         onClick={() => openEditModal(category)}
-                                        title="Modifier"
+                                        title="Edit"
                                     >
                                         <Edit size={16} />
                                     </button>
                                     <button
                                         className="btn-icon btn-icon--danger"
                                         onClick={() => handleDelete(category)}
-                                        title="Supprimer"
+                                        title="Delete"
                                     >
                                         <Trash2 size={16} />
                                     </button>
@@ -279,7 +279,7 @@ export default function CustomerCategoriesPage() {
                                 {category.price_modifier_type === 'discount_percentage' && category.discount_percentage && (
                                     <span className="pricing-discount">
                                         <Percent size={14} />
-                                        {category.discount_percentage}% de réduction
+                                        {category.discount_percentage}% discount
                                     </span>
                                 )}
                             </div>
@@ -300,9 +300,9 @@ export default function CustomerCategoriesPage() {
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>
-                                {editingCategory ? 'Modifier la Catégorie' : 'Nouvelle Catégorie'}
+                                {editingCategory ? 'Edit Category' : 'New Category'}
                             </h2>
-                            <button className="btn-icon" onClick={() => setShowModal(false)} title="Fermer" aria-label="Fermer">
+                            <button className="btn-icon" onClick={() => setShowModal(false)} title="Close" aria-label="Close">
                                 <X size={20} />
                             </button>
                         </div>
@@ -310,7 +310,7 @@ export default function CustomerCategoriesPage() {
                         <div className="modal-body">
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label>Nom *</label>
+                                    <label>Name *</label>
                                     <input
                                         type="text"
                                         value={formData.name}
@@ -320,6 +320,7 @@ export default function CustomerCategoriesPage() {
                                 </div>
                                 <div className="form-group">
                                     <label>Code *</label>
+
                                     <input
                                         type="text"
                                         value={formData.slug}
@@ -334,13 +335,13 @@ export default function CustomerCategoriesPage() {
                                 <textarea
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    placeholder="Description de la catégorie..."
+                                    placeholder="Category description..."
                                     rows={2}
                                 />
                             </div>
 
                             <div className="form-group">
-                                <label>Couleur</label>
+                                <label>Color</label>
                                 <div className="color-picker">
                                     {COLOR_OPTIONS.map(color => (
                                         <button
@@ -348,8 +349,8 @@ export default function CustomerCategoriesPage() {
                                             type="button"
                                             className={`color-option ${formData.color === color ? 'selected' : ''}`}
                                             style={{ backgroundColor: color }}
-                                            title={`Couleur ${color}`}
-                                            aria-label={`Sélectionner la couleur ${color}`}
+                                            title={`Color ${color}`}
+                                            aria-label={`Select color ${color}`}
                                             onClick={() => setFormData({ ...formData, color })}
                                         />
                                     ))}
@@ -357,7 +358,7 @@ export default function CustomerCategoriesPage() {
                             </div>
 
                             <div className="form-group">
-                                <label>Type de Tarification</label>
+                                <label>Pricing Type</label>
                                 <div className="pricing-options">
                                     {PRICING_TYPES.map(pricing => (
                                         <div
@@ -377,11 +378,11 @@ export default function CustomerCategoriesPage() {
 
                             {formData.price_modifier_type === 'discount_percentage' && (
                                 <div className="form-group">
-                                    <label>Pourcentage de réduction</label>
+                                    <label>Discount percentage</label>
                                     <div className="input-with-suffix">
                                         <input
                                             type="number"
-                                            aria-label="Pourcentage de réduction"
+                                            aria-label="Discount percentage"
                                             value={formData.discount_percentage}
                                             onChange={(e) => setFormData({ ...formData, discount_percentage: Number(e.target.value) })}
                                             min="0"
@@ -400,14 +401,14 @@ export default function CustomerCategoriesPage() {
                                         checked={formData.is_active}
                                         onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                                     />
-                                    <span>Catégorie active</span>
+                                    <span>Active category</span>
                                 </label>
                             </div>
                         </div>
 
                         <div className="modal-footer">
                             <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
-                                Annuler
+                                Cancel
                             </button>
                             <button
                                 className="btn btn-primary"
@@ -415,7 +416,7 @@ export default function CustomerCategoriesPage() {
                                 disabled={saving}
                             >
                                 <Save size={18} />
-                                {saving ? 'Enregistrement...' : 'Enregistrer'}
+                                {saving ? 'Saving...' : 'Save'}
                             </button>
                         </div>
                     </div>

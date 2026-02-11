@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import type { ProductWithCategory } from '../../types/database'
-import { MOCK_PRODUCTS } from '../useProducts'
+import { MOCK_PRODUCTS } from '../../data/mockProducts'
 
 /**
  * Fetch products list, optionally filtered by category

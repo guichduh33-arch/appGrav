@@ -94,14 +94,27 @@ serve(async (req: Request) => {
     }
 
     if (!isValid) {
-      // Get updated failed attempts count
-      const { data: updatedProfile } = await supabase
-        .from('user_profiles')
-        .select('failed_login_attempts, locked_until')
-        .eq('id', user_id)
-        .single();
+      // Increment failed attempts server-side
+      const newFailedAttempts = (profile.failed_login_attempts || 0) + 1;
+      const maxAttempts = 5;
+      const lockoutMinutes = 15;
 
-      const attemptsRemaining = 5 - (updatedProfile?.failed_login_attempts || 0);
+      // Lock account after max attempts
+      const shouldLock = newFailedAttempts >= maxAttempts;
+      const lockedUntil = shouldLock
+        ? new Date(Date.now() + lockoutMinutes * 60 * 1000).toISOString()
+        : null;
+
+      // Update failed attempts counter in database
+      await supabase
+        .from('user_profiles')
+        .update({
+          failed_login_attempts: newFailedAttempts,
+          locked_until: lockedUntil
+        })
+        .eq('id', user_id);
+
+      const attemptsRemaining = maxAttempts - newFailedAttempts;
 
       // Log failed attempt
       await supabase.from('audit_logs').insert({
@@ -110,18 +123,18 @@ serve(async (req: Request) => {
         module: 'auth',
         entity_type: 'user_profiles',
         entity_id: user_id,
-        new_values: { reason: 'invalid_pin', device_type, device_name },
+        new_values: { reason: 'invalid_pin', device_type, device_name, failed_attempts: newFailedAttempts },
         severity: attemptsRemaining <= 1 ? 'warning' : 'info'
       });
 
-      if (updatedProfile?.locked_until) {
-        const minutesLeft = Math.ceil((new Date(updatedProfile.locked_until).getTime() - Date.now()) / 60000);
+      if (shouldLock) {
+        const minutesLeft = lockoutMinutes;
         return jsonResponse({
           success: false,
           error: 'account_locked',
           message: `Too many failed attempts. Account locked for ${minutesLeft} minutes.`,
-          locked_until: updatedProfile.locked_until
-        }, 403);
+          locked_until: lockedUntil
+        }, 429);
       }
 
       return jsonResponse({
@@ -132,7 +145,24 @@ serve(async (req: Request) => {
       }, 401);
     }
 
-    // PIN is valid - create session
+    // PIN is valid - reset failed attempts counter
+    if (profile.failed_login_attempts > 0) {
+      await supabase
+        .from('user_profiles')
+        .update({
+          failed_login_attempts: 0,
+          locked_until: null,
+          last_login_at: new Date().toISOString()
+        })
+        .eq('id', user_id);
+    } else {
+      await supabase
+        .from('user_profiles')
+        .update({ last_login_at: new Date().toISOString() })
+        .eq('id', user_id);
+    }
+
+    // Create session
     const sessionToken = crypto.randomUUID();
     const clientIp = req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || null;
     const userAgent = req.headers.get('user-agent') || null;

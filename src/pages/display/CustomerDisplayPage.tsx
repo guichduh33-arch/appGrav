@@ -196,7 +196,7 @@ export default function CustomerDisplayPage() {
             <span className="display-logo__icon">🥐</span>
             <h1 className="display-logo__text">The Breakery</h1>
           </div>
-          <p className="display-connecting__text">Connexion en cours...</p>
+          <p className="display-connecting__text">Connecting...</p>
         </div>
       </div>
     );
@@ -212,7 +212,7 @@ export default function CustomerDisplayPage() {
         <div className="display-cart">
           {/* Header */}
           <div className="display-cart__header">
-            <h2>Votre Commande</h2>
+            <h2>Your Order</h2>
             {cart.customerName && (
               <span className="display-cart__customer">{cart.customerName}</span>
             )}
@@ -246,11 +246,11 @@ export default function CustomerDisplayPage() {
             {cart.discountAmount > 0 && (
               <>
                 <div className="display-cart__subtotal">
-                  <span>Sous-total</span>
+                  <span>Subtotal</span>
                   <span>{formatPrice(cart.subtotal)}</span>
                 </div>
                 <div className="display-cart__discount">
-                  <span>Remise</span>
+                  <span>Discount</span>
                   <span>-{formatPrice(cart.discountAmount)}</span>
                 </div>
               </>
@@ -267,7 +267,7 @@ export default function CustomerDisplayPage() {
         {/* Side panel - Ready Orders */}
         {readyOrders.length > 0 && (
           <div className="display-side-panel">
-            <h3>Commandes Prêtes</h3>
+            <h3>Ready Orders</h3>
             <div className="display-ready-orders">
               {readyOrders.map((order) => (
                 <div
@@ -319,7 +319,7 @@ export default function CustomerDisplayPage() {
             <div className="display-logo">
               <span className="display-logo__icon">🥐</span>
               <h1 className="display-logo__text">The Breakery</h1>
-              <p className="display-logo__tagline">Boulangerie Artisanale Française</p>
+              <p className="display-logo__tagline">French Artisan Bakery</p>
             </div>
 
             <div className="display-info">
@@ -333,7 +333,7 @@ export default function CustomerDisplayPage() {
               </div>
               <div className="display-info__item">
                 <span className="display-info__icon">⏰</span>
-                <span>Ouvert 7j/7 • 7h - 18h</span>
+                <span>Open 7/7 • 7am - 6pm</span>
               </div>
             </div>
           </>
@@ -346,7 +346,7 @@ export default function CustomerDisplayPage() {
           {/* Preparing Orders */}
           {orderQueue.length > 0 && (
             <div className="display-queue-section">
-              <h3>En Préparation</h3>
+              <h3>Preparing</h3>
               <div className="display-queue">
                 {orderQueue.map((order) => (
                   <div key={order.orderId} className="display-queue__item">
@@ -360,7 +360,7 @@ export default function CustomerDisplayPage() {
           {/* Ready Orders */}
           {readyOrders.length > 0 && (
             <div className="display-ready-section">
-              <h3>Prêtes à Servir</h3>
+              <h3>Ready to Serve</h3>
               <div className="display-ready">
                 {readyOrders.map((order) => (
                   <div

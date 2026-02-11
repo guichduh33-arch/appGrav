@@ -121,7 +121,7 @@ export default function CustomerFormPage() {
             }
         } catch (error) {
             console.error('Error fetching customer:', error)
-            toast.error('Erreur lors du chargement du client')
+            toast.error('Error loading customer')
             navigate('/customers')
         } finally {
             setLoading(false)
@@ -149,7 +149,7 @@ export default function CustomerFormPage() {
         e.preventDefault()
 
         if (!formData.name.trim()) {
-            toast.error('Le nom est requis')
+            toast.error('Name is required')
             return
         }
 
@@ -187,9 +187,9 @@ export default function CustomerFormPage() {
 
                 if (error) {
                     console.error('Supabase update error:', error)
-                    throw new Error(error.message || 'Erreur lors de la mise à jour')
+                    throw new Error(error.message || 'Error updating customer')
                 }
-                toast.success('Client mis à jour avec succès')
+                toast.success('Customer updated successfully')
             } else {
                 const { error } = await supabase
                     .from('customers')
@@ -200,21 +200,21 @@ export default function CustomerFormPage() {
                     console.error('Supabase insert error:', error)
                     // Handle specific errors
                     if (error.code === '42501') {
-                        throw new Error('Permission refusée. Veuillez vérifier les politiques RLS.')
+                        throw new Error('Permission denied. Please check RLS policies.')
                     } else if (error.code === '23503') {
-                        throw new Error('Catégorie invalide. Veuillez sélectionner une catégorie valide.')
+                        throw new Error('Invalid category. Please select a valid category.')
                     } else if (error.code === '23505') {
-                        throw new Error('Un client avec ce numéro de téléphone ou email existe déjà.')
+                        throw new Error('A customer with this phone number or email already exists.')
                     }
-                    throw new Error(error.message || 'Erreur lors de la création')
+                    throw new Error(error.message || 'Error creating customer')
                 }
-                toast.success('Client créé avec succès')
+                toast.success('Customer created successfully')
             }
 
             navigate('/customers')
         } catch (error: unknown) {
             console.error('Error saving customer:', error)
-            const errorMessage = error instanceof Error ? error.message : 'Erreur lors de l\'enregistrement'
+            const errorMessage = error instanceof Error ? error.message : 'Error saving customer'
             toast.error(errorMessage)
         } finally {
             setSaving(false)
@@ -224,7 +224,7 @@ export default function CustomerFormPage() {
     const handleDelete = async () => {
         if (!id) return
 
-        if (!confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) {
+        if (!confirm('Are you sure you want to delete this customer?')) {
             return
         }
 
@@ -235,11 +235,11 @@ export default function CustomerFormPage() {
                 .eq('id', id)
 
             if (error) throw error
-            toast.success('Client supprimé')
+            toast.success('Customer deleted')
             navigate('/customers')
         } catch (error) {
             console.error('Error deleting customer:', error)
-            toast.error('Erreur lors de la suppression')
+            toast.error('Error deleting customer')
         }
     }
 
@@ -250,7 +250,7 @@ export default function CustomerFormPage() {
             <div className="customer-form-page">
                 <div className="customer-form-loading">
                     <div className="spinner"></div>
-                    <span>Chargement...</span>
+                    <span>Loading...</span>
                 </div>
             </div>
         )
@@ -264,15 +264,15 @@ export default function CustomerFormPage() {
                     <button
                         type="button"
                         className="btn btn-ghost"
-                        title="Retour"
-                        aria-label="Retour"
+                        title="Back"
+                        aria-label="Back"
                         onClick={() => navigate('/customers')}
                     >
                         <ArrowLeft size={20} />
                     </button>
                     <div>
                         <h1 className="customer-form-header__title">
-                            {isEditing ? 'Modifier le Client' : 'Nouveau Client'}
+                            {isEditing ? 'Edit Customer' : 'New Customer'}
                         </h1>
                         {membershipNumber && (
                             <span className="customer-form-header__membership">
@@ -290,7 +290,7 @@ export default function CustomerFormPage() {
                             onClick={handleDelete}
                         >
                             <Trash2 size={18} />
-                            Supprimer
+                            Delete
                         </button>
                     )}
                     <button
@@ -300,7 +300,7 @@ export default function CustomerFormPage() {
                         disabled={saving}
                     >
                         <Save size={18} />
-                        {saving ? 'Enregistrement...' : 'Enregistrer'}
+                        {saving ? 'Saving...' : 'Save'}
                     </button>
                 </div>
             </header>
@@ -311,18 +311,18 @@ export default function CustomerFormPage() {
                     <div className="form-section">
                         <h2 className="form-section__title">
                             <User size={20} />
-                            Informations Générales
+                            General Information
                         </h2>
 
                         <div className="form-group">
-                            <label htmlFor="name">Nom complet *</label>
+                            <label htmlFor="name">Full name *</label>
                             <input
                                 type="text"
                                 id="name"
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
-                                placeholder="Nom du client"
+                                placeholder="Customer name"
                                 required
                             />
                         </div>
@@ -330,7 +330,7 @@ export default function CustomerFormPage() {
                         <div className="form-group">
                             <label htmlFor="company_name">
                                 <Building2 size={14} />
-                                Nom de l'entreprise
+                                Company name
                             </label>
                             <input
                                 type="text"
@@ -338,7 +338,7 @@ export default function CustomerFormPage() {
                                 name="company_name"
                                 value={formData.company_name}
                                 onChange={handleChange}
-                                placeholder="Entreprise (optionnel)"
+                                placeholder="Company (optional)"
                             />
                         </div>
 
@@ -346,7 +346,7 @@ export default function CustomerFormPage() {
                             <div className="form-group">
                                 <label htmlFor="phone">
                                     <Phone size={14} />
-                                    Téléphone
+                                    Phone
                                 </label>
                                 <input
                                     type="tel"
@@ -368,7 +368,7 @@ export default function CustomerFormPage() {
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    placeholder="email@exemple.com"
+                                    placeholder="email@example.com"
                                 />
                             </div>
                         </div>
@@ -376,14 +376,14 @@ export default function CustomerFormPage() {
                         <div className="form-group">
                             <label htmlFor="address">
                                 <MapPin size={14} />
-                                Adresse
+                                Address
                             </label>
                             <textarea
                                 id="address"
                                 name="address"
                                 value={formData.address}
                                 onChange={handleChange}
-                                placeholder="Adresse complète"
+                                placeholder="Full address"
                                 rows={2}
                             />
                         </div>
@@ -391,7 +391,7 @@ export default function CustomerFormPage() {
                         <div className="form-group">
                             <label htmlFor="date_of_birth">
                                 <Calendar size={14} />
-                                Date de naissance
+                                Date of birth
                             </label>
                             <input
                                 type="date"
@@ -407,11 +407,11 @@ export default function CustomerFormPage() {
                     <div className="form-section">
                         <h2 className="form-section__title">
                             <Tag size={20} />
-                            Catégorie & Fidélité
+                            Category & Loyalty
                         </h2>
 
                         <div className="form-group">
-                            <label>Catégorie Client</label>
+                            <label>Customer Category</label>
                             <div className="category-selector">
                                 {categories.map(category => (
                                     <div
@@ -424,10 +424,10 @@ export default function CustomerFormPage() {
                                         <div className="category-option__content">
                                             <span className="category-option__name">{category.name}</span>
                                             <span className="category-option__desc">
-                                                {category.price_modifier_type === 'retail' && 'Prix standard'}
-                                                {category.price_modifier_type === 'wholesale' && 'Prix de gros'}
-                                                {category.price_modifier_type === 'discount_percentage' && `${category.discount_percentage}% de réduction`}
-                                                {category.price_modifier_type === 'custom' && 'Prix personnalisé'}
+                                                {category.price_modifier_type === 'retail' && 'Standard price'}
+                                                {category.price_modifier_type === 'wholesale' && 'Wholesale price'}
+                                                {category.price_modifier_type === 'discount_percentage' && `${category.discount_percentage}% discount`}
+                                                {category.price_modifier_type === 'custom' && 'Custom price'}
                                             </span>
                                         </div>
                                         {category.discount_percentage && category.discount_percentage > 0 && (
@@ -463,7 +463,7 @@ export default function CustomerFormPage() {
                             <div className="qr-code-section">
                                 <h3>
                                     <QrCode size={18} />
-                                    Code QR Fidélité
+                                    Loyalty QR Code
                                 </h3>
                                 <div className="qr-code-display">
                                     <div className="qr-code-placeholder">
@@ -471,8 +471,8 @@ export default function CustomerFormPage() {
                                         <span className="qr-code-value">{customerQR}</span>
                                     </div>
                                     <p className="qr-code-info">
-                                        Le client peut présenter ce QR code lors de ses achats
-                                        pour accumuler des points fidélité.
+                                        The customer can present this QR code during purchases
+                                        to accumulate loyalty points.
                                     </p>
                                 </div>
                             </div>
@@ -486,7 +486,7 @@ export default function CustomerFormPage() {
                                     checked={formData.is_active}
                                     onChange={handleChange}
                                 />
-                                <span>Client actif</span>
+                                <span>Active customer</span>
                             </label>
                         </div>
                     </div>
@@ -496,38 +496,38 @@ export default function CustomerFormPage() {
                         <div className="form-section">
                             <h2 className="form-section__title">
                                 <Building2 size={20} />
-                                Paramètres B2B
+                                B2B Settings
                             </h2>
 
                             <div className="form-group">
-                                <label htmlFor="tax_id">N° Fiscal / SIRET</label>
+                                <label htmlFor="tax_id">Tax ID / NPWP</label>
                                 <input
                                     type="text"
                                     id="tax_id"
                                     name="tax_id"
                                     value={formData.tax_id}
                                     onChange={handleChange}
-                                    placeholder="Numéro d'identification fiscale"
+                                    placeholder="Tax identification number"
                                 />
                             </div>
 
                             <div className="form-row">
                                 <div className="form-group">
-                                    <label htmlFor="payment_terms">Délai de paiement</label>
+                                    <label htmlFor="payment_terms">Payment terms</label>
                                     <select
                                         id="payment_terms"
                                         name="payment_terms"
                                         value={formData.payment_terms}
                                         onChange={handleChange}
                                     >
-                                        <option value="cod">Comptant (COD)</option>
-                                        <option value="net15">15 jours</option>
-                                        <option value="net30">30 jours</option>
-                                        <option value="net60">60 jours</option>
+                                        <option value="cod">Cash on Delivery (COD)</option>
+                                        <option value="net15">Net 15 days</option>
+                                        <option value="net30">Net 30 days</option>
+                                        <option value="net60">Net 60 days</option>
                                     </select>
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="credit_limit">Limite de crédit (IDR)</label>
+                                    <label htmlFor="credit_limit">Credit limit (IDR)</label>
                                     <input
                                         type="number"
                                         id="credit_limit"
@@ -554,7 +554,7 @@ export default function CustomerFormPage() {
                                 name="notes"
                                 value={formData.notes}
                                 onChange={handleChange}
-                                placeholder="Notes internes sur ce client..."
+                                placeholder="Internal notes about this customer..."
                                 rows={3}
                             />
                         </div>

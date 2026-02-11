@@ -35,7 +35,22 @@ serve(async (req: Request) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Verify session exists and belongs to user
+    // Validate caller identity via JWT if Authorization header is present
+    const authHeader = req.headers.get('Authorization');
+    if (authHeader) {
+      const supabaseAnon = createClient(
+        supabaseUrl,
+        Deno.env.get('SUPABASE_ANON_KEY')!,
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      const { data: { user: caller } } = await supabaseAnon.auth.getUser();
+      // If we got a valid JWT user, ensure they can only log out their own sessions
+      if (caller && caller.id !== user_id) {
+        return errorResponse('Forbidden', 403);
+      }
+    }
+
+    // Verify session exists and belongs to the specified user
     const { data: session, error: sessionError } = await supabase
       .from('user_sessions')
       .select('id, user_id, ended_at')

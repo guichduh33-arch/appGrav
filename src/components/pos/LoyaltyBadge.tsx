@@ -7,6 +7,7 @@
  * @see Story 6.3: Loyalty Points Display (Read-Only)
  */
 
+import { memo } from 'react'
 import { Star, Crown, WifiOff } from 'lucide-react'
 import { getTierColor, getTierDiscount } from '@/constants/loyalty'
 import './LoyaltyBadge.css'
@@ -31,7 +32,7 @@ export interface LoyaltyBadgeProps {
  * AC4: Bronze shows no discount
  * AC5: Shows offline indicator when in offline mode
  */
-export function LoyaltyBadge({ tier, points, isOffline = false, compact = false }: LoyaltyBadgeProps) {
+export const LoyaltyBadge = memo(function LoyaltyBadge({ tier, points, isOffline = false, compact = false }: LoyaltyBadgeProps) {
     const normalizedTier = tier?.toLowerCase() || 'bronze'
     const tierColor = getTierColor(normalizedTier)
     const discount = getTierDiscount(normalizedTier)
@@ -90,6 +91,6 @@ export function LoyaltyBadge({ tier, points, isOffline = false, compact = false 
             )}
         </div>
     )
-}
+})
 
 export default LoyaltyBadge
