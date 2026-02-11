@@ -1,5 +1,5 @@
 // Edge Functions - Session Token Authentication
-// Validates x-session-token header against pin_auth_sessions table
+// Validates x-session-token header against user_sessions table using SHA-256 hash
 
 import { supabaseAdmin } from './supabase-client.ts';
 
@@ -9,16 +9,25 @@ interface SessionValidationResult {
 }
 
 /**
+ * Compute SHA-256 hex hash of a session token (matches DB trigger output).
+ */
+async function hashToken(token: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(token);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
  * Validate a session token from the request.
- * Checks the x-session-token header against active (non-expired, non-closed) sessions
- * in the pin_auth_sessions table.
+ * Hashes the token and looks up by session_token_hash in user_sessions.
  *
  * @returns { userId, sessionId } on success, null on failure
  */
 export async function validateSessionToken(
   req: Request
 ): Promise<SessionValidationResult | null> {
-  // Check x-session-token header first, fallback to x-user-id for backwards compat
   const sessionToken = req.headers.get('x-session-token');
 
   if (!sessionToken) {
@@ -26,19 +35,16 @@ export async function validateSessionToken(
   }
 
   try {
+    const tokenHash = await hashToken(sessionToken);
+
     const { data: session, error } = await supabaseAdmin
-      .from('pin_auth_sessions')
-      .select('id, user_id, expires_at, ended_at')
-      .eq('session_token', sessionToken)
+      .from('user_sessions')
+      .select('id, user_id, ended_at')
+      .eq('session_token_hash', tokenHash)
       .is('ended_at', null)
       .single();
 
     if (error || !session) {
-      return null;
-    }
-
-    // Check if session is expired
-    if (session.expires_at && new Date(session.expires_at) < new Date()) {
       return null;
     }
 

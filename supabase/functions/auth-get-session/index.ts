@@ -14,6 +14,17 @@ interface GetSessionRequest {
 // Session timeout in milliseconds (4 hours)
 const SESSION_TIMEOUT_MS = 4 * 60 * 60 * 1000;
 
+/**
+ * Compute SHA-256 hex hash of a session token (matches DB trigger output).
+ */
+async function hashToken(token: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(token);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 serve(async (req: Request) => {
   // Handle CORS preflight
   const corsResponse = handleCors(req);
@@ -36,11 +47,14 @@ serve(async (req: Request) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Hash the token and look up by hash (plaintext is cleared by DB trigger)
+    const tokenHash = await hashToken(session_token);
+
     // Get session
     const { data: session, error: sessionError } = await supabase
       .from('user_sessions')
       .select('id, user_id, started_at, last_activity_at, ended_at, device_type')
-      .eq('session_token', session_token)
+      .eq('session_token_hash', tokenHash)
       .single();
 
     if (sessionError || !session) {

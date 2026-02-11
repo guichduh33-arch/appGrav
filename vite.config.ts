@@ -91,7 +91,7 @@ export default defineConfig(({ mode }) => ({
                     },
                     // SECURITY: Never cache auth-related endpoints (QUAL-08)
                     {
-                        urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/(user_profiles|roles|permissions|role_permissions|user_roles|user_permissions|pin_auth_sessions).*/i,
+                        urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/(user_profiles|roles|permissions|role_permissions|user_roles|user_permissions|user_sessions).*/i,
                         handler: 'NetworkOnly' as const,
                     },
                     // Cache Supabase API responses (stale-while-revalidate)

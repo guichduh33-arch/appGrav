@@ -1,6 +1,6 @@
 # Plan de Corrections Consolide — Cycle 1
 
-**Date** : 2026-02-11
+**Date** : 2026-02-11 (mis a jour 2026-02-12)
 **Sources** : 01-architecture.md, 02-backend-database.md, 03-security.md, 04-functional.md
 
 ---
@@ -9,47 +9,47 @@
 
 ### BLOQUANT (Empeche la mise en production)
 
-| # | Source | Description | Effort |
-|---|--------|-------------|--------|
-| B1 | Security | **PIN hash expose au client** — `MobileLoginPage.tsx:106` fetch `pin_hash` (bcrypt) vers le navigateur | XS |
-| B2 | Security | **XSS Stored dans factures** — `generate-invoice` et `B2BOrderDetailPage` interpole HTML sans echappement | S |
-| B3 | Backend | **RLS trop permissives** — ~50 tables avec `USING(TRUE)` pour INSERT/UPDATE/DELETE | L |
-| B4 | Backend | **2 Edge Functions CORS wildcard + sans session** — `intersection_stock_movements`, `purchase_order_module` | S |
-| B5 | Backend | **`update_setting()` SECURITY DEFINER sans check permission** — N'importe quel authentifie peut modifier les settings systeme | S |
-| B6 | ~~Build~~ | ~~19 erreurs TypeScript~~ | ~~FAIT~~ |
+| # | Source | Description | Effort | Statut |
+|---|--------|-------------|--------|--------|
+| B1 | Security | **PIN hash expose au client** — `MobileLoginPage.tsx:106` fetch `pin_hash` (bcrypt) vers le navigateur | XS | ~~FAIT~~ |
+| B2 | Security | **XSS Stored dans factures** — `generate-invoice` et `B2BOrderDetailPage` interpole HTML sans echappement | S | ~~FAIT~~ |
+| B3 | Backend | **RLS trop permissives** — ~50 tables avec `USING(TRUE)` pour INSERT/UPDATE/DELETE | L | PARTIEL (8 tables critiques) |
+| B4 | Backend | **2 Edge Functions CORS wildcard + sans session** — `intersection_stock_movements`, `purchase_order_module` | S | ~~FAIT~~ |
+| B5 | Backend | **`update_setting()` SECURITY DEFINER sans check permission** — N'importe quel authentifie peut modifier les settings systeme | S | ~~FAIT~~ |
+| B6 | ~~Build~~ | ~~19 erreurs TypeScript~~ | ~~FAIT~~ | ~~FAIT~~ |
 
 ### CRITIQUE (Doit etre corrige avant production)
 
-| # | Source | Description | Effort |
-|---|--------|-------------|--------|
-| C1 | Backend | **Tax rate default 0.11 au lieu de 0.10** dans `purchase_orders` | XS |
-| C2 | Backend | **`deduct_stock_on_sale_items()` ne met pas a jour `section_stock`** (source de verite) | M |
-| C3 | Security | **~111 pages, seulement 2 utilisent PermissionGuard** — Toutes les pages admin accessibles a tout authentifie | M |
-| C4 | Security | **SMTP password en clair dans `settings`** — Lisible par tout authentifie | S |
-| C5 | Backend | **`auth-verify-pin` n'incremente pas les echecs** — Rate limiting serveur ineffectif | S |
-| C6 | Backend | **`auth-logout` sans validation proprietaire** — Un utilisateur peut deconnecter un autre | XS |
-| C7 | Backend | **`send-to-printer` tax hardcodee 11%** | XS |
-| C8 | Architecture | **0 React.memo** sur 100+ composants — Performance POS/KDS degradee | M |
-| C9 | Architecture | **N+1 queries** dans comptabilite (30+ appels) et inventoryAlerts (100+ appels) | M |
-| C10 | Fonctionnel | **46 textes francais** dans 15 fichiers (convention English-only) | S |
+| # | Source | Description | Effort | Statut |
+|---|--------|-------------|--------|--------|
+| C1 | Backend | **Tax rate default 0.11 au lieu de 0.10** dans `purchase_orders` | XS | ~~FAIT~~ |
+| C2 | Backend | **`deduct_stock_on_sale_items()` ne met pas a jour `section_stock`** (source de verite) | M | ~~FAIT~~ |
+| C3 | Security | **~111 pages, seulement 2 utilisent PermissionGuard** — Toutes les pages admin accessibles a tout authentifie | M | ~~FAIT~~ (RouteGuard sur toutes les routes admin) |
+| C4 | Security | **SMTP password en clair dans `settings`** — Lisible par tout authentifie | S | ~~FAIT~~ (password jamais charge cote client) |
+| C5 | Backend | **`auth-verify-pin` n'incremente pas les echecs** — Rate limiting serveur ineffectif | S | ~~FAIT~~ |
+| C6 | Backend | **`auth-logout` sans validation proprietaire** — Un utilisateur peut deconnecter un autre | XS | ~~FAIT~~ |
+| C7 | Backend | **`send-to-printer` tax hardcodee 11%** | XS | ~~FAIT~~ |
+| C8 | Architecture | **0 React.memo** sur 100+ composants — Performance POS/KDS degradee | M | ~~FAIT~~ |
+| C9 | Architecture | **N+1 queries** dans comptabilite (30+ appels) et inventoryAlerts (100+ appels) | M | ~~FAIT~~ |
+| C10 | Fonctionnel | **46 textes francais** dans 15 fichiers (convention English-only) | S | ~~FAIT~~ |
 
 ### IMPORTANT (Fortement recommande)
 
-| # | Source | Description | Effort |
-|---|--------|-------------|--------|
-| I1 | Architecture | 55+ `as any` casts | L |
-| I2 | Architecture | 40+ `as unknown as X` unsafe casts | L |
-| I3 | Architecture | 17 appels Supabase directs dans pages/components | M |
-| I4 | Architecture | 1 seul ErrorBoundary au root (crash POS = crash app) | S |
-| I5 | Architecture | Code mort : `ProductionPage.tsx` (697 lignes, jamais importe) | XS |
-| I6 | Architecture | Hooks `useProducts` dupliques (root vs feature) | S |
-| I7 | Backend | `user_profiles.pin_code` colonne en clair non supprimee | XS |
-| I8 | Backend | `loyalty_transactions.order_id` sans FK | XS |
-| I9 | Backend | Pas de nettoyage `idempotency_keys` et `sync_queue` | S |
-| I10 | Backend | Tokens session en clair dans `pin_auth_sessions` | M |
-| I11 | Security | Service Worker ne cache pas les Edge Functions auth en NetworkOnly | XS |
-| I12 | Fonctionnel | Arrondi IDR manquant sur le total panier | XS |
-| I13 | Fonctionnel | Bouton "Voir" B2B client non fonctionnel | XS |
+| # | Source | Description | Effort | Statut |
+|---|--------|-------------|--------|--------|
+| I1 | Architecture | 55+ `as any` casts | L | A FAIRE |
+| I2 | Architecture | 40+ `as unknown as X` unsafe casts | L | A FAIRE |
+| I3 | Architecture | 17 appels Supabase directs dans pages/components | M | A FAIRE |
+| I4 | Architecture | 1 seul ErrorBoundary au root (crash POS = crash app) | S | ~~FAIT~~ |
+| I5 | Architecture | Code mort : `ProductionPage.tsx` (697 lignes, jamais importe) | XS | ~~FAIT~~ |
+| I6 | Architecture | Hooks `useProducts` dupliques (root vs feature) | S | ~~FAIT~~ |
+| I7 | Backend | `user_profiles.pin_code` colonne en clair non supprimee | XS | ~~FAIT~~ |
+| I8 | Backend | `loyalty_transactions.order_id` sans FK | XS | ~~FAIT~~ |
+| I9 | Backend | Pas de nettoyage `idempotency_keys` et `sync_queue` | S | ~~FAIT~~ |
+| I10 | Backend | Tokens session en clair dans `pin_auth_sessions` | M | ~~FAIT~~ |
+| I11 | Security | Service Worker ne cache pas les Edge Functions auth en NetworkOnly | XS | ~~FAIT~~ |
+| I12 | Fonctionnel | Arrondi IDR manquant sur le total panier | XS | ~~FAIT~~ |
+| I13 | Fonctionnel | Bouton "Voir" B2B client non fonctionnel | XS | ~~FAIT~~ |
 
 ### SOUHAITABLE (Amelioration qualite)
 

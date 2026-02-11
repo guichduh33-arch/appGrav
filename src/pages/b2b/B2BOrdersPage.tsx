@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
     Plus, Search, FileText, Truck, CreditCard,
     Eye, Edit2, Clock, CheckCircle, Package, AlertCircle
@@ -50,11 +50,14 @@ const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string }> = 
 
 export default function B2BOrdersPage() {
     const navigate = useNavigate()
+    const [searchParams, setSearchParams] = useSearchParams()
+    const customerFilter = searchParams.get('customer')
     const [orders, setOrders] = useState<B2BOrder[]>([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState<string>('all')
     const [paymentFilter, setPaymentFilter] = useState<string>('all')
+    const [customerName, setCustomerName] = useState<string>('')
 
     useEffect(() => {
         fetchOrders()
@@ -90,6 +93,18 @@ export default function B2BOrdersPage() {
         }
     }
 
+    // Resolve customer name for the filter banner
+    useEffect(() => {
+        if (customerFilter && orders.length > 0) {
+            const match = orders.find(o => o.customer_id === customerFilter)
+            if (match?.customer) {
+                setCustomerName(match.customer.company_name || match.customer.name)
+            }
+        } else {
+            setCustomerName('')
+        }
+    }, [customerFilter, orders])
+
     const filteredOrders = orders.filter(order => {
         const searchLower = searchTerm.toLowerCase()
         const matchesSearch =
@@ -99,8 +114,9 @@ export default function B2BOrdersPage() {
 
         const matchesStatus = statusFilter === 'all' || order.status === statusFilter
         const matchesPayment = paymentFilter === 'all' || order.payment_status === paymentFilter
+        const matchesCustomer = !customerFilter || order.customer_id === customerFilter
 
-        return matchesSearch && matchesStatus && matchesPayment
+        return matchesSearch && matchesStatus && matchesPayment && matchesCustomer
     })
 
     const stats = {
@@ -244,6 +260,28 @@ export default function B2BOrdersPage() {
                     </select>
                 </div>
             </div>
+
+            {/* Customer filter banner */}
+            {customerFilter && customerName && (
+                <div className="b2b-orders-customer-filter-banner" style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    padding: '8px 16px', background: 'var(--color-primary-50, #eff6ff)',
+                    borderRadius: '8px', marginBottom: '16px', fontSize: '14px'
+                }}>
+                    <span>Showing orders for <strong>{customerName}</strong></span>
+                    <button
+                        type="button"
+                        onClick={() => setSearchParams({})}
+                        style={{
+                            marginLeft: 'auto', background: 'none', border: 'none',
+                            cursor: 'pointer', fontSize: '14px', color: 'var(--color-primary-600, #2563eb)',
+                            textDecoration: 'underline'
+                        }}
+                    >
+                        Show all orders
+                    </button>
+                </div>
+            )}
 
             {/* Orders Table */}
             {loading ? (
