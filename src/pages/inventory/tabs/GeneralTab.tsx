@@ -61,20 +61,16 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
     }
 
     const getSectionIcon = (section: Section) => {
-        // Use section_type (new schema) with fallback to old boolean flags
-        const sectionType = (section as any).section_type
-        if (sectionType === 'production' || (section as any).is_production_point) return <Factory size={20} />
-        if (sectionType === 'sales' || (section as any).is_sales_point) return <ShoppingCart size={20} />
-        if (sectionType === 'warehouse' || (section as any).is_warehouse) return <Warehouse size={20} />
+        if (section.section_type === 'production') return <Factory size={20} />
+        if (section.section_type === 'sales') return <ShoppingCart size={20} />
+        if (section.section_type === 'warehouse') return <Warehouse size={20} />
         return <Layers size={20} />
     }
 
     const getSectionColor = (section: Section) => {
-        // Use section_type (new schema) with fallback to old boolean flags
-        const sectionType = (section as any).section_type
-        if (sectionType === 'production' || (section as any).is_production_point) return { bg: '#FEF3C7', color: '#D97706', border: '#FCD34D' }
-        if (sectionType === 'sales' || (section as any).is_sales_point) return { bg: '#D1FAE5', color: '#059669', border: '#6EE7B7' }
-        if (sectionType === 'warehouse' || (section as any).is_warehouse) return { bg: '#DBEAFE', color: '#2563EB', border: '#93C5FD' }
+        if (section.section_type === 'production') return { bg: '#FEF3C7', color: '#D97706', border: '#FCD34D' }
+        if (section.section_type === 'sales') return { bg: '#D1FAE5', color: '#059669', border: '#6EE7B7' }
+        if (section.section_type === 'warehouse') return { bg: '#DBEAFE', color: '#2563EB', border: '#93C5FD' }
         return { bg: '#F3F4F6', color: '#6B7280', border: '#D1D5DB' }
     }
 
@@ -307,7 +303,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
 
                                     {/* Type badges - using section_type */}
                                     <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
-                                        {((section as any).section_type === 'production' || (section as any).is_production_point) && (
+                                        {section.section_type === 'production' && (
                                             <span style={{
                                                 fontSize: '0.625rem',
                                                 padding: '0.125rem 0.5rem',
@@ -319,7 +315,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                                                 letterSpacing: '0.025em'
                                             }}>Production</span>
                                         )}
-                                        {((section as any).section_type === 'sales' || (section as any).is_sales_point) && (
+                                        {section.section_type === 'sales' && (
                                             <span style={{
                                                 fontSize: '0.625rem',
                                                 padding: '0.125rem 0.5rem',
@@ -331,7 +327,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                                                 letterSpacing: '0.025em'
                                             }}>Sales</span>
                                         )}
-                                        {((section as any).section_type === 'warehouse' || (section as any).is_warehouse) && (
+                                        {section.section_type === 'warehouse' && (
                                             <span style={{
                                                 fontSize: '0.625rem',
                                                 padding: '0.125rem 0.5rem',

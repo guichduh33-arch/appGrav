@@ -37,7 +37,7 @@
 
 | # | Source | Description | Effort | Statut |
 |---|--------|-------------|--------|--------|
-| I1 | Architecture | 55+ `as any` casts | L | PARTIEL (44→22 prod, helpers centralises) |
+| I1 | Architecture | 55+ `as any` casts | L | ~~FAIT~~ (0 `as any` en prod, helpers centralises) |
 | I2 | Architecture | 40+ `as unknown as X` unsafe casts | L | ~~FAIT~~ (remplaces par types propres) |
 | I3 | Architecture | 17 appels Supabase directs dans pages/components | M | ~~FAIT~~ |
 | I4 | Architecture | 1 seul ErrorBoundary au root (crash POS = crash app) | S | ~~FAIT~~ |
@@ -55,15 +55,15 @@
 
 | # | Source | Description | Effort | Statut |
 |---|--------|-------------|--------|--------|
-| S1 | Architecture | 20+ fichiers > 400 lignes (refactoring) | XL |
+| S1 | Architecture | 20+ fichiers > 400 lignes (refactoring) | XL | ~~FAIT~~ (top 5 >700 lignes splittes) |
 | S2 | Architecture | 13 `error: any` dans catch blocks | S | ~~FAIT~~ |
 | S3 | Architecture | 46 eslint-disable suppressions | M |
 | S4 | Architecture | Pas de vendor chunk splitting | S | ~~FAIT~~ |
 | S5 | Architecture | 84 CSS files alongside Tailwind | L |
 | S6 | Architecture | 413 inline styles | L |
-| S7 | Security | Pas de Content-Security-Policy | S |
+| S7 | Security | Pas de Content-Security-Policy | S | ~~FAIT~~ (meta CSP dans index.html) |
 | S8 | Security | Pas de rate limiting IP sur auth online | M |
-| S9 | Backend | `generate-invoice` numero non thread-safe | S |
+| S9 | Backend | `generate-invoice` numero non thread-safe | S | ~~FAIT~~ (pg_advisory_xact_lock + unique index) |
 | S10 | Backend | Vues reporting ignorent paiements splits | M |
 | S11 | Fonctionnel | 5 rapports placeholder non implementes | M |
 | S12 | Fonctionnel | Allergenes produits (securite alimentaire) | M |

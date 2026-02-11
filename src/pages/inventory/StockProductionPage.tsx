@@ -422,9 +422,17 @@ export default function StockProductionPage() {
                     `)
                     .eq('product_id', item.productId)
 
+                interface RecipeWithMaterial {
+                    id: string
+                    material_id: string
+                    quantity: number
+                    unit: string | null
+                    material: { id: string; name: string; current_stock: number | null; cost_price: number | null; unit: string | null } | null
+                }
+
                 if (recipeItems && recipeItems.length > 0) {
-                    for (const recipe of recipeItems as any[]) {
-                        const material = recipe.material as { id: string; name: string; current_stock: number | null; cost_price: number | null; unit: string | null } | null
+                    for (const recipe of recipeItems as unknown as RecipeWithMaterial[]) {
+                        const material = recipe.material
                         if (!material) continue
 
                         // Use quantity in base unit for recipe deduction
@@ -477,7 +485,7 @@ export default function StockProductionPage() {
                 .single()
 
             if (record) {
-                const rec = record as any
+                const rec = record as unknown as { product_id: string; quantity_produced: number; quantity_waste?: number }
                 const { data: productData } = await supabase
                     .from('products')
                     .select('current_stock')
@@ -511,8 +519,8 @@ export default function StockProductionPage() {
         }
     }
 
-    const totalProduced = todayHistory.reduce((sum, r) => sum + (r as any).quantity_produced, 0)
-    const totalWaste = todayHistory.reduce((sum, r) => sum + ((r as any).quantity_waste || 0), 0)
+    const totalProduced = todayHistory.reduce((sum, r) => sum + r.quantity_produced, 0)
+    const totalWaste = todayHistory.reduce((sum, r) => sum + (r.quantity_waste || 0), 0)
 
     if (isLoading) {
         return (

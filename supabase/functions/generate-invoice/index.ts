@@ -240,29 +240,20 @@ serve(async (req) => {
             return errorResponse('Failed to fetch order items');
         }
 
-        // Generate invoice number if not exists
+        // Generate invoice number if not exists (thread-safe via DB function)
         let invoiceNumber = order.invoice_number;
         if (!invoiceNumber) {
-            const today = new Date();
-            const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+            // Use the database function which serializes concurrent requests
+            // via pg_advisory_xact_lock to prevent duplicate invoice numbers
+            const { data: rpcResult, error: rpcError } = await supabaseAdmin
+                .rpc('generate_next_invoice_number', { p_order_id: order_id });
 
-            // Get sequence number for today
-            const { count } = await supabaseAdmin
-                .from('b2b_orders')
-                .select('*', { count: 'exact', head: true })
-                .like('invoice_number', `INV-${dateStr}%`);
+            if (rpcError) {
+                console.error('Error generating invoice number:', rpcError);
+                return errorResponse('Failed to generate invoice number', 500);
+            }
 
-            const seqNum = (count || 0) + 1;
-            invoiceNumber = `INV-${dateStr}-${String(seqNum).padStart(3, '0')}`;
-
-            // Update order with invoice number
-            await supabaseAdmin
-                .from('b2b_orders')
-                .update({
-                    invoice_number: invoiceNumber,
-                    invoice_generated_at: new Date().toISOString(),
-                })
-                .eq('id', order_id);
+            invoiceNumber = rpcResult as string;
         }
 
         // Prepare invoice data
