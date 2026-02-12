@@ -53,10 +53,15 @@ export function saveProductionReminder(
   };
 
   reminders.push(reminder);
-  localStorage.setItem(
-    PRODUCTION_REMINDERS_STORAGE_KEY,
-    JSON.stringify(reminders)
-  );
+  try {
+    localStorage.setItem(
+      PRODUCTION_REMINDERS_STORAGE_KEY,
+      JSON.stringify(reminders)
+    );
+  } catch {
+    // localStorage unavailable (Safari private mode, quota exceeded)
+    console.warn('[ProductionReminder] Failed to save reminder to localStorage');
+  }
 
   console.debug('[ProductionReminder] Saved reminder:', id);
   return id;
@@ -125,10 +130,14 @@ export function getProductionReminderById(
  */
 export function deleteProductionReminder(id: string): void {
   const reminders = getProductionReminders().filter((r) => r.id !== id);
-  localStorage.setItem(
-    PRODUCTION_REMINDERS_STORAGE_KEY,
-    JSON.stringify(reminders)
-  );
+  try {
+    localStorage.setItem(
+      PRODUCTION_REMINDERS_STORAGE_KEY,
+      JSON.stringify(reminders)
+    );
+  } catch {
+    // localStorage unavailable
+  }
   console.debug('[ProductionReminder] Deleted reminder:', id);
 }
 
@@ -136,7 +145,11 @@ export function deleteProductionReminder(id: string): void {
  * Delete all production reminders
  */
 export function clearAllProductionReminders(): void {
-  localStorage.removeItem(PRODUCTION_REMINDERS_STORAGE_KEY);
+  try {
+    localStorage.removeItem(PRODUCTION_REMINDERS_STORAGE_KEY);
+  } catch {
+    // localStorage unavailable
+  }
   console.debug('[ProductionReminder] Cleared all reminders');
 }
 

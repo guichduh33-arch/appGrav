@@ -68,14 +68,23 @@ const SYNC_TIMESTAMPS = {
  * Get last sync timestamp for a given key
  */
 function getLastSyncTimestamp(key: string): string | null {
-  return localStorage.getItem(key);
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    // localStorage unavailable (Safari private mode, quota exceeded)
+    return null;
+  }
 }
 
 /**
  * Set last sync timestamp for a given key
  */
 function setLastSyncTimestamp(key: string, timestamp: string): void {
-  localStorage.setItem(key, timestamp);
+  try {
+    localStorage.setItem(key, timestamp);
+  } catch {
+    // localStorage unavailable
+  }
 }
 
 /**
@@ -368,9 +377,13 @@ export async function clearOfflineProductData(): Promise<void> {
     db.offline_modifiers.clear(),
   ]);
 
-  localStorage.removeItem(SYNC_TIMESTAMPS.PRODUCTS);
-  localStorage.removeItem(SYNC_TIMESTAMPS.CATEGORIES);
-  localStorage.removeItem(SYNC_TIMESTAMPS.MODIFIERS);
+  try {
+    localStorage.removeItem(SYNC_TIMESTAMPS.PRODUCTS);
+    localStorage.removeItem(SYNC_TIMESTAMPS.CATEGORIES);
+    localStorage.removeItem(SYNC_TIMESTAMPS.MODIFIERS);
+  } catch {
+    // localStorage unavailable
+  }
 
   logger.debug('[ProductSync] Cleared all offline product data');
 }

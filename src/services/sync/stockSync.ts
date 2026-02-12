@@ -38,10 +38,20 @@ export async function getLastStockSyncTime(): Promise<string | null> {
       return meta.lastSyncAt;
     }
     // Fallback to legacy localStorage (migration path)
-    return localStorage.getItem(LEGACY_SYNC_TIMESTAMP_KEY);
+    try {
+      return localStorage.getItem(LEGACY_SYNC_TIMESTAMP_KEY);
+    } catch {
+      // localStorage unavailable
+      return null;
+    }
   } catch (error) {
     console.error('[StockSync] Error reading sync meta:', error);
-    return localStorage.getItem(LEGACY_SYNC_TIMESTAMP_KEY);
+    try {
+      return localStorage.getItem(LEGACY_SYNC_TIMESTAMP_KEY);
+    } catch {
+      // localStorage unavailable
+      return null;
+    }
   }
 }
 
@@ -50,7 +60,12 @@ export async function getLastStockSyncTime(): Promise<string | null> {
  * @deprecated Prefer async getLastStockSyncTime()
  */
 export function getLastStockSyncTimeSync(): string | null {
-  return localStorage.getItem(LEGACY_SYNC_TIMESTAMP_KEY);
+  try {
+    return localStorage.getItem(LEGACY_SYNC_TIMESTAMP_KEY);
+  } catch {
+    // localStorage unavailable
+    return null;
+  }
 }
 
 /**
@@ -65,7 +80,11 @@ async function setLastStockSyncTime(timestamp: string, recordCount: number): Pro
     recordCount,
   });
   // Also update localStorage for backwards compatibility
-  localStorage.setItem(LEGACY_SYNC_TIMESTAMP_KEY, timestamp);
+  try {
+    localStorage.setItem(LEGACY_SYNC_TIMESTAMP_KEY, timestamp);
+  } catch {
+    // localStorage unavailable
+  }
 }
 
 /**
@@ -169,6 +188,10 @@ export async function getOfflineStockCount(): Promise<number> {
 export async function clearOfflineStockData(): Promise<void> {
   await db.offline_stock_levels.clear();
   await db.offline_sync_meta.delete(STOCK_SYNC_META_ENTITY);
-  localStorage.removeItem(LEGACY_SYNC_TIMESTAMP_KEY);
+  try {
+    localStorage.removeItem(LEGACY_SYNC_TIMESTAMP_KEY);
+  } catch {
+    // localStorage unavailable
+  }
   logger.debug('[StockSync] Cleared all offline stock data');
 }

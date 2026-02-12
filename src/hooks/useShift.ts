@@ -64,24 +64,42 @@ export interface ShiftUser {
 
 // Get or generate a terminal ID for this browser/device
 function getTerminalId(): string {
-    let terminalId = localStorage.getItem('pos_terminal_id')
+    let terminalId: string | null = null
+    try {
+        terminalId = localStorage.getItem('pos_terminal_id')
+    } catch {
+        // localStorage unavailable (Safari private mode, quota exceeded)
+    }
     if (!terminalId) {
         terminalId = `TERM-${Date.now().toString(36).toUpperCase()}`
-        localStorage.setItem('pos_terminal_id', terminalId)
+        try {
+            localStorage.setItem('pos_terminal_id', terminalId)
+        } catch {
+            // localStorage unavailable
+        }
     }
     return terminalId
 }
 
 // Get or set active shift user ID from localStorage
 function getStoredActiveShiftUserId(): string | null {
-    return localStorage.getItem('pos_active_shift_user_id')
+    try {
+        return localStorage.getItem('pos_active_shift_user_id')
+    } catch {
+        // localStorage unavailable
+        return null
+    }
 }
 
 function setStoredActiveShiftUserId(userId: string | null) {
-    if (userId) {
-        localStorage.setItem('pos_active_shift_user_id', userId)
-    } else {
-        localStorage.removeItem('pos_active_shift_user_id')
+    try {
+        if (userId) {
+            localStorage.setItem('pos_active_shift_user_id', userId)
+        } else {
+            localStorage.removeItem('pos_active_shift_user_id')
+        }
+    } catch {
+        // localStorage unavailable
     }
 }
 

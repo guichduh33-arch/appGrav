@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Clock, CheckCircle, ChefHat, AlertTriangle, Pause, Play, Smartphone, Wifi } from 'lucide-react'
 import { useOrderAutoRemove } from '@/hooks/kds/useOrderAutoRemove'
 import { useKDSConfigSettings } from '@/hooks/settings/useModuleConfigSettings'
@@ -40,7 +40,7 @@ const ORDER_TYPE_CONFIG: Record<string, { label: string; icon: string; color: st
     b2b: { label: 'B2B', icon: '🏢', color: '#8B5CF6' }
 }
 
-export default function KDSOrderCard({
+function KDSOrderCard({
     orderId,
     orderNumber,
     orderType,
@@ -255,7 +255,7 @@ export default function KDSOrderCard({
                                         e.stopPropagation()
                                         onToggleHold(item.id, item.is_held)
                                     }}
-                                    title={item.is_held ? 'Reprendre' : 'Mettre en attente'}
+                                    title={item.is_held ? 'Resume' : 'Hold'}
                                 >
                                     {item.is_held ? <Play size={14} /> : <Pause size={14} />}
                                 </button>
@@ -317,3 +317,5 @@ export default function KDSOrderCard({
         </div>
     )
 }
+
+export default React.memo(KDSOrderCard)

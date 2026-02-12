@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { Trash2, Tag, Lock, List, User, QrCode, Star, FileText, ChevronDown, ChevronUp, Building2 } from 'lucide-react'
 import { useCartStore } from '../../stores/cartStore'
@@ -27,7 +27,7 @@ interface CartProps {
     onItemClick?: (item: CartItem) => void
 }
 
-export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }: CartProps) {
+function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }: CartProps) {
     const { isOffline } = useNetworkStatus()
     const {
         items, orderType, setOrderType, tableNumber, setTableNumber,
@@ -247,3 +247,5 @@ export default function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders,
         </aside>
     )
 }
+
+export default React.memo(Cart)

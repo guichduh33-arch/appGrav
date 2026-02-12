@@ -68,7 +68,11 @@ export const getFavorites = (): string[] => {
 
 // Save favorites to localStorage
 export const saveFavorites = (favorites: string[]) => {
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites))
+    try {
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites))
+    } catch {
+        // localStorage unavailable (Safari private mode, quota exceeded)
+    }
 }
 
 // Transform offline customer to ICustomerSearchCustomer type for display

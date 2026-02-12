@@ -6,6 +6,16 @@ import { corsHeaders, handleCors, jsonResponse, errorResponse } from '../_shared
 import { supabaseAdmin } from '../_shared/supabase-client.ts';
 import { requireSession } from '../_shared/session-auth.ts';
 
+function escapeHtml(str: string | null | undefined): string {
+    if (!str) return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 interface InvoiceData {
     order: {
         id: string;
@@ -56,8 +66,8 @@ function formatDate(dateStr: string): string {
 function generateInvoiceHTML(data: InvoiceData, invoiceNumber: string): string {
     const itemsHTML = data.items.map(item => `
     <tr>
-      <td>${item.product_sku}</td>
-      <td>${item.product_name}</td>
+      <td>${escapeHtml(item.product_sku)}</td>
+      <td>${escapeHtml(item.product_name)}</td>
       <td class="text-right">${item.quantity}</td>
       <td class="text-right">${formatCurrency(item.unit_price)}</td>
       <td class="text-right">${formatCurrency(item.total)}</td>
@@ -106,20 +116,20 @@ function generateInvoiceHTML(data: InvoiceData, invoiceNumber: string): string {
       </div>
       <div class="invoice-info">
         <h2>INVOICE</h2>
-        <p><strong>No:</strong> ${invoiceNumber}</p>
+        <p><strong>No:</strong> ${escapeHtml(invoiceNumber)}</p>
         <p><strong>Date:</strong> ${formatDate(data.order.order_date)}</p>
-        <p><strong>Order:</strong> ${data.order.order_number}</p>
+        <p><strong>Order:</strong> ${escapeHtml(data.order.order_number)}</p>
       </div>
     </div>
     
     <div class="parties">
       <div class="party">
         <h3>Bill To</h3>
-        <p><strong>${data.customer.company_name || data.customer.name}</strong></p>
-        ${data.customer.address ? `<p>${data.customer.address}</p>` : ''}
-        ${data.customer.phone ? `<p>Tel: ${data.customer.phone}</p>` : ''}
-        ${data.customer.email ? `<p>Email: ${data.customer.email}</p>` : ''}
-        ${data.customer.tax_id ? `<p>NPWP: ${data.customer.tax_id}</p>` : ''}
+        <p><strong>${escapeHtml(data.customer.company_name || data.customer.name)}</strong></p>
+        ${data.customer.address ? `<p>${escapeHtml(data.customer.address)}</p>` : ''}
+        ${data.customer.phone ? `<p>Tel: ${escapeHtml(data.customer.phone)}</p>` : ''}
+        ${data.customer.email ? `<p>Email: ${escapeHtml(data.customer.email)}</p>` : ''}
+        ${data.customer.tax_id ? `<p>NPWP: ${escapeHtml(data.customer.tax_id)}</p>` : ''}
       </div>
       <div class="party">
         <h3>From</h3>
@@ -169,7 +179,7 @@ function generateInvoiceHTML(data: InvoiceData, invoiceNumber: string): string {
     ${data.order.notes ? `
     <div class="notes">
       <h4>Notes</h4>
-      <p>${data.order.notes}</p>
+      <p>${escapeHtml(data.order.notes)}</p>
     </div>
     ` : ''}
     

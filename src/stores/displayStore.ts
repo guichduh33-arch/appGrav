@@ -69,6 +69,9 @@ interface DisplayState {
 // Duration for ready orders to remain visible (5 minutes)
 const READY_ORDER_VISIBLE_DURATION = 5 * 60 * 1000;
 
+// Track timeout IDs for ready order auto-removal to prevent memory leaks
+const readyOrderTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
+
 export const useDisplayStore = create<DisplayState>((set, get) => ({
   // Initial cart state
   cart: {
@@ -200,10 +203,19 @@ export const useDisplayStore = create<DisplayState>((set, get) => ({
         });
       }
 
+      // Clear any existing timeout for this order
+      const existingTimeout = readyOrderTimeouts.get(payload.orderId);
+      if (existingTimeout) {
+        clearTimeout(existingTimeout);
+        readyOrderTimeouts.delete(payload.orderId);
+      }
+
       // Schedule removal after 5 minutes
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
+        readyOrderTimeouts.delete(payload.orderId);
         get().removeReadyOrder(payload.orderId);
       }, READY_ORDER_VISIBLE_DURATION);
+      readyOrderTimeouts.set(payload.orderId, timeoutId);
     } else if (payload.status === 'called') {
       // Update order as called
       set({
@@ -215,6 +227,12 @@ export const useDisplayStore = create<DisplayState>((set, get) => ({
         lastActivity: now,
       });
     } else if (payload.status === 'completed') {
+      // Clear any pending timeout for this order
+      const completedTimeout = readyOrderTimeouts.get(payload.orderId);
+      if (completedTimeout) {
+        clearTimeout(completedTimeout);
+        readyOrderTimeouts.delete(payload.orderId);
+      }
       // Remove from both queues
       set({
         orderQueue: orderQueue.filter((o) => o.orderId !== payload.orderId),
@@ -225,9 +243,15 @@ export const useDisplayStore = create<DisplayState>((set, get) => ({
   },
 
   /**
-   * Remove ready order (after timeout)
+   * Remove ready order (after timeout or manually)
    */
   removeReadyOrder: (orderId) => {
+    // Clear any pending timeout for this order
+    const existingTimeout = readyOrderTimeouts.get(orderId);
+    if (existingTimeout) {
+      clearTimeout(existingTimeout);
+      readyOrderTimeouts.delete(orderId);
+    }
     set({
       readyOrders: get().readyOrders.filter((o) => o.orderId !== orderId),
     });

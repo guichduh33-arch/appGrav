@@ -6,7 +6,7 @@ import { supabase } from './lib/supabase'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
 import { ModuleErrorBoundary } from './components/ui/ModuleErrorBoundary'
 import { RouteGuard } from './components/auth/PermissionGuard'
-import { initializeSyncEngine } from './services/sync/syncEngine'
+import { initializeSyncEngine, stopBackgroundSync } from './services/sync/syncEngine'
 import { initProductsCache, stopProductsCacheRefresh } from './services/offline/productsCacheInit'
 import { loadCart, validateAndFilterCartItems } from './services/offline/cartPersistenceService'
 import { toast } from 'sonner'
@@ -159,6 +159,9 @@ function App() {
     // Initialize sync engine for automatic background sync (Story 3.5)
     useEffect(() => {
         initializeSyncEngine();
+        return () => {
+            stopBackgroundSync(); // Clean up sync interval on unmount
+        };
     }, [])
 
     // Initialize products cache when authenticated (Story 2.1)

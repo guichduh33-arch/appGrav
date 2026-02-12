@@ -2,6 +2,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { getCorsHeaders, handleCors } from '../_shared/cors.ts'
+import { requireSession } from '../_shared/session-auth.ts'
 
 serve(async (req) => {
   // Handle CORS preflight using shared origin-validated handler
@@ -9,6 +10,10 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   const corsHeaders = getCorsHeaders(req);
+
+  // Require authenticated session (SEC-006)
+  const session = await requireSession(req);
+  if (session instanceof Response) return session;
 
   try {
     // Validate Authorization header is present

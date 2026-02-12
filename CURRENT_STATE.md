@@ -285,10 +285,11 @@ Replaces ~40 hardcoded operational constants across 17 files with configurable s
 
 ## CSS → Tailwind Migration (2026-02-12)
 
-Eliminated all standalone CSS files in favor of Tailwind utility classes.
+Migrated majority of standalone CSS files to Tailwind utility classes. **24 CSS files remain** and need further migration in a follow-up pass.
 
 ### Scope
-- **55 CSS files deleted** (~18,000 lines removed)
+- **55 CSS files deleted** out of ~79 standalone CSS files (~18,000 lines removed)
+- **24 CSS files remain** requiring further migration
 - **86 TSX files updated** with inline Tailwind classes
 - **tailwind.config.js** extended with custom utilities (animations, colors, component patterns)
 - **Net change**: -18,125 lines (22,569 deleted, 4,444 added)
