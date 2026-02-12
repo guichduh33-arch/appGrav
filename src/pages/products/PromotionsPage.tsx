@@ -7,7 +7,7 @@ import {
 import { supabase } from '../../lib/supabase'
 import { formatCurrency } from '../../utils/helpers'
 import { Promotion, PromotionType } from '../../types/database'
-import './PromotionsPage.css'
+import { cn } from '@/lib/utils'
 
 const PROMOTION_TYPE_LABELS: Record<PromotionType, string> = {
     percentage: 'Discount %',
@@ -175,20 +175,20 @@ export default function PromotionsPage() {
     }
 
     return (
-        <div className="promotions-page">
+        <div className="p-8 max-w-[1400px] mx-auto md:p-4">
             {/* Header */}
-            <header className="promotions-header">
-                <div className="promotions-header__info">
-                    <h1 className="promotions-header__title">
+            <header className="flex justify-between items-center mb-8 max-md:flex-col max-md:items-start max-md:gap-4">
+                <div className="flex-1">
+                    <h1 className="flex items-center gap-3 text-[1.75rem] font-bold text-slate-800 mb-2">
                         <Tag size={28} />
                         Promotion Management
                     </h1>
-                    <p className="promotions-header__subtitle">
+                    <p className="text-slate-500 text-[0.95rem] m-0">
                         Create promotions with time rules and purchase conditions
                     </p>
                 </div>
                 <button
-                    className="btn btn-primary"
+                    className="inline-flex items-center gap-2 px-6 py-3 border-none rounded-lg text-[0.95rem] font-medium cursor-pointer transition-all duration-200 bg-indigo-500 text-white hover:bg-indigo-600 hover:-translate-y-px hover:shadow-[0_4px_6px_rgba(99,102,241,0.25)]"
                     onClick={() => navigate('/products/promotions/new')}
                 >
                     <Plus size={18} />
@@ -197,52 +197,53 @@ export default function PromotionsPage() {
             </header>
 
             {/* Stats */}
-            <div className="promotions-stats">
-                <div className="stat-card">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mb-8 max-md:grid-cols-1">
+                <div className="group bg-white p-6 rounded-xl shadow-sm flex items-center gap-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 [&>svg]:text-indigo-500 [&>svg]:shrink-0">
                     <Tag size={24} />
-                    <div className="stat-content">
-                        <span className="stat-value">{stats.total}</span>
-                        <span className="stat-label">Total Promotions</span>
+                    <div className="flex flex-col">
+                        <span className="text-[1.75rem] font-bold text-slate-800 leading-none">{stats.total}</span>
+                        <span className="text-sm text-slate-500 mt-1">Total Promotions</span>
                     </div>
                 </div>
-                <div className="stat-card active">
+                <div className="group bg-white p-6 rounded-xl shadow-sm flex items-center gap-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 [&>svg]:text-emerald-500 [&>svg]:shrink-0">
                     <CheckCircle size={24} />
-                    <div className="stat-content">
-                        <span className="stat-value">{stats.active}</span>
-                        <span className="stat-label">Active</span>
+                    <div className="flex flex-col">
+                        <span className="text-[1.75rem] font-bold text-slate-800 leading-none">{stats.active}</span>
+                        <span className="text-sm text-slate-500 mt-1">Active</span>
                     </div>
                 </div>
-                <div className="stat-card inactive">
+                <div className="group bg-white p-6 rounded-xl shadow-sm flex items-center gap-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 [&>svg]:text-amber-500 [&>svg]:shrink-0">
                     <AlertCircle size={24} />
-                    <div className="stat-content">
-                        <span className="stat-value">{stats.inactive}</span>
-                        <span className="stat-label">Inactive</span>
+                    <div className="flex flex-col">
+                        <span className="text-[1.75rem] font-bold text-slate-800 leading-none">{stats.inactive}</span>
+                        <span className="text-sm text-slate-500 mt-1">Inactive</span>
                     </div>
                 </div>
-                <div className="stat-card expired">
+                <div className="group bg-white p-6 rounded-xl shadow-sm flex items-center gap-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 [&>svg]:text-red-500 [&>svg]:shrink-0">
                     <Calendar size={24} />
-                    <div className="stat-content">
-                        <span className="stat-value">{stats.expired}</span>
-                        <span className="stat-label">Expired</span>
+                    <div className="flex flex-col">
+                        <span className="text-[1.75rem] font-bold text-slate-800 leading-none">{stats.expired}</span>
+                        <span className="text-sm text-slate-500 mt-1">Expired</span>
                     </div>
                 </div>
             </div>
 
             {/* Filters */}
-            <div className="promotions-filters">
-                <div className="promotions-search">
+            <div className="flex gap-4 mb-8 max-md:flex-col">
+                <div className="flex-1 relative flex items-center [&>svg:first-child]:absolute [&>svg:first-child]:left-4 [&>svg:first-child]:text-slate-400">
                     <Search size={20} />
                     <input
                         type="text"
                         placeholder="Search by name, code or description..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full py-3 pr-4 pl-12 border border-slate-200 rounded-lg text-[0.95rem] transition-all duration-200 focus:outline-none focus:border-indigo-500 focus:ring-[3px] focus:ring-indigo-500/10"
                     />
                 </div>
                 <select
                     value={filterType}
                     onChange={(e) => setFilterType(e.target.value as PromotionType | 'all')}
-                    className="filter-select"
+                    className="py-3 px-4 border border-slate-200 rounded-lg text-[0.95rem] bg-white cursor-pointer transition-all duration-200 focus:outline-none focus:border-indigo-500 focus:ring-[3px] focus:ring-indigo-500/10"
                 >
                     <option value="all">All types</option>
                     <option value="percentage">Discount %</option>
@@ -253,7 +254,7 @@ export default function PromotionsPage() {
                 <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value as 'all' | 'active' | 'inactive')}
-                    className="filter-select"
+                    className="py-3 px-4 border border-slate-200 rounded-lg text-[0.95rem] bg-white cursor-pointer transition-all duration-200 focus:outline-none focus:border-indigo-500 focus:ring-[3px] focus:ring-indigo-500/10"
                 >
                     <option value="all">All statuses</option>
                     <option value="active">Active</option>
@@ -263,22 +264,22 @@ export default function PromotionsPage() {
 
             {/* Promotions List */}
             {loading ? (
-                <div className="promotions-loading">
-                    <div className="spinner"></div>
-                    <span>Loading promotions...</span>
+                <div className="flex flex-col items-center justify-center py-16 px-8 gap-4">
+                    <div className="w-10 h-10 border-[3px] border-slate-200 border-t-indigo-500 rounded-full animate-spin" />
+                    <span className="text-slate-500 text-[0.95rem]">Loading promotions...</span>
                 </div>
             ) : filteredPromotions.length === 0 ? (
-                <div className="promotions-empty">
+                <div className="flex flex-col items-center justify-center py-16 px-8 text-center [&>svg:first-child]:text-slate-300 [&>svg:first-child]:mb-4">
                     <Tag size={64} />
-                    <h3>No promotion found</h3>
-                    <p>
+                    <h3 className="text-xl text-slate-800 m-0 mb-2">No promotion found</h3>
+                    <p className="text-slate-500 text-[0.95rem] m-0">
                         {searchTerm || filterType !== 'all'
                             ? 'Try modifying your filters'
                             : 'Start by creating your first promotion'}
                     </p>
                 </div>
             ) : (
-                <div className="promotions-grid">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(380px,1fr))] gap-6 max-md:grid-cols-1">
                     {filteredPromotions.map(promo => {
                         const active = isPromotionActive(promo)
                         const timeConstraints = formatTimeConstraints(promo)
@@ -286,34 +287,42 @@ export default function PromotionsPage() {
                         return (
                             <div
                                 key={promo.id}
-                                className={`promotion-card ${!active ? 'inactive' : ''}`}
+                                className={cn(
+                                    'bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-200 flex flex-col hover:shadow-md hover:-translate-y-0.5',
+                                    !active && 'opacity-70'
+                                )}
                             >
-                                <div className="promotion-card__header">
-                                    <div className="promotion-card__type">
+                                <div className="flex justify-between items-center px-6 py-4 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white">
+                                    <div className="flex items-center gap-2 text-sm font-semibold">
                                         {PROMOTION_TYPE_ICONS[promo.promotion_type as PromotionType]}
                                         <span>{PROMOTION_TYPE_LABELS[promo.promotion_type as PromotionType]}</span>
                                     </div>
-                                    <span className={`status-badge ${active ? 'active' : 'inactive'}`}>
+                                    <span className={cn(
+                                        'text-xs py-1.5 px-3 rounded-md font-medium bg-white/20',
+                                        active ? 'text-white' : 'text-white/80'
+                                    )}>
                                         {active ? 'Active' : 'Inactive'}
                                     </span>
                                 </div>
 
-                                <div className="promotion-card__content">
-                                    <h3 className="promotion-card__name">{promo.name}</h3>
-                                    <div className="promotion-card__code">Code: {promo.code}</div>
+                                <div className="p-6 flex-1 flex flex-col gap-4">
+                                    <h3 className="text-xl font-semibold text-slate-800 m-0">{promo.name}</h3>
+                                    <div className="text-sm py-2 px-3 bg-slate-50 border border-dashed border-slate-300 rounded-md text-slate-600 font-mono font-semibold w-fit">
+                                        Code: {promo.code}
+                                    </div>
 
                                     {promo.description && (
-                                        <p className="promotion-card__description">{promo.description}</p>
+                                        <p className="text-slate-500 text-[0.9rem] m-0 leading-relaxed">{promo.description}</p>
                                     )}
 
-                                    <div className="promotion-card__value">
+                                    <div className="text-lg font-bold text-emerald-500 py-3 px-4 bg-green-50 rounded-lg text-center">
                                         {formatPromotionValue(promo)}
                                     </div>
 
                                     {timeConstraints.length > 0 && (
-                                        <div className="promotion-card__constraints">
+                                        <div className="flex gap-3 py-3 px-4 bg-amber-100 rounded-lg text-amber-900 text-sm [&>svg]:shrink-0 [&>svg]:mt-0.5">
                                             <Clock size={14} />
-                                            <div className="constraints-list">
+                                            <div className="flex flex-col gap-1">
                                                 {timeConstraints.map((constraint, idx) => (
                                                     <span key={idx}>{constraint}</span>
                                                 ))}
@@ -322,59 +331,64 @@ export default function PromotionsPage() {
                                     )}
 
                                     {promo.min_purchase_amount && (
-                                        <div className="promotion-card__requirement">
+                                        <div className="py-2 px-3 bg-violet-100 text-violet-800 rounded-md text-sm font-medium">
                                             Minimum purchase: {formatCurrency(promo.min_purchase_amount)}
                                         </div>
                                     )}
 
                                     {(promo.max_uses_total || promo.max_uses_per_customer) && (
-                                        <div className="promotion-card__usage">
+                                        <div className="flex items-center gap-2 py-2 px-3 bg-blue-100 text-blue-800 rounded-md text-sm [&>svg]:shrink-0">
                                             <Users size={14} />
                                             <span>
-                                                {promo.current_uses} / {promo.max_uses_total || '∞'} uses
+                                                {promo.current_uses} / {promo.max_uses_total || '\u221E'} uses
                                             </span>
                                             {promo.max_uses_per_customer && (
-                                                <span className="per-customer">
+                                                <span className="ml-auto text-[0.8rem] opacity-80">
                                                     (Max {promo.max_uses_per_customer}/customer)
                                                 </span>
                                             )}
                                         </div>
                                     )}
 
-                                    <div className="promotion-card__meta">
-                                        <span className="priority-badge">
+                                    <div className="flex gap-2 pt-2 border-t border-slate-200">
+                                        <span className="text-xs py-1.5 px-3 bg-slate-100 text-slate-600 rounded-md font-medium">
                                             Priority: {promo.priority}
                                         </span>
                                         {promo.is_stackable && (
-                                            <span className="stackable-badge">Stackable</span>
+                                            <span className="text-xs py-1.5 px-3 bg-green-100 text-green-800 rounded-md font-medium">
+                                                Stackable
+                                            </span>
                                         )}
                                     </div>
                                 </div>
 
-                                <div className="promotion-card__actions">
+                                <div className="flex gap-2 px-6 py-4 bg-slate-50 border-t border-slate-200">
                                     <button
-                                        className="btn-icon"
+                                        className="p-2 border-none bg-white rounded-md cursor-pointer transition-all duration-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-800"
                                         onClick={() => navigate(`/products/promotions/${promo.id}`)}
                                         title="View details"
                                     >
                                         <Eye size={16} />
                                     </button>
                                     <button
-                                        className="btn-icon"
+                                        className="p-2 border-none bg-white rounded-md cursor-pointer transition-all duration-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-800"
                                         onClick={() => navigate(`/products/promotions/${promo.id}/edit`)}
                                         title="Edit"
                                     >
                                         <Edit size={16} />
                                     </button>
                                     <button
-                                        className={`btn-icon ${promo.is_active ? 'active' : 'inactive'}`}
+                                        className={cn(
+                                            'p-2 border-none bg-white rounded-md cursor-pointer transition-all duration-200 flex items-center justify-center hover:bg-slate-100',
+                                            promo.is_active ? 'text-emerald-500' : 'text-slate-400'
+                                        )}
                                         onClick={() => handleToggleActive(promo)}
                                         title={promo.is_active ? 'Deactivate' : 'Activate'}
                                     >
                                         <CheckCircle size={16} />
                                     </button>
                                     <button
-                                        className="btn-icon danger"
+                                        className="p-2 border-none bg-white rounded-md cursor-pointer transition-all duration-200 flex items-center justify-center text-red-500 hover:bg-red-50"
                                         onClick={() => handleDelete(promo.id)}
                                         title="Delete"
                                     >

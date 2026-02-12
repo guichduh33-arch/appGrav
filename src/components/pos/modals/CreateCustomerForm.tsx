@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X, User, Crown, Building2, UserCheck, Phone, Mail, Save } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
 import { ICustomerCategory, ICustomerSearchCustomer } from './customerSearchTypes'
+import { cn } from '@/lib/utils'
 
 interface CreateCustomerFormProps {
     categories: ICustomerCategory[]
@@ -65,16 +66,16 @@ export default function CreateCustomerForm({
     }
 
     return (
-        <div className="create-customer-form">
+        <div className="flex flex-col gap-4 py-2 overflow-y-auto flex-1 min-h-0">
             {formError && (
-                <div className="form-error">
+                <div className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-[0.85rem]">
                     <X size={16} />
                     {formError}
                 </div>
             )}
 
-            <div className="form-group">
-                <label>
+            <div className="flex flex-col gap-1.5">
+                <label className="flex items-center gap-1.5 text-[0.8rem] font-medium text-slate-500 [&>svg]:text-slate-400">
                     <User size={16} />
                     Name *
                 </label>
@@ -84,11 +85,12 @@ export default function CreateCustomerForm({
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Customer name"
                     autoFocus
+                    className="px-4 py-3 border-2 border-slate-200 rounded-lg text-[0.95rem] transition-all duration-200 focus:outline-none focus:border-indigo-500 focus:ring-[3px] focus:ring-indigo-500/10 placeholder:text-slate-400"
                 />
             </div>
 
-            <div className="form-group">
-                <label>
+            <div className="flex flex-col gap-1.5">
+                <label className="flex items-center gap-1.5 text-[0.8rem] font-medium text-slate-500 [&>svg]:text-slate-400">
                     <Phone size={16} />
                     Phone
                 </label>
@@ -97,11 +99,12 @@ export default function CreateCustomerForm({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+62 812 345 6789"
+                    className="px-4 py-3 border-2 border-slate-200 rounded-lg text-[0.95rem] transition-all duration-200 focus:outline-none focus:border-indigo-500 focus:ring-[3px] focus:ring-indigo-500/10 placeholder:text-slate-400"
                 />
             </div>
 
-            <div className="form-group">
-                <label>
+            <div className="flex flex-col gap-1.5">
+                <label className="flex items-center gap-1.5 text-[0.8rem] font-medium text-slate-500 [&>svg]:text-slate-400">
                     <Mail size={16} />
                     Email
                 </label>
@@ -110,18 +113,23 @@ export default function CreateCustomerForm({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="email@example.com"
+                    className="px-4 py-3 border-2 border-slate-200 rounded-lg text-[0.95rem] transition-all duration-200 focus:outline-none focus:border-indigo-500 focus:ring-[3px] focus:ring-indigo-500/10 placeholder:text-slate-400"
                 />
             </div>
 
-            <div className="form-group">
-                <label>
+            <div className="flex flex-col gap-1.5">
+                <label className="flex items-center gap-1.5 text-[0.8rem] font-medium text-slate-500 [&>svg]:text-slate-400">
                     <Crown size={16} />
                     Category
                 </label>
-                <div className="category-selector">
+                <div className="flex flex-wrap gap-2">
                     <button
                         type="button"
-                        className={`category-option ${!categoryId ? 'active' : ''}`}
+                        className={cn(
+                            'flex items-center gap-1.5 px-3 py-2 border-2 border-slate-200 bg-slate-50 rounded-lg text-[0.8rem] font-medium text-slate-500 cursor-pointer transition-all duration-200',
+                            'hover:border-slate-300 hover:bg-slate-100',
+                            !categoryId && 'border-indigo-500 bg-indigo-500 text-white'
+                        )}
                         onClick={() => setCategoryId(null)}
                     >
                         <User size={14} />
@@ -131,8 +139,15 @@ export default function CreateCustomerForm({
                         <button
                             key={cat.id}
                             type="button"
-                            className={`category-option ${categoryId === cat.id ? 'active' : ''}`}
-                            style={{
+                            className={cn(
+                                'flex items-center gap-1.5 px-3 py-2 border-2 border-slate-200 bg-slate-50 rounded-lg text-[0.8rem] font-medium text-slate-500 cursor-pointer transition-all duration-200',
+                                'hover:border-slate-300 hover:bg-slate-100',
+                                categoryId === cat.id && 'text-white'
+                            )}
+                            style={categoryId === cat.id ? {
+                                borderColor: cat.color,
+                                backgroundColor: cat.color,
+                            } : {
                                 '--category-color': cat.color
                             } as React.CSSProperties}
                             onClick={() => setCategoryId(cat.id)}
@@ -143,7 +158,7 @@ export default function CreateCustomerForm({
                             {!['wholesale', 'vip', 'staff'].includes(cat.slug) && <User size={14} />}
                             {cat.name}
                             {cat.discount_percentage && cat.discount_percentage > 0 && (
-                                <span className="discount">-{cat.discount_percentage}%</span>
+                                <span className="px-1.5 py-0.5 bg-white/20 rounded text-[0.7rem] font-semibold">-{cat.discount_percentage}%</span>
                             )}
                         </button>
                     ))}
@@ -151,7 +166,7 @@ export default function CreateCustomerForm({
             </div>
 
             <button
-                className="btn btn-primary btn-create-customer"
+                className="mt-2 p-4 text-base justify-center inline-flex items-center gap-2 rounded-lg font-medium cursor-pointer border-none transition-all duration-200 text-white bg-gradient-to-br from-emerald-500 to-emerald-600 hover:not-disabled:bg-gradient-to-br hover:not-disabled:from-emerald-600 hover:not-disabled:to-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed"
                 onClick={handleCreate}
                 disabled={saving || !name.trim()}
             >

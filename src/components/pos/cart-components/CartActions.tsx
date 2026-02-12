@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import { SendHorizontal, CreditCard } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface CartActionsProps {
     hasLockedItems: boolean
@@ -17,10 +18,15 @@ export const CartActions = memo(function CartActions({
     onCheckout,
 }: CartActionsProps) {
     return (
-        <div className="pos-cart__buttons">
+        <div className="p-md bg-zinc-800 grid grid-cols-2 gap-2 border-t border-zinc-700">
             <button
                 type="button"
-                className={`btn ${hasLockedItems ? 'btn-kitchen-add' : 'btn-kitchen'}`}
+                className={cn(
+                    'w-full h-[52px] text-white border-none rounded-lg text-base font-bold cursor-pointer flex items-center justify-center gap-2 p-2 transition-all duration-200',
+                    hasLockedItems ? 'bg-warning' : 'bg-success',
+                    'hover:enabled:-translate-y-0.5 hover:enabled:shadow-md',
+                    'disabled:bg-zinc-600 disabled:text-zinc-400 disabled:cursor-not-allowed disabled:translate-y-0'
+                )}
                 onClick={onSendToKitchen}
                 disabled={!hasUnlockedItems && itemCount === 0}
             >
@@ -30,7 +36,11 @@ export const CartActions = memo(function CartActions({
 
             <button
                 type="button"
-                className="btn-checkout"
+                className={cn(
+                    'w-full h-[52px] bg-gold text-white border-none rounded-lg text-base font-bold cursor-pointer flex items-center justify-center gap-2 p-2 transition-all duration-200',
+                    'hover:enabled:bg-gold-light hover:enabled:-translate-y-0.5 hover:enabled:shadow-md',
+                    'disabled:bg-zinc-600 disabled:text-zinc-400 disabled:cursor-not-allowed disabled:translate-y-0'
+                )}
                 onClick={onCheckout}
                 disabled={itemCount === 0}
             >

@@ -93,7 +93,7 @@ const mockMaterials: IOfflineProduct[] = [
     id: 'mat-flour',
     category_id: 'cat-materials',
     sku: 'MAT-FLOUR',
-    name: 'Farine T55',
+    name: 'Flour T55',
     product_type: 'raw_material',
     retail_price: 0,
     wholesale_price: null,
@@ -109,7 +109,7 @@ const mockMaterials: IOfflineProduct[] = [
     id: 'mat-butter',
     category_id: 'cat-materials',
     sku: 'MAT-BUTTER',
-    name: 'Beurre',
+    name: 'Butter',
     product_type: 'raw_material',
     retail_price: 0,
     wholesale_price: null,
@@ -125,7 +125,7 @@ const mockMaterials: IOfflineProduct[] = [
     id: 'mat-sugar',
     category_id: 'cat-materials',
     sku: 'MAT-SUGAR',
-    name: 'Sucre',
+    name: 'Sugar',
     product_type: 'raw_material',
     retail_price: 0,
     wholesale_price: null,
@@ -282,7 +282,7 @@ describe('recipesCacheService', () => {
       const flourRecipe = recipes.find((r) => r.material_id === 'mat-flour');
       expect(flourRecipe).toBeDefined();
       expect(flourRecipe?.material).toBeDefined();
-      expect(flourRecipe?.material?.name).toBe('Farine T55');
+      expect(flourRecipe?.material?.name).toBe('Flour T55');
       expect(flourRecipe?.material?.cost_price).toBe(15000);
     });
 

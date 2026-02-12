@@ -59,15 +59,15 @@ export default function QRScanArea({ onCustomerFound }: QRScanAreaProps) {
     }
 
     return (
-        <div className="qr-scan-area">
-            <div className="qr-scan-icon">
+        <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
+            <div className="text-indigo-500 mb-6 animate-pulse">
                 <QrCode size={80} />
             </div>
-            <p className="qr-scan-instruction">
+            <p className="mb-6 text-slate-500 text-[0.9rem] leading-relaxed">
                 Scan customer QR code or enter member number
             </p>
             {qrError && (
-                <div className="qr-error">
+                <div className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-[0.85rem] mb-4">
                     <X size={16} />
                     {qrError}
                 </div>
@@ -75,7 +75,7 @@ export default function QRScanArea({ onCustomerFound }: QRScanAreaProps) {
             <input
                 ref={qrInputRef}
                 type="text"
-                className="qr-scan-input"
+                className="w-full max-w-[300px] p-4 border-2 border-slate-200 rounded-[10px] text-lg text-center font-mono mb-4 focus:outline-none focus:border-indigo-500 focus:ring-[3px] focus:ring-indigo-500/10"
                 value={qrInput}
                 onChange={(e) => setQrInput(e.target.value)}
                 onKeyDown={handleQrKeyDown}
@@ -83,7 +83,7 @@ export default function QRScanArea({ onCustomerFound }: QRScanAreaProps) {
                 autoFocus
             />
             <button
-                className="btn btn-primary btn-scan"
+                className="inline-flex items-center gap-2 py-3.5 px-8 rounded-lg text-base font-medium cursor-pointer border-none transition-all duration-200 bg-indigo-500 text-white hover:not-disabled:bg-indigo-600 disabled:opacity-60 disabled:cursor-not-allowed"
                 onClick={handleQrScan}
                 disabled={!qrInput.trim() || loading}
             >

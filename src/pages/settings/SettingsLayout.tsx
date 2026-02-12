@@ -28,7 +28,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { useSettingsCategories, useInitializeSettings } from '../../hooks/settings';
-import './SettingsPage.css';
+import { cn } from '@/lib/utils';
 
 // Icon mapping for settings categories
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -99,18 +99,18 @@ const SettingsLayout = () => {
   };
 
   return (
-    <div className="settings-page">
-      <header className="settings-page__header">
-        <h1 className="settings-page__title">Settings</h1>
+    <div className="p-lg h-full overflow-y-auto bg-cream">
+      <header className="flex items-center justify-between mb-lg">
+        <h1 className="font-display text-4xl font-bold text-espresso">Settings</h1>
       </header>
 
-      <div className="settings-grid">
+      <div className="grid grid-cols-[250px_1fr] gap-lg max-[900px]:grid-cols-1">
         {/* Navigation */}
-        <nav className="settings-nav">
+        <nav className="bg-white rounded-lg shadow p-sm h-fit">
           {/* Dynamic categories from database */}
           {isLoading ? (
-            <div className="settings-nav__loading">
-              <div className="spinner" />
+            <div className="flex justify-center p-lg">
+              <div className="w-6 h-6 border-3 border-border border-t-[var(--color-rose-poudre)] rounded-full animate-spin" />
             </div>
           ) : (
             <>
@@ -119,10 +119,13 @@ const SettingsLayout = () => {
                   key={category.code}
                   to={`/settings/${category.code}`}
                   className={({ isActive }) =>
-                    `settings-nav__item ${isActive ? 'is-active' : ''}`
+                    cn(
+                      'w-full flex items-center gap-sm p-md bg-transparent border-none rounded-md text-sm font-medium text-smoke cursor-pointer text-left transition-all duration-fast ease-standard hover:bg-cream hover:text-espresso',
+                      isActive && 'bg-[var(--color-rose-poudre)] text-white hover:bg-[var(--color-rose-poudre)] hover:text-white'
+                    )
                   }
                 >
-                  <span className="settings-nav__icon">
+                  <span className="w-5 h-5 flex items-center justify-center">
                     {CATEGORY_ICONS[category.code] || <Settings2 size={18} />}
                   </span>
                   {getCategoryName(category)}
@@ -130,7 +133,7 @@ const SettingsLayout = () => {
               ))}
 
               {/* Divider */}
-              <div className="settings-nav__divider" />
+              <div className="h-px bg-border my-sm" />
 
               {/* Extra static tabs */}
               {EXTRA_TABS.map((tab) => (
@@ -138,10 +141,13 @@ const SettingsLayout = () => {
                   key={tab.code}
                   to={`/settings/${tab.path}`}
                   className={({ isActive }) =>
-                    `settings-nav__item ${isActive ? 'is-active' : ''}`
+                    cn(
+                      'w-full flex items-center gap-sm p-md bg-transparent border-none rounded-md text-sm font-medium text-smoke cursor-pointer text-left transition-all duration-fast ease-standard hover:bg-cream hover:text-espresso',
+                      isActive && 'bg-[var(--color-rose-poudre)] text-white hover:bg-[var(--color-rose-poudre)] hover:text-white'
+                    )
                   }
                 >
-                  <span className="settings-nav__icon">{tab.icon}</span>
+                  <span className="w-5 h-5 flex items-center justify-center">{tab.icon}</span>
                   {getExtraTabName(tab.code)}
                 </NavLink>
               ))}
@@ -150,7 +156,7 @@ const SettingsLayout = () => {
         </nav>
 
         {/* Content */}
-        <div className="settings-content">
+        <div className="flex flex-col gap-lg">
           <Outlet />
         </div>
       </div>

@@ -283,16 +283,27 @@ Replaces ~40 hardcoded operational constants across 17 files with configurable s
 - 93 test files, 1,650 tests pass
 - 17 files changed, +168/-84 lines
 
-## CSS → Tailwind Migration (2026-02-12)
+## CSS to Tailwind Migration (2026-02-12) -- PARTIALLY COMPLETE
 
-Migrated majority of standalone CSS files to Tailwind utility classes. **24 CSS files remain** and need further migration in a follow-up pass.
+Migrated majority of standalone CSS files to Tailwind utility classes. Migration is **partially complete** -- 18 CSS files remain with 19 active imports in TSX files.
 
 ### Scope
 - **55 CSS files deleted** out of ~79 standalone CSS files (~18,000 lines removed)
-- **24 CSS files remain** requiring further migration
+- **18 CSS files remain** requiring further migration
+- **19 active CSS imports** in TSX files (18 local + 1 external `react-day-picker/dist/style.css`)
 - **86 TSX files updated** with inline Tailwind classes
 - **tailwind.config.js** extended with custom utilities (animations, colors, component patterns)
 - **Net change**: -18,125 lines (22,569 deleted, 4,444 added)
+
+### Remaining CSS Files
+- `src/styles/index.css` (global styles, likely permanent)
+- `src/pages/pos/POSMainPage.css`
+- `src/pages/settings/SettingsPage.css`, `LanMonitoringPage.css`
+- `src/pages/inventory/` -- `IncomingStockPage.css`, `WastedPage.css`, `StockMovementsPage.css`, `TransferDetailPage.css`, `StockProductionPage.css`, `tabs/ModifiersTab.css`
+- `src/pages/products/` -- `ComboFormPage.css`, `CombosPage.css`, `ProductCategoryPricingPage.css`, `ProductsPage.css`
+- `src/pages/purchasing/PurchaseOrderDetailPage.css`
+- `src/components/pos/modals/` -- `CashierAnalyticsModal.css`, `PaymentModal.css`
+- `src/components/settings/FloorPlanEditor.css`
 
 ### Modules Covered
 POS (menu, grids, modals, shift), KDS, inventory, B2B, customers, orders, purchasing, mobile, reports, auth/login, settings, layouts, and display.
@@ -311,14 +322,14 @@ INSERT/UPDATE/DELETE policies used `USING (true)` or `WITH CHECK (true)`, allowi
 
 ### Migration (`20260212180000_fix_rls_always_true.sql`)
 
-**Part 1 — Drop 20 duplicate policies** on 8 tables:
+**Part 1 -- Drop 20 duplicate policies** on 8 tables:
 | Table | Duplicates Dropped |
 |-------|--------------------|
 | `kds_order_queue`, `lan_messages`, `lan_nodes`, `sync_conflicts`, `sync_devices`, `sync_queue` | 3 each (INSERT/UPDATE/DELETE) |
 | `settings_history` | 1 (INSERT) |
 | `user_sessions` | 1 (INSERT) |
 
-**Part 2 — Tighten 136 remaining policies** by replacing `true` with `(auth.uid() IS NOT NULL)`:
+**Part 2 -- Tighten 136 remaining policies** by replacing `true` with `(auth.uid() IS NOT NULL)`:
 | Policy Type | Count | ALTER Clause |
 |-------------|-------|-------------|
 | DELETE | 44 | `USING (auth.uid() IS NOT NULL)` |
@@ -327,7 +338,7 @@ INSERT/UPDATE/DELETE policies used `USING (true)` or `WITH CHECK (true)`, allowi
 | UPDATE (qual only) | 8 | `USING (...)` |
 
 ### Result
-- Supabase security advisors: **156 → 0** "RLS Policy Always True" warnings
+- Supabase security advisors: **156 to 0** "RLS Policy Always True" warnings
 - Only remaining warning: `auth_leaked_password_protection` (Auth config, not RLS)
 - No test regressions: 93 files, 1,650 tests pass
 

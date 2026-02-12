@@ -100,8 +100,8 @@ export default function MobileLoginPage() {
     setError(null);
 
     try {
-      // Verify PIN server-side via RPC (never fetch pin_hash to client)
-      const { data: verifyResult, error: verifyError } = await supabase.rpc('verify_user_pin', {
+      // Verify PIN server-side via RPC (PIN-only lookup across all active users)
+      const { data: verifyResult, error: verifyError } = await supabase.rpc('mobile_verify_pin', {
         p_pin: pin,
       });
 
@@ -109,14 +109,14 @@ export default function MobileLoginPage() {
         throw new Error(verifyError.message);
       }
 
-      if (!verifyResult || !verifyResult.user_id) {
+      if (!verifyResult || verifyResult.length === 0) {
         incrementLoginAttempts();
         setError('Incorrect PIN');
         setPin('');
         return;
       }
 
-      const { user_id, name, display_name, role } = verifyResult;
+      const { user_id, name, display_name, role } = verifyResult[0];
 
       // Check if user has server/waiter role
       const hasServerRole = ['admin', 'server', 'waiter', 'manager'].includes(role);

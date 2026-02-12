@@ -8,7 +8,7 @@ import { CartItemRow, CartTotals, CartActions } from './cart-components'
 import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'
 import { useDisplayBroadcast } from '@/hooks/pos'
 import { getTierColor } from '@/constants/loyalty'
-import './Cart.css'
+import { cn } from '@/lib/utils'
 import type { CartItem } from '../../stores/cartStore'
 
 interface SelectedCustomer {
@@ -113,25 +113,41 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
     }
 
     return (
-        <aside className="pos-cart">
-            <div className="pos-cart__pending-button">
-                <button type="button" className="btn btn-pending-orders" onClick={onShowPendingOrders}>
+        <aside className="w-[460px] bg-zinc-800 border-l border-zinc-700 flex flex-col flex-shrink-0 z-[15] shadow-[-4px_0_24px_rgba(0,0,0,0.2)] text-white">
+            {/* Pending Orders Button */}
+            <div className="px-md py-sm bg-zinc-900 border-b border-zinc-700">
+                <button
+                    type="button"
+                    className="w-full p-2.5 bg-zinc-700 border border-zinc-600 rounded-md text-white font-semibold text-sm cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 hover:bg-zinc-600 hover:border-gold hover:text-gold-light"
+                    onClick={onShowPendingOrders}
+                >
                     <List size={18} /> Pending Orders
                 </button>
             </div>
 
-            <div className="pos-cart__header">
-                <div className="pos-cart__header-row">
-                    <div className="pos-cart__types">
+            {/* Header */}
+            <div className="px-md py-sm bg-zinc-800 border-b border-zinc-700">
+                <div className="flex items-center justify-between gap-sm">
+                    {/* Order Type Selector */}
+                    <div className="flex gap-1 flex-shrink-0">
                         {(['dine_in', 'takeaway', 'delivery'] as const).map((type) => (
-                            <button key={type} type="button" className={`order-type-btn ${orderType === type ? 'is-active' : ''}`} onClick={() => handleOrderTypeChange(type)}>
+                            <button
+                                key={type}
+                                type="button"
+                                className={cn(
+                                    'px-3 py-1.5 bg-zinc-700 border-2 border-transparent rounded-md text-xs font-bold text-zinc-300 cursor-pointer transition-all duration-200 uppercase tracking-wide whitespace-nowrap',
+                                    'hover:bg-zinc-600 hover:text-white',
+                                    orderType === type && 'bg-gold border-gold-light text-white shadow-[0_2px_8px_rgba(59,130,246,0.3)]'
+                                )}
+                                onClick={() => handleOrderTypeChange(type)}
+                            >
                                 {type === 'dine_in' ? 'Dine In' : type === 'takeaway' ? 'Takeaway' : 'Delivery'}
                             </button>
                         ))}
                     </div>
-                    <span className="pos-cart__order-number">
+                    <span className="font-display text-base font-bold text-white tracking-tight flex items-center gap-1 flex-1 justify-center">
                         {displayOrderNumber}
-                        {hasLockedItems && <Lock size={14} className="order-lock-icon" />}
+                        {hasLockedItems && <Lock size={14} className="text-warning ml-1" />}
                     </span>
                     <button type="button" className="btn-icon btn-icon-sm" title="Clear cart" onClick={clearCart} disabled={items.length === 0}>
                         <Trash2 size={18} />
@@ -140,57 +156,73 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
 
                 {/* B2B mode indicator (Story 6.7) */}
                 {customerCategorySlug === 'wholesale' && (
-                    <div className="pos-cart__b2b-banner">
+                    <div className="mt-1.5 px-2.5 py-1.5 bg-[rgba(139,92,246,0.15)] border border-[rgba(139,92,246,0.4)] rounded-sm flex items-center gap-1.5 text-xs font-semibold text-[#a78bfa]">
                         <Building2 size={14} />
                         <span>B2B Mode</span>
-                        <span className="pos-cart__b2b-credit">Store Credit Available</span>
+                        <span className="ml-auto text-[10px] font-normal opacity-80">Store Credit Available</span>
                     </div>
                 )}
 
                 {orderType === 'dine_in' && tableNumber && (
-                    <div className="pos-cart__table-info">
+                    <div className="mt-1.5 px-2.5 py-1.5 bg-[rgba(59,130,246,0.1)] border border-[rgba(59,130,246,0.3)] rounded-sm flex items-center justify-between text-xs text-gold-light">
                         <span>Table: {tableNumber}</span>
-                        <button type="button" className="btn-change-table" onClick={() => setShowTableModal(true)}>Change</button>
+                        <button
+                            type="button"
+                            className="px-2 py-1 bg-transparent border border-gold rounded-sm text-gold-light text-xs font-semibold cursor-pointer transition-all duration-200 hover:bg-gold hover:text-white"
+                            onClick={() => setShowTableModal(true)}
+                        >
+                            Change
+                        </button>
                     </div>
                 )}
 
-                <div className="pos-cart__customer">
+                {/* Customer Selection */}
+                <div className="mt-2">
                     {selectedCustomer || customerId ? (
-                        <button type="button" className="customer-badge" onClick={() => setShowCustomerModal(true)} style={{ borderColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze') }}>
-                            <div className="customer-badge__avatar" style={{ backgroundColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze') }}>
+                        <button type="button" className="w-full flex items-center gap-2.5 px-2.5 py-2 bg-zinc-700 border-2 border-gold rounded-md cursor-pointer transition-all duration-200 hover:bg-zinc-600" onClick={() => setShowCustomerModal(true)} style={{ borderColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze') }}>
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-semibold text-[0.85rem] flex-shrink-0" style={{ backgroundColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze') }}>
                                 {(selectedCustomer?.company_name || selectedCustomer?.name || customerName || '?')[0].toUpperCase()}
                             </div>
-                            <div className="customer-badge__info">
-                                <span className="customer-badge__name">{selectedCustomer?.company_name || selectedCustomer?.name || customerName}</span>
+                            <div className="flex-1 min-w-0 flex flex-col">
+                                <span className="text-sm font-semibold text-white whitespace-nowrap overflow-hidden text-ellipsis">{selectedCustomer?.company_name || selectedCustomer?.name || customerName}</span>
                                 {selectedCustomer && (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         <LoyaltyBadge tier={selectedCustomer.loyalty_tier || 'bronze'} points={selectedCustomer.loyalty_points || 0} isOffline={isOffline} compact={true} />
-                                        <button type="button" onClick={(e) => { e.stopPropagation(); handleRedeemPointsClick() }} className="customer-badge__use-points" style={{ fontSize: '10px', color: isOffline ? '#9ca3af' : '#3b82f6', background: 'none', border: 'none', cursor: isOffline ? 'not-allowed' : 'pointer', textDecoration: 'underline', padding: '2px 4px' }} title={isOffline ? 'Requires online connection' : 'Use loyalty points'}>
+                                        <button type="button" onClick={(e) => { e.stopPropagation(); handleRedeemPointsClick() }} className="text-[10px] bg-transparent border-none underline px-1 py-0.5" style={{ color: isOffline ? '#9ca3af' : '#3b82f6', cursor: isOffline ? 'not-allowed' : 'pointer' }} title={isOffline ? 'Requires online connection' : 'Use loyalty points'}>
                                             <Star size={10} style={{ marginRight: '2px' }} />Use pts
                                         </button>
                                     </div>
                                 )}
                             </div>
-                            <div className="customer-badge__discounts">
+                            <div>
                                 {selectedCustomer?.category?.discount_percentage && selectedCustomer.category.discount_percentage > 0 && (
-                                    <span className="customer-badge__discount customer-badge__discount--category" title={`Category: ${selectedCustomer.category.name}`} style={{ backgroundColor: '#3b82f6' }}>
+                                    <span className="px-2 py-1 rounded text-xs font-bold text-[#22c55e]" style={{ backgroundColor: '#3b82f6' }} title={`Category: ${selectedCustomer.category.name}`}>
                                         <Tag size={10} />-{selectedCustomer.category.discount_percentage}%
                                     </span>
                                 )}
                             </div>
                         </button>
                     ) : (
-                        <button type="button" className="btn-add-customer" onClick={() => setShowCustomerModal(true)}>
+                        <button
+                            type="button"
+                            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-700 border border-dashed border-zinc-500 rounded-md text-zinc-400 text-xs font-semibold cursor-pointer transition-all duration-200 hover:bg-zinc-600 hover:border-gold hover:text-gold-light"
+                            onClick={() => setShowCustomerModal(true)}
+                        >
                             <QrCode size={16} /><User size={16} /><span>Client</span>
                         </button>
                     )}
                 </div>
 
                 {/* Order Notes (F3.3) */}
-                <div className="pos-cart__notes">
+                <div className="mt-sm pt-sm border-t border-zinc-700">
                     <button
                         type="button"
-                        className={`pos-cart__notes-toggle ${showOrderNotes || orderNotes ? 'has-notes' : ''}`}
+                        className={cn(
+                            'w-full flex items-center gap-2 px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-zinc-300 text-sm cursor-pointer transition-all duration-200',
+                            'hover:bg-zinc-600 hover:text-white',
+                            (showOrderNotes || orderNotes) && 'text-gold-light border-gold',
+                            '[&>svg:last-child]:ml-auto'
+                        )}
                         onClick={() => setShowOrderNotes(!showOrderNotes)}
                     >
                         <FileText size={16} />
@@ -199,7 +231,7 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                     </button>
                     {showOrderNotes && (
                         <textarea
-                            className="pos-cart__notes-input"
+                            className="w-full mt-2 px-3 py-2.5 bg-zinc-900 border border-zinc-600 rounded-md text-white text-sm font-[inherit] resize-none transition-colors duration-200 focus:outline-none focus:border-gold placeholder:text-zinc-500"
                             placeholder="Add special instructions for this order..."
                             value={orderNotes}
                             onChange={(e) => setOrderNotes(e.target.value)}
@@ -209,11 +241,12 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                 </div>
             </div>
 
-            <div className="pos-cart__items">
+            {/* Cart Items */}
+            <div className="flex-1 overflow-y-auto p-md bg-zinc-900">
                 {items.length === 0 ? (
-                    <div className="pos-cart__empty">
-                        <span className="pos-cart__empty-icon">🛒</span>
-                        <p className="pos-cart__empty-text">Your cart is empty. Select products.</p>
+                    <div className="h-full flex flex-col items-center justify-center text-zinc-500">
+                        <span className="text-[48px] mb-md opacity-30">🛒</span>
+                        <p>Your cart is empty. Select products.</p>
                     </div>
                 ) : (
                     items.map(item => (

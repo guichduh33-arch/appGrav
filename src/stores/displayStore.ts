@@ -63,6 +63,7 @@ interface DisplayState {
   setPromoInterval: (seconds: number) => void;
   nextPromo: () => void;
   resetPromoIndex: () => void;
+  clearAllTimeouts: () => void;
   checkIdle: () => void;
 }
 
@@ -127,6 +128,9 @@ export const useDisplayStore = create<DisplayState>((set, get) => ({
    * Clear cart display
    */
   clearCart: () => {
+    // Clear all pending ready order timeouts
+    readyOrderTimeouts.forEach(id => clearTimeout(id));
+    readyOrderTimeouts.clear();
     set({
       cart: {
         items: [],
@@ -140,7 +144,17 @@ export const useDisplayStore = create<DisplayState>((set, get) => ({
       },
       lastCartUpdate: new Date().toISOString(),
       isIdle: true,
+      readyOrders: [],
+      orderQueue: [],
     });
+  },
+
+  /**
+   * Clear all pending ready order timeouts (prevents memory leaks on unmount)
+   */
+  clearAllTimeouts: () => {
+    readyOrderTimeouts.forEach(id => clearTimeout(id));
+    readyOrderTimeouts.clear();
   },
 
   /**

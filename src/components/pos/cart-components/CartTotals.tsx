@@ -15,42 +15,45 @@ export const CartTotals = memo(function CartTotals({ subtotal, discountAmount, t
     const appliedPromotions = useCartStore(state => state.appliedPromotions)
 
     return (
-        <div className="pos-cart__totals">
-            <div className="cart-total-row">
-                <span className="cart-total-row__label">Subtotal</span>
-                <span className="cart-total-row__value">{formatPrice(subtotal)}</span>
+        <div className="px-md py-sm bg-zinc-800 border-t border-zinc-700">
+            {/* Subtotal row */}
+            <div className="flex justify-between mb-1 text-xs text-zinc-400">
+                <span>Subtotal</span>
+                <span className="font-semibold text-white">{formatPrice(subtotal)}</span>
             </div>
             {/* Promotion discounts (Story 6.5) */}
             {promotionTotalDiscount > 0 && (
-                <div className="cart-total-row">
-                    <span className="cart-total-row__label" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#ea580c', fontSize: '13px' }}>
+                <div className="flex justify-between mb-1 text-xs text-zinc-400">
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#ea580c', fontSize: '13px' }}>
                         <Percent size={12} />
                         Promo
                         {appliedPromotions.length === 1 && (
                             <span style={{ fontWeight: 400, fontSize: '11px' }}>({appliedPromotions[0].promotionName})</span>
                         )}
                     </span>
-                    <span className="cart-total-row__value" style={{ color: '#ea580c' }}>
+                    <span className="font-semibold" style={{ color: '#ea580c' }}>
                         -{formatPrice(promotionTotalDiscount)}
                     </span>
                 </div>
             )}
-            <div className="cart-total-row">
+            {/* Discount row */}
+            <div className="flex justify-between mb-1 text-xs text-zinc-400">
                 <button
                     type="button"
-                    className="btn-discount-link"
+                    className="bg-transparent border-none p-0 text-zinc-400 text-sm cursor-pointer transition-all duration-200 flex items-center gap-1.5 hover:text-gold-light"
                     onClick={onDiscountClick}
                 >
                     <Tag size={14} />
                     Discount
                 </button>
-                <span className="cart-total-row__value text-urgent">
+                <span className="font-semibold text-white text-urgent">
                     {discountAmount > 0 ? `-${formatPrice(discountAmount)}` : formatPrice(0)}
                 </span>
             </div>
-            <div className="cart-total-row is-grand-total">
-                <span className="cart-total-row__label">TOTAL</span>
-                <span className="cart-total-row__value">{formatPrice(total)}</span>
+            {/* Grand total row */}
+            <div className="flex justify-between mt-1.5 pt-1.5 border-t border-dashed border-zinc-600 mb-0">
+                <span className="text-base font-bold text-white">TOTAL</span>
+                <span className="text-xl font-extrabold text-gold-light">{formatPrice(total)}</span>
             </div>
         </div>
     )

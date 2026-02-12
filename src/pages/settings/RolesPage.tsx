@@ -20,8 +20,6 @@ import { usePermissions } from '@/hooks/usePermissions'
 import { RouteGuard, PermissionGuard } from '@/components/auth/PermissionGuard'
 import { RoleCard, RoleModal } from '@/components/settings/roles'
 
-import './SettingsPage.css'
-
 function RolesPageContent() {
   const { isOnline } = useNetworkStatus()
   const { isAdmin } = usePermissions()
@@ -129,10 +127,10 @@ function RolesPageContent() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="settings-page">
-        <div className="settings-section">
-          <div className="settings-section__body settings-section__loading">
-            <div className="spinner" />
+      <div className="p-lg h-full overflow-y-auto bg-cream">
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="flex flex-col items-center justify-center p-2xl text-center text-smoke gap-md">
+            <div className="w-6 h-6 border-3 border-border border-t-[var(--color-rose-poudre)] rounded-full animate-spin" />
             <span>Loading roles...</span>
           </div>
         </div>
@@ -143,9 +141,9 @@ function RolesPageContent() {
   // Error state
   if (rolesError) {
     return (
-      <div className="settings-page">
-        <div className="settings-section">
-          <div className="settings-section__body">
+      <div className="p-lg h-full overflow-y-auto bg-cream">
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="p-lg">
             <div className="text-red-600 text-center py-8">
               Failed to load roles. Please try again.
             </div>
@@ -156,7 +154,7 @@ function RolesPageContent() {
   }
 
   return (
-    <div className="settings-page">
+    <div className="p-lg h-full overflow-y-auto bg-cream">
       {/* Offline Warning */}
       {!isOnline && (
         <div className="flex items-center gap-3 p-4 mb-6 bg-amber-500/10 rounded-lg text-amber-600 text-sm">
@@ -166,14 +164,18 @@ function RolesPageContent() {
       )}
 
       {/* Header */}
-      <header className="settings-page__header">
+      <header className="flex items-center justify-between mb-lg">
         <div className="flex items-center gap-4">
-          <Link to="/settings/security" className="btn-icon" title="Back to settings">
+          <Link
+            to="/settings/security"
+            className="w-9 h-9 flex items-center justify-center bg-white border border-border rounded-sm text-smoke cursor-pointer transition-all duration-fast ease-standard hover:border-[var(--color-rose-poudre)] hover:text-[var(--color-rose-poudre)]"
+            title="Back to settings"
+          >
             <ArrowLeft size={18} />
           </Link>
           <div>
-            <h1 className="settings-page__title">Role Management</h1>
-            <p className="text-[var(--color-gris-chaud)] text-sm mt-1">
+            <h1 className="font-display text-4xl font-bold text-espresso">Role Management</h1>
+            <p className="text-smoke text-sm mt-1">
               Configure roles and their access permissions
             </p>
           </div>
@@ -181,7 +183,7 @@ function RolesPageContent() {
         <PermissionGuard permission="users.roles">
           <button
             type="button"
-            className="btn-primary"
+            className="inline-flex items-center gap-xs py-sm px-lg bg-[var(--color-rose-poudre)] text-white border-none rounded-md text-sm font-semibold cursor-pointer transition-all duration-fast ease-standard hover:opacity-90"
             onClick={handleCreate}
             disabled={!isOnline}
           >
@@ -192,19 +194,19 @@ function RolesPageContent() {
       </header>
 
       {/* Roles Grid */}
-      <div className="settings-section">
-        <div className="settings-section__header">
-          <div className="settings-section__header-content">
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="p-lg border-b border-border">
+          <div className="flex items-start justify-between gap-md">
             <div>
-              <h2 className="settings-section__title">System Roles</h2>
-              <p className="settings-section__description">
+              <h2 className="flex items-center gap-sm text-lg font-semibold text-espresso mb-xs">System Roles</h2>
+              <p className="text-sm text-smoke">
                 {roles.length} role{roles.length !== 1 ? 's' : ''} configured
               </p>
             </div>
           </div>
         </div>
 
-        <div className="settings-section__body">
+        <div className="p-lg">
           <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6">
             {roles.map((role) => (
               <RoleCard
@@ -219,7 +221,7 @@ function RolesPageContent() {
           </div>
 
           {roles.length === 0 && (
-            <div className="text-center py-12 text-[var(--color-gris-chaud)]">
+            <div className="text-center py-12 text-smoke">
               No roles configured yet. Create your first role to get started.
             </div>
           )}

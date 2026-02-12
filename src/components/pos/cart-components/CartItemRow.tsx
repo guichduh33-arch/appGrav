@@ -2,6 +2,7 @@ import { memo } from 'react'
 import { Trash2, Tag, Plus, Minus, Lock, Percent } from 'lucide-react'
 import { formatPrice } from '@/utils/helpers'
 import { useCartStore, type CartItem } from '@/stores/cartStore'
+import { cn } from '@/lib/utils'
 import type { IItemPromotionDiscount } from '@/services/pos/promotionEngine'
 
 interface CartItemRowProps {
@@ -26,23 +27,31 @@ export const CartItemRow = memo(function CartItemRow({
 
     return (
         <div
-            className={`cart-item ${isLocked ? 'is-locked' : ''}`}
+            className={cn(
+                'bg-transparent py-2 mb-0 border-b border-zinc-700 transition-all duration-200 cursor-pointer',
+                'hover:bg-[rgba(59,130,246,0.05)]',
+                'last:border-b-0',
+                isLocked && 'bg-[rgba(245,158,11,0.05)] border-l-[3px] border-l-warning pl-2 cursor-default'
+            )}
             onClick={() => !isLocked && onItemClick?.(item)}
         >
-            <div className="cart-item__info">
-                <div className="cart-item__name">
-                    {isLocked && <Lock size={12} className="cart-item__lock-icon" />}
-                    <span className="cart-item__qty">{item.quantity}x</span>
+            <div className="mb-1.5 flex-1">
+                <div className={cn(
+                    'font-semibold text-sm text-white flex items-center gap-1.5 leading-[1.4]',
+                    isLocked && 'text-warning-text'
+                )}>
+                    {isLocked && <Lock size={12} />}
+                    <span className="text-gold-light font-bold mr-1">{item.quantity}x</span>
                     {item.type === 'combo' ? item.combo?.name : item.product?.name}
                 </div>
                 {/* Combo selections (Story 6.6) */}
                 {item.type === 'combo' && item.comboSelections && item.comboSelections.length > 0 && (
-                    <div className="cart-item__combo-selections">
+                    <div className="mt-0.5 pl-3 border-l-2 border-zinc-600">
                         {item.comboSelections.map((sel) => (
-                            <div key={sel.item_id} className="cart-item__combo-sel">
-                                <span className="cart-item__combo-sel-name">{sel.product_name}</span>
+                            <div key={sel.item_id} className="flex items-center gap-1 text-[11px] text-zinc-300 leading-[1.5]">
+                                <span className="opacity-85">{sel.product_name}</span>
                                 {sel.price_adjustment !== 0 && (
-                                    <span className="cart-item__combo-sel-adj">
+                                    <span className="text-gold-light font-medium text-[10px]">
                                         {sel.price_adjustment > 0 ? '+' : ''}{formatPrice(sel.price_adjustment)}
                                     </span>
                                 )}
@@ -51,12 +60,12 @@ export const CartItemRow = memo(function CartItemRow({
                     </div>
                 )}
                 {item.modifiers.length > 0 && (
-                    <div className="cart-item__mods">
+                    <div className="text-xs text-zinc-300 mt-0.5 leading-[1.4]">
                         {item.modifiers.map(m => m.optionLabel).join(', ')}
                     </div>
                 )}
                 {item.notes && (
-                    <div className="cart-item__notes">{item.notes}</div>
+                    <div className="text-xs text-danger italic mt-0.5">{item.notes}</div>
                 )}
                 {/* Promotion badges (Story 6.5) */}
                 {itemPromotions.length > 0 && (
@@ -68,11 +77,11 @@ export const CartItemRow = memo(function CartItemRow({
                 )}
             </div>
 
-            <div className="cart-item__controls">
-                <div className="cart-item__quantity">
+            <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 rounded-md p-0">
                     <button
                         type="button"
-                        className="qty-btn"
+                        className="w-[22px] h-[22px] flex items-center justify-center bg-transparent border border-zinc-600 rounded-sm text-zinc-300 cursor-pointer transition-all duration-200 hover:enabled:border-gold hover:enabled:text-gold-light hover:enabled:bg-[rgba(59,130,246,0.1)] disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={(e) => {
                             e.stopPropagation()
                             onQuantityChange(item.id, item.quantity - 1)
@@ -83,10 +92,10 @@ export const CartItemRow = memo(function CartItemRow({
                     >
                         <Minus size={14} />
                     </button>
-                    <span>{item.quantity}</span>
+                    <span className="text-sm font-semibold min-w-[16px] text-center text-white">{item.quantity}</span>
                     <button
                         type="button"
-                        className="qty-btn"
+                        className="w-[22px] h-[22px] flex items-center justify-center bg-transparent border border-zinc-600 rounded-sm text-zinc-300 cursor-pointer transition-all duration-200 hover:enabled:border-gold hover:enabled:text-gold-light hover:enabled:bg-[rgba(59,130,246,0.1)] disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={(e) => {
                             e.stopPropagation()
                             onQuantityChange(item.id, item.quantity + 1)
@@ -98,10 +107,10 @@ export const CartItemRow = memo(function CartItemRow({
                     </button>
                 </div>
 
-                <div className="cart-item__actions">
+                <div className="flex items-center gap-2">
                     <button
                         type="button"
-                        className="cart-item__discount-btn"
+                        className="w-6 h-6 flex items-center justify-center bg-transparent border border-zinc-600 rounded-sm text-zinc-400 cursor-pointer transition-all duration-200 hover:bg-zinc-700 hover:border-gold hover:text-gold-light"
                         onClick={(e) => {
                             e.stopPropagation()
                             onDiscountClick(item)
@@ -111,7 +120,10 @@ export const CartItemRow = memo(function CartItemRow({
                         <Tag size={14} />
                     </button>
 
-                    <div className="cart-item__price">
+                    <div className={cn(
+                        'font-semibold text-sm text-white min-w-[70px] text-right',
+                        isLocked && 'text-warning-text'
+                    )}>
                         {totalPromoDiscount > 0 ? (
                             <>
                                 <span style={{ textDecoration: 'line-through', color: '#94a3b8', fontSize: '11px' }}>
@@ -157,7 +169,7 @@ export const CartItemRow = memo(function CartItemRow({
 
                     <button
                         type="button"
-                        className={`cart-item__remove ${isLocked ? 'requires-pin' : ''}`}
+                        className="w-6 h-6 flex items-center justify-center border border-transparent bg-transparent text-zinc-400 cursor-pointer rounded-sm transition-all duration-200 hover:bg-[rgba(239,68,68,0.1)] hover:border-danger hover:text-danger"
                         onClick={(e) => {
                             e.stopPropagation()
                             onDeleteClick(item.id)

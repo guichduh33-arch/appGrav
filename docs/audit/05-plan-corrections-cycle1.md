@@ -59,7 +59,7 @@
 | S2 | Architecture | 13 `error: any` dans catch blocks | S | ~~FAIT~~ |
 | S3 | Architecture | 46 eslint-disable suppressions | M | ~~FAIT~~ (46 → 2 justifies) |
 | S4 | Architecture | Pas de vendor chunk splitting | S | ~~FAIT~~ |
-| S5 | Architecture | 84 CSS files alongside Tailwind | L | **PARTIEL** (55 CSS files supprimés, 24 restants à migrer vers Tailwind utilities) |
+| S5 | Architecture | 84 CSS files alongside Tailwind | L | **PARTIEL** (55 CSS files supprimes, 18 restants + 19 imports actifs. Fichiers majeurs: POSMainPage.css, SettingsPage.css, FloorPlanEditor.css, PaymentModal.css, ProductsPage.css, CombosPage.css, + 12 autres pages inventory/products/purchasing) |
 | S6 | Architecture | 413 inline styles | L |
 | S7 | Security | Pas de Content-Security-Policy | S | ~~FAIT~~ (meta CSP dans index.html) |
 | S8 | Security | Pas de rate limiting IP sur auth online | M |

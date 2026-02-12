@@ -25,6 +25,7 @@ CREATE OR REPLACE FUNCTION public.transfer_stock(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = ''
 AS $$
 DECLARE
   v_current_stock DECIMAL;
@@ -57,7 +58,7 @@ BEGIN
   IF p_from_section_id IS NULL THEN
     -- Source is warehouse: lock and deduct from products.current_stock
     SELECT current_stock INTO v_current_stock
-    FROM products
+    FROM public.products
     WHERE id = p_product_id
     FOR UPDATE;
 
@@ -71,14 +72,14 @@ BEGIN
 
     v_new_source_stock := v_current_stock - p_quantity;
 
-    UPDATE products
+    UPDATE public.products
     SET current_stock = v_new_source_stock
     WHERE id = p_product_id;
 
   ELSE
     -- Source is a section: lock and deduct from section_stock
     SELECT quantity INTO v_current_stock
-    FROM section_stock
+    FROM public.section_stock
     WHERE product_id = p_product_id AND section_id = p_from_section_id
     FOR UPDATE;
 
@@ -92,7 +93,7 @@ BEGIN
 
     v_new_source_stock := v_current_stock - p_quantity;
 
-    UPDATE section_stock
+    UPDATE public.section_stock
     SET quantity = v_new_source_stock,
         updated_at = NOW()
     WHERE product_id = p_product_id AND section_id = p_from_section_id;
@@ -105,17 +106,17 @@ BEGIN
 
   IF p_to_section_id IS NULL THEN
     -- Destination is warehouse: add to products.current_stock
-    UPDATE products
+    UPDATE public.products
     SET current_stock = current_stock + p_quantity
     WHERE id = p_product_id;
 
   ELSE
     -- Destination is a section: upsert into section_stock
-    INSERT INTO section_stock (product_id, section_id, quantity)
+    INSERT INTO public.section_stock (product_id, section_id, quantity)
     VALUES (p_product_id, p_to_section_id, p_quantity)
     ON CONFLICT (section_id, product_id)
     DO UPDATE SET
-      quantity = section_stock.quantity + p_quantity,
+      quantity = public.section_stock.quantity + p_quantity,
       updated_at = NOW();
 
   END IF;
@@ -124,7 +125,7 @@ BEGIN
   -- STEP 3: Record stock movements for audit
   -- ============================================
 
-  INSERT INTO stock_movements (
+  INSERT INTO public.stock_movements (
     movement_id, product_id, movement_type, quantity,
     stock_before, stock_after, reason, staff_id,
     reference_type
@@ -132,7 +133,7 @@ BEGIN
   VALUES (
     v_movement_id_out,
     p_product_id,
-    'transfer_out'::movement_type,
+    'transfer_out'::public.movement_type,
     p_quantity,
     v_current_stock,
     v_new_source_stock,
@@ -144,7 +145,7 @@ BEGIN
     'section_transfer'
   );
 
-  INSERT INTO stock_movements (
+  INSERT INTO public.stock_movements (
     movement_id, product_id, movement_type, quantity,
     stock_before, stock_after, reason, staff_id,
     reference_type
@@ -152,19 +153,19 @@ BEGIN
   VALUES (
     v_movement_id_in,
     p_product_id,
-    'transfer_in'::movement_type,
+    'transfer_in'::public.movement_type,
     p_quantity,
     COALESCE(
       CASE
-        WHEN p_to_section_id IS NULL THEN (SELECT current_stock - p_quantity FROM products WHERE id = p_product_id)
-        ELSE (SELECT quantity - p_quantity FROM section_stock WHERE product_id = p_product_id AND section_id = p_to_section_id)
+        WHEN p_to_section_id IS NULL THEN (SELECT current_stock - p_quantity FROM public.products WHERE id = p_product_id)
+        ELSE (SELECT quantity - p_quantity FROM public.section_stock WHERE product_id = p_product_id AND section_id = p_to_section_id)
       END,
       0
     ),
     COALESCE(
       CASE
-        WHEN p_to_section_id IS NULL THEN (SELECT current_stock FROM products WHERE id = p_product_id)
-        ELSE (SELECT quantity FROM section_stock WHERE product_id = p_product_id AND section_id = p_to_section_id)
+        WHEN p_to_section_id IS NULL THEN (SELECT current_stock FROM public.products WHERE id = p_product_id)
+        ELSE (SELECT quantity FROM public.section_stock WHERE product_id = p_product_id AND section_id = p_to_section_id)
       END,
       p_quantity
     ),
