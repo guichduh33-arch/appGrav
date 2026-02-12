@@ -29,17 +29,17 @@ export function Breadcrumbs({ items, className = '' }: BreadcrumbsProps) {
                 return (
                     <div key={index} className="flex items-center gap-1.5">
                         {index > 0 && (
-                            <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0" />
                         )}
                         {!isLast && item.href ? (
                             <Link
                                 to={item.href}
-                                className="text-blue-600 hover:text-blue-800 hover:underline transition-colors min-h-[44px] flex items-center"
+                                className="text-muted-foreground hover:text-primary hover:underline transition-colors min-h-[44px] flex items-center"
                             >
                                 {item.label}
                             </Link>
                         ) : (
-                            <span className={isLast ? 'text-gray-900 font-medium' : 'text-gray-600'}>
+                            <span className={isLast ? 'text-foreground font-medium' : 'text-muted-foreground'}>
                                 {item.label}
                             </span>
                         )}

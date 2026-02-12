@@ -26,6 +26,7 @@ import { useDashboardData, type TAggregatedPayment } from '@/hooks/useDashboardD
 import { ComparisonKpiCard, ComparisonKpiGrid } from '@/components/reports/ComparisonKpiCard';
 import { formatCurrency } from '@/utils/helpers';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 const PAYMENT_COLORS: Record<string, string> = {
   cash: '#22c55e',
@@ -48,10 +49,6 @@ function formatAxisValue(value: number): string {
   return String(value);
 }
 
-// Skeleton placeholder
-function Skeleton({ className }: { className?: string }) {
-  return <div className={cn('animate-pulse rounded-lg bg-gray-200', className)} />;
-}
 
 export default function DashboardPage() {
   const user = useAuthStore(s => s.user);

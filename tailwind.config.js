@@ -103,6 +103,7 @@ export default {
           'var(--font-body)'
         ],
         mono: [
+          'JetBrains Mono',
           'var(--font-mono)'
         ],
         fraunces: [
@@ -150,7 +151,8 @@ export default {
         sticky: 'var(--z-sticky)',
         'modal-backdrop': 'var(--z-modal-backdrop)',
         modal: 'var(--z-modal)',
-        toast: 'var(--z-toast)'
+        toast: 'var(--z-toast)',
+        tooltip: '600'
       },
       transitionDuration: {
         fast: 'var(--duration-fast)',

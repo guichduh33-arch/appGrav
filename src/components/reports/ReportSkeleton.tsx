@@ -1,21 +1,4 @@
-import { cn } from '@/lib/utils';
-
-interface SkeletonProps {
-  className?: string;
-  style?: React.CSSProperties;
-}
-
-function SkeletonBox({ className, style }: SkeletonProps) {
-  return (
-    <div
-      className={cn(
-        'animate-pulse bg-gray-200 rounded',
-        className
-      )}
-      style={style}
-    />
-  );
-}
+import { Skeleton as SkeletonBox } from '@/components/ui/Skeleton';
 
 export function KPICardSkeleton() {
   return (

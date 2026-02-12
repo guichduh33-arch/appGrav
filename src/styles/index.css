@@ -71,11 +71,11 @@
     --color-sand: #94a3b8;
     /* Slate-400 */
 
-    /* Metallic Gold Accents (Champagne) */
-    --color-gold-light: #ebd098;
-    --color-gold: #d4b465;
-    --color-gold-dark: #a1853d;
-    --color-gold-deep: #705b26;
+    /* Metallic Gold Accents (Option C Palette) */
+    --color-gold-light: #E2D0A0;
+    --color-gold: #C9A55C;
+    --color-gold-dark: #9A7B3A;
+    --color-gold-deep: #6B5425;
 
     /* Semantic Colors (Dark Mode Optimized) */
     --color-success: #22c55e;
@@ -1180,12 +1180,12 @@ tbody tr:hover {
        Text: White/Zinc-400
        Accent: Champagne Gold
     */
-    --theme-bg-primary: #09090b;
-    /* Zinc-950 - Deepest black-ish */
-    --theme-bg-secondary: #18181b;
-    /* Zinc-900 - Card bg */
-    --theme-bg-tertiary: #27272a;
-    /* Zinc-800 - Hover states */
+    --theme-bg-primary: #111113;
+    /* Warm dark - Deepest */
+    --theme-bg-secondary: #1A1A1E;
+    /* Warm dark - Card bg */
+    --theme-bg-tertiary: #232328;
+    /* Warm dark - Hover states */
 
     --theme-text-primary: #fafafa;
     /* Zinc-50 */
