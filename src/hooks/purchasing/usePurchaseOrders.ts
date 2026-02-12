@@ -419,7 +419,7 @@ export function useUpdatePurchaseOrder() {
           .insert(itemsToInsert)
 
         if (itemsError) {
-          logError(`PO ${params.id} items insertion failed after delete:`, itemsError)
+          logError(`PO ${params.id} items insertion failed after delete`, itemsError)
           throw new Error(`ITEMS_INSERT_FAILED: PO header updated and old items deleted, but new items failed. Please add items manually.`)
         }
       }
@@ -594,7 +594,7 @@ export function useUpdatePurchaseOrderStatus() {
         })
 
       if (historyError.error) {
-        logError('Failed to log PO history:', historyError.error)
+        logError('Failed to log PO history', historyError.error)
         // Don't throw - history logging is secondary to status update
       }
 

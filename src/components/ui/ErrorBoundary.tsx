@@ -23,7 +23,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    logError('ErrorBoundary caught:', error, errorInfo);
+    logError(`ErrorBoundary caught: ${errorInfo?.componentStack ?? ''}`, error);
     
     // POST-LAUNCH: Send to error monitoring service (Sentry) - Phase 4.2
     this.setState({ error, errorInfo });

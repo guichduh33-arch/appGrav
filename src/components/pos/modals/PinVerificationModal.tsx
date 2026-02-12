@@ -166,7 +166,7 @@ export default function PinVerificationModal({
                 })
 
                 if (verifyError) {
-                    logError('PIN verification error for user', user.id, verifyError)
+                    logError(`PIN verification error for user ${user.id}`, verifyError)
                     continue
                 }
 
