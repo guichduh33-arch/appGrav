@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createElement } from 'react';
+import { format } from 'date-fns';
 import { useDashboardData } from '../useDashboardData';
 
 // Mock supabase
@@ -26,7 +27,7 @@ vi.mock('@/lib/supabase', () => ({
                   return Promise.resolve({
                     data: [
                       {
-                        date: new Date().toISOString().split('T')[0],
+                        date: format(new Date(), 'yyyy-MM-dd'),
                         total_revenue: 4200000,
                         total_orders: 198,
                         completed_orders: 190,

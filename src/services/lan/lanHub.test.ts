@@ -238,7 +238,7 @@ describe('lanHub', () => {
         orderId: 'order-123',
       });
 
-      expect(consoleSpy).toHaveBeenCalledWith('[LanHub] Cannot broadcast - hub not running');
+      expect(consoleSpy).toHaveBeenCalledWith('[WARN] [LanHub] Cannot broadcast - hub not running');
       expect(mockChannel.send).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
@@ -282,7 +282,7 @@ describe('lanHub', () => {
         orderId: 'order-123',
       });
 
-      expect(consoleSpy).toHaveBeenCalledWith('[LanHub] Cannot send - hub not running');
+      expect(consoleSpy).toHaveBeenCalledWith('[WARN] [LanHub] Cannot send - hub not running');
       expect(mockChannel.send).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
