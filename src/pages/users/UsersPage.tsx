@@ -14,6 +14,7 @@ import { getRoleName } from './usersPageHelpers';
 import { StatCard } from './StatCard';
 import { UserTableRow } from './UserTableRow';
 import { UserFormModal } from './UserFormModal';
+import { logError } from '@/utils/logger'
 
 const UsersPage = () => {
   const { user: currentUser } = useAuthStore();
@@ -87,7 +88,7 @@ const UsersPage = () => {
         toast.error(result.error || 'Error');
       }
     } catch (error) {
-      console.error('Toggle active error:', error);
+      logError('Toggle active error:', error);
       toast.error('Error');
     }
   };
@@ -103,7 +104,7 @@ const UsersPage = () => {
         toast.error(result.error || 'Error');
       }
     } catch (error) {
-      console.error('Delete error:', error);
+      logError('Delete error:', error);
       toast.error('Error');
     }
   };

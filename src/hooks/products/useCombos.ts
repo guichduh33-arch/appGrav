@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import type { ProductCombo } from '../../types/database'
+import { logError } from '@/utils/logger'
 
 /**
  * Fetch active combos available at POS
@@ -17,7 +18,7 @@ export function usePOSCombos() {
                 .order('sort_order', { ascending: true })
 
             if (error) {
-                console.error('Error fetching POS combos:', error)
+                logError('Error fetching POS combos:', error)
                 return []
             }
 

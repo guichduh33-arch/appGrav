@@ -95,7 +95,7 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
             setSaveSuccess(true)
             setTimeout(() => setSaveSuccess(false), 3000)
         } catch (err) {
-            console.error('Error saving modifiers:', err)
+            logError('Error saving modifiers:', err)
         }
     }
 
@@ -174,6 +174,7 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
                     <Info size={18} />
                     <span>
                         {`${categoryGroups.length} group(s) inherited from category. Add product-specific groups or customize inherited groups.`}
+import { logError } from '@/utils/logger'
                     </span>
                 </div>
             )}

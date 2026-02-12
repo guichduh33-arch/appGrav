@@ -3,6 +3,7 @@ import { X, User, Crown, Building2, UserCheck, Phone, Mail, Save } from 'lucide-
 import { supabase } from '../../../lib/supabase'
 import { ICustomerCategory, ICustomerSearchCustomer } from './customerSearchTypes'
 import { cn } from '@/lib/utils'
+import { logError } from '@/utils/logger'
 
 interface CreateCustomerFormProps {
     categories: ICustomerCategory[]
@@ -55,7 +56,7 @@ export default function CreateCustomerForm({
 
             onCustomerCreated(data)
         } catch (error: unknown) {
-            console.error('Error creating customer:', error)
+            logError('Error creating customer:', error)
             if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
                 setFormError('A customer with this phone or email already exists')
             } else {

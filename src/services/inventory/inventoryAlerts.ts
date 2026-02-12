@@ -8,6 +8,7 @@
 import { supabase } from '@/lib/supabase'
 import { useCoreSettingsStore } from '@/stores/settings/coreSettingsStore'
 import { INVENTORY_CONFIG_DEFAULTS } from '@/hooks/settings/useModuleConfigSettings'
+import { logError } from '@/utils/logger'
 
 // ============================================
 // Types
@@ -89,7 +90,7 @@ export async function getLowStockItems(): Promise<ILowStockItem[]> {
         .order('current_stock', { ascending: true })
 
     if (error) {
-        console.error('[inventoryAlerts] Error fetching low stock items:', error)
+        logError('[inventoryAlerts] Error fetching low stock items:', error)
         return []
     }
 
@@ -144,7 +145,7 @@ export async function getReorderSuggestions(): Promise<IReorderSuggestion[]> {
     })
 
     if (error) {
-        console.error('[inventoryAlerts] Error fetching reorder suggestions:', error)
+        logError('[inventoryAlerts] Error fetching reorder suggestions:', error)
         return []
     }
 
@@ -202,7 +203,7 @@ export async function getProductionSuggestions(): Promise<IProductionSuggestion[
     })
 
     if (rpcError) {
-        console.error('[inventoryAlerts] Error fetching production suggestions:', rpcError)
+        logError('[inventoryAlerts] Error fetching production suggestions:', rpcError)
         return []
     }
 
@@ -409,7 +410,7 @@ export async function receivePoItems(
 
         return { success: true }
     } catch (err) {
-        console.error('[inventoryAlerts] Error receiving PO:', err)
+        logError('[inventoryAlerts] Error receiving PO:', err)
         return { success: false, error: 'Failed to receive PO items' }
     }
 }
@@ -478,7 +479,7 @@ export async function createPoFromLowStock(
 
         return { success: true, poId: po.id }
     } catch (err) {
-        console.error('[inventoryAlerts] Error creating PO:', err)
+        logError('[inventoryAlerts] Error creating PO:', err)
         return { success: false, error: 'Failed to create PO' }
     }
 }

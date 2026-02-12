@@ -5,6 +5,7 @@ import { formatCurrency } from '../../utils/helpers'
 import { exportProducts, pushLocalProductsToCloud } from '@/services/products/productImportExport'
 import { exportRecipes } from '@/services/products/recipeImportExport'
 import { db } from '@/lib/db'
+import { cn } from '@/lib/utils'
 import {
     Cloud, Package, Coffee, Croissant, Search, Plus,
     Eye, Edit, Tag, DollarSign, LayoutGrid, List,
@@ -13,7 +14,7 @@ import {
 import ProductImportModal from '@/components/products/ProductImportModal'
 import RecipeImportModal from '@/components/products/RecipeImportModal'
 import { toast } from 'sonner'
-import './ProductsPage.css'
+import { logError } from '@/utils/logger'
 
 interface Category {
     id: string
@@ -86,7 +87,7 @@ export default function ProductsPage() {
             if (productsRes.data) setProducts(productsRes.data)
             if (categoriesRes.data) setCategories(categoriesRes.data)
         } catch (error) {
-            console.error('Error fetching products:', error)
+            logError('Error fetching products:', error)
         } finally {
             setLoading(false)
         }
@@ -188,20 +189,29 @@ export default function ProductsPage() {
         }
     }
 
+    const getTypeBadgeClasses = (type: string) => {
+        switch (type) {
+            case 'finished': return 'bg-success-bg text-success-text border border-success-border'
+            case 'semi_finished': return 'bg-warning-bg text-warning-text border border-warning-border'
+            case 'raw_material': return 'bg-info-bg text-info-text border border-info-border'
+            default: return ''
+        }
+    }
+
     return (
-        <div className="products-page">
+        <div className="p-8 max-w-[1600px] mx-auto md:p-4">
             {/* Header */}
-            <header className="products-header">
-                <div className="products-header__info">
-                    <h1 className="products-header__title">
+            <header className="flex justify-between items-start mb-8 gap-4 flex-wrap md:flex-col">
+                <div className="flex-1">
+                    <h1 className="flex items-center gap-3 font-display text-[2rem] font-semibold text-charcoal m-0 mb-1 md:text-2xl [&>svg]:text-gold">
                         <Package size={28} />
                         Product Management
                     </h1>
-                    <p className="products-header__subtitle">
+                    <p className="font-display italic text-stone text-base m-0">
                         Manage your products, prices and customer category pricing
                     </p>
                 </div>
-                <div className="products-header__actions">
+                <div className="flex gap-3 flex-wrap">
                     {localCount > 0 && products.length === 0 && (
                         <button
                             type="button"
@@ -254,7 +264,7 @@ export default function ProductsPage() {
                     </button>
                     <button
                         type="button"
-                        className="btn btn-primary"
+                        className="inline-flex items-center gap-2 py-3 px-5 rounded-lg font-body text-sm font-semibold cursor-pointer border-2 border-transparent transition-all duration-[250ms] bg-gradient-to-b from-gold to-gold-dark text-white shadow-[0_2px_8px_rgba(201,165,92,0.3)] hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(201,165,92,0.4)]"
                         onClick={() => navigate('/products/new')}
                     >
                         <Plus size={18} />
@@ -264,64 +274,46 @@ export default function ProductsPage() {
             </header>
 
             {/* Stats */}
-            <div className="products-stats">
-                <div
-                    className={`stat-card ${activeTab === 'all' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('all')}
-                >
-                    <Package size={24} />
-                    <div className="stat-content">
-                        <span className="stat-value">{stats.all}</span>
-                        <span className="stat-label">All Products</span>
+            <div className="grid grid-cols-4 gap-4 mb-8 lg:grid-cols-2 md:grid-cols-2">
+                {([
+                    { tab: 'all' as TabType, icon: <Package size={24} />, value: stats.all, label: 'All Products' },
+                    { tab: 'finished' as TabType, icon: <Coffee size={24} />, value: stats.finished, label: 'Finished Products' },
+                    { tab: 'semi_finished' as TabType, icon: <Croissant size={24} />, value: stats.semiFinished, label: 'Semi-Finished' },
+                    { tab: 'raw_material' as TabType, icon: <Package size={24} />, value: stats.rawMaterial, label: 'Raw Materials' },
+                ]).map(stat => (
+                    <div
+                        key={stat.tab}
+                        className={cn(
+                            'flex items-center gap-4 p-5 bg-flour rounded-lg border border-parchment cursor-pointer transition-all duration-[250ms] shadow-sm hover:border-gold-light hover:-translate-y-0.5 hover:shadow-md md:p-4 [&>svg]:text-gold [&>svg]:shrink-0',
+                            activeTab === stat.tab && 'border-gold bg-gradient-to-br from-[rgba(201,165,92,0.08)] to-flour shadow-[0_0_0_2px_rgba(201,165,92,0.2)]'
+                        )}
+                        onClick={() => setActiveTab(stat.tab)}
+                    >
+                        {stat.icon}
+                        <div className="flex flex-col">
+                            <span className="font-display text-[1.75rem] font-bold text-charcoal md:text-2xl">{stat.value}</span>
+                            <span className="font-body text-xs text-stone uppercase tracking-[0.05em]">{stat.label}</span>
+                        </div>
                     </div>
-                </div>
-                <div
-                    className={`stat-card ${activeTab === 'finished' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('finished')}
-                >
-                    <Coffee size={24} />
-                    <div className="stat-content">
-                        <span className="stat-value">{stats.finished}</span>
-                        <span className="stat-label">Finished Products</span>
-                    </div>
-                </div>
-                <div
-                    className={`stat-card ${activeTab === 'semi_finished' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('semi_finished')}
-                >
-                    <Croissant size={24} />
-                    <div className="stat-content">
-                        <span className="stat-value">{stats.semiFinished}</span>
-                        <span className="stat-label">Semi-Finished</span>
-                    </div>
-                </div>
-                <div
-                    className={`stat-card ${activeTab === 'raw_material' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('raw_material')}
-                >
-                    <Package size={24} />
-                    <div className="stat-content">
-                        <span className="stat-value">{stats.rawMaterial}</span>
-                        <span className="stat-label">Raw Materials</span>
-                    </div>
-                </div>
+                ))}
             </div>
 
             {/* Filters */}
-            <div className="products-filters">
-                <div className="products-search">
+            <div className="flex gap-4 mb-6 items-center flex-wrap md:flex-col">
+                <div className="flex-1 min-w-[280px] flex items-center gap-3 px-4 bg-flour border-[1.5px] border-parchment rounded-lg transition-all duration-200 focus-within:border-gold focus-within:shadow-[0_0_0_3px_rgba(201,165,92,0.15)] [&>svg]:text-stone [&>svg]:shrink-0 md:w-full md:min-w-0">
                     <Search size={20} />
                     <input
                         type="text"
                         placeholder="Search by name or SKU..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        className="flex-1 border-none py-3.5 font-body text-sm bg-transparent text-charcoal outline-none placeholder:text-stone placeholder:opacity-70"
                     />
                 </div>
                 <select
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="products-filter"
+                    className="py-3.5 px-4 border-[1.5px] border-parchment rounded-lg bg-flour font-body text-sm text-charcoal min-w-[180px] cursor-pointer transition-all duration-200 appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2716%27%20height=%2716%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%236b6358%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpolyline%20points=%276%209%2012%2015%2018%209%27%3E%3C/polyline%3E%3C/svg%3E')] bg-no-repeat bg-[right_1rem_center] pr-10 focus:outline-none focus:border-gold focus:shadow-[0_0_0_3px_rgba(201,165,92,0.15)] md:w-full md:min-w-0"
                     aria-label="Filter by category"
                 >
                     <option value="all">All categories</option>
@@ -329,9 +321,12 @@ export default function ProductsPage() {
                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                     ))}
                 </select>
-                <div className="view-toggle">
+                <div className="flex bg-kraft rounded-md p-1 border border-parchment">
                     <button
-                        className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                        className={cn(
+                            'py-2 px-2.5 border-none bg-transparent rounded-sm cursor-pointer text-stone transition-all duration-200 flex items-center justify-center hover:text-charcoal',
+                            viewMode === 'grid' && 'bg-flour text-gold shadow-sm'
+                        )}
                         onClick={() => setViewMode('grid')}
                         title="Grid view"
                         aria-label="Grid view"
@@ -339,7 +334,10 @@ export default function ProductsPage() {
                         <LayoutGrid size={18} />
                     </button>
                     <button
-                        className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+                        className={cn(
+                            'py-2 px-2.5 border-none bg-transparent rounded-sm cursor-pointer text-stone transition-all duration-200 flex items-center justify-center hover:text-charcoal',
+                            viewMode === 'list' && 'bg-flour text-gold shadow-sm'
+                        )}
                         onClick={() => setViewMode('list')}
                         title="List view"
                         aria-label="List view"
@@ -351,77 +349,89 @@ export default function ProductsPage() {
 
             {/* Products List */}
             {loading ? (
-                <div className="products-loading">
-                    <div className="spinner"></div>
+                <div className="flex flex-col items-center justify-center py-16 px-8 bg-flour rounded-xl border-2 border-dashed border-parchment text-stone gap-4">
+                    <div className="w-10 h-10 border-[3px] border-parchment border-t-gold rounded-full animate-spin" />
                     <span>Loading products...</span>
                 </div>
             ) : filteredProducts.length === 0 ? (
-                <div className="products-empty">
+                <div className="flex flex-col items-center justify-center py-16 px-8 bg-flour rounded-xl border-2 border-dashed border-parchment text-stone gap-4">
                     <Package size={64} />
-                    <h3>No product found</h3>
-                    <p>
+                    <h3 className="m-0 font-display text-smoke">No product found</h3>
+                    <p className="m-0 font-body">
                         {searchTerm || categoryFilter !== 'all'
                             ? 'Try modifying your filters'
                             : 'Start by adding your first product'}
                     </p>
                 </div>
             ) : viewMode === 'grid' ? (
-                <div className="products-grid">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5 md:grid-cols-1">
                     {filteredProducts.map(product => (
                         <div
                             key={product.id}
-                            className={`product-card ${!product.is_active ? 'inactive' : ''}`}
+                            className={cn(
+                                'bg-flour rounded-lg border border-parchment overflow-hidden cursor-pointer transition-all duration-[250ms] relative shadow-sm hover:-translate-y-1 hover:shadow-lg hover:border-gold-light group',
+                                !product.is_active && 'opacity-60'
+                            )}
                             onClick={() => navigate(`/products/${product.id}`)}
                         >
-                            <div className="product-card__image">
+                            <div className="h-[140px] bg-gradient-to-br from-kraft to-parchment relative flex items-center justify-center">
                                 {product.image_url ? (
-                                    <img src={product.image_url} alt={product.name} />
+                                    <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="product-card__placeholder">
+                                    <div className="text-stone [&>svg]:w-12 [&>svg]:h-12">
                                         {getProductTypeIcon(product.product_type)}
                                     </div>
                                 )}
-                                <span className={`product-type-badge ${product.product_type}`}>
+                                <span className={cn(
+                                    'absolute top-2.5 left-2.5 flex items-center gap-1 py-1 px-2.5 rounded-md font-body text-[0.65rem] font-semibold uppercase tracking-[0.03em]',
+                                    getTypeBadgeClasses(product.product_type)
+                                )}>
                                     {getProductTypeIcon(product.product_type)}
                                     {getProductTypeLabel(product.product_type)}
                                 </span>
                             </div>
-                            <div className="product-card__content">
-                                <h3 className="product-card__name">{product.name}</h3>
-                                <span className="product-card__sku">{product.sku}</span>
+                            <div className="p-4">
+                                <h3 className="m-0 mb-1 font-display text-[1.1rem] font-semibold text-charcoal whitespace-nowrap overflow-hidden text-ellipsis">{product.name}</h3>
+                                <span className="block font-mono text-[0.7rem] text-stone mb-2">{product.sku}</span>
                                 {product.category && (
                                     <span
-                                        className="product-card__category"
+                                        className="inline-flex items-center gap-1 py-0.5 px-2 rounded-sm font-body text-[0.7rem] text-white mb-3"
                                         style={{ backgroundColor: product.category.color || '#6366f1' }}
                                     >
                                         <Tag size={12} />
                                         {product.category.name}
                                     </span>
                                 )}
-                                <div className="product-card__prices">
-                                    <div className="price">
-                                        <span className="price-label">Retail</span>
-                                        <span className="price-value">{formatCurrency(product.retail_price)}</span>
+                                <div className="flex gap-4 mt-2">
+                                    <div className="flex flex-col">
+                                        <span className="font-body text-[0.6rem] text-stone uppercase tracking-[0.05em]">Retail</span>
+                                        <span className="font-mono text-[0.95rem] font-semibold text-charcoal">{formatCurrency(product.retail_price)}</span>
                                     </div>
                                     {product.wholesale_price && (
-                                        <div className="price">
-                                            <span className="price-label">Wholesale</span>
-                                            <span className="price-value">{formatCurrency(product.wholesale_price)}</span>
+                                        <div className="flex flex-col">
+                                            <span className="font-body text-[0.6rem] text-stone uppercase tracking-[0.05em]">Wholesale</span>
+                                            <span className="font-mono text-[0.95rem] font-semibold text-charcoal">{formatCurrency(product.wholesale_price)}</span>
                                         </div>
                                     )}
                                 </div>
                             </div>
-                            <div className="product-card__footer">
-                                <span className={`status-badge ${product.is_active ? 'active' : 'inactive'}`}>
+                            <div className="flex gap-2 py-3 px-4 bg-kraft border-t border-parchment">
+                                <span className={cn(
+                                    'py-0.5 px-2 rounded-sm font-body text-[0.7rem] font-semibold',
+                                    product.is_active ? 'bg-success-bg text-success-text' : 'bg-danger-bg text-danger-text'
+                                )}>
                                     {product.is_active ? 'Active' : 'Inactive'}
                                 </span>
-                                <span className={`pos-badge ${product.pos_visible ? 'visible' : ''}`}>
+                                <span className={cn(
+                                    'py-0.5 px-2 rounded-sm font-body text-[0.7rem] font-medium bg-kraft text-stone',
+                                    product.pos_visible && 'bg-info-bg text-info-text'
+                                )}>
                                     {product.pos_visible ? 'POS' : 'Hidden'}
                                 </span>
                             </div>
-                            <div className="product-card__actions">
+                            <div className="absolute top-2.5 right-2.5 flex gap-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                                 <button
-                                    className="btn-icon"
+                                    className="w-[34px] h-[34px] p-0 rounded-md bg-flour border border-parchment text-smoke cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-gold hover:border-gold hover:text-white"
                                     onClick={(e) => {
                                         e.stopPropagation()
                                         navigate(`/products/${product.id}`)
@@ -432,7 +442,7 @@ export default function ProductsPage() {
                                     <Eye size={16} />
                                 </button>
                                 <button
-                                    className="btn-icon"
+                                    className="w-[34px] h-[34px] p-0 rounded-md bg-flour border border-parchment text-smoke cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-gold hover:border-gold hover:text-white"
                                     onClick={(e) => {
                                         e.stopPropagation()
                                         navigate(`/products/${product.id}/edit`)
@@ -443,7 +453,7 @@ export default function ProductsPage() {
                                     <Edit size={16} />
                                 </button>
                                 <button
-                                    className="btn-icon"
+                                    className="w-[34px] h-[34px] p-0 rounded-md bg-flour border border-parchment text-smoke cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-gold hover:border-gold hover:text-white"
                                     onClick={(e) => {
                                         e.stopPropagation()
                                         navigate(`/products/${product.id}/pricing`)
@@ -458,81 +468,92 @@ export default function ProductsPage() {
                     ))}
                 </div>
             ) : (
-                <div className="products-table">
-                    <table>
+                <div className="bg-flour rounded-lg border border-parchment overflow-hidden shadow-sm">
+                    <table className="w-full border-collapse">
                         <thead>
                             <tr>
-                                <th>Product</th>
-                                <th>SKU</th>
-                                <th>Type</th>
-                                <th>Category</th>
-                                <th className="text-right">Retail Price</th>
-                                <th className="text-right">Wholesale Price</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <th className="text-left p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">Product</th>
+                                <th className="text-left p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">SKU</th>
+                                <th className="text-left p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">Type</th>
+                                <th className="text-left p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">Category</th>
+                                <th className="text-right p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">Retail Price</th>
+                                <th className="text-right p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">Wholesale Price</th>
+                                <th className="text-left p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">Status</th>
+                                <th className="text-left p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredProducts.map(product => (
                                 <tr
                                     key={product.id}
-                                    className={!product.is_active ? 'inactive' : ''}
+                                    className={cn(
+                                        'cursor-pointer transition-colors duration-200 hover:bg-kraft',
+                                        !product.is_active && 'opacity-50'
+                                    )}
                                     onClick={() => navigate(`/products/${product.id}`)}
                                 >
-                                    <td className="product-name-cell">
-                                        <span className="product-name">{product.name}</span>
+                                    <td className="py-3.5 px-4 font-body border-b border-kraft text-sm text-espresso">
+                                        <span className="font-display font-semibold text-charcoal">{product.name}</span>
                                     </td>
-                                    <td className="sku-cell">{product.sku}</td>
-                                    <td>
-                                        <span className={`type-badge ${product.product_type}`}>
+                                    <td className="py-3.5 px-4 font-mono text-stone text-xs border-b border-kraft">{product.sku}</td>
+                                    <td className="py-3.5 px-4 font-body border-b border-kraft text-sm text-espresso">
+                                        <span className={cn(
+                                            'inline-flex items-center gap-1 py-1 px-2.5 rounded-md font-body text-[0.7rem] font-semibold',
+                                            getTypeBadgeClasses(product.product_type)
+                                        )}>
                                             {getProductTypeIcon(product.product_type)}
                                             {getProductTypeLabel(product.product_type)}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td className="py-3.5 px-4 font-body border-b border-kraft text-sm text-espresso">
                                         {product.category && (
                                             <span
-                                                className="category-badge"
+                                                className="inline-block py-0.5 px-2 rounded-sm font-body text-[0.7rem] text-white"
                                                 style={{ backgroundColor: product.category.color || '#6366f1' }}
                                             >
                                                 {product.category.name}
                                             </span>
                                         )}
                                     </td>
-                                    <td className="text-right price-cell">
+                                    <td className="text-right py-3.5 px-4 font-mono font-medium text-charcoal border-b border-kraft">
                                         {formatCurrency(product.retail_price)}
                                     </td>
-                                    <td className="text-right price-cell">
+                                    <td className="text-right py-3.5 px-4 font-mono font-medium text-charcoal border-b border-kraft">
                                         {product.wholesale_price ? formatCurrency(product.wholesale_price) : '-'}
                                     </td>
-                                    <td>
-                                        <span className={`status-badge ${product.is_active ? 'active' : 'inactive'}`}>
+                                    <td className="py-3.5 px-4 font-body border-b border-kraft text-sm text-espresso">
+                                        <span className={cn(
+                                            'py-0.5 px-2 rounded-sm font-body text-[0.7rem] font-semibold',
+                                            product.is_active ? 'bg-success-bg text-success-text' : 'bg-danger-bg text-danger-text'
+                                        )}>
                                             {product.is_active ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
-                                    <td className="actions-cell">
-                                        <button
-                                            className="btn-icon"
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                navigate(`/products/${product.id}`)
-                                            }}
-                                            title="View"
-                                            aria-label="View"
-                                        >
-                                            <Eye size={16} />
-                                        </button>
-                                        <button
-                                            className="btn-icon"
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                navigate(`/products/${product.id}/pricing`)
-                                            }}
-                                            title="Prices"
-                                            aria-label="Prices"
-                                        >
-                                            <DollarSign size={16} />
-                                        </button>
+                                    <td className="py-3.5 px-4 font-body border-b border-kraft text-sm text-espresso">
+                                        <div className="flex gap-1.5">
+                                            <button
+                                                className="w-[34px] h-[34px] p-0 rounded-md bg-flour border border-parchment text-smoke cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-gold hover:border-gold hover:text-white"
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    navigate(`/products/${product.id}`)
+                                                }}
+                                                title="View"
+                                                aria-label="View"
+                                            >
+                                                <Eye size={16} />
+                                            </button>
+                                            <button
+                                                className="w-[34px] h-[34px] p-0 rounded-md bg-flour border border-parchment text-smoke cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-gold hover:border-gold hover:text-white"
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    navigate(`/products/${product.id}/pricing`)
+                                                }}
+                                                title="Prices"
+                                                aria-label="Prices"
+                                            >
+                                                <DollarSign size={16} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

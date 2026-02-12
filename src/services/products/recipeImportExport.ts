@@ -6,6 +6,7 @@
  */
 
 import { supabase } from '@/lib/supabase'
+import { logError } from '@/utils/logger'
 
 export interface IRecipeImport {
     product_name?: string    // Product name (priority)
@@ -78,7 +79,7 @@ export async function exportRecipes(): Promise<{ success: boolean; error?: strin
 
         return { success: true }
     } catch (err) {
-        console.error('Export recipes error:', err)
+        logError('Export recipes error:', err)
         return { success: false, error: 'Error during recipe export' }
     }
 }

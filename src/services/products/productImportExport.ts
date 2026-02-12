@@ -7,6 +7,7 @@
 
 import { supabase } from '@/lib/supabase'
 import { db } from '@/lib/db'
+import { logError, logWarn } from '@/utils/logger'
 
 export interface IProductImport {
     sku: string
@@ -116,7 +117,7 @@ export async function exportProducts(): Promise<{ success: boolean; error?: stri
 
         return { success: true }
     } catch (err) {
-        console.error('Export error:', err)
+        logError('Export error:', err)
         return { success: false, error: 'Error during export' }
     }
 }
@@ -271,7 +272,7 @@ export async function importProducts(
                 sectionId = sectionMap.get(row.section.toLowerCase()) || null
                 if (!sectionId) {
                     // Section not found - add warning but continue
-                    console.warn(`Section "${row.section}" not found for SKU ${row.sku}`)
+                    logWarn(`Section "${row.section}" not found for SKU ${row.sku}`)
                 }
             }
 

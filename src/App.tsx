@@ -17,6 +17,7 @@ import BackOfficeLayout from './layouts/BackOfficeLayout'
 // Critical paths loaded immediately
 import LoginPage from './pages/auth/LoginPage'
 import POSMainPage from './pages/pos/POSMainPage'
+import { logWarn } from '@/utils/logger'
 
 // Loading fallback component
 const PageLoader = () => (
@@ -150,7 +151,7 @@ function App() {
     useEffect(() => {
         const checkAndRepairSession = async () => {
             if (isAuthenticated && user?.id.startsWith('demo-')) {
-                console.warn('Invalid demo-ID detected, forcing session clear')
+                logWarn('Invalid demo-ID detected, forcing session clear')
                 await supabase.auth.signOut()
                 logout()
                 toast.success('Session updated for database compatibility. Please log in again.')

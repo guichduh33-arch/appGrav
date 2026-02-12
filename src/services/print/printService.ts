@@ -9,6 +9,7 @@
 
 import type { TPaymentMethod } from '@/types/payment';
 import { useCoreSettingsStore } from '@/stores/settings/coreSettingsStore';
+import { logError, logWarn } from '@/utils/logger'
 
 // =====================================================
 // Configuration
@@ -136,7 +137,7 @@ export async function printReceipt(orderData: IOrderPrintData): Promise<IPrintRe
   const isAvailable = await checkPrintServer();
 
   if (!isAvailable) {
-    console.warn('Print server not available');
+    logWarn('Print server not available');
     return {
       success: false,
       error: 'Print server not available',
@@ -168,7 +169,7 @@ export async function printReceipt(orderData: IOrderPrintData): Promise<IPrintRe
     return { success: true };
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-    console.error('Print receipt error:', errorMessage);
+    logError('Print receipt error:', errorMessage);
     return {
       success: false,
       error: errorMessage,
@@ -190,7 +191,7 @@ export async function printKitchenTicket(ticketData: IKitchenTicketData): Promis
   const isAvailable = await checkPrintServer();
 
   if (!isAvailable) {
-    console.warn('Print server not available');
+    logWarn('Print server not available');
     return {
       success: false,
       error: 'Print server not available',
@@ -222,7 +223,7 @@ export async function printKitchenTicket(ticketData: IKitchenTicketData): Promis
     return { success: true };
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-    console.error('Print kitchen ticket error:', errorMessage);
+    logError('Print kitchen ticket error:', errorMessage);
     return {
       success: false,
       error: errorMessage,
@@ -244,7 +245,7 @@ export async function printBaristaTicket(ticketData: IKitchenTicketData): Promis
   const isAvailable = await checkPrintServer();
 
   if (!isAvailable) {
-    console.warn('Print server not available');
+    logWarn('Print server not available');
     return {
       success: false,
       error: 'Print server not available',
@@ -276,7 +277,7 @@ export async function printBaristaTicket(ticketData: IKitchenTicketData): Promis
     return { success: true };
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-    console.error('Print barista ticket error:', errorMessage);
+    logError('Print barista ticket error:', errorMessage);
     return {
       success: false,
       error: errorMessage,
@@ -297,7 +298,7 @@ export async function openCashDrawer(): Promise<IPrintResult> {
   const isAvailable = await checkPrintServer();
 
   if (!isAvailable) {
-    console.warn('Print server not available');
+    logWarn('Print server not available');
     return {
       success: false,
       error: 'Print server not available',
@@ -327,7 +328,7 @@ export async function openCashDrawer(): Promise<IPrintResult> {
     return { success: true };
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-    console.error('Open cash drawer error:', errorMessage);
+    logError('Open cash drawer error:', errorMessage);
     return {
       success: false,
       error: errorMessage,

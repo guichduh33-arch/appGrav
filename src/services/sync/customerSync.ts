@@ -12,6 +12,7 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { db, type IOfflineCustomer } from '@/lib/db';
+import { logError } from '@/utils/logger'
 
 // Re-export interface for consumers
 export type { IOfflineCustomer };
@@ -79,7 +80,7 @@ export async function syncCustomersToOffline(): Promise<number> {
   const { data: customersData, error: customersError } = await query;
 
   if (customersError) {
-    console.error('[CustomerSync] Error fetching customers:', customersError);
+    logError('[CustomerSync] Error fetching customers:', customersError);
     throw customersError;
   }
 
@@ -95,7 +96,7 @@ export async function syncCustomersToOffline(): Promise<number> {
     .order('min_points', { ascending: false });
 
   if (tiersError) {
-    console.error('[CustomerSync] Error fetching loyalty tiers:', tiersError);
+    logError('[CustomerSync] Error fetching loyalty tiers:', tiersError);
     // Continue without tiers - not critical
   }
 

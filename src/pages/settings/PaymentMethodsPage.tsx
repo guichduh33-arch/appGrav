@@ -24,6 +24,7 @@ import {
 } from '../../hooks/settings';
 import type { PaymentMethod, PaymentType } from '../../types/settings';
 import { toast } from 'sonner';
+import { logError } from '@/utils/logger'
 
 interface PaymentMethodFormData {
   code: string;
@@ -154,7 +155,7 @@ const PaymentMethodsPage = () => {
       setShowModal(false);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error saving payment method';
-      console.error('Payment method save error:', error);
+      logError('Payment method save error:', error);
       toast.error(message);
     }
   };
@@ -173,7 +174,7 @@ const PaymentMethodsPage = () => {
       toast.success('Payment method deleted');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error deleting payment method';
-      console.error('Payment method delete error:', error);
+      logError('Payment method delete error:', error);
       toast.error(message);
     }
   };
@@ -188,7 +189,7 @@ const PaymentMethodsPage = () => {
       toast.success(method.is_active ? 'Payment method disabled' : 'Payment method enabled');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error toggling status';
-      console.error('Payment method toggle error:', error);
+      logError('Payment method toggle error:', error);
       toast.error(message);
     }
   };
@@ -214,7 +215,7 @@ const PaymentMethodsPage = () => {
       toast.success(`${method[nameKey]} set as default`);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error setting default';
-      console.error('Set default payment method error:', error);
+      logError('Set default payment method error:', error);
       toast.error(message);
     }
   };

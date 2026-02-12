@@ -6,6 +6,7 @@
  */
 
 import { supabase } from '@/lib/supabase'
+import { logError } from '@/utils/logger'
 
 export interface ISystemAlert {
     id: string
@@ -70,7 +71,7 @@ export async function getSystemAlerts(options?: {
     const { data, error } = await query
 
     if (error) {
-        console.error('Error fetching alerts:', error)
+        logError('Error fetching alerts:', error)
         return []
     }
 
@@ -91,7 +92,7 @@ export async function getAlertCounts(): Promise<{
         .eq('is_resolved', false)
 
     if (error) {
-        console.error('Error fetching alert counts:', error)
+        logError('Error fetching alert counts:', error)
         return { total: 0, unread: 0, critical: 0, warning: 0, info: 0 }
     }
 

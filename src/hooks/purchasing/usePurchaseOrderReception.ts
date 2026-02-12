@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import type { TPOStatus } from './usePurchaseOrders'
 import { logPOHistory } from './usePurchaseOrderWorkflow'
+import { logError } from '@/utils/logger'
 
 // ============================================================================
 // TYPES
@@ -135,7 +136,7 @@ export function useReceivePOItem() {
           .single()
 
         if (productError) {
-          console.error('Error fetching product:', productError)
+          logError('Error fetching product:', productError)
         } else if (product) {
           const currentStock = product.current_stock || 0
           const newStock = currentStock + delta
@@ -157,7 +158,7 @@ export function useReceivePOItem() {
           })
 
           if (movementError) {
-            console.error('Error creating stock movement:', movementError)
+            logError('Error creating stock movement:', movementError)
             throw movementError
           }
 
@@ -168,7 +169,7 @@ export function useReceivePOItem() {
             .eq('id', typedItem.product_id)
 
           if (stockUpdateError) {
-            console.error('Error updating product stock:', stockUpdateError)
+            logError('Error updating product stock:', stockUpdateError)
             throw stockUpdateError
           }
 

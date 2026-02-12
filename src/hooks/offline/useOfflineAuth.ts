@@ -18,6 +18,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { offlineAuthService, rateLimitService } from '@/services/offline';
 import type { TOfflineAuthError } from '@/types/offline';
+import { logDebug } from '@/utils/logger'
 
 /**
  * Error thrown by offline authentication
@@ -148,7 +149,7 @@ export function useOfflineAuth(): IUseOfflineAuthReturn {
           preferred_language: cachedUser.preferred_language,
         }, cachedUser.roles, cachedUser.permissions);
 
-        console.debug('[useOfflineAuth] Offline login successful:', userId);
+        logDebug('[useOfflineAuth] Offline login successful:', userId);
       } finally {
         setIsLoading(false);
       }

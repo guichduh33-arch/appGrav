@@ -11,6 +11,7 @@ import {
     type TPaymentStatus
 } from '@/hooks/purchasing/usePurchaseOrders'
 import { toast } from 'sonner'
+import { logError } from '@/utils/logger'
 
 export default function PurchaseOrdersPage() {
     const navigate = useNavigate()
@@ -58,7 +59,7 @@ export default function PurchaseOrdersPage() {
             await deleteMutation.mutateAsync(id)
             toast.success('Purchase order deleted successfully')
         } catch (error) {
-            console.error('Error deleting purchase order:', error)
+            logError('Error deleting purchase order:', error)
             // Handle specific validation error for non-draft PO deletion
             if (error instanceof Error && error.message === 'DELETE_NOT_DRAFT') {
                 toast.error('Only draft purchase orders can be deleted')
@@ -81,7 +82,7 @@ export default function PurchaseOrdersPage() {
             })
             toast.success('Purchase order updated successfully')
         } catch (error) {
-            console.error('Error updating purchase order status:', error)
+            logError('Error updating purchase order status:', error)
             toast.error('Failed to update purchase order')
         }
     }

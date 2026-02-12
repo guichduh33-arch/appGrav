@@ -12,6 +12,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { logDebug } from '@/utils/logger'
 
 /**
  * Return type for useNetworkStatus hook
@@ -63,12 +64,12 @@ export function useNetworkStatus(): IUseNetworkStatusReturn {
 
     const handleOnline = () => {
       setIsOnline(true);
-      console.debug('[useNetworkStatus] Network online');
+      logDebug('[useNetworkStatus] Network online');
     };
 
     const handleOffline = () => {
       setIsOnline(false);
-      console.debug('[useNetworkStatus] Network offline');
+      logDebug('[useNetworkStatus] Network offline');
     };
 
     // Add event listeners

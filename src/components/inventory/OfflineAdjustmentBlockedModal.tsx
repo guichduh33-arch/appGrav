@@ -12,6 +12,7 @@
 import { useState } from 'react';
 import { X, WifiOff, StickyNote } from 'lucide-react';
 import { addDeferredNote } from '@/services/inventory/deferredAdjustmentService';
+import { logError } from '@/utils/logger'
 
 
 interface OfflineAdjustmentBlockedModalProps {
@@ -49,7 +50,7 @@ export default function OfflineAdjustmentBlockedModal({
       onNoteSaved?.();
       onClose();
     } catch (error) {
-      console.error('Failed to save deferred note:', error);
+      logError('Failed to save deferred note:', error);
       // Show error to user and keep modal open so they can retry or copy their note
       setSaveError('Error saving. Please try again.');
     } finally {

@@ -19,6 +19,7 @@ import {
 } from '@/services/offline/categoriesCacheService';
 import type { IOfflineCategory } from '@/types/offline';
 import type { Category } from '@/types/database';
+import { logError } from '@/utils/logger'
 
 /**
  * Convert offline category to match online Category type
@@ -87,7 +88,7 @@ export function useCategoriesOffline(): IUseCategoriesOfflineResult {
       try {
         return await getCachedCategories();
       } catch (error) {
-        console.error('[useCategoriesOffline] Error loading offline categories:', error);
+        logError('[useCategoriesOffline] Error loading offline categories:', error);
         return [];
       }
     },
@@ -146,7 +147,7 @@ export function useOfflineCategoriesRaw(): {
     try {
       return await getCachedCategories();
     } catch (error) {
-      console.error('[useOfflineCategoriesRaw] Error:', error);
+      logError('[useOfflineCategoriesRaw] Error:', error);
       return [];
     }
   });
@@ -190,7 +191,7 @@ export function useCategoryOffline(categoryId: string | null): {
       try {
         return await getCachedCategoryById(categoryId);
       } catch (error) {
-        console.error('[useCategoryOffline] Error:', error);
+        logError('[useCategoryOffline] Error:', error);
         return undefined;
       }
     },

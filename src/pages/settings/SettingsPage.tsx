@@ -103,7 +103,7 @@ const SettingsPage = () => {
                     : cat
             ));
         } catch (error) {
-            console.error('Error updating category station:', error);
+            logError('Error updating category station:', error);
             toast.error('Error updating station');
         } finally {
             setSavingCategory(null);
@@ -170,7 +170,7 @@ const SettingsPage = () => {
 
             setShowSectionModal(false);
         } catch (error) {
-            console.error('Error saving section:', error);
+            logError('Error saving section:', error);
             toast.error('Error saving section: ' + (error instanceof Error ? error.message : 'Unknown error'));
         } finally {
             setSavingSection(false);
@@ -193,7 +193,7 @@ const SettingsPage = () => {
                 const count = msg.split(':')[1];
                 toast.error(`Cannot delete "${section.name}". ${count} stock record(s) exist. Clear stock first.`);
             } else {
-                console.error('Error deleting section:', error);
+                logError('Error deleting section:', error);
                 toast.error('Error deleting section: ' + msg);
             }
         }
@@ -749,3 +749,5 @@ const SettingsPage = () => {
 };
 
 export default SettingsPage;
+
+import { logError } from '@/utils/logger'

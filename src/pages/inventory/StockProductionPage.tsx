@@ -7,7 +7,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../stores/authStore'
 import { Product, Section, ProductionRecord } from '../../types/database'
 import { toast } from 'sonner'
-import { logError, logDebug } from '@/utils/logger'
+import { logError, logDebug, logInfo } from '@/utils/logger'
 import './StockProductionPage.css'
 
 // Format number with thousand separators
@@ -92,7 +92,7 @@ export default function StockProductionPage() {
                 setSelectedSectionId(data[0].id)
             }
         } catch (error) {
-            console.error('Error fetching sections:', error)
+            logError('Error fetching sections:', error)
         } finally {
             setIsLoading(false)
         }
@@ -102,7 +102,7 @@ export default function StockProductionPage() {
         if (!selectedSectionId) return
 
         try {
-            console.log('📦 [StockProduction] Fetching products for section:', selectedSectionId)
+            logDebug('📦 [StockProduction] Fetching products for section:', selectedSectionId)
 
             // First, get all product_sections for this section
             const { data: psData, error: psError } = await supabase
@@ -110,21 +110,21 @@ export default function StockProductionPage() {
                 .select('product_id')
                 .eq('section_id', selectedSectionId)
 
-            console.log('📦 [StockProduction] Product IDs:', psData)
+            logDebug('📦 [StockProduction] Product IDs:', psData)
 
             if (psError) {
-                console.error('❌ [StockProduction] Error fetching product_sections:', psError)
+                logError('❌ [StockProduction] Error fetching product_sections:', psError)
                 throw psError
             }
 
             if (!psData || psData.length === 0) {
-                console.log('📦 [StockProduction] No products found for this section')
+                logDebug('📦 [StockProduction] No products found for this section')
                 setSectionProducts([])
                 return
             }
 
             const productIds = psData.map(ps => ps.product_id)
-            console.log('📦 [StockProduction] Product IDs to fetch:', productIds.length)
+            logDebug('📦 [StockProduction] Product IDs to fetch:', productIds.length)
 
             // Then fetch the full product details
             const { data, error } = await supabase
@@ -137,8 +137,8 @@ export default function StockProductionPage() {
                 .in('product_type', ['finished', 'semi_finished'])
                 .neq('is_active', false)
 
-            console.log('📦 [StockProduction] Products fetched:', data?.length)
-            console.log('📦 [StockProduction] Error:', error)
+            logDebug('📦 [StockProduction] Products fetched:', data?.length)
+            logDebug('📦 [StockProduction] Error:', error)
 
             if (error) throw error
 
@@ -158,11 +158,11 @@ export default function StockProductionPage() {
             )
 
             const products = productsWithUoms as ProductWithSection[]
-            console.log('📦 [StockProduction] Final products:', products.length, products.slice(0, 5).map(p => p.name))
+            logDebug('📦 [StockProduction] Final products:', products.length, products.slice(0, 5).map(p => p.name))
 
             setSectionProducts(products)
         } catch (error) {
-            console.error('❌ [StockProduction] Error fetching section products:', error)
+            logError('❌ [StockProduction] Error fetching section products:', error)
         }
     }
 
@@ -188,7 +188,7 @@ export default function StockProductionPage() {
             if (error) throw error
             setTodayHistory((data || []) as never)
         } catch (error) {
-            console.error('Error fetching history:', error)
+            logError('Error fetching history:', error)
         }
     }
 
@@ -467,7 +467,7 @@ export default function StockProductionPage() {
             setProductionItems([])
             fetchTodayHistory()
         } catch (error) {
-            console.error('Error saving:', error)
+            logError('Error saving:', error)
             toast.error('Error: ' + (error instanceof Error ? error.message : 'Unknown error'))
         } finally {
             setIsSaving(false)

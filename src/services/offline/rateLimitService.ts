@@ -15,6 +15,7 @@
 import { db } from '@/lib/db';
 import type { IOfflineRateLimit } from '@/types/offline';
 import { useCoreSettingsStore } from '@/stores/settings/coreSettingsStore';
+import { logDebug } from '@/utils/logger'
 
 /** Maximum failed attempts before rate limiting */
 const MAX_ATTEMPTS = 3;
@@ -102,7 +103,7 @@ export const rateLimitService = {
 
     await db.offline_rate_limits.put(entry);
 
-    console.debug(
+    logDebug(
       '[rateLimit] Failed attempt recorded:',
       userId,
       `(${entry.attempts}/${maxAttempts})`
@@ -118,7 +119,7 @@ export const rateLimitService = {
     const exists = await db.offline_rate_limits.get(userId);
     if (exists) {
       await db.offline_rate_limits.delete(userId);
-      console.debug('[rateLimit] Attempts reset for user:', userId);
+      logDebug('[rateLimit] Attempts reset for user:', userId);
     }
   },
 
@@ -165,7 +166,7 @@ export const rateLimitService = {
 
     if (expired.length > 0) {
       await db.offline_rate_limits.bulkDelete(expired.map((e) => e.id));
-      console.debug('[rateLimit] Cleaned up', expired.length, 'expired entries');
+      logDebug('[rateLimit] Cleaned up', expired.length, 'expired entries');
     }
   },
 };

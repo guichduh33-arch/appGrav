@@ -23,6 +23,7 @@ import { lanClient } from '@/services/lan/lanClient';
 import { LAN_MESSAGE_TYPES } from '@/services/lan/lanProtocol';
 import { supabase } from '@/lib/supabase';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { logError } from '@/utils/logger'
 
 /**
  * Mobile Cart Page Component
@@ -142,7 +143,7 @@ export default function MobileCartPage() {
         navigate('/mobile/orders');
       }, 1500);
     } catch (error) {
-      console.error('[MobileCart] Send error:', error);
+      logError('[MobileCart] Send error:', error);
       setSendStatus('error');
       setErrorMessage('Error sending order');
     } finally {

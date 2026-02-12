@@ -17,6 +17,7 @@ import {
   calculateStockStatus,
   type TStockStatus,
 } from '@/hooks/offline/useStockLevelsOffline';
+import { logError } from '@/utils/logger'
 
 interface IStockAlertsPanelProps {
   /** Initial filter to apply */
@@ -112,7 +113,7 @@ export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
       const allProducts = await db.offline_products.toArray();
       return new Map(allProducts.map((p) => [p.id, p.name]));
     } catch (error) {
-      console.error('[StockAlertsPanel] Error loading products:', error);
+      logError('[StockAlertsPanel] Error loading products:', error);
       return new Map<string, string>();
     }
   }, []);

@@ -102,7 +102,7 @@ export default function SyncStatusPage() {
       setQueueItems(items);
       setFailedItems(items.filter((item) => item.status === 'failed'));
     } catch (error) {
-      console.error('[SyncStatusPage] Error loading queue items:', error);
+      logError('[SyncStatusPage] Error loading queue items:', error);
     } finally {
       setIsLoadingItems(false);
     }
@@ -121,7 +121,7 @@ export default function SyncStatusPage() {
       setOfflinePeriods(periods);
       setPeriodStats(stats);
     } catch (error) {
-      console.error('[SyncStatusPage] Error loading offline periods:', error);
+      logError('[SyncStatusPage] Error loading offline periods:', error);
     } finally {
       setIsLoadingPeriods(false);
     }
@@ -153,7 +153,7 @@ export default function SyncStatusPage() {
       await loadQueueItems();
       await refreshCounts();
     } catch (error) {
-      console.error('[SyncStatusPage] Manual sync error:', error);
+      logError('[SyncStatusPage] Manual sync error:', error);
     }
   };
 
@@ -166,7 +166,7 @@ export default function SyncStatusPage() {
       await loadQueueItems();
       await refreshCounts();
     } catch (error) {
-      console.error('[SyncStatusPage] Retry error:', error);
+      logError('[SyncStatusPage] Retry error:', error);
     }
   };
 
@@ -179,7 +179,7 @@ export default function SyncStatusPage() {
       await loadQueueItems();
       await refreshCounts();
     } catch (error) {
-      console.error('[SyncStatusPage] Remove error:', error);
+      logError('[SyncStatusPage] Remove error:', error);
     }
   };
 
@@ -192,7 +192,7 @@ export default function SyncStatusPage() {
       await loadQueueItems();
       await refreshCounts();
     } catch (error) {
-      console.error('[SyncStatusPage] Cleanup error:', error);
+      logError('[SyncStatusPage] Cleanup error:', error);
     }
   };
 

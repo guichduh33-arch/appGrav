@@ -9,6 +9,7 @@ import {
     ProductComboGroupItem,
     Product
 } from '../../../types/database'
+import { logError } from '@/utils/logger'
 
 interface GroupItemWithProduct extends ProductComboGroupItem {
     product: Product
@@ -109,7 +110,7 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
             setSelections(initialSelections)
 
         } catch (err) {
-            console.error('Error fetching combo:', err)
+            logError('Error fetching combo:', err)
             setError('Error loading combo')
         } finally {
             setLoading(false)

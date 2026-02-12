@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { QrCode, X } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
 import { ICustomerSearchCustomer } from './customerSearchTypes'
+import { logError } from '@/utils/logger'
 
 interface QRScanAreaProps {
     onCustomerFound: (customer: ICustomerSearchCustomer) => void
@@ -44,7 +45,7 @@ export default function QRScanArea({ onCustomerFound }: QRScanAreaProps) {
 
             onCustomerFound(data)
         } catch (error) {
-            console.error('Error scanning QR:', error)
+            logError('Error scanning QR:', error)
             setQrError('Error during search')
             setQrInput('')
         } finally {

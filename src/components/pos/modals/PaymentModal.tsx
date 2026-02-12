@@ -253,6 +253,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
         }
 
         // Calculate total change from all cash payments
+import { logError } from '@/utils/logger'
         const totalChange = payments.reduce((sum, p) => {
           if (p.method === 'cash' && p.cashReceived) {
             return sum + Math.max(0, p.cashReceived - p.amount);
@@ -272,7 +273,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
         }
       }
     } catch (err) {
-      console.error('Payment error:', err);
+      logError('Payment error:', err);
     }
   }, [isComplete, isProcessing, getPaymentInputs, processPayment, processSplitPayment, payments, isOnline, activeOrderNumber, total, broadcastOrderComplete, customerId, customerName, customerCategorySlug, cartItems, subtotal, discountAmount, user]);
 
@@ -328,7 +329,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
         toast.error(result.error || 'Print failed');
       }
     } catch (err) {
-      console.error('Print error:', err);
+      logError('Print error:', err);
       toast.error('Failed to print receipt');
     } finally {
       setIsPrinting(false);

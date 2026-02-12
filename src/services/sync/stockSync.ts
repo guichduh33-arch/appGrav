@@ -12,6 +12,7 @@ import { supabase } from '@/lib/supabase';
 import { db } from '@/lib/db';
 import logger from '@/utils/logger';
 import type { IOfflineStockLevel } from '@/types/offline';
+import { logError } from '@/utils/logger'
 
 // Re-export interface for consumers
 export type { IOfflineStockLevel };
@@ -45,7 +46,7 @@ export async function getLastStockSyncTime(): Promise<string | null> {
       return null;
     }
   } catch (error) {
-    console.error('[StockSync] Error reading sync meta:', error);
+    logError('[StockSync] Error reading sync meta:', error);
     try {
       return localStorage.getItem(LEGACY_SYNC_TIMESTAMP_KEY);
     } catch {
@@ -102,7 +103,7 @@ export async function syncStockLevelsToOffline(): Promise<number> {
     .order('updated_at', { ascending: false });
 
   if (error) {
-    console.error('[StockSync] Error fetching stock levels:', error);
+    logError('[StockSync] Error fetching stock levels:', error);
     throw error;
   }
 

@@ -23,6 +23,7 @@ import {
     ORDER_STATUSES,
 } from './ordersPageHelpers';
 import type { Order, OrderItem, OrderStatus, OrderType, PaymentStatus } from './ordersPageHelpers';
+import { logError } from '@/utils/logger'
 
 const OrdersPage = () => {
     const queryClient = useQueryClient();
@@ -92,7 +93,7 @@ const OrdersPage = () => {
             const { data, error } = await query.limit(500);
 
             if (error) {
-                console.error('Error fetching orders:', error);
+                logError('Error fetching orders:', error);
                 return [];
             }
 

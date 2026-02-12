@@ -51,7 +51,7 @@ export default function PinVerificationModal({
                     .eq('is_active', true)
 
                 if (usersError) {
-                    console.error('Error fetching users:', usersError)
+                    logError('Error fetching users:', usersError)
                     setError('Error loading users')
                     return
                 }
@@ -64,7 +64,7 @@ export default function PinVerificationModal({
                     .returns<UserRoleRow[]>()
 
                 if (rolesError) {
-                    console.error('Error fetching user roles:', rolesError)
+                    logError('Error fetching user roles:', rolesError)
                     // Continue with legacy roles only
                 }
 
@@ -118,7 +118,7 @@ export default function PinVerificationModal({
 
                 setUsers(filteredUsers)
             } catch (err) {
-                console.error('Error:', err)
+                logError('Error:', err)
                 setError('Connection error')
             } finally {
                 setIsLoadingUsers(false)
@@ -166,7 +166,7 @@ export default function PinVerificationModal({
                 })
 
                 if (verifyError) {
-                    console.error('PIN verification error for user', user.id, verifyError)
+                    logError('PIN verification error for user', user.id, verifyError)
                     continue
                 }
 
@@ -187,7 +187,7 @@ export default function PinVerificationModal({
             setTimeout(() => setIsShaking(false), 500)
             setPin('')
         } catch (err) {
-            console.error('Verification error:', err)
+            logError('Verification error:', err)
             setError('Verification error')
         } finally {
             setIsVerifying(false)

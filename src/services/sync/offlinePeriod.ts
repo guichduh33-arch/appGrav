@@ -10,6 +10,7 @@
 import { db } from '@/lib/db';
 import logger from '@/utils/logger';
 import type { IOfflinePeriod } from '@/types/offline';
+import { logWarn } from '@/utils/logger'
 
 // Re-export interface for consumers
 export type { IOfflinePeriod };
@@ -42,7 +43,7 @@ export async function startOfflinePeriod(): Promise<string> {
 export async function endOfflinePeriod(periodId: string): Promise<IOfflinePeriod | null> {
   const period = await db.offline_periods.get(periodId);
   if (!period) {
-    console.warn(`[OfflinePeriod] Period ${periodId} not found`);
+    logWarn(`[OfflinePeriod] Period ${periodId} not found`);
     return null;
   }
 

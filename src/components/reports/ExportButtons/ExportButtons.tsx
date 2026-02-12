@@ -13,6 +13,7 @@ import {
   type PdfExportOptions,
   type PdfSummary,
 } from '@/services/reports/pdfExport';
+import { logError } from '@/utils/logger'
 
 export interface ExportConfig<T extends object> {
   data: T[];
@@ -74,7 +75,7 @@ export function ExportButtons<T extends object>({
       const result = exportToCSV(config.data, csvColumns, csvOptions);
       onExportComplete?.('csv', result.success);
     } catch (error) {
-      console.error('CSV export error:', error);
+      logError('CSV export error:', error);
       onExportComplete?.('csv', false);
     } finally {
       setIsExportingCsv(false);
@@ -112,7 +113,7 @@ export function ExportButtons<T extends object>({
       const result = await exportToPDF(config.data, pdfColumns, pdfOptions, config.summaries);
       onExportComplete?.('pdf', result.success);
     } catch (error) {
-      console.error('PDF export error:', error);
+      logError('PDF export error:', error);
       onExportComplete?.('pdf', false);
     } finally {
       setIsExportingPdf(false);

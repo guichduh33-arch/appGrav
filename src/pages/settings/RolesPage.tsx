@@ -19,6 +19,7 @@ import { usePermissions } from '@/hooks/usePermissions'
 // Components
 import { RouteGuard, PermissionGuard } from '@/components/auth/PermissionGuard'
 import { RoleCard, RoleModal } from '@/components/settings/roles'
+import { logError } from '@/utils/logger'
 
 function RolesPageContent() {
   const { isOnline } = useNetworkStatus()
@@ -89,7 +90,7 @@ function RolesPageContent() {
         await deleteRole.mutateAsync(role.id)
         toast.success('Role deleted successfully')
       } catch (error) {
-        console.error('Error deleting role:', error)
+        logError('Error deleting role:', error)
         toast.error(error instanceof Error ? error.message : 'Failed to delete role')
       }
     },
@@ -110,7 +111,7 @@ function RolesPageContent() {
         setShowModal(false)
         setSelectedRole(null)
       } catch (error) {
-        console.error('Error saving role:', error)
+        logError('Error saving role:', error)
         toast.error(error instanceof Error ? error.message : 'Failed to save role')
         throw error // Re-throw to prevent modal from closing
       }

@@ -8,6 +8,7 @@
 import { supabase } from '@/lib/supabase'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
+import { logError } from '@/utils/logger'
 
 // =============================================================
 // Types
@@ -112,7 +113,7 @@ export function exportToCSV<T extends object>(
 
     return { success: true };
   } catch (err) {
-    console.error('CSV Export error:', err);
+    logError('CSV Export error:', err);
     return { success: false, error: 'Erreur lors de l\'export CSV' };
   }
 }
@@ -247,7 +248,7 @@ export async function exportSalesReport(
 
         return { success: true }
     } catch (err) {
-        console.error('Export error:', err)
+        logError('Export error:', err)
         return { success: false, error: 'Erreur lors de l\'export' }
     }
 }
@@ -308,7 +309,7 @@ export async function exportInventoryReport(): Promise<{ success: boolean; error
 
         return { success: true }
     } catch (err) {
-        console.error('Export error:', err)
+        logError('Export error:', err)
         return { success: false, error: 'Erreur lors de l\'export' }
     }
 }
@@ -376,7 +377,7 @@ export async function exportCustomersReport(): Promise<{ success: boolean; error
 
         return { success: true }
     } catch (err) {
-        console.error('Export error:', err)
+        logError('Export error:', err)
         return { success: false, error: 'Erreur lors de l\'export' }
     }
 }
@@ -439,7 +440,7 @@ export async function exportStockMovementsReport(
 
         return { success: true }
     } catch (err) {
-        console.error('Export error:', err)
+        logError('Export error:', err)
         return { success: false, error: 'Erreur lors de l\'export' }
     }
 }
@@ -508,7 +509,7 @@ export async function exportPurchaseOrdersReport(
 
         return { success: true }
     } catch (err) {
-        console.error('Export error:', err)
+        logError('Export error:', err)
         return { success: false, error: 'Erreur lors de l\'export' }
     }
 }

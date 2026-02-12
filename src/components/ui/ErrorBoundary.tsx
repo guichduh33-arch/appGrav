@@ -1,4 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
+import { logError } from '@/utils/logger'
 
 interface Props {
   children: ReactNode;
@@ -22,7 +23,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught:', error, errorInfo);
+    logError('ErrorBoundary caught:', error, errorInfo);
     
     // POST-LAUNCH: Send to error monitoring service (Sentry) - Phase 4.2
     this.setState({ error, errorInfo });

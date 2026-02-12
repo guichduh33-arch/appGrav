@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase'
 import { useCoreSettingsStore } from '@/stores/settings/coreSettingsStore'
 import { addToCustomerBalance } from './creditService'
 import type { CartItem } from '@/stores/cartStore'
+import { logError } from '@/utils/logger'
 
 export interface IB2BPosOrderInput {
     customerId: string
@@ -138,13 +139,13 @@ export async function createB2BPosOrder(input: IB2BPosOrderInput): Promise<IB2BP
             .insert(orderItems)
 
         if (itemsError) {
-            console.error('Error creating B2B order items:', itemsError)
+            logError('Error creating B2B order items:', itemsError)
         }
 
         // Update customer credit balance
         const creditResult = await addToCustomerBalance(input.customerId, input.total)
         if (!creditResult.success) {
-            console.error('Error updating credit balance:', creditResult.error)
+            logError('Error updating credit balance:', creditResult.error)
         }
 
         return {
@@ -153,7 +154,7 @@ export async function createB2BPosOrder(input: IB2BPosOrderInput): Promise<IB2BP
             orderNumber: order.order_number,
         }
     } catch (err) {
-        console.error('Error creating B2B POS order:', err)
+        logError('Error creating B2B POS order:', err)
         return { success: false, error: 'Failed to create B2B order' }
     }
 }

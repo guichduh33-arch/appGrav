@@ -22,6 +22,7 @@ import {
 } from '@/services/financial/financialOperationService';
 import type { TPaymentMethod } from '@/types/payment';
 import { cn } from '@/lib/utils';
+import { logError } from '@/utils/logger'
 
 interface RefundModalProps {
   orderId: string;
@@ -126,7 +127,7 @@ export default function RefundModal({
           toast.error(result.error || 'Failed to process refund');
         }
       } catch (error) {
-        console.error('Refund error:', error);
+        logError('Refund error:', error);
         toast.error('Failed to process refund');
       } finally {
         setIsProcessing(false);

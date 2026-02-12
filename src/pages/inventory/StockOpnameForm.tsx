@@ -5,6 +5,7 @@ import { ArrowLeft, Save, CheckCheck, Search, Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import type { InventoryCount, Product, ISection } from '../../types/database'
 import { cn } from '@/lib/utils'
+import { logError } from '@/utils/logger'
 
 // Extended item type for UI (adds product relation and computed unit)
 interface CountItemWithProduct {
@@ -78,7 +79,7 @@ export default function StockOpnameForm() {
                 setItems(itemsWithUnit)
             }
         } catch (error) {
-            console.error('Error loading session:', error)
+            logError('Error loading session:', error)
             alert('Error loading session')
         } finally {
             setStatus('ready')
@@ -130,7 +131,7 @@ export default function StockOpnameForm() {
             .select('*, product:products(*)')
 
         if (error) {
-            console.error('Init Error:', error)
+            logError('Init Error:', error)
             throw error
         }
 

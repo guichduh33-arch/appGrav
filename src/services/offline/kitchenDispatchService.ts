@@ -27,6 +27,7 @@ import {
   DISPATCH_MAX_ATTEMPTS,
   DISPATCH_RETRY_BACKOFF_MS,
 } from '@/types/offline';
+import { logError, logWarn } from '@/utils/logger'
 
 /**
  * Get dispatch station for a category from offline cache
@@ -168,7 +169,7 @@ export async function dispatchOrderToKitchen(
         dispatched.push(station);
         logger.debug(`[kitchenDispatch] Dispatched to ${station}:`, order.order_number);
       } catch (error) {
-        console.error(`[kitchenDispatch] Failed to dispatch to ${station}:`, error);
+        logError(`[kitchenDispatch] Failed to dispatch to ${station}:`, error);
         await addToDispatchQueue(order, station, stationItems);
         queued.push(station);
       }
@@ -295,7 +296,7 @@ export async function processDispatchQueue(): Promise<{
         await updateOrderDispatchStatus(item.order_id, 'failed', null, errorMsg);
         failed++;
 
-        console.error(`[kitchenDispatch] Dispatch failed after ${DISPATCH_MAX_ATTEMPTS} attempts:`, errorMsg);
+        logError(`[kitchenDispatch] Dispatch failed after ${DISPATCH_MAX_ATTEMPTS} attempts:`, errorMsg);
       } else {
         // Reset to pending for retry with exponential backoff
         await db.offline_dispatch_queue.update(item.id!, {
@@ -305,7 +306,7 @@ export async function processDispatchQueue(): Promise<{
         });
 
         const nextDelay = getRetryDelay(attempts);
-        console.warn(`[kitchenDispatch] Dispatch attempt ${attempts} failed, will retry in ${nextDelay}ms:`, errorMsg);
+        logWarn(`[kitchenDispatch] Dispatch attempt ${attempts} failed, will retry in ${nextDelay}ms:`, errorMsg);
       }
     }
   }

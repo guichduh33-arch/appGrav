@@ -16,6 +16,7 @@ import { useSettingsByCategory, useUpdateSetting } from '../../hooks/settings';
 import { usePermissions } from '../../hooks/usePermissions';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
+import { logError } from '@/utils/logger'
 
 // Notification settings form data interface
 interface INotificationFormData {
@@ -290,7 +291,7 @@ const NotificationSettingsPage = () => {
       setPasswordChanged(false);
       setFormData((prev) => ({ ...prev, smtp_password: '' }));
     } catch (error) {
-      console.error('Save error:', error);
+      logError('Save error:', error);
       toast.error('Failed to save settings');
     } finally {
       setIsSaving(false);
@@ -329,7 +330,7 @@ const NotificationSettingsPage = () => {
       setTestResult('success');
       toast.success('Test email sent successfully');
     } catch (error) {
-      console.error('Test email error:', error);
+      logError('Test email error:', error);
       setTestResult('error');
       const errorMessage = error instanceof Error ? error.message : 'Failed to send test email';
       toast.error(errorMessage);

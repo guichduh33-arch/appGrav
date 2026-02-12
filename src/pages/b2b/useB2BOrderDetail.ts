@@ -62,7 +62,7 @@ export function useB2BOrderDetail(id: string | undefined) {
                 setOrder(mappedOrder)
             }
         } catch (error) {
-            console.error('Error fetching order:', error)
+            logError('Error fetching order:', error)
         } finally {
             setLoading(false)
         }
@@ -99,7 +99,7 @@ export function useB2BOrderDetail(id: string | undefined) {
                 setItems(mappedItems)
             }
         } catch (error) {
-            console.error('Error fetching items:', error)
+            logError('Error fetching items:', error)
         }
     }
 
@@ -115,7 +115,7 @@ export function useB2BOrderDetail(id: string | undefined) {
             if (error) throw error
             if (data) setPayments(data)
         } catch (error) {
-            console.error('Error fetching payments:', error)
+            logError('Error fetching payments:', error)
         }
     }
 
@@ -134,7 +134,7 @@ export function useB2BOrderDetail(id: string | undefined) {
             }
             if (data) setDeliveries(data)
         } catch (error) {
-            console.error('Error fetching deliveries:', error)
+            logError('Error fetching deliveries:', error)
             setDeliveries([])
         }
     }
@@ -154,7 +154,7 @@ export function useB2BOrderDetail(id: string | undefined) {
             }
             if (data) setHistory(data)
         } catch (error) {
-            console.error('Error fetching history:', error)
+            logError('Error fetching history:', error)
             setHistory([])
         }
     }
@@ -176,7 +176,7 @@ export function useB2BOrderDetail(id: string | undefined) {
             fetchOrder()
             fetchHistory()
         } catch (error) {
-            console.error('Error updating status:', error)
+            logError('Error updating status:', error)
             alert(`Error updating status: ${error instanceof Error ? error.message : 'Unknown error'}`)
         }
     }
@@ -215,7 +215,7 @@ export function useB2BOrderDetail(id: string | undefined) {
             fetchPayments()
             fetchHistory()
         } catch (error) {
-            console.error('Error adding payment:', error)
+            logError('Error adding payment:', error)
             alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
         }
     }

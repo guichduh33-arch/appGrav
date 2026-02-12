@@ -3,6 +3,7 @@ import { X, Banknote, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatPrice } from '../../../utils/helpers'
 import { usePOSConfigSettings } from '@/hooks/settings/useModuleConfigSettings'
+import { logError } from '@/utils/logger'
 
 interface OpenShiftModalProps {
     onOpen: (openingCash: number, terminalId?: string, notes?: string) => Promise<void>
@@ -32,7 +33,7 @@ export default function OpenShiftModal({ onOpen, onClose, isLoading }: OpenShift
         try {
             await onOpen(openingCash, undefined, notes || undefined)
         } catch (error) {
-            console.error('Error opening shift:', error)
+            logError('Error opening shift:', error)
         }
     }
 

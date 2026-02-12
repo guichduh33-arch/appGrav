@@ -22,6 +22,7 @@ import { usePrintingServerSettings } from '../../hooks/settings/useModuleConfigS
 import { usePermissions } from '../../hooks/usePermissions';
 import type { PrinterConfiguration } from '../../types/settings';
 import { toast } from 'sonner';
+import { logError } from '@/utils/logger'
 
 interface IPrinterFormData {
     name: string;
@@ -179,7 +180,7 @@ const PrintingSettingsPage = () => {
 
             toast.success('Print test successful');
         } catch (error) {
-            console.error('Print test error:', error);
+            logError('Print test error:', error);
             if (error instanceof TypeError && (error.message.includes('fetch') || error.message.includes('Failed to fetch') || error.name === 'TypeError')) {
                 toast.error(`Print server unreachable. Is it running at ${printingConfig.serverUrl}?`);
             } else if (error instanceof Error && error.name === 'TimeoutError') {

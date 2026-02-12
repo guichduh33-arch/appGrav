@@ -18,6 +18,7 @@ import type { ICartDisplayPayload, IOrderStatusPayload } from '@/services/displa
 import { supabase } from '@/lib/supabase';
 import type { IDisplayPromotion } from '@/types/database';
 import { cn } from '@/lib/utils';
+import { logError } from '@/utils/logger'
 
 /**
  * Format price in IDR
@@ -95,7 +96,7 @@ export default function CustomerDisplayPage() {
       })) as IDisplayPromotion[];
       setPromotions(promotionsData);
     } catch (error) {
-      console.error('[CustomerDisplay] Error loading promotions:', error);
+      logError('[CustomerDisplay] Error loading promotions:', error);
     }
   }, []);
 

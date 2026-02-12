@@ -119,7 +119,7 @@ export default function B2BPaymentsPage() {
             if (error) throw error
             if (data) setPayments(data)
         } catch (error) {
-            console.error('Error fetching payments:', error)
+            logError('Error fetching payments:', error)
         } finally {
             setLoading(false)
         }
@@ -152,7 +152,7 @@ export default function B2BPaymentsPage() {
                 setOutstandingOrders(mappedOrders)
             }
         } catch (error) {
-            console.error('Error fetching outstanding orders:', error)
+            logError('Error fetching outstanding orders:', error)
         }
     }
 
@@ -162,7 +162,7 @@ export default function B2BPaymentsPage() {
             const report = await generateAgingReport()
             setAgingReport(report)
         } catch (error) {
-            console.error('Error loading aging report:', error)
+            logError('Error loading aging report:', error)
             toast.error('Failed to load aging report')
         } finally {
             setAgingLoading(false)
@@ -219,7 +219,7 @@ export default function B2BPaymentsPage() {
                 toast.error(result.error || 'Payment failed')
             }
         } catch (error) {
-            console.error('FIFO payment error:', error)
+            logError('FIFO payment error:', error)
             toast.error('Payment processing failed')
         } finally {
             setFifoProcessing(false)

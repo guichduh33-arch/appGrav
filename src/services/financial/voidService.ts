@@ -16,6 +16,7 @@ import {
   VOID_PERMISSION,
 } from './financialOperationService';
 import { logVoidOperation } from './auditService';
+import { logError } from '@/utils/logger'
 
 // =====================================================
 // Types
@@ -60,7 +61,7 @@ export async function canVoidOrder(userId: string): Promise<boolean> {
   });
 
   if (error) {
-    console.error('Permission check failed:', error);
+    logError('Permission check failed:', error);
     return false;
   }
 

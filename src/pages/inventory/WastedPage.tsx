@@ -109,7 +109,7 @@ export default function WastedPage() {
             setShowModal(false)
             resetForm()
         } catch (err) {
-            console.error('Error saving waste:', err)
+            logError('Error saving waste:', err)
             toast.error('Error saving waste record')
         }
     }
@@ -128,6 +128,7 @@ export default function WastedPage() {
     }
 
     // Extract reason type from full reason string (e.g., "Expired: some notes" -> "expired")
+import { logError } from '@/utils/logger'
     const getReasonType = (reason: string | null): string => {
         if (!reason) return 'other'
         const lowerReason = reason.toLowerCase()

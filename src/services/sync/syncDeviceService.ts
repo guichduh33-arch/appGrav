@@ -7,6 +7,7 @@
  */
 
 import { supabase, untypedFrom } from '@/lib/supabase';
+import { logError } from '@/utils/logger';
 import type { ISyncDevice, TSyncDeviceType } from '@/types/database';
 
 /**
@@ -72,14 +73,14 @@ export async function registerSyncDevice(
       );
 
     if (error) {
-      console.error('[syncDeviceService] Registration error:', error);
+      logError('[syncDeviceService] Registration error', error);
       return { success: false, error: error.message };
     }
 
     // Return the raw token - this should be stored locally and never exposed
     return { success: true, token };
   } catch (err) {
-    console.error('[syncDeviceService] Unexpected error:', err);
+    logError('[syncDeviceService] Unexpected error', err);
     return { success: false, error: 'Failed to register device' };
   }
 }
@@ -106,7 +107,7 @@ export async function verifyDeviceToken(
 
     return data.token_hash === tokenHash;
   } catch (err) {
-    console.error('[syncDeviceService] Token verification error:', err);
+    logError('[syncDeviceService] Token verification error', err);
     return false;
   }
 }
@@ -120,7 +121,7 @@ export async function updateDeviceLastSeen(deviceId: string): Promise<void> {
       .update({ last_seen: new Date().toISOString() })
       .eq('device_id', deviceId);
   } catch (err) {
-    console.error('[syncDeviceService] Update last seen error:', err);
+    logError('[syncDeviceService] Update last seen error', err);
   }
 }
 
@@ -140,7 +141,7 @@ export async function getDeviceInfo(deviceId: string): Promise<ISyncDevice | nul
 
     return data as ISyncDevice;
   } catch (err) {
-    console.error('[syncDeviceService] Get device info error:', err);
+    logError('[syncDeviceService] Get device info error', err);
     return null;
   }
 }
@@ -156,7 +157,7 @@ export async function deactivateDevice(deviceId: string): Promise<boolean> {
 
     return !error;
   } catch (err) {
-    console.error('[syncDeviceService] Deactivate device error:', err);
+    logError('[syncDeviceService] Deactivate device error:', err);
     return false;
   }
 }
@@ -185,7 +186,7 @@ export async function regenerateDeviceToken(
 
     return { success: true, token };
   } catch (err) {
-    console.error('[syncDeviceService] Regenerate token error:', err);
+    logError('[syncDeviceService] Regenerate token error:', err);
     return { success: false, error: 'Failed to regenerate token' };
   }
 }
@@ -206,7 +207,7 @@ export async function getActiveDevices(): Promise<ISyncDevice[]> {
 
     return data as ISyncDevice[];
   } catch (err) {
-    console.error('[syncDeviceService] Get active devices error:', err);
+    logError('[syncDeviceService] Get active devices error:', err);
     return [];
   }
 }
@@ -230,7 +231,7 @@ export async function getOfflineVersions(): Promise<Record<string, number>> {
 
     return versions;
   } catch (err) {
-    console.error('[syncDeviceService] Get offline versions error:', err);
+    logError('[syncDeviceService] Get offline versions error:', err);
     return {};
   }
 }
@@ -259,7 +260,7 @@ export async function updateOfflineVersion(
 
     return !error;
   } catch (err) {
-    console.error('[syncDeviceService] Update offline version error:', err);
+    logError('[syncDeviceService] Update offline version error:', err);
     return false;
   }
 }

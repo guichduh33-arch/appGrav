@@ -4,6 +4,7 @@ import { useSettingsByCategory, useUpdateSetting } from '../../hooks/settings';
 import { usePermissions } from '../../hooks/usePermissions';
 import { companyAssetsService } from '../../services/storage';
 import { toast } from 'sonner';
+import { logError } from '@/utils/logger'
 
 // Company form data interface
 interface ICompanyFormData {
@@ -196,7 +197,7 @@ const CompanySettingsPage = () => {
       handleChange('logo_url', result.publicUrl!);
       toast.success('Logo uploaded successfully');
     } catch (error) {
-      console.error('Logo upload error:', error);
+      logError('Logo upload error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       toast.error(`Failed to upload logo: ${errorMessage}`);
     } finally {
@@ -218,7 +219,7 @@ const CompanySettingsPage = () => {
       handleChange('logo_url', '');
       toast.success('Logo removed');
     } catch (error) {
-      console.error('Logo removal error:', error);
+      logError('Logo removal error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       toast.error(`Failed to remove logo: ${errorMessage}`);
     }
@@ -257,7 +258,7 @@ const CompanySettingsPage = () => {
       toast.success('Company settings saved');
       setIsDirty(false);
     } catch (error) {
-      console.error('Save error:', error);
+      logError('Save error:', error);
       toast.error('Failed to save settings');
     } finally {
       setIsSaving(false);

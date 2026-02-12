@@ -101,7 +101,7 @@ export default function CombosPage() {
                 setCombos(combosWithGroups)
             }
         } catch (error) {
-            console.error('Error fetching combos:', error)
+            logError('Error fetching combos:', error)
         } finally {
             setLoading(false)
         }
@@ -125,7 +125,7 @@ export default function CombosPage() {
 
             await fetchCombos()
         } catch (error) {
-            console.error('Error deleting combo:', error)
+            logError('Error deleting combo:', error)
         }
     }
 
@@ -140,7 +140,7 @@ export default function CombosPage() {
 
             await fetchCombos()
         } catch (error) {
-            console.error('Error updating combo:', error)
+            logError('Error updating combo:', error)
         }
     }
 
@@ -408,3 +408,5 @@ export default function CombosPage() {
         </div>
     )
 }
+
+import { logError } from '@/utils/logger'

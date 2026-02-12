@@ -142,7 +142,7 @@ export default function PurchaseOrderDetailPage() {
       refetch()
       toast.success('Payment status updated')
     } catch (err) {
-      console.error('Error updating payment status:', err)
+      logError('Error updating payment status:', err)
       toast.error('Failed to update payment status')
     }
   }
@@ -171,7 +171,7 @@ export default function PurchaseOrderDetailPage() {
       if (error.message === 'INVALID_PO_STATUS') {
         toast.error('Cannot receive items in this status')
       } else {
-        console.error('Error receiving item:', err)
+        logError('Error receiving item:', err)
         toast.error('Failed to receive item')
       }
     }
@@ -224,7 +224,7 @@ export default function PurchaseOrderDetailPage() {
       setShowReturnModal(false)
       toast.success('Return submitted successfully')
     } catch (err) {
-      console.error('Error submitting return:', err)
+      logError('Error submitting return:', err)
       toast.error('Failed to submit return')
     }
   }
@@ -330,3 +330,5 @@ export default function PurchaseOrderDetailPage() {
     </div>
   )
 }
+
+import { logError } from '@/utils/logger'

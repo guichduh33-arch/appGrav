@@ -7,6 +7,7 @@ import { calculateCustomerPrice } from '@/services/sync/customerPricingService'
 import type { IOfflineProduct } from '@/lib/db'
 import type { ICustomerPriceResult } from '@/types/offline'
 import { cn } from '@/lib/utils'
+import { logError } from '@/utils/logger'
 
 interface ModifierModalProps {
     product: Product & { category?: { name: string } | null }
@@ -167,7 +168,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                 const result = await calculateCustomerPrice(offlineProduct, customerCategorySlug)
                 setCustomerPriceResult(result)
             } catch (error) {
-                console.error('[ModifierModal] Error calculating customer price:', error)
+                logError('[ModifierModal] Error calculating customer price:', error)
                 // Fallback to retail price
                 setCustomerPriceResult({
                     price: product.retail_price || 0,

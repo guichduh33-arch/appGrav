@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { useTransfer, useReceiveTransfer } from '@/hooks/inventory'
 import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'
 import { cn } from '@/lib/utils'
+import { logError } from '@/utils/logger'
 
 // Status colors
 const STATUS_COLORS = {
@@ -118,7 +119,7 @@ export default function TransferDetailPage() {
       toast.success('Transfer received successfully')
       navigate('/inventory/transfers')
     } catch (err) {
-      console.error('Reception error:', err)
+      logError('Reception error:', err)
       const message = err instanceof Error ? err.message : 'Error receiving transfer'
       if (message.includes('already been received') || message.includes('another user')) {
         toast.error(message)

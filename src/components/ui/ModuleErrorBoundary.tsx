@@ -1,5 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { logError } from '@/utils/logger'
 
 interface ModuleErrorBoundaryProps {
   children: ReactNode;
@@ -30,8 +31,8 @@ export class ModuleErrorBoundary extends Component<ModuleErrorBoundaryProps, Mod
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error(`[${this.props.moduleName}] Error caught by ModuleErrorBoundary:`, error);
-    console.error(`[${this.props.moduleName}] Component stack:`, errorInfo.componentStack);
+    logError(`[${this.props.moduleName}] Error caught by ModuleErrorBoundary:`, error);
+    logError(`[${this.props.moduleName}] Component stack:`, errorInfo.componentStack);
   }
 
   handleReset = () => {

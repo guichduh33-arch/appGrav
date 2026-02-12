@@ -150,7 +150,7 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
                 comparison: { salesChange, ordersChange }
             })
         } catch (error) {
-            console.error('Failed to load analytics:', error)
+            logError('Failed to load analytics:', error)
         } finally {
             setLoading(false)
         }
@@ -437,3 +437,5 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
         </div>
     )
 }
+
+import { logError } from '@/utils/logger'

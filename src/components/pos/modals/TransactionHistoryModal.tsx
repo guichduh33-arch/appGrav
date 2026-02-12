@@ -7,6 +7,7 @@ import {
 import { cn } from '@/lib/utils'
 import { supabase } from '../../../lib/supabase'
 import { formatPrice } from '../../../utils/helpers'
+import { logError } from '@/utils/logger'
 
 interface TransactionHistoryModalProps {
     sessionId?: string
@@ -97,7 +98,7 @@ export default function TransactionHistoryModal({
             const { data, error } = await query.limit(50).returns<RawOrder[]>()
 
             if (error) {
-                console.error('Error fetching orders:', error)
+                logError('Error fetching orders:', error)
                 return []
             }
 

@@ -2,6 +2,7 @@ import { supabase, untypedRpc } from '../lib/supabase'
 import {
     Promotion
 } from '../types/database'
+import { logError } from '@/utils/logger'
 
 export interface CartItem {
     product_id: string
@@ -139,7 +140,7 @@ export async function getApplicablePromotions(
 
         return validPromotions
     } catch (error) {
-        console.error('Error fetching applicable promotions:', error)
+        logError('Error fetching applicable promotions:', error)
         return []
     }
 }
@@ -243,7 +244,7 @@ export async function calculatePromotionDiscount(
             applicable_items: applicableItems
         }
     } catch (error) {
-        console.error('Error calculating promotion discount:', error)
+        logError('Error calculating promotion discount:', error)
         return null
     }
 }
@@ -307,7 +308,7 @@ export async function applyBestPromotions(
 
         return appliedPromotions
     } catch (error) {
-        console.error('Error applying promotions:', error)
+        logError('Error applying promotions:', error)
         return []
     }
 }
@@ -329,7 +330,7 @@ export async function recordPromotionUsage(
             p_discount_amount: discountAmount
         })
     } catch (error) {
-        console.error('Error recording promotion usage:', error)
+        logError('Error recording promotion usage:', error)
     }
 }
 
@@ -369,7 +370,7 @@ export async function validatePromotionCode(
 
         return { valid: true, promotion }
     } catch (error) {
-        console.error('Error validating promotion code:', error)
+        logError('Error validating promotion code:', error)
         return { valid: false, reason: 'Erreur lors de la validation du code' }
     }
 }

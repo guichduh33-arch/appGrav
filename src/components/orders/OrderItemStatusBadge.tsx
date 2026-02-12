@@ -8,6 +8,7 @@
 
 import { ChefHat, CheckCircle, Clock, UtensilsCrossed } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logWarn } from '@/utils/logger'
 
 export type TItemStatus = 'new' | 'preparing' | 'ready' | 'served';
 
@@ -55,7 +56,7 @@ export function OrderItemStatusBadge({
   animate = false,
 }: OrderItemStatusBadgeProps) {
   if (!(status in STATUS_CONFIG)) {
-    console.warn(`[OrderItemStatusBadge] Invalid status "${status}", falling back to "new"`);
+    logWarn(`[OrderItemStatusBadge] Invalid status "${status}", falling back to "new"`);
   }
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.new;
 

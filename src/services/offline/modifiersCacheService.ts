@@ -21,6 +21,7 @@ import logger from '@/utils/logger';
 import { db } from '@/lib/db';
 import type { IOfflineModifier, ISyncMeta } from '@/types/offline';
 import type { ModifierGroup } from '@/hooks/products/useProductModifiers';
+import { logError } from '@/utils/logger'
 
 // =====================================================
 // Constants
@@ -112,7 +113,7 @@ export async function getCachedModifiersForProduct(
     // Filter active modifiers (Dexie stores booleans as 0/1)
     return modifiers.filter((m) => Boolean(m.is_active));
   } catch (error) {
-    console.error('[ModifiersCache] Error getting product modifiers:', error);
+    logError('[ModifiersCache] Error getting product modifiers:', error);
     return [];
   }
 }
@@ -135,7 +136,7 @@ export async function getCachedModifiersForCategory(
     // Filter active modifiers (Dexie stores booleans as 0/1)
     return modifiers.filter((m) => Boolean(m.is_active));
   } catch (error) {
-    console.error('[ModifiersCache] Error getting category modifiers:', error);
+    logError('[ModifiersCache] Error getting category modifiers:', error);
     return [];
   }
 }
@@ -152,7 +153,7 @@ export async function getCachedModifierById(
   try {
     return await db.offline_modifiers.get(modifierId);
   } catch (error) {
-    console.error('[ModifiersCache] Error getting modifier by ID:', error);
+    logError('[ModifiersCache] Error getting modifier by ID:', error);
     return undefined;
   }
 }
@@ -164,7 +165,7 @@ export async function getCachedModifiersCount(): Promise<number> {
   try {
     return await db.offline_modifiers.count();
   } catch (error) {
-    console.error('[ModifiersCache] Error counting modifiers:', error);
+    logError('[ModifiersCache] Error counting modifiers:', error);
     return 0;
   }
 }
@@ -287,7 +288,7 @@ export async function getLastModifiersSyncAt(): Promise<string | null> {
     const meta = await db.offline_sync_meta.get('modifiers');
     return meta?.lastSyncAt ?? null;
   } catch (error) {
-    console.error('[ModifiersCache] Error getting sync timestamp:', error);
+    logError('[ModifiersCache] Error getting sync timestamp:', error);
     return null;
   }
 }
@@ -302,7 +303,7 @@ export async function getModifiersSyncMeta(): Promise<ISyncMeta | null> {
     const meta = await db.offline_sync_meta.get('modifiers');
     return meta ?? null;
   } catch (error) {
-    console.error('[ModifiersCache] Error getting sync metadata:', error);
+    logError('[ModifiersCache] Error getting sync metadata:', error);
     return null;
   }
 }
@@ -327,7 +328,7 @@ export async function shouldRefreshModifiers(): Promise<boolean> {
 
     return hoursSinceSync >= CACHE_TTL_HOURS;
   } catch (error) {
-    console.error('[ModifiersCache] Error checking cache freshness:', error);
+    logError('[ModifiersCache] Error checking cache freshness:', error);
     return true;
   }
 }
@@ -351,7 +352,7 @@ export async function shouldRefreshModifiersHourly(): Promise<boolean> {
 
     return hoursSinceSync >= REFRESH_INTERVAL_HOURS;
   } catch (error) {
-    console.error('[ModifiersCache] Error checking hourly refresh:', error);
+    logError('[ModifiersCache] Error checking hourly refresh:', error);
     return true;
   }
 }
@@ -373,7 +374,7 @@ export async function refreshModifiersCacheIfNeeded(
     }
     return false;
   } catch (error) {
-    console.error('[ModifiersCache] Error refreshing cache:', error);
+    logError('[ModifiersCache] Error refreshing cache:', error);
     return false;
   }
 }
@@ -391,6 +392,6 @@ export async function clearModifiersCache(): Promise<void> {
     await db.offline_sync_meta.delete('modifiers');
     logger.debug('[ModifiersCache] Cache cleared');
   } catch (error) {
-    console.error('[ModifiersCache] Error clearing cache:', error);
+    logError('[ModifiersCache] Error clearing cache:', error);
   }
 }

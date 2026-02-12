@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { X, Banknote, QrCode, CreditCard, Clock, AlertTriangle, Lock } from 'lucide-react'
 import { formatPrice } from '../../../utils/helpers'
+import { logError } from '@/utils/logger'
 
 interface CloseShiftModalProps {
     sessionStats: {
@@ -45,7 +46,7 @@ export default function CloseShiftModal({
                 notes || undefined
             )
         } catch (error) {
-            console.error('Error closing shift:', error)
+            logError('Error closing shift:', error)
         }
     }
 

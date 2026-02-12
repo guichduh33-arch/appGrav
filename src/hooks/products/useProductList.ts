@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import type { ProductWithCategory } from '../../types/database'
 import { MOCK_PRODUCTS } from '../../data/mockProducts'
+import { logError, logWarn } from '@/utils/logger'
 
 /**
  * Fetch products list, optionally filtered by category
@@ -29,13 +30,13 @@ export function useProducts(categoryId: string | null = null) {
                 if (error) throw error
                 if (data && data.length > 0) return data as ProductWithCategory[]
 
-                console.warn('No products from Supabase, using mock')
+                logWarn('No products from Supabase, using mock')
                 if (categoryId) {
                     return MOCK_PRODUCTS.filter(p => p.category_id === categoryId) as ProductWithCategory[]
                 }
                 return MOCK_PRODUCTS as ProductWithCategory[]
             } catch (err) {
-                console.error('Error loading products:', err)
+                logError('Error loading products:', err)
                 if (categoryId) {
                     return MOCK_PRODUCTS.filter(p => p.category_id === categoryId) as ProductWithCategory[]
                 }

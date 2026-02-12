@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react'
 import { X, Upload, Download, FileSpreadsheet, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 import { importProducts, downloadImportTemplate, IImportResult } from '@/services/products/productImportExport'
 import { cn } from '@/lib/utils'
+import { logError } from '@/utils/logger'
 
 interface ProductImportModalProps {
     onClose: () => void
@@ -104,7 +105,7 @@ export default function ProductImportModal({ onClose, onSuccess }: ProductImport
                 onSuccess()
             }
         } catch (error) {
-            console.error('Import error:', error)
+            logError('Import error:', error)
             setResult({
                 success: false,
                 created: 0,

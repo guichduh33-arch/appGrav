@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { TPOStatus } from './usePurchaseOrders'
+import { logError } from '@/utils/logger'
 
 // ============================================================================
 // TYPES
@@ -106,7 +107,7 @@ export async function logPOHistory(params: ILogPOHistoryParams): Promise<void> {
     })
 
   if (error) {
-    console.error('Failed to log PO history:', error)
+    logError('Failed to log PO history:', error)
     // Don't throw - history logging is secondary to status update
   }
 }

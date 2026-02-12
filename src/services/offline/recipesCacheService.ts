@@ -23,6 +23,7 @@ import {
   RECIPES_CACHE_TTL_MS,
   RECIPES_REFRESH_INTERVAL_MS,
 } from '@/types/offline';
+import { logError } from '@/utils/logger'
 
 // =====================================================
 // Cache Operations
@@ -102,7 +103,7 @@ export async function getCachedRecipesForProduct(
     // Filter for active recipes (boolean coercion for Dexie 0/1 storage)
     return allRecipes.filter((r) => Boolean(r.is_active));
   } catch (error) {
-    console.error('Error reading cached recipes:', error);
+    logError('Error reading cached recipes:', error);
     return [];
   }
 }
@@ -155,7 +156,7 @@ export async function getCachedRecipesWithMaterials(
       };
     });
   } catch (error) {
-    console.error('Error reading cached recipes with materials:', error);
+    logError('Error reading cached recipes with materials:', error);
     return [];
   }
 }
@@ -172,7 +173,7 @@ export async function getCachedRecipeById(
   try {
     return await db.offline_recipes.get(id);
   } catch (error) {
-    console.error('Error reading cached recipe:', error);
+    logError('Error reading cached recipe:', error);
     return undefined;
   }
 }
@@ -187,7 +188,7 @@ export async function getAllCachedRecipes(): Promise<IOfflineRecipe[]> {
     const allRecipes = await db.offline_recipes.toArray();
     return allRecipes.filter((r) => Boolean(r.is_active));
   } catch (error) {
-    console.error('Error reading all cached recipes:', error);
+    logError('Error reading all cached recipes:', error);
     return [];
   }
 }
@@ -206,7 +207,7 @@ export async function getLastRecipesSyncAt(): Promise<string | null> {
     const meta = await db.offline_sync_meta.get('recipes');
     return meta?.lastSyncAt ?? null;
   } catch (error) {
-    console.error('Error reading recipes sync meta:', error);
+    logError('Error reading recipes sync meta:', error);
     return null;
   }
 }
@@ -220,7 +221,7 @@ export async function getRecipesSyncMeta(): Promise<ISyncMeta | undefined> {
   try {
     return await db.offline_sync_meta.get('recipes');
   } catch (error) {
-    console.error('Error reading recipes sync meta:', error);
+    logError('Error reading recipes sync meta:', error);
     return undefined;
   }
 }
@@ -234,7 +235,7 @@ export async function getCachedRecipesCount(): Promise<number> {
   try {
     return await db.offline_recipes.count();
   } catch (error) {
-    console.error('Error counting cached recipes:', error);
+    logError('Error counting cached recipes:', error);
     return 0;
   }
 }

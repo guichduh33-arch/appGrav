@@ -9,6 +9,7 @@
 import { untypedFrom, untypedRpc } from '@/lib/supabase';
 import type { ILanNode, TSyncDeviceType, TLanNodeStatus } from '@/types/database';
 import type { TKitchenStation } from '@/types/offline';
+import { logError } from '@/utils/logger'
 
 // Re-export device type for consumers
 export type TDeviceType = TSyncDeviceType;
@@ -185,13 +186,13 @@ export async function registerLanNode(
     });
 
     if (error) {
-      console.error('[lanProtocol] Registration error:', error);
+      logError('[lanProtocol] Registration error:', error);
       return { success: false, error: error.message };
     }
 
     return { success: true, nodeId: data };
   } catch (err) {
-    console.error('[lanProtocol] Unexpected error:', err);
+    logError('[lanProtocol] Unexpected error:', err);
     return { success: false, error: 'Failed to register node' };
   }
 }
@@ -207,7 +208,7 @@ export async function sendHeartbeat(deviceId: string): Promise<boolean> {
 
     return !error;
   } catch (err) {
-    console.error('[lanProtocol] Heartbeat error:', err);
+    logError('[lanProtocol] Heartbeat error:', err);
     return false;
   }
 }
@@ -223,7 +224,7 @@ export async function deregisterLanNode(deviceId: string): Promise<boolean> {
 
     return !error;
   } catch (err) {
-    console.error('[lanProtocol] Deregister error:', err);
+    logError('[lanProtocol] Deregister error:', err);
     return false;
   }
 }
@@ -245,7 +246,7 @@ export async function getOnlineNodes(): Promise<ILanNode[]> {
 
     return data as ILanNode[];
   } catch (err) {
-    console.error('[lanProtocol] Get online nodes error:', err);
+    logError('[lanProtocol] Get online nodes error:', err);
     return [];
   }
 }
@@ -263,7 +264,7 @@ export async function getHubNode(): Promise<ILanNode | null> {
 
     return data[0] as ILanNode;
   } catch (err) {
-    console.error('[lanProtocol] Get hub node error:', err);
+    logError('[lanProtocol] Get hub node error:', err);
     return null;
   }
 }
@@ -328,7 +329,7 @@ export async function getNodesByType(deviceType: TSyncDeviceType): Promise<ILanN
 
     return data as ILanNode[];
   } catch (err) {
-    console.error('[lanProtocol] Get nodes by type error:', err);
+    logError('[lanProtocol] Get nodes by type error:', err);
     return [];
   }
 }
@@ -348,7 +349,7 @@ export async function cleanupStaleNodes(timeoutSeconds: number = 60): Promise<nu
 
     return data || 0;
   } catch (err) {
-    console.error('[lanProtocol] Cleanup stale nodes error:', err);
+    logError('[lanProtocol] Cleanup stale nodes error:', err);
     return 0;
   }
 }
@@ -380,7 +381,7 @@ export async function logMessage(
 
     return !error;
   } catch (err) {
-    console.error('[lanProtocol] Log message error:', err);
+    logError('[lanProtocol] Log message error:', err);
     return false;
   }
 }
@@ -403,7 +404,7 @@ export async function updateMessageStatus(
 
     return !error;
   } catch (err) {
-    console.error('[lanProtocol] Update message status error:', err);
+    logError('[lanProtocol] Update message status error:', err);
     return false;
   }
 }

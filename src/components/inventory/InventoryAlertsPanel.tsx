@@ -31,6 +31,7 @@ import {
 } from '@/services/inventory/inventoryAlerts'
 import { formatPrice } from '@/utils/helpers'
 import { cn } from '@/lib/utils'
+import { logError } from '@/utils/logger'
 
 type TabType = 'alerts' | 'reorder' | 'production'
 
@@ -63,7 +64,7 @@ export default function InventoryAlertsPanel() {
             setReorderSuggestions(reorder)
             setProductionSuggestions(production)
         } catch (err) {
-            console.error('Error loading alerts:', err)
+            logError('Error loading alerts:', err)
         } finally {
             setLoading(false)
         }
@@ -121,7 +122,7 @@ export default function InventoryAlertsPanel() {
             setSelectedForPo(new Set())
             navigate('/purchasing/purchase-orders')
         } catch (err) {
-            console.error('Error creating PO:', err)
+            logError('Error creating PO:', err)
         } finally {
             setCreatingPo(false)
         }

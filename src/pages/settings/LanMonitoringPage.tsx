@@ -24,6 +24,7 @@ import {
   type IOfflinePeriod
 } from '@/services/sync/offlinePeriod';
 import { cn } from '@/lib/utils';
+import { logError } from '@/utils/logger'
 
 /**
  * Device type icon mapping
@@ -90,7 +91,7 @@ const LanMonitoringPage = () => {
       setOfflinePeriods(periods);
       setOfflineStats(stats);
     } catch (err) {
-      console.error('[LanMonitoring] Error loading offline data:', err);
+      logError('[LanMonitoring] Error loading offline data:', err);
     } finally {
       setLoadingOffline(false);
     }

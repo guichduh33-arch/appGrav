@@ -10,6 +10,7 @@ import {
     useToggleSupplierActive,
 } from '@/hooks/purchasing/useSuppliersCrud'
 import type { ISupplierFormData } from '@/hooks/purchasing/useSuppliersCrud'
+import { logError } from '@/utils/logger'
 
 // Extended supplier type for the page (the DB returns all columns via select('*'))
 interface Supplier extends ISupplier {
@@ -103,7 +104,7 @@ export default function SuppliersPage() {
             }
             handleCloseModal()
         } catch (error) {
-            console.error('Error saving supplier:', error)
+            logError('Error saving supplier:', error)
             const errorMessage = error instanceof Error ? error.message : 'Unknown error'
             toast.error(`Error saving supplier: ${errorMessage}`)
         }
@@ -117,7 +118,7 @@ export default function SuppliersPage() {
         try {
             await deleteSupplierMutation.mutateAsync(id)
         } catch (error) {
-            console.error('Error deleting supplier:', error)
+            logError('Error deleting supplier:', error)
             toast.error('Error deleting supplier')
         }
     }
@@ -126,7 +127,7 @@ export default function SuppliersPage() {
         try {
             await toggleActiveMutation.mutateAsync({ id: supplier.id, isActive: supplier.is_active })
         } catch (error) {
-            console.error('Error toggling supplier status:', error)
+            logError('Error toggling supplier status:', error)
         }
     }
 

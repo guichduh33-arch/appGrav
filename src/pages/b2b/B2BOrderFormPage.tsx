@@ -7,6 +7,7 @@ import {
 import { cn } from '@/lib/utils'
 import { supabase } from '../../lib/supabase'
 import { formatCurrency } from '../../utils/helpers'
+import { logError } from '@/utils/logger'
 
 interface Customer {
     id: string
@@ -104,7 +105,7 @@ export default function B2BOrderFormPage() {
             if (error) throw error
             if (data) setCustomers(data)
         } catch (error) {
-            console.error('Error fetching customers:', error)
+            logError('Error fetching customers:', error)
         }
     }
 
@@ -122,7 +123,7 @@ export default function B2BOrderFormPage() {
             if (error) throw error
             if (data) setProducts(data)
         } catch (error) {
-            console.error('Error fetching products:', error)
+            logError('Error fetching products:', error)
         }
     }
 
@@ -179,7 +180,7 @@ export default function B2BOrderFormPage() {
                 })))
             }
         } catch (error) {
-            console.error('Error fetching order:', error)
+            logError('Error fetching order:', error)
         } finally {
             setLoading(false)
         }
@@ -356,7 +357,7 @@ export default function B2BOrderFormPage() {
 
             navigate('/b2b/orders')
         } catch (error) {
-            console.error('Error saving order:', error)
+            logError('Error saving order:', error)
             alert(`Error saving: ${error instanceof Error ? error.message : 'Unknown error'}`)
         } finally {
             setSaving(false)

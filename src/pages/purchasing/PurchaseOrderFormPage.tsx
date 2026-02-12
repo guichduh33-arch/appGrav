@@ -13,6 +13,7 @@ import {
     type IPOItem
 } from '@/hooks/purchasing/usePurchaseOrders'
 import { toast } from 'sonner'
+import { logError } from '@/utils/logger'
 
 const DEFAULT_ITEM: IPOItem = {
     product_id: null,
@@ -188,7 +189,7 @@ export default function PurchaseOrderFormPage() {
 
             navigate('/purchasing/purchase-orders')
         } catch (error) {
-            console.error('Error saving purchase order:', error)
+            logError('Error saving purchase order:', error)
             toast.error(isEditing ? 'Failed to update purchase order' : 'Failed to create purchase order')
         }
     }

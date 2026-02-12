@@ -21,6 +21,7 @@ import {
   type TVoidReasonCode,
 } from '@/services/financial/financialOperationService';
 import type { TPaymentMethod } from '@/types/payment';
+import { logError } from '@/utils/logger'
 
 interface VoidModalProps {
   orderId: string;
@@ -91,7 +92,7 @@ export default function VoidModal({
           toast.error(result.error || 'Failed to void order');
         }
       } catch (error) {
-        console.error('Void error:', error);
+        logError('Void error:', error);
         toast.error('Failed to void order');
       } finally {
         setIsProcessing(false);

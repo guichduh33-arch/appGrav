@@ -29,6 +29,7 @@ import type {
   IDispatchQueueItem,
 } from '@/types/offline';
 import logger from '@/utils/logger';
+import { logError, logWarn } from '@/utils/logger'
 
 /**
  * Dispatch status for a specific order
@@ -118,7 +119,7 @@ export function useKitchenDispatch(): UseKitchenDispatchResult {
             logger.debug(`[useKitchenDispatch] Processed ${processed} pending dispatches`);
           }
           if (failed > 0) {
-            console.warn(`[useKitchenDispatch] ${failed} dispatches failed`);
+            logWarn(`[useKitchenDispatch] ${failed} dispatches failed`);
           }
         });
       }, 500);
@@ -176,7 +177,7 @@ export function useKitchenDispatch(): UseKitchenDispatchResult {
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Dispatch failed';
       setLastError(msg);
-      console.error('[useKitchenDispatch] Error:', error);
+      logError('[useKitchenDispatch] Error:', error);
       return false;
     } finally {
       setIsDispatching(false);
@@ -208,7 +209,7 @@ export function useKitchenDispatch(): UseKitchenDispatchResult {
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Queue processing failed';
       setLastError(msg);
-      console.error('[useKitchenDispatch] Queue processing error:', error);
+      logError('[useKitchenDispatch] Queue processing error:', error);
       return { processed: 0, failed: 0 };
     } finally {
       setIsDispatching(false);

@@ -18,6 +18,7 @@
 
 import type { CartItem } from '@/stores/cartStore';
 import { db } from '@/lib/db';
+import { logError } from '@/utils/logger'
 
 // =====================================================
 // Constants
@@ -105,7 +106,7 @@ export function saveCart(state: TSaveCartInput): void {
   } catch (error) {
     // Silent failure - log but don't throw
     // Persistence failure shouldn't break the app
-    console.error('[CartPersistence] Failed to save cart:', error);
+    logError('[CartPersistence] Failed to save cart:', error);
   }
 }
 
@@ -149,7 +150,7 @@ export function loadCart(): IPersistedCartState | null {
     };
   } catch (error) {
     // Silent failure - log but return null
-    console.error('[CartPersistence] Failed to load cart:', error);
+    logError('[CartPersistence] Failed to load cart:', error);
     return null;
   }
 }
@@ -165,7 +166,7 @@ export function clearPersistedCart(): void {
     localStorage.removeItem(CART_PERSISTENCE_KEY);
   } catch (error) {
     // Silent failure - log but don't throw
-    console.error('[CartPersistence] Failed to clear cart:', error);
+    logError('[CartPersistence] Failed to clear cart:', error);
   }
 }
 

@@ -37,6 +37,7 @@ import {
 } from './recipesCacheService';
 import { PRODUCTS_REFRESH_INTERVAL_MS } from '@/types/offline';
 import logger from '@/utils/logger';
+import { logError } from '@/utils/logger'
 
 let refreshIntervalId: ReturnType<typeof setInterval> | null = null;
 let isInitialized = false;
@@ -106,7 +107,7 @@ export async function initProductsCache(
 
       if (failures.length > 0) {
         failures.forEach((failure, idx) => {
-          console.error(`[DataCache] Cache refresh failed for entity ${idx}:`, failure.reason);
+          logError(`[DataCache] Cache refresh failed for entity ${idx}:`, failure.reason);
         });
         logger.debug(`[DataCache] Cache refresh completed with ${failures.length} failure(s)`);
       } else {
@@ -122,7 +123,7 @@ export async function initProductsCache(
 
     return needsProductsRefresh || needsCategoriesRefresh || needsModifiersRefresh || needsRecipesRefresh;
   } catch (error) {
-    console.error('[DataCache] Failed to initialize cache:', error);
+    logError('[DataCache] Failed to initialize cache:', error);
     // Don't throw - cache failure shouldn't block app startup
     return false;
   }
@@ -185,14 +186,14 @@ function startHourlyRefresh(): void {
 
       if (failures.length > 0) {
         failures.forEach((failure) => {
-          console.error('[DataCache] Hourly refresh failed for entity:', failure.reason);
+          logError('[DataCache] Hourly refresh failed for entity:', failure.reason);
         });
         logger.debug(`[DataCache] Hourly refresh completed with ${failures.length} failure(s)`);
       } else {
         logger.debug('[DataCache] Hourly refresh completed successfully');
       }
     } catch (error) {
-      console.error('[DataCache] Hourly refresh error:', error);
+      logError('[DataCache] Hourly refresh error:', error);
     }
   }, PRODUCTS_REFRESH_INTERVAL_MS);
 

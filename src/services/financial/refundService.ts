@@ -21,6 +21,7 @@ import {
   REFUND_PERMISSION,
 } from './financialOperationService';
 import { logRefundOperation } from './auditService';
+import { logError } from '@/utils/logger'
 
 // =====================================================
 // Types
@@ -75,7 +76,7 @@ export async function canRefundOrder(userId: string): Promise<boolean> {
   });
 
   if (error) {
-    console.error('Permission check failed:', error);
+    logError('Permission check failed:', error);
     return false;
   }
 

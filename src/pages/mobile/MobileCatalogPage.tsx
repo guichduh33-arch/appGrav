@@ -21,6 +21,7 @@ import { useOfflineData } from '@/hooks/useOfflineData';
 import { cn } from '@/lib/utils';
 import type { Product, Category, ProductModifier } from '@/types/database';
 import { supabase } from '@/lib/supabase';
+import { logError } from '@/utils/logger'
 
 /**
  * Product with modifiers for selection
@@ -85,7 +86,7 @@ export default function MobileCatalogPage() {
         if (productsRes.data) setProducts(productsRes.data);
         if (categoriesRes.data) setCategories(categoriesRes.data);
       } catch (error) {
-        console.error('[MobileCatalog] Error loading data:', error);
+        logError('[MobileCatalog] Error loading data:', error);
       }
 
       setIsLoading(false);

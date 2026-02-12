@@ -12,6 +12,7 @@
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { db, type IOfflineCustomerCategory } from '@/lib/db';
+import { logError } from '@/utils/logger'
 
 // Re-export interface for consumers
 export type { IOfflineCustomerCategory };
@@ -70,7 +71,7 @@ export async function syncCustomerCategoriesToOffline(): Promise<number> {
   const { data: categoriesData, error: categoriesError } = await query;
 
   if (categoriesError) {
-    console.error('[CustomerCategorySync] Error fetching customer categories:', categoriesError);
+    logError('[CustomerCategorySync] Error fetching customer categories:', categoriesError);
     throw categoriesError;
   }
 

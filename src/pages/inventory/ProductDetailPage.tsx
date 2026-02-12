@@ -17,6 +17,7 @@ import { RecipeTab } from './tabs/RecipeTab'
 import { CostingTab } from './tabs/CostingTab'
 import { PricesTab } from './tabs/PricesTab'
 import { VariantsTab } from './tabs/VariantsTab'
+import { logError } from '@/utils/logger'
 
 type Tab = 'general' | 'units' | 'recipe' | 'costing' | 'prices' | 'variants'
 
@@ -165,7 +166,7 @@ export default function ProductDetailPage() {
             if (prices) setPriceHistory(prices)
 
         } catch (error) {
-            console.error('Error fetching product details:', error)
+            logError('Error fetching product details:', error)
         } finally {
             setLoading(false)
         }
@@ -282,7 +283,7 @@ export default function ProductDetailPage() {
             setRecipeItems([...recipeItems, data])
             setShowIngredientSearch(false)
         } catch (error) {
-            console.error('Error adding ingredient:', error)
+            logError('Error adding ingredient:', error)
         }
     }
 
@@ -296,7 +297,7 @@ export default function ProductDetailPage() {
             if (error) throw error
             setRecipeItems(recipeItems.filter(r => r.id !== recipeId))
         } catch (error) {
-            console.error('Error deleting ingredient:', error)
+            logError('Error deleting ingredient:', error)
         }
     }
 
@@ -311,7 +312,7 @@ export default function ProductDetailPage() {
                 .update({ quantity, unit })
                 .eq('id', recipeId)
         } catch (error) {
-            console.error('Error updating recipe:', error)
+            logError('Error updating recipe:', error)
         }
     }
 

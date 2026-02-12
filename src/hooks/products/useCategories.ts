@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabase'
 import type { Category } from '../../types/database'
 import { MOCK_CATEGORIES } from '../../data/mockCategories'
+import { logError, logWarn } from '@/utils/logger'
 
 /**
  * Fetch all active product categories
@@ -22,10 +23,10 @@ export function useCategories() {
                 if (error) throw error
                 if (data && data.length > 0) return data
 
-                console.warn('No categories from Supabase, using mock')
+                logWarn('No categories from Supabase, using mock')
                 return MOCK_CATEGORIES
             } catch (err) {
-                console.error('Error loading categories:', err)
+                logError('Error loading categories:', err)
                 return MOCK_CATEGORIES
             }
         },

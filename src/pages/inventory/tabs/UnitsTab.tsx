@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Plus, Trash2, Package, Scale, ClipboardList, ShoppingCart } from 'lucide-react'
 import { Product, ProductUOM } from '../../../types/database'
 import { supabase } from '../../../lib/supabase'
+import { logError } from '@/utils/logger'
 
 // Extended UOM type with UI-specific fields
 interface ExtendedUOM extends ProductUOM {
@@ -63,7 +64,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
             // Refresh - this would need to be passed from parent
             window.location.reload()
         } catch (error) {
-            console.error('Error setting context unit:', error)
+            logError('Error setting context unit:', error)
         } finally {
             setSaving(false)
         }

@@ -89,7 +89,7 @@ export default function ProductCategoryPricingPage() {
                 })))
             }
         } catch (error) {
-            console.error('Error fetching data:', error)
+            logError('Error fetching data:', error)
             toast.error('Error during loading')
             navigate('/products')
         } finally {
@@ -217,7 +217,7 @@ export default function ProductCategoryPricingPage() {
             toast.success('Prices saved successfully')
             fetchData() // Refresh
         } catch (error) {
-            console.error('Error saving prices:', error)
+            logError('Error saving prices:', error)
             toast.error('Error during save')
         } finally {
             setSaving(false)
@@ -435,3 +435,5 @@ export default function ProductCategoryPricingPage() {
         </div>
     )
 }
+
+import { logError } from '@/utils/logger'

@@ -15,6 +15,7 @@ import { db } from '@/lib/db';
 import { supabase } from '@/lib/supabase';
 import type { ISyncQueueItem, IOfflineOrderItem, IOfflinePayment } from '@/types/offline';
 import { isLocalId, detectConflictType, type ISyncResult } from './syncQueueHelpers';
+import { logError } from '@/utils/logger'
 
 /**
  * Process an order sync queue item
@@ -112,7 +113,7 @@ export async function processOrderSync(
         .insert(serverItems);
 
       if (itemsError) {
-        console.error('[OrderSync] Failed to insert items:', itemsError);
+        logError('[OrderSync] Failed to insert items:', itemsError);
         // Continue - order was created successfully
       }
     }
@@ -135,7 +136,7 @@ export async function processOrderSync(
         .insert(serverPayments);
 
       if (paymentsError) {
-        console.error('[OrderSync] Failed to insert payments:', paymentsError);
+        logError('[OrderSync] Failed to insert payments:', paymentsError);
         // Continue - order was created successfully
       }
     }

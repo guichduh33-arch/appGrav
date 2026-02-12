@@ -11,6 +11,7 @@ import { lanHub } from '@/services/lan/lanHub';
 import { useLanStore } from '@/stores/lanStore';
 import { generateUUID } from '@/lib/utils';
 import logger from '@/utils/logger';
+import { logError } from '@/utils/logger'
 
 /**
  * Hook configuration options
@@ -164,7 +165,7 @@ export function useLanHub(options: IUseLanHubOptions = {}): IUseLanHubResult {
 
       if (!success) {
         setError('Failed to start LAN hub');
-        console.error('[useLanHub] Failed to start hub');
+        logError('[useLanHub] Failed to start hub');
       } else {
         logger.debug('[useLanHub] Hub started successfully');
       }
@@ -173,7 +174,7 @@ export function useLanHub(options: IUseLanHubOptions = {}): IUseLanHubResult {
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown error starting hub';
       setError(msg);
-      console.error('[useLanHub] Start error:', err);
+      logError('[useLanHub] Start error:', err);
       return false;
     }
   }, [deviceName, heartbeatInterval, staleTimeout]);

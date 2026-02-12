@@ -256,7 +256,7 @@ export default function KDSMainPage() {
 
             setOrders(transformedOrders)
         } catch (error) {
-            console.error('Error fetching orders:', error)
+            logError('Error fetching orders:', error)
         } finally {
             setLoading(false)
         }
@@ -320,7 +320,7 @@ export default function KDSMainPage() {
         )
 
         if (!result.success) {
-            console.error('Error updating item status:', result.error)
+            logError('Error updating item status:', result.error)
             // Surgical rollback - restore only affected items' previous statuses
             previousStatuses.forEach((status, itemId) => {
                 updateOrderItem(orderId, itemId, { item_status: status })
@@ -353,7 +353,7 @@ export default function KDSMainPage() {
         )
 
         if (!result.success) {
-            console.error('Error updating item status:', result.error)
+            logError('Error updating item status:', result.error)
             // Surgical rollback - restore only affected items' previous statuses
             previousStatuses.forEach((status, itemId) => {
                 updateOrderItem(orderId, itemId, { item_status: status })
@@ -380,7 +380,7 @@ export default function KDSMainPage() {
 
             fetchOrders()
         } catch (error) {
-            console.error('Error toggling hold status:', error)
+            logError('Error toggling hold status:', error)
         }
     }
 
@@ -410,7 +410,7 @@ export default function KDSMainPage() {
 
             fetchOrders()
         } catch (error) {
-            console.error('Error updating item status:', error)
+            logError('Error updating item status:', error)
         }
     }
 
@@ -433,7 +433,7 @@ export default function KDSMainPage() {
             // Broadcast order ready to Customer Display
             broadcastOrderStatus(orderId, order.order_number, 'ready')
         } else {
-            console.error('Failed to complete order:', result.error)
+            logError('Failed to complete order:', result.error)
             // Refetch in case of error to ensure state consistency
             fetchOrders()
         }

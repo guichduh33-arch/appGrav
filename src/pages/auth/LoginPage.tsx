@@ -119,7 +119,7 @@ export default function LoginPage() {
         await handleLegacyLogin();
       }
     } catch (err) {
-      console.error('Login error:', err);
+      logError('Login error:', err);
       // Fallback to legacy login
       await handleLegacyLogin();
     } finally {
@@ -144,7 +144,7 @@ export default function LoginPage() {
       });
 
       if (verifyError) {
-        console.error('PIN verification error:', verifyError);
+        logError('PIN verification error:', verifyError);
         setError('Authentication service unavailable');
         return;
       }
@@ -154,7 +154,7 @@ export default function LoginPage() {
         return;
       }
     } catch (rpcError) {
-      console.error('RPC error:', rpcError);
+      logError('RPC error:', rpcError);
       setError('Authentication service unavailable');
       return;
     }
@@ -219,7 +219,7 @@ export default function LoginPage() {
       toast.success(`Welcome, ${user.display_name || user.name}!`);
       navigate('/pos');
     } catch (err) {
-      console.error('Error loading permissions:', err);
+      logError('Error loading permissions:', err);
       // Fallback to basic login without permissions
       const { login } = useAuthStore.getState();
       login(user);

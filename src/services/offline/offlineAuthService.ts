@@ -332,7 +332,7 @@ export const offlineAuthService = {
       const cached = await this.getCachedUser(userId);
       return cached?.permissions ?? [];
     } catch (error) {
-      console.error('[offlineAuth] Failed to get offline permissions:', error);
+      logError('[offlineAuth] Failed to get offline permissions', error);
       return [];
     }
   },
@@ -348,7 +348,7 @@ export const offlineAuthService = {
       const cached = await this.getCachedUser(userId);
       return cached?.roles ?? [];
     } catch (error) {
-      console.error('[offlineAuth] Failed to get offline roles:', error);
+      logError('[offlineAuth] Failed to get offline roles', error);
       return [];
     }
   },
@@ -381,7 +381,7 @@ export const offlineAuthService = {
         ['SUPER_ADMIN', 'ADMIN', 'MANAGER'].includes(r.code)
       );
     } catch (error) {
-      console.error('[offlineAuth] Failed to check manager status offline:', error);
+      logError('[offlineAuth] Failed to check manager status offline', error);
       return false;
     }
   },

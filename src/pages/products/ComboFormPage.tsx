@@ -68,7 +68,7 @@ export default function ComboFormPage() {
             if (error) throw error
             if (data) setProducts(data)
         } catch (error) {
-            console.error('Error fetching products:', error)
+            logError('Error fetching products:', error)
             toast.error('Error loading products')
         }
     }
@@ -148,7 +148,7 @@ export default function ComboFormPage() {
                 }
             }
         } catch (error) {
-            console.error('Error fetching combo:', error)
+            logError('Error fetching combo:', error)
             toast.error('Error loading combo')
         } finally {
             setLoading(false)
@@ -359,7 +359,7 @@ export default function ComboFormPage() {
 
             navigate('/products/combos')
         } catch (error) {
-            console.error('Error saving combo:', error)
+            logError('Error saving combo:', error)
             toast.error('Error saving combo')
         } finally {
             setSaving(false)
@@ -786,3 +786,5 @@ export default function ComboFormPage() {
         </div>
     )
 }
+
+import { logError } from '@/utils/logger'

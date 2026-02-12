@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useShift, ShiftUser } from '../useShift'
+import { logError } from '@/utils/logger'
 
 export interface IUsePOSShiftReturn {
     // Shift state from useShift
@@ -96,7 +97,7 @@ export function usePOSShift(): IUsePOSShiftReturn {
             await openShift(openingCash, verifiedUser.id, verifiedUser.name, notes)
             setVerifiedUser(null)
         } catch (error) {
-            console.error('Error opening shift:', error)
+            logError('Error opening shift:', error)
             throw error
         }
     }, [verifiedUser, openShift])
@@ -113,7 +114,7 @@ export function usePOSShift(): IUsePOSShiftReturn {
             await closeShift(actualCash, actualQris, actualEdc, verifiedUser.id, notes)
             setVerifiedUser(null)
         } catch (error) {
-            console.error('Error closing shift:', error)
+            logError('Error closing shift:', error)
             throw error
         }
     }, [verifiedUser, closeShift])

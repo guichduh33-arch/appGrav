@@ -17,6 +17,7 @@ import {
     type IPermission as Permission,
 } from '@/hooks/usePermissionsData'
 import { cn } from '@/lib/utils'
+import { logError } from '@/utils/logger'
 
 // Group permissions by module
 const MODULE_ORDER = [
@@ -137,7 +138,7 @@ export default function PermissionsPage() {
             setHasChanges(false)
             toast.success('Permissions saved')
         } catch (error) {
-            console.error('Error saving permissions:', error)
+            logError('Error saving permissions:', error)
             toast.error('Error saving')
         }
     }

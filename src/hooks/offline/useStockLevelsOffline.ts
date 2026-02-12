@@ -17,6 +17,7 @@ import {
   getStockLevelByProductId,
 } from '@/services/sync/stockSync';
 import type { IOfflineStockLevel } from '@/types/offline';
+import { logError } from '@/utils/logger'
 
 /**
  * Stock level status based on quantity vs minimum
@@ -130,7 +131,7 @@ export function useStockLevelsOffline(
           hasData: totalCount > 0,
         };
       } catch (error) {
-        console.error('[useStockLevelsOffline] Error loading stock cache:', error);
+        logError('[useStockLevelsOffline] Error loading stock cache:', error);
         return {
           stockLevels: [],
           lastSyncAt: null,
@@ -202,7 +203,7 @@ export function useProductStockOffline(productId: string | null): {
       try {
         return (await getStockLevelByProductId(productId)) ?? null;
       } catch (error) {
-        console.error('[useProductStockOffline] Error loading stock:', error);
+        logError('[useProductStockOffline] Error loading stock:', error);
         return null;
       }
     },

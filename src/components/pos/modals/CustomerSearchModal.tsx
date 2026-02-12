@@ -46,7 +46,7 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
     const searchAbortRef = useRef<AbortController | null>(null)
 
     useEffect(() => {
-        if (isOnline) syncCustomersToOffline().catch(err => console.error('[CustomerSearchModal] Error syncing customers:', err))
+        if (isOnline) syncCustomersToOffline().catch(err => logError('[CustomerSearchModal] Error syncing customers:', err))
     }, [isOnline])
 
     useEffect(() => { fetchCategories().then(setCategories) }, [])
@@ -77,7 +77,7 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
     const doFetchRecent = async () => {
         setLoading(true)
         try { setCustomers(await fetchRecentCustomers(isOnline)) }
-        catch (e) { console.error('Error fetching recent customers:', e) }
+        catch (e) { logError('Error fetching recent customers:', e) }
         finally { setLoading(false) }
     }
 
@@ -86,14 +86,14 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
         searchAbortRef.current = new AbortController()
         setLoading(true)
         try { setCustomers(await searchCustomersApi(term, isOnline, searchAbortRef.current.signal)) }
-        catch (e) { if (e instanceof Error && e.name === 'AbortError') return; console.error('Error searching:', e) }
+        catch (e) { if (e instanceof Error && e.name === 'AbortError') return; logError('Error searching:', e) }
         finally { setLoading(false) }
     }
 
     const doLoadFavorites = async () => {
         setLoading(true)
         try { setFavoriteCustomers(await loadFavoritesApi(favoriteIds)) }
-        catch (e) { console.error('Error loading favorites:', e) }
+        catch (e) { logError('Error loading favorites:', e) }
         finally { setLoading(false) }
     }
 
@@ -103,7 +103,7 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
             const r = await loadHistoryApi(customerId)
             setOrderHistory(r.orderHistory)
             setFrequentProducts(r.frequentProducts)
-        } catch (e) { console.error('Error loading customer history:', e) }
+        } catch (e) { logError('Error loading customer history:', e) }
         finally { setLoadingHistory(false) }
     }
 

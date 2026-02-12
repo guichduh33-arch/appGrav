@@ -24,6 +24,7 @@ import {
 } from './lanProtocol';
 import type { TDeviceType } from './lanProtocol';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { logError, logWarn } from '@/utils/logger'
 
 /**
  * Hub configuration
@@ -79,7 +80,7 @@ class LanHub {
       );
 
       if (!result.success) {
-        console.error('[LanHub] Failed to register:', result.error);
+        logError('[LanHub] Failed to register:', result.error);
         return false;
       }
 
@@ -122,7 +123,7 @@ class LanHub {
       logger.debug('[LanHub] Started successfully');
       return true;
     } catch (error) {
-      console.error('[LanHub] Start error:', error);
+      logError('[LanHub] Start error:', error);
       useLanStore.getState().setLastError('Failed to start hub');
       return false;
     }
@@ -177,7 +178,7 @@ class LanHub {
    */
   async broadcast<T>(type: TLanMessageType, payload: T): Promise<void> {
     if (!this.isRunning || !this.config) {
-      console.warn('[LanHub] Cannot broadcast - hub not running');
+      logWarn('[LanHub] Cannot broadcast - hub not running');
       return;
     }
 
@@ -203,7 +204,7 @@ class LanHub {
    */
   async sendTo<T>(deviceId: string, type: TLanMessageType, payload: T): Promise<void> {
     if (!this.isRunning || !this.config) {
-      console.warn('[LanHub] Cannot send - hub not running');
+      logWarn('[LanHub] Cannot send - hub not running');
       return;
     }
 

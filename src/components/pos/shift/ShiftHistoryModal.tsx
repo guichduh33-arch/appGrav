@@ -3,6 +3,7 @@ import { X, Calendar, Clock, Banknote, TrendingUp, AlertCircle, CheckCircle } fr
 import { supabase } from '../../../lib/supabase'
 import { formatCurrency, formatDateTime } from '../../../utils/helpers'
 import { cn } from '../../../lib/utils'
+import { logError } from '@/utils/logger'
 
 interface ShiftSession {
     id: string
@@ -79,7 +80,7 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
 
             setSessions(formatted)
         } catch (error) {
-            console.error('Error loading shift history:', error)
+            logError('Error loading shift history:', error)
         } finally {
             setLoading(false)
         }

@@ -5,6 +5,7 @@ import type {
   ITransferItemWithProduct,
   TTransferStatus
 } from '@/types/database'
+import { logError } from '@/utils/logger'
 
 // Cache configuration
 const TRANSFERS_STALE_TIME = 30 * 1000 // 30 seconds - transfers change frequently
@@ -345,7 +346,7 @@ export function useReceiveTransfer() {
 
         if (itemError) {
           // Log error but don't fail completely - status already updated
-          console.error(`Failed to update item ${item.itemId}:`, itemError)
+          logError(`Failed to update item ${item.itemId}:`, itemError)
           throw itemError
         }
       }
@@ -427,7 +428,7 @@ export function useReceiveTransfer() {
       if (movementsError) {
         // Critical: status is 'received' but movements failed
         // Log for manual recovery, but throw to notify user
-        console.error(`CRITICAL: Transfer ${transfer.transfer_number} marked received but stock_movements failed:`, movementsError)
+        logError(`CRITICAL: Transfer ${transfer.transfer_number} marked received but stock_movements failed:`, movementsError)
         throw new Error(`Stock movements creation failed. Transfer marked received but inventory not updated. Contact support. Error: ${movementsError.message}`)
       }
 

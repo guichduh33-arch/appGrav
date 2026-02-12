@@ -56,7 +56,7 @@ export default function POSMainPage() {
     })
 
     useEffect(() => {
-        if (lanHubError) console.error('[POS] LAN Hub error:', lanHubError)
+        if (lanHubError) logError('[POS] LAN Hub error:', lanHubError)
     }, [lanHubError])
 
     useEffect(() => {
@@ -398,3 +398,5 @@ export default function POSMainPage() {
         </div>
     )
 }
+
+import { logError } from '@/utils/logger'

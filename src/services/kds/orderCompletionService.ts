@@ -10,6 +10,7 @@ import { lanClient } from '@/services/lan/lanClient';
 import { LAN_MESSAGE_TYPES } from '@/services/lan/lanProtocol';
 import type { IOrderCompletePayload } from '@/services/lan/lanProtocol';
 import type { TKitchenStation } from '@/types/offline';
+import { logWarn } from '@/utils/logger'
 
 /**
  * Result of an order completion operation
@@ -65,7 +66,7 @@ export async function completeOrder(
         lanSent = true;
       } catch (lanError) {
         // Log but don't fail the operation - Supabase update succeeded
-        console.warn('[orderCompletionService] LAN notification failed:', lanError);
+        logWarn('[orderCompletionService] LAN notification failed:', lanError);
       }
     }
 

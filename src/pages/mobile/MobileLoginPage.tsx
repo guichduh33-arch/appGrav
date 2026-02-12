@@ -11,6 +11,7 @@ import { Loader2, AlertCircle, Lock } from 'lucide-react';
 import { useMobileStore } from '@/stores/mobileStore';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
+import { logError } from '@/utils/logger'
 
 /**
  * PIN keypad configuration
@@ -130,7 +131,7 @@ export default function MobileLoginPage() {
       login(user_id, display_name || name || 'Server');
       navigate('/mobile');
     } catch (err) {
-      console.error('[MobileLogin] Error:', err);
+      logError('[MobileLogin] Error:', err);
       incrementLoginAttempts();
       setError('Connection error');
       setPin('');

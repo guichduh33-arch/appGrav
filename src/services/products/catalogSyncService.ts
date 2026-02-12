@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { db } from '@/lib/db';
 import { addToSyncQueue } from '@/services/sync/syncQueue';
 import type { IOfflineProduct, IOfflineCategory, IOfflineProductCategoryPrice } from '@/types/offline';
+import { logError, logWarn } from '@/utils/logger'
 
 /**
  * Save a product with offline-first logic
@@ -35,7 +36,7 @@ export async function saveProduct(product: Partial<IOfflineProduct> & { id: stri
 
             return { success: true, synced: true };
         } catch (err: unknown) {
-            console.warn('[CatalogSync] Supabase sync failed, queuing for background sync:', err instanceof Error ? err.message : err);
+            logWarn('[CatalogSync] Supabase sync failed, queuing for background sync:', err instanceof Error ? err.message : err);
 
             // 4. Queue for background sync if offline/failed
             await addToSyncQueue('product', updatedProduct);
@@ -44,7 +45,7 @@ export async function saveProduct(product: Partial<IOfflineProduct> & { id: stri
         }
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
-        console.error('[CatalogSync] Critical error saving product:', message);
+        logError('[CatalogSync] Critical error saving product:', message);
         return { success: false, synced: false, error: message };
     }
 }
@@ -75,7 +76,7 @@ export async function saveCategory(category: Partial<IOfflineCategory> & { id: s
 
             return { success: true, synced: true };
         } catch (err: unknown) {
-            console.warn('[CatalogSync] Supabase sync failed, queuing for background sync:', err instanceof Error ? err.message : err);
+            logWarn('[CatalogSync] Supabase sync failed, queuing for background sync:', err instanceof Error ? err.message : err);
 
             // 4. Queue for background sync if offline/failed
             await addToSyncQueue('category', updatedCategory);
@@ -84,7 +85,7 @@ export async function saveCategory(category: Partial<IOfflineCategory> & { id: s
         }
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
-        console.error('[CatalogSync] Critical error saving category:', message);
+        logError('[CatalogSync] Critical error saving category:', message);
         return { success: false, synced: false, error: message };
     }
 }
@@ -115,7 +116,7 @@ export async function saveProductCategoryPrice(price: Partial<IOfflineProductCat
 
             return { success: true, synced: true };
         } catch (err: unknown) {
-            console.warn('[CatalogSync] Supabase sync failed, queuing for background sync:', err instanceof Error ? err.message : err);
+            logWarn('[CatalogSync] Supabase sync failed, queuing for background sync:', err instanceof Error ? err.message : err);
 
             // 4. Queue for background sync if offline/failed
             await addToSyncQueue('product_category_price', updatedPrice);
@@ -124,7 +125,7 @@ export async function saveProductCategoryPrice(price: Partial<IOfflineProductCat
         }
     } catch (err: unknown) {
         const message = err instanceof Error ? err.message : String(err);
-        console.error('[CatalogSync] Critical error saving product category price:', message);
+        logError('[CatalogSync] Critical error saving product category price:', message);
         return { success: false, synced: false, error: message };
     }
 }

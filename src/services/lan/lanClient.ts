@@ -20,6 +20,7 @@ import {
 } from './lanProtocol';
 import type { TDeviceType } from './lanProtocol';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { logError, logWarn } from '@/utils/logger'
 
 /**
  * Client configuration
@@ -85,7 +86,7 @@ class LanClient {
       );
 
       if (!result.success) {
-        console.error('[LanClient] Failed to register:', result.error);
+        logError('[LanClient] Failed to register:', result.error);
         store.setLastError(result.error || 'Registration failed');
         this.scheduleReconnect();
         return false;
@@ -121,7 +122,7 @@ class LanClient {
       logger.debug('[LanClient] Connecting...');
       return true;
     } catch (error) {
-      console.error('[LanClient] Connect error:', error);
+      logError('[LanClient] Connect error:', error);
       store.setLastError('Connection failed');
       this.scheduleReconnect();
       return false;
@@ -180,7 +181,7 @@ class LanClient {
    */
   async send<T>(type: TLanMessageType, payload: T, targetDeviceId?: string): Promise<void> {
     if (!this.isConnected || !this.config) {
-      console.warn('[LanClient] Cannot send - not connected');
+      logWarn('[LanClient] Cannot send - not connected');
       useLanStore.getState().addPendingMessage(
         createMessage(type, this.config?.deviceId || '', payload, targetDeviceId)
       );
@@ -325,7 +326,7 @@ class LanClient {
     const attempts = store.reconnectAttempts;
 
     if (attempts >= (this.config.maxReconnectAttempts || 10)) {
-      console.error('[LanClient] Max reconnect attempts reached');
+      logError('[LanClient] Max reconnect attempts reached');
       store.setConnectionStatus('error');
       store.setLastError('Max reconnect attempts reached');
       return;

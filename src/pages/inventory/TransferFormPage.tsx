@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { useSectionsByType, useCreateTransfer, useTransfer } from '@/hooks/inventory'
 import { useProducts } from '@/hooks/products'
 import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'
+import { logError } from '@/utils/logger'
 
 interface TransferItemForm {
   id?: string
@@ -167,7 +168,7 @@ export default function TransferFormPage() {
       toast.success('Transfer created successfully')
       navigate('/inventory/transfers')
     } catch (error) {
-      console.error('Error saving transfer:', error)
+      logError('Error saving transfer:', error)
       toast.error(error instanceof Error ? error.message : 'Error loading transfers')
     }
   }

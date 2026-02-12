@@ -6,6 +6,7 @@
  */
 
 import { supabase } from '@/lib/supabase'
+import { logError } from '@/utils/logger'
 
 export interface IOutstandingOrder {
     id: string
@@ -66,7 +67,7 @@ export async function getOutstandingOrders(): Promise<IOutstandingOrder[]> {
         .order('order_date', { ascending: true })
 
     if (error) {
-        console.error('Error fetching outstanding orders:', error)
+        logError('Error fetching outstanding orders:', error)
         return []
     }
 
@@ -208,7 +209,7 @@ export async function applyFIFOPayment(
             .eq('id', allocation.orderId)
 
         if (updateError) {
-            console.error(`Error updating order ${allocation.orderNumber}:`, updateError)
+            logError(`Error updating order ${allocation.orderNumber}:`, updateError)
             return {
                 success: false,
                 error: `Failed to update order ${allocation.orderNumber}: ${updateError.message}. ${appliedAllocations.length} allocation(s) were already applied.`,
@@ -230,7 +231,7 @@ export async function applyFIFOPayment(
             })
 
         if (paymentError) {
-            console.error(`Error creating payment for ${allocation.orderNumber}:`, paymentError)
+            logError(`Error creating payment for ${allocation.orderNumber}:`, paymentError)
             return {
                 success: false,
                 error: `Failed to record payment for ${allocation.orderNumber}: ${paymentError.message}. Order was updated but payment record missing.`,
@@ -256,7 +257,7 @@ export async function applyFIFOPayment(
             .eq('id', customerId)
 
         if (balanceError) {
-            console.error('Error updating credit balance:', balanceError)
+            logError('Error updating credit balance:', balanceError)
             return {
                 success: false,
                 error: `Payments applied but credit balance update failed: ${balanceError.message}`,

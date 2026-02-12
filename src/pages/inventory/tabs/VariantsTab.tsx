@@ -56,7 +56,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
             if (error) throw error
             setAvailableProducts(data || [])
         } catch (error) {
-            console.error('Error loading products:', error)
+            logError('Error loading products:', error)
         }
     }
 
@@ -107,7 +107,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
 
             setVariantGroups(Object.values(groups))
         } catch (error) {
-            console.error('Error loading variants:', error)
+            logError('Error loading variants:', error)
             toast.error('Error loading variants')
         } finally {
             setLoading(false)
@@ -147,7 +147,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
             setShowAddGroup(false)
             loadVariants()
         } catch (error) {
-            console.error('Error adding variant group:', error)
+            logError('Error adding variant group:', error)
             toast.error('Error adding category')
         }
     }
@@ -179,7 +179,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
             toast.success('Option added')
             loadVariants()
         } catch (error) {
-            console.error('Error adding option:', error)
+            logError('Error adding option:', error)
             toast.error('Error adding option')
         }
     }
@@ -198,7 +198,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
             toast.success('Option deleted')
             loadVariants()
         } catch (error) {
-            console.error('Error deleting option:', error)
+            logError('Error deleting option:', error)
             toast.error('Error deleting option')
         }
     }
@@ -218,7 +218,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
             toast.success('Category deleted')
             loadVariants()
         } catch (error) {
-            console.error('Error deleting group:', error)
+            logError('Error deleting group:', error)
             toast.error('Error deleting category')
         }
     }
@@ -243,7 +243,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
 
             if (error) throw error
         } catch (error) {
-            console.error('Error updating option:', error)
+            logError('Error updating option:', error)
             toast.error('Error updating option')
             // Reload to get correct state on error
             loadVariants()

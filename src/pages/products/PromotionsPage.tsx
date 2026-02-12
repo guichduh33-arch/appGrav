@@ -8,6 +8,7 @@ import { supabase } from '../../lib/supabase'
 import { formatCurrency } from '../../utils/helpers'
 import { Promotion, PromotionType } from '../../types/database'
 import { cn } from '@/lib/utils'
+import { logError } from '@/utils/logger'
 
 const PROMOTION_TYPE_LABELS: Record<PromotionType, string> = {
     percentage: 'Discount %',
@@ -60,7 +61,7 @@ export default function PromotionsPage() {
             if (error) throw error
             if (data) setPromotions(data)
         } catch (error) {
-            console.error('Error fetching promotions:', error)
+            logError('Error fetching promotions:', error)
         } finally {
             setLoading(false)
         }
@@ -109,7 +110,7 @@ export default function PromotionsPage() {
             if (error) throw error
             await fetchPromotions()
         } catch (error) {
-            console.error('Error deleting promotion:', error)
+            logError('Error deleting promotion:', error)
         }
     }
 
@@ -123,7 +124,7 @@ export default function PromotionsPage() {
             if (error) throw error
             await fetchPromotions()
         } catch (error) {
-            console.error('Error updating promotion:', error)
+            logError('Error updating promotion:', error)
         }
     }
 

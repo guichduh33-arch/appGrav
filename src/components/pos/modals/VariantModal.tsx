@@ -8,6 +8,7 @@ import { calculateCustomerPrice } from '@/services/sync/customerPricingService'
 import type { IOfflineProduct } from '@/lib/db'
 import type { ICustomerPriceResult } from '@/types/offline'
 import { cn } from '@/lib/utils'
+import { logError } from '@/utils/logger'
 
 interface VariantModalProps {
     baseProduct: Product
@@ -57,7 +58,7 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                 const result = await calculateCustomerPrice(offlineProduct, customerCategorySlug)
                 setCustomerPriceResult(result)
             } catch (error) {
-                console.error('[VariantModal] Error calculating customer price:', error)
+                logError('[VariantModal] Error calculating customer price:', error)
                 setCustomerPriceResult({
                     price: baseProduct.retail_price || 0,
                     priceType: 'retail',

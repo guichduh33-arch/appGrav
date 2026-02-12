@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/authStore'
 import { cn } from '@/lib/utils'
+import { logError } from '@/utils/logger'
 
 interface POSMenuProps {
     isOpen: boolean
@@ -66,7 +67,7 @@ export default function POSMenu({
         try {
             await logout()
         } catch (error) {
-            console.error('Logout error:', error)
+            logError('Logout error:', error)
         } finally {
             // Always navigate to login, even if logout fails
             navigate('/login')

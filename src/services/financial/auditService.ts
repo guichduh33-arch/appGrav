@@ -10,6 +10,7 @@
 import { supabase } from '@/lib/supabase';
 import { db } from '@/lib/db';
 import { FINANCIAL_OPERATION_SEVERITY } from './financialOperationService';
+import { logError } from '@/utils/logger'
 
 // =====================================================
 // Types
@@ -126,7 +127,7 @@ export async function logFinancialOperation(
     const { error } = await supabase.from('audit_logs').insert(logEntry);
 
     if (error) {
-      console.error('Failed to insert audit log:', error);
+      logError('Failed to insert audit log:', error);
       // Fall back to offline queue on error
       await queueOfflineAuditLog({
         id: auditId,
@@ -285,7 +286,7 @@ export async function getAuditLogsForEntity(
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Failed to fetch audit logs:', error);
+    logError('Failed to fetch audit logs:', error);
     return [];
   }
 
@@ -310,7 +311,7 @@ export async function getRecentFinancialOperations(
     .limit(limit);
 
   if (error) {
-    console.error('Failed to fetch financial operations:', error);
+    logError('Failed to fetch financial operations:', error);
     return [];
   }
 

@@ -18,6 +18,7 @@ import type {
   IProductionReminderItem,
 } from '@/types/offline';
 import { PRODUCTION_REMINDERS_STORAGE_KEY } from '@/types/offline';
+import { logError, logDebug, logWarn } from '@/utils/logger'
 
 /** TTL for production reminders (7 days in ms) */
 const REMINDER_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -60,10 +61,10 @@ export function saveProductionReminder(
     );
   } catch {
     // localStorage unavailable (Safari private mode, quota exceeded)
-    console.warn('[ProductionReminder] Failed to save reminder to localStorage');
+    logWarn('[ProductionReminder] Failed to save reminder to localStorage');
   }
 
-  console.debug('[ProductionReminder] Saved reminder:', id);
+  logDebug('[ProductionReminder] Saved reminder:', id);
   return id;
 }
 
@@ -82,7 +83,7 @@ export function getProductionReminders(): IProductionReminder[] {
 
     const parsed = JSON.parse(data);
     if (!Array.isArray(parsed)) {
-      console.warn('[ProductionReminder] Invalid data format, returning empty');
+      logWarn('[ProductionReminder] Invalid data format, returning empty');
       return [];
     }
 
@@ -96,7 +97,7 @@ export function getProductionReminders(): IProductionReminder[] {
     // Update storage if any were removed
     if (validReminders.length !== parsed.length) {
       const removedCount = parsed.length - validReminders.length;
-      console.debug(`[ProductionReminder] Auto-removed ${removedCount} expired reminder(s)`);
+      logDebug(`[ProductionReminder] Auto-removed ${removedCount} expired reminder(s)`);
       localStorage.setItem(
         PRODUCTION_REMINDERS_STORAGE_KEY,
         JSON.stringify(validReminders)
@@ -105,7 +106,7 @@ export function getProductionReminders(): IProductionReminder[] {
 
     return validReminders;
   } catch (error) {
-    console.error('[ProductionReminder] Error reading reminders:', error);
+    logError('[ProductionReminder] Error reading reminders:', error);
     return [];
   }
 }
@@ -138,7 +139,7 @@ export function deleteProductionReminder(id: string): void {
   } catch {
     // localStorage unavailable
   }
-  console.debug('[ProductionReminder] Deleted reminder:', id);
+  logDebug('[ProductionReminder] Deleted reminder:', id);
 }
 
 /**
@@ -150,7 +151,7 @@ export function clearAllProductionReminders(): void {
   } catch {
     // localStorage unavailable
   }
-  console.debug('[ProductionReminder] Cleared all reminders');
+  logDebug('[ProductionReminder] Cleared all reminders');
 }
 
 /**

@@ -10,6 +10,7 @@ import { supabase } from '../../lib/supabase';
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { logError } from '@/utils/logger'
 
 interface UserSession {
   id: string;
@@ -89,7 +90,7 @@ export default function ProfilePage() {
       }));
       setSessions(mapped);
     } catch (error) {
-      console.error('Error loading sessions:', error);
+      logError('Error loading sessions:', error);
     } finally {
       setLoadingSessions(false);
     }
@@ -112,7 +113,7 @@ export default function ProfilePage() {
       toast.success('Profile updated');
       setIsEditing(false);
     } catch (error) {
-      console.error('Error updating profile:', error);
+      logError('Error updating profile:', error);
       toast.error(error instanceof Error ? error.message : 'Error');
     } finally {
       setIsSaving(false);
@@ -144,7 +145,7 @@ export default function ProfilePage() {
         toast.error(result.error || 'Error');
       }
     } catch (error) {
-      console.error('Error changing PIN:', error);
+      logError('Error changing PIN:', error);
       toast.error(error instanceof Error ? error.message : 'Error');
     } finally {
       setChangingPin(false);
@@ -169,7 +170,7 @@ export default function ProfilePage() {
       toast.success('Session terminated');
       loadSessions();
     } catch (error) {
-      console.error('Error terminating session:', error);
+      logError('Error terminating session:', error);
       toast.error(error instanceof Error ? error.message : 'Error');
     }
   };

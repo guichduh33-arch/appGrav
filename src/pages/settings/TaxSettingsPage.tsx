@@ -19,6 +19,7 @@ import {
 import SettingField from '../../components/settings/SettingField';
 import type { TaxRate } from '../../types/settings';
 import { toast } from 'sonner';
+import { logError } from '@/utils/logger'
 
 interface TaxRateFormData {
   code: string;
@@ -119,7 +120,7 @@ const TaxSettingsPage = () => {
       setShowModal(false);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error saving tax rate';
-      console.error('Tax rate save error:', error);
+      logError('Tax rate save error:', error);
       toast.error(message);
     }
   };
@@ -138,7 +139,7 @@ const TaxSettingsPage = () => {
       toast.success('Tax rate deleted');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error deleting tax rate';
-      console.error('Tax rate delete error:', error);
+      logError('Tax rate delete error:', error);
       toast.error(message);
     }
   };
@@ -170,7 +171,7 @@ const TaxSettingsPage = () => {
       toast.success(`${rate[nameKey]} set as default`);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error setting default tax rate';
-      console.error('Set default tax rate error:', error);
+      logError('Set default tax rate error:', error);
       toast.error(message);
     }
   };
@@ -182,7 +183,7 @@ const TaxSettingsPage = () => {
       toast.success('Setting saved');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error saving setting';
-      console.error('Setting save error:', error);
+      logError('Setting save error:', error);
       toast.error(message);
     }
   };

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
+import { logError } from '@/utils/logger'
 
 // Cache configuration
 const PURCHASE_ORDERS_STALE_TIME = 30 * 1000 // 30 seconds
@@ -324,7 +325,7 @@ export function useCreatePurchaseOrder() {
 
         if (itemsError) {
           // Log for debugging - PO created but items failed
-          console.error(`PO ${poNumber} created but items insertion failed:`, itemsError)
+          logError(`PO ${poNumber} created but items insertion failed`, itemsError)
           throw new Error(`ITEMS_INSERTION_FAILED: PO ${poNumber} created but items failed. Please edit the PO to add items.`)
         }
       }
@@ -393,7 +394,7 @@ export function useUpdatePurchaseOrder() {
         .eq('purchase_order_id', params.id)
 
       if (deleteError) {
-        console.error(`PO ${params.id} header updated but old items deletion failed:`, deleteError)
+        logError(`PO ${params.id} header updated but old items deletion failed`, deleteError)
         throw new Error(`ITEMS_DELETE_FAILED: PO header updated but items cleanup failed. Please retry.`)
       }
 
@@ -418,7 +419,7 @@ export function useUpdatePurchaseOrder() {
           .insert(itemsToInsert)
 
         if (itemsError) {
-          console.error(`PO ${params.id} items insertion failed after delete:`, itemsError)
+          logError(`PO ${params.id} items insertion failed after delete:`, itemsError)
           throw new Error(`ITEMS_INSERT_FAILED: PO header updated and old items deleted, but new items failed. Please add items manually.`)
         }
       }
@@ -593,7 +594,7 @@ export function useUpdatePurchaseOrderStatus() {
         })
 
       if (historyError.error) {
-        console.error('Failed to log PO history:', historyError.error)
+        logError('Failed to log PO history:', historyError.error)
         // Don't throw - history logging is secondary to status update
       }
 

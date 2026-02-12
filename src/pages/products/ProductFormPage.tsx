@@ -17,6 +17,7 @@ import type { IOfflineProduct } from '@/types/offline'
 import { formatCurrency } from '@/utils/helpers'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { logError } from '@/utils/logger'
 
 interface Category {
     id: string
@@ -148,7 +149,7 @@ export default function ProductFormPage() {
                 }
             }
         } catch (error) {
-            console.error('Error loading data:', error)
+            logError('Error loading data:', error)
             toast.error('Error loading data')
         } finally {
             setLoading(false)
@@ -222,7 +223,7 @@ export default function ProductFormPage() {
 
             navigate('/products')
         } catch (error) {
-            console.error('Error saving product:', error)
+            logError('Error saving product:', error)
             toast.error('Error during save')
         } finally {
             setSaving(false)
@@ -251,7 +252,7 @@ export default function ProductFormPage() {
             setForm(prev => ({ ...prev, image_url: publicUrl }))
             toast.success('Image uploaded')
         } catch (error) {
-            console.error('Error uploading image:', error)
+            logError('Error uploading image:', error)
             toast.error('Error during upload')
         }
     }

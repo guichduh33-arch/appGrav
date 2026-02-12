@@ -4,6 +4,7 @@ import { Building2, Plus, FileText, Eye, CreditCard, TrendingUp, Clock, ArrowRig
 import { cn } from '@/lib/utils';
 import { supabase } from '../../lib/supabase';
 import { formatCurrency } from '../../utils/helpers';
+import { logError } from '@/utils/logger'
 
 type TabType = 'clients' | 'orders';
 
@@ -121,7 +122,7 @@ const B2BPage = () => {
                 }
             }
         } catch (error) {
-            console.error('Error fetching B2B data:', error);
+            logError('Error fetching B2B data:', error);
         } finally {
             setLoading(false);
         }

@@ -19,6 +19,7 @@ import {
   PRODUCTS_CACHE_TTL_MS,
   PRODUCTS_REFRESH_INTERVAL_MS,
 } from '@/types/offline';
+import { logError } from '@/utils/logger'
 
 // =====================================================
 // Cache Operations
@@ -104,7 +105,7 @@ export async function getCachedProducts(
 
     return products;
   } catch (error) {
-    console.error('Error reading cached products:', error);
+    logError('Error reading cached products:', error);
     return [];
   }
 }
@@ -121,7 +122,7 @@ export async function getCachedProductById(
   try {
     return await db.offline_products.get(id);
   } catch (error) {
-    console.error('Error reading cached product:', error);
+    logError('Error reading cached product:', error);
     return undefined;
   }
 }
@@ -166,7 +167,7 @@ export async function getLastProductsSyncAt(): Promise<string | null> {
     const meta = await db.offline_sync_meta.get('products');
     return meta?.lastSyncAt ?? null;
   } catch (error) {
-    console.error('Error reading products sync meta:', error);
+    logError('Error reading products sync meta:', error);
     return null;
   }
 }
@@ -180,7 +181,7 @@ export async function getProductsSyncMeta(): Promise<ISyncMeta | undefined> {
   try {
     return await db.offline_sync_meta.get('products');
   } catch (error) {
-    console.error('Error reading products sync meta:', error);
+    logError('Error reading products sync meta:', error);
     return undefined;
   }
 }
@@ -194,7 +195,7 @@ export async function getCachedProductsCount(): Promise<number> {
   try {
     return await db.offline_products.count();
   } catch (error) {
-    console.error('Error counting cached products:', error);
+    logError('Error counting cached products:', error);
     return 0;
   }
 }

@@ -6,6 +6,7 @@ import {
     IFrequentProduct,
     transformOfflineCustomer,
 } from './customerSearchTypes'
+import { logError } from '@/utils/logger'
 
 const CUSTOMER_SELECT = `
     *,
@@ -32,7 +33,7 @@ export async function fetchRecentCustomers(
 
         return data ?? []
     } catch (error) {
-        console.error('Error fetching customers:', error)
+        logError('Error fetching customers:', error)
         // Fallback to offline
         const offlineCustomers = await searchCustomersOffline('')
         return offlineCustomers.slice(0, 10).map(transformOfflineCustomer)
@@ -68,7 +69,7 @@ export async function searchCustomers(
     } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') throw error
 
-        console.error('Error searching customers:', error)
+        logError('Error searching customers:', error)
         const offlineCustomers = await searchCustomersOffline(term)
         return offlineCustomers.map(transformOfflineCustomer)
     }

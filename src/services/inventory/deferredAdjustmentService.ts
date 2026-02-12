@@ -10,6 +10,7 @@
 
 import { db } from '@/lib/db';
 import type { IDeferredAdjustmentNote, TStockAdjustmentType } from '@/types/offline';
+import { logInfo } from '@/utils/logger'
 
 /**
  * Input for creating a deferred adjustment note

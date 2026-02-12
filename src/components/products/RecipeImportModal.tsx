@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react'
 import { X, Upload, Download, FileSpreadsheet, CheckCircle, AlertCircle, Loader2, ChefHat } from 'lucide-react'
 import { importRecipes, downloadRecipeImportTemplate, IRecipeImportResult } from '@/services/products/recipeImportExport'
 import { cn } from '@/lib/utils'
+import { logError } from '@/utils/logger'
 
 interface RecipeImportModalProps {
     onClose: () => void
@@ -104,7 +105,7 @@ export default function RecipeImportModal({ onClose, onSuccess }: RecipeImportMo
                 onSuccess()
             }
         } catch (error) {
-            console.error('Import error:', error)
+            logError('Import error:', error)
             setResult({
                 success: false,
                 created: 0,

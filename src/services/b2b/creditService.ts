@@ -6,6 +6,7 @@
  */
 
 import { supabase } from '@/lib/supabase'
+import { logError } from '@/utils/logger'
 
 export interface ICustomerCredit {
     customer_id: string
@@ -132,7 +133,7 @@ export async function getOverdueInvoices(): Promise<IOverdueInvoice[]> {
         .rpc('get_overdue_invoices')
 
     if (error) {
-        console.error('Error fetching overdue invoices:', error)
+        logError('Error fetching overdue invoices:', error)
         return []
     }
 
@@ -221,7 +222,7 @@ export async function createInvoice(
         .rpc('generate_next_customer_invoice_number')
 
     if (rpcError || !invoiceNumber) {
-        console.error('Error generating invoice number:', rpcError)
+        logError('Error generating invoice number:', rpcError)
         return { success: false, error: rpcError?.message || 'Failed to generate invoice number' }
     }
 
@@ -291,7 +292,7 @@ export async function recordInvoicePayment(
         .eq('id', invoice.customer_id)
 
     if (balanceError) {
-        console.error('Error updating customer balance:', balanceError)
+        logError('Error updating customer balance:', balanceError)
     }
 
     return { success: true }

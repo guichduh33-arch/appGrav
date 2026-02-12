@@ -16,6 +16,7 @@ const formatNumber = (num: number | null | undefined): string => {
     return num.toLocaleString('en-US')
 }
 import { toast } from 'sonner'
+import { logError } from '@/utils/logger'
 
 // Icon mapping for movement types
 const MOVEMENT_ICONS: Record<string, React.ReactNode> = {
@@ -148,7 +149,7 @@ export default function StockMovementsPage() {
 
             toast.success(`Export successful: ${filteredMovements.length} movements exported`)
         } catch (error) {
-            console.error('Error exporting to Excel:', error)
+            logError('Error exporting to Excel:', error)
             toast.error('Error exporting to Excel')
         }
     }

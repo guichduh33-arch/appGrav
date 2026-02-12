@@ -21,6 +21,7 @@ import {
   calculateCustomerPricesBatch,
   categoryHasSpecialPricing,
 } from '@/services/sync/customerPricingService';
+import { logError } from '@/utils/logger'
 
 export interface UsePricingOfflineResult {
   /**
@@ -140,7 +141,7 @@ export function usePricingOffline(): UsePricingOfflineResult {
       try {
         return await categoryHasSpecialPricing(categorySlug);
       } catch (err) {
-        console.error('[usePricingOffline] Error checking special pricing:', err);
+        logError('[usePricingOffline] Error checking special pricing:', err);
         return false;
       }
     },

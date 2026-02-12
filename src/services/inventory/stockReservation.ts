@@ -6,6 +6,7 @@
  */
 
 import { supabase, untypedRpc } from '@/lib/supabase'
+import { logError } from '@/utils/logger'
 
 export interface IStockReservation {
     id: string
@@ -42,7 +43,7 @@ export async function getActiveReservations(productId?: string): Promise<IStockR
     const { data, error } = await query
 
     if (error) {
-        console.error('Error fetching reservations:', error)
+        logError('Error fetching reservations:', error)
         return []
     }
 
@@ -173,7 +174,7 @@ export async function expireOldReservations(): Promise<number> {
         .select('id')
 
     if (error) {
-        console.error('Error expiring reservations:', error)
+        logError('Error expiring reservations:', error)
         return 0
     }
 

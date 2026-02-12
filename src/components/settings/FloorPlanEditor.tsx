@@ -98,7 +98,7 @@ export default function FloorPlanEditor() {
                 setItems(data as FloorPlanItem[])
             }
         } catch (error) {
-            console.error('Error fetching floor plan items:', error)
+            logError('Error fetching floor plan items:', error)
         } finally {
             setLoading(false)
         }
@@ -115,7 +115,7 @@ export default function FloorPlanEditor() {
 
             alert('Floor plan saved successfully!')
         } catch (error) {
-            console.error('Error saving floor plan:', error)
+            logError('Error saving floor plan:', error)
             alert('Error saving floor plan')
         } finally {
             setSaving(false)
@@ -157,7 +157,7 @@ export default function FloorPlanEditor() {
                 setTableForm({ number: '', capacity: 2, section: 'Main', shape: 'square' })
             }
         } catch (error) {
-            console.error('Error adding table:', error)
+            logError('Error adding table:', error)
             alert('Error adding table: ' + (error instanceof Error ? error.message : String(error)))
         }
     }
@@ -189,7 +189,7 @@ export default function FloorPlanEditor() {
                 setDecorationForm({ decoration_type: 'plant', shape: 'square' })
             }
         } catch (error) {
-            console.error('Error adding decoration:', error)
+            logError('Error adding decoration:', error)
             alert('Error adding decoration: ' + (error instanceof Error ? error.message : String(error)))
         }
     }
@@ -210,7 +210,7 @@ export default function FloorPlanEditor() {
             setItems(items.filter(i => i.id !== itemId))
             setSelectedItem(null)
         } catch (error) {
-            console.error('Error deleting item:', error)
+            logError('Error deleting item:', error)
             alert('Error deleting item')
         }
     }

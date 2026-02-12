@@ -12,6 +12,7 @@ import { lanClient } from '@/services/lan/lanClient';
 import { useLanStore } from '@/stores/lanStore';
 import { LAN_MESSAGE_TYPES } from '@/services/lan/lanProtocol';
 import logger from '@/utils/logger';
+import { logError } from '@/utils/logger'
 
 /**
  * Cart update payload for display
@@ -185,7 +186,7 @@ export function startCartBroadcast(): void {
 
         debounceTimer = setTimeout(() => {
           broadcastCartUpdate().catch((error) => {
-            console.error('[DisplayBroadcast] Error broadcasting cart:', error);
+            logError('[DisplayBroadcast] Error broadcasting cart:', error);
           });
         }, 100); // 100ms debounce for NFR-P1 (<500ms latency)
       }

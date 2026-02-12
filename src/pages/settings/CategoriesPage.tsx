@@ -38,6 +38,7 @@ import {
 } from '../../hooks/settings/useCategorySettings';
 import type { Category } from '../../types/database';
 import { toast } from 'sonner';
+import { logError } from '@/utils/logger'
 
 // Predefined color palette
 const COLOR_PALETTE = [
@@ -222,7 +223,7 @@ const CategoriesPage = () => {
       setShowModal(false);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error saving category';
-      console.error('Category save error:', error);
+      logError('Category save error:', error);
       toast.error(message);
     }
   };
@@ -242,7 +243,7 @@ const CategoriesPage = () => {
       toast.success('Category deleted');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error deleting category';
-      console.error('Category delete error:', error);
+      logError('Category delete error:', error);
       toast.error(message);
     }
   };
@@ -262,7 +263,7 @@ const CategoriesPage = () => {
         await reorderCategories.mutateAsync(orderedIds);
         toast.success('Order updated');
       } catch (error) {
-        console.error('Reorder error:', error);
+        logError('Reorder error:', error);
         toast.error('Failed to update order');
       }
     }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Users } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
 import { cn } from '@/lib/utils'
+import { logError } from '@/utils/logger'
 
 interface Table {
     id: string
@@ -47,7 +48,7 @@ export default function TableSelectionModal({ onSelectTable, onClose: _onClose }
                 setTables(data as Table[])
             }
         } catch (error) {
-            console.error('Error fetching tables:', error)
+            logError('Error fetching tables:', error)
         } finally {
             setLoading(false)
         }

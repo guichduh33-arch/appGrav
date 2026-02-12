@@ -9,6 +9,7 @@ import type jsPDF from 'jspdf';
 import type { RowInput, CellDef } from 'jspdf-autotable';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { logError } from '@/utils/logger'
 
 // =============================================================
 // Types
@@ -262,7 +263,7 @@ export async function exportToPDF<T extends object>(
 
     return { success: true };
   } catch (err) {
-    console.error('PDF Export error:', err);
+    logError('PDF Export error:', err);
     return { success: false, error: 'Erreur lors de l\'export PDF' };
   }
 }

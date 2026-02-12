@@ -5,6 +5,7 @@ import { authService } from '../../services/authService';
 import { toast } from 'sonner';
 import type { IUserWithRoles } from '@/hooks/useUsers';
 import type { Role } from '../../types/auth';
+import { logError } from '@/utils/logger'
 
 interface IUserFormModalProps {
   user: IUserWithRoles | null;
@@ -117,7 +118,7 @@ export function UserFormModal({ user, roles, onClose, onSave }: IUserFormModalPr
         }
       }
     } catch (error) {
-      console.error('Save error:', error);
+      logError('Save error:', error);
       toast.error('Error');
     } finally {
       setIsLoading(false);
