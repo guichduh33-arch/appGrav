@@ -10,57 +10,65 @@ import { render, screen } from '@testing-library/react';
 import { OrderItemStatusBadge, type TItemStatus } from '../OrderItemStatusBadge';
 
 describe('OrderItemStatusBadge', () => {
-  const statuses: Array<{ status: TItemStatus; expectedLabel: string; expectedClass: string }> = [
-    { status: 'new', expectedLabel: 'New', expectedClass: 'order-item-badge--new' },
-    { status: 'preparing', expectedLabel: 'Preparing', expectedClass: 'order-item-badge--preparing' },
-    { status: 'ready', expectedLabel: 'Ready', expectedClass: 'order-item-badge--ready' },
-    { status: 'served', expectedLabel: 'Served', expectedClass: 'order-item-badge--served' },
+  const statuses: Array<{ status: TItemStatus; expectedLabel: string; colorFragment: string }> = [
+    { status: 'new', expectedLabel: 'New', colorFragment: 'blue' },
+    { status: 'preparing', expectedLabel: 'Preparing', colorFragment: 'amber' },
+    { status: 'ready', expectedLabel: 'Ready', colorFragment: 'emerald' },
+    { status: 'served', expectedLabel: 'Served', colorFragment: 'gray' },
   ];
 
-  it.each(statuses)('should render $status status with correct label and class', ({ status, expectedLabel, expectedClass }) => {
+  it.each(statuses)('should render $status status with correct label and class', ({ status, expectedLabel, colorFragment }) => {
     const { container } = render(<OrderItemStatusBadge status={status} />);
 
     expect(screen.getByText(expectedLabel)).toBeInTheDocument();
-    expect(container.querySelector(`.${expectedClass}`)).toBeInTheDocument();
+    // Badge root should contain the status-specific Tailwind color class
+    const badge = container.querySelector('span');
+    expect(badge?.className).toContain(colorFragment);
   });
 
   it('should hide label when showLabel is false', () => {
-    const { container } = render(<OrderItemStatusBadge status="ready" showLabel={false} />);
+    render(<OrderItemStatusBadge status="ready" showLabel={false} />);
 
-    expect(container.querySelector('.order-item-badge__label')).not.toBeInTheDocument();
-    expect(container.querySelector('.order-item-badge--ready')).toBeInTheDocument();
+    expect(screen.queryByText('Ready')).not.toBeInTheDocument();
   });
 
   it('should apply small size class by default', () => {
     const { container } = render(<OrderItemStatusBadge status="new" />);
 
-    expect(container.querySelector('.order-item-badge--sm')).toBeInTheDocument();
+    const badge = container.querySelector('span');
+    // Default size is 'sm' which uses text-[0.65rem]
+    expect(badge?.className).toContain('text-[0.65rem]');
   });
 
   it('should apply medium size class when specified', () => {
     const { container } = render(<OrderItemStatusBadge status="new" size="md" />);
 
-    expect(container.querySelector('.order-item-badge--md')).toBeInTheDocument();
-    expect(container.querySelector('.order-item-badge--sm')).not.toBeInTheDocument();
+    const badge = container.querySelector('span');
+    expect(badge?.className).toContain('text-xs');
+    expect(badge?.className).not.toContain('text-[0.65rem]');
   });
 
   it('should apply animate class when animate is true', () => {
     const { container } = render(<OrderItemStatusBadge status="preparing" animate />);
 
-    expect(container.querySelector('.order-item-badge--animate')).toBeInTheDocument();
+    const badge = container.querySelector('span');
+    expect(badge?.className).toContain('animate-pulse-preparing');
   });
 
   it('should not apply animate class when animate is false', () => {
     const { container } = render(<OrderItemStatusBadge status="preparing" animate={false} />);
 
-    expect(container.querySelector('.order-item-badge--animate')).not.toBeInTheDocument();
+    const badge = container.querySelector('span');
+    expect(badge?.className).not.toContain('animate-pulse-preparing');
   });
 
   it('should render with correct icon for each status', () => {
-    // Test that the badge renders without errors for each status
     statuses.forEach(({ status }) => {
       const { container } = render(<OrderItemStatusBadge status={status} />);
-      expect(container.querySelector('.order-item-badge')).toBeInTheDocument();
+      // Each badge renders as a span with an SVG icon
+      const badge = container.querySelector('span');
+      expect(badge).toBeInTheDocument();
+      expect(badge?.querySelector('svg')).toBeInTheDocument();
     });
   });
 
@@ -68,7 +76,7 @@ describe('OrderItemStatusBadge', () => {
     const { container } = render(<OrderItemStatusBadge status="ready" />);
 
     // Badge should be a span (inline element)
-    const badge = container.querySelector('.order-item-badge');
+    const badge = container.firstElementChild;
     expect(badge?.tagName.toLowerCase()).toBe('span');
   });
 });

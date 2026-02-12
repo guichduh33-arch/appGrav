@@ -146,15 +146,14 @@ describe('LoyaltyBadge', () => {
             render(<LoyaltyBadge tier="gold" points={2000} compact={true} />)
 
             const tierBadge = screen.getByTestId('loyalty-tier')
-            // In compact mode, tier name should not be displayed
-            expect(tierBadge.querySelector('.loyalty-badge__tier-name')).not.toBeInTheDocument()
+            // In compact mode, tier name should not be displayed as text
+            expect(tierBadge).not.toHaveTextContent('Gold')
         })
 
         it('renders tier name in default (non-compact) mode', () => {
             render(<LoyaltyBadge tier="gold" points={2000} compact={false} />)
 
             const tierBadge = screen.getByTestId('loyalty-tier')
-            expect(tierBadge.querySelector('.loyalty-badge__tier-name')).toBeInTheDocument()
             expect(tierBadge).toHaveTextContent('Gold')
         })
     })

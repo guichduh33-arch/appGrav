@@ -67,7 +67,7 @@ describe('ComboGrid', () => {
         const { container } = render(
             <ComboGrid combos={[]} onComboClick={vi.fn()} isLoading={true} />
         )
-        const skeletons = container.querySelectorAll('.pos-product-card-skeleton')
+        const skeletons = container.querySelectorAll('.animate-pulse')
         expect(skeletons.length).toBe(3)
     })
 })
