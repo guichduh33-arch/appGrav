@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Check } from 'lucide-react'
+import { X, Check, PackageOpen, Trash2, PlusCircle, MinusCircle } from 'lucide-react'
 import { useStockAdjustment, useSuppliers } from '@/hooks/inventory'
 import { cn } from '@/lib/utils'
 
@@ -17,11 +17,18 @@ interface StockAdjustmentModalProps {
 
 type AdjustmentType = 'purchase' | 'waste' | 'adjustment_in' | 'adjustment_out'
 
-const ADJUSTMENT_TYPES: Array<{ id: AdjustmentType; icon: string; label: string; desc: string; isDanger?: boolean }> = [
-    { id: 'purchase', icon: '📥', label: 'Reception', desc: 'Supplier delivery' },
-    { id: 'waste', icon: '🗑️', label: 'Waste / Loss', desc: 'Damaged/expired product', isDanger: true },
-    { id: 'adjustment_in', icon: '➕', label: 'Correction (+)', desc: 'Count error' },
-    { id: 'adjustment_out', icon: '➖', label: 'Correction (-)', desc: 'Count error' },
+const ADJUSTMENT_TYPE_ICONS: Record<AdjustmentType, React.ReactNode> = {
+    purchase: <PackageOpen size={18} />,
+    waste: <Trash2 size={18} />,
+    adjustment_in: <PlusCircle size={18} />,
+    adjustment_out: <MinusCircle size={18} />,
+}
+
+const ADJUSTMENT_TYPES: Array<{ id: AdjustmentType; label: string; desc: string; isDanger?: boolean }> = [
+    { id: 'purchase', label: 'Reception', desc: 'Supplier delivery' },
+    { id: 'waste', label: 'Waste / Loss', desc: 'Damaged/expired product', isDanger: true },
+    { id: 'adjustment_in', label: 'Correction (+)', desc: 'Count error' },
+    { id: 'adjustment_out', label: 'Correction (-)', desc: 'Count error' },
 ]
 
 export default function StockAdjustmentModal({ product, onClose }: StockAdjustmentModalProps) {
@@ -96,10 +103,10 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                                         onClick={() => setType(adj.id)}
                                     >
                                         <span className={cn(
-                                            'text-[1.75rem] w-12 h-12 flex items-center justify-center rounded shrink-0',
-                                            isActive ? 'bg-white' : 'bg-gray-50'
+                                            'w-12 h-12 flex items-center justify-center rounded shrink-0',
+                                            isActive ? 'bg-white text-foreground' : 'bg-gray-50 text-muted-foreground'
                                         )}>
-                                            {adj.icon}
+                                            {ADJUSTMENT_TYPE_ICONS[adj.id]}
                                         </span>
                                         <div>
                                             <span className="block font-semibold text-[0.95rem] text-gray-900 mb-0.5">{adj.label}</span>

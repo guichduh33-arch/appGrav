@@ -519,7 +519,7 @@ const SettingsPage = () => {
                                 <div className="printer-list">
                                     {printers.map(printer => (
                                         <div key={printer.id} className="printer-item">
-                                            <div className="printer-item__icon">🖨️</div>
+                                            <div className="printer-item__icon"><Printer size={20} /></div>
                                             <div className="printer-item__info">
                                                 <div className="printer-item__name">{printer.name}</div>
                                                 <div className="printer-item__status">

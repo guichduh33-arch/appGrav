@@ -238,7 +238,7 @@ function App() {
 
             // Notify if items were removed due to unavailable products
             if (removedNames.length > 0) {
-                toast(`${removedNames.length} items removed (unavailable)`, { icon: 'ℹ️' })
+                toast(`${removedNames.length} items removed (unavailable)`)
             }
         }
 

@@ -69,7 +69,6 @@ export function useNetworkAlerts(): void {
       toast.error('Connection lost - Offline mode activated', {
         id: 'network-offline',
         duration: 5000,
-        icon: '📴',
       });
 
       // Start tracking offline period (Story 3.3)
@@ -85,7 +84,6 @@ export function useNetworkAlerts(): void {
       toast.success('Connection restored - Syncing...', {
         id: 'network-online',
         duration: 4000,
-        icon: '📶',
       });
 
       // End the offline period (Story 3.3)

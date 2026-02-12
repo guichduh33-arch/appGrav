@@ -1,5 +1,6 @@
 import { ArrowLeft, Volume2, VolumeX, RefreshCw, AlertTriangle, ClipboardList } from 'lucide-react';
 import { LanConnectionIndicator } from '../lan/LanConnectionIndicator';
+import { BreakeryLogo } from '@/components/ui/BreakeryLogo';
 import type { TLanConnectionStatus } from '@/stores/lanStore';
 import { cn } from '@/lib/utils';
 
@@ -37,16 +38,16 @@ export function KDSHeader({
   onToggleAllDayCount,
 }: IKDSHeaderProps) {
   return (
-    <header className="flex items-center justify-between h-[70px] px-5 bg-[#2a2a2a] border-b-2 border-[var(--station-color,#333)] max-md:flex-wrap max-md:h-auto max-md:px-4 max-md:py-3 max-md:gap-3">
+    <header className="flex items-center justify-between h-[70px] px-5 bg-[var(--kds-surface)] border-b-2 border-[var(--station-color,var(--kds-border))] max-md:flex-wrap max-md:h-auto max-md:px-4 max-md:py-3 max-md:gap-3">
       <div className="flex items-center gap-4 max-md:order-1">
         <button
-          className="bg-[#333] border-none text-white w-10 h-10 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#444] hover:scale-105"
+          className="bg-[var(--kds-surface-elevated)] border-none text-white w-12 h-12 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[var(--kds-surface-hover)] hover:scale-105"
           onClick={onBack}
         >
           <ArrowLeft size={20} />
         </button>
-        <div className="flex items-center gap-2.5 text-xl font-bold text-pink-300">
-          <span>🥐</span>
+        <div className="flex items-center gap-2.5 text-xl font-bold text-white">
+          <BreakeryLogo size="sm" variant="light" showText={false} />
           <span>The Breakery KDS</span>
         </div>
       </div>
@@ -74,11 +75,11 @@ export function KDSHeader({
         <LanConnectionIndicator
           status={connectionStatus}
           reconnectAttempts={reconnectAttempts}
-          className="mr-2 p-2 bg-[#333] rounded-[10px]"
+          className="mr-2 p-2 bg-[var(--kds-surface-elevated)] rounded-[10px]"
         />
         <button
           className={cn(
-            'bg-[#333] border-none text-white w-10 h-10 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#444]',
+            'bg-[var(--kds-surface-elevated)] border-none text-white w-12 h-12 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[var(--kds-surface-hover)]',
             showAllDayCount && 'bg-[#3B82F6] text-white'
           )}
           onClick={onToggleAllDayCount}
@@ -88,7 +89,7 @@ export function KDSHeader({
         </button>
         <button
           className={cn(
-            'bg-[#333] border-none text-white w-10 h-10 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#444]',
+            'bg-[var(--kds-surface-elevated)] border-none text-white w-12 h-12 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[var(--kds-surface-hover)]',
             !soundEnabled && 'text-[#EF4444]'
           )}
           onClick={onSoundToggle}
@@ -96,12 +97,12 @@ export function KDSHeader({
           {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
         </button>
         <button
-          className="bg-[#333] border-none text-white w-10 h-10 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#444]"
+          className="bg-[var(--kds-surface-elevated)] border-none text-white w-12 h-12 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[var(--kds-surface-hover)]"
           onClick={onRefresh}
         >
           <RefreshCw size={20} />
         </button>
-        <div className="font-mono text-xl font-semibold py-2 px-4 bg-[#333] rounded-[10px]">
+        <div className="font-mono text-xl font-semibold py-2 px-4 bg-[var(--kds-surface-elevated)] rounded-[10px]">
           {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
         </div>
       </div>

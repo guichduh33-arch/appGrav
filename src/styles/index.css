@@ -111,6 +111,26 @@
     --color-gray-800: #27272a;
     --color-gray-900: #18181b;
 
+    /* ----------------------------------------
+       POS Dark Theme Tokens
+       ---------------------------------------- */
+    --pos-bg-deep: #020617;
+    --pos-bg: #0f0f12;
+    --pos-surface: #1a1a1f;
+    --pos-surface-hover: #252529;
+    --pos-border: #2a2a30;
+    --pos-text: #f5f5f5;
+    --pos-text-muted: #9ca3af;
+
+    /* ----------------------------------------
+       KDS Dark Theme Tokens
+       ---------------------------------------- */
+    --kds-bg: #1a1a1a;
+    --kds-surface: #2a2a2a;
+    --kds-surface-elevated: #333333;
+    --kds-surface-hover: #444444;
+    --kds-border: #333333;
+
     /* Primary as Gold */
     --color-primary-50: rgba(212, 180, 101, 0.05);
     --color-primary-100: rgba(212, 180, 101, 0.1);

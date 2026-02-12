@@ -8,6 +8,8 @@ import type { Role } from '../../types/auth';
 import { useNetworkStatus, useOfflineAuth } from '../../hooks/offline';
 import { useActiveUsers } from '@/hooks/useActiveUsers';
 import { logError } from '@/utils/logger';
+import { WifiOff } from 'lucide-react';
+import { BreakeryLogo } from '@/components/ui/BreakeryLogo';
 import { cn } from '@/lib/utils';
 
 export default function LoginPage() {
@@ -245,9 +247,9 @@ export default function LoginPage() {
       >
         {/* Logo */}
         <div className="text-center mb-2xl">
-          <span className="text-[4rem] block mb-md" style={{ filter: 'drop-shadow(0 4px 12px rgba(201,165,92,0.3))' }}>
-            {'\uD83E\uDD50'}
-          </span>
+          <div className="flex justify-center mb-md" style={{ filter: 'drop-shadow(0 4px 12px rgba(201,165,92,0.3))' }}>
+            <BreakeryLogo size="xl" variant="gold" showText={false} />
+          </div>
           <h1 className="font-display text-3xl font-semibold text-white m-0 tracking-[-0.02em] max-[480px]:text-2xl">
             The Breakery
           </h1>
@@ -259,7 +261,7 @@ export default function LoginPage() {
         {/* Offline Mode Indicator (Story 1.2) */}
         {isOffline && (
           <div className="bg-gray-500 text-white py-sm px-lg rounded-md mb-lg flex items-center justify-center gap-sm text-sm font-body">
-            <span>{'\uD83D\uDCF6'}</span>
+            <WifiOff size={16} />
             <span>Offline Mode</span>
           </div>
         )}

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useMobileStore } from '@/stores/mobileStore';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { BreakeryLogo } from '@/components/ui/BreakeryLogo';
 import { cn } from '@/lib/utils';
 
 interface INavItem {
@@ -68,7 +69,7 @@ export default function MobileLayout() {
       {/* Header */}
       <header className="flex items-center gap-4 px-4 py-2 bg-white border-b border-border min-h-[56px] z-[100] supports-[padding:env(safe-area-inset-top)]:pt-[calc(0.5rem+env(safe-area-inset-top))]">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">🥐</span>
+          <BreakeryLogo size="sm" variant="dark" showText={false} />
           <span className="font-semibold text-lg text-foreground">The Breakery</span>
         </div>
         <div className="ml-auto">

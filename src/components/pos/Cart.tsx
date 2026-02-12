@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { toast } from 'sonner'
-import { Trash2, Tag, Lock, List, User, QrCode, Star, FileText, ChevronDown, ChevronUp, Building2 } from 'lucide-react'
+import { Trash2, Tag, Lock, List, User, QrCode, Star, FileText, ChevronDown, ChevronUp, Building2, ShoppingCart } from 'lucide-react'
 import { useCartStore } from '../../stores/cartStore'
 import { PinVerificationModal, TableSelectionModal, DiscountModal, CustomerSearchModal } from './modals'
 import { LoyaltyBadge } from './LoyaltyBadge'
@@ -245,7 +245,7 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
             <div className="flex-1 overflow-y-auto p-md bg-zinc-900">
                 {items.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-zinc-500">
-                        <span className="text-[48px] mb-md opacity-30">🛒</span>
+                        <ShoppingCart size={48} className="mb-md opacity-30" />
                         <p>Your cart is empty. Select products.</p>
                     </div>
                 ) : (

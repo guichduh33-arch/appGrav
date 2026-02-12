@@ -1,5 +1,6 @@
 import { useMemo, memo, useCallback } from 'react'
 import { toast } from 'sonner'
+import { Search } from 'lucide-react'
 import type { Product } from '../../types/database'
 import { formatPrice } from '../../utils/helpers'
 import { useStockLevelsOffline, TStockStatus } from '@/hooks/offline/useStockLevelsOffline'
@@ -50,7 +51,7 @@ const ProductCard = memo(function ProductCard({
                 </div>
             )}
 
-            {/* Product image or emoji */}
+            {/* Product image or initial */}
             <div className={cn(
                 'w-full h-[80px] bg-[var(--color-gray-800)] flex items-center justify-center overflow-hidden shrink-0',
                 isOutOfStock && 'grayscale-[50%]'
@@ -69,10 +70,10 @@ const ProductCard = memo(function ProductCard({
                     />
                 ) : null}
                 <span
-                    className="text-[28px]"
+                    className="text-2xl font-display font-semibold text-[var(--color-gray-400)]"
                     style={{ display: product.image_url ? 'none' : 'block' }}
                 >
-                    {getProductEmoji(product)}
+                    {product.name.charAt(0).toUpperCase()}
                 </span>
             </div>
 
@@ -122,7 +123,7 @@ function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) 
     if (products.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center h-[300px] text-[var(--color-gray-400)] text-center">
-                <span className="text-[48px] mb-md opacity-50">🔍</span>
+                <Search size={48} className="mb-md opacity-50" />
                 <p>No items found</p>
             </div>
         )
@@ -147,23 +148,6 @@ function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) 
             })}
         </div>
     )
-}
-
-function getProductEmoji(product: Product): string {
-    const name = product.name.toLowerCase()
-
-    if (name.includes('cappuccino') || name.includes('latte') || name.includes('espresso')) return '☕'
-    if (name.includes('matcha')) return '🍵'
-    if (name.includes('croissant')) return '🥐'
-    if (name.includes('pain au chocolat') || name.includes('chocolatine')) return '🍫'
-    if (name.includes('bagel')) return '🥯'
-    if (name.includes('sandwich') || name.includes('burger')) return '🥪'
-    if (name.includes('cheesecake')) return '🍰'
-    if (name.includes('bread') || name.includes('pain') || name.includes('sourdough')) return '🍞'
-    if (name.includes('juice') || name.includes('jus')) return '🧃'
-    if (name.includes('smoothie')) return '🥤'
-
-    return '🥐'
 }
 
 export default memo(ProductGrid)

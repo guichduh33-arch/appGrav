@@ -1,4 +1,5 @@
 import { memo } from 'react'
+import { Gift } from 'lucide-react'
 import type { ProductCombo } from '../../types/database'
 import { formatPrice } from '../../utils/helpers'
 
@@ -33,9 +34,7 @@ export default memo(function ComboGrid({ combos, onComboClick, isLoading }: Comb
                         Combo
                     </div>
                     <div className="w-full h-[80px] bg-[var(--color-gray-800)] flex items-center justify-center overflow-hidden shrink-0">
-                        <span className="text-[28px] block">
-                            🎁
-                        </span>
+                        <Gift size={28} className="text-primary" />
                     </div>
                     <div className="px-4 pt-4 pb-1 text-[1.3rem] font-bold text-white leading-tight line-clamp-3 flex-1">
                         {combo.name}

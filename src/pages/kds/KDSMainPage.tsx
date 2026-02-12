@@ -239,7 +239,7 @@ export default function KDSMainPage() {
     )
 
     return (
-        <div className="flex flex-col h-screen overflow-hidden bg-[#1a1a1a] text-white" style={{ '--station-color': stationConfig.color } as React.CSSProperties}>
+        <div className="flex flex-col h-screen overflow-hidden bg-[var(--kds-bg)] text-white" style={{ '--station-color': stationConfig.color } as React.CSSProperties}>
             <KDSHeader
                 stationConfig={stationConfig}
                 urgentCount={urgentCount}
@@ -265,7 +265,7 @@ export default function KDSMainPage() {
                     </div>
                 ) : orders.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-center">
-                        <div className="w-[120px] h-[120px] rounded-[30px] bg-[#2a2a2a] flex items-center justify-center mb-6 text-[var(--station-color)] [&_svg]:w-[60px] [&_svg]:h-[60px]">{stationConfig.icon}</div>
+                        <div className="w-[120px] h-[120px] rounded-[30px] bg-[var(--kds-surface)] flex items-center justify-center mb-6 text-[var(--station-color)] [&_svg]:w-[60px] [&_svg]:h-[60px]">{stationConfig.icon}</div>
                         <h2 className="text-[2rem] m-0 mb-2 text-white">No Orders</h2>
                         <p className="text-[1.1rem] text-[#888] m-0">Waiting for new orders...</p>
                     </div>

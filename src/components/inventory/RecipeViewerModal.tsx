@@ -1,4 +1,4 @@
-import { X, Package, AlertCircle } from 'lucide-react'
+import { X, Package, AlertCircle, FlaskConical } from 'lucide-react'
 import type { Product } from '../../types/database'
 import { useProductRecipe } from '@/hooks/inventory'
 import { cn } from '@/lib/utils'
@@ -69,7 +69,7 @@ export default function RecipeViewerModal({ product, onClose }: RecipeViewerModa
                                         )}
                                     >
                                         <div className="flex items-center gap-2 font-medium">
-                                            <span className="text-xl">🧪</span>
+                                            <FlaskConical size={18} className="text-muted-foreground shrink-0" />
                                             {material?.name || 'Unknown Ingredient'}
                                         </div>
                                         <div className="font-semibold text-foreground">

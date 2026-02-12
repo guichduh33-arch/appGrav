@@ -102,7 +102,7 @@ export default function StockProductionPage() {
         if (!selectedSectionId) return
 
         try {
-            logDebug('📦 [StockProduction] Fetching products for section:', selectedSectionId)
+            logDebug('[StockProduction] Fetching products for section:', selectedSectionId)
 
             // First, get all product_sections for this section
             const { data: psData, error: psError } = await supabase
@@ -110,21 +110,21 @@ export default function StockProductionPage() {
                 .select('product_id')
                 .eq('section_id', selectedSectionId)
 
-            logDebug('📦 [StockProduction] Product IDs:', psData)
+            logDebug('[StockProduction] Product IDs:', psData)
 
             if (psError) {
-                logError('❌ [StockProduction] Error fetching product_sections:', psError)
+                logError('[StockProduction] Error fetching product_sections:', psError)
                 throw psError
             }
 
             if (!psData || psData.length === 0) {
-                logDebug('📦 [StockProduction] No products found for this section')
+                logDebug('[StockProduction] No products found for this section')
                 setSectionProducts([])
                 return
             }
 
             const productIds = psData.map(ps => ps.product_id)
-            logDebug('📦 [StockProduction] Product IDs to fetch:', productIds.length)
+            logDebug('[StockProduction] Product IDs to fetch:', productIds.length)
 
             // Then fetch the full product details
             const { data, error } = await supabase
@@ -137,8 +137,8 @@ export default function StockProductionPage() {
                 .in('product_type', ['finished', 'semi_finished'])
                 .neq('is_active', false)
 
-            logDebug('📦 [StockProduction] Products fetched:', data?.length)
-            logDebug('📦 [StockProduction] Error:', error)
+            logDebug('[StockProduction] Products fetched:', data?.length)
+            logDebug('[StockProduction] Error:', error)
 
             if (error) throw error
 
@@ -158,11 +158,11 @@ export default function StockProductionPage() {
             )
 
             const products = productsWithUoms as ProductWithSection[]
-            logDebug('📦 [StockProduction] Final products:', products.length, products.slice(0, 5).map(p => p.name))
+            logDebug('[StockProduction] Final products:', products.length, products.slice(0, 5).map(p => p.name))
 
             setSectionProducts(products)
         } catch (error) {
-            logError('❌ [StockProduction] Error fetching section products:', error)
+            logError('[StockProduction] Error fetching section products:', error)
         }
     }
 

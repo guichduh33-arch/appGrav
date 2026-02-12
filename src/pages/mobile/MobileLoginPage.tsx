@@ -8,6 +8,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, AlertCircle, Lock } from 'lucide-react';
+import { BreakeryLogo } from '@/components/ui/BreakeryLogo';
 import { useMobileStore } from '@/stores/mobileStore';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -152,7 +153,9 @@ export default function MobileLoginPage() {
       <div className="w-full max-w-[320px] flex flex-col items-center gap-xl">
         {/* Logo */}
         <div className="text-center text-white">
-          <span className="text-[4rem] block mb-md">🥐</span>
+          <div className="flex justify-center mb-md">
+            <BreakeryLogo size="xl" variant="light" showText={false} />
+          </div>
           <h1 className="text-3xl font-bold m-0 [text-shadow:0_2px_4px_rgba(0,0,0,0.1)]">The Breakery</h1>
           <p className="text-lg mt-xs m-0 opacity-90">Server App</p>
         </div>

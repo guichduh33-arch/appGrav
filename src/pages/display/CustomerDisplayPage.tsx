@@ -17,6 +17,8 @@ import { LAN_MESSAGE_TYPES, type ILanMessage } from '@/services/lan/lanProtocol'
 import type { ICartDisplayPayload, IOrderStatusPayload } from '@/services/display/displayBroadcast';
 import { supabase } from '@/lib/supabase';
 import type { IDisplayPromotion } from '@/types/database';
+import { MapPin, Wifi, Clock } from 'lucide-react';
+import { BreakeryLogo } from '@/components/ui/BreakeryLogo';
 import { cn } from '@/lib/utils';
 import { logError } from '@/utils/logger'
 
@@ -197,9 +199,9 @@ export default function CustomerDisplayPage() {
       >
         <div className="flex-1 flex flex-col items-center justify-center text-center">
           <div className="mb-2xl">
-            <span className="text-[6rem] block mb-md animate-[cd-float_3s_ease-in-out_infinite]">
-              {'\uD83E\uDD50'}
-            </span>
+            <div className="flex justify-center mb-md animate-[cd-float_3s_ease-in-out_infinite]">
+              <BreakeryLogo size="xl" variant="light" showText={false} />
+            </div>
             <h1 className="font-display text-[4rem] font-bold m-0" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
               The Breakery
             </h1>
@@ -346,9 +348,9 @@ export default function CustomerDisplayPage() {
         ) : (
           <>
             <div className="mb-2xl">
-              <span className="text-[6rem] block mb-md animate-[cd-float_3s_ease-in-out_infinite]">
-                {'\uD83E\uDD50'}
-              </span>
+              <div className="flex justify-center mb-md animate-[cd-float_3s_ease-in-out_infinite]">
+                <BreakeryLogo size="xl" variant="light" showText={false} />
+              </div>
               <h1 className="font-display text-[4rem] font-bold m-0" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
                 The Breakery
               </h1>
@@ -357,15 +359,15 @@ export default function CustomerDisplayPage() {
 
             <div className="flex flex-col gap-md mb-2xl">
               <div className="flex items-center justify-center gap-sm text-lg opacity-90">
-                <span className="text-[1.5rem]">{'\uD83D\uDCCD'}</span>
+                <MapPin size={24} />
                 <span>Senggigi, Lombok</span>
               </div>
               <div className="flex items-center justify-center gap-sm text-lg opacity-90">
-                <span className="text-[1.5rem]">{'\uD83D\uDCF6'}</span>
+                <Wifi size={24} />
                 <span>WiFi: TheBreakery &bull; Pass: croissant2024</span>
               </div>
               <div className="flex items-center justify-center gap-sm text-lg opacity-90">
-                <span className="text-[1.5rem]">{'\u23F0'}</span>
+                <Clock size={24} />
                 <span>Open 7/7 &bull; 7am - 6pm</span>
               </div>
             </div>

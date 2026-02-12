@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Plus, Save, Trash2, Grid, Users, Circle, Square, Minus, Home, Sun, Star } from 'lucide-react'
+import { Plus, Save, Trash2, Grid, Users, Circle, Square, Minus, Home, Sun, Star, Palmtree, Fence, Wine, DoorOpen, Palette } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { logError } from '@/utils/logger'
 import type { Insertable } from '../../types/database'
@@ -26,11 +26,18 @@ const TABLE_SHAPES = [
     { value: 'rectangle' as const, label: 'Rectangle', icon: <Minus size={20} /> }
 ]
 
+const DECORATION_TYPE_ICONS: Record<string, React.ReactNode> = {
+    plant: <Palmtree size={18} className="text-emerald-500" />,
+    wall: <Fence size={18} className="text-stone-400" />,
+    bar: <Wine size={18} className="text-amber-500" />,
+    entrance: <DoorOpen size={18} className="text-blue-400" />,
+}
+
 const DECORATION_TYPES = [
-    { value: 'plant' as const, label: '🌿 Plant', emoji: '🌿' },
-    { value: 'wall' as const, label: '🧱 Wall', emoji: '🧱' },
-    { value: 'bar' as const, label: '🍺 Bar', emoji: '🍺' },
-    { value: 'entrance' as const, label: '🚪 Entrance', emoji: '🚪' }
+    { value: 'plant' as const, label: 'Plant' },
+    { value: 'wall' as const, label: 'Wall' },
+    { value: 'bar' as const, label: 'Bar' },
+    { value: 'entrance' as const, label: 'Entrance' }
 ]
 
 const FLOOR_SECTIONS = [
@@ -357,7 +364,7 @@ export default function FloorPlanEditor() {
                                         setShowAddMenu(false)
                                     }}
                                 >
-                                    <span className="text-lg">🌿</span>
+                                    <Palmtree size={18} className="text-emerald-500" />
                                     <div>
                                         <div className="add-menu__item-title">Decoration</div>
                                         <div className="add-menu__item-desc">Plant, wall, bar, etc.</div>
@@ -377,7 +384,7 @@ export default function FloorPlanEditor() {
                             <span>{totalCovers} covers</span>
                         </div>
                         <div className="floor-plan-stat">
-                            <span className="text-base">🌿</span>
+                            <Palmtree size={16} className="text-emerald-500" />
                             <span>{decorations.length} decorations</span>
                         </div>
                     </div>
@@ -477,7 +484,7 @@ export default function FloorPlanEditor() {
                                         className={`decoration-btn ${decorationForm.decoration_type === deco.value ? 'is-active' : ''}`}
                                         onClick={() => setDecorationForm({ ...decorationForm, decoration_type: deco.value })}
                                     >
-                                        <span className="decoration-btn__emoji">{deco.emoji}</span>
+                                        <span className="decoration-btn__emoji">{DECORATION_TYPE_ICONS[deco.value]}</span>
                                         <span>{deco.label}</span>
                                     </button>
                                 ))}
@@ -536,7 +543,6 @@ export default function FloorPlanEditor() {
                         <>
                             {/* Decorations (rendered first, behind tables) */}
                             {filteredItems.filter(i => i.type === 'decoration').map(item => {
-                                const decorationType = DECORATION_TYPES.find(d => d.value === item.decoration_type)
                                 return (
                                     <div
                                         key={item.id}
@@ -552,7 +558,7 @@ export default function FloorPlanEditor() {
                                         }}
                                     >
                                         <span className="floor-plan-decoration__emoji">
-                                            {decorationType?.emoji || '🎨'}
+                                            {DECORATION_TYPE_ICONS[item.decoration_type || ''] || <Palette size={18} />}
                                         </span>
                                         {/* Resize handles */}
                                         {selectedItem?.id === item.id && (

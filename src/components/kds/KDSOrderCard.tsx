@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Clock, CheckCircle, ChefHat, AlertTriangle, Pause, Play, Smartphone, Wifi } from 'lucide-react'
+import { Clock, CheckCircle, ChefHat, AlertTriangle, Pause, Play, Smartphone, Wifi, UtensilsCrossed, Package, Bike, Building2, MapPin, User } from 'lucide-react'
 import { useOrderAutoRemove } from '@/hooks/kds/useOrderAutoRemove'
 import { useKDSConfigSettings } from '@/hooks/settings/useModuleConfigSettings'
 import { KDSCountdownBar } from './KDSCountdownBar'
@@ -33,11 +33,11 @@ interface KDSOrderCardProps {
     onOrderComplete?: (orderId: string) => void // Story 4.6
 }
 
-const ORDER_TYPE_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
-    dine_in: { label: 'Dine In', icon: '🍽️', color: '#10B981' },
-    takeaway: { label: 'Takeaway', icon: '🥡', color: '#F59E0B' },
-    delivery: { label: 'Delivery', icon: '🚴', color: '#3B82F6' },
-    b2b: { label: 'B2B', icon: '🏢', color: '#8B5CF6' }
+const ORDER_TYPE_ICONS: Record<string, { label: string; Icon: typeof UtensilsCrossed; color: string }> = {
+    dine_in: { label: 'Dine In', Icon: UtensilsCrossed, color: '#10B981' },
+    takeaway: { label: 'Takeaway', Icon: Package, color: '#F59E0B' },
+    delivery: { label: 'Delivery', Icon: Bike, color: '#3B82F6' },
+    b2b: { label: 'B2B', Icon: Building2, color: '#8B5CF6' }
 }
 
 function KDSOrderCard({
@@ -108,7 +108,7 @@ function KDSOrderCard({
 
     const overallStatus = getOverallStatus()
     const urgency = getUrgencyLevel()
-    const orderConfig = ORDER_TYPE_CONFIG[orderType] || ORDER_TYPE_CONFIG.dine_in
+    const orderConfig = ORDER_TYPE_ICONS[orderType] || ORDER_TYPE_ICONS.dine_in
 
     // Story 4.6: Auto-remove when all items are ready (except waiter station)
     const isWaiterStation = station === 'waiter'
@@ -161,7 +161,7 @@ function KDSOrderCard({
 
     return (
         <div className={cn(
-            'relative bg-[#2a2a2a] rounded-xl overflow-hidden flex flex-col transition-all duration-300 border-2 border-transparent motion-reduce:transition-none',
+            'relative bg-[var(--kds-surface)] rounded-xl overflow-hidden flex flex-col transition-all duration-300 border-2 border-transparent motion-reduce:transition-none',
             overallStatus === 'new' && 'border-[#3B82F6] animate-pulse-new motion-reduce:animate-none',
             overallStatus === 'preparing' && 'border-[#F59E0B]',
             overallStatus === 'ready' && 'border-[#10B981] bg-gradient-to-br from-[#2a2a2a] to-[#1a3a2a]',
@@ -172,18 +172,19 @@ function KDSOrderCard({
             isExiting && 'animate-card-exit pointer-events-none motion-reduce:animate-none motion-reduce:opacity-0'
         )}>
             {/* Header */}
-            <div className="flex justify-between items-center py-3 px-4 bg-[#1a1a1a] border-b border-[#333]">
+            <div className="flex justify-between items-center py-3 px-4 bg-[var(--kds-bg)] border-b border-[var(--kds-border)]">
                 <div className="flex items-center gap-2.5">
                     <span className="text-2xl font-bold text-white">#{orderNumber}</span>
                     <span
-                        className="text-[0.9rem] font-bold py-2 px-4 rounded-[20px] text-white whitespace-nowrap"
+                        className="text-[0.9rem] font-bold py-2 px-4 rounded-[20px] text-white whitespace-nowrap inline-flex items-center gap-1.5"
                         style={{ backgroundColor: orderConfig.color }}
                     >
-                        {orderConfig.icon} {orderConfig.label}
+                        <orderConfig.Icon size={16} />
+                        {orderConfig.label}
                     </span>
                     {/* Story 8.1: Mobile order indicator */}
                     {source === 'mobile' && (
-                        <span className="flex items-center justify-center w-7 h-7 rounded-md bg-[#8B5CF6] text-white animate-pulse-mobile motion-reduce:animate-none">
+                        <span className="flex items-center justify-center w-9 h-9 rounded-md bg-[#8B5CF6] text-white animate-pulse-mobile motion-reduce:animate-none">
                             <Smartphone size={14} />
                         </span>
                     )}
@@ -196,7 +197,7 @@ function KDSOrderCard({
                     )}
                 </div>
                 <div className={cn(
-                    'flex items-center gap-1.5 font-mono text-[1.1rem] font-semibold py-1.5 px-3 rounded-lg bg-[#333]',
+                    'flex items-center gap-1.5 font-mono text-[1.1rem] font-semibold py-1.5 px-3 rounded-lg bg-[var(--kds-surface-elevated)]',
                     urgency === 'normal' && 'text-[#10B981]',
                     urgency === 'warning' && 'text-[#F59E0B] bg-[rgba(245,158,11,0.2)]',
                     urgency === 'critical' && 'text-[#EF4444] bg-[rgba(239,68,68,0.2)]'
@@ -208,9 +209,9 @@ function KDSOrderCard({
 
             {/* Customer/Table Info */}
             {(tableName || customerName) && (
-                <div className="flex gap-4 py-2 px-4 bg-[#222] text-[0.9rem] text-[#aaa]">
-                    {tableName && <span className="flex items-center gap-1">📍 {tableName}</span>}
-                    {customerName && <span className="flex items-center gap-1">👤 {customerName}</span>}
+                <div className="flex gap-4 py-2 px-4 bg-[var(--kds-bg)] text-[0.9rem] text-[#aaa]">
+                    {tableName && <span className="flex items-center gap-1"><MapPin size={14} /> {tableName}</span>}
+                    {customerName && <span className="flex items-center gap-1"><User size={14} /> {customerName}</span>}
                 </div>
             )}
 
@@ -220,7 +221,7 @@ function KDSOrderCard({
                     <div
                         key={item.id}
                         className={cn(
-                            'py-2.5 px-3 bg-[#1a1a1a] rounded-lg border-l-4 transition-all duration-300',
+                            'py-2.5 px-3 bg-[var(--kds-bg)] rounded-lg border-l-4 transition-all duration-300',
                             item.item_status === 'new' && 'border-l-[#3B82F6]',
                             item.item_status === 'preparing' && 'border-l-[#F59E0B] bg-[rgba(245,158,11,0.1)]',
                             item.item_status === 'ready' && 'border-l-[#10B981] bg-[rgba(16,185,129,0.1)] line-through opacity-70',
@@ -248,7 +249,7 @@ function KDSOrderCard({
                             {onToggleHold && item.item_status !== 'served' && (
                                 <button
                                     className={cn(
-                                        'w-7 h-7 border-none rounded-md bg-[#374151] text-[#9CA3AF] cursor-pointer flex items-center justify-center transition-all duration-200 ml-auto shrink-0 hover:bg-[#4B5563] hover:text-white',
+                                        'w-9 h-9 border-none rounded-md bg-[#374151] text-[#9CA3AF] cursor-pointer flex items-center justify-center transition-all duration-200 ml-auto shrink-0 hover:bg-[#4B5563] hover:text-white',
                                         item.is_held && 'bg-[#DC2626] text-white hover:bg-[#EF4444]'
                                     )}
                                     onClick={(e) => {
@@ -276,10 +277,10 @@ function KDSOrderCard({
             </div>
 
             {/* Action Buttons */}
-            <div className="py-3 px-4 bg-[#1a1a1a] border-t border-[#333]">
+            <div className="py-3 px-4 bg-[var(--kds-bg)] border-t border-[var(--kds-border)]">
                 {overallStatus === 'new' && (
                     <button
-                        className="w-full py-3.5 px-5 border-none rounded-[10px] text-[1.1rem] font-bold cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(59,130,246,0.4)]"
+                        className="w-full py-4 px-5 border-none rounded-[10px] text-[1.1rem] min-h-[48px] font-bold cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(59,130,246,0.4)]"
                         onClick={handleStartPreparing}
                     >
                         <ChefHat size={20} />
@@ -288,7 +289,7 @@ function KDSOrderCard({
                 )}
                 {overallStatus === 'preparing' && (
                     <button
-                        className="w-full py-3.5 px-5 border-none rounded-[10px] text-[1.1rem] font-bold cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#10B981] to-[#059669] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(16,185,129,0.4)]"
+                        className="w-full py-4 px-5 border-none rounded-[10px] text-[1.1rem] min-h-[48px] font-bold cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#10B981] to-[#059669] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(16,185,129,0.4)]"
                         onClick={handleMarkReady}
                     >
                         <CheckCircle size={20} />
@@ -297,7 +298,7 @@ function KDSOrderCard({
                 )}
                 {overallStatus === 'ready' && station === 'waiter' && (
                     <button
-                        className="w-full py-3.5 px-5 border-none rounded-[10px] text-[1.1rem] font-bold cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(139,92,246,0.4)]"
+                        className="w-full py-4 px-5 border-none rounded-[10px] text-[1.1rem] min-h-[48px] font-bold cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(139,92,246,0.4)]"
                         onClick={handleMarkServed}
                     >
                         <CheckCircle size={20} />
