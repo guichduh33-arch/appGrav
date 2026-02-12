@@ -3,7 +3,7 @@
 
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
-import { logError, logInfo, logDebug, logWarn } from '@/utils/logger';
+import { logError } from '@/utils/logger';
 import type {
   Role,
   EffectivePermission,

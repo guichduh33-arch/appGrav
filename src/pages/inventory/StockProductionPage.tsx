@@ -7,7 +7,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../stores/authStore'
 import { Product, Section, ProductionRecord } from '../../types/database'
 import { toast } from 'sonner'
-import { logError, logDebug, logInfo } from '@/utils/logger'
+import { logError, logDebug } from '@/utils/logger'
 import './StockProductionPage.css'
 
 // Format number with thousand separators

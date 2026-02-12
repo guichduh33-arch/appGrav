@@ -10,6 +10,7 @@ import {
     Save
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/authStore'
+import { logError } from '@/utils/logger'
 import { formatCurrency, formatDateTime } from '../../utils/helpers'
 import { toast } from 'sonner'
 import {
@@ -128,7 +129,6 @@ export default function WastedPage() {
     }
 
     // Extract reason type from full reason string (e.g., "Expired: some notes" -> "expired")
-import { logError } from '@/utils/logger'
     const getReasonType = (reason: string | null): string => {
         if (!reason) return 'other'
         const lowerReason = reason.toLowerCase()

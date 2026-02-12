@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { logError } from '@/utils/logger';
 import {
   X,
   Check,
@@ -253,7 +254,6 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
         }
 
         // Calculate total change from all cash payments
-import { logError } from '@/utils/logger'
         const totalChange = payments.reduce((sum, p) => {
           if (p.method === 'cash' && p.cashReceived) {
             return sum + Math.max(0, p.cashReceived - p.amount);

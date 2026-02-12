@@ -10,6 +10,7 @@ import {
     type ModifierOption
 } from '../../../hooks/products'
 import { formatPrice } from '../../../utils/helpers'
+import { logError } from '@/utils/logger'
 import './ModifiersTab.css'
 
 interface ModifiersTabProps {
@@ -174,7 +175,6 @@ export const ModifiersTab: React.FC<ModifiersTabProps> = ({ productId }) => {
                     <Info size={18} />
                     <span>
                         {`${categoryGroups.length} group(s) inherited from category. Add product-specific groups or customize inherited groups.`}
-import { logError } from '@/utils/logger'
                     </span>
                 </div>
             )}

@@ -10,7 +10,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { CartItem } from '@/stores/cartStore';
 import { logError, logWarn } from '@/utils/logger';
-import { logError, logWarn } from '@/utils/logger';
 
 // =====================================================
 // Types
