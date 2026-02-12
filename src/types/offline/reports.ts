@@ -40,8 +40,7 @@ export interface IOfflineReportCache {
   report_date: string;
 
   /** Cached report data (JSON-serializable) */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: Record<string, any>;
+  data: Record<string, unknown>;
 
   /** ISO 8601 timestamp when cached */
   cached_at: string;

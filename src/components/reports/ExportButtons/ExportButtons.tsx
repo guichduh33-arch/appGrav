@@ -14,8 +14,7 @@ import {
   type PdfSummary,
 } from '@/services/reports/pdfExport';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface ExportConfig<T extends Record<string, any>> {
+export interface ExportConfig<T extends object> {
   data: T[];
   columns: Array<{
     key: keyof T | string;
@@ -31,8 +30,7 @@ export interface ExportConfig<T extends Record<string, any>> {
   summaries?: PdfSummary[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface ExportButtonsProps<T extends Record<string, any>> {
+export interface ExportButtonsProps<T extends object> {
   config: ExportConfig<T>;
   disabled?: boolean;
   showLabels?: boolean;
@@ -41,8 +39,7 @@ export interface ExportButtonsProps<T extends Record<string, any>> {
   onExportComplete?: (type: 'csv' | 'pdf', success: boolean) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function ExportButtons<T extends Record<string, any>>({
+export function ExportButtons<T extends object>({
   config,
   disabled = false,
   showLabels = true,
@@ -185,15 +182,13 @@ export function ExportButtons<T extends Record<string, any>>({
 }
 
 // Compact version for toolbars
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface ExportDropdownProps<T extends Record<string, any>> {
+export interface ExportDropdownProps<T extends object> {
   config: ExportConfig<T>;
   disabled?: boolean;
   className?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function ExportDropdown<T extends Record<string, any>>({
+export function ExportDropdown<T extends object>({
   config,
   disabled = false,
   className = '',

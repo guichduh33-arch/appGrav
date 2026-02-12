@@ -158,7 +158,7 @@ export interface ILegacySyncQueueItem {
   action?: 'create' | 'update' | 'delete';
 
   /** Transaction payload data */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- payload must accept arbitrary interface types
   payload: Record<string, any>;
 
   /** Current sync status */

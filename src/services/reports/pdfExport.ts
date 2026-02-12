@@ -78,7 +78,7 @@ function addWatermark(doc: jsPDF, text: string, showDate: boolean = true): void 
 /**
  * Get nested value from object using dot notation
  */
-function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
+function getNestedValue(obj: object, path: string): unknown {
   return path.split('.').reduce((current, key) => {
     if (current && typeof current === 'object') {
       return (current as Record<string, unknown>)[key];
@@ -94,7 +94,7 @@ function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
 /**
  * Export data to PDF with professional formatting
  */
-export function exportToPDF<T extends Record<string, unknown>>(
+export function exportToPDF<T extends object>(
   data: T[],
   columns: PdfColumn<T>[],
   options: PdfExportOptions,

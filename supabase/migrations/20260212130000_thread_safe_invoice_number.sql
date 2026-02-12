@@ -91,3 +91,43 @@ $$;
 -- but this ensures the function is callable via RPC as well)
 GRANT EXECUTE ON FUNCTION public.generate_next_invoice_number(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.generate_next_invoice_number(UUID) TO service_role;
+
+-- =====================================================
+-- Function: generate_next_customer_invoice_number
+-- Thread-safe invoice number generation for customer_invoices table.
+-- Uses a separate advisory lock ID (7283947) to avoid contention
+-- with the b2b_orders invoice number generator.
+-- Format: INV-YYYY-NNNNN (zero-padded 5-digit global sequence per year)
+-- =====================================================
+CREATE OR REPLACE FUNCTION public.generate_next_customer_invoice_number()
+RETURNS TEXT
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_year TEXT;
+  v_prefix TEXT;
+  v_count INT;
+  v_invoice_number TEXT;
+BEGIN
+  -- Acquire an advisory lock scoped to customer invoice generation.
+  -- Lock ID 7283947 is a separate constant from the b2b invoice lock.
+  PERFORM pg_advisory_xact_lock(7283947);
+
+  -- Build the year prefix
+  v_year := to_char(CURRENT_DATE, 'YYYY');
+  v_prefix := 'INV-' || v_year || '-';
+
+  -- Count existing invoice numbers with this prefix (serialized by advisory lock)
+  SELECT COUNT(*) INTO v_count
+    FROM public.customer_invoices
+   WHERE invoice_number LIKE v_prefix || '%';
+
+  v_invoice_number := v_prefix || lpad((v_count + 1)::TEXT, 5, '0');
+
+  RETURN v_invoice_number;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.generate_next_customer_invoice_number() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.generate_next_customer_invoice_number() TO service_role;

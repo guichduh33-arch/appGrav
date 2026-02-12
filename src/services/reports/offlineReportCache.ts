@@ -20,8 +20,7 @@ const DATE_FORMAT = 'yyyy-MM-dd';
 export async function cacheReportData(
   reportType: TReportCacheType,
   reportDate: Date | string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: Record<string, any>
+  data: Record<string, unknown>
 ): Promise<void> {
   const dateStr = typeof reportDate === 'string' ? reportDate : format(reportDate, DATE_FORMAT);
 
@@ -54,8 +53,7 @@ export async function cacheReportData(
 export async function getCachedReport(
   reportType: TReportCacheType,
   dateRange: { from: Date; to: Date }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<{ data: Record<string, any>[]; complete: boolean; lastSyncDate: Date | null }> {
+): Promise<{ data: Record<string, unknown>[]; complete: boolean; lastSyncDate: Date | null }> {
   const fromStr = format(dateRange.from, DATE_FORMAT);
   const toStr = format(dateRange.to, DATE_FORMAT);
 
@@ -97,8 +95,7 @@ export async function getCachedReport(
 export async function getCachedReportForDate(
   reportType: TReportCacheType,
   date: Date | string
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<Record<string, any> | null> {
+): Promise<Record<string, unknown> | null> {
   const dateStr = typeof date === 'string' ? date : format(date, DATE_FORMAT);
 
   const entry = await db.offline_reports_cache
@@ -114,8 +111,7 @@ export async function getCachedReportForDate(
  */
 export async function cacheReportDataBulk(
   reportType: TReportCacheType,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  entries: Array<{ date: Date | string; data: Record<string, any> }>
+  entries: Array<{ date: Date | string; data: Record<string, unknown> }>
 ): Promise<void> {
   const now = new Date().toISOString();
 

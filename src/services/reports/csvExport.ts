@@ -41,7 +41,7 @@ function escapeCSV(value: unknown): string {
 }
 
 // Helper to convert data to CSV
-function toCSV<T extends Record<string, unknown>>(
+function toCSV<T extends object>(
     data: T[],
     columns: { key: keyof T; header: string }[]
 ): string {
@@ -70,7 +70,7 @@ function downloadCSV(content: string, filename: string) {
  * Export any data array to CSV with custom columns
  * This is the main function for exporting report data
  */
-export function exportToCSV<T extends Record<string, unknown>>(
+export function exportToCSV<T extends object>(
   data: T[],
   columns: CsvColumn<T>[],
   options: CsvExportOptions
@@ -120,7 +120,7 @@ export function exportToCSV<T extends Record<string, unknown>>(
 /**
  * Helper to get nested value from object using dot notation
  */
-function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
+function getNestedValue(obj: object, path: string): unknown {
   return path.split('.').reduce((current, key) => {
     if (current && typeof current === 'object') {
       return (current as Record<string, unknown>)[key];

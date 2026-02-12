@@ -54,7 +54,7 @@ export function getBackoffDelay(attempts: number): number {
  */
 export async function addToSyncQueue(
   type: TSyncQueueType,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- payload must accept arbitrary interface types
   payload: Record<string, any>,
   options?: { priority?: TSyncPriority; idempotency_key?: string }
 ): Promise<string> {

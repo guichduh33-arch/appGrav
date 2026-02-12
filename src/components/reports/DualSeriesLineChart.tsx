@@ -8,6 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import type { Payload, ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
 import { formatCurrency } from '@/utils/helpers';
 
 export interface DualSeriesDataPoint {
@@ -44,8 +45,7 @@ export interface DualSeriesLineChartProps {
 
 interface CustomTooltipProps {
   active?: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  payload?: any[];
+  payload?: Payload<ValueType, NameType>[];
   format?: 'currency' | 'number' | 'percent';
   currentLabel?: string;
   previousLabel?: string;
@@ -75,30 +75,33 @@ function CustomTooltip({
     }
   };
 
-  const currentData = payload.find((p: { dataKey: string }) => p.dataKey === 'current');
-  const previousData = payload.find((p: { dataKey: string }) => p.dataKey === 'previous');
+  const currentData = payload.find((p) => p.dataKey === 'current');
+  const previousData = payload.find((p) => p.dataKey === 'previous');
   const dataPoint = payload[0]?.payload as DualSeriesDataPoint | undefined;
+
+  const currentValue = typeof currentData?.value === 'number' ? currentData.value : undefined;
+  const previousValue = typeof previousData?.value === 'number' ? previousData.value : undefined;
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3 text-sm">
       <p className="font-medium text-gray-900 mb-2">{dataPoint?.label}</p>
 
-      {currentData && currentData.value !== undefined && (
+      {currentValue !== undefined && (
         <div className="flex items-center gap-2 mb-1">
           <div className="w-3 h-0.5 bg-blue-600" />
           <span className="text-gray-600">{currentLabel}:</span>
-          <span className="font-medium text-gray-900">{formatValue(currentData.value)}</span>
+          <span className="font-medium text-gray-900">{formatValue(currentValue)}</span>
           {dataPoint?.currentDate && (
             <span className="text-gray-400 text-xs">({dataPoint.currentDate})</span>
           )}
         </div>
       )}
 
-      {previousData && previousData.value !== undefined && previousData.value !== null && (
+      {previousValue !== undefined && (
         <div className="flex items-center gap-2">
           <div className="w-3 h-0.5 bg-gray-400" style={{ borderStyle: 'dashed' }} />
           <span className="text-gray-600">{previousLabel}:</span>
-          <span className="font-medium text-gray-900">{formatValue(previousData.value)}</span>
+          <span className="font-medium text-gray-900">{formatValue(previousValue)}</span>
           {dataPoint?.previousDate && (
             <span className="text-gray-400 text-xs">({dataPoint.previousDate})</span>
           )}
@@ -106,10 +109,10 @@ function CustomTooltip({
       )}
 
       {/* Variation */}
-      {currentData?.value !== undefined && previousData?.value !== undefined && previousData.value !== null && previousData.value !== 0 && (
+      {currentValue !== undefined && previousValue !== undefined && previousValue !== 0 && (
         <div className="mt-2 pt-2 border-t border-gray-100">
           {(() => {
-            const variation = ((currentData.value - previousData.value) / Math.abs(previousData.value)) * 100;
+            const variation = ((currentValue - previousValue) / Math.abs(previousValue)) * 100;
             const isPositive = variation > 0;
             return (
               <span className={`text-xs font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>

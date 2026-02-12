@@ -22,7 +22,6 @@ interface Expense {
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#6B7280', '#14B8A6'];
 
 // Note: expenses table doesn't exist yet - this is a placeholder
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function getExpenses(_from: Date, _to: Date): Promise<Expense[]> {
   // Table doesn't exist yet, return empty array
   // When expenses table is created, uncomment and use this:

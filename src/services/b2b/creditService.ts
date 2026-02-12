@@ -215,18 +215,14 @@ export async function createInvoice(
     dueDate: Date,
     notes?: string
 ): Promise<{ success: boolean; invoiceId?: string; error?: string }> {
-    // Generate invoice number
-    const { data: lastInvoice } = await supabase
-        .from('customer_invoices')
-        .select('invoice_number')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
+    // Generate invoice number via thread-safe DB function (S9 audit fix)
+    // Uses pg_advisory_xact_lock to prevent duplicate numbers under concurrency
+    const { data: invoiceNumber, error: rpcError } = await supabase
+        .rpc('generate_next_customer_invoice_number')
 
-    let invoiceNumber = 'INV-0001'
-    if (lastInvoice) {
-        const lastNum = parseInt(lastInvoice.invoice_number.split('-')[1]) || 0
-        invoiceNumber = `INV-${String(lastNum + 1).padStart(4, '0')}`
+    if (rpcError || !invoiceNumber) {
+        console.error('Error generating invoice number:', rpcError)
+        return { success: false, error: rpcError?.message || 'Failed to generate invoice number' }
     }
 
     const { data, error } = await supabase
@@ -234,7 +230,7 @@ export async function createInvoice(
         .insert({
             customer_id: customerId,
             order_id: orderId,
-            invoice_number: invoiceNumber,
+            invoice_number: invoiceNumber as string,
             due_date: dueDate.toISOString(),
             amount: amount,
             status: 'pending',

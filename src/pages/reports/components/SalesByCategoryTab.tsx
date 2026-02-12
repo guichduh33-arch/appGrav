@@ -306,7 +306,7 @@ export const SalesByCategoryTab = () => {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  // @ts-expect-error recharts type issue with custom data shape
+                  // @ts-expect-error -- recharts ChartDataInput requires index signature; interface CategorySalesStat lacks it
                   data={data}
                   cx="50%"
                   cy="50%"
