@@ -173,11 +173,19 @@ export default defineConfig(async ({ mode }) => {
                         if (id.includes('react-dom') || id.includes('react-router')) return 'vendor-react'
                         if (id.includes('@tanstack') || id.includes('tanstack')) return 'vendor-query'
                         if (id.includes('@supabase') || id.includes('supabase')) return 'vendor-supabase'
-                        if (id.includes('lucide-react') || id.includes('lucide') || id.includes('sonner')) return 'vendor-ui'
                         if (id.includes('recharts') || id.includes('d3-')) return 'vendor-charts'
                         if (id.includes('jspdf') || id.includes('jspdf-autotable')) return 'vendor-pdf'
                         if (id.includes('xlsx')) return 'vendor-xlsx'
                         if (id.includes('html2canvas')) return 'vendor-html2canvas'
+                        // UI: lucide + sonner + radix + tailwind-merge + clsx + cva
+                        if (id.includes('lucide-react') || id.includes('lucide') || id.includes('sonner')
+                            || id.includes('@radix-ui') || id.includes('react-remove-scroll')
+                            || id.includes('aria-hidden') || id.includes('react-style-singleton')
+                            || id.includes('use-callback-ref') || id.includes('use-sidecar')
+                            || id.includes('get-nonce') || id.includes('tailwind-merge')
+                            || id.includes('clsx') || id.includes('class-variance-authority')) return 'vendor-ui'
+                        // Offline: dexie + bcryptjs
+                        if (id.includes('dexie') || id.includes('bcryptjs')) return 'vendor-offline'
                     }
                 },
             },
@@ -189,5 +197,24 @@ export default defineConfig(async ({ mode }) => {
         setupFiles: './src/setupTests.ts',
         css: true,
         testTimeout: 15000,
+        coverage: {
+            provider: 'v8',
+            reporter: ['text', 'html', 'lcov'],
+            reportsDirectory: './coverage',
+            thresholds: {
+                statements: 60,
+                branches: 50,
+                functions: 60,
+                lines: 60,
+            },
+            include: ['src/**/*.{ts,tsx}'],
+            exclude: [
+                'src/**/*.test.{ts,tsx}',
+                'src/**/__tests__/**',
+                'src/setupTests.ts',
+                'src/types/**',
+                'src/vite-env.d.ts',
+            ],
+        },
     },
 }})

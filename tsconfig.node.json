@@ -1,6 +1,9 @@
 {
     "compilerOptions": {
         "composite": true,
+        "outDir": "node_modules/.tmp/tsc-node",
+        "declarationDir": "node_modules/.tmp/tsc-node",
+        "tsBuildInfoFile": "node_modules/.tmp/tsc-node/tsconfig.node.tsbuildinfo",
         "skipLibCheck": true,
         "module": "ESNext",
         "moduleResolution": "bundler",

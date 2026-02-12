@@ -13,7 +13,6 @@
  * @see _bmad-output/planning-artifacts/architecture.md#ADR-005
  */
 
-import bcryptjs from 'bcryptjs';
 import { db } from '@/lib/db';
 import { logDebug, logError } from '@/utils/logger';
 import type { IOfflineUser, IOfflineAuthResult } from '@/types/offline';
@@ -241,7 +240,8 @@ export const offlineAuthService = {
         return { success: false, error: 'INVALID_PIN' };
       }
 
-      // Verify PIN using bcrypt compare
+      // Verify PIN using bcrypt compare (dynamic import to reduce initial bundle)
+      const { default: bcryptjs } = await import('bcryptjs');
       const isValid = await bcryptjs.compare(pinInput, cached.pin_hash);
       if (!isValid) {
         logDebug('[offlineAuth] PIN verification failed for user', userId);
