@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Plus, X, Trash2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
+import { logError } from '@/utils/logger'
 
 interface VariantMaterial {
     material_id: string

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Plus, Save, Trash2, Grid, Users, Circle, Square, Minus, Home, Sun, Star } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import { logError } from '@/utils/logger'
 import type { Insertable } from '../../types/database'
 import './FloorPlanEditor.css'
 

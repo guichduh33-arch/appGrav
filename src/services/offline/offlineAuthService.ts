@@ -15,6 +15,7 @@
 
 import bcryptjs from 'bcryptjs';
 import { db } from '@/lib/db';
+import { logDebug, logError } from '@/utils/logger';
 import type { IOfflineUser, IOfflineAuthResult } from '@/types/offline';
 import { OFFLINE_USER_CACHE_TTL_MS } from '@/types/offline';
 import type { Role, EffectivePermission, UserProfileExtended } from '@/types/auth';
@@ -56,7 +57,7 @@ export const offlineAuthService = {
   ): Promise<void> {
     // Can't cache without PIN hash - skip silently
     if (!user.id || !user.pin_hash) {
-      console.debug('[offlineAuth] Skipping cache - no PIN hash available');
+      logDebug('[offlineAuth] Skipping cache - no PIN hash available');
       return;
     }
 
@@ -73,9 +74,9 @@ export const offlineAuthService = {
     try {
       // Use put() to insert or update (upsert)
       await db.offline_users.put(offlineUser);
-      console.debug('[offlineAuth] User credentials cached:', user.id);
+      logDebug('[offlineAuth] User credentials cached', user.id);
     } catch (error) {
-      console.error('[offlineAuth] Failed to cache user credentials:', error);
+      logError('[offlineAuth] Failed to cache user credentials', error);
       // Don't throw - caching is optional enhancement
     }
   },
@@ -93,7 +94,7 @@ export const offlineAuthService = {
       const cached = await db.offline_users.get(userId);
       return cached ?? null;
     } catch (error) {
-      console.error('[offlineAuth] Failed to get cached user:', error);
+      logError('[offlineAuth] Failed to get cached user', error);
       return null;
     }
   },
@@ -120,12 +121,12 @@ export const offlineAuthService = {
       const isValid = now - cachedTime < OFFLINE_USER_CACHE_TTL_MS;
 
       if (!isValid) {
-        console.debug('[offlineAuth] Cache expired for user:', userId);
+        logDebug('[offlineAuth] Cache expired for user', userId);
       }
 
       return isValid;
     } catch (error) {
-      console.error('[offlineAuth] Failed to validate cache:', error);
+      logError('[offlineAuth] Failed to validate cache', error);
       return false;
     }
   },
@@ -140,9 +141,9 @@ export const offlineAuthService = {
   async clearUserCache(userId: string): Promise<void> {
     try {
       await db.offline_users.delete(userId);
-      console.debug('[offlineAuth] User cache cleared:', userId);
+      logDebug('[offlineAuth] User cache cleared', userId);
     } catch (error) {
-      console.error('[offlineAuth] Failed to clear user cache:', error);
+      logError('[offlineAuth] Failed to clear user cache', error);
       // Don't throw - cleanup is best effort
     }
   },
@@ -155,9 +156,9 @@ export const offlineAuthService = {
   async clearAllCache(): Promise<void> {
     try {
       await db.offline_users.clear();
-      console.debug('[offlineAuth] All user cache cleared');
+      logDebug('[offlineAuth] All user cache cleared');
     } catch (error) {
-      console.error('[offlineAuth] Failed to clear all cache:', error);
+      logError('[offlineAuth] Failed to clear all cache', error);
     }
   },
 
@@ -225,11 +226,11 @@ export const offlineAuthService = {
         const cached = await this.getCachedUser(userId);
         if (cached) {
           // Cache exists but expired - need online reconnection
-          console.debug('[offlineAuth] Cache expired for user:', userId);
+          logDebug('[offlineAuth] Cache expired for user', userId);
           return { success: false, error: 'CACHE_EXPIRED' };
         }
         // User not cached - return generic error (security: don't reveal cache state)
-        console.debug('[offlineAuth] User not in cache:', userId);
+        logDebug('[offlineAuth] User not in cache', userId);
         return { success: false, error: 'INVALID_PIN' };
       }
 
@@ -243,15 +244,15 @@ export const offlineAuthService = {
       // Verify PIN using bcrypt compare
       const isValid = await bcryptjs.compare(pinInput, cached.pin_hash);
       if (!isValid) {
-        console.debug('[offlineAuth] PIN verification failed for user:', userId);
+        logDebug('[offlineAuth] PIN verification failed for user', userId);
         return { success: false, error: 'INVALID_PIN' };
       }
 
       // Success - return cached user data
-      console.debug('[offlineAuth] PIN verified successfully for user:', userId);
+      logDebug('[offlineAuth] PIN verified successfully for user', userId);
       return { success: true, user: cached };
     } catch (error) {
-      console.error('[offlineAuth] PIN verification error:', error);
+      logError('[offlineAuth] PIN verification error', error);
       // Return generic error on any exception
       return { success: false, error: 'INVALID_PIN' };
     }
@@ -287,7 +288,7 @@ export const offlineAuthService = {
       const perm = cached.permissions.find(p => p.permission_code === code);
       return perm?.is_granted ?? false;
     } catch (error) {
-      console.error('[offlineAuth] Failed to check permission offline:', error);
+      logError('[offlineAuth] Failed to check permission offline', error);
       return false;
     }
   },
@@ -315,7 +316,7 @@ export const offlineAuthService = {
 
       return cached.roles.some(r => r.code === roleCode);
     } catch (error) {
-      console.error('[offlineAuth] Failed to check role offline:', error);
+      logError('[offlineAuth] Failed to check role offline', error);
       return false;
     }
   },

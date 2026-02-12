@@ -11,6 +11,7 @@
 
 import { useMemo, useCallback, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { logError } from '@/utils/logger';
 import { useNetworkStatus } from './useNetworkStatus';
 import { useProducts } from '../products/useProductList';
 import {
@@ -116,7 +117,7 @@ export function useProductsOffline(
         setOfflineError(null);
         return await getCachedProducts(categoryId);
       } catch (error) {
-        console.error('Error loading offline products:', error);
+        logError('Error loading offline products', error);
         setOfflineError(error instanceof Error ? error : new Error('Failed to load offline products'));
         return [];
       }
@@ -131,7 +132,7 @@ export function useProductsOffline(
       try {
         return await getProductsSyncMeta();
       } catch (error) {
-        console.error('Error loading sync meta:', error);
+        logError('Error loading sync meta', error);
         return undefined;
       }
     },
@@ -145,7 +146,7 @@ export function useProductsOffline(
       try {
         return await getLastProductsSyncAt();
       } catch (error) {
-        console.error('Error loading last sync time:', error);
+        logError('Error loading last sync time', error);
         return null;
       }
     },
@@ -208,7 +209,7 @@ export function useOfflineProductsRaw(
       try {
         return await getCachedProducts(categoryId);
       } catch (error) {
-        console.error('Error loading offline products:', error);
+        logError('Error loading offline products', error);
         return [];
       }
     },
@@ -220,7 +221,7 @@ export function useOfflineProductsRaw(
       try {
         return await getProductsSyncMeta();
       } catch (error) {
-        console.error('Error loading sync meta:', error);
+        logError('Error loading sync meta', error);
         return undefined;
       }
     },

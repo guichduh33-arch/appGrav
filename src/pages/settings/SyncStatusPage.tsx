@@ -25,6 +25,7 @@ import {
 } from '../../services/sync/syncQueue';
 import { runSyncEngine } from '../../services/sync/syncEngine';
 import { getOfflinePeriods, getOfflinePeriodStats, type IOfflinePeriod } from '../../services/sync/offlinePeriod';
+import { logError } from '@/utils/logger';
 
 /**
  * Status colors for sync states

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { X, Lock, AlertCircle, Loader2 } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
+import { logError } from '@/utils/logger'
 import { cn } from '@/lib/utils'
 
 interface VerifiedUser {

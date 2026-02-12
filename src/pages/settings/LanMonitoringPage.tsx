@@ -23,7 +23,7 @@ import {
   getOfflinePeriods, getOfflinePeriodStats,
   type IOfflinePeriod
 } from '@/services/sync/offlinePeriod';
-import './LanMonitoringPage.css';
+import { cn } from '@/lib/utils';
 
 /**
  * Device type icon mapping
@@ -127,41 +127,47 @@ const LanMonitoringPage = () => {
   };
 
   return (
-    <div className="lan-monitoring">
+    <div className="flex flex-col gap-4">
       {/* Header */}
-      <div className="lan-monitoring__header">
-        <div className="lan-monitoring__header-info">
-          <h2 className="lan-monitoring__title">LAN Network & Devices</h2>
-          <p className="lan-monitoring__subtitle">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h2 className="font-display text-2xl font-bold text-[var(--color-brun-chocolat)] m-0">LAN Network & Devices</h2>
+          <p className="text-sm text-[var(--color-gris-chaud)] mt-0.5 mb-0">
             Monitor connected devices and network health
           </p>
         </div>
-        <div className="lan-monitoring__header-actions">
+        <div>
           <button
-            className={`btn-secondary ${refreshing ? 'is-loading' : ''}`}
+            className={cn('btn-secondary flex items-center gap-2', refreshing && 'opacity-70')}
             onClick={handleRefresh}
             disabled={refreshing}
           >
-            <RefreshCw size={16} className={refreshing ? 'spinning' : ''} />
+            <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
             Refresh
           </button>
         </div>
       </div>
 
       {/* Hub Status Card */}
-      <div className={`hub-status-card ${isRunning ? 'is-active' : 'is-inactive'}`}>
-        <div className="hub-status-card__icon">
+      <div className={cn(
+        'flex items-center gap-4 px-6 py-4 rounded-lg border transition-all duration-200',
+        isRunning ? 'bg-[#ecfdf5] border-[#a7f3d0]' : 'bg-[#fef2f2] border-[#fecaca]'
+      )}>
+        <div className={cn(
+          'flex items-center justify-center w-12 h-12 rounded-md shrink-0',
+          isRunning ? 'bg-[#d1fae5] text-[#059669]' : 'bg-[#fee2e2] text-[#dc2626]'
+        )}>
           {isRunning ? <Wifi size={24} /> : <WifiOff size={24} />}
         </div>
-        <div className="hub-status-card__info">
-          <h3 className="hub-status-card__title">
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold m-0 text-[var(--color-brun-chocolat)]">
             LAN Hub {isRunning ? 'Active' : 'Inactive'}
           </h3>
-          <div className="hub-status-card__meta">
+          <div className="text-sm text-[var(--color-gris-chaud)] mt-0.5 flex items-center gap-1">
             {isRunning ? (
               <>
                 <span>{deviceCount} device{deviceCount !== 1 ? 's' : ''} connected</span>
-                <span className="hub-status-card__separator" />
+                <span className="after:content-['\2022'] after:text-[var(--color-gris-chaud)] after:opacity-50" />
                 <span>Uptime: {formatDuration(status.uptime)}</span>
               </>
             ) : (
@@ -169,15 +175,20 @@ const LanMonitoringPage = () => {
             )}
           </div>
           {error && (
-            <div className="hub-status-card__error">
+            <div className="flex items-center gap-1.5 mt-1.5 text-xs text-[#dc2626]">
               <AlertTriangle size={14} />
               {error}
             </div>
           )}
         </div>
-        <div className="hub-status-card__actions">
+        <div className="shrink-0">
           <button
-            className={`btn-hub-toggle ${isRunning ? 'is-running' : ''}`}
+            className={cn(
+              'flex items-center gap-1.5 px-4 py-2 rounded-md border text-sm font-medium cursor-pointer transition-all duration-150 hover:opacity-90 hover:-translate-y-px',
+              isRunning
+                ? 'bg-white border-[#dc2626] text-[#dc2626]'
+                : 'bg-[#059669] border-[#059669] text-white'
+            )}
             onClick={handleToggleHub}
           >
             {isRunning ? <PowerOff size={18} /> : <Power size={18} />}
@@ -187,16 +198,22 @@ const LanMonitoringPage = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="lan-monitoring__tabs">
+      <div className="flex gap-1 border-b border-gray-200">
         <button
-          className={`lan-tab ${activeTab === 'devices' ? 'is-active' : ''}`}
+          className={cn(
+            'flex items-center gap-1.5 px-4 py-2.5 border-none bg-transparent text-sm font-medium text-[var(--color-gris-chaud)] cursor-pointer border-b-2 border-b-transparent -mb-px transition-all duration-150',
+            activeTab === 'devices' && 'text-[var(--color-brun-chocolat)] border-b-[var(--color-brun-chocolat)]'
+          )}
           onClick={() => setActiveTab('devices')}
         >
           <Monitor size={16} />
           Devices ({deviceCount})
         </button>
         <button
-          className={`lan-tab ${activeTab === 'offline' ? 'is-active' : ''}`}
+          className={cn(
+            'flex items-center gap-1.5 px-4 py-2.5 border-none bg-transparent text-sm font-medium text-[var(--color-gris-chaud)] cursor-pointer border-b-2 border-b-transparent -mb-px transition-all duration-150',
+            activeTab === 'offline' && 'text-[var(--color-brun-chocolat)] border-b-[var(--color-brun-chocolat)]'
+          )}
           onClick={() => setActiveTab('offline')}
         >
           <Clock size={16} />
@@ -206,27 +223,27 @@ const LanMonitoringPage = () => {
 
       {/* Devices Tab */}
       {activeTab === 'devices' && (
-        <div className="lan-monitoring__content">
-          <div className="lan-monitoring__grid">
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-[1fr_320px] gap-4 max-[900px]:grid-cols-1">
             {/* Devices List */}
-            <div className="devices-panel">
-              <div className="devices-panel__header">
-                <h3>Connected Devices</h3>
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <h3 className="text-base font-semibold text-[var(--color-brun-chocolat)] m-0 flex items-center gap-2">Connected Devices</h3>
               </div>
 
               {isLoading ? (
-                <div className="devices-loading">
-                  <RefreshCw size={20} className="spinning" />
+                <div className="flex items-center justify-center gap-2 py-8 text-[var(--color-gris-chaud)] text-sm">
+                  <RefreshCw size={20} className="animate-spin" />
                   <span>Loading devices...</span>
                 </div>
               ) : devices.length === 0 ? (
-                <div className="devices-empty">
+                <div className="flex flex-col items-center gap-2 py-8 text-center text-[var(--color-gris-chaud)]">
                   <WifiOff size={40} />
-                  <h4>No devices connected</h4>
-                  <p>Start the hub and connect devices via QR code or manual IP entry.</p>
+                  <h4 className="text-base font-semibold text-[var(--color-brun-chocolat)] m-0">No devices connected</h4>
+                  <p className="text-sm m-0 max-w-[280px]">Start the hub and connect devices via QR code or manual IP entry.</p>
                 </div>
               ) : (
-                <div className="devices-list">
+                <div className="p-2 flex flex-col gap-1">
                   {devices.map((device) => (
                     <DeviceCard
                       key={device.deviceId}
@@ -240,28 +257,28 @@ const LanMonitoringPage = () => {
             </div>
 
             {/* QR Code & Connection Info */}
-            <div className="connection-panel">
-              <div className="connection-panel__header">
-                <h3>
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <h3 className="text-base font-semibold text-[var(--color-brun-chocolat)] m-0 flex items-center gap-2">
                   <QrCode size={18} />
                   Device Setup
                 </h3>
               </div>
 
-              <div className="qr-section">
-                <div className="qr-placeholder">
+              <div className="px-6 py-4 flex flex-col gap-4">
+                <div className="flex flex-col items-center gap-2 p-6 bg-gray-50 rounded-md border-2 border-dashed border-gray-200 text-[var(--color-gris-chaud)]">
                   <QrCode size={120} strokeWidth={1} />
-                  <p className="qr-placeholder__text">
+                  <p className="text-xs text-center text-[var(--color-gris-chaud)] m-0">
                     Scan this QR code from a mobile device to connect
                   </p>
                 </div>
 
-                <div className="connection-info">
-                  <label className="connection-info__label">Hub Address</label>
-                  <div className="connection-info__value">
-                    <code>{hubAddress || `${window.location.hostname}:3001`}</code>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[var(--color-gris-chaud)]">Hub Address</label>
+                  <div className="flex items-center gap-1.5">
+                    <code className="text-xs bg-gray-100 px-2 py-1 rounded-sm text-[var(--color-brun-chocolat)] flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{hubAddress || `${window.location.hostname}:3001`}</code>
                     <button
-                      className="btn-icon-sm"
+                      className="flex items-center justify-center w-7 h-7 rounded-sm border border-gray-200 bg-white text-[var(--color-gris-chaud)] cursor-pointer transition-all duration-150 shrink-0 hover:bg-gray-100 hover:text-[var(--color-brun-chocolat)]"
                       onClick={handleCopyAddress}
                       title="Copy address"
                     >
@@ -270,17 +287,17 @@ const LanMonitoringPage = () => {
                   </div>
                 </div>
 
-                <div className="connection-info">
-                  <label className="connection-info__label">Device ID</label>
-                  <div className="connection-info__value">
-                    <code>{deviceId || 'Not assigned'}</code>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[var(--color-gris-chaud)]">Device ID</label>
+                  <div className="flex items-center gap-1.5">
+                    <code className="text-xs bg-gray-100 px-2 py-1 rounded-sm text-[var(--color-brun-chocolat)] flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{deviceId || 'Not assigned'}</code>
                   </div>
                 </div>
 
-                <div className="connection-info">
-                  <label className="connection-info__label">Protocol</label>
-                  <div className="connection-info__value">
-                    <code>BroadcastChannel + Supabase Realtime</code>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-[var(--color-gris-chaud)]">Protocol</label>
+                  <div className="flex items-center gap-1.5">
+                    <code className="text-xs bg-gray-100 px-2 py-1 rounded-sm text-[var(--color-brun-chocolat)] flex-1 overflow-hidden text-ellipsis whitespace-nowrap">BroadcastChannel + Supabase Realtime</code>
                   </div>
                 </div>
               </div>
@@ -291,54 +308,54 @@ const LanMonitoringPage = () => {
 
       {/* Offline History Tab */}
       {activeTab === 'offline' && (
-        <div className="lan-monitoring__content">
+        <div className="flex flex-col gap-4">
           {/* Stats Summary */}
           {offlineStats && offlineStats.totalPeriods > 0 && (
-            <div className="offline-stats">
-              <div className="offline-stat-card">
-                <span className="offline-stat-card__value">{offlineStats.totalPeriods}</span>
-                <span className="offline-stat-card__label">Total Incidents</span>
+            <div className="grid grid-cols-4 gap-2 max-[700px]:grid-cols-2">
+              <div className="bg-white rounded-lg shadow-sm p-4 flex flex-col gap-1">
+                <span className="text-xl font-bold text-[var(--color-brun-chocolat)]">{offlineStats.totalPeriods}</span>
+                <span className="text-xs text-[var(--color-gris-chaud)] uppercase tracking-wide">Total Incidents</span>
               </div>
-              <div className="offline-stat-card">
-                <span className="offline-stat-card__value">
+              <div className="bg-white rounded-lg shadow-sm p-4 flex flex-col gap-1">
+                <span className="text-xl font-bold text-[var(--color-brun-chocolat)]">
                   {formatDuration(offlineStats.totalDurationMs)}
                 </span>
-                <span className="offline-stat-card__label">Total Downtime</span>
+                <span className="text-xs text-[var(--color-gris-chaud)] uppercase tracking-wide">Total Downtime</span>
               </div>
-              <div className="offline-stat-card">
-                <span className="offline-stat-card__value">
+              <div className="bg-white rounded-lg shadow-sm p-4 flex flex-col gap-1">
+                <span className="text-xl font-bold text-[var(--color-brun-chocolat)]">
                   {formatDuration(offlineStats.averageDurationMs)}
                 </span>
-                <span className="offline-stat-card__label">Avg Duration</span>
+                <span className="text-xs text-[var(--color-gris-chaud)] uppercase tracking-wide">Avg Duration</span>
               </div>
-              <div className="offline-stat-card">
-                <span className="offline-stat-card__value">
+              <div className="bg-white rounded-lg shadow-sm p-4 flex flex-col gap-1">
+                <span className="text-xl font-bold text-[var(--color-brun-chocolat)]">
                   {offlineStats.totalTransactions}
                 </span>
-                <span className="offline-stat-card__label">Offline Transactions</span>
+                <span className="text-xs text-[var(--color-gris-chaud)] uppercase tracking-wide">Offline Transactions</span>
               </div>
             </div>
           )}
 
           {/* Offline Periods List */}
-          <div className="offline-periods">
-            <div className="offline-periods__header">
-              <h3>Offline Period Log</h3>
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h3 className="text-base font-semibold text-[var(--color-brun-chocolat)] m-0 flex items-center gap-2">Offline Period Log</h3>
             </div>
 
             {loadingOffline ? (
-              <div className="devices-loading">
-                <RefreshCw size={20} className="spinning" />
+              <div className="flex items-center justify-center gap-2 py-8 text-[var(--color-gris-chaud)] text-sm">
+                <RefreshCw size={20} className="animate-spin" />
                 <span>Loading history...</span>
               </div>
             ) : offlinePeriods.length === 0 ? (
-              <div className="devices-empty">
+              <div className="flex flex-col items-center gap-2 py-8 text-center text-[var(--color-gris-chaud)]">
                 <CheckCircle size={40} />
-                <h4>No offline periods recorded</h4>
-                <p>The system has been continuously online.</p>
+                <h4 className="text-base font-semibold text-[var(--color-brun-chocolat)] m-0">No offline periods recorded</h4>
+                <p className="text-sm m-0 max-w-[280px]">The system has been continuously online.</p>
               </div>
             ) : (
-              <div className="offline-periods__list">
+              <div className="p-2 flex flex-col">
                 {offlinePeriods.map((period) => (
                   <OfflinePeriodRow key={period.id} period={period} />
                 ))}
@@ -363,41 +380,48 @@ function DeviceCard({
   isCurrentDevice: boolean;
   onForceRefresh: () => void;
 }) {
-  const statusClass =
-    device.status === 'online' ? 'is-online' :
-    device.status === 'idle' ? 'is-idle' : 'is-offline';
-
   const lastSeen = device.lastHeartbeat
     ? formatDistanceToNow(new Date(device.lastHeartbeat), { addSuffix: true, locale: enUS })
     : 'Unknown';
 
   return (
-    <div className={`device-card ${statusClass} ${isCurrentDevice ? 'is-current' : ''}`}>
-      <div className={`device-card__status-dot ${statusClass}`} />
-      <div className="device-card__icon">
+    <div className={cn(
+      'flex items-center gap-2 px-4 py-2 rounded-md transition-colors duration-150 relative hover:bg-gray-50',
+      isCurrentDevice && 'bg-[#eff6ff]'
+    )}>
+      <div className={cn(
+        'w-2 h-2 rounded-full shrink-0',
+        device.status === 'online' && 'bg-[#10b981] shadow-[0_0_4px_rgba(16,185,129,0.5)]',
+        device.status === 'idle' && 'bg-[#f59e0b]',
+        device.status !== 'online' && device.status !== 'idle' && 'bg-[#9ca3af]'
+      )} />
+      <div className={cn(
+        'flex items-center justify-center w-9 h-9 rounded-sm shrink-0',
+        device.status === 'online' ? 'bg-[#d1fae5] text-[#059669]' : 'bg-gray-100 text-[var(--color-gris-chaud)]'
+      )}>
         <DeviceIcon type={device.deviceType} size={22} />
       </div>
-      <div className="device-card__info">
-        <div className="device-card__name">
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold text-[var(--color-brun-chocolat)] flex items-center gap-1.5">
           {device.deviceName}
-          {isCurrentDevice && <span className="device-card__badge">This device</span>}
-          {device.isHub && <span className="device-card__badge device-card__badge--hub">Hub</span>}
+          {isCurrentDevice && <span className="text-[10px] font-medium px-1.5 py-px rounded-full bg-[#dbeafe] text-[#2563eb]">This device</span>}
+          {device.isHub && <span className="text-[10px] font-medium px-1.5 py-px rounded-full bg-[#d1fae5] text-[#059669]">Hub</span>}
         </div>
-        <div className="device-card__meta">
+        <div className="text-xs text-[var(--color-gris-chaud)] flex items-center gap-1 flex-wrap">
           <span>{DEVICE_TYPE_LABELS[device.deviceType] || device.deviceType}</span>
           {device.ipAddress && (
             <>
-              <span className="device-card__separator" />
+              <span className="after:content-['\2022'] after:opacity-40" />
               <span>{device.ipAddress}</span>
             </>
           )}
-          <span className="device-card__separator" />
+          <span className="after:content-['\2022'] after:opacity-40" />
           <span>Last seen {lastSeen}</span>
         </div>
       </div>
       {!isCurrentDevice && device.status === 'online' && (
         <button
-          className="btn-secondary btn-sm"
+          className="btn-secondary !px-2 !py-1 !text-xs"
           onClick={onForceRefresh}
           title="Force device to re-fetch data"
         >
@@ -417,47 +441,53 @@ function OfflinePeriodRow({ period }: { period: IOfflinePeriod }) {
   const isActive = !period.end_time;
 
   return (
-    <div className={`offline-period-row ${isActive ? 'is-active' : ''}`}>
-      <div className="offline-period-row__indicator">
+    <div className={cn(
+      'flex items-start gap-2 px-4 py-2 rounded-md transition-colors duration-150 hover:bg-gray-50',
+      isActive && 'bg-[#fef3c7]'
+    )}>
+      <div className={cn(
+        'flex items-center justify-center w-8 h-8 rounded-full shrink-0 mt-0.5',
+        isActive ? 'bg-[#fde68a] text-[#d97706]' : 'bg-gray-100 text-[var(--color-gris-chaud)]'
+      )}>
         {isActive ? (
-          <Activity size={16} className="pulse" />
+          <Activity size={16} className="animate-pulse" />
         ) : (
           <Clock size={16} />
         )}
       </div>
-      <div className="offline-period-row__info">
-        <div className="offline-period-row__time">
+      <div className="flex-1">
+        <div className="text-sm font-semibold text-[var(--color-brun-chocolat)] flex items-center gap-1.5">
           {format(startTime, 'MMM d, HH:mm', { locale: enUS })}
           {endTime && (
             <>
-              <span className="offline-period-row__arrow">&rarr;</span>
+              <span className="text-[var(--color-gris-chaud)] opacity-50">&rarr;</span>
               {format(endTime, 'HH:mm', { locale: enUS })}
             </>
           )}
-          {isActive && <span className="offline-period-row__live">Ongoing</span>}
+          {isActive && <span className="text-[10px] font-medium px-1.5 py-px rounded-full bg-[#fde68a] text-[#92400e] animate-pulse">Ongoing</span>}
         </div>
-        <div className="offline-period-row__meta">
+        <div className="text-xs text-[var(--color-gris-chaud)] flex items-center gap-1 flex-wrap mt-0.5">
           {period.duration_ms != null && (
             <span>Duration: {formatDuration(period.duration_ms)}</span>
           )}
           {period.transactions_created > 0 && (
             <>
-              <span className="offline-period-row__separator" />
+              <span className="after:content-['\2022'] after:opacity-40" />
               <span>{period.transactions_created} transactions</span>
             </>
           )}
           {period.transactions_synced > 0 && (
             <>
-              <span className="offline-period-row__separator" />
-              <span className="offline-period-row__synced">
+              <span className="after:content-['\2022'] after:opacity-40" />
+              <span className="text-[#059669]">
                 {period.transactions_synced} synced
               </span>
             </>
           )}
           {period.transactions_failed > 0 && (
             <>
-              <span className="offline-period-row__separator" />
-              <span className="offline-period-row__failed">
+              <span className="after:content-['\2022'] after:opacity-40" />
+              <span className="text-[#dc2626]">
                 {period.transactions_failed} failed
               </span>
             </>

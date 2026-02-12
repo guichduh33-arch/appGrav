@@ -8,6 +8,7 @@ import { useStockMovements, type IStockMovement, type TMovementFilterType } from
 import { useProductListSimple } from '@/hooks/products/useProductList'
 import { MOVEMENT_STYLES, getMovementStyle } from '@/constants/inventory'
 import { formatCurrency } from '@/utils/helpers'
+import { cn } from '@/lib/utils'
 
 // Format number with thousand separators
 const formatNumber = (num: number | null | undefined): string => {
@@ -15,7 +16,6 @@ const formatNumber = (num: number | null | undefined): string => {
     return num.toLocaleString('en-US')
 }
 import { toast } from 'sonner'
-import './StockMovementsPage.css'
 
 // Icon mapping for movement types
 const MOVEMENT_ICONS: Record<string, React.ReactNode> = {
@@ -165,77 +165,78 @@ export default function StockMovementsPage() {
 
     if (isLoading) {
         return (
-            <div className="movements-loading">
-                <div className="spinner" />
+            <div className="flex flex-col items-center justify-center px-8 py-16 text-center text-gray-500">
+                <div className="w-8 h-8 border-3 border-gray-200 border-t-blue-500 rounded-full animate-spin" />
                 <p>Loading movements...</p>
             </div>
         )
     }
 
     return (
-        <div className="stock-movements-page-new">
+        <div className="flex flex-col gap-6">
             {/* Stats Cards */}
-            <div className="movements-stats">
+            <div className="grid grid-cols-5 gap-4 xl:grid-cols-3 md:grid-cols-2">
                 {/* Total Movements */}
-                <div className="stat-card stat-primary">
-                    <div className="stat-label">Total Movements</div>
-                    <div className="stat-value">{filteredMovements.length}</div>
-                    <div className="stat-sub">records</div>
+                <div className="flex flex-col items-start p-5 rounded-2xl border border-gray-200 bg-gradient-to-br from-blue-500 to-blue-700 text-white">
+                    <div className="text-xs opacity-90">Total Movements</div>
+                    <div className="text-[1.75rem] font-bold">{ filteredMovements.length}</div>
+                    <div className="text-xs opacity-90">records</div>
                 </div>
 
                 {/* Total In */}
-                <div className="stat-card">
-                    <div className="stat-icon stat-icon-green">
+                <div className="flex items-center gap-4 p-5 bg-white rounded-2xl border border-gray-200">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-500">
                         <TrendingUp size={18} />
                     </div>
-                    <div className="stat-content">
-                        <div className="stat-label">Total In</div>
-                        <div className="stat-value text-green">+{formatNumber(stats.totalIn)}</div>
-                        <div className="stat-sub text-green">+{formatCurrency(stats.totalInValue)}</div>
+                    <div className="flex-1">
+                        <div className="text-xs text-gray-500 mb-1">Total In</div>
+                        <div className="text-2xl font-bold leading-none text-emerald-500">+{formatNumber(stats.totalIn)}</div>
+                        <div className="text-xs font-medium mt-1 text-emerald-600">+{formatCurrency(stats.totalInValue)}</div>
                     </div>
                 </div>
 
                 {/* Total Out */}
-                <div className="stat-card">
-                    <div className="stat-icon stat-icon-red">
+                <div className="flex items-center gap-4 p-5 bg-white rounded-2xl border border-gray-200">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-red-500/15 text-red-500">
                         <TrendingDown size={18} />
                     </div>
-                    <div className="stat-content">
-                        <div className="stat-label">Total Out</div>
-                        <div className="stat-value text-red">-{formatNumber(stats.totalOut)}</div>
-                        <div className="stat-sub text-red">-{formatCurrency(stats.totalOutValue)}</div>
+                    <div className="flex-1">
+                        <div className="text-xs text-gray-500 mb-1">Total Out</div>
+                        <div className="text-2xl font-bold leading-none text-red-500">-{formatNumber(stats.totalOut)}</div>
+                        <div className="text-xs font-medium mt-1 text-red-600">-{formatCurrency(stats.totalOutValue)}</div>
                     </div>
                 </div>
 
                 {/* Production In */}
-                <div className="stat-card">
-                    <div className="stat-icon stat-icon-amber">
+                <div className="flex items-center gap-4 p-5 bg-white rounded-2xl border border-gray-200">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-amber-500/15 text-amber-500">
                         <Factory size={18} />
                     </div>
-                    <div className="stat-content">
-                        <div className="stat-label">Production In</div>
-                        <div className="stat-value text-amber">+{formatNumber(stats.productionIn)}</div>
+                    <div className="flex-1">
+                        <div className="text-xs text-gray-500 mb-1">Production In</div>
+                        <div className="text-2xl font-bold leading-none text-amber-700">+{formatNumber(stats.productionIn)}</div>
                     </div>
                 </div>
 
                 {/* Production Out */}
-                <div className="stat-card">
-                    <div className="stat-icon stat-icon-pink">
+                <div className="flex items-center gap-4 p-5 bg-white rounded-2xl border border-gray-200">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-pink-700/15 text-pink-700">
                         <Package size={18} />
                     </div>
-                    <div className="stat-content">
-                        <div className="stat-label">Production Out</div>
-                        <div className="stat-value text-pink">-{formatNumber(stats.productionOut)}</div>
+                    <div className="flex-1">
+                        <div className="text-xs text-gray-500 mb-1">Production Out</div>
+                        <div className="text-2xl font-bold leading-none text-pink-700">-{formatNumber(stats.productionOut)}</div>
                     </div>
                 </div>
             </div>
 
             {/* Search & Filters */}
-            <div className="movements-search-bar">
-                <div className="search-input-wrapper">
-                    <Search size={18} />
+            <div className="flex gap-4 items-center flex-wrap md:flex-col md:items-stretch">
+                <div className="flex-1 min-w-[300px] md:min-w-0 relative">
+                    <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                         type="text"
+                        className="w-full py-3 px-4 pl-11 border border-gray-200 rounded-xl text-[0.9375rem] text-gray-700 focus:outline-none focus:border-blue-500 focus:ring-[3px] focus:ring-blue-500/10"
                         placeholder="Search by product, SKU, reason..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -243,11 +244,12 @@ export default function StockMovementsPage() {
                 </div>
 
                 {/* Product Filter */}
-                <div className="product-filter-wrapper" style={{ position: 'relative', minWidth: '200px' }}>
-                    <div className="search-input-wrapper">
-                        <Package size={16} />
+                <div className="relative min-w-[200px]">
+                    <div className="relative">
+                        <Package size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                         <input
                             type="text"
+                            className="w-full py-3 px-4 pl-11 border border-gray-200 rounded-xl text-[0.9375rem] text-gray-700 focus:outline-none focus:border-blue-500 focus:ring-[3px] focus:ring-blue-500/10"
                             placeholder="Filter by product..."
                             value={selectedProductId ? products.find(p => p.id === selectedProductId)?.name || '' : productSearch}
                             onChange={(e) => {
@@ -262,39 +264,14 @@ export default function StockMovementsPage() {
                                     setSelectedProductId('')
                                     setProductSearch('')
                                 }}
-                                style={{
-                                    position: 'absolute',
-                                    right: '8px',
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    color: '#6B7280',
-                                    padding: '4px'
-                                }}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer text-gray-500 p-1"
                             >
                                 <X size={16} />
                             </button>
                         )}
                     </div>
                     {productSearch && !selectedProductId && filteredProducts.length > 0 && (
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: '100%',
-                                left: 0,
-                                right: 0,
-                                background: 'white',
-                                border: '1px solid #E5E7EB',
-                                borderRadius: '8px',
-                                marginTop: '4px',
-                                maxHeight: '300px',
-                                overflowY: 'auto',
-                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                                zIndex: 1000
-                            }}
-                        >
+                        <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg mt-1 max-h-[300px] overflow-y-auto shadow-md z-[1000]">
                             {filteredProducts.slice(0, 50).map(product => (
                                 <div
                                     key={product.id}
@@ -302,37 +279,32 @@ export default function StockMovementsPage() {
                                         setSelectedProductId(product.id)
                                         setProductSearch('')
                                     }}
-                                    style={{
-                                        padding: '8px 12px',
-                                        cursor: 'pointer',
-                                        borderBottom: '1px solid #F3F4F6',
-                                        fontSize: '0.875rem'
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.background = '#F9FAFB'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+                                    className="px-3 py-2 cursor-pointer border-b border-gray-100 text-sm hover:bg-gray-50"
                                 >
-                                    <div style={{ fontWeight: 500 }}>{product.name}</div>
-                                    <div style={{ color: '#6B7280', fontSize: '0.75rem' }}>{product.sku}</div>
+                                    <div className="font-medium">{product.name}</div>
+                                    <div className="text-gray-500 text-xs">{product.sku}</div>
                                 </div>
                             ))}
                         </div>
                     )}
                 </div>
 
-                <div className="date-filters">
-                    <div className="date-input-wrapper">
-                        <Calendar size={16} />
+                <div className="flex items-center gap-2 md:justify-center">
+                    <div className="relative flex items-center">
+                        <Calendar size={16} className="absolute left-3 text-gray-400 pointer-events-none" />
                         <input
                             type="date"
+                            className="py-3 px-4 pl-9 border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:border-blue-500"
                             value={dateFrom}
                             onChange={(e) => setDateFrom(e.target.value)}
                         />
                     </div>
-                    <span className="date-separator">to</span>
-                    <div className="date-input-wrapper">
-                        <Calendar size={16} />
+                    <span className="text-gray-400 text-sm">to</span>
+                    <div className="relative flex items-center">
+                        <Calendar size={16} className="absolute left-3 text-gray-400 pointer-events-none" />
                         <input
                             type="date"
+                            className="py-3 px-4 pl-9 border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:border-blue-500"
                             value={dateTo}
                             onChange={(e) => setDateTo(e.target.value)}
                         />
@@ -343,20 +315,12 @@ export default function StockMovementsPage() {
                 <button
                     onClick={handleExportExcel}
                     disabled={filteredMovements.length === 0}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '10px 16px',
-                        background: filteredMovements.length > 0 ? '#10B981' : '#E5E7EB',
-                        color: filteredMovements.length > 0 ? 'white' : '#9CA3AF',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: filteredMovements.length > 0 ? 'pointer' : 'not-allowed',
-                        fontWeight: 500,
-                        fontSize: '0.875rem',
-                        whiteSpace: 'nowrap'
-                    }}
+                    className={cn(
+                        'flex items-center gap-2 px-4 py-2.5 border-none rounded-lg font-medium text-sm whitespace-nowrap',
+                        filteredMovements.length > 0
+                            ? 'bg-emerald-500 text-white cursor-pointer'
+                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    )}
                     title="Export to Excel"
                 >
                     <Download size={18} />
@@ -365,15 +329,20 @@ export default function StockMovementsPage() {
             </div>
 
             {/* Type Filters */}
-            <div className="movements-filters">
-                <div className="filter-label">
+            <div className="flex items-center gap-3 flex-wrap p-4 bg-white rounded-2xl border border-gray-200">
+                <div className="flex items-center gap-2 text-gray-500 font-medium text-sm">
                     <Filter size={18} />
                     <span>Filter:</span>
                 </div>
 
                 <button
                     onClick={() => setFilterType('all')}
-                    className={`filter-btn ${filterType === 'all' ? 'active' : ''}`}
+                    className={cn(
+                        'flex items-center gap-1.5 px-4 py-2 rounded-lg border font-medium text-sm cursor-pointer transition-all duration-150',
+                        filterType === 'all'
+                            ? 'border-2 font-semibold border-gray-200 bg-white text-gray-500'
+                            : 'border-gray-200 bg-white text-gray-500'
+                    )}
                 >
                     All ({movements.length})
                 </button>
@@ -385,12 +354,15 @@ export default function StockMovementsPage() {
                         <button
                             key={type}
                             onClick={() => setFilterType(type as TMovementFilterType)}
-                            className={`filter-btn ${filterType === type ? 'active' : ''}`}
+                            className={cn(
+                                'flex items-center gap-1.5 px-4 py-2 rounded-lg border font-medium text-sm cursor-pointer transition-all duration-150 hover:border-blue-500',
+                                filterType === type ? 'border-2 font-semibold' : ''
+                            )}
                             style={{
-                                '--btn-bg': filterType === type ? style.bgColor : 'white',
-                                '--btn-color': filterType === type ? style.textColor : '#6B7280',
-                                '--btn-border': filterType === type ? style.borderColor : '#E5E7EB'
-                            } as React.CSSProperties}
+                                background: filterType === type ? style.bgColor : 'white',
+                                color: filterType === type ? style.textColor : '#6B7280',
+                                borderColor: filterType === type ? style.borderColor : '#E5E7EB'
+                            }}
                         >
                             {getMovementIcon(type)}
                             {style.label} ({count})
@@ -400,13 +372,13 @@ export default function StockMovementsPage() {
             </div>
 
             {/* Movements List */}
-            <div className="movements-list-card">
-                <div className="movements-list-header">
-                    <h3>Movement History ({filteredMovements.length})</h3>
+            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                <div className="px-5 py-4 border-b border-gray-200 bg-gray-50">
+                    <h3 className="m-0 text-base font-semibold text-gray-700">Movement History ({filteredMovements.length})</h3>
                 </div>
 
                 {filteredMovements.length > 0 ? (
-                    <div className="movements-list">
+                    <div className="max-h-[600px] overflow-y-auto">
                         {filteredMovements.map((movement: IStockMovement) => {
                             const style = getMovementStyle(movement.movement_type)
                             const { date, time } = formatDate(movement.created_at)
@@ -414,10 +386,10 @@ export default function StockMovementsPage() {
                             const value = Math.abs(movement.quantity * movement.product_cost)
 
                             return (
-                                <div key={movement.id} className="movement-item">
+                                <div key={movement.id} className="flex items-center gap-4 px-5 py-4 border-b border-gray-100 transition-colors duration-150 last:border-b-0 hover:bg-gray-50 md:flex-wrap">
                                     {/* Type Icon */}
                                     <div
-                                        className="movement-icon"
+                                        className="w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 md:order-0"
                                         style={{
                                             background: style.bgColor,
                                             borderColor: style.borderColor,
@@ -428,16 +400,16 @@ export default function StockMovementsPage() {
                                     </div>
 
                                     {/* Product & Details */}
-                                    <div className="movement-details">
-                                        <div className="movement-product">
-                                            <span className="product-name">{movement.product_name}</span>
+                                    <div className="flex-1 min-w-0 md:w-full md:order-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="font-semibold text-gray-900">{movement.product_name}</span>
                                             {movement.product_sku && (
-                                                <span className="product-sku">{movement.product_sku}</span>
+                                                <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">{movement.product_sku}</span>
                                             )}
                                         </div>
-                                        <div className="movement-meta">
+                                        <div className="flex items-center gap-2 mb-1">
                                             <span
-                                                className="movement-type-badge"
+                                                className="px-2 py-1 rounded-md text-xs font-semibold uppercase"
                                                 style={{
                                                     background: style.bgColor,
                                                     color: style.textColor
@@ -445,61 +417,41 @@ export default function StockMovementsPage() {
                                             >
                                                 {style.label}
                                             </span>
-                                            <span className="movement-desc">{style.description}</span>
+                                            <span className="text-xs text-gray-400">{style.description}</span>
                                         </div>
                                         {movement.reason && (
-                                            <div className="movement-reason" title={movement.reason}>
+                                            <div className="text-sm text-gray-500 whitespace-nowrap overflow-hidden text-ellipsis max-w-[300px]" title={movement.reason}>
                                                 {movement.reason}
                                             </div>
                                         )}
                                     </div>
 
                                     {/* Quantity & Value */}
-                                    <div className="movement-quantity">
-                                        <div className={`qty-value ${isPositive ? 'positive' : 'negative'}`}>
+                                    <div className="text-center shrink-0 min-w-[100px] md:order-2 md:text-left">
+                                        <div className={cn('text-xl font-bold', isPositive ? 'text-emerald-500' : 'text-red-500')}>
                                             {isPositive ? '+' : ''}{formatNumber(movement.quantity)} {movement.product_unit}
                                         </div>
-                                        <div className={`qty-cost ${isPositive ? 'positive' : 'negative'}`}>
+                                        <div className={cn('text-xs font-semibold mt-0.5', isPositive ? 'text-emerald-600' : 'text-red-600')}>
                                             {isPositive ? '+' : '-'}{formatCurrency(value)}
                                         </div>
                                     </div>
 
                                     {/* Stock Before/After */}
-                                    <div className="movement-stock-info" style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        gap: '4px',
-                                        minWidth: '120px',
-                                        fontSize: '0.8125rem'
-                                    }}>
-                                        <div style={{
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            padding: '4px 8px',
-                                            background: '#F9FAFB',
-                                            borderRadius: '4px'
-                                        }}>
-                                            <span style={{ color: '#6B7280', fontSize: '0.75rem' }}>Stock before:</span>
-                                            <span style={{ fontWeight: 600, color: '#374151' }}>
+                                    <div className="flex flex-col gap-1 min-w-[120px] text-[0.8125rem] md:order-3 md:w-full">
+                                        <div className="flex justify-between items-center px-2 py-1 bg-gray-50 rounded">
+                                            <span className="text-gray-500 text-xs">Stock before:</span>
+                                            <span className="font-semibold text-gray-700">
                                                 {movement.stock_before !== null && movement.stock_before !== undefined
                                                     ? `${formatNumber(movement.stock_before)} ${movement.product_unit}`
                                                     : '-'}
                                             </span>
                                         </div>
-                                        <div style={{
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            padding: '4px 8px',
-                                            background: isPositive ? '#ECFDF5' : '#FEF2F2',
-                                            borderRadius: '4px'
-                                        }}>
-                                            <span style={{ color: '#6B7280', fontSize: '0.75rem' }}>Stock after:</span>
-                                            <span style={{
-                                                fontWeight: 600,
-                                                color: isPositive ? '#059669' : '#DC2626'
-                                            }}>
+                                        <div className={cn(
+                                            'flex justify-between items-center px-2 py-1 rounded',
+                                            isPositive ? 'bg-emerald-50' : 'bg-red-50'
+                                        )}>
+                                            <span className="text-gray-500 text-xs">Stock after:</span>
+                                            <span className={cn('font-semibold', isPositive ? 'text-emerald-600' : 'text-red-600')}>
                                                 {movement.stock_after !== null && movement.stock_after !== undefined
                                                     ? `${formatNumber(movement.stock_after)} ${movement.product_unit}`
                                                     : '-'}
@@ -508,14 +460,14 @@ export default function StockMovementsPage() {
                                     </div>
 
                                     {/* Date & Staff */}
-                                    <div className="movement-date">
-                                        <div className="date-value">{date}</div>
-                                        <div className="time-value">
+                                    <div className="text-right shrink-0 min-w-[100px] md:order-4 md:text-left">
+                                        <div className="text-sm text-gray-600 font-medium">{date}</div>
+                                        <div className="text-xs text-gray-400 flex items-center justify-end gap-1 mt-0.5">
                                             <Clock size={12} />
                                             {time}
                                         </div>
                                         {movement.staff_name && (
-                                            <div className="staff-name">{movement.staff_name}</div>
+                                            <div className="text-xs text-gray-500 mt-1">{movement.staff_name}</div>
                                         )}
                                     </div>
                                 </div>
@@ -523,10 +475,10 @@ export default function StockMovementsPage() {
                         })}
                     </div>
                 ) : (
-                    <div className="movements-empty">
-                        <Package size={48} />
-                        <p className="empty-title">No movements</p>
-                        <p className="empty-desc">
+                    <div className="px-8 py-16 text-center text-gray-400">
+                        <Package size={48} className="mb-4 opacity-50 mx-auto" />
+                        <p className="m-0 font-semibold text-gray-600">No movements</p>
+                        <p className="mt-2 mb-0 text-sm">
                             {filterType !== 'all'
                                 ? 'No movements of this type found'
                                 : 'Stock movements will appear here'}

@@ -316,7 +316,7 @@ export function useDisplayBroadcastListener(onMessage: TDisplayMessageHandler): 
         onMessage(event.data);
       };
     } catch (err) {
-      console.error('Failed to create BroadcastChannel listener:', err);
+      logError('Failed to create BroadcastChannel listener', err);
       return;
     }
 

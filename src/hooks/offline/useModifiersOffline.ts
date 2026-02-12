@@ -11,6 +11,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useNetworkStatus } from '../useNetworkStatus';
 import { useProductModifiersForPOS } from '../products/useProductModifiers';
+import { logError } from '@/utils/logger';
 import {
   resolveOfflineModifiers,
   getLastModifiersSyncAt,
@@ -53,7 +54,7 @@ export function useModifiersOffline(
       try {
         return await resolveOfflineModifiers(productId, categoryId ?? undefined);
       } catch (error) {
-        console.error('[useModifiersOffline] Error loading offline modifiers:', error);
+        logError('[useModifiersOffline] Error loading offline modifiers', error);
         return [];
       }
     },
@@ -67,7 +68,7 @@ export function useModifiersOffline(
       try {
         return await getLastModifiersSyncAt();
       } catch (error) {
-        console.error('[useModifiersOffline] Error getting sync timestamp:', error);
+        logError('[useModifiersOffline] Error getting sync timestamp', error);
         return null;
       }
     },
@@ -121,7 +122,7 @@ export function useOfflineModifiersRaw() {
       try {
         return await db.offline_modifiers.toArray();
       } catch (error) {
-        console.error('[useOfflineModifiersRaw] Error loading modifiers:', error);
+        logError('[useOfflineModifiersRaw] Error loading modifiers', error);
         return [];
       }
     },
@@ -133,7 +134,7 @@ export function useOfflineModifiersRaw() {
       try {
         return await db.offline_sync_meta.get('modifiers');
       } catch (error) {
-        console.error('[useOfflineModifiersRaw] Error loading sync meta:', error);
+        logError('[useOfflineModifiersRaw] Error loading sync meta', error);
         return null;
       }
     },
@@ -181,7 +182,7 @@ export function useProductModifiersOffline(productId: string | undefined) {
         const raw = await getCachedModifiersForProduct(productId);
         return groupOfflineModifiers(raw, false);
       } catch (error) {
-        console.error('[useProductModifiersOffline] Error:', error);
+        logError('[useProductModifiersOffline] Error', error);
         return [];
       }
     },
@@ -223,7 +224,7 @@ export function useCategoryModifiersOffline(categoryId: string | undefined) {
         const raw = await getCachedModifiersForCategory(categoryId);
         return groupOfflineModifiers(raw, true);
       } catch (error) {
-        console.error('[useCategoryModifiersOffline] Error:', error);
+        logError('[useCategoryModifiersOffline] Error', error);
         return [];
       }
     },

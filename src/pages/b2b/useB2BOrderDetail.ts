@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
+import { logError } from '@/utils/logger'
 import type { B2BOrder, OrderItem, Payment, Delivery, HistoryEntry, PaymentFormData } from './b2bOrderDetailTypes'
 
 const DEFAULT_PAYMENT_FORM: PaymentFormData = {

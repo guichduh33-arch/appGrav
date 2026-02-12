@@ -11,6 +11,7 @@
 
 import { useMemo, useCallback } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { logWarn } from '@/utils/logger';
 import { useCoreSettingsStore } from '@/stores/settings';
 import { useTaxStore } from '@/stores/settings';
 import { usePaymentMethodStore } from '@/stores/settings';
@@ -154,7 +155,7 @@ export function useSettingsOffline() {
       try {
         return await db.offline_settings.toArray();
       } catch (error) {
-        console.warn('[useSettingsOffline] Failed to read offline_settings:', error);
+        logWarn(`[useSettingsOffline] Failed to read offline_settings: ${error}`);
         return [];
       }
     },
@@ -168,7 +169,7 @@ export function useSettingsOffline() {
       try {
         return await db.offline_tax_rates.toArray();
       } catch (error) {
-        console.warn('[useSettingsOffline] Failed to read offline_tax_rates:', error);
+        logWarn(`[useSettingsOffline] Failed to read offline_tax_rates: ${error}`);
         return [];
       }
     },
@@ -182,7 +183,7 @@ export function useSettingsOffline() {
       try {
         return await db.offline_payment_methods.orderBy('sort_order').toArray();
       } catch (error) {
-        console.warn('[useSettingsOffline] Failed to read offline_payment_methods:', error);
+        logWarn(`[useSettingsOffline] Failed to read offline_payment_methods: ${error}`);
         return [];
       }
     },
@@ -196,7 +197,7 @@ export function useSettingsOffline() {
       try {
         return await db.offline_business_hours.orderBy('day_of_week').toArray();
       } catch (error) {
-        console.warn('[useSettingsOffline] Failed to read offline_business_hours:', error);
+        logWarn(`[useSettingsOffline] Failed to read offline_business_hours: ${error}`);
         return [];
       }
     },
@@ -210,7 +211,7 @@ export function useSettingsOffline() {
       try {
         return await db.offline_sync_meta.toArray();
       } catch (error) {
-        console.warn('[useSettingsOffline] Failed to read offline_sync_meta:', error);
+        logWarn(`[useSettingsOffline] Failed to read offline_sync_meta: ${error}`);
         return [];
       }
     },

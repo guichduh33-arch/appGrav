@@ -13,6 +13,7 @@ import { useKDSConfigSettings } from '../../hooks/settings/useModuleConfigSettin
 import { LanConnectionIndicator } from '../../components/lan/LanConnectionIndicator'
 import { playNewOrderSound } from '../../utils/audio'
 import { cn } from '../../lib/utils'
+import { logError } from '@/utils/logger'
 import type { IKdsNewOrderPayload, TKitchenStation } from '../../types/offline'
 
 // Story 4.4: Use IKdsOrder and IKdsOrderItem from hook for type consistency

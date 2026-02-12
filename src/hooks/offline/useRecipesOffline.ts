@@ -11,6 +11,7 @@
 
 import { useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { logError } from '@/utils/logger';
 import { useNetworkStatus } from './useNetworkStatus';
 import { useProductRecipe, IRecipeIngredient } from '../inventory/useProductRecipe';
 import {
@@ -120,7 +121,7 @@ export function useRecipesOffline(
       try {
         return await getCachedRecipesWithMaterials(productId);
       } catch (error) {
-        console.error('Error loading offline recipes:', error);
+        logError('Error loading offline recipes', error);
         return [];
       }
     },
@@ -134,7 +135,7 @@ export function useRecipesOffline(
       try {
         return await getRecipesSyncMeta();
       } catch (error) {
-        console.error('Error loading recipes sync meta:', error);
+        logError('Error loading recipes sync meta', error);
         return undefined;
       }
     },
@@ -148,7 +149,7 @@ export function useRecipesOffline(
       try {
         return await getLastRecipesSyncAt();
       } catch (error) {
-        console.error('Error loading last recipes sync time:', error);
+        logError('Error loading last recipes sync time', error);
         return null;
       }
     },
@@ -232,7 +233,7 @@ export function useOfflineRecipesRaw(productId: string | null): {
       try {
         return await getCachedRecipesWithMaterials(productId);
       } catch (error) {
-        console.error('Error loading offline recipes:', error);
+        logError('Error loading offline recipes', error);
         return [];
       }
     },
@@ -244,7 +245,7 @@ export function useOfflineRecipesRaw(productId: string | null): {
       try {
         return await getRecipesSyncMeta();
       } catch (error) {
-        console.error('Error loading recipes sync meta:', error);
+        logError('Error loading recipes sync meta', error);
         return undefined;
       }
     },

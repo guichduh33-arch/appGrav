@@ -18,6 +18,7 @@ import {
     type IOutstandingOrder,
 } from '../../services/b2b/arService'
 import { useAuthStore } from '../../stores/authStore'
+import { logError } from '@/utils/logger'
 
 interface Payment {
     id: string

@@ -7,6 +7,7 @@ import type { Role } from '../../types/auth';
 // Offline authentication imports (Story 1.2)
 import { useNetworkStatus, useOfflineAuth } from '../../hooks/offline';
 import { useActiveUsers } from '@/hooks/useActiveUsers';
+import { logError } from '@/utils/logger';
 import { cn } from '@/lib/utils';
 
 export default function LoginPage() {

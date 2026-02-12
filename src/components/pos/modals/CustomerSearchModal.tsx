@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, Search, QrCode, User, UserPlus, WifiOff, Heart, AlertTriangle, Clock } from 'lucide-react'
 import { useNetworkStore } from '../../../stores/networkStore'
+import { logError } from '@/utils/logger'
 import { syncCustomersToOffline } from '../../../services/sync/customerSync'
 import { useCustomersLastSync } from '@/hooks/customers/useCustomersOffline'
 import { cn } from '@/lib/utils'
