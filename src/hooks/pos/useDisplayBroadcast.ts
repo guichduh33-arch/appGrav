@@ -256,7 +256,7 @@ export function useDisplayBroadcast(): IUseDisplayBroadcastReturn {
     try {
       channelRef.current.postMessage(displayMessage);
     } catch (err) {
-      console.error('Failed to broadcast welcome:', err);
+      logError('Failed to broadcast welcome', err);
     }
   }, []);
 
