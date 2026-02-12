@@ -73,6 +73,7 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 title: 'Sales By Date',
                 description: 'Detailed sales log by date',
                 icon: Calendar,
+                hidden: true,
                 placeholder: 'This report is planned for a future release.'
             },
             {
@@ -80,6 +81,7 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 title: 'Sales Items By Date',
                 description: 'Itemized sales log',
                 icon: List,
+                hidden: true,
                 placeholder: 'This report is planned for a future release.'
             },
             {
@@ -99,6 +101,7 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 title: 'Product Sales By Brand',
                 description: 'Performance by brand',
                 icon: LayoutGrid,
+                hidden: true,
                 placeholder: 'This report is planned for a future release.'
             },
             {
@@ -149,6 +152,7 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 title: 'Incoming Stocks',
                 description: 'Purchases and internal transfers in',
                 icon: TrendingUp,
+                hidden: true,
                 placeholder: 'This report is planned for a future release.'
             },
             {
@@ -156,6 +160,7 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 title: 'Outgoing Stocks',
                 description: 'Sales, wastage, and transfers out',
                 icon: TrendingDown,
+                hidden: true,
                 placeholder: 'This report is planned for a future release.'
             },
             {
@@ -206,6 +211,7 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 title: 'Purchase Returns',
                 description: 'Items returned to suppliers',
                 icon: TrendingDown,
+                hidden: true,
                 placeholder: 'This report is planned for a future release.'
             },
             {

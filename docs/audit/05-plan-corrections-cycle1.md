@@ -13,7 +13,7 @@
 |---|--------|-------------|--------|--------|
 | B1 | Security | **PIN hash expose au client** — `MobileLoginPage.tsx:106` fetch `pin_hash` (bcrypt) vers le navigateur | XS | ~~FAIT~~ |
 | B2 | Security | **XSS Stored dans factures** — `generate-invoice` et `B2BOrderDetailPage` interpole HTML sans echappement | S | ~~FAIT~~ |
-| B3 | Backend | **RLS trop permissives** — ~50 tables avec `USING(TRUE)` pour INSERT/UPDATE/DELETE | L | PARTIEL (8 tables critiques) |
+| B3 | Backend | **RLS trop permissives** — ~50 tables avec `USING(TRUE)` pour INSERT/UPDATE/DELETE | L | ~~FAIT~~ (48 tables + helper `current_user_can()`) |
 | B4 | Backend | **2 Edge Functions CORS wildcard + sans session** — `intersection_stock_movements`, `purchase_order_module` | S | ~~FAIT~~ |
 | B5 | Backend | **`update_setting()` SECURITY DEFINER sans check permission** — N'importe quel authentifie peut modifier les settings systeme | S | ~~FAIT~~ |
 | B6 | ~~Build~~ | ~~19 erreurs TypeScript~~ | ~~FAIT~~ | ~~FAIT~~ |
@@ -57,15 +57,15 @@
 |---|--------|-------------|--------|--------|
 | S1 | Architecture | 20+ fichiers > 400 lignes (refactoring) | XL | ~~FAIT~~ (top 5 >700 lignes splittes) |
 | S2 | Architecture | 13 `error: any` dans catch blocks | S | ~~FAIT~~ |
-| S3 | Architecture | 46 eslint-disable suppressions | M |
+| S3 | Architecture | 46 eslint-disable suppressions | M | ~~FAIT~~ (46 → 2 justifies) |
 | S4 | Architecture | Pas de vendor chunk splitting | S | ~~FAIT~~ |
 | S5 | Architecture | 84 CSS files alongside Tailwind | L |
 | S6 | Architecture | 413 inline styles | L |
 | S7 | Security | Pas de Content-Security-Policy | S | ~~FAIT~~ (meta CSP dans index.html) |
 | S8 | Security | Pas de rate limiting IP sur auth online | M |
 | S9 | Backend | `generate-invoice` numero non thread-safe | S | ~~FAIT~~ (pg_advisory_xact_lock + unique index) |
-| S10 | Backend | Vues reporting ignorent paiements splits | M |
-| S11 | Fonctionnel | 5 rapports placeholder non implementes | M |
+| S10 | Backend | Vues reporting ignorent paiements splits | M | ~~FAIT~~ (view_daily_kpis + view_payment_method_stats reecrites) |
+| S11 | Fonctionnel | 5 rapports placeholder non implementes | M | ~~FAIT~~ (6 rapports masques via hidden: true) |
 | S12 | Fonctionnel | Allergenes produits (securite alimentaire) | M |
 | S13 | Fonctionnel | Points fidelite non utilisables dans le flux POS | M |
 | S14 | Fonctionnel | Facture B2B formelle PDF manquante | L |
