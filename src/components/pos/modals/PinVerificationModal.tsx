@@ -56,9 +56,11 @@ export default function PinVerificationModal({
                 }
 
                 // Get user_roles with role codes
+                type UserRoleRow = { user_id: string; roles: { code: string } | { code: string }[] | null };
                 const { data: userRoles, error: rolesError } = await supabase
                     .from('user_roles')
                     .select('user_id, roles(code)')
+                    .returns<UserRoleRow[]>()
 
                 if (rolesError) {
                     console.error('Error fetching user roles:', rolesError)
@@ -66,10 +68,9 @@ export default function PinVerificationModal({
                 }
 
                 // Build a map of user_id -> role codes
-                type UserRoleRow = { user_id: string; roles: { code: string } | { code: string }[] | null };
                 const userRoleMap = new Map<string, string[]>()
                 if (userRoles) {
-                    for (const ur of userRoles as unknown as UserRoleRow[]) {
+                    for (const ur of userRoles) {
                         const roles = ur.roles
                         const roleCode = Array.isArray(roles) ? roles[0]?.code : roles?.code
                         if (roleCode) {

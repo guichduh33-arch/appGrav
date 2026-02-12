@@ -100,14 +100,14 @@ const OrdersPage = () => {
             type RawOrderItem = Omit<OrderItem, 'item_status'> & { item_status?: string };
             type RawOrder = Omit<Order, 'items'> & { order_items?: RawOrderItem[] };
 
-            const rawOrders = data as unknown as RawOrder[];
+            const rawOrders = data as RawOrder[];
             return rawOrders.map((order) => ({
                 ...order,
                 items: (order.order_items || []).map(item => ({
                     ...item,
                     item_status: (item.item_status || 'new') as TItemStatus,
                 })),
-            })) as Order[];
+            }));
         },
         refetchInterval: 30000 // Refresh every 30 seconds
     });

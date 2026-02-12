@@ -55,7 +55,6 @@ export interface IUseProductsOfflineReturn {
  * Category is loaded separately, so we set it to null here.
  */
 function mapToProductWithCategory(product: IOfflineProduct): ProductWithCategory {
-  // Cast to unknown first to satisfy TypeScript when mapping from cached data
   // The offline cache has a subset of Product fields, so we provide defaults for missing ones
   return {
     id: product.id,
@@ -75,7 +74,7 @@ function mapToProductWithCategory(product: IOfflineProduct): ProductWithCategory
     category: null,
     // Include other required Product fields with defaults
     created_at: product.updated_at,
-  } as unknown as ProductWithCategory;
+  } as ProductWithCategory;
 }
 
 /**

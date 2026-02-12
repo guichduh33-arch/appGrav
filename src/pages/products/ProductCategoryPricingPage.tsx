@@ -78,7 +78,7 @@ export default function ProductCategoryPricingPage() {
                 retail_price: productRes.data.retail_price ?? 0,
                 wholesale_price: productRes.data.wholesale_price ?? null
             })
-            if (categoriesRes.data) setCategories(categoriesRes.data as unknown as CustomerCategory[])
+            if (categoriesRes.data) setCategories(categoriesRes.data)
 
             if (pricesRes.data) {
                 setCategoryPrices(pricesRes.data.map(p => ({

@@ -50,9 +50,10 @@ export function useIncomingStock() {
           )
         `)
         .order('order_date', { ascending: false })
+        .returns<IIncomingPurchaseOrder[]>()
 
       if (error) throw error
-      return (data ?? []) as unknown as IIncomingPurchaseOrder[]
+      return data ?? []
     },
     staleTime: 15_000,
   })

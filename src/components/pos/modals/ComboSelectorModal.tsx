@@ -82,10 +82,11 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                         `)
                         .eq('group_id', group.id)
                         .order('sort_order', { ascending: true })
+                        .returns<GroupItemWithProduct[]>()
 
                     return {
                         ...group,
-                        items: (itemsData || []) as unknown as GroupItemWithProduct[]
+                        items: itemsData ?? []
                     }
                 })
             )

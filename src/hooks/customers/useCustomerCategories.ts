@@ -29,9 +29,9 @@ export function useCustomerCategories(activeOnly = false) {
                 query = query.eq('is_active', true)
             }
 
-            const { data, error } = await query
+            const { data, error } = await query.returns<ICustomerCategory[]>()
             if (error) throw error
-            return (data ?? []) as unknown as ICustomerCategory[]
+            return data ?? []
         },
     })
 }

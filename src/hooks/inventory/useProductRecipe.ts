@@ -34,12 +34,13 @@ export function useProductRecipe(productId: string | null) {
         `)
         .eq('product_id', productId)
         .eq('is_active', true)
+        .returns<IRecipeIngredient[]>()
 
       if (error) {
         throw error
       }
 
-      return (data || []) as unknown as IRecipeIngredient[]
+      return data ?? []
     },
     enabled: !!productId
   })

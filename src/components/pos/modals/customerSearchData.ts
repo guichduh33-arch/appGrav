@@ -28,8 +28,9 @@ export async function fetchRecentCustomers(
             .eq('is_active', true)
             .order('last_visit_at', { ascending: false, nullsFirst: false })
             .limit(10)
+            .returns<ICustomerSearchCustomer[]>()
 
-        return (data as unknown as ICustomerSearchCustomer[]) ?? []
+        return data ?? []
     } catch (error) {
         console.error('Error fetching customers:', error)
         // Fallback to offline
@@ -61,9 +62,9 @@ export async function searchCustomers(
             query = query.abortSignal(signal)
         }
 
-        const { data, error } = await query
+        const { data, error } = await query.returns<ICustomerSearchCustomer[]>()
         if (error) throw error
-        return (data as unknown as ICustomerSearchCustomer[]) ?? []
+        return data ?? []
     } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') throw error
 
@@ -84,8 +85,9 @@ export async function loadFavoriteCustomers(
         .select(CUSTOMER_SELECT)
         .in('id', favoriteIds)
         .eq('is_active', true)
+        .returns<ICustomerSearchCustomer[]>()
 
-    return (data as unknown as ICustomerSearchCustomer[]) ?? []
+    return data ?? []
 }
 
 /** Load customer order history and frequent products (Story 7.4, 7.5) */

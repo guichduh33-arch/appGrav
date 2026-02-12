@@ -48,11 +48,12 @@ export default function CreateCustomerForm({
                     *,
                     category:customer_categories(name, slug, color, price_modifier_type, discount_percentage)
                 `)
+                .returns<ICustomerSearchCustomer>()
                 .single()
 
             if (error) throw error
 
-            onCustomerCreated(data as unknown as ICustomerSearchCustomer)
+            onCustomerCreated(data)
         } catch (error: unknown) {
             console.error('Error creating customer:', error)
             if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
@@ -145,10 +146,10 @@ export default function CreateCustomerForm({
                                 categoryId === cat.id && 'text-white'
                             )}
                             style={categoryId === cat.id ? {
-                                borderColor: cat.color,
-                                backgroundColor: cat.color,
+                                borderColor: cat.color ?? undefined,
+                                backgroundColor: cat.color ?? undefined,
                             } : {
-                                '--category-color': cat.color
+                                '--category-color': cat.color ?? undefined
                             } as React.CSSProperties}
                             onClick={() => setCategoryId(cat.id)}
                         >

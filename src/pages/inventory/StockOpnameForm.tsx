@@ -67,12 +67,14 @@ export default function StockOpnameForm() {
             if (sess.status === 'draft' && (!existingItems || existingItems.length === 0)) {
                 await initializeItems(id, sess.section_id)
             } else {
-                // Add unit from product to each item
-                const rawItems = existingItems as unknown as Array<CountItemWithProduct & { product?: Product }>;
+                // Add unit from product to each item - map to proper type
+                type RawItem = CountItemWithProduct & { product?: Product };
+                const rawItems = existingItems as RawItem[];
                 const itemsWithUnit = rawItems.map((item) => ({
                     ...item,
-                    unit: item.product?.unit || 'pcs'
-                })) as CountItemWithProduct[]
+                    unit: item.product?.unit || 'pcs',
+                    product: item.product!
+                }))
                 setItems(itemsWithUnit)
             }
         } catch (error) {
@@ -137,11 +139,13 @@ export default function StockOpnameForm() {
             .select('*, product:products(*)')
             .eq('count_id', sessionId)
 
-        const rawItems = reloaded as unknown as Array<CountItemWithProduct & { product?: Product }>;
+        type RawItem = CountItemWithProduct & { product?: Product };
+        const rawItems = reloaded as RawItem[];
         const itemsWithUnit = rawItems.map((item) => ({
             ...item,
-            unit: item.product?.unit || 'pcs'
-        })) as CountItemWithProduct[]
+            unit: item.product?.unit || 'pcs',
+            product: item.product!
+        }))
         setItems(itemsWithUnit)
     }
 

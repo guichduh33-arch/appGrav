@@ -46,23 +46,29 @@ export async function exportRecipes(): Promise<{ success: boolean; error?: strin
             'product_sku,product_name,material_sku,material_name,quantity,unit'
         ]
 
-        for (const r of recipes || []) {
-            const recipe = r as unknown as {
-                quantity: number
-                unit: string | null
-                product: { sku: string; name: string } | null
-                material: { sku: string; name: string; unit: string } | null
-            }
+        type RecipeExportRow = {
+            quantity: number
+            unit: string | null
+            product: { sku: string; name: string }[] | { sku: string; name: string } | null
+            material: { sku: string; name: string; unit: string }[] | { sku: string; name: string; unit: string } | null
+        };
 
-            if (!recipe.product || !recipe.material) continue
+        for (const r of recipes || []) {
+            const recipe = r as RecipeExportRow;
+
+            // Handle both single object and array responses from Supabase
+            const product = recipe.product ? (Array.isArray(recipe.product) ? recipe.product[0] : recipe.product) : null;
+            const material = recipe.material ? (Array.isArray(recipe.material) ? recipe.material[0] : recipe.material) : null;
+
+            if (!product || !material) continue
 
             const row = [
-                escapeCSV(recipe.product.sku),
-                escapeCSV(recipe.product.name),
-                escapeCSV(recipe.material.sku),
-                escapeCSV(recipe.material.name),
+                escapeCSV(product.sku),
+                escapeCSV(product.name),
+                escapeCSV(material.sku),
+                escapeCSV(material.name),
                 recipe.quantity,
-                escapeCSV(recipe.unit || recipe.material.unit || '')
+                escapeCSV(recipe.unit || material.unit || '')
             ].join(',')
             csvRows.push(row)
         }

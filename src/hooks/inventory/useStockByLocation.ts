@@ -51,9 +51,10 @@ export function useStockBalances() {
         .select('*')
         .order('location_name')
         .order('product_name')
+        .returns<IStockBalance[]>()
 
       if (error) throw error
-      return (data ?? []) as unknown as IStockBalance[]
+      return data ?? []
     },
     staleTime: 15_000,
   })

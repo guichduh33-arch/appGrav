@@ -12,6 +12,7 @@ export function useTerminalSettings(terminalId: string) {
       const { data: terminal, error: terminalError } = await untypedFrom('pos_terminals')
         .select('mode, default_printer_id, kitchen_printer_id, kds_station, allowed_payment_methods, default_order_type, floor_plan_id, auto_logout_timeout')
         .eq('id', terminalId)
+        .returns<TerminalSettings>()
         .single()
 
       if (terminalError) {
@@ -19,7 +20,7 @@ export function useTerminalSettings(terminalId: string) {
         throw terminalError
       }
 
-      return terminal as unknown as TerminalSettings
+      return terminal
     },
     enabled: !!terminalId,
   })
@@ -57,9 +58,10 @@ export function useTerminalSettingOverrides(terminalId: string) {
       const { data, error } = await untypedFrom('terminal_settings')
         .select('*')
         .eq('terminal_id', terminalId)
+        .returns<ITerminalSetting[]>()
 
       if (error) throw error
-      return (data || []) as unknown as ITerminalSetting[]
+      return data || []
     },
     enabled: !!terminalId,
   })

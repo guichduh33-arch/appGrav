@@ -16,13 +16,13 @@
 | B3 | Backend | **RLS trop permissives** — ~50 tables avec `USING(TRUE)` pour INSERT/UPDATE/DELETE | L | ~~FAIT~~ (48 tables + helper `current_user_can()`) |
 | B4 | Backend | **2 Edge Functions CORS wildcard + sans session** — `intersection_stock_movements`, `purchase_order_module` | S | ~~FAIT~~ |
 | B5 | Backend | **`update_setting()` SECURITY DEFINER sans check permission** — N'importe quel authentifie peut modifier les settings systeme | S | ~~FAIT~~ |
-| B6 | ~~Build~~ | ~~19 erreurs TypeScript~~ | ~~FAIT~~ | ~~FAIT~~ |
+| B6 | ~~Build~~ | ~~19 erreurs TypeScript~~ | ~~FAIT~~ | ~~FAIT~~ (0 erreurs tsc) |
 
 ### CRITIQUE (Doit etre corrige avant production)
 
 | # | Source | Description | Effort | Statut |
 |---|--------|-------------|--------|--------|
-| C1 | Backend | **Tax rate default 0.11 au lieu de 0.10** dans `purchase_orders` | XS | ~~FAIT~~ |
+| C1 | Backend | **Tax rate default 0.11 au lieu de 0.10** dans `purchase_orders` | XS | ~~FAIT~~ (migration `20260212190000`) |
 | C2 | Backend | **`deduct_stock_on_sale_items()` ne met pas a jour `section_stock`** (source de verite) | M | ~~FAIT~~ |
 | C3 | Security | **~111 pages, seulement 2 utilisent PermissionGuard** — Toutes les pages admin accessibles a tout authentifie | M | ~~FAIT~~ (RouteGuard sur toutes les routes admin) |
 | C4 | Security | **SMTP password en clair dans `settings`** — Lisible par tout authentifie | S | ~~FAIT~~ (password jamais charge cote client) |
@@ -38,7 +38,7 @@
 | # | Source | Description | Effort | Statut |
 |---|--------|-------------|--------|--------|
 | I1 | Architecture | 55+ `as any` casts | L | ~~FAIT~~ (0 `as any` en prod, helpers centralises) |
-| I2 | Architecture | 40+ `as unknown as X` unsafe casts | L | ~~FAIT~~ (remplaces par types propres) |
+| I2 | Architecture | 40+ `as unknown as X` unsafe casts | L | ~~FAIT~~ (145→14 en prod, 53 en tests; `.returns<T>()` Supabase + casts structurels) |
 | I3 | Architecture | 17 appels Supabase directs dans pages/components | M | ~~FAIT~~ |
 | I4 | Architecture | 1 seul ErrorBoundary au root (crash POS = crash app) | S | ~~FAIT~~ |
 | I5 | Architecture | Code mort : `ProductionPage.tsx` (697 lignes, jamais importe) | XS | ~~FAIT~~ |

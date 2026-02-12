@@ -223,11 +223,24 @@ export async function logRefundOperation(
  * Uses the general sync queue with entity type 'audit_logs'
  */
 async function queueOfflineAuditLog(log: IOfflineAuditLog): Promise<void> {
+  // Convert IOfflineAuditLog to plain object for storage
+  const payload: Record<string, unknown> = {
+    id: log.id,
+    action: log.action,
+    entityType: log.entityType,
+    entityId: log.entityId,
+    userId: log.userId,
+    severity: log.severity,
+    details: log.details,
+    createdAt: log.createdAt,
+    synced: log.synced,
+  };
+
   await db.offline_sync_queue.add({
     entity: 'audit_logs' as never, // Type workaround - extend TSyncEntity if needed
     action: 'create',
     entityId: log.id,
-    payload: log as unknown as Record<string, unknown>,
+    payload,
     created_at: log.createdAt,
     status: 'pending',
     retries: 0,

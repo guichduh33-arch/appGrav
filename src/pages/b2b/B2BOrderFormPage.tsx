@@ -97,11 +97,12 @@ export default function B2BOrderFormPage() {
                 .from('customers')
                 .select('*')
                 .eq('is_active', true)
+                .returns<Customer[]>()
                 .order('company_name', { ascending: true, nullsFirst: false })
                 .order('name')
 
             if (error) throw error
-            if (data) setCustomers(data as unknown as Customer[])
+            if (data) setCustomers(data)
         } catch (error) {
             console.error('Error fetching customers:', error)
         }
@@ -115,10 +116,11 @@ export default function B2BOrderFormPage() {
                 .eq('is_active', true)
                 .eq('product_type', 'finished')
                 .eq('available_for_sale', true)
+                .returns<Product[]>()
                 .order('name')
 
             if (error) throw error
-            if (data) setProducts(data as unknown as Product[])
+            if (data) setProducts(data)
         } catch (error) {
             console.error('Error fetching products:', error)
         }

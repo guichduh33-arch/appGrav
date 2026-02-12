@@ -59,29 +59,29 @@ export function usePromotionForm() {
                 const d = data as Record<string, unknown>
                 setForm(mapPromotionToForm(data, d))
 
+                type PromoProductRow = { product: Product | null }
                 const { data: promoProducts } = await supabase
                     .from('promotion_products')
                     .select('product:products(*)')
                     .eq('promotion_id', id)
+                    .returns<PromoProductRow[]>()
 
                 if (promoProducts) {
-                    type PromoProductRow = { product: Product | null }
-                    const rawData = promoProducts as unknown as PromoProductRow[]
                     setSelectedProducts(
-                        rawData.map((pp) => pp.product).filter((p): p is Product => p !== null)
+                        promoProducts.map((pp) => pp.product).filter((p): p is Product => p !== null)
                     )
                 }
 
+                type PromoFreeProductRow = { product: Product | null }
                 const { data: promoFreeProducts } = await supabase
                     .from('promotion_free_products')
                     .select('product:products(*)')
                     .eq('promotion_id', id)
+                    .returns<PromoFreeProductRow[]>()
 
                 if (promoFreeProducts) {
-                    type PromoFreeProductRow = { product: Product | null }
-                    const rawFreeData = promoFreeProducts as unknown as PromoFreeProductRow[]
                     setFreeProducts(
-                        rawFreeData.map((pp) => pp.product).filter((p): p is Product => p !== null)
+                        promoFreeProducts.map((pp) => pp.product).filter((p): p is Product => p !== null)
                     )
                 }
             }

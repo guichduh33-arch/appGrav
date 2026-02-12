@@ -75,14 +75,15 @@ export default function ProductsPage() {
                         pos_visible, is_active, image_url,
                         category:categories(id, name, color)
                     `)
-                    .order('name'),
+                    .order('name')
+                    .returns<Product[]>(),
                 supabase
                     .from('categories')
                     .select('id, name, color')
                     .order('name')
             ])
 
-            if (productsRes.data) setProducts(productsRes.data as unknown as Product[])
+            if (productsRes.data) setProducts(productsRes.data)
             if (categoriesRes.data) setCategories(categoriesRes.data)
         } catch (error) {
             console.error('Error fetching products:', error)

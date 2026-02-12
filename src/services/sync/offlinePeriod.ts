@@ -73,7 +73,7 @@ export async function endOfflinePeriod(periodId: string): Promise<IOfflinePeriod
 export async function getCurrentOfflinePeriod(): Promise<IOfflinePeriod | null> {
   const periods = await db.offline_periods
     .where('end_time')
-    .equals(null as unknown as string)
+    .equals(null!)
     .toArray();
 
   return periods.length > 0 ? periods[0] : null;

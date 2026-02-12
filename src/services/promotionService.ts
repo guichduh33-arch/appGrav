@@ -216,15 +216,15 @@ export async function calculatePromotionDiscount(
 
             case 'free_product': {
                 // Get free products
+                type FreeProductRow = { product_id?: string; free_product_id?: string; quantity?: number };
                 const { data: freeProductsData } = await supabase
                     .from('promotion_free_products')
                     .select('product_id, quantity')
                     .eq('promotion_id', promotion.id)
+                    .returns<FreeProductRow[]>();
 
                 if (freeProductsData) {
-                    type FreeProductRow = { product_id?: string; free_product_id?: string; quantity?: number };
-                    const rawData = freeProductsData as unknown as FreeProductRow[];
-                    const validItems = rawData
+                    const validItems = freeProductsData
                         .map((fp) => ({
                             product_id: fp.product_id || fp.free_product_id || '',
                             quantity: fp.quantity || 1

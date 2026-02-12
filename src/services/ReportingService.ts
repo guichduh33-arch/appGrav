@@ -41,7 +41,7 @@ export const ReportingService = {
         });
 
         if (error) throw error;
-        return (data || []) as unknown as SalesComparison[];
+        return data || [];
     },
 
     /**
@@ -57,7 +57,7 @@ export const ReportingService = {
         });
 
         if (error) throw error;
-        return data as unknown as DashboardSummary;
+        return data;
     },
 
     /**
@@ -65,10 +65,11 @@ export const ReportingService = {
      */
     async getPaymentMethodStats(): Promise<PaymentMethodStat[]> {
         const { data, error } = await untypedFrom('view_payment_method_stats')
-            .select('*') as { data: unknown[] | null; error: Error | null };
+            .select('*')
+            .returns<PaymentMethodStat[]>();
 
         if (error) throw error;
-        return (data || []) as unknown as PaymentMethodStat[];
+        return data || [];
     },
 
     /**
@@ -205,7 +206,7 @@ export const ReportingService = {
             total_price: number;
             product?: { category?: { id: string; name: string } };
         };
-        const rawData = data as unknown as CategoryItemRow[];
+        const rawData = data as CategoryItemRow[];
         rawData?.forEach((item) => {
             const category = item.product?.category;
             const key = category?.id || 'uncategorized';
@@ -308,11 +309,12 @@ export const ReportingService = {
         const { data, error } = await supabase
             .from('audit_logs')
             .select('*')
+            .returns<AuditLogEntry[]>()
             .order('created_at', { ascending: false })
             .limit(limit);
 
         if (error) throw error;
-        return (data || []) as unknown as AuditLogEntry[];
+        return data || [];
     },
 
     /**
@@ -361,7 +363,7 @@ export const ReportingService = {
             supplier?: { name?: string };
             product?: { cost_price?: number };
         };
-        const rawData = data as unknown as SupplierMovementRow[];
+        const rawData = data as SupplierMovementRow[];
         rawData?.forEach((item) => {
             const supplierName = item.supplier?.name || 'Unknown Supplier';
             const key = supplierName;
@@ -395,10 +397,11 @@ export const ReportingService = {
             .select('*')
             .gte('report_date', startDate.toISOString().split('T')[0])
             .lte('report_date', endDate.toISOString().split('T')[0])
-            .order('report_date', { ascending: false }) as { data: unknown[] | null; error: Error | null };
+            .order('report_date', { ascending: false })
+            .returns<IProfitLossReport[]>();
 
         if (error) throw error;
-        return (data || []) as unknown as IProfitLossReport[];
+        return data || [];
     },
 
     /**
@@ -407,12 +410,13 @@ export const ReportingService = {
     async getSalesByCustomer(startDate: Date, endDate: Date): Promise<ISalesByCustomerReport[]> {
         // Query from orders with customer join and filter by date
         const { data, error } = await untypedFrom('view_sales_by_customer')
-            .select('*') as { data: unknown[] | null; error: Error | null };
+            .select('*')
+            .returns<ISalesByCustomerReport[]>();
 
         if (error) throw error;
 
         // Filter by date range if last_order_at is within range
-        const filtered = (data || []) as ISalesByCustomerReport[];
+        const filtered = data || [];
         return filtered.filter(c =>
             c.last_order_at &&
             new Date(c.last_order_at) >= startDate &&
@@ -428,10 +432,11 @@ export const ReportingService = {
             .select('*')
             .gte('report_date', startDate.toISOString().split('T')[0])
             .lte('report_date', endDate.toISOString().split('T')[0])
-            .order('hour_of_day', { ascending: true }) as { data: unknown[] | null; error: Error | null };
+            .order('hour_of_day', { ascending: true })
+            .returns<ISalesByHourReport[]>();
 
         if (error) throw error;
-        return (data || []) as unknown as ISalesByHourReport[];
+        return data || [];
     },
 
     /**
@@ -442,10 +447,11 @@ export const ReportingService = {
             .select('*')
             .gte('started_at', startDate.toISOString())
             .lte('started_at', endDate.toISOString())
-            .order('started_at', { ascending: false }) as { data: unknown[] | null; error: Error | null };
+            .order('started_at', { ascending: false })
+            .returns<ISessionCashBalanceReport[]>();
 
         if (error) throw error;
-        return (data || []) as unknown as ISessionCashBalanceReport[];
+        return data || [];
     },
 
     /**
@@ -455,10 +461,11 @@ export const ReportingService = {
         const { data, error } = await untypedFrom('view_b2b_receivables')
             .select('*')
             .gt('outstanding_amount', 0)
-            .order('outstanding_amount', { ascending: false }) as { data: unknown[] | null; error: Error | null };
+            .order('outstanding_amount', { ascending: false })
+            .returns<IB2BReceivablesReport[]>();
 
         if (error) throw error;
-        return (data || []) as unknown as IB2BReceivablesReport[];
+        return data || [];
     },
 
     /**
@@ -466,10 +473,11 @@ export const ReportingService = {
      */
     async getStockWarning(): Promise<IStockWarningReport[]> {
         const { data, error } = await untypedFrom('view_stock_warning')
-            .select('*') as { data: unknown[] | null; error: Error | null };
+            .select('*')
+            .returns<IStockWarningReport[]>();
 
         if (error) throw error;
-        return (data || []) as unknown as IStockWarningReport[];
+        return data || [];
     },
 
     /**
@@ -478,10 +486,11 @@ export const ReportingService = {
     async getExpiredStock(): Promise<IExpiredStockReport[]> {
         const { data, error } = await untypedFrom('view_expired_stock')
             .select('*')
-            .in('expiry_status', ['expired', 'expiring_soon', 'expiring']) as { data: unknown[] | null; error: Error | null };
+            .in('expiry_status', ['expired', 'expiring_soon', 'expiring'])
+            .returns<IExpiredStockReport[]>();
 
         if (error) throw error;
-        return (data || []) as unknown as IExpiredStockReport[];
+        return data || [];
     },
 
     /**
@@ -491,10 +500,11 @@ export const ReportingService = {
         const { data, error } = await untypedFrom('view_unsold_products')
             .select('*')
             .gte('days_since_sale', daysSinceLastSale)
-            .order('days_since_sale', { ascending: false }) as { data: unknown[] | null; error: Error | null };
+            .order('days_since_sale', { ascending: false })
+            .returns<IUnsoldProductsReport[]>();
 
         if (error) throw error;
-        return (data || []) as unknown as IUnsoldProductsReport[];
+        return data || [];
     },
 
     /**
@@ -525,18 +535,28 @@ export const ReportingService = {
             cancelled_at: string;
             total: number;
             cancellation_reason: string | null;
-            staff: { name: string } | null;
+            staff: { name: string } | { name: string }[] | null;
             order_items: { id: string }[];
         };
 
-        return ((data || []) as unknown as CancellationRow[]).map(o => ({
-            order_id: o.id,
-            order_number: o.order_number,
-            cancelled_at: o.cancelled_at,
-            cashier_name: o.staff?.name || null,
-            order_total: o.total,
-            cancel_reason: o.cancellation_reason,
-            items_count: o.order_items?.length || 0,
-        }));
+        return ((data || []) as CancellationRow[]).map(o => {
+            let cashierName: string | null = null;
+            if (o.staff) {
+                if (Array.isArray(o.staff)) {
+                    cashierName = o.staff.length > 0 ? o.staff[0].name : null;
+                } else {
+                    cashierName = o.staff.name;
+                }
+            }
+            return {
+                order_id: o.id,
+                order_number: o.order_number,
+                cancelled_at: o.cancelled_at,
+                cashier_name: cashierName,
+                order_total: o.total,
+                cancel_reason: o.cancellation_reason,
+                items_count: o.order_items?.length || 0,
+            };
+        });
     },
 };

@@ -57,7 +57,7 @@ export function useB2BOrderDetail(id: string | undefined) {
                     discount_value: data.discount_percent ?? 0,
                     payment_status: data.payment_status ?? 'unpaid',
                     tax_rate: displayTaxRate,
-                } as unknown as B2BOrder
+                } as B2BOrder
                 setOrder(mappedOrder)
             }
         } catch (error) {
@@ -69,28 +69,32 @@ export function useB2BOrderDetail(id: string | undefined) {
 
     const fetchItems = async () => {
         try {
-            const { data, error } = await supabase
+            const { data: itemsWithReturns, error: itemsError } = await supabase
                 .from('b2b_order_items')
                 .select('*')
                 .eq('order_id', id!)
                 .order('created_at')
 
-            if (error) throw error
-            if (data) {
-                const mappedItems = data.map(item => ({
-                    id: item.id,
-                    product_id: item.product_id,
-                    product_name: item.product_name,
-                    product_sku: item.product_sku,
-                    quantity: item.quantity,
-                    unit: 'pcs',
-                    unit_price: item.unit_price,
-                    discount_percentage: item.discount_percent ?? 0,
-                    discount_amount: (item.unit_price * item.quantity * (item.discount_percent ?? 0)) / 100,
-                    line_total: item.total,
-                    quantity_delivered: 0,
-                    quantity_remaining: item.quantity,
-                })) as unknown as OrderItem[]
+            if (itemsError) throw itemsError
+            if (itemsWithReturns) {
+                const mappedItems = itemsWithReturns.map(item => {
+                    const discPct = (item as unknown as { discount_percent?: number }).discount_percent ?? 0
+                    const lineTotal = (item as unknown as { total?: number }).total ?? 0
+                    return {
+                        id: item.id,
+                        product_id: item.product_id,
+                        product_name: item.product_name,
+                        product_sku: item.product_sku,
+                        quantity: item.quantity,
+                        unit: 'pcs',
+                        unit_price: item.unit_price,
+                        discount_percentage: discPct,
+                        discount_amount: (item.unit_price * item.quantity * discPct) / 100,
+                        line_total: lineTotal,
+                        quantity_delivered: 0,
+                        quantity_remaining: item.quantity,
+                    }
+                })
                 setItems(mappedItems)
             }
         } catch (error) {
@@ -104,10 +108,11 @@ export function useB2BOrderDetail(id: string | undefined) {
                 .from('b2b_payments')
                 .select('*')
                 .eq('order_id', id!)
+                .returns<Payment[]>()
                 .order('payment_date', { ascending: false })
 
             if (error) throw error
-            if (data) setPayments(data as unknown as Payment[])
+            if (data) setPayments(data)
         } catch (error) {
             console.error('Error fetching payments:', error)
         }
@@ -119,13 +124,14 @@ export function useB2BOrderDetail(id: string | undefined) {
                 .from('b2b_deliveries')
                 .select('*')
                 .eq('order_id', id!)
+                .returns<Delivery[]>()
                 .order('scheduled_date', { ascending: false })
 
             if (error) {
                 setDeliveries([])
                 return
             }
-            if (data) setDeliveries(data as unknown as Delivery[])
+            if (data) setDeliveries(data)
         } catch (error) {
             console.error('Error fetching deliveries:', error)
             setDeliveries([])
@@ -138,13 +144,14 @@ export function useB2BOrderDetail(id: string | undefined) {
                 .from('b2b_order_history')
                 .select('*')
                 .eq('order_id', id!)
+                .returns<HistoryEntry[]>()
                 .order('created_at', { ascending: false })
 
             if (error) {
                 setHistory([])
                 return
             }
-            if (data) setHistory(data as unknown as HistoryEntry[])
+            if (data) setHistory(data)
         } catch (error) {
             console.error('Error fetching history:', error)
             setHistory([])

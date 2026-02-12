@@ -63,13 +63,6 @@ function initStore(total: number = ORDER_TOTAL) {
   return usePaymentStore.getState();
 }
 
-/**
- * Add a payment and return updated state.
- */
-function addAndGetState(payment: IPaymentInput) {
-  usePaymentStore.getState().addPayment(payment);
-  return usePaymentStore.getState();
-}
 
 // =====================================================
 // Initial State
@@ -634,8 +627,8 @@ describe('paymentStore', () => {
       });
 
       // Ensure internal fields are stripped
-      expect((inputs[0] as Record<string, unknown>).id).toBeUndefined();
-      expect((inputs[0] as Record<string, unknown>).timestamp).toBeUndefined();
+      expect((inputs[0] as unknown as Record<string, unknown>).id).toBeUndefined();
+      expect((inputs[0] as unknown as Record<string, unknown>).timestamp).toBeUndefined();
     });
 
     it('should return multiple payment inputs in order', () => {

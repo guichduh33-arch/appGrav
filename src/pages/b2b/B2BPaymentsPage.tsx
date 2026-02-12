@@ -112,10 +112,11 @@ export default function B2BPaymentsPage() {
                     customer:customers(name, company_name)
                 `)
                 .eq('status', 'completed')
+                .returns<Payment[]>()
                 .order('payment_date', { ascending: false })
 
             if (error) throw error
-            if (data) setPayments(data as unknown as Payment[])
+            if (data) setPayments(data)
         } catch (error) {
             console.error('Error fetching payments:', error)
         } finally {
@@ -134,6 +135,7 @@ export default function B2BPaymentsPage() {
                 .in('payment_status', ['unpaid', 'partial'])
                 .neq('status', 'cancelled')
                 .order('delivery_date', { ascending: true, nullsFirst: false })
+                .returns<OutstandingOrder[]>()
 
             if (error) throw error
             if (data) {
@@ -141,11 +143,11 @@ export default function B2BPaymentsPage() {
                     id: order.id,
                     order_number: order.order_number,
                     customer: order.customer,
-                    total_amount: order.total ?? 0,
-                    amount_due: (order.total ?? 0) - (order.paid_amount ?? 0),
-                    due_date: order.delivery_date,
+                    total_amount: (order as unknown as { total: number | null }).total ?? 0,
+                    amount_due: ((order as unknown as { total: number | null }).total ?? 0) - ((order as unknown as { paid_amount: number | null }).paid_amount ?? 0),
+                    due_date: (order as unknown as { delivery_date: string | null }).delivery_date,
                     payment_status: order.payment_status ?? 'unpaid',
-                })) as unknown as OutstandingOrder[]
+                }))
                 setOutstandingOrders(mappedOrders)
             }
         } catch (error) {

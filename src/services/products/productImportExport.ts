@@ -90,7 +90,7 @@ export async function exportProducts(): Promise<{ success: boolean; error?: stri
         ]
 
         for (const p of products || []) {
-            const product = p as unknown as Record<string, unknown>
+            const product = p as Record<string, unknown>
             const category = product.category as { name: string } | null
             const sectionSlug = sectionMap.get(product.id as string) || ''
             const row = [

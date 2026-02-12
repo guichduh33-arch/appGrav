@@ -77,7 +77,7 @@ export default function ProfilePage() {
         started_at: string;
         ended_at?: string | null;
       };
-      const rawData = data as unknown as SessionRow[];
+      const rawData = data as SessionRow[];
       const mapped = rawData.map((s) => ({
         id: s.id,
         device_type: (s.device_info as { type?: string })?.type || 'unknown',

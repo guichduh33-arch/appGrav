@@ -68,7 +68,7 @@ export function useRoles() {
 
       // Map permissions to roles
       type RoleRow = Role & { user_roles?: { count: number }[] }
-      const rawRoles = (rolesData || []) as unknown as RoleRow[]
+      const rawRoles = (rolesData || []) as RoleRow[]
       const rolePerms = (rolePermsData || []) as { role_id: string; permission_id: string }[]
 
       return rawRoles.map((role) => ({

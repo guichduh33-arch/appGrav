@@ -33,12 +33,13 @@ export function useInventoryItems() {
           category:categories(name)
         `)
         .order('name')
+        .returns<TInventoryItem[]>()
 
       if (error) {
         throw error
       }
 
-      return (data || []) as unknown as TInventoryItem[]
+      return data || []
     }
   })
 }

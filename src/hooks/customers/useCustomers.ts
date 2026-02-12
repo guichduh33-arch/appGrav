@@ -43,9 +43,10 @@ export function useCustomers() {
                     category:customer_categories(id, name, slug, color, price_modifier_type, discount_percentage)
                 `)
                 .order('created_at', { ascending: false })
+                .returns<ICustomerWithCategory[]>()
 
             if (error) throw error
-            return (data ?? []) as unknown as ICustomerWithCategory[]
+            return data ?? []
         },
     })
 }
@@ -62,10 +63,11 @@ export function useCustomerById(id: string | undefined) {
                     category:customer_categories(id, name, slug, color, price_modifier_type, discount_percentage)
                 `)
                 .eq('id', id!)
+                .returns<ICustomerWithCategory>()
                 .single()
 
             if (error) throw error
-            return data as unknown as ICustomerWithCategory
+            return data
         },
     })
 }

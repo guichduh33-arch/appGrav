@@ -193,8 +193,8 @@ export default function KDSMainPage() {
                 order_items?: RawOrderItem[];
             };
 
-            // Transform data with cast through unknown
-            const rawOrders = data as unknown as RawOrder[];
+            // Transform data
+            const rawOrders = data as RawOrder[];
             const transformedOrders: IKdsOrder[] = (rawOrders || [])
                 .map((order) => {
                     // Map items with modifiers

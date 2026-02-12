@@ -65,9 +65,9 @@ export function useUsersWithRoles(options?: { showInactive?: boolean }) {
         query = query.eq('is_active', true)
       }
 
-      const { data, error } = await query
+      const { data, error } = await query.returns<IUserWithRoles[]>()
       if (error) throw error
-      return (data as unknown as IUserWithRoles[]) || []
+      return data || []
     },
     staleTime: 30_000,
   })

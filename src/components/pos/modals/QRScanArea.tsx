@@ -33,6 +33,7 @@ export default function QRScanArea({ onCustomerFound }: QRScanAreaProps) {
                 `)
                 .or(`loyalty_qr_code.eq.${qrInput.trim()},membership_number.eq.${qrInput.trim()}`)
                 .eq('is_active', true)
+                .returns<ICustomerSearchCustomer>()
                 .single()
 
             if (error || !data) {
@@ -41,7 +42,7 @@ export default function QRScanArea({ onCustomerFound }: QRScanAreaProps) {
                 return
             }
 
-            onCustomerFound(data as unknown as ICustomerSearchCustomer)
+            onCustomerFound(data)
         } catch (error) {
             console.error('Error scanning QR:', error)
             setQrError('Error during search')

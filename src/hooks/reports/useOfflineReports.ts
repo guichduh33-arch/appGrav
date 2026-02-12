@@ -103,10 +103,10 @@ export function useOfflineReports<T>({
     // For array data, return all cached items
     // For object data, return the first item
     if (Array.isArray(cached.data[0])) {
-      return cached.data.flat() as unknown as T;
+      return cached.data.flat() as T;
     }
 
-    return cached.data as unknown as T;
+    return cached.data as T;
   }, [reportType, dateRange]);
 
   // Online query function - fetches and caches
@@ -125,7 +125,7 @@ export function useOfflineReports<T>({
         }
       } else {
         // Cache as a single entry for today's date
-        await cacheReportData(reportType, new Date(), data as unknown as Record<string, unknown>);
+        await cacheReportData(reportType, new Date(), data as Record<string, unknown>);
       }
 
       // Update last sync time
@@ -190,7 +190,7 @@ export function useOfflineSnapshot<T>({
       throw new Error('No cached data available');
     }
 
-    return cached.data[0] as unknown as T;
+    return cached.data[0] as T;
   }, [reportType]);
 
   const onlineQueryFn = useCallback(async (): Promise<T> => {
@@ -198,7 +198,7 @@ export function useOfflineSnapshot<T>({
 
     try {
       const data = await queryFn();
-      await cacheReportData(reportType, new Date(), data as unknown as Record<string, unknown>);
+      await cacheReportData(reportType, new Date(), data as Record<string, unknown>);
       setLastSyncDate(new Date());
       return data;
     } finally {

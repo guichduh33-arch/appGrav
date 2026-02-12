@@ -89,7 +89,12 @@ export default function TransactionHistoryModal({
                 query = query.gte('created_at', sessionOpenedAt)
             }
 
-            const { data, error } = await query.limit(50)
+            type RawOrder = Omit<OrderWithItems, 'total_amount' | 'items'> & {
+                total: number;
+                order_items?: OrderWithItems['items'];
+            };
+
+            const { data, error } = await query.limit(50).returns<RawOrder[]>()
 
             if (error) {
                 console.error('Error fetching orders:', error)
@@ -97,12 +102,8 @@ export default function TransactionHistoryModal({
             }
 
             // Map total to total_amount for consistency
-            type RawOrder = Omit<OrderWithItems, 'total_amount' | 'items'> & {
-                total: number;
-                order_items?: OrderWithItems['items'];
-            };
-            const rawOrders = data as unknown as RawOrder[];
-            return (rawOrders || []).map((order) => ({
+            const rawOrders = data ?? [];
+            return rawOrders.map((order) => ({
                 ...order,
                 total_amount: order.total,
                 items: order.order_items || []

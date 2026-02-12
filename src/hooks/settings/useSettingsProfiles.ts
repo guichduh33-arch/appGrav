@@ -10,9 +10,10 @@ export function useSettingsProfiles() {
       const { data, error } = await untypedFrom('settings_profiles')
         .select('*')
         .order('name')
+        .returns<ISettingsProfile[]>()
 
       if (error) throw error
-      return (data || []) as unknown as ISettingsProfile[]
+      return data || []
     },
   })
 }
@@ -24,13 +25,14 @@ export function useSettingsProfile(id: string) {
       const { data, error } = await untypedFrom('settings_profiles')
         .select('*')
         .eq('id', id)
+        .returns<ISettingsProfile>()
         .single()
 
       if (error) {
         if (error.code === 'PGRST116') return null
         throw error
       }
-      return data as unknown as ISettingsProfile
+      return data
     },
     enabled: !!id,
   })
@@ -44,10 +46,11 @@ export function useCreateSettingsProfile() {
       const { data, error } = await untypedFrom('settings_profiles')
         .insert(profile)
         .select()
+        .returns<ISettingsProfile>()
         .single()
 
       if (error) throw error
-      return data as unknown as ISettingsProfile
+      return data
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: settingsKeys.profiles() })

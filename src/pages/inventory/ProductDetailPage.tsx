@@ -79,7 +79,7 @@ export default function ProductDetailPage() {
                         deleted_at: null,
                         is_made_to_order: false,
                         section_id: null,
-                    } as unknown as Product
+                    } as Product
                     setProduct(mockProduct)
                     setCategories(MOCK_CATEGORIES)
                     setSections([])
@@ -100,7 +100,7 @@ export default function ProductDetailPage() {
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString(),
                         deduct_ingredients: null,
-                    } as unknown as Product)))
+                    } as Product)))
                     return
                 }
                 if (pError) throw pError

@@ -32,12 +32,13 @@ export function useSuppliers() {
         .select('*')
         .eq('is_active', true)
         .order('name')
+        .returns<ISupplier[]>()
 
       if (error) {
         throw error
       }
 
-      return (data || []) as unknown as ISupplier[]
+      return data || []
     }
   })
 }

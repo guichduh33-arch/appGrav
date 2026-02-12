@@ -224,6 +224,16 @@ export async function getProductionSuggestions(): Promise<IProductionSuggestion[
     const productIds = baseData.map(d => d.product_id)
 
     // Single batch query for all recipes + ingredients (replaces N individual recipe queries)
+    type RecipeRow = {
+        id: string
+        product_id: string
+        output_quantity: number
+        recipe_ingredients: Array<{
+            ingredient_id: string
+            quantity: number
+            products: { name: string; current_stock: number } | null
+        }>
+    };
     const { data: recipes } = await supabase
         .from('recipes')
         .select(`
@@ -238,6 +248,7 @@ export async function getProductionSuggestions(): Promise<IProductionSuggestion[
         `)
         .in('product_id', productIds)
         .eq('is_active', true)
+        .returns<RecipeRow[]>()
 
     // Index recipes by product_id for O(1) lookup
     const recipeByProduct = new Map<string, {
@@ -250,16 +261,7 @@ export async function getProductionSuggestions(): Promise<IProductionSuggestion[
         }>
     }>()
 
-    for (const recipe of ((recipes ?? []) as unknown as Array<{
-        id: string
-        product_id: string
-        output_quantity: number
-        recipe_ingredients: Array<{
-            ingredient_id: string
-            quantity: number
-            products: { name: string; current_stock: number } | null
-        }>
-    }>)) {
+    for (const recipe of (recipes ?? [])) {
         // Use first recipe per product (same as original logic)
         if (!recipeByProduct.has(recipe.product_id)) {
             recipeByProduct.set(recipe.product_id, recipe)

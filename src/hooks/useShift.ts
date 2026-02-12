@@ -139,8 +139,9 @@ export function useShift() {
             }
 
             // RPC returns an array, get first element
-            const session = Array.isArray(data) ? data[0] : data
-            return session as unknown as PosSession | null
+            const sessions = data as PosSession[] | null
+            const session = sessions && Array.isArray(sessions) ? sessions[0] : sessions
+            return session || null
         },
         enabled: !!(activeShiftUserId || user?.id)
     })
@@ -163,7 +164,7 @@ export function useShift() {
                 return []
             }
 
-            return (data || []) as unknown as PosSession[]
+            return (data as PosSession[] | null) || []
         }
     })
 
@@ -231,10 +232,10 @@ export function useShift() {
                     console.error('Error fetching transactions:', fallbackError)
                     return []
                 }
-                return fallbackData as unknown as ShiftTransaction[]
+                return (fallbackData as ShiftTransaction[] | null) || []
             }
 
-            return data as unknown as ShiftTransaction[]
+            return (data as ShiftTransaction[] | null) || []
         },
         enabled: !!currentSession?.id
     })
@@ -299,7 +300,7 @@ export function useShift() {
             // Set the active shift user
             setActiveShiftUserId(userId)
 
-            return { ...(data as unknown as Record<string, unknown>), userName, recovered: false }
+            return { ...(data as Record<string, unknown>), userName, recovered: false }
         },
         onSuccess: (data) => {
             if (data.recovered) {
@@ -335,7 +336,7 @@ export function useShift() {
             })
 
             if (error) throw error
-            return data as unknown as CloseShiftResult
+            return data as CloseShiftResult
         },
         onSuccess: (data) => {
             toast.success('Shift fermé avec succès')
@@ -370,7 +371,7 @@ export function useShift() {
                 return []
             }
 
-            return data as unknown as PosSession[]
+            return (data as PosSession[] | null) || []
         }
     })
 

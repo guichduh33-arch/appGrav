@@ -31,7 +31,7 @@ export const StockMovementTab = () => {
     queryKey: ['stockMovements', dateRange.from, dateRange.to],
     queryFn: async () => {
       const data = await ReportingService.getStockMovements(dateRange.from, dateRange.to);
-      return data as unknown as StockMovementWithProduct[];
+      return data as StockMovementWithProduct[];
     },
     staleTime: 5 * 60 * 1000,
   });

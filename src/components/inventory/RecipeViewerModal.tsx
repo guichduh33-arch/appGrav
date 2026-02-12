@@ -56,7 +56,7 @@ export default function RecipeViewerModal({ product, onClose }: RecipeViewerModa
                                 <span>Quantity</span>
                                 <span>Current Stock</span>
                             </div>
-                            {(recipe as unknown as Array<{ material?: Product & { current_stock?: number }; quantity: number; unit?: string }>).map((item, index) => {
+                            {recipe.map((item, index) => {
                                 const material = item.material
                                 const isLowStock = material && (material.current_stock ?? 0) < item.quantity
 
@@ -73,7 +73,7 @@ export default function RecipeViewerModal({ product, onClose }: RecipeViewerModa
                                             {material?.name || 'Unknown Ingredient'}
                                         </div>
                                         <div className="font-semibold text-foreground">
-                                            {item.quantity} {item.unit || material?.unit || 'pcs'}
+                                            {item.quantity} {material?.unit || 'pcs'}
                                         </div>
                                         <div className="flex items-center gap-1">
                                             {material ? (

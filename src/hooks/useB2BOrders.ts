@@ -39,14 +39,16 @@ export function useB2BOrders() {
 
             if (error) throw error
 
-            return (data ?? []).map(order => ({
+            // Map database fields to IB2BOrder interface
+            type RawB2BOrder = typeof data extends (infer U)[] ? U : never
+            return (data ?? []).map((order: RawB2BOrder) => ({
                 ...order,
-                total_amount: order.total ?? 0,
-                amount_paid: order.paid_amount ?? 0,
-                amount_due: (order.total ?? 0) - (order.paid_amount ?? 0),
-                requested_delivery_date: order.delivery_date,
+                total_amount: (order as any).total ?? 0,
+                amount_paid: (order as any).paid_amount ?? 0,
+                amount_due: ((order as any).total ?? 0) - ((order as any).paid_amount ?? 0),
+                requested_delivery_date: (order as any).delivery_date,
                 payment_status: order.payment_status ?? 'unpaid',
-            })) as unknown as IB2BOrder[]
+            })) as IB2BOrder[]
         },
     })
 }

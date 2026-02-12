@@ -156,7 +156,7 @@ export default function StockProductionPage() {
                 })
             )
 
-            const products = productsWithUoms as unknown as ProductWithSection[]
+            const products = productsWithUoms as ProductWithSection[]
             console.log('📦 [StockProduction] Final products:', products.length, products.slice(0, 5).map(p => p.name))
 
             setSectionProducts(products)
@@ -485,7 +485,7 @@ export default function StockProductionPage() {
                 .single()
 
             if (record) {
-                const rec = record as unknown as { product_id: string; quantity_produced: number; quantity_waste?: number }
+                const rec = record as { product_id: string; quantity_produced: number; quantity_waste?: number }
                 const { data: productData } = await supabase
                     .from('products')
                     .select('current_stock')
@@ -787,9 +787,9 @@ export default function StockProductionPage() {
                                                 <span className="badge-produced">
                                                     +{formatNumber(record.quantity_produced)} {getRecordUnit(record as RecordWithProduct)}
                                                 </span>
-                                                {(record as unknown as { quantity_waste?: number }).quantity_waste && (record as unknown as { quantity_waste: number }).quantity_waste > 0 && (
+                                                {record.quantity_waste && record.quantity_waste > 0 && (
                                                     <span className="badge-waste">
-                                                        -{formatNumber((record as unknown as { quantity_waste: number }).quantity_waste)} {getRecordUnit(record as RecordWithProduct)}
+                                                        -{formatNumber(record.quantity_waste)} {getRecordUnit(record as RecordWithProduct)}
                                                     </span>
                                                 )}
                                                 {isAdmin && (

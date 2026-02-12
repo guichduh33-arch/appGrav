@@ -12,9 +12,10 @@ export function useSoundAssets() {
         .eq('is_active', true)
         .order('category', { ascending: true })
         .order('name', { ascending: true })
+        .returns<ISoundAsset[]>()
 
       if (error) throw error
-      return (data || []) as unknown as ISoundAsset[]
+      return data || []
     },
   })
 }

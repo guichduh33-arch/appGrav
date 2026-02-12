@@ -80,7 +80,7 @@ export default function CombosPage() {
 
                         // Map combo fields to match interface
                         type RawGroup = ProductComboGroup & { items?: Array<ProductComboGroupItem & { product?: Product }> };
-                        const rawGroups = groupsWithItems as unknown as RawGroup[];
+                        const rawGroups = groupsWithItems as RawGroup[];
                         const mappedGroups = rawGroups.map((g) => ({
                             ...g,
                             items: (g.items || []).map((item) => ({
@@ -98,7 +98,7 @@ export default function CombosPage() {
                         }
                     })
                 )
-                setCombos(combosWithGroups as unknown as ComboWithGroups[])
+                setCombos(combosWithGroups)
             }
         } catch (error) {
             console.error('Error fetching combos:', error)

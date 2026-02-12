@@ -87,14 +87,15 @@ const B2BPage = () => {
                     customer:customers(name, company_name)
                 `)
                 .order('order_date', { ascending: false })
-                .limit(5);
+                .limit(5)
+                .returns<RecentOrder[]>();
 
             if (ordersData) {
                 // Map DB field 'total' to UI field 'total_amount'
                 const mappedOrders = ordersData.map(order => ({
                     ...order,
-                    total_amount: order.total ?? 0,
-                })) as unknown as RecentOrder[]
+                    total_amount: (order as unknown as { total: number | null }).total ?? 0,
+                }))
                 setRecentOrders(mappedOrders);
 
                 // Calculate stats from orders
