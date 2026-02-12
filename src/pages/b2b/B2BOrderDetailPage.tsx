@@ -4,6 +4,7 @@ import {
     ArrowLeft, Edit2, Printer, Truck, CreditCard, Clock,
     CheckCircle, Package, AlertCircle
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import PinVerificationModal from '../../components/pos/modals/PinVerificationModal'
 import { STATUS_CONFIG, formatDate } from './b2bOrderDetailHelpers'
 import { printB2BOrder } from './b2bOrderPrint'
@@ -15,9 +16,18 @@ import B2BOrderDeliveriesTab from './B2BOrderDeliveriesTab'
 import B2BOrderHistoryTab from './B2BOrderHistoryTab'
 import B2BOrderSummary from './B2BOrderSummary'
 import B2BPaymentModal from './B2BPaymentModal'
-import './B2BOrderDetailPage.css'
 
 type TabKey = 'items' | 'payments' | 'deliveries' | 'history'
+
+const statusColorMap: Record<string, string> = {
+    gray: 'bg-[rgba(108,117,125,0.1)] text-[#6c757d]',
+    blue: 'bg-[rgba(123,163,181,0.15)] text-info',
+    yellow: 'bg-[rgba(234,192,134,0.2)] text-[#b38600]',
+    purple: 'bg-[rgba(138,118,171,0.15)] text-[#7c5cbf]',
+    orange: 'bg-[rgba(255,153,0,0.15)] text-[#cc7a00]',
+    green: 'bg-[rgba(107,142,107,0.15)] text-success',
+    red: 'bg-[rgba(220,53,69,0.1)] text-[var(--color-urgent)]',
+}
 
 export default function B2BOrderDetailPage() {
     const navigate = useNavigate()
@@ -54,7 +64,10 @@ export default function B2BOrderDetailPage() {
         if (!config) return null
         const Icon = config.icon
         return (
-            <span className={`b2b-detail-status b2b-detail-status--${config.color}`}>
+            <span className={cn(
+                'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold uppercase tracking-wide',
+                statusColorMap[config.color] || ''
+            )}>
                 <Icon size={16} />
                 {config.label}
             </span>
@@ -63,8 +76,8 @@ export default function B2BOrderDetailPage() {
 
     if (loading) {
         return (
-            <div className="b2b-detail-loading">
-                <div className="spinner"></div>
+            <div className="flex flex-col items-center justify-center h-[400px] gap-md text-[var(--color-gris-chaud)]">
+                <div className="w-10 h-10 border-3 border-border border-t-[var(--color-rose-poudre)] rounded-full animate-spin"></div>
                 <span>Loading order...</span>
             </div>
         )
@@ -72,9 +85,9 @@ export default function B2BOrderDetailPage() {
 
     if (!order) {
         return (
-            <div className="b2b-detail-error">
+            <div className="flex flex-col items-center justify-center h-[400px] gap-md text-[var(--color-gris-chaud)]">
                 <AlertCircle size={48} />
-                <h3>Order not found</h3>
+                <h3 className="text-[var(--color-brun-chocolat)]">Order not found</h3>
                 <button className="btn btn-primary" onClick={() => navigate('/b2b/orders')}>
                     Back to orders
                 </button>
@@ -83,24 +96,24 @@ export default function B2BOrderDetailPage() {
     }
 
     return (
-        <div className="b2b-order-detail-page">
+        <div className="p-lg h-full overflow-y-auto bg-[var(--color-blanc-creme)]">
             {/* Header */}
-            <div className="b2b-detail-header">
-                <div className="b2b-detail-header__left">
+            <div className="flex items-center justify-between mb-xl gap-lg">
+                <div className="flex items-center gap-md">
                     <button className="btn btn-ghost" onClick={() => navigate('/b2b/orders')}>
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <div className="b2b-detail-header__number">
-                            <span className="order-number">{order.order_number}</span>
+                        <div className="flex items-center gap-md">
+                            <span className="font-display text-2xl font-bold text-[var(--color-brun-chocolat)]">{order.order_number}</span>
                             {getStatusBadge(order.status)}
                         </div>
-                        <p className="b2b-detail-header__date">
+                        <p className="text-[var(--color-gris-chaud)] text-sm mt-1">
                             Created on {formatDate(order.order_date)}
                         </p>
                     </div>
                 </div>
-                <div className="b2b-detail-header__actions">
+                <div className="flex gap-sm">
                     {order.status !== 'cancelled' && (
                         <button className="btn btn-secondary" onClick={handleEditClick}>
                             <Edit2 size={18} />
@@ -138,44 +151,36 @@ export default function B2BOrderDetailPage() {
                 </div>
             </div>
 
-            <div className="b2b-detail-content">
-                <div className="b2b-detail-main">
+            <div className="grid grid-cols-[1fr_320px] max-md:grid-cols-1 gap-xl items-start">
+                <div>
                     <B2BOrderInfoCards order={order} onRecordPayment={openPaymentModal} />
 
                     {/* Tabs */}
-                    <div className="b2b-detail-tabs">
-                        <button
-                            className={`b2b-detail-tab ${activeTab === 'items' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('items')}
-                        >
-                            <Package size={16} />
-                            Items ({items.length})
-                        </button>
-                        <button
-                            className={`b2b-detail-tab ${activeTab === 'payments' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('payments')}
-                        >
-                            <CreditCard size={16} />
-                            Payments ({payments.length})
-                        </button>
-                        <button
-                            className={`b2b-detail-tab ${activeTab === 'deliveries' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('deliveries')}
-                        >
-                            <Truck size={16} />
-                            Deliveries ({deliveries.length})
-                        </button>
-                        <button
-                            className={`b2b-detail-tab ${activeTab === 'history' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('history')}
-                        >
-                            <Clock size={16} />
-                            History
-                        </button>
+                    <div className="flex gap-xs border-b border-border mb-lg">
+                        {([
+                            { key: 'items' as TabKey, icon: Package, label: `Items (${items.length})` },
+                            { key: 'payments' as TabKey, icon: CreditCard, label: `Payments (${payments.length})` },
+                            { key: 'deliveries' as TabKey, icon: Truck, label: `Deliveries (${deliveries.length})` },
+                            { key: 'history' as TabKey, icon: Clock, label: 'History' },
+                        ]).map(tab => (
+                            <button
+                                key={tab.key}
+                                className={cn(
+                                    'flex items-center gap-xs px-md py-sm bg-transparent border-none border-b-2 border-b-transparent text-sm font-medium cursor-pointer transition-all duration-fast -mb-px',
+                                    activeTab === tab.key
+                                        ? 'text-[var(--color-rose-poudre)] !border-b-[var(--color-rose-poudre)]'
+                                        : 'text-[var(--color-gris-chaud)] hover:text-[var(--color-brun-chocolat)]'
+                                )}
+                                onClick={() => setActiveTab(tab.key)}
+                            >
+                                <tab.icon size={16} />
+                                {tab.label}
+                            </button>
+                        ))}
                     </div>
 
                     {/* Tab Content */}
-                    <div className="b2b-detail-tab-content">
+                    <div className="bg-white rounded-lg shadow overflow-hidden">
                         {activeTab === 'items' && <B2BOrderItemsTab items={items} />}
                         {activeTab === 'payments' && <B2BOrderPaymentsTab payments={payments} />}
                         {activeTab === 'deliveries' && <B2BOrderDeliveriesTab deliveries={deliveries} />}

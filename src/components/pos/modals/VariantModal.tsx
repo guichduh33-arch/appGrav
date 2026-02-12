@@ -7,7 +7,7 @@ import { useProductVariants, type IVariantGroup } from '../../../hooks/products/
 import { calculateCustomerPrice } from '@/services/sync/customerPricingService'
 import type { IOfflineProduct } from '@/lib/db'
 import type { ICustomerPriceResult } from '@/types/offline'
-import './VariantModal.css'
+import { cn } from '@/lib/utils'
 
 interface VariantModalProps {
     baseProduct: Product
@@ -70,11 +70,9 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
         fetchCustomerPrice()
     }, [baseProduct, customerCategorySlug])
 
-    // Si pas de variants, ajouter directement au panier et fermer
     useEffect(() => {
         if (!isLoading && !hasCheckedVariants && variantGroups.length === 0 && customerPriceResult) {
             setHasCheckedVariants(true)
-            // Story 6.2: Use customer pricing if available
             if (customerPriceResult.priceType !== 'retail') {
                 addItemWithPricing(
                     baseProduct,
@@ -92,16 +90,13 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
         }
     }, [isLoading, hasCheckedVariants, variantGroups.length, baseProduct, addItem, addItemWithPricing, customerPriceResult, onClose])
 
-    // État pour stocker les sélections pour chaque groupe
     const [selections, setSelections] = useState<Record<string, string[]>>(() => {
         const initial: Record<string, string[]> = {}
         variantGroups.forEach(group => {
-            // Select default options
             const defaultOptions = group.options.filter(opt => opt.is_default)
             if (defaultOptions.length > 0) {
                 initial[group.group_name] = defaultOptions.map(opt => opt.option_id)
             } else if (group.options.length > 0) {
-                // Otherwise, select first option for single groups
                 if (group.group_type === 'single') {
                     initial[group.group_name] = [group.options[0].option_id]
                 } else {
@@ -112,14 +107,11 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
         return initial
     })
 
-    // Gérer la sélection d'une option
     const handleOptionSelect = (group: IVariantGroup, optionId: string) => {
         setSelections(prev => {
             if (group.group_type === 'single') {
-                // Pour single, remplacer la sélection
                 return { ...prev, [group.group_name]: [optionId] }
             } else {
-                // Pour multiple, toggle l'option
                 const current = prev[group.group_name] || []
                 const isSelected = current.includes(optionId)
                 return {
@@ -132,9 +124,7 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
         })
     }
 
-    // Calculer le prix total avec les ajustements - Story 6.2: Use customer price as base
     const totalPrice = useMemo(() => {
-        // Use customer-specific price if available, otherwise retail price
         let price = customerPriceResult?.price ?? (baseProduct.retail_price || 0)
 
         variantGroups.forEach(group => {
@@ -150,7 +140,6 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
         return price
     }, [customerPriceResult, baseProduct.retail_price, variantGroups, selections])
 
-    // Vérifier si toutes les sélections requises sont faites
     const isValidSelection = useMemo(() => {
         return variantGroups.every(group => {
             if (group.group_required) {
@@ -162,7 +151,6 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
     }, [variantGroups, selections])
 
     const handleAddToCart = () => {
-        // Construire les variants sélectionnés pour le panier
         const selectedVariants: SelectedVariant[] = variantGroups.map(group => {
             const selectedOptionIds = selections[group.group_name] || []
             const selectedOptions = selectedOptionIds
@@ -182,31 +170,27 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
             }
         })
 
-        // Créer une note descriptive des variants
         const variantNote = selectedVariants
             .filter(v => v.optionLabels.length > 0)
             .map(v => `${v.groupName}: ${v.optionLabels.join(', ')}`)
             .join(' | ')
 
-        // Story 6.2: Use customer pricing if available
         if (customerPriceResult && customerPriceResult.priceType !== 'retail') {
             addItemWithPricing(
                 baseProduct,
                 1,
-                [], // No modifiers for variants, adjustments are in totalPrice
+                [],
                 variantNote,
-                totalPrice, // Total includes base customer price + variant adjustments
+                totalPrice,
                 customerPriceResult.priceType,
                 customerPriceResult.savings,
                 selectedVariants
             )
         } else {
-            // Ajouter au panier avec le prix ajusté et les variants
             const productWithAdjustedPrice = {
                 ...baseProduct,
                 retail_price: totalPrice
             }
-            // Passer les selectedVariants pour le tracking des ingrédients
             addItem(productWithAdjustedPrice, 1, [], variantNote, selectedVariants)
         }
         onClose()
@@ -215,7 +199,7 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
     if (isLoading) {
         return (
             <div className="modal-backdrop is-active" onClick={(e) => e.target === e.currentTarget && onClose()}>
-                <div className="modal modal-md is-active variant-modal">
+                <div className="modal modal-md is-active max-w-[500px]">
                     <div className="modal__header">
                         <h3 className="modal__title">Loading...</h3>
                         <button className="modal__close" onClick={onClose} title="Close" aria-label="Close">
@@ -223,7 +207,7 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                         </button>
                     </div>
                     <div className="modal__body">
-                        <div style={{ textAlign: 'center', padding: '2rem' }}>
+                        <div className="text-center p-8">
                             Loading options...
                         </div>
                     </div>
@@ -234,14 +218,14 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
 
     return (
         <div className="modal-backdrop is-active" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className="modal modal-md is-active variant-modal">
+            <div className="modal modal-md is-active max-w-[500px]">
                 <div className="modal__header">
-                    <div className="variant-modal__product-info">
+                    <div className="flex items-center gap-4">
                         {baseProduct.image_url && (
                             <img
                                 src={baseProduct.image_url}
                                 alt={baseProduct.name}
-                                className="variant-modal__image"
+                                className="w-20 h-20 rounded-xl object-cover"
                             />
                         )}
                         <div>
@@ -256,33 +240,41 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
 
                 <div className="modal__body">
                     {variantGroups.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '1rem', color: '#6B7280' }}>
+                        <div className="text-center p-4 text-gray-500">
                             No options available for this product
                         </div>
                     ) : (
                         variantGroups.map(group => (
-                            <div key={group.group_name} className="variant-section">
-                                <h4 className="variant-section__title">
+                            <div key={group.group_name} className="mb-6">
+                                <h4 className="text-[0.95rem] font-semibold text-foreground mb-3 flex items-center gap-2">
                                     {group.group_name}
-                                    {group.group_required && <span style={{ color: '#EF4444', marginLeft: '0.25rem' }}>*</span>}
+                                    {group.group_required && <span className="text-red-500 ml-1">*</span>}
                                     {group.group_type === 'multiple' && (
-                                        <span style={{ fontSize: '0.75rem', fontWeight: 'normal', marginLeft: '0.5rem', color: '#6B7280' }}>
+                                        <span className="text-xs font-normal ml-2 text-gray-500">
                                             (Multiple choice)
                                         </span>
                                     )}
                                 </h4>
-                                <div className="variant-options">
+                                <div className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-3">
                                     {group.options.map(option => {
                                         const isSelected = (selections[group.group_name] || []).includes(option.option_id)
                                         return (
                                             <button
                                                 key={option.option_id}
-                                                className={`variant-option ${isSelected ? 'is-selected' : ''}`}
+                                                className={cn(
+                                                    'flex flex-col items-center justify-center gap-2 p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 min-h-[80px]',
+                                                    isSelected
+                                                        ? 'border-primary bg-primary text-white'
+                                                        : 'border-border bg-background hover:border-primary hover:bg-primary-light'
+                                                )}
                                                 onClick={() => handleOptionSelect(group, option.option_id)}
                                             >
-                                                <span className="variant-option__label">{option.option_label}</span>
+                                                <span className="text-[0.9rem] font-medium text-center">{option.option_label}</span>
                                                 {option.price_adjustment !== 0 && (
-                                                    <span className="variant-option__price">
+                                                    <span className={cn(
+                                                        'text-xs opacity-80',
+                                                        isSelected ? 'text-white/90' : 'text-success'
+                                                    )}>
                                                         {option.price_adjustment > 0 ? '+' : ''}{formatPrice(option.price_adjustment)}
                                                     </span>
                                                 )}
@@ -295,9 +287,9 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                     )}
 
                     {/* Selected Price Display */}
-                    <div className="variant-price-display">
+                    <div className="flex justify-between items-center p-4 bg-muted rounded-lg mt-4 text-lg">
                         <span>Total price:</span>
-                        <strong>{formatPrice(totalPrice)}</strong>
+                        <strong className="text-xl text-primary">{formatPrice(totalPrice)}</strong>
                     </div>
                 </div>
 

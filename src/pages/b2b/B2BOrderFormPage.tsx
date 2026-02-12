@@ -4,9 +4,9 @@ import {
     ArrowLeft, Plus, Trash2, Save, Send, Search,
     User, Calendar, Percent, Package
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { supabase } from '../../lib/supabase'
 import { formatCurrency } from '../../utils/helpers'
-import './B2BOrderFormPage.css'
 
 interface Customer {
     id: string
@@ -370,36 +370,36 @@ export default function B2BOrderFormPage() {
 
     if (loading) {
         return (
-            <div className="b2b-form-loading">
-                <div className="spinner"></div>
+            <div className="flex flex-col items-center justify-center h-[400px] gap-md text-[var(--color-gris-chaud)]">
+                <div className="w-10 h-10 border-3 border-border border-t-[var(--color-rose-poudre)] rounded-full animate-spin"></div>
                 <span>Loading order...</span>
             </div>
         )
     }
 
     return (
-        <div className="b2b-order-form-page">
+        <div className="p-lg h-full overflow-y-auto bg-[var(--color-blanc-creme)]">
             {/* Header */}
-            <div className="b2b-order-form__header">
+            <div className="flex items-center gap-md mb-xl">
                 <button className="btn btn-ghost" onClick={() => navigate('/b2b/orders')}>
                     <ArrowLeft size={20} />
                     Back
                 </button>
-                <h1 className="b2b-order-form__title">
+                <h1 className="font-display text-2xl font-bold text-[var(--color-brun-chocolat)]">
                     {isEditing ? 'Edit Order' : 'New B2B Order'}
                 </h1>
             </div>
 
-            <div className="b2b-order-form__content">
+            <div className="grid grid-cols-[1fr_340px] max-md:grid-cols-1 gap-xl items-start">
                 {/* Main Form */}
-                <div className="b2b-order-form__main">
+                <div className="flex flex-col gap-lg">
                     {/* Customer Section */}
-                    <div className="b2b-form-section">
-                        <h2 className="b2b-form-section__title">
+                    <div className="bg-white rounded-lg shadow p-lg">
+                        <h2 className="flex items-center gap-sm text-lg font-semibold text-[var(--color-brun-chocolat)] mb-lg">
                             <User size={20} />
                             Customer
                         </h2>
-                        <div className="b2b-form-grid">
+                        <div className="grid grid-cols-2 max-md:grid-cols-1 gap-md">
                             <div className="form-group form-group--full">
                                 <label>B2B Customer *</label>
                                 <select
@@ -417,20 +417,20 @@ export default function B2BOrderFormPage() {
                                 </select>
                             </div>
                             {selectedCustomer && (
-                                <div className="b2b-customer-info">
-                                    <div className="b2b-customer-info__item">
-                                        <span className="label">Contact:</span>
+                                <div className="col-span-full flex flex-wrap gap-md p-md bg-[var(--color-blanc-creme)] rounded-md mt-sm">
+                                    <div className="flex gap-xs text-sm">
+                                        <span className="text-[var(--color-gris-chaud)]">Contact:</span>
                                         <span>{selectedCustomer.name}</span>
                                     </div>
                                     {selectedCustomer.phone && (
-                                        <div className="b2b-customer-info__item">
-                                            <span className="label">Phone:</span>
+                                        <div className="flex gap-xs text-sm">
+                                            <span className="text-[var(--color-gris-chaud)]">Phone:</span>
                                             <span>{selectedCustomer.phone}</span>
                                         </div>
                                     )}
                                     {selectedCustomer.email && (
-                                        <div className="b2b-customer-info__item">
-                                            <span className="label">Email:</span>
+                                        <div className="flex gap-xs text-sm">
+                                            <span className="text-[var(--color-gris-chaud)]">Email:</span>
                                             <span>{selectedCustomer.email}</span>
                                         </div>
                                     )}
@@ -440,12 +440,12 @@ export default function B2BOrderFormPage() {
                     </div>
 
                     {/* Delivery Section */}
-                    <div className="b2b-form-section">
-                        <h2 className="b2b-form-section__title">
+                    <div className="bg-white rounded-lg shadow p-lg">
+                        <h2 className="flex items-center gap-sm text-lg font-semibold text-[var(--color-brun-chocolat)] mb-lg">
                             <Calendar size={20} />
                             Delivery
                         </h2>
-                        <div className="b2b-form-grid">
+                        <div className="grid grid-cols-2 max-md:grid-cols-1 gap-md">
                             <div className="form-group">
                                 <label>Requested delivery date</label>
                                 <input
@@ -489,9 +489,9 @@ export default function B2BOrderFormPage() {
                     </div>
 
                     {/* Items Section */}
-                    <div className="b2b-form-section">
-                        <div className="b2b-form-section__header">
-                            <h2 className="b2b-form-section__title">
+                    <div className="bg-white rounded-lg shadow p-lg">
+                        <div className="flex items-center justify-between mb-lg">
+                            <h2 className="flex items-center gap-sm text-lg font-semibold text-[var(--color-brun-chocolat)]">
                                 <Package size={20} />
                                 Items
                             </h2>
@@ -501,54 +501,55 @@ export default function B2BOrderFormPage() {
                             </button>
                         </div>
 
-                        <div className="b2b-items-table">
-                            <table>
+                        <div className="overflow-x-auto overflow-y-visible mt-md">
+                            <table className="w-full border-collapse overflow-visible">
                                 <thead>
                                     <tr>
-                                        <th>Product</th>
-                                        <th style={{ width: '80px' }}>Qty</th>
-                                        <th style={{ width: '100px' }}>Unit Price</th>
-                                        <th style={{ width: '80px' }}>Discount %</th>
-                                        <th style={{ width: '120px' }}>Total</th>
-                                        <th style={{ width: '50px' }}></th>
+                                        <th className="px-md py-sm text-left text-xs font-semibold text-[var(--color-gris-chaud)] uppercase tracking-wide bg-[var(--color-blanc-creme)] border-b border-border">Product</th>
+                                        <th className="px-md py-sm text-left text-xs font-semibold text-[var(--color-gris-chaud)] uppercase tracking-wide bg-[var(--color-blanc-creme)] border-b border-border" style={{ width: '80px' }}>Qty</th>
+                                        <th className="px-md py-sm text-left text-xs font-semibold text-[var(--color-gris-chaud)] uppercase tracking-wide bg-[var(--color-blanc-creme)] border-b border-border" style={{ width: '100px' }}>Unit Price</th>
+                                        <th className="px-md py-sm text-left text-xs font-semibold text-[var(--color-gris-chaud)] uppercase tracking-wide bg-[var(--color-blanc-creme)] border-b border-border" style={{ width: '80px' }}>Discount %</th>
+                                        <th className="px-md py-sm text-left text-xs font-semibold text-[var(--color-gris-chaud)] uppercase tracking-wide bg-[var(--color-blanc-creme)] border-b border-border" style={{ width: '120px' }}>Total</th>
+                                        <th className="px-md py-sm text-left text-xs font-semibold text-[var(--color-gris-chaud)] uppercase tracking-wide bg-[var(--color-blanc-creme)] border-b border-border" style={{ width: '50px' }}></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {items.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>
-                                                <div className="b2b-product-selector">
+                                        <tr key={index} className="[&:last-child>td]:border-b-0">
+                                            <td className="px-md py-sm text-sm border-b border-border align-middle overflow-visible">
+                                                <div className="relative z-10">
                                                     <div
-                                                        className="b2b-product-selector__input"
+                                                        className="px-md py-sm border border-border rounded-md text-sm cursor-pointer bg-white min-w-[200px] hover:border-[var(--color-rose-poudre)]"
                                                         onClick={() => setShowProductSearch(showProductSearch === index ? null : index)}
                                                     >
                                                         {item.product_name || (
-                                                            <span className="placeholder">Search a product...</span>
+                                                            <span className="text-[var(--color-gris-chaud)]">Search a product...</span>
                                                         )}
                                                     </div>
                                                     {showProductSearch === index && (
-                                                        <div className="b2b-product-dropdown">
-                                                            <div className="b2b-product-dropdown__search">
-                                                                <Search size={16} />
+                                                        <div className="absolute top-full left-0 mt-1 bg-white border border-border rounded-md shadow-lg z-[1000] min-w-[350px] max-h-[400px] overflow-hidden flex flex-col">
+                                                            <div className="flex items-center gap-sm px-md py-sm border-b border-border">
+                                                                <Search size={16} className="text-[var(--color-gris-chaud)] shrink-0" />
                                                                 <input
                                                                     type="text"
                                                                     placeholder="Search..."
                                                                     value={productSearch}
                                                                     onChange={(e) => setProductSearch(e.target.value)}
                                                                     autoFocus
+                                                                    className="flex-1 border-none outline-none text-sm"
                                                                 />
                                                             </div>
-                                                            <div className="b2b-product-dropdown__list">
+                                                            <div className="overflow-y-auto max-h-[350px]">
                                                                 {filteredProducts.map(product => (
                                                                     <div
                                                                         key={product.id}
-                                                                        className="b2b-product-dropdown__item"
+                                                                        className="px-md py-sm cursor-pointer transition-colors duration-fast hover:bg-[rgba(186,144,162,0.1)]"
                                                                         onClick={() => handleProductSelect(index, product)}
                                                                     >
-                                                                        <div className="b2b-product-dropdown__name">
+                                                                        <div className="font-medium text-[var(--color-brun-chocolat)] mb-0.5">
                                                                             {product.name}
                                                                         </div>
-                                                                        <div className="b2b-product-dropdown__meta">
+                                                                        <div className="flex gap-md text-xs text-[var(--color-gris-chaud)]">
                                                                             <span>{product.sku}</span>
                                                                             <span>{formatCurrency(product.wholesale_price || product.retail_price || 0)}</span>
                                                                             <span>Stock: {product.current_stock}</span>
@@ -560,37 +561,40 @@ export default function B2BOrderFormPage() {
                                                     )}
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td className="px-md py-sm text-sm border-b border-border align-middle">
                                                 <input
                                                     type="number"
                                                     min="1"
                                                     value={item.quantity}
                                                     onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 1)}
+                                                    className="w-full px-sm py-xs border border-border rounded-sm text-sm focus:outline-none focus:border-[var(--color-rose-poudre)]"
                                                 />
                                             </td>
-                                            <td>
+                                            <td className="px-md py-sm text-sm border-b border-border align-middle">
                                                 <input
                                                     type="number"
                                                     min="0"
                                                     value={item.unit_price}
                                                     onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                                                    className="w-full px-sm py-xs border border-border rounded-sm text-sm focus:outline-none focus:border-[var(--color-rose-poudre)]"
                                                 />
                                             </td>
-                                            <td>
+                                            <td className="px-md py-sm text-sm border-b border-border align-middle">
                                                 <input
                                                     type="number"
                                                     min="0"
                                                     max="100"
                                                     value={item.discount_percentage}
                                                     onChange={(e) => handleItemChange(index, 'discount_percentage', parseFloat(e.target.value) || 0)}
+                                                    className="w-full px-sm py-xs border border-border rounded-sm text-sm focus:outline-none focus:border-[var(--color-rose-poudre)]"
                                                 />
                                             </td>
-                                            <td>
+                                            <td className="px-md py-sm text-sm border-b border-border align-middle">
                                                 <strong>{formatCurrency(item.line_total)}</strong>
                                             </td>
-                                            <td>
+                                            <td className="px-md py-sm text-sm border-b border-border align-middle">
                                                 <button
-                                                    className="btn-icon btn-icon--danger"
+                                                    className="w-8 h-8 flex items-center justify-center bg-transparent border border-border rounded-md text-[var(--color-gris-chaud)] cursor-pointer transition-all duration-fast hover:border-[var(--color-urgent)] hover:text-[var(--color-urgent)] disabled:opacity-40 disabled:cursor-not-allowed"
                                                     onClick={() => removeItem(index)}
                                                     disabled={items.length === 1}
                                                 >
@@ -605,9 +609,9 @@ export default function B2BOrderFormPage() {
                     </div>
 
                     {/* Notes Section */}
-                    <div className="b2b-form-section">
-                        <h2 className="b2b-form-section__title">Notes</h2>
-                        <div className="b2b-form-grid">
+                    <div className="bg-white rounded-lg shadow p-lg">
+                        <h2 className="flex items-center gap-sm text-lg font-semibold text-[var(--color-brun-chocolat)] mb-lg">Notes</h2>
+                        <div className="grid grid-cols-2 max-md:grid-cols-1 gap-md">
                             <div className="form-group">
                                 <label>Notes (visible on purchase order)</label>
                                 <textarea
@@ -631,37 +635,43 @@ export default function B2BOrderFormPage() {
                 </div>
 
                 {/* Sidebar - Summary */}
-                <div className="b2b-order-form__sidebar">
-                    <div className="b2b-order-summary">
-                        <h3>Summary</h3>
+                <div className="sticky top-lg max-md:static">
+                    <div className="bg-white rounded-lg shadow p-lg">
+                        <h3 className="text-lg font-semibold text-[var(--color-brun-chocolat)] mb-lg">Summary</h3>
 
-                        <div className="b2b-summary-line">
+                        <div className="flex justify-between items-center py-sm text-sm text-[var(--color-brun-chocolat)]">
                             <span>Subtotal</span>
                             <span>{formatCurrency(totals.subtotal)}</span>
                         </div>
 
                         {/* Discount */}
-                        <div className="b2b-summary-discount">
-                            <div className="b2b-discount-type">
+                        <div className="flex flex-col gap-sm py-sm">
+                            <div className="flex gap-xs">
                                 <button
-                                    className={`btn-chip ${formData.discount_type === 'percentage' ? 'active' : ''}`}
+                                    className={cn(
+                                        'inline-flex items-center gap-1 px-3 py-1.5 bg-[var(--color-blanc-creme)] border border-border rounded-xl text-xs font-medium text-[var(--color-gris-chaud)] cursor-pointer transition-all duration-fast hover:border-[var(--color-rose-poudre)] hover:text-[var(--color-rose-poudre)]',
+                                        formData.discount_type === 'percentage' && 'bg-[var(--color-rose-poudre)] border-[var(--color-rose-poudre)] text-white'
+                                    )}
                                     onClick={() => setFormData({ ...formData, discount_type: 'percentage' })}
                                 >
                                     <Percent size={14} />
                                     %
                                 </button>
                                 <button
-                                    className={`btn-chip ${formData.discount_type === 'fixed' ? 'active' : ''}`}
+                                    className={cn(
+                                        'inline-flex items-center gap-1 px-3 py-1.5 bg-[var(--color-blanc-creme)] border border-border rounded-xl text-xs font-medium text-[var(--color-gris-chaud)] cursor-pointer transition-all duration-fast hover:border-[var(--color-rose-poudre)] hover:text-[var(--color-rose-poudre)]',
+                                        formData.discount_type === 'fixed' && 'bg-[var(--color-rose-poudre)] border-[var(--color-rose-poudre)] text-white'
+                                    )}
                                     onClick={() => setFormData({ ...formData, discount_type: 'fixed' })}
                                 >
                                     Fixed
                                 </button>
                                 {formData.discount_type && (
                                     <button
-                                        className="btn-chip btn-chip--clear"
+                                        className="inline-flex items-center gap-1 px-2 py-1.5 bg-[var(--color-blanc-creme)] border border-border rounded-xl text-xs font-medium text-[var(--color-gris-chaud)] cursor-pointer transition-all duration-fast hover:border-[var(--color-rose-poudre)] hover:text-[var(--color-rose-poudre)]"
                                         onClick={() => setFormData({ ...formData, discount_type: '', discount_value: 0 })}
                                     >
-                                        ×
+                                        &times;
                                     </button>
                                 )}
                             </div>
@@ -672,30 +682,31 @@ export default function B2BOrderFormPage() {
                                     value={formData.discount_value}
                                     onChange={(e) => setFormData({ ...formData, discount_value: parseFloat(e.target.value) || 0 })}
                                     placeholder={formData.discount_type === 'percentage' ? '% discount' : 'Amount'}
+                                    className="p-sm border border-border rounded-md text-sm"
                                 />
                             )}
                         </div>
 
                         {totals.discountAmount > 0 && (
-                            <div className="b2b-summary-line b2b-summary-line--discount">
+                            <div className="flex justify-between items-center py-sm text-sm text-success">
                                 <span>Discount</span>
                                 <span>-{formatCurrency(totals.discountAmount)}</span>
                             </div>
                         )}
 
-                        <div className="b2b-summary-line">
+                        <div className="flex justify-between items-center py-sm text-sm text-[var(--color-brun-chocolat)]">
                             <span>Tax ({formData.tax_rate}%)</span>
                             <span>{formatCurrency(totals.taxAmount)}</span>
                         </div>
 
-                        <div className="b2b-summary-divider"></div>
+                        <div className="h-px bg-border my-md"></div>
 
-                        <div className="b2b-summary-total">
+                        <div className="flex justify-between items-center text-xl font-bold text-[var(--color-brun-chocolat)] py-sm">
                             <span>Total</span>
                             <span>{formatCurrency(totals.total)}</span>
                         </div>
 
-                        <div className="b2b-summary-actions">
+                        <div className="flex flex-col gap-sm mt-lg">
                             <button
                                 className="btn btn-secondary btn-block"
                                 onClick={() => handleSubmit('draft')}

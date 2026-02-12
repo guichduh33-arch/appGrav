@@ -21,7 +21,7 @@ import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'
 import { useStockLevelsOffline } from '@/hooks/offline/useStockLevelsOffline'
 import { isDataStale } from '@/types/offline'
 import type { Product } from '../../types/database'
-import './StockPage.css'
+import { cn } from '@/lib/utils'
 
 type FilterType = 'all' | 'raw_material' | 'finished' | 'low_stock'
 
@@ -79,8 +79,7 @@ export default function StockPage() {
     })
 
     return (
-        <div className="stock-page">
-            {/* Offline Banner */}
+        <div className="flex flex-col gap-6">
             {!isOnline && (
                 <OfflineStockBanner
                     lastSyncAt={lastSyncAt}
@@ -89,7 +88,6 @@ export default function StockPage() {
                 />
             )}
 
-            {/* Stale Data Warning - shown when offline and data is old */}
             {!isOnline && isDataStale(lastSyncAt) && (
                 <StaleDataWarning
                     lastSyncAt={lastSyncAt}
@@ -97,7 +95,6 @@ export default function StockPage() {
                 />
             )}
 
-            {/* Stock Alerts Panel - shown when ?filter=alerts or low stock items exist */}
             {(showAlertsPanel || stats.lowStockItems > 0) && (
                 <StockAlertsPanel
                     className="mb-4"
@@ -106,99 +103,59 @@ export default function StockPage() {
             )}
 
             {/* Filter Tabs */}
-            <div className="stock-filters">
-                <button
-                    className={`filter-btn ${activeFilter === 'all' ? 'is-active' : ''}`}
-                    onClick={() => setActiveFilter('all')}
-                >
-                    <LayoutDashboard size={18} />
-                    All
-                </button>
-                <button
-                    className={`filter-btn ${activeFilter === 'raw_material' ? 'is-active' : ''}`}
-                    onClick={() => setActiveFilter('raw_material')}
-                >
-                    <Package size={18} />
-                    Raw Materials
-                </button>
-                <button
-                    className={`filter-btn ${activeFilter === 'finished' ? 'is-active' : ''}`}
-                    onClick={() => setActiveFilter('finished')}
-                >
-                    <Coffee size={18} />
-                    Finished Products
-                </button>
-                <button
-                    className={`filter-btn ${activeFilter === 'low_stock' ? 'is-active' : ''}`}
-                    onClick={() => setActiveFilter('low_stock')}
-                >
-                    <AlertCircle size={18} />
-                    Low Stock
-                    {stats.lowStockItems > 0 && (
-                        <span className="filter-badge">{stats.lowStockItems}</span>
-                    )}
-                </button>
+            <div className="flex gap-2 flex-wrap max-md:overflow-x-auto max-md:flex-nowrap max-md:pb-2">
+                {([
+                    { key: 'all', label: 'All', icon: <LayoutDashboard size={18} /> },
+                    { key: 'raw_material', label: 'Raw Materials', icon: <Package size={18} /> },
+                    { key: 'finished', label: 'Finished Products', icon: <Coffee size={18} /> },
+                    { key: 'low_stock', label: 'Low Stock', icon: <AlertCircle size={18} /> },
+                ] as const).map(f => (
+                    <button
+                        key={f.key}
+                        className={cn(
+                            'flex items-center gap-2 py-2.5 px-4 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg cursor-pointer transition-all duration-200 max-md:shrink-0 hover:border-primary hover:text-primary',
+                            activeFilter === f.key && 'bg-primary border-primary text-white hover:text-white'
+                        )}
+                        onClick={() => setActiveFilter(f.key)}
+                    >
+                        {f.icon}
+                        {f.label}
+                        {f.key === 'low_stock' && stats.lowStockItems > 0 && (
+                            <span className={cn(
+                                'inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-semibold rounded-full',
+                                activeFilter === 'low_stock' ? 'bg-white text-primary' : 'bg-red-500 text-white'
+                            )}>
+                                {stats.lowStockItems}
+                            </span>
+                        )}
+                    </button>
+                ))}
             </div>
 
             {/* KPI Stats Cards */}
-            <div className="stock-stats-grid">
-                <div className="stat-card">
-                    <div className="stat-icon total">
-                        <Boxes size={24} />
-                    </div>
-                    <div className="stat-info">
-                        <div className="stat-label">Total Products</div>
-                        <div className="stat-value">{stats.totalItems}</div>
-                        <div className="stat-trend up">
-                            <TrendingUp size={12} />
-                            In stock
+            <div className="grid grid-cols-4 max-xl:grid-cols-2 max-md:grid-cols-1 gap-4">
+                {([
+                    { icon: <Boxes size={24} />, iconClass: 'bg-blue-500/10 text-primary', label: 'Total Products', value: stats.totalItems, trend: 'In stock', trendIcon: <TrendingUp size={12} />, trendUp: true },
+                    { icon: <Package size={24} />, iconClass: 'bg-amber-500/10 text-amber-500', label: 'Raw Materials', value: stats.rawMaterials, trend: 'Ingredients', trendUp: true },
+                    { icon: <Coffee size={24} />, iconClass: 'bg-emerald-500/10 text-emerald-500', label: 'Finished Products', value: stats.finishedProducts, trend: 'Ready to sell', trendUp: true },
+                    { icon: <AlertTriangle size={24} />, iconClass: 'bg-red-500/10 text-red-500', label: 'Low Stock Alerts', value: stats.lowStockItems, trend: stats.lowStockItems > 0 ? 'Needs attention' : 'All OK', trendUp: stats.lowStockItems === 0 },
+                ]).map((stat, i) => (
+                    <div key={i} className="flex items-start gap-4 p-5 bg-white border border-gray-200 rounded-xl">
+                        <div className={cn('flex items-center justify-center w-12 h-12 rounded-xl', stat.iconClass)}>
+                            {stat.icon}
+                        </div>
+                        <div className="flex-1">
+                            <div className="text-[0.8125rem] font-medium text-gray-500 uppercase tracking-wide">{stat.label}</div>
+                            <div className="text-[1.75rem] font-bold text-gray-900 leading-tight">{stat.value}</div>
+                            <div className={cn('flex items-center gap-1 text-[0.8125rem] font-medium mt-1', stat.trendUp ? 'text-emerald-600' : 'text-red-600')}>
+                                {stat.trendIcon}
+                                {stat.trend}
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div className="stat-card">
-                    <div className="stat-icon raw">
-                        <Package size={24} />
-                    </div>
-                    <div className="stat-info">
-                        <div className="stat-label">Raw Materials</div>
-                        <div className="stat-value">{stats.rawMaterials}</div>
-                        <div className="stat-trend up">
-                            Ingredients
-                        </div>
-                    </div>
-                </div>
-
-                <div className="stat-card">
-                    <div className="stat-icon finished">
-                        <Coffee size={24} />
-                    </div>
-                    <div className="stat-info">
-                        <div className="stat-label">Finished Products</div>
-                        <div className="stat-value">{stats.finishedProducts}</div>
-                        <div className="stat-trend up">
-                            Ready to sell
-                        </div>
-                    </div>
-                </div>
-
-                <div className="stat-card">
-                    <div className="stat-icon alert">
-                        <AlertTriangle size={24} />
-                    </div>
-                    <div className="stat-info">
-                        <div className="stat-label">Low Stock Alerts</div>
-                        <div className="stat-value">{stats.lowStockItems}</div>
-                        <div className={`stat-trend ${stats.lowStockItems > 0 ? 'down' : 'up'}`}>
-                            {stats.lowStockItems > 0
-                                ? 'Needs attention'
-                                : 'All OK'}
-                        </div>
-                    </div>
-                </div>
+                ))}
             </div>
 
-            {/* Deferred Notes Badge - shown when online and notes exist */}
             {isOnline && (
                 <div className="mb-4 flex justify-end">
                     <DeferredNotesBadge />
@@ -206,7 +163,7 @@ export default function StockPage() {
             )}
 
             {/* Inventory Table */}
-            <div className="stock-table-section">
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
                 <InventoryTable
                     items={filteredItems as unknown as InventoryItemWithCategory[]}
                     isLoading={isLoading}

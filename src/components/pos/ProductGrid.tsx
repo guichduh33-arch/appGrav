@@ -4,7 +4,7 @@ import type { Product } from '../../types/database'
 import { formatPrice } from '../../utils/helpers'
 import { useStockLevelsOffline, TStockStatus } from '@/hooks/offline/useStockLevelsOffline'
 import { StockBadge } from './StockBadge'
-import './ProductGrid.css'
+import { cn } from '@/lib/utils'
 
 interface ProductGridProps {
     products: Product[]
@@ -31,12 +31,17 @@ const ProductCard = memo(function ProductCard({
 
     return (
         <button
-            className={`pos-product-card ${isOutOfStock ? 'pos-product-card--out-of-stock' : ''}`}
+            className={cn(
+                'relative flex flex-col bg-[var(--color-gray-700)] border border-[var(--color-gray-600)] rounded-xl p-0 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden h-full text-left',
+                'hover:-translate-y-1 hover:shadow-lg hover:border-primary hover:bg-[var(--color-gray-600)]',
+                'active:scale-[0.98]',
+                isOutOfStock && 'opacity-60 hover:opacity-80'
+            )}
             onClick={() => onClick(product)}
         >
             {/* Stock badge with tooltip */}
             {stockStatus && (
-                <div className="pos-product-card__stock-badge">
+                <div className="absolute top-1.5 left-1.5 z-[2] pointer-events-none">
                     <StockBadge
                         status={stockStatus}
                         stockQuantity={stockQuantity}
@@ -46,12 +51,16 @@ const ProductCard = memo(function ProductCard({
             )}
 
             {/* Product image or emoji */}
-            <div className="pos-product-card__image">
+            <div className={cn(
+                'w-full h-[80px] bg-[var(--color-gray-800)] flex items-center justify-center overflow-hidden shrink-0',
+                isOutOfStock && 'grayscale-[50%]'
+            )}>
                 {product.image_url ? (
                     <img
                         src={product.image_url}
                         alt={product.name}
                         loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-400 ease-in-out group-hover:scale-105"
                         onError={(e) => {
                             e.currentTarget.style.display = 'none'
                             const fallback = e.currentTarget.nextElementSibling as HTMLElement
@@ -60,7 +69,7 @@ const ProductCard = memo(function ProductCard({
                     />
                 ) : null}
                 <span
-                    className="pos-product-card__emoji"
+                    className="text-[28px]"
                     style={{ display: product.image_url ? 'none' : 'block' }}
                 >
                     {getProductEmoji(product)}
@@ -68,11 +77,11 @@ const ProductCard = memo(function ProductCard({
             </div>
 
             {/* Product info */}
-            <div className="pos-product-card__name">
+            <div className="px-4 pt-4 pb-1 text-[1.3rem] font-bold text-white leading-tight line-clamp-3 flex-1">
                 {product.name}
             </div>
 
-            <div className="pos-product-card__price">
+            <div className="px-4 pt-1 pb-4 text-base font-bold text-primary-light">
                 {formatPrice(product.retail_price || 0)}
             </div>
         </button>
@@ -102,9 +111,9 @@ function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) 
 
     if (isLoading) {
         return (
-            <div className="products-grid">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-8 w-full pb-xl">
                 {[...Array(8)].map((_, i) => (
-                    <div key={i} className="pos-product-card-skeleton" />
+                    <div key={i} className="h-[200px] bg-[var(--color-gray-100)] rounded-xl animate-pulse" />
                 ))}
             </div>
         )
@@ -112,15 +121,15 @@ function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) 
 
     if (products.length === 0) {
         return (
-            <div className="products-empty">
-                <span className="products-empty__icon">🔍</span>
+            <div className="flex flex-col items-center justify-center h-[300px] text-[var(--color-gray-400)] text-center">
+                <span className="text-[48px] mb-md opacity-50">🔍</span>
                 <p>No items found</p>
             </div>
         )
     }
 
     return (
-        <div className="products-grid">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-8 w-full pb-xl">
             {products.map((product) => {
                 const stockStatus = getStockStatus(product.id)
                 const stockLevel = stockMap.get(product.id)

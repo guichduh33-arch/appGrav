@@ -6,7 +6,7 @@ import {
     type IStockBalance as StockBalance,
 } from '@/hooks/inventory/useStockByLocation'
 import { useInventoryConfigSettings } from '@/hooks/settings/useModuleConfigSettings'
-import './StockByLocationPage.css'
+import { cn } from '@/lib/utils'
 
 export default function StockByLocationPage() {
     const { data: balances = [], isLoading: loading } = useStockBalances()
@@ -36,34 +36,35 @@ export default function StockByLocationPage() {
     }, {} as Record<string, { location_name: string; location_code: string; items: StockBalance[] }>)
 
     return (
-        <div className="stock-by-location-page">
-            <header className="stock-location-header">
+        <div className="mx-auto max-w-[1600px] p-6">
+            <header className="mb-6">
                 <div>
-                    <h1 className="stock-location-title">
+                    <h1 className="mb-2 flex items-center gap-4 text-3xl font-bold text-foreground">
                         <MapPin size={28} />
                         Stock by Location
                     </h1>
-                    <p className="stock-location-subtitle">
+                    <p className="text-base text-muted-foreground">
                         Real-time view of stock at each location
                     </p>
                 </div>
             </header>
 
             {/* Filters */}
-            <div className="stock-location-filters">
-                <div className="search-box">
-                    <Search size={20} />
+            <div className="mb-6 flex gap-4">
+                <div className="relative flex-1">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
                     <input
                         type="text"
                         placeholder="Search for a product..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full rounded-lg border border-border bg-card py-3 pl-12 pr-4 text-foreground"
                     />
                 </div>
                 <select
                     value={selectedLocation}
                     onChange={(e) => setSelectedLocation(e.target.value)}
-                    className="location-select"
+                    className="cursor-pointer rounded-lg border border-border bg-card px-4 py-3 text-foreground"
                     aria-label="Filter by location"
                 >
                     <option value="all">All locations</option>
@@ -75,33 +76,33 @@ export default function StockByLocationPage() {
 
             {/* Stock by Location */}
             {loading ? (
-                <div className="stock-location-loading">Loading...</div>
+                <div className="flex items-center justify-center p-16 text-muted-foreground">Loading...</div>
             ) : Object.keys(groupedByLocation).length === 0 ? (
-                <div className="stock-location-empty">
-                    <Package size={64} />
-                    <h3>No stock</h3>
-                    <p>No products in stock at any location</p>
+                <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-card p-16 text-center">
+                    <Package size={64} className="mb-4 text-muted-foreground/60" />
+                    <h3 className="mb-2 text-xl font-bold text-foreground">No stock</h3>
+                    <p className="text-muted-foreground">No products in stock at any location</p>
                 </div>
             ) : (
-                <div className="locations-grid">
+                <div className="grid gap-6">
                     {Object.entries(groupedByLocation).map(([locationId, { location_name, location_code, items }]) => {
                         const totalValue = items.reduce((sum, item) => sum + item.stock_value, 0)
                         const lowStockCount = items.filter(item => item.current_stock < invConfig.stockWarningThreshold).length
 
                         return (
-                            <div key={locationId} className="location-card">
-                                <div className="location-card__header">
+                            <div key={locationId} className="rounded-lg border border-border bg-card p-5">
+                                <div className="mb-4 flex items-start justify-between border-b border-border pb-4">
                                     <div>
-                                        <h3>{location_name}</h3>
-                                        <span className="location-code">{location_code}</span>
+                                        <h3 className="mb-1 text-xl font-bold text-foreground">{location_name}</h3>
+                                        <span className="text-sm text-muted-foreground">{location_code}</span>
                                     </div>
-                                    <div className="location-stats">
-                                        <div className="stat-badge">
+                                    <div className="flex gap-2">
+                                        <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
                                             <Package size={16} />
                                             {items.length} products
                                         </div>
                                         {lowStockCount > 0 && (
-                                            <div className="stat-badge warning">
+                                            <div className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-3 py-1 text-xs font-semibold text-warning">
                                                 <AlertTriangle size={16} />
                                                 {lowStockCount} low
                                             </div>
@@ -109,38 +110,43 @@ export default function StockByLocationPage() {
                                     </div>
                                 </div>
 
-                                <div className="location-card__value">
-                                    Total value: <strong>IDR {totalValue.toLocaleString()}</strong>
+                                <div className="mb-4 text-sm text-muted-foreground">
+                                    Total value: <strong className="text-lg text-foreground">IDR {totalValue.toLocaleString()}</strong>
                                 </div>
 
-                                <div className="location-card__items">
-                                    <table>
+                                <div>
+                                    <table className="w-full border-collapse">
                                         <thead>
                                             <tr>
-                                                <th>Product</th>
-                                                <th>Stock</th>
-                                                <th>Value</th>
+                                                <th className="border-b border-border bg-muted/50 p-2.5 text-left text-xs font-semibold uppercase text-muted-foreground">Product</th>
+                                                <th className="border-b border-border bg-muted/50 p-2.5 text-left text-xs font-semibold uppercase text-muted-foreground">Stock</th>
+                                                <th className="border-b border-border bg-muted/50 p-2.5 text-left text-xs font-semibold uppercase text-muted-foreground">Value</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {items.map(item => (
-                                                <tr key={item.product_id} className={item.current_stock < invConfig.stockWarningThreshold ? 'low-stock' : ''}>
-                                                    <td>
-                                                        <div className="product-cell">
-                                                            <span className="product-name">{item.product_name}</span>
-                                                            {item.sku && <span className="product-sku">{item.sku}</span>}
+                                                <tr
+                                                    key={item.product_id}
+                                                    className={cn(
+                                                        item.current_stock < invConfig.stockWarningThreshold && 'bg-warning/5'
+                                                    )}
+                                                >
+                                                    <td className="border-b border-border p-2.5 text-sm text-muted-foreground">
+                                                        <div className="flex flex-col gap-1">
+                                                            <span className="font-medium text-foreground">{item.product_name}</span>
+                                                            {item.sku && <span className="text-xs text-muted-foreground">{item.sku}</span>}
                                                         </div>
                                                     </td>
-                                                    <td className="stock-cell">
+                                                    <td className="border-b border-border p-2.5 text-sm font-semibold">
                                                         {item.current_stock > 0 ? (
-                                                            <span className="stock-positive">
+                                                            <span className="text-success">
                                                                 {item.current_stock} {item.stock_unit}
                                                             </span>
                                                         ) : (
-                                                            <span className="stock-zero">0</span>
+                                                            <span className="text-muted-foreground">0</span>
                                                         )}
                                                     </td>
-                                                    <td>IDR {item.stock_value.toLocaleString()}</td>
+                                                    <td className="border-b border-border p-2.5 text-sm text-muted-foreground">IDR {item.stock_value.toLocaleString()}</td>
                                                 </tr>
                                             ))}
                                         </tbody>

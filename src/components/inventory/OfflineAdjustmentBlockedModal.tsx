@@ -12,7 +12,7 @@
 import { useState } from 'react';
 import { X, WifiOff, StickyNote } from 'lucide-react';
 import { addDeferredNote } from '@/services/inventory/deferredAdjustmentService';
-import './StockAdjustmentModal.css';
+
 
 interface OfflineAdjustmentBlockedModalProps {
   /** Product context - optional if user is making general adjustment */

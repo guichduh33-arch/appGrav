@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { X, Check } from 'lucide-react'
 import { useStockAdjustment, useSuppliers } from '@/hooks/inventory'
-import './StockAdjustmentModal.css'
+import { cn } from '@/lib/utils'
 
-// Local interface to avoid type import issues
 interface IProduct {
     id: string
     name: string
@@ -17,6 +16,13 @@ interface StockAdjustmentModalProps {
 }
 
 type AdjustmentType = 'purchase' | 'waste' | 'adjustment_in' | 'adjustment_out'
+
+const ADJUSTMENT_TYPES: Array<{ id: AdjustmentType; icon: string; label: string; desc: string; isDanger?: boolean }> = [
+    { id: 'purchase', icon: '📥', label: 'Reception', desc: 'Supplier delivery' },
+    { id: 'waste', icon: '🗑️', label: 'Waste / Loss', desc: 'Damaged/expired product', isDanger: true },
+    { id: 'adjustment_in', icon: '➕', label: 'Correction (+)', desc: 'Count error' },
+    { id: 'adjustment_out', icon: '➖', label: 'Correction (-)', desc: 'Count error' },
+]
 
 export default function StockAdjustmentModal({ product, onClose }: StockAdjustmentModalProps) {
     const { mutate: adjustStock, isPending } = useStockAdjustment()
@@ -71,51 +77,37 @@ export default function StockAdjustmentModal({ product, onClose }: StockAdjustme
                     {/* Adjustment Type */}
                     <div className="form-group">
                         <label className="form-label">Operation Type</label>
-                        <div className="adjustment-type-grid">
-                            <button
-                                type="button"
-                                className={`adjustment-type-btn type-purchase ${type === 'purchase' ? 'is-active' : ''}`}
-                                onClick={() => setType('purchase')}
-                            >
-                                <span className="adjustment-type-icon">📥</span>
-                                <div>
-                                    <span className="adjustment-type-label">Reception</span>
-                                    <span className="adjustment-type-desc">Supplier delivery</span>
-                                </div>
-                            </button>
-                            <button
-                                type="button"
-                                className={`adjustment-type-btn type-waste ${type === 'waste' ? 'is-active' : ''}`}
-                                onClick={() => setType('waste')}
-                            >
-                                <span className="adjustment-type-icon">🗑️</span>
-                                <div>
-                                    <span className="adjustment-type-label">Waste / Loss</span>
-                                    <span className="adjustment-type-desc">Damaged/expired product</span>
-                                </div>
-                            </button>
-                            <button
-                                type="button"
-                                className={`adjustment-type-btn type-adj-in ${type === 'adjustment_in' ? 'is-active' : ''}`}
-                                onClick={() => setType('adjustment_in')}
-                            >
-                                <span className="adjustment-type-icon">➕</span>
-                                <div>
-                                    <span className="adjustment-type-label">Correction (+)</span>
-                                    <span className="adjustment-type-desc">Count error</span>
-                                </div>
-                            </button>
-                            <button
-                                type="button"
-                                className={`adjustment-type-btn type-adj-out ${type === 'adjustment_out' ? 'is-active' : ''}`}
-                                onClick={() => setType('adjustment_out')}
-                            >
-                                <span className="adjustment-type-icon">➖</span>
-                                <div>
-                                    <span className="adjustment-type-label">Correction (-)</span>
-                                    <span className="adjustment-type-desc">Count error</span>
-                                </div>
-                            </button>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                            {ADJUSTMENT_TYPES.map(adj => {
+                                const isActive = type === adj.id
+                                return (
+                                    <button
+                                        key={adj.id}
+                                        type="button"
+                                        className={cn(
+                                            'flex items-center gap-4 p-4 border rounded-lg cursor-pointer text-left transition-all duration-200 relative overflow-hidden',
+                                            'hover:-translate-y-0.5 hover:shadow-md',
+                                            isActive && adj.isDanger
+                                                ? 'bg-danger-bg border-danger shadow-[0_0_0_2px_var(--color-danger-border)]'
+                                                : isActive
+                                                    ? 'bg-primary/5 border-primary shadow-[0_0_0_2px_hsl(var(--primary)/0.2)]'
+                                                    : 'bg-white border-gray-200 hover:border-primary-light'
+                                        )}
+                                        onClick={() => setType(adj.id)}
+                                    >
+                                        <span className={cn(
+                                            'text-[1.75rem] w-12 h-12 flex items-center justify-center rounded shrink-0',
+                                            isActive ? 'bg-white' : 'bg-gray-50'
+                                        )}>
+                                            {adj.icon}
+                                        </span>
+                                        <div>
+                                            <span className="block font-semibold text-[0.95rem] text-gray-900 mb-0.5">{adj.label}</span>
+                                            <span className="block text-xs text-gray-500 leading-tight">{adj.desc}</span>
+                                        </div>
+                                    </button>
+                                )
+                            })}
                         </div>
                     </div>
 

@@ -10,8 +10,15 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, ShoppingCart, Clock, Table2, ChevronRight, Bell } from 'lucide-react';
 import { useMobileStore } from '@/stores/mobileStore';
 import { supabase } from '@/lib/supabase';
+import { cn } from '@/lib/utils';
 import type { FloorPlanItem } from '@/types/database';
-import './MobileHomePage.css';
+
+/** Status-specific badge styles */
+const orderStatusStyles: Record<string, string> = {
+  sent: 'bg-info-bg text-info',
+  preparing: 'bg-warning-bg text-warning',
+  ready: 'bg-success-bg text-success',
+};
 
 /**
  * Mobile Home Page Component
@@ -70,20 +77,20 @@ export default function MobileHomePage() {
   };
 
   return (
-    <div className="mobile-home">
+    <div className="p-4 flex flex-col gap-6">
       {/* Welcome Section */}
-      <section className="mobile-home__welcome">
-        <h1>Hello, {userName}</h1>
-        <p>Ready to take orders?</p>
+      <section className="p-6 bg-gradient-to-br from-[#BA90A2] to-[#DDB892] rounded-xl text-white">
+        <h1 className="text-2xl font-bold m-0">Hello, {userName}</h1>
+        <p className="text-sm opacity-90 mt-1 mb-0">Ready to take orders?</p>
       </section>
 
       {/* Ready Orders Alert */}
       {readyOrders.length > 0 && (
         <section
-          className="mobile-home__alert"
+          className="flex items-center gap-2 p-4 bg-success-bg rounded-xl text-success font-semibold cursor-pointer"
           onClick={() => navigate('/mobile/orders')}
         >
-          <Bell size={20} className="mobile-home__alert-icon" />
+          <Bell size={20} className="animate-pulse-alert" />
           <span>
             {readyOrders.length} order{readyOrders.length > 1 ? 's' : ''} ready
           </span>
@@ -92,15 +99,18 @@ export default function MobileHomePage() {
       )}
 
       {/* Quick Actions */}
-      <section className="mobile-home__actions">
-        <button className="mobile-home__action mobile-home__action--primary" onClick={handleNewOrder}>
+      <section className="flex flex-col gap-2">
+        <button
+          className="flex items-center gap-4 py-4 px-6 bg-primary border border-primary rounded-xl text-base font-medium text-white cursor-pointer transition-all duration-150 min-h-14 active:opacity-90 active:scale-[0.98]"
+          onClick={handleNewOrder}
+        >
           <Plus size={24} />
           <span>New Order</span>
         </button>
 
         {currentOrder && currentOrder.items.length > 0 && (
           <button
-            className="mobile-home__action"
+            className="flex items-center gap-4 py-4 px-6 bg-white border border-border rounded-xl text-base font-medium text-foreground cursor-pointer transition-all duration-150 min-h-14 active:bg-secondary active:scale-[0.98]"
             onClick={() => navigate('/mobile/cart')}
           >
             <ShoppingCart size={24} />
@@ -109,7 +119,7 @@ export default function MobileHomePage() {
         )}
 
         <button
-          className="mobile-home__action"
+          className="flex items-center gap-4 py-4 px-6 bg-white border border-border rounded-xl text-base font-medium text-foreground cursor-pointer transition-all duration-150 min-h-14 active:bg-secondary active:scale-[0.98]"
           onClick={() => navigate('/mobile/orders')}
         >
           <Clock size={24} />
@@ -119,25 +129,25 @@ export default function MobileHomePage() {
 
       {/* Current Order Summary */}
       {currentOrder && currentOrder.items.length > 0 && (
-        <section className="mobile-home__current-order">
-          <div className="mobile-home__section-header">
-            <h2>Current Order</h2>
+        <section className="bg-white rounded-xl p-4 border border-border">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold m-0">Current Order</h2>
             {currentOrder.tableNumber && (
-              <span className="mobile-home__table-badge">
+              <span className="flex items-center gap-1 py-1 px-2 bg-secondary rounded-full text-sm text-muted-foreground">
                 <Table2 size={14} /> Table {currentOrder.tableNumber}
               </span>
             )}
           </div>
 
-          <div className="mobile-home__order-summary">
+          <div className="flex justify-between mb-4">
             <span>{currentOrder.items.length} item{currentOrder.items.length > 1 ? 's' : ''}</span>
-            <span className="mobile-home__order-total">
+            <span className="font-semibold text-primary">
               Rp {currentOrder.total.toLocaleString('id-ID')}
             </span>
           </div>
 
           <button
-            className="mobile-home__continue-btn"
+            className="flex items-center justify-center gap-2 w-full p-4 bg-primary border-none rounded-xl text-white font-semibold cursor-pointer transition-all duration-150 active:opacity-90"
             onClick={() => navigate('/mobile/cart')}
           >
             Continue order
@@ -148,24 +158,35 @@ export default function MobileHomePage() {
 
       {/* Recent Orders */}
       {sentOrders.length > 0 && (
-        <section className="mobile-home__recent">
-          <div className="mobile-home__section-header">
-            <h2>Recent Orders</h2>
-            <button onClick={() => navigate('/mobile/orders')}>
+        <section className="bg-white rounded-xl p-4 border border-border">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold m-0">Recent Orders</h2>
+            <button
+              className="flex items-center gap-1 bg-transparent border-none text-primary text-sm font-medium cursor-pointer p-1"
+              onClick={() => navigate('/mobile/orders')}
+            >
               View all <ChevronRight size={16} />
             </button>
           </div>
 
-          <div className="mobile-home__orders-list">
+          <div className="flex flex-col gap-2">
             {sentOrders.slice(0, 3).map((order) => (
-              <div key={order.orderId} className="mobile-home__order-item">
-                <div className="mobile-home__order-info">
-                  <span className="mobile-home__order-number">#{order.orderNumber}</span>
+              <div
+                key={order.orderId}
+                className="flex justify-between items-center py-2 border-b border-border last:border-b-0"
+              >
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-semibold">#{order.orderNumber}</span>
                   {order.tableNumber && (
-                    <span className="mobile-home__order-table">Table {order.tableNumber}</span>
+                    <span className="text-sm text-muted-foreground">Table {order.tableNumber}</span>
                   )}
                 </div>
-                <span className={`mobile-home__order-status mobile-home__order-status--${order.status}`}>
+                <span
+                  className={cn(
+                    'text-sm font-medium py-1 px-2 rounded-full',
+                    orderStatusStyles[order.status] ?? ''
+                  )}
+                >
                   {order.status === 'sent' && 'Sent'}
                   {order.status === 'preparing' && 'Preparing'}
                   {order.status === 'ready' && 'Ready'}
@@ -178,14 +199,20 @@ export default function MobileHomePage() {
 
       {/* Table Picker Modal */}
       {showTablePicker && (
-        <div className="mobile-modal" onClick={() => setShowTablePicker(false)}>
-          <div className="mobile-modal__content" onClick={(e) => e.stopPropagation()}>
-            <h2>Choose a table</h2>
-            <div className="mobile-home__table-grid">
+        <div
+          className="fixed inset-0 bg-black/50 flex items-end z-[1000] animate-[fadeIn_0.2s_ease]"
+          onClick={() => setShowTablePicker(false)}
+        >
+          <div
+            className="w-full bg-white rounded-t-2xl p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] animate-slide-up max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-semibold mb-6 text-center">Choose a table</h2>
+            <div className="grid grid-cols-3 gap-2">
               {tables.map((table) => (
                 <button
                   key={table.id}
-                  className="mobile-home__table-btn"
+                  className="flex flex-col items-center justify-center gap-1 p-4 bg-secondary border border-border rounded-xl text-foreground text-sm font-medium cursor-pointer transition-all duration-150 min-h-20 active:bg-primary active:text-white active:border-primary"
                   onClick={() => handleTableSelect(table.table_number?.toString() || '')}
                 >
                   <Table2 size={24} />
@@ -193,7 +220,7 @@ export default function MobileHomePage() {
                 </button>
               ))}
               <button
-                className="mobile-home__table-btn mobile-home__table-btn--takeaway"
+                className="col-span-3 flex flex-row items-center justify-center gap-1 p-4 bg-secondary border border-border rounded-xl text-foreground text-sm font-medium cursor-pointer transition-all duration-150 min-h-14 active:bg-primary active:text-white active:border-primary"
                 onClick={() => handleTableSelect('')}
               >
                 <ShoppingCart size={24} />

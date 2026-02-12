@@ -37,7 +37,7 @@ import { DiscountsVoidsTab } from './components/DiscountsVoidsTab';
 import { AlertsDashboardTab } from './components/AlertsDashboardTab';
 import { REPORT_CATEGORIES } from './ReportsConfig';
 import { ReportPlaceholder } from '@/components/reports/ReportPlaceholder';
-import './ReportsPage.css';
+import { cn } from '@/lib/utils';
 
 const ReportsPage = () => {
     const [activeCategoryId, setActiveCategoryId] = useState<string>('sales');
@@ -134,60 +134,63 @@ const ReportsPage = () => {
     };
 
     return (
-        <div className="reports-layout">
+        <div className="flex h-[calc(100vh-64px)] w-full bg-gray-50 overflow-hidden">
             {/* Sidebar */}
-            <aside className="reports-sidebar">
-                <div className="reports-sidebar__header">
-                    <h1 className="reports-sidebar__title">Reports & Analytics</h1>
-                    <p className="reports-sidebar__subtitle">Analytics & Logs</p>
+            <aside className="w-[280px] bg-white border-r border-gray-200 flex flex-col shrink-0">
+                <div className="py-6 px-8 border-b border-gray-100">
+                    <h1 className="text-xl font-bold text-gray-900 tracking-tight mb-1">Reports & Analytics</h1>
+                    <p className="text-xs text-gray-500 font-medium uppercase tracking-widest">Analytics & Logs</p>
                 </div>
-                <nav className="reports-sidebar__nav">
+                <nav className="flex-1 overflow-y-auto p-4 flex flex-col gap-1">
                     {REPORT_CATEGORIES.map((category) => (
                         <button
                             key={category.id}
                             onClick={() => {
                                 setActiveCategoryId(category.id);
-                                setActiveReportId(null); // Reset report when changing category
+                                setActiveReportId(null);
                             }}
-                            className={`reports-nav-item ${activeCategoryId === category.id ? 'active' : ''}`}
+                            className={cn(
+                                'flex items-center w-full py-3 px-4 bg-transparent border-none rounded-lg cursor-pointer text-left transition-all duration-200 text-gray-600 text-sm font-medium hover:bg-gray-50 hover:text-gray-900',
+                                activeCategoryId === category.id && 'bg-primary/10 text-primary-deep'
+                            )}
                         >
-                            <category.icon size={18} className="reports-nav-item__icon" />
-                            <span className="reports-nav-item__label">{category.title}</span>
-                            {activeCategoryId === category.id && <ChevronRight size={14} className="reports-nav-item__arrow" />}
+                            <category.icon size={18} className="mr-3 opacity-80" />
+                            <span className="flex-1">{category.title}</span>
+                            {activeCategoryId === category.id && <ChevronRight size={14} className="opacity-40 transition-transform duration-200 group-hover:opacity-80 group-hover:translate-x-0.5" />}
                         </button>
                     ))}
                 </nav>
             </aside>
 
             {/* Main Content */}
-            <main className="reports-main">
+            <main className="flex-1 flex flex-col overflow-hidden relative">
                 {/* Header */}
-                <header className="reports-header">
-                    <div className="reports-header__left">
+                <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shrink-0">
+                    <div className="flex items-center gap-4">
                         {activeReportId ? (
                             <>
                                 <button
                                     onClick={() => setActiveReportId(null)}
-                                    className="reports-back-btn"
+                                    className="flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 bg-white text-gray-600 cursor-pointer transition-all duration-200 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300"
                                     aria-label="Back to categories"
                                     title="Back"
                                 >
                                     <ArrowLeft size={20} />
                                 </button>
                                 <div>
-                                    <h2 className="reports-header__title">{activeReport?.title}</h2>
-                                    <p className="reports-header__subtitle">{activeReport?.description}</p>
+                                    <h2 className="text-xl font-bold text-gray-900 leading-tight">{activeReport?.title}</h2>
+                                    <p className="text-sm text-gray-500">{activeReport?.description}</p>
                                 </div>
                             </>
                         ) : (
                             <div>
-                                <h2 className="reports-header__title">{activeCategory.title}</h2>
-                                <p className="reports-header__subtitle">Select a report to view details</p>
+                                <h2 className="text-xl font-bold text-gray-900 leading-tight">{activeCategory.title}</h2>
+                                <p className="text-sm text-gray-500">Select a report to view details</p>
                             </div>
                         )}
                     </div>
 
-                    <div className="reports-header__actions">
+                    <div>
                         {activeReportId && (
                             <button className="btn btn-secondary">
                                 <Download size={16} />
@@ -197,7 +200,6 @@ const ReportsPage = () => {
                     </div>
                 </header>
 
-                {/* Offline Banner */}
                 <OfflineReportBanner
                     isOffline={!isOnline}
                     lastSyncDate={lastSyncDate}
@@ -205,29 +207,29 @@ const ReportsPage = () => {
                 />
 
                 {/* Content Body */}
-                <div className="reports-content">
+                <div className="flex-1 overflow-y-auto p-8 bg-gray-50">
                     {activeReportId ? (
-                        <div className="reports-content__container animate-fade-in">
+                        <div className="max-w-[1200px] mx-auto w-full animate-in fade-in slide-in-from-bottom-2 duration-400">
                             {renderReportComponent(activeReportId)}
                         </div>
                     ) : (
-                        <div className="reports-content__container">
-                            <div className="reports-grid">
+                        <div className="max-w-[1200px] mx-auto w-full">
+                            <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6">
                                 {activeCategory.reports
                                     .filter((report) => !report.hidden)
                                     .map((report) => (
                                         <button
                                             key={report.id}
                                             onClick={() => setActiveReportId(report.id)}
-                                            className="report-card-btn group"
+                                            className="group flex flex-col items-start p-8 bg-white border border-gray-200 rounded-2xl cursor-pointer transition-all duration-300 text-left h-full relative overflow-hidden hover:-translate-y-0.5 hover:shadow-lg hover:border-primary-light"
                                         >
-                                            <div className="report-card-btn__icon-wrapper">
+                                            <div className="w-12 h-12 flex items-center justify-center bg-primary/10 text-primary rounded-xl mb-4 transition-all duration-300 group-hover:bg-primary group-hover:text-white group-hover:scale-110">
                                                 <report.icon size={24} />
                                             </div>
-                                            <h3 className="report-card-btn__title">
+                                            <h3 className="text-lg font-bold text-gray-900 mb-2 transition-colors duration-200 group-hover:text-primary-deep">
                                                 {report.title}
                                             </h3>
-                                            <p className="report-card-btn__desc">
+                                            <p className="text-sm text-gray-500 leading-relaxed">
                                                 {report.description}
                                             </p>
                                         </button>

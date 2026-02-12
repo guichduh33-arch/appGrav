@@ -15,7 +15,7 @@ import {
 } from '@/hooks/customers'
 import { formatCurrency } from '../../utils/helpers'
 import { toast } from 'sonner'
-import './CustomerDetailPage.css'
+import { cn } from '@/lib/utils'
 
 type TabType = 'overview' | 'history' | 'loyalty' | 'orders'
 
@@ -132,8 +132,8 @@ export default function CustomerDetailPage() {
 
     if (isLoading) {
         return (
-            <div className="customer-detail-page">
-                <div className="customer-detail-loading">
+            <div className="p-6 max-w-[1200px] mx-auto max-md:p-4">
+                <div className="flex flex-col items-center justify-center py-16 px-8 text-muted-foreground gap-4">
                     <div className="spinner"></div>
                     <span>Loading...</span>
                 </div>
@@ -147,48 +147,51 @@ export default function CustomerDetailPage() {
     const nextTier = getNextTier()
 
     return (
-        <div className="customer-detail-page">
+        <div className="p-6 max-w-[1200px] mx-auto max-md:p-4">
             {/* Header */}
-            <header className="customer-detail-header">
-                <div className="customer-detail-header__left">
+            <header className="flex justify-between items-center mb-6 gap-4 max-md:flex-col max-md:items-start">
+                <div className="flex items-center gap-4">
                     <button className="btn btn-ghost" onClick={() => navigate('/customers')}>
                         <ArrowLeft size={20} />
                     </button>
                     <div
-                        className="customer-detail-avatar"
+                        className="w-14 h-14 rounded-[14px] flex items-center justify-center text-white text-2xl font-bold shrink-0"
                         style={{ background: tierConfig.gradient }}
                     >
                         {customer.company_name?.[0] || customer.name[0]}
                     </div>
-                    <div className="customer-detail-header__info">
-                        <h1>{customer.company_name || customer.name}</h1>
+                    <div>
+                        <h1 className="m-0 text-2xl font-bold text-foreground">{customer.company_name || customer.name}</h1>
                         {customer.company_name && (
-                            <span className="customer-contact-name">{customer.name}</span>
+                            <span className="block text-sm text-muted-foreground mb-1.5">{customer.name}</span>
                         )}
-                        <div className="customer-badges">
+                        <div className="flex gap-2 flex-wrap mt-1.5">
                             {customer.category && (
                                 <span
-                                    className="category-badge"
+                                    className="inline-flex items-center gap-1 px-2 py-1 rounded text-[0.7rem] font-medium text-white capitalize"
                                     style={{ backgroundColor: customer.category.color }}
                                 >
                                     {customer.category.name}
                                 </span>
                             )}
                             <span
-                                className="tier-badge"
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded text-[0.7rem] font-medium text-white capitalize"
                                 style={{ background: tierConfig.gradient }}
                             >
                                 <Crown size={12} />
                                 {customer.loyalty_tier}
                             </span>
-                            <span className={`status-badge ${customer.is_active ? 'active' : 'inactive'}`}>
+                            <span className={cn(
+                                'px-2 py-1 rounded text-[0.7rem] font-medium',
+                                customer.is_active ? 'bg-green-100 text-green-600' : 'bg-red-50 text-red-600'
+                            )}>
                                 {customer.is_active ? 'Active' : 'Inactive'}
                             </span>
                         </div>
                     </div>
                 </div>
                 <button
-                    className="btn btn-primary"
+                    className="btn btn-primary max-md:w-full"
                     onClick={() => navigate(`/customers/${id}/edit`)}
                 >
                     <Edit size={18} />
@@ -197,53 +200,56 @@ export default function CustomerDetailPage() {
             </header>
 
             {/* Loyalty Card */}
-            <div className="loyalty-card" style={{ background: tierConfig.gradient }}>
-                <div className="loyalty-card__header">
-                    <div className="loyalty-card__tier">
+            <div
+                className="rounded-2xl p-6 text-white mb-6 shadow-[0_10px_40px_rgba(0,0,0,0.2)]"
+                style={{ background: tierConfig.gradient }}
+            >
+                <div className="flex justify-between items-start mb-6">
+                    <div className="flex items-center gap-2 text-xl font-bold uppercase tracking-wide">
                         <Crown size={24} />
                         <span>{customer.loyalty_tier.toUpperCase()}</span>
                     </div>
                     {customer.membership_number && (
-                        <div className="loyalty-card__member">
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 rounded-md text-sm font-mono">
                             <QrCode size={16} />
                             {customer.membership_number}
                         </div>
                     )}
                 </div>
-                <div className="loyalty-card__points">
-                    <div className="points-current">
-                        <span className="points-value">{customer.loyalty_points.toLocaleString()}</span>
-                        <span className="points-label">Available points</span>
+                <div className="flex gap-12 mb-6 max-md:flex-col max-md:gap-4">
+                    <div className="flex flex-col">
+                        <span className="text-[2rem] font-extrabold leading-none">{customer.loyalty_points.toLocaleString()}</span>
+                        <span className="text-sm opacity-90 mt-1">Available points</span>
                     </div>
-                    <div className="points-lifetime">
-                        <span className="points-value">{customer.lifetime_points.toLocaleString()}</span>
-                        <span className="points-label">Lifetime points</span>
+                    <div className="flex flex-col">
+                        <span className="text-[2rem] font-extrabold leading-none">{customer.lifetime_points.toLocaleString()}</span>
+                        <span className="text-sm opacity-90 mt-1">Lifetime points</span>
                     </div>
                 </div>
                 {nextTier && (
-                    <div className="loyalty-card__progress">
-                        <div className="progress-info">
+                    <div className="mb-6">
+                        <div className="flex justify-between text-sm mb-2 opacity-90">
                             <span>Next tier: {nextTier.name}</span>
                             <span>{nextTier.min_points - customer.lifetime_points} pts remaining</span>
                         </div>
-                        <div className="progress-bar">
+                        <div className="h-2 bg-white/30 rounded overflow-hidden">
                             <div
-                                className="progress-bar__fill"
+                                className="h-full bg-white rounded transition-[width] duration-300 ease-out"
                                 style={{ width: `${getProgressToNextTier()}%` }}
                             />
                         </div>
                     </div>
                 )}
-                <div className="loyalty-card__actions">
+                <div className="flex gap-3 max-md:flex-col">
                     <button
-                        className="btn btn-loyalty"
+                        className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-white/20 border border-white/30 rounded-lg text-white text-sm font-medium cursor-pointer transition-all hover:bg-white/30 disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={() => { setPointsAction('add'); setShowPointsModal(true) }}
                     >
                         <Plus size={16} />
                         Add points
                     </button>
                     <button
-                        className="btn btn-loyalty"
+                        className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-white/20 border border-white/30 rounded-lg text-white text-sm font-medium cursor-pointer transition-all hover:bg-white/30 disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={() => { setPointsAction('redeem'); setShowPointsModal(true) }}
                         disabled={customer.loyalty_points <= 0}
                     >
@@ -254,59 +260,71 @@ export default function CustomerDetailPage() {
             </div>
 
             {/* Stats */}
-            <div className="customer-stats">
-                <div className="customer-stat">
+            <div className="grid grid-cols-4 gap-4 mb-6 max-lg:grid-cols-2 max-md:grid-cols-1">
+                <div className="bg-white rounded-xl border border-border p-4 flex items-center gap-4 [&>svg]:text-primary">
                     <ShoppingBag size={24} />
-                    <div>
-                        <span className="stat-value">{customer.total_visits}</span>
-                        <span className="stat-label">Visits</span>
+                    <div className="flex flex-col">
+                        <span className="text-xl font-bold text-foreground">{customer.total_visits}</span>
+                        <span className="text-xs text-muted-foreground">Visits</span>
                     </div>
                 </div>
-                <div className="customer-stat">
+                <div className="bg-white rounded-xl border border-border p-4 flex items-center gap-4 [&>svg]:text-primary">
                     <TrendingUp size={24} />
-                    <div>
-                        <span className="stat-value stat-value--sm">{formatCurrency(customer.total_spent)}</span>
-                        <span className="stat-label">Total spent</span>
+                    <div className="flex flex-col">
+                        <span className="text-base font-bold text-foreground">{formatCurrency(customer.total_spent)}</span>
+                        <span className="text-xs text-muted-foreground">Total spent</span>
                     </div>
                 </div>
-                <div className="customer-stat">
+                <div className="bg-white rounded-xl border border-border p-4 flex items-center gap-4 [&>svg]:text-primary">
                     <CreditCard size={24} />
-                    <div>
-                        <span className="stat-value stat-value--sm">
+                    <div className="flex flex-col">
+                        <span className="text-base font-bold text-foreground">
                             {customer.total_visits > 0
                                 ? formatCurrency(customer.total_spent / customer.total_visits)
                                 : formatCurrency(0)}
                         </span>
-                        <span className="stat-label">Average basket</span>
+                        <span className="text-xs text-muted-foreground">Average basket</span>
                     </div>
                 </div>
-                <div className="customer-stat">
+                <div className="bg-white rounded-xl border border-border p-4 flex items-center gap-4 [&>svg]:text-primary">
                     <Calendar size={24} />
-                    <div>
-                        <span className="stat-value stat-value--date">{formatDate(customer.last_visit_at)}</span>
-                        <span className="stat-label">Last visit</span>
+                    <div className="flex flex-col">
+                        <span className="text-sm font-bold text-foreground">{formatDate(customer.last_visit_at)}</span>
+                        <span className="text-xs text-muted-foreground">Last visit</span>
                     </div>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="customer-tabs">
+            <div className="flex gap-1 bg-slate-100 p-1 rounded-[10px] mb-6 max-md:flex-wrap">
                 <button
-                    className={`customer-tab ${activeTab === 'overview' ? 'active' : ''}`}
+                    className={cn(
+                        'flex-1 flex items-center justify-center gap-2 py-3 px-4 border-none bg-transparent rounded-lg text-sm font-medium text-muted-foreground cursor-pointer transition-all hover:text-slate-600',
+                        activeTab === 'overview' && 'bg-white text-primary shadow-sm',
+                        'max-md:flex-[0_0_calc(50%-0.25rem)]'
+                    )}
                     onClick={() => setActiveTab('overview')}
                 >
                     <User size={16} />
                     Info
                 </button>
                 <button
-                    className={`customer-tab ${activeTab === 'loyalty' ? 'active' : ''}`}
+                    className={cn(
+                        'flex-1 flex items-center justify-center gap-2 py-3 px-4 border-none bg-transparent rounded-lg text-sm font-medium text-muted-foreground cursor-pointer transition-all hover:text-slate-600',
+                        activeTab === 'loyalty' && 'bg-white text-primary shadow-sm',
+                        'max-md:flex-[0_0_calc(50%-0.25rem)]'
+                    )}
                     onClick={() => setActiveTab('loyalty')}
                 >
                     <Star size={16} />
                     Loyalty ({loyaltyTransactions.length})
                 </button>
                 <button
-                    className={`customer-tab ${activeTab === 'orders' ? 'active' : ''}`}
+                    className={cn(
+                        'flex-1 flex items-center justify-center gap-2 py-3 px-4 border-none bg-transparent rounded-lg text-sm font-medium text-muted-foreground cursor-pointer transition-all hover:text-slate-600',
+                        activeTab === 'orders' && 'bg-white text-primary shadow-sm',
+                        'max-md:flex-[0_0_calc(50%-0.25rem)]'
+                    )}
                     onClick={() => setActiveTab('orders')}
                 >
                     <FileText size={16} />
@@ -315,56 +333,56 @@ export default function CustomerDetailPage() {
             </div>
 
             {/* Tab Content */}
-            <div className="customer-tab-content">
+            <div className="bg-white rounded-xl border border-border p-6 min-h-[300px]">
                 {activeTab === 'overview' && (
-                    <div className="customer-overview">
-                        <div className="info-section">
-                            <h3>Contact Information</h3>
-                            <div className="info-grid">
+                    <div className="grid grid-cols-2 gap-6 max-lg:grid-cols-1">
+                        <div>
+                            <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">Contact Information</h3>
+                            <div className="flex flex-col gap-3">
                                 {customer.phone && (
-                                    <div className="info-item">
+                                    <div className="flex items-center gap-3 text-foreground text-sm [&>svg]:text-slate-400 [&>svg]:shrink-0">
                                         <Phone size={16} />
                                         <span>{customer.phone}</span>
                                     </div>
                                 )}
                                 {customer.email && (
-                                    <div className="info-item">
+                                    <div className="flex items-center gap-3 text-foreground text-sm [&>svg]:text-slate-400 [&>svg]:shrink-0">
                                         <Mail size={16} />
                                         <span>{customer.email}</span>
                                     </div>
                                 )}
                                 {customer.address && (
-                                    <div className="info-item info-item--full">
+                                    <div className="flex items-center gap-3 text-foreground text-sm [&>svg]:text-slate-400 [&>svg]:shrink-0">
                                         <MapPin size={16} />
                                         <span>{customer.address}</span>
                                     </div>
                                 )}
                                 {customer.date_of_birth && (
-                                    <div className="info-item">
+                                    <div className="flex items-center gap-3 text-foreground text-sm [&>svg]:text-slate-400 [&>svg]:shrink-0">
                                         <Calendar size={16} />
                                         <span>Birthday: {formatDate(customer.date_of_birth)}</span>
                                     </div>
                                 )}
                             </div>
                         </div>
-                        <div className="info-section">
-                            <h3>Member since</h3>
-                            <p className="member-since">
+                        <div>
+                            <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">Member since</h3>
+                            <p className="flex items-center gap-2 m-0 text-slate-600 text-sm [&>svg]:text-slate-400">
                                 <Clock size={16} />
                                 {formatDate(customer.created_at)}
                             </p>
                         </div>
                         {customer.category && (
-                            <div className="info-section">
-                                <h3>Pricing</h3>
-                                <div className="pricing-info">
+                            <div>
+                                <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">Pricing</h3>
+                                <div className="flex items-center gap-3">
                                     <span
-                                        className="pricing-badge"
+                                        className="px-3 py-1.5 rounded-md text-white text-sm font-medium"
                                         style={{ backgroundColor: customer.category.color }}
                                     >
                                         {customer.category.name}
                                     </span>
-                                    <span className="pricing-type">
+                                    <span className="text-slate-600 text-sm">
                                         {customer.category.price_modifier_type === 'retail' && 'Standard price'}
                                         {customer.category.price_modifier_type === 'wholesale' && 'Wholesale price'}
                                         {customer.category.price_modifier_type === 'discount_percentage' &&
@@ -378,29 +396,38 @@ export default function CustomerDetailPage() {
                 )}
 
                 {activeTab === 'loyalty' && (
-                    <div className="loyalty-history">
+                    <div>
                         {loyaltyTransactions.length === 0 ? (
-                            <div className="empty-state">
+                            <div className="flex flex-col items-center justify-center py-12 px-8 text-center [&>svg]:text-slate-300 [&>svg]:mb-4">
                                 <Star size={48} />
-                                <h3>No loyalty transactions</h3>
-                                <p>Points transactions will appear here</p>
+                                <h3 className="m-0 mb-2 text-slate-600 text-base">No loyalty transactions</h3>
+                                <p className="m-0 text-slate-400 text-sm">Points transactions will appear here</p>
                             </div>
                         ) : (
-                            <div className="transactions-list">
+                            <div className="flex flex-col gap-2">
                                 {loyaltyTransactions.map(tx => (
-                                    <div key={tx.id} className="transaction-item">
-                                        <div className={`transaction-icon ${tx.transaction_type}`}>
+                                    <div key={tx.id} className="flex items-center gap-4 py-3.5 px-4 bg-slate-50 rounded-lg">
+                                        <div className={cn(
+                                            'w-9 h-9 rounded-full flex items-center justify-center shrink-0',
+                                            tx.transaction_type === 'earn' && 'bg-green-100 text-green-600',
+                                            tx.transaction_type === 'redeem' && 'bg-amber-100 text-amber-600',
+                                            (tx.transaction_type === 'adjust' || tx.transaction_type === 'expire') && 'bg-slate-100 text-muted-foreground'
+                                        )}>
                                             {tx.transaction_type === 'earn' ? <Plus size={16} /> :
                                                 tx.transaction_type === 'redeem' ? <Minus size={16} /> :
                                                     <History size={16} />}
                                         </div>
-                                        <div className="transaction-info">
-                                            <span className="transaction-desc">
+                                        <div className="flex-1">
+                                            <span className="block text-sm text-foreground font-medium">
                                                 {tx.description || (tx.transaction_type === 'earn' ? 'Points earned' : 'Points redeemed')}
                                             </span>
-                                            <span className="transaction-date">{formatDateTime(tx.created_at)}</span>
+                                            <span className="block text-xs text-slate-400 mt-0.5">{formatDateTime(tx.created_at)}</span>
                                         </div>
-                                        <span className={`transaction-points ${tx.transaction_type}`}>
+                                        <span className={cn(
+                                            'text-base font-bold',
+                                            tx.transaction_type === 'earn' && 'text-green-600',
+                                            tx.transaction_type === 'redeem' && 'text-amber-600'
+                                        )}>
                                             {tx.transaction_type === 'earn' ? '+' : '-'}{tx.points}
                                         </span>
                                     </div>
@@ -411,25 +438,31 @@ export default function CustomerDetailPage() {
                 )}
 
                 {activeTab === 'orders' && (
-                    <div className="orders-history">
+                    <div>
                         {orders.length === 0 ? (
-                            <div className="empty-state">
+                            <div className="flex flex-col items-center justify-center py-12 px-8 text-center [&>svg]:text-slate-300 [&>svg]:mb-4">
                                 <FileText size={48} />
-                                <h3>No orders</h3>
-                                <p>Customer orders will appear here</p>
+                                <h3 className="m-0 mb-2 text-slate-600 text-base">No orders</h3>
+                                <p className="m-0 text-slate-400 text-sm">Customer orders will appear here</p>
                             </div>
                         ) : (
-                            <div className="orders-list">
+                            <div className="flex flex-col gap-2">
                                 {orders.map(order => (
-                                    <div key={order.id} className="order-item">
-                                        <div className="order-info">
-                                            <span className="order-number">{order.order_number}</span>
-                                            <span className="order-date">{formatDateTime(order.created_at)}</span>
+                                    <div key={order.id} className="flex items-center gap-4 py-3.5 px-4 bg-slate-50 rounded-lg">
+                                        <div className="flex-1">
+                                            <span className="block text-sm font-semibold text-foreground">{order.order_number}</span>
+                                            <span className="block text-xs text-slate-400 mt-0.5">{formatDateTime(order.created_at)}</span>
                                         </div>
-                                        <span className={`order-status ${order.status}`}>
+                                        <span className={cn(
+                                            'px-2 py-1 rounded text-xs font-medium',
+                                            order.status === 'completed' && 'bg-green-100 text-green-600',
+                                            (order.status === 'pending' || order.status === 'preparing') && 'bg-amber-100 text-amber-600',
+                                            order.status === 'ready' && 'bg-blue-100 text-blue-600',
+                                            order.status === 'cancelled' && 'bg-red-50 text-red-600'
+                                        )}>
                                             {getStatusLabel(order.status)}
                                         </span>
-                                        <span className="order-amount">{formatCurrency(order.total_amount)}</span>
+                                        <span className="text-sm font-semibold text-foreground">{formatCurrency(order.total_amount)}</span>
                                     </div>
                                 ))}
                             </div>
@@ -440,9 +473,15 @@ export default function CustomerDetailPage() {
 
             {/* Points Modal */}
             {showPointsModal && (
-                <div className="modal-overlay" onClick={() => setShowPointsModal(false)}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <h2>
+                <div
+                    className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] p-4"
+                    onClick={() => setShowPointsModal(false)}
+                >
+                    <div
+                        className="bg-white rounded-2xl p-6 w-full max-w-[400px] shadow-[0_20px_60px_rgba(0,0,0,0.2)]"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <h2 className="flex items-center gap-2 text-xl m-0 mb-4 text-foreground [&>svg]:text-primary">
                             {pointsAction === 'add' ? (
                                 <><Plus size={20} /> Add Points</>
                             ) : (
@@ -450,8 +489,8 @@ export default function CustomerDetailPage() {
                             )}
                         </h2>
                         {pointsAction === 'redeem' && (
-                            <p className="points-available">
-                                Available points: <strong>{customer.loyalty_points.toLocaleString()}</strong>
+                            <p className="m-0 mb-4 p-3 bg-slate-100 rounded-lg text-sm text-slate-600">
+                                Available points: <strong className="text-primary">{customer.loyalty_points.toLocaleString()}</strong>
                             </p>
                         )}
                         <div className="form-group">
@@ -474,7 +513,7 @@ export default function CustomerDetailPage() {
                                 placeholder="Reason for adjustment"
                             />
                         </div>
-                        <div className="modal-actions">
+                        <div className="flex gap-3 mt-6 [&>.btn]:flex-1">
                             <button
                                 className="btn btn-secondary"
                                 onClick={() => setShowPointsModal(false)}

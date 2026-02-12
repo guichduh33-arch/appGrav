@@ -16,7 +16,7 @@ import {
     useSavePermissions,
     type IPermission as Permission,
 } from '@/hooks/usePermissionsData'
-import './PermissionsPage.css'
+import { cn } from '@/lib/utils'
 
 // Group permissions by module
 const MODULE_ORDER = [
@@ -165,21 +165,23 @@ export default function PermissionsPage() {
 
     if (loading) {
         return (
-            <div className="permissions-page loading">
-                <RefreshCw className="spin" size={32} />
+            <div className="p-5 flex flex-col items-center justify-center min-h-[400px] gap-4 text-gray-400">
+                <RefreshCw className="animate-spin" size={32} />
                 <span>Loading permissions...</span>
             </div>
         )
     }
 
     return (
-        <div className="permissions-page">
-            <header className="permissions-page__header">
+        <div className="p-5 max-w-full">
+            <header className="flex justify-between items-start mb-6 flex-wrap gap-4 max-md:flex-col">
                 <div>
-                    <h1><Shield size={24} /> Permissions Management</h1>
-                    <p>Configure access for each role</p>
+                    <h1 className="flex items-center gap-2.5 text-2xl font-semibold m-0 text-gray-900">
+                        <Shield size={24} /> Permissions Management
+                    </h1>
+                    <p className="text-gray-500 mt-1 ml-[34px]">Configure access for each role</p>
                 </div>
-                <div className="permissions-page__actions">
+                <div className="flex gap-3 max-md:w-full max-md:[&>button]:flex-1 max-md:[&>button]:justify-center">
                     {hasChanges && (
                         <button className="btn btn-secondary" onClick={handleReset}>
                             <X size={18} />
@@ -197,26 +199,27 @@ export default function PermissionsPage() {
                 </div>
             </header>
 
-            <div className="permissions-page__search">
+            <div className="flex items-center gap-2.5 py-2.5 px-4 bg-white border border-gray-200 rounded-[10px] mb-5 max-w-[400px] [&>svg]:text-gray-400">
                 <Search size={18} />
                 <input
                     type="text"
+                    className="flex-1 border-none outline-none text-[0.95rem]"
                     placeholder="Search for a permission..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                 />
             </div>
 
-            <div className="permissions-table-wrapper">
-                <table className="permissions-table">
+            <div className="overflow-x-auto bg-white rounded-xl shadow-sm">
+                <table className="w-full border-collapse min-w-[800px] [&_th]:py-3 [&_th]:px-4 [&_th]:text-left [&_th]:border-b [&_th]:border-gray-200 [&_td]:py-3 [&_td]:px-4 [&_td]:border-b [&_td]:border-gray-200">
                     <thead>
                         <tr>
-                            <th className="permission-col">Permission</th>
+                            <th className="min-w-[280px] bg-gray-50 font-semibold text-[0.85rem] text-gray-700 sticky top-0 z-10">Permission</th>
                             {roles.map(role => (
-                                <th key={role.id} className="role-col">
-                                    <div className="role-header">
+                                <th key={role.id} className="min-w-[120px] !text-center bg-gray-50 font-semibold text-[0.85rem] text-gray-700 sticky top-0 z-10">
+                                    <div className="flex flex-col items-center gap-0.5">
                                         <span>{getLocalizedName(role)}</span>
-                                        <span className="role-code">{role.code}</span>
+                                        <span className="text-[0.7rem] font-normal text-gray-400 font-mono">{role.code}</span>
                                     </div>
                                 </th>
                             ))}
@@ -225,9 +228,9 @@ export default function PermissionsPage() {
                     <tbody>
                         {filteredModules.map(module => (
                             <>
-                                <tr key={module} className="module-row">
+                                <tr key={module} className="bg-gray-100 hover:bg-gray-200">
                                     <td
-                                        className="module-cell"
+                                        className="flex items-center gap-2 cursor-pointer font-medium"
                                         onClick={() => toggleModule(module)}
                                     >
                                         {expandedModules.has(module) ? (
@@ -236,7 +239,7 @@ export default function PermissionsPage() {
                                             <ChevronRight size={16} />
                                         )}
                                         <strong>{getModuleLabel(module)}</strong>
-                                        <span className="permission-count">
+                                        <span className="text-gray-400 font-normal text-[0.85rem]">
                                             ({groupedPermissions[module]?.length || 0})
                                         </span>
                                     </td>
@@ -248,9 +251,14 @@ export default function PermissionsPage() {
                                         const noneGranted = grantedCount === 0
 
                                         return (
-                                            <td key={role.id} className="module-toggle-cell">
+                                            <td key={role.id} className="!text-center">
                                                 <button
-                                                    className={`module-toggle ${allGranted ? 'all' : noneGranted ? 'none' : 'partial'}`}
+                                                    className={cn(
+                                                        'w-8 h-8 border-none rounded-md cursor-pointer inline-flex items-center justify-center transition-all duration-200 hover:scale-110',
+                                                        allGranted && 'bg-emerald-500 text-white',
+                                                        noneGranted && 'bg-gray-200 text-gray-400',
+                                                        !allGranted && !noneGranted && 'bg-amber-400 text-amber-900 text-xs font-semibold'
+                                                    )}
                                                     onClick={() => toggleAllForRole(role.id, module, !allGranted)}
                                                     title={allGranted ? 'Remove all' : 'Grant all'}
                                                 >
@@ -259,7 +267,7 @@ export default function PermissionsPage() {
                                                     ) : noneGranted ? (
                                                         <X size={16} />
                                                     ) : (
-                                                        <span className="partial-indicator">{grantedCount}</span>
+                                                        <span>{grantedCount}</span>
                                                     )}
                                                 </button>
                                             </td>
@@ -273,12 +281,12 @@ export default function PermissionsPage() {
                                     }
 
                                     return (
-                                        <tr key={perm.id} className="permission-row">
-                                            <td className="permission-cell">
-                                                <span className="permission-name">{getLocalizedName(perm)}</span>
-                                                <span className="permission-code">{perm.code}</span>
+                                        <tr key={perm.id} className="hover:bg-gray-50">
+                                            <td className="!pl-10">
+                                                <span className="block text-gray-700">{getLocalizedName(perm)}</span>
+                                                <span className="block text-xs text-gray-400 font-mono">{perm.code}</span>
                                                 {perm.description && (
-                                                    <span className="permission-desc" title={perm.description}>
+                                                    <span className="inline-flex items-center ml-1.5 text-gray-400 cursor-help" title={perm.description}>
                                                         <Info size={12} />
                                                     </span>
                                                 )}
@@ -288,9 +296,12 @@ export default function PermissionsPage() {
                                                 const hasPermission = rolePerms.has(perm.id)
 
                                                 return (
-                                                    <td key={role.id} className="checkbox-cell">
+                                                    <td key={role.id} className="!text-center">
                                                         <button
-                                                            className={`permission-checkbox ${hasPermission ? 'checked' : ''}`}
+                                                            className={cn(
+                                                                'w-6 h-6 border-2 border-gray-300 rounded-md bg-white cursor-pointer inline-flex items-center justify-center transition-all duration-200 hover:border-blue-500',
+                                                                hasPermission && 'bg-blue-500 border-blue-500 text-white'
+                                                            )}
                                                             onClick={() => togglePermission(role.id, perm.id)}
                                                         >
                                                             {hasPermission && <Check size={14} />}

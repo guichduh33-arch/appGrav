@@ -10,7 +10,7 @@
 import { memo } from 'react'
 import { Star, Crown, WifiOff } from 'lucide-react'
 import { getTierColor, getTierDiscount } from '@/constants/loyalty'
-import './LoyaltyBadge.css'
+import { cn } from '@/lib/utils'
 
 export interface LoyaltyBadgeProps {
     /** Customer's loyalty tier (bronze, silver, gold, platinum) */
@@ -38,14 +38,19 @@ export const LoyaltyBadge = memo(function LoyaltyBadge({ tier, points, isOffline
     const discount = getTierDiscount(normalizedTier)
     const hasDiscount = discount > 0
 
-    // Format points with locale-aware thousand separators
     const formattedPoints = points?.toLocaleString() || '0'
 
     return (
-        <div className={`loyalty-badge${compact ? ' loyalty-badge--compact' : ''}`} data-testid="loyalty-badge">
+        <div
+            className={cn('inline-flex items-center gap-1.5 flex-wrap text-[11px]', compact && 'gap-1 text-[10px]')}
+            data-testid="loyalty-badge"
+        >
             {/* Tier Badge */}
             <span
-                className="loyalty-badge__tier"
+                className={cn(
+                    'inline-flex items-center gap-[3px] px-1.5 py-0.5 rounded text-white font-semibold text-[10px] uppercase tracking-wider',
+                    compact && 'px-1 py-px text-[9px]'
+                )}
                 style={{ backgroundColor: tierColor }}
                 title={`${normalizedTier.charAt(0).toUpperCase() + normalizedTier.slice(1)} tier`}
                 data-testid="loyalty-tier"
@@ -56,7 +61,7 @@ export const LoyaltyBadge = memo(function LoyaltyBadge({ tier, points, isOffline
                     <Star size={compact ? 10 : 12} />
                 )}
                 {!compact && (
-                    <span className="loyalty-badge__tier-name">
+                    <span className="ml-0.5">
                         {normalizedTier.charAt(0).toUpperCase() + normalizedTier.slice(1)}
                     </span>
                 )}
@@ -64,7 +69,10 @@ export const LoyaltyBadge = memo(function LoyaltyBadge({ tier, points, isOffline
 
             {/* Points Display */}
             <span
-                className="loyalty-badge__points"
+                className={cn(
+                    'inline-flex items-center gap-[3px] text-slate-500 text-[11px] font-medium',
+                    compact && 'text-[10px]'
+                )}
                 title={isOffline ? 'Points balance may be outdated' : `${formattedPoints} loyalty points`}
                 data-testid="loyalty-points"
             >
@@ -72,7 +80,7 @@ export const LoyaltyBadge = memo(function LoyaltyBadge({ tier, points, isOffline
                 {formattedPoints} pts
                 {isOffline && (
                     <span title="Points balance may be outdated" data-testid="offline-indicator">
-                        <WifiOff size={10} className="loyalty-badge__offline-icon" />
+                        <WifiOff size={10} className="text-amber-500 ml-0.5" />
                     </span>
                 )}
             </span>
@@ -80,7 +88,10 @@ export const LoyaltyBadge = memo(function LoyaltyBadge({ tier, points, isOffline
             {/* Loyalty Discount - Only for Silver, Gold, Platinum (AC3, AC4) */}
             {hasDiscount && (
                 <span
-                    className="loyalty-badge__discount loyalty-badge__discount--loyalty"
+                    className={cn(
+                        'inline-flex items-center gap-[3px] px-1.5 py-0.5 rounded font-semibold text-[10px]',
+                        compact && 'px-1 py-px text-[9px]'
+                    )}
                     style={{ backgroundColor: tierColor, color: normalizedTier === 'silver' || normalizedTier === 'platinum' ? '#333' : '#fff' }}
                     title={`Loyalty discount: ${discount}%`}
                     data-testid="loyalty-discount"

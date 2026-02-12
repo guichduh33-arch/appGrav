@@ -3,7 +3,7 @@ import { Clock, CheckCircle, ChefHat, AlertTriangle, Pause, Play, Smartphone, Wi
 import { useOrderAutoRemove } from '@/hooks/kds/useOrderAutoRemove'
 import { useKDSConfigSettings } from '@/hooks/settings/useModuleConfigSettings'
 import { KDSCountdownBar } from './KDSCountdownBar'
-import './KDSOrderCard.css'
+import { cn } from '@/lib/utils'
 
 interface OrderItem {
     id: string
@@ -159,42 +159,48 @@ export default function KDSOrderCard({
 
     if (stationItems.length === 0) return null
 
-    // Build dynamic class names for card state
-    const cardClassNames = [
-        'kds-order-card',
-        `kds-order-card--${overallStatus}`,
-        `kds-order-card--${urgency}`,
-        isCountingDown && 'kds-order-card--countdown',
-        isExiting && 'kds-order-card--exiting',
-    ].filter(Boolean).join(' ')
-
     return (
-        <div className={cardClassNames}>
+        <div className={cn(
+            'relative bg-[#2a2a2a] rounded-xl overflow-hidden flex flex-col transition-all duration-300 border-2 border-transparent motion-reduce:transition-none',
+            overallStatus === 'new' && 'border-[#3B82F6] animate-pulse-new motion-reduce:animate-none',
+            overallStatus === 'preparing' && 'border-[#F59E0B]',
+            overallStatus === 'ready' && 'border-[#10B981] bg-gradient-to-br from-[#2a2a2a] to-[#1a3a2a]',
+            overallStatus === 'served' && 'opacity-50 border-[#666]',
+            urgency === 'warning' && 'shadow-[0_0_20px_rgba(245,158,11,0.3)]',
+            urgency === 'critical' && 'animate-pulse-critical motion-reduce:animate-none',
+            isCountingDown && 'shadow-[0_0_20px_rgba(16,185,129,0.4)] border-[#10B981] motion-reduce:shadow-[0_0_5px_rgba(16,185,129,0.3)]',
+            isExiting && 'animate-card-exit pointer-events-none motion-reduce:animate-none motion-reduce:opacity-0'
+        )}>
             {/* Header */}
-            <div className="kds-order-card__header">
-                <div className="kds-order-card__order-info">
-                    <span className="kds-order-card__number">#{orderNumber}</span>
+            <div className="flex justify-between items-center py-3 px-4 bg-[#1a1a1a] border-b border-[#333]">
+                <div className="flex items-center gap-2.5">
+                    <span className="text-2xl font-bold text-white">#{orderNumber}</span>
                     <span
-                        className="kds-order-card__type"
+                        className="text-[0.9rem] font-bold py-2 px-4 rounded-[20px] text-white whitespace-nowrap"
                         style={{ backgroundColor: orderConfig.color }}
                     >
                         {orderConfig.icon} {orderConfig.label}
                     </span>
                     {/* Story 8.1: Mobile order indicator */}
                     {source === 'mobile' && (
-                        <span className="kds-order-card__source kds-order-card__source--mobile">
+                        <span className="flex items-center justify-center w-7 h-7 rounded-md bg-[#8B5CF6] text-white animate-pulse-mobile motion-reduce:animate-none">
                             <Smartphone size={14} />
                         </span>
                     )}
                     {/* Story 4.3: LAN order indicator */}
                     {source === 'lan' && (
-                        <span className="kds-order-card__source kds-order-card__source--lan">
+                        <span className="inline-flex items-center gap-1 py-1 px-2.5 bg-[#10B981] text-white text-xs font-semibold rounded-md">
                             <Wifi size={14} />
                             LAN
                         </span>
                     )}
                 </div>
-                <div className={`kds-order-card__timer kds-order-card__timer--${urgency}`}>
+                <div className={cn(
+                    'flex items-center gap-1.5 font-mono text-[1.1rem] font-semibold py-1.5 px-3 rounded-lg bg-[#333]',
+                    urgency === 'normal' && 'text-[#10B981]',
+                    urgency === 'warning' && 'text-[#F59E0B] bg-[rgba(245,158,11,0.2)]',
+                    urgency === 'critical' && 'text-[#EF4444] bg-[rgba(239,68,68,0.2)]'
+                )}>
                     <Clock size={16} />
                     <span>{formatTime(elapsedTime)}</span>
                 </div>
@@ -202,36 +208,49 @@ export default function KDSOrderCard({
 
             {/* Customer/Table Info */}
             {(tableName || customerName) && (
-                <div className="kds-order-card__customer">
-                    {tableName && <span className="kds-order-card__table">📍 {tableName}</span>}
-                    {customerName && <span className="kds-order-card__name">👤 {customerName}</span>}
+                <div className="flex gap-4 py-2 px-4 bg-[#222] text-[0.9rem] text-[#aaa]">
+                    {tableName && <span className="flex items-center gap-1">📍 {tableName}</span>}
+                    {customerName && <span className="flex items-center gap-1">👤 {customerName}</span>}
                 </div>
             )}
 
             {/* Items List */}
-            <div className="kds-order-card__items">
+            <div className="flex-1 py-3 px-4 flex flex-col gap-2.5 overflow-y-auto max-h-[250px]">
                 {stationItems.map((item) => (
                     <div
                         key={item.id}
-                        className={`kds-order-card__item kds-order-card__item--${item.item_status} ${item.is_held ? 'kds-order-card__item--held' : ''}`}
+                        className={cn(
+                            'py-2.5 px-3 bg-[#1a1a1a] rounded-lg border-l-4 transition-all duration-300',
+                            item.item_status === 'new' && 'border-l-[#3B82F6]',
+                            item.item_status === 'preparing' && 'border-l-[#F59E0B] bg-[rgba(245,158,11,0.1)]',
+                            item.item_status === 'ready' && 'border-l-[#10B981] bg-[rgba(16,185,129,0.1)] line-through opacity-70',
+                            item.item_status === 'served' && 'border-l-[#666] opacity-40 line-through',
+                            item.is_held && '!border-l-[#DC2626] !bg-[rgba(220,38,38,0.15)] opacity-90'
+                        )}
                     >
-                        <div className="kds-order-card__item-main">
-                            <span className="kds-order-card__item-qty">{item.quantity}×</span>
-                            <span className="kds-order-card__item-name">{item.product_name}</span>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[1.2rem] font-bold text-[#F59E0B] min-w-[35px]">{item.quantity}x</span>
+                            <span className={cn(
+                                'text-base font-semibold text-white flex-1',
+                                item.is_held && 'text-red-300'
+                            )}>{item.product_name}</span>
                             {/* Story 8.4: Hold indicator */}
                             {item.is_held && (
-                                <span className="kds-order-card__item-held-badge">HOLD</span>
+                                <span className="py-0.5 px-2 bg-[#DC2626] text-white text-[0.7rem] font-bold rounded uppercase animate-blink-hold motion-reduce:animate-none">HOLD</span>
                             )}
                             {item.item_status === 'ready' && !item.is_held && (
-                                <CheckCircle className="kds-order-card__item-ready" size={18} />
+                                <CheckCircle className="text-[#10B981]" size={18} />
                             )}
                             {item.item_status === 'preparing' && !item.is_held && (
-                                <ChefHat className="kds-order-card__item-preparing" size={18} />
+                                <ChefHat className="text-[#F59E0B] animate-spin motion-reduce:animate-none" style={{ animationDuration: '2s' }} size={18} />
                             )}
                             {/* Story 8.4: Hold button */}
                             {onToggleHold && item.item_status !== 'served' && (
                                 <button
-                                    className={`kds-order-card__hold-btn ${item.is_held ? 'kds-order-card__hold-btn--held' : ''}`}
+                                    className={cn(
+                                        'w-7 h-7 border-none rounded-md bg-[#374151] text-[#9CA3AF] cursor-pointer flex items-center justify-center transition-all duration-200 ml-auto shrink-0 hover:bg-[#4B5563] hover:text-white',
+                                        item.is_held && 'bg-[#DC2626] text-white hover:bg-[#EF4444]'
+                                    )}
                                     onClick={(e) => {
                                         e.stopPropagation()
                                         onToggleHold(item.id, item.is_held)
@@ -243,12 +262,12 @@ export default function KDSOrderCard({
                             )}
                         </div>
                         {item.modifiers && (
-                            <div className="kds-order-card__item-modifiers">
+                            <div className="mt-1.5 pl-[43px] text-[0.85rem] text-[#10B981] italic">
                                 {item.modifiers}
                             </div>
                         )}
                         {item.notes && (
-                            <div className="kds-order-card__item-notes">
+                            <div className="mt-1.5 py-1.5 px-2.5 ml-[43px] bg-[rgba(239,68,68,0.2)] rounded-md text-[0.85rem] text-[#EF4444] flex items-center gap-1.5">
                                 <AlertTriangle size={12} /> {item.notes}
                             </div>
                         )}
@@ -257,10 +276,10 @@ export default function KDSOrderCard({
             </div>
 
             {/* Action Buttons */}
-            <div className="kds-order-card__actions">
+            <div className="py-3 px-4 bg-[#1a1a1a] border-t border-[#333]">
                 {overallStatus === 'new' && (
                     <button
-                        className="kds-order-card__btn kds-order-card__btn--start"
+                        className="w-full py-3.5 px-5 border-none rounded-[10px] text-[1.1rem] font-bold cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(59,130,246,0.4)]"
                         onClick={handleStartPreparing}
                     >
                         <ChefHat size={20} />
@@ -269,7 +288,7 @@ export default function KDSOrderCard({
                 )}
                 {overallStatus === 'preparing' && (
                     <button
-                        className="kds-order-card__btn kds-order-card__btn--ready"
+                        className="w-full py-3.5 px-5 border-none rounded-[10px] text-[1.1rem] font-bold cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#10B981] to-[#059669] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(16,185,129,0.4)]"
                         onClick={handleMarkReady}
                     >
                         <CheckCircle size={20} />
@@ -278,7 +297,7 @@ export default function KDSOrderCard({
                 )}
                 {overallStatus === 'ready' && station === 'waiter' && (
                     <button
-                        className="kds-order-card__btn kds-order-card__btn--served"
+                        className="w-full py-3.5 px-5 border-none rounded-[10px] text-[1.1rem] font-bold cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(139,92,246,0.4)]"
                         onClick={handleMarkServed}
                     >
                         <CheckCircle size={20} />

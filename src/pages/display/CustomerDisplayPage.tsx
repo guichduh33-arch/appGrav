@@ -17,7 +17,7 @@ import { LAN_MESSAGE_TYPES, type ILanMessage } from '@/services/lan/lanProtocol'
 import type { ICartDisplayPayload, IOrderStatusPayload } from '@/services/display/displayBroadcast';
 import { supabase } from '@/lib/supabase';
 import type { IDisplayPromotion } from '@/types/database';
-import './CustomerDisplayPage.css';
+import { cn } from '@/lib/utils';
 
 /**
  * Format price in IDR
@@ -190,13 +190,20 @@ export default function CustomerDisplayPage() {
   // Show connecting state
   if (isConnecting) {
     return (
-      <div className="customer-display">
-        <div className="display-connecting">
-          <div className="display-logo">
-            <span className="display-logo__icon">🥐</span>
-            <h1 className="display-logo__text">The Breakery</h1>
+      <div
+        className="h-screen flex flex-col text-white overflow-hidden font-display"
+        style={{ background: 'linear-gradient(135deg, #BA90A2 0%, #DDB892 100%)' }}
+      >
+        <div className="flex-1 flex flex-col items-center justify-center text-center">
+          <div className="mb-2xl">
+            <span className="text-[6rem] block mb-md animate-[cd-float_3s_ease-in-out_infinite]">
+              {'\uD83E\uDD50'}
+            </span>
+            <h1 className="font-display text-[4rem] font-bold m-0" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
+              The Breakery
+            </h1>
           </div>
-          <p className="display-connecting__text">Connecting...</p>
+          <p className="text-xl opacity-90 animate-[cd-blink_1.5s_ease-in-out_infinite]">Connecting...</p>
         </div>
       </div>
     );
@@ -205,36 +212,46 @@ export default function CustomerDisplayPage() {
   // Show cart when active
   if (!isIdle && cart.items.length > 0) {
     return (
-      <div className="customer-display customer-display--active">
+      <div className="h-screen flex flex-row text-white overflow-hidden font-display" style={{ background: '#1a1a2e' }}>
         {/* Hidden audio element */}
         <audio ref={audioRef} src="/sounds/order-ready.mp3" preload="auto" />
 
-        <div className="display-cart">
+        <div className="flex-1 flex flex-col p-xl overflow-hidden">
           {/* Header */}
-          <div className="display-cart__header">
-            <h2>Your Order</h2>
+          <div className="flex items-center gap-lg pb-lg mb-lg" style={{ borderBottom: '2px solid rgba(255,255,255,0.1)' }}>
+            <h2 className="text-3xl font-semibold m-0 flex-1">Your Order</h2>
             {cart.customerName && (
-              <span className="display-cart__customer">{cart.customerName}</span>
+              <span className="text-lg py-xs px-md rounded-full" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                {cart.customerName}
+              </span>
             )}
             {cart.tableNumber && (
-              <span className="display-cart__table">Table {cart.tableNumber}</span>
+              <span className="text-lg py-xs px-md rounded-full" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                Table {cart.tableNumber}
+              </span>
             )}
           </div>
 
           {/* Items */}
-          <div className="display-cart__items">
+          <div className="cd-cart-items flex-1 overflow-y-auto pr-md">
             {cart.items.map((item) => (
-              <div key={item.id} className="display-cart__item">
-                <div className="display-cart__item-info">
-                  <span className="display-cart__item-qty">{item.quantity}x</span>
-                  <span className="display-cart__item-name">{item.name}</span>
+              <div
+                key={item.id}
+                className="flex justify-between items-start py-md animate-[cd-slideIn_0.3s_ease-out]"
+                style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+              >
+                <div className="flex flex-wrap items-baseline gap-sm">
+                  <span className="text-lg font-semibold min-w-[2rem]" style={{ color: '#DDB892' }}>
+                    {item.quantity}x
+                  </span>
+                  <span className="text-[18px] font-medium">{item.name}</span>
                   {item.modifiers.length > 0 && (
-                    <span className="display-cart__item-mods">
+                    <span className="text-sm opacity-70 w-full ml-[2.5rem]">
                       ({item.modifiers.join(', ')})
                     </span>
                   )}
                 </div>
-                <span className="display-cart__item-price">
+                <span className="text-[24px] font-semibold whitespace-nowrap">
                   {formatPrice(item.totalPrice)}
                 </span>
               </div>
@@ -242,22 +259,22 @@ export default function CustomerDisplayPage() {
           </div>
 
           {/* Totals */}
-          <div className="display-cart__totals">
+          <div className="pt-lg mt-auto" style={{ borderTop: '2px solid rgba(255,255,255,0.1)' }}>
             {cart.discountAmount > 0 && (
               <>
-                <div className="display-cart__subtotal">
+                <div className="flex justify-between text-lg opacity-80 mb-sm">
                   <span>Subtotal</span>
                   <span>{formatPrice(cart.subtotal)}</span>
                 </div>
-                <div className="display-cart__discount">
+                <div className="flex justify-between text-lg opacity-80 mb-sm">
                   <span>Discount</span>
-                  <span>-{formatPrice(cart.discountAmount)}</span>
+                  <span className="text-green-400">-{formatPrice(cart.discountAmount)}</span>
                 </div>
               </>
             )}
-            <div className="display-cart__total">
+            <div className="flex justify-between text-2xl font-semibold mt-md">
               <span>Total</span>
-              <span className="display-cart__total-amount">
+              <span className="text-[32px]" style={{ color: '#DDB892' }}>
                 {formatPrice(cart.total)}
               </span>
             </div>
@@ -266,15 +283,18 @@ export default function CustomerDisplayPage() {
 
         {/* Side panel - Ready Orders */}
         {readyOrders.length > 0 && (
-          <div className="display-side-panel">
-            <h3>Ready Orders</h3>
-            <div className="display-ready-orders">
+          <div className="w-[280px] p-lg" style={{ background: 'rgba(255,255,255,0.05)', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
+            <h3 className="text-lg font-semibold m-0 mb-lg uppercase tracking-[0.05em] opacity-70">
+              Ready Orders
+            </h3>
+            <div className="flex flex-col gap-sm">
               {readyOrders.map((order) => (
                 <div
                   key={order.orderId}
-                  className={`display-ready-order ${
-                    order.orderNumber === newReadyOrder ? 'display-ready-order--new' : ''
-                  }`}
+                  className={cn(
+                    'bg-green-500 text-white p-md rounded-lg text-2xl font-bold text-center',
+                    order.orderNumber === newReadyOrder && 'animate-[cd-flash_0.5s_ease-in-out_3]'
+                  )}
                 >
                   {order.orderNumber}
                 </div>
@@ -282,21 +302,26 @@ export default function CustomerDisplayPage() {
             </div>
           </div>
         )}
+
+        <style>{cdStyles}</style>
       </div>
     );
   }
 
   // Show idle state with promotions and queue
   return (
-    <div className="customer-display customer-display--idle">
+    <div
+      className="h-screen flex flex-col justify-center text-white overflow-hidden font-display"
+      style={{ background: 'linear-gradient(135deg, #BA90A2 0%, #DDB892 100%)' }}
+    >
       {/* Hidden audio element */}
       <audio ref={audioRef} src="/sounds/order-ready.mp3" preload="auto" />
 
       {/* Main content - Promo or branding */}
-      <div className="display-idle">
+      <div className="flex-1 flex flex-col items-center justify-center text-center p-2xl">
         {currentPromo ? (
           <div
-            className="display-promo-content"
+            className="flex-1 flex flex-col items-center justify-center p-2xl animate-[cd-fadeIn_0.5s_ease-in-out]"
             style={{
               backgroundColor: currentPromo.background_color ?? undefined,
               color: currentPromo.text_color ?? undefined,
@@ -306,34 +331,41 @@ export default function CustomerDisplayPage() {
               <img
                 src={currentPromo.image_url}
                 alt={currentPromo.title}
-                className="display-promo-content__image"
+                className="max-w-[60%] max-h-[50vh] object-contain rounded-xl mb-xl"
+                style={{ boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}
               />
             )}
-            <h2 className="display-promo-content__title">{currentPromo.title}</h2>
+            <h2 className="text-[4rem] font-bold m-0 text-center" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
+              {currentPromo.title}
+            </h2>
             {currentPromo.subtitle && (
-              <p className="display-promo-content__subtitle">{currentPromo.subtitle}</p>
+              <p className="text-2xl mt-md opacity-90 text-center">{currentPromo.subtitle}</p>
             )}
           </div>
         ) : (
           <>
-            <div className="display-logo">
-              <span className="display-logo__icon">🥐</span>
-              <h1 className="display-logo__text">The Breakery</h1>
-              <p className="display-logo__tagline">French Artisan Bakery</p>
+            <div className="mb-2xl">
+              <span className="text-[6rem] block mb-md animate-[cd-float_3s_ease-in-out_infinite]">
+                {'\uD83E\uDD50'}
+              </span>
+              <h1 className="font-display text-[4rem] font-bold m-0" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
+                The Breakery
+              </h1>
+              <p className="text-lg opacity-90 mt-sm">French Artisan Bakery</p>
             </div>
 
-            <div className="display-info">
-              <div className="display-info__item">
-                <span className="display-info__icon">📍</span>
+            <div className="flex flex-col gap-md mb-2xl">
+              <div className="flex items-center justify-center gap-sm text-lg opacity-90">
+                <span className="text-[1.5rem]">{'\uD83D\uDCCD'}</span>
                 <span>Senggigi, Lombok</span>
               </div>
-              <div className="display-info__item">
-                <span className="display-info__icon">📶</span>
-                <span>WiFi: TheBreakery • Pass: croissant2024</span>
+              <div className="flex items-center justify-center gap-sm text-lg opacity-90">
+                <span className="text-[1.5rem]">{'\uD83D\uDCF6'}</span>
+                <span>WiFi: TheBreakery &bull; Pass: croissant2024</span>
               </div>
-              <div className="display-info__item">
-                <span className="display-info__icon">⏰</span>
-                <span>Open 7/7 • 7am - 6pm</span>
+              <div className="flex items-center justify-center gap-sm text-lg opacity-90">
+                <span className="text-[1.5rem]">{'\u23F0'}</span>
+                <span>Open 7/7 &bull; 7am - 6pm</span>
               </div>
             </div>
           </>
@@ -342,14 +374,23 @@ export default function CustomerDisplayPage() {
 
       {/* Bottom panel - Order Queue and Ready Orders */}
       {(orderQueue.length > 0 || readyOrders.length > 0) && (
-        <div className="display-bottom-panel">
+        <div
+          className="flex gap-2xl py-lg px-2xl"
+          style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(10px)' }}
+        >
           {/* Preparing Orders */}
           {orderQueue.length > 0 && (
-            <div className="display-queue-section">
-              <h3>Preparing</h3>
-              <div className="display-queue">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold m-0 mb-md uppercase tracking-[0.05em] opacity-80">
+                Preparing
+              </h3>
+              <div className="flex flex-wrap gap-sm">
                 {orderQueue.map((order) => (
-                  <div key={order.orderId} className="display-queue__item">
+                  <div
+                    key={order.orderId}
+                    className="py-sm px-lg rounded-md text-xl font-semibold"
+                    style={{ background: 'rgba(255,255,255,0.15)' }}
+                  >
                     {order.orderNumber}
                   </div>
                 ))}
@@ -359,15 +400,18 @@ export default function CustomerDisplayPage() {
 
           {/* Ready Orders */}
           {readyOrders.length > 0 && (
-            <div className="display-ready-section">
-              <h3>Ready to Serve</h3>
-              <div className="display-ready">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold m-0 mb-md uppercase tracking-[0.05em] opacity-80">
+                Ready to Serve
+              </h3>
+              <div className="flex flex-wrap gap-sm">
                 {readyOrders.map((order) => (
                   <div
                     key={order.orderId}
-                    className={`display-ready__item ${
-                      order.orderNumber === newReadyOrder ? 'display-ready__item--new' : ''
-                    }`}
+                    className={cn(
+                      'bg-green-500 py-sm px-lg rounded-md text-xl font-bold',
+                      order.orderNumber === newReadyOrder && 'animate-[cd-flash_0.5s_ease-in-out_3]'
+                    )}
                   >
                     {order.orderNumber}
                   </div>
@@ -377,6 +421,36 @@ export default function CustomerDisplayPage() {
           )}
         </div>
       )}
+
+      <style>{cdStyles}</style>
     </div>
   );
 }
+
+/** Scoped keyframe styles for CustomerDisplay animations and scrollbar */
+const cdStyles = `
+  @keyframes cd-blink {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+  @keyframes cd-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes cd-fadeIn {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes cd-slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes cd-flash {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); background: #4ade80; }
+  }
+  .cd-cart-items::-webkit-scrollbar { width: 6px; }
+  .cd-cart-items::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
+  .cd-cart-items::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .cd-cart-items::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+`;

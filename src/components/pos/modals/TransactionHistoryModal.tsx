@@ -4,9 +4,9 @@ import {
     X, Receipt, Clock, CreditCard, Banknote, QrCode,
     ChevronDown, ChevronUp, ShoppingBag, User, Hash
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { supabase } from '../../../lib/supabase'
 import { formatPrice } from '../../../utils/helpers'
-import './TransactionHistoryModal.css'
 
 interface TransactionHistoryModalProps {
     sessionId?: string
@@ -112,10 +112,10 @@ export default function TransactionHistoryModal({
 
     const getPaymentIcon = (method: string | null) => {
         switch (method) {
-            case 'cash': return <Banknote size={16} className="payment-icon payment-icon--cash" />
-            case 'qris': return <QrCode size={16} className="payment-icon payment-icon--qris" />
+            case 'cash': return <Banknote size={16} className="text-emerald-500" />
+            case 'qris': return <QrCode size={16} className="text-blue-500" />
             case 'card':
-            case 'edc': return <CreditCard size={16} className="payment-icon payment-icon--card" />
+            case 'edc': return <CreditCard size={16} className="text-violet-500" />
             default: return <CreditCard size={16} />
         }
     }
@@ -170,101 +170,110 @@ export default function TransactionHistoryModal({
     }), { count: 0, total: 0, cash: 0, qris: 0, card: 0 })
 
     return (
-        <div className="transaction-history-overlay" onClick={onClose}>
-            <div className="transaction-history" onClick={e => e.stopPropagation()}>
-                <div className="transaction-history__header">
-                    <div className="transaction-history__header-icon">
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-black/70 p-4" onClick={onClose}>
+            <div
+                className="flex w-full max-w-[600px] max-h-[90vh] flex-col rounded-2xl bg-[var(--color-gray-800)] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] max-[480px]:max-h-screen max-[480px]:rounded-none"
+                onClick={e => e.stopPropagation()}
+            >
+                <div className="flex items-start gap-4 border-b border-[var(--color-gray-700)] p-6">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
                         <Receipt size={24} />
                     </div>
                     <div>
-                        <h2 className="transaction-history__title">
+                        <h2 className="m-0 text-xl font-bold text-white">
                             Transaction History
                         </h2>
-                        <p className="transaction-history__subtitle">
+                        <p className="mt-1 text-sm text-[var(--color-gray-400)]">
                             {orders.length} transaction{orders.length > 1 ? 's' : ''} this shift
                         </p>
                     </div>
-                    <button className="transaction-history__close" onClick={onClose}>
+                    <button
+                        className="ml-auto cursor-pointer rounded-lg border-none bg-transparent p-2 text-[var(--color-gray-400)] transition-all duration-150 hover:bg-[var(--color-gray-700)] hover:text-white"
+                        onClick={onClose}
+                    >
                         <X size={24} />
                     </button>
                 </div>
 
                 {/* Summary Stats */}
-                <div className="transaction-history__stats">
-                    <div className="transaction-history__stat">
-                        <span className="transaction-history__stat-label">Total</span>
-                        <span className="transaction-history__stat-value">{formatPrice(totals.total)}</span>
+                <div className="flex gap-4 border-b border-[var(--color-gray-700)] bg-[var(--color-gray-900)] px-6 py-4 max-[480px]:flex-wrap">
+                    <div className="flex flex-1 flex-col items-start gap-1 rounded-lg bg-[var(--color-gray-800)] px-4 py-2">
+                        <span className="text-xs text-[var(--color-gray-400)]">Total</span>
+                        <span className="font-bold text-white">{formatPrice(totals.total)}</span>
                     </div>
-                    <div className="transaction-history__stat">
+                    <div className="flex items-center gap-2 rounded-lg bg-[var(--color-gray-800)] px-4 py-2">
                         <Banknote size={14} />
-                        <span className="transaction-history__stat-value transaction-history__stat-value--cash">
+                        <span className="font-bold text-emerald-500">
                             {formatPrice(totals.cash)}
                         </span>
                     </div>
-                    <div className="transaction-history__stat">
+                    <div className="flex items-center gap-2 rounded-lg bg-[var(--color-gray-800)] px-4 py-2">
                         <QrCode size={14} />
-                        <span className="transaction-history__stat-value transaction-history__stat-value--qris">
+                        <span className="font-bold text-blue-500">
                             {formatPrice(totals.qris)}
                         </span>
                     </div>
-                    <div className="transaction-history__stat">
+                    <div className="flex items-center gap-2 rounded-lg bg-[var(--color-gray-800)] px-4 py-2">
                         <CreditCard size={14} />
-                        <span className="transaction-history__stat-value transaction-history__stat-value--card">
+                        <span className="font-bold text-violet-500">
                             {formatPrice(totals.card)}
                         </span>
                     </div>
                 </div>
 
-                <div className="transaction-history__content">
+                <div className="flex-1 overflow-y-auto p-4">
                     {isLoading ? (
-                        <div className="transaction-history__loading">
+                        <div className="flex flex-col items-center justify-center gap-4 p-12 text-[var(--color-gray-500)]">
                             Loading...
                         </div>
                     ) : orders.length === 0 ? (
-                        <div className="transaction-history__empty">
+                        <div className="flex flex-col items-center justify-center gap-4 p-12 text-[var(--color-gray-500)]">
                             <Receipt size={48} />
-                            <p>No transactions for this shift</p>
+                            <p className="m-0">No transactions for this shift</p>
                         </div>
                     ) : (
-                        <div className="transaction-history__list">
+                        <div className="flex flex-col gap-3">
                             {orders.map(order => (
                                 <div
                                     key={order.id}
-                                    className={`transaction-card ${expandedOrder === order.id ? 'is-expanded' : ''}`}
+                                    className={cn(
+                                        'overflow-hidden rounded-xl bg-[var(--color-gray-700)] transition-all duration-200',
+                                        expandedOrder === order.id && 'bg-[var(--color-gray-750,var(--color-gray-700))]'
+                                    )}
                                 >
                                     <div
-                                        className="transaction-card__header"
+                                        className="flex cursor-pointer items-center justify-between p-4 transition-colors duration-150 hover:bg-white/5"
                                         onClick={() => toggleExpand(order.id)}
                                     >
-                                        <div className="transaction-card__main">
-                                            <div className="transaction-card__number">
+                                        <div className="flex flex-col gap-1.5">
+                                            <div className="flex items-center gap-1.5 font-bold text-white">
                                                 <Hash size={14} />
                                                 {order.order_number}
                                             </div>
-                                            <div className="transaction-card__meta">
-                                                <span className="transaction-card__time">
+                                            <div className="flex items-center gap-3 text-xs text-[var(--color-gray-400)]">
+                                                <span className="flex items-center gap-1">
                                                     <Clock size={12} />
                                                     {formatTime(order.created_at)}
                                                 </span>
-                                                <span className="transaction-card__type">
+                                                <span className="rounded bg-[var(--color-gray-600)] px-2 py-0.5">
                                                     {getOrderTypeLabel(order.order_type)}
                                                 </span>
                                                 {order.table_number && (
-                                                    <span className="transaction-card__table">
+                                                    <span className="text-[var(--color-primary-light)]">
                                                         Table {order.table_number}
                                                     </span>
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="transaction-card__right">
-                                            <div className="transaction-card__payment">
+                                        <div className="flex items-center gap-4 max-[480px]:flex-col max-[480px]:items-end max-[480px]:gap-2">
+                                            <div className="flex items-center gap-1.5 text-xs text-[var(--color-gray-300)]">
                                                 {getPaymentIcon(order.payment_method)}
                                                 <span>{getPaymentLabel(order.payment_method)}</span>
                                             </div>
-                                            <div className="transaction-card__amount">
+                                            <div className="min-w-[100px] text-right text-base font-bold text-white">
                                                 {formatPrice(order.total_amount)}
                                             </div>
-                                            <button className="transaction-card__expand">
+                                            <button className="cursor-pointer border-none bg-transparent p-1 text-[var(--color-gray-400)] transition-colors duration-150 hover:text-white">
                                                 {expandedOrder === order.id ? (
                                                     <ChevronUp size={20} />
                                                 ) : (
@@ -275,57 +284,57 @@ export default function TransactionHistoryModal({
                                     </div>
 
                                     {expandedOrder === order.id && (
-                                        <div className="transaction-card__details">
+                                        <div className="flex flex-col gap-4 border-t border-[var(--color-gray-600)] p-4">
                                             {/* Order Info */}
-                                            <div className="transaction-card__info">
-                                                <div className="transaction-card__info-row">
-                                                    <span>Transaction ID</span>
-                                                    <span className="transaction-card__id">{order.id.slice(0, 8)}...</span>
+                                            <div className="grid grid-cols-2 gap-2 max-[480px]:grid-cols-1">
+                                                <div className="flex justify-between rounded-md bg-[var(--color-gray-800)] px-2 py-1.5 text-xs">
+                                                    <span className="flex items-center gap-1 text-[var(--color-gray-400)]">Transaction ID</span>
+                                                    <span className="font-medium font-mono text-[var(--color-gray-200)]">{order.id.slice(0, 8)}...</span>
                                                 </div>
-                                                <div className="transaction-card__info-row">
-                                                    <span>Date</span>
-                                                    <span>{formatDate(order.created_at)}</span>
+                                                <div className="flex justify-between rounded-md bg-[var(--color-gray-800)] px-2 py-1.5 text-xs">
+                                                    <span className="flex items-center gap-1 text-[var(--color-gray-400)]">Date</span>
+                                                    <span className="font-medium text-[var(--color-gray-200)]">{formatDate(order.created_at)}</span>
                                                 </div>
-                                                <div className="transaction-card__info-row">
-                                                    <span>Order Time</span>
-                                                    <span>{formatTime(order.created_at)}</span>
+                                                <div className="flex justify-between rounded-md bg-[var(--color-gray-800)] px-2 py-1.5 text-xs">
+                                                    <span className="flex items-center gap-1 text-[var(--color-gray-400)]">Order Time</span>
+                                                    <span className="font-medium text-[var(--color-gray-200)]">{formatTime(order.created_at)}</span>
                                                 </div>
                                                 {order.completed_at && (
-                                                    <div className="transaction-card__info-row">
-                                                        <span>Payment Time</span>
-                                                        <span>{formatTime(order.completed_at)}</span>
+                                                    <div className="flex justify-between rounded-md bg-[var(--color-gray-800)] px-2 py-1.5 text-xs">
+                                                        <span className="flex items-center gap-1 text-[var(--color-gray-400)]">Payment Time</span>
+                                                        <span className="font-medium text-[var(--color-gray-200)]">{formatTime(order.completed_at)}</span>
                                                     </div>
                                                 )}
                                                 {order.customer_name && (
-                                                    <div className="transaction-card__info-row">
-                                                        <span><User size={12} /> Customer</span>
-                                                        <span>{order.customer_name}</span>
+                                                    <div className="flex justify-between rounded-md bg-[var(--color-gray-800)] px-2 py-1.5 text-xs">
+                                                        <span className="flex items-center gap-1 text-[var(--color-gray-400)]"><User size={12} /> Customer</span>
+                                                        <span className="font-medium text-[var(--color-gray-200)]">{order.customer_name}</span>
                                                     </div>
                                                 )}
                                             </div>
 
                                             {/* Order Items */}
-                                            <div className="transaction-card__items">
-                                                <div className="transaction-card__items-header">
+                                            <div className="rounded-lg bg-[var(--color-gray-800)] p-3">
+                                                <div className="mb-2 flex items-center gap-2 border-b border-[var(--color-gray-700)] pb-2 text-xs font-semibold text-[var(--color-gray-400)]">
                                                     <ShoppingBag size={14} />
                                                     <span>Items ({order.items.length})</span>
                                                 </div>
                                                 {order.items.map(item => (
-                                                    <div key={item.id} className="transaction-card__item">
-                                                        <div className="transaction-card__item-info">
-                                                            <span className="transaction-card__item-qty">
+                                                    <div key={item.id} className="flex items-center justify-between py-1.5 text-sm">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="min-w-[28px] font-semibold text-[var(--color-gray-400)]">
                                                                 {item.quantity}x
                                                             </span>
-                                                            <span className="transaction-card__item-name">
+                                                            <span className="text-white">
                                                                 {item.product_name}
                                                             </span>
                                                             {item.modifiers && Object.keys(item.modifiers).length > 0 && (
-                                                                <span className="transaction-card__item-mods">
+                                                                <span className="text-[0.7rem] text-[var(--color-primary-light)]">
                                                                     + options
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <span className="transaction-card__item-price">
+                                                        <span className="font-semibold text-[var(--color-gray-300)]">
                                                             {formatPrice(item.total_price + item.modifiers_total)}
                                                         </span>
                                                     </div>
@@ -333,32 +342,32 @@ export default function TransactionHistoryModal({
                                             </div>
 
                                             {/* Order Totals */}
-                                            <div className="transaction-card__totals">
-                                                <div className="transaction-card__total-row">
+                                            <div className="rounded-lg bg-[var(--color-gray-800)] p-3">
+                                                <div className="flex justify-between py-1.5 text-sm text-[var(--color-gray-300)]">
                                                     <span>Subtotal</span>
                                                     <span>{formatPrice(order.subtotal)}</span>
                                                 </div>
                                                 {order.discount_amount > 0 && (
-                                                    <div className="transaction-card__total-row transaction-card__total-row--discount">
+                                                    <div className="flex justify-between py-1.5 text-sm text-amber-400">
                                                         <span>Discount</span>
                                                         <span>-{formatPrice(order.discount_amount)}</span>
                                                     </div>
                                                 )}
-                                                <div className="transaction-card__total-row">
+                                                <div className="flex justify-between py-1.5 text-sm text-[var(--color-gray-300)]">
                                                     <span>Tax (10%)</span>
                                                     <span>{formatPrice(order.tax_amount)}</span>
                                                 </div>
-                                                <div className="transaction-card__total-row transaction-card__total-row--final">
+                                                <div className="mt-1.5 flex justify-between border-t border-[var(--color-gray-700)] pt-3 text-base font-bold text-white">
                                                     <span>Total</span>
                                                     <span>{formatPrice(order.total_amount)}</span>
                                                 </div>
                                                 {order.payment_method === 'cash' && order.cash_received && (
                                                     <>
-                                                        <div className="transaction-card__total-row">
+                                                        <div className="flex justify-between py-1.5 text-sm text-[var(--color-gray-300)]">
                                                             <span>Cash Received</span>
                                                             <span>{formatPrice(order.cash_received)}</span>
                                                         </div>
-                                                        <div className="transaction-card__total-row">
+                                                        <div className="flex justify-between py-1.5 text-sm text-[var(--color-gray-300)]">
                                                             <span>Change</span>
                                                             <span>{formatPrice(order.change_given || 0)}</span>
                                                         </div>

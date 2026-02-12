@@ -8,7 +8,7 @@ import {
 import { supabase } from '../../lib/supabase'
 import type { Product, Recipe, ProductUOM, Category, Section } from '../../types/database'
 import { MOCK_PRODUCTS, MOCK_CATEGORIES } from '../../hooks/products'
-import './ProductDetailPage.css'
+import { cn } from '@/lib/utils'
 
 // Tabs
 import { GeneralTab } from './tabs/GeneralTab'
@@ -315,10 +315,10 @@ export default function ProductDetailPage() {
         }
     }
 
-    if (loading) return <div className="product-detail-page flex items-center justify-center text-gray-500 h-screen">Loading...</div>
+    if (loading) return <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-gray-500 h-screen">Loading...</div>
 
     if (!product) return (
-        <div className="product-detail-page flex items-center justify-center p-8">
+        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-8">
             <div className="card max-w-md w-full flex flex-col items-center p-8">
                 <AlertTriangle size={64} className="mb-6 text-orange-500 opacity-80" />
                 <h2 className="text-2xl font-bold mb-2 text-gray-800 text-center">Product not found</h2>
@@ -337,16 +337,16 @@ export default function ProductDetailPage() {
     )
 
     return (
-        <div className="product-detail-page">
+        <div className="min-h-screen bg-gray-50 flex flex-col">
             {/* Header */}
-            <header className="detail-header">
+            <header className="bg-white px-8 py-5 border-b border-gray-200 flex justify-between items-center sticky top-0 z-20 shadow-sm">
                 <div className="flex items-center gap-4">
                     <button onClick={() => navigate('/inventory')} className="btn-icon" title="Back">
                         <ArrowLeft />
                     </button>
                     <div>
-                        <h1 className="text-2xl font-bold">{product.name}</h1>
-                        <span className="sku-badge">SKU: {product.sku}</span>
+                        <h1 className="text-2xl font-bold text-gray-900 m-0">{product.name}</h1>
+                        <span className="inline-block bg-gray-100 text-gray-600 px-2 py-0.5 rounded-sm font-mono text-sm mt-1">SKU: {product.sku}</span>
                     </div>
                 </div>
                 <button
@@ -361,29 +361,31 @@ export default function ProductDetailPage() {
             </header>
 
             {/* Tabs */}
-            <div className="detail-tabs">
-                <button className={`tab-btn ${activeTab === 'general' ? 'active' : ''}`} onClick={() => setActiveTab('general')}>
-                    <Settings size={16} /> General
-                </button>
-                <button className={`tab-btn ${activeTab === 'units' ? 'active' : ''}`} onClick={() => setActiveTab('units')}>
-                    <Scale size={16} /> Units
-                </button>
-                <button className={`tab-btn ${activeTab === 'recipe' ? 'active' : ''}`} onClick={() => setActiveTab('recipe')}>
-                    <Layers size={16} /> Recipe
-                </button>
-                <button className={`tab-btn ${activeTab === 'variants' ? 'active' : ''}`} onClick={() => setActiveTab('variants')}>
-                    <Layers size={16} /> Variants
-                </button>
-                <button className={`tab-btn ${activeTab === 'costing' ? 'active' : ''}`} onClick={() => setActiveTab('costing')}>
-                    <DollarSign size={16} /> Costing
-                </button>
-                <button className={`tab-btn ${activeTab === 'prices' ? 'active' : ''}`} onClick={() => setActiveTab('prices')}>
-                    <DollarSign size={16} /> Prices
-                </button>
+            <div className="flex gap-2 pt-4 px-8 bg-white border-b border-gray-200 overflow-x-auto">
+                {([
+                    { key: 'general' as Tab, icon: <Settings size={16} />, label: 'General' },
+                    { key: 'units' as Tab, icon: <Scale size={16} />, label: 'Units' },
+                    { key: 'recipe' as Tab, icon: <Layers size={16} />, label: 'Recipe' },
+                    { key: 'variants' as Tab, icon: <Layers size={16} />, label: 'Variants' },
+                    { key: 'costing' as Tab, icon: <DollarSign size={16} />, label: 'Costing' },
+                    { key: 'prices' as Tab, icon: <DollarSign size={16} />, label: 'Prices' },
+                ]).map(tab => (
+                    <button
+                        key={tab.key}
+                        className={cn(
+                            'flex items-center gap-2 px-4 py-3 text-[0.95rem] font-medium text-gray-500 bg-transparent border-none border-b-2 border-transparent cursor-pointer transition-all duration-200 whitespace-nowrap',
+                            'hover:text-primary hover:bg-primary/5 hover:rounded-t-md',
+                            activeTab === tab.key && 'text-primary border-b-primary bg-transparent'
+                        )}
+                        onClick={() => setActiveTab(tab.key)}
+                    >
+                        {tab.icon} {tab.label}
+                    </button>
+                ))}
             </div>
 
             {/* Content */}
-            <div className="detail-content">
+            <div className="flex-1 p-8 max-w-[1400px] mx-auto w-full max-md:p-4">
                 {activeTab === 'general' && (
                     <GeneralTab
                         product={product}

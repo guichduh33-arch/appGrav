@@ -15,8 +15,11 @@ export default function B2BPaymentModal({
     onClose
 }: B2BPaymentModalProps) {
     return (
-        <div className="b2b-payment-modal-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className="b2b-payment-modal">
+        <div
+            className="fixed inset-0 w-screen h-screen bg-black/50 flex items-center justify-center z-[99999] p-lg"
+            onClick={(e) => e.target === e.currentTarget && onClose()}
+        >
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-[480px] max-h-[90vh] overflow-hidden flex flex-col text-[var(--color-brun-chocolat)]">
                 <div className="modal__header">
                     <h2 className="modal__title">Record a payment</h2>
                     <button

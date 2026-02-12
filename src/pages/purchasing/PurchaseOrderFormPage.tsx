@@ -13,7 +13,6 @@ import {
     type IPOItem
 } from '@/hooks/purchasing/usePurchaseOrders'
 import { toast } from 'sonner'
-import './PurchaseOrderFormPage.css'
 
 const DEFAULT_ITEM: IPOItem = {
     product_id: null,
@@ -209,40 +208,40 @@ export default function PurchaseOrderFormPage() {
 
     if (isLoading) {
         return (
-            <div className="po-form-page">
-                <div className="po-form-page__loading">Loading...</div>
+            <div className="p-xl max-w-[1600px] mx-auto">
+                <div className="flex items-center justify-center min-h-[300px] text-muted-foreground text-lg">Loading...</div>
             </div>
         )
     }
 
     return (
-        <div className="po-form-page">
+        <div className="p-xl max-w-[1600px] mx-auto">
             {/* Offline Warning Banner */}
             {!isOnline && (
-                <div className="po-form-page__offline-banner">
+                <div className="flex items-center gap-sm px-lg py-md mb-lg bg-warning/10 border border-warning rounded-md text-warning font-medium">
                     <WifiOff size={20} />
                     <span>This feature requires an internet connection</span>
                 </div>
             )}
 
             {/* Header */}
-            <div className="po-form-page__header">
+            <div className="flex items-center gap-lg mb-xl">
                 <button className="btn btn-secondary" onClick={() => navigate('/purchasing/purchase-orders')}>
                     <ArrowLeft size={20} />
                     Cancel
                 </button>
-                <h1 className="po-form-page__title">
+                <h1 className="text-3xl font-bold text-white m-0">
                     {isEditing ? 'Edit Purchase Order' : 'New Purchase Order'}
                 </h1>
             </div>
 
-            <div className="po-form-page__content">
+            <div className="grid grid-cols-[1fr_350px] gap-xl items-start max-lg:grid-cols-1">
                 {/* Main Form */}
-                <div className="po-form-page__main">
+                <div className="flex flex-col gap-xl">
                     {/* Supplier & Dates */}
-                    <div className="po-form-section">
+                    <div className="bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg p-lg [&>h2]:text-xl [&>h2]:font-bold [&>h2]:text-white [&>h2]:m-0 [&>h2]:mb-lg">
                         <h2>Supplier</h2>
-                        <div className="po-form-grid">
+                        <div className="grid grid-cols-2 gap-md max-md:grid-cols-1">
                             <div className="form-group">
                                 <label>Supplier *</label>
                                 <select
@@ -270,7 +269,7 @@ export default function PurchaseOrderFormPage() {
                                     aria-label="Expected delivery date"
                                 />
                             </div>
-                            <div className="form-group form-group--full">
+                            <div className="form-group col-span-full">
                                 <label>Notes</label>
                                 <textarea
                                     rows={2}
@@ -284,11 +283,11 @@ export default function PurchaseOrderFormPage() {
                     </div>
 
                     {/* Items */}
-                    <div className="po-form-section">
-                        <div className="po-form-section__header">
-                            <h2>Items</h2>
+                    <div className="bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg p-lg">
+                        <div className="flex justify-between items-center mb-lg">
+                            <h2 className="text-xl font-bold text-white m-0">Items</h2>
                             <button
-                                className="btn btn-secondary btn-sm"
+                                className="btn btn-secondary py-2 px-4 text-sm"
                                 onClick={handleAddItem}
                                 disabled={!isOnline}
                             >
@@ -297,22 +296,22 @@ export default function PurchaseOrderFormPage() {
                             </button>
                         </div>
 
-                        <div className="po-items-table">
-                            <table>
+                        <div className="overflow-x-auto max-md:text-sm">
+                            <table className="w-full border-collapse">
                                 <thead>
                                     <tr>
-                                        <th>Product</th>
-                                        <th>Description</th>
-                                        <th style={{ width: '100px' }}>Quantity</th>
-                                        <th style={{ width: '80px' }}>Unit</th>
-                                        <th style={{ width: '120px' }}>Unit Price</th>
-                                        <th style={{ width: '100px' }}>Discount</th>
-                                        <th style={{ width: '80px' }}>Tax %</th>
-                                        <th style={{ width: '120px' }}>Line Total</th>
-                                        <th style={{ width: '50px' }}></th>
+                                        <th className="p-sm text-left text-xs font-bold text-muted-foreground uppercase tracking-wider border-b border-[var(--color-gray-700)]">Product</th>
+                                        <th className="p-sm text-left text-xs font-bold text-muted-foreground uppercase tracking-wider border-b border-[var(--color-gray-700)]">Description</th>
+                                        <th className="p-sm text-left text-xs font-bold text-muted-foreground uppercase tracking-wider border-b border-[var(--color-gray-700)]" style={{ width: '100px' }}>Quantity</th>
+                                        <th className="p-sm text-left text-xs font-bold text-muted-foreground uppercase tracking-wider border-b border-[var(--color-gray-700)]" style={{ width: '80px' }}>Unit</th>
+                                        <th className="p-sm text-left text-xs font-bold text-muted-foreground uppercase tracking-wider border-b border-[var(--color-gray-700)]" style={{ width: '120px' }}>Unit Price</th>
+                                        <th className="p-sm text-left text-xs font-bold text-muted-foreground uppercase tracking-wider border-b border-[var(--color-gray-700)]" style={{ width: '100px' }}>Discount</th>
+                                        <th className="p-sm text-left text-xs font-bold text-muted-foreground uppercase tracking-wider border-b border-[var(--color-gray-700)]" style={{ width: '80px' }}>Tax %</th>
+                                        <th className="p-sm text-left text-xs font-bold text-muted-foreground uppercase tracking-wider border-b border-[var(--color-gray-700)]" style={{ width: '120px' }}>Line Total</th>
+                                        <th className="p-sm text-left text-xs font-bold text-muted-foreground uppercase tracking-wider border-b border-[var(--color-gray-700)]" style={{ width: '50px' }}></th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="[&_td]:p-sm [&_td]:border-b [&_td]:border-[var(--color-gray-700)] [&_tr:last-child_td]:border-b-0 [&_input]:w-full [&_input]:p-2 [&_input]:bg-[var(--color-gray-700)] [&_input]:border [&_input]:border-[var(--color-gray-600)] [&_input]:rounded-md [&_input]:text-white [&_input]:text-sm [&_input:focus]:outline-none [&_input:focus]:border-primary [&_input[type=number]]:text-right [&_select]:w-full [&_select]:p-2 [&_select]:bg-[var(--color-gray-700)] [&_select]:border [&_select]:border-[var(--color-gray-600)] [&_select]:rounded-md [&_select]:text-white [&_select]:text-sm [&_select:focus]:outline-none [&_select:focus]:border-primary">
                                     {items.map((item, index) => (
                                         <tr key={index}>
                                             <td>
@@ -416,7 +415,7 @@ export default function PurchaseOrderFormPage() {
                                             </td>
                                             <td>
                                                 <button
-                                                    className="btn-icon btn-icon--danger"
+                                                    className="flex items-center justify-center w-8 h-8 bg-transparent border-none rounded-md text-muted-foreground cursor-pointer transition-all duration-200 hover:enabled:bg-red-500/15 hover:enabled:text-danger disabled:opacity-40 disabled:cursor-not-allowed"
                                                     onClick={() => handleRemoveItem(index)}
                                                     disabled={items.length === 1 || !isOnline}
                                                     aria-label="Delete"
@@ -434,17 +433,17 @@ export default function PurchaseOrderFormPage() {
                 </div>
 
                 {/* Summary Sidebar */}
-                <div className="po-form-page__sidebar">
-                    <div className="po-summary">
-                        <h3>Summary</h3>
+                <div className="sticky top-lg max-lg:static">
+                    <div className="bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg p-lg">
+                        <h3 className="text-lg font-bold text-white m-0 mb-lg">Summary</h3>
 
-                        <div className="po-summary__line">
+                        <div className="flex justify-between items-center py-sm text-base text-[var(--color-gray-300)]">
                             <span>Subtotal</span>
                             <span>{formatCurrency(totals.subtotal)}</span>
                         </div>
 
                         <button
-                            className="po-summary__discount-btn"
+                            className="w-full flex items-center justify-center gap-2 py-sm px-sm my-sm bg-transparent border border-dashed border-[var(--color-gray-600)] rounded-md text-primary-light text-sm font-semibold cursor-pointer transition-all duration-200 hover:bg-blue-500/10 hover:border-primary"
                             onClick={() => setShowDiscountModal(true)}
                             disabled={!isOnline}
                         >
@@ -453,27 +452,27 @@ export default function PurchaseOrderFormPage() {
                         </button>
 
                         {totals.orderDiscount > 0 && (
-                            <div className="po-summary__line po-summary__line--discount">
+                            <div className="flex justify-between items-center py-sm text-base text-success">
                                 <span>Discount Amount</span>
                                 <span>-{formatCurrency(totals.orderDiscount)}</span>
                             </div>
                         )}
 
-                        <div className="po-summary__line">
+                        <div className="flex justify-between items-center py-sm text-base text-[var(--color-gray-300)]">
                             <span>Tax Amount</span>
                             <span>{formatCurrency(totals.tax)}</span>
                         </div>
 
-                        <div className="po-summary__divider"></div>
+                        <div className="h-px bg-[var(--color-gray-700)] my-md"></div>
 
-                        <div className="po-summary__total">
+                        <div className="flex justify-between items-center py-md text-xl font-bold text-white">
                             <span>Total Amount</span>
                             <span>{formatCurrency(totals.total)}</span>
                         </div>
 
-                        <div className="po-summary__actions">
+                        <div className="flex flex-col gap-sm mt-lg">
                             <button
-                                className="btn btn-secondary btn-block"
+                                className="btn btn-secondary w-full justify-center"
                                 onClick={() => handleSubmit(false)}
                                 disabled={isSaving || !isOnline}
                             >
@@ -481,7 +480,7 @@ export default function PurchaseOrderFormPage() {
                                 Save as Draft
                             </button>
                             <button
-                                className="btn btn-primary btn-block"
+                                className="btn btn-primary w-full justify-center"
                                 onClick={() => handleSubmit(true)}
                                 disabled={isSaving || !isOnline}
                             >

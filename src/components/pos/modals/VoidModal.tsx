@@ -21,7 +21,6 @@ import {
   type TVoidReasonCode,
 } from '@/services/financial/financialOperationService';
 import type { TPaymentMethod } from '@/types/payment';
-import './VoidModal.css';
 
 interface VoidModalProps {
   orderId: string;
@@ -45,16 +44,13 @@ export default function VoidModal({
   const isOnline = useNetworkStore((state) => state.isOnline);
   const posConfig = usePOSConfigSettings();
 
-  // Form state
   const [reasonCode, setReasonCode] = useState<TVoidReasonCode | ''>('');
   const [notes, setNotes] = useState('');
   const [showPinModal, setShowPinModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Can submit?
   const canSubmit = reasonCode !== '';
 
-  // Handle void button click - show PIN modal
   const handleVoidClick = useCallback(() => {
     if (!canSubmit) {
       toast.error('Please select a reason');
@@ -63,7 +59,6 @@ export default function VoidModal({
     setShowPinModal(true);
   }, [canSubmit]);
 
-  // Handle PIN verification
   const handlePinVerified = useCallback(
     async (verified: boolean, verifiedUser?: { id: string; name: string }) => {
       if (!verified || !verifiedUser) {
@@ -75,7 +70,6 @@ export default function VoidModal({
       setIsProcessing(true);
 
       try {
-        // Construct reason text
         const reasonLabel = VOID_REASON_OPTIONS.find((o) => o.value === reasonCode)?.label || reasonCode;
         const fullReason = notes ? `${reasonLabel}: ${notes}` : reasonLabel;
 
@@ -106,7 +100,6 @@ export default function VoidModal({
     [orderId, orderNumber, reasonCode, notes, isOnline, onVoid, onClose]
   );
 
-  // Payment method display name
   const paymentMethodName: string = ({
     cash: 'Cash',
     card: 'Card',
@@ -122,11 +115,12 @@ export default function VoidModal({
         className="modal-backdrop is-active"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
-        <div className="modal modal-md is-active void-modal">
-          <div className="modal__header void-modal__header">
-            <div className="void-modal__header-content">
-              <AlertTriangle size={24} className="void-modal__icon" />
-              <h3 className="modal__title">Void Order</h3>
+        <div className="modal modal-md is-active max-w-[500px]">
+          {/* Red gradient header */}
+          <div className="modal__header bg-gradient-to-br from-red-600 to-red-700 !border-b-0">
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={24} className="text-red-50" />
+              <h3 className="modal__title !text-white">Void Order</h3>
             </div>
             <button
               type="button"
@@ -139,37 +133,37 @@ export default function VoidModal({
             </button>
           </div>
 
-          <div className="modal__body void-modal__body">
+          <div className="modal__body flex flex-col gap-6 p-6">
             {/* Order Summary */}
-            <div className="void-modal__summary">
-              <div className="void-modal__summary-header">
-                <span className="void-modal__order-number">Order {orderNumber}</span>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="mb-2 pb-2 border-b border-red-200">
+                <span className="text-lg font-bold text-red-900">Order {orderNumber}</span>
               </div>
-              <div className="void-modal__summary-details">
-                <div className="void-modal__detail">
-                  <span className="void-modal__detail-label">Total</span>
-                  <span className="void-modal__detail-value">{formatPrice(orderTotal)}</span>
+              <div className="flex flex-col gap-1">
+                <div className="flex justify-between items-center">
+                  <span className="text-red-950 text-sm">Total</span>
+                  <span className="font-semibold text-red-900">{formatPrice(orderTotal)}</span>
                 </div>
-                <div className="void-modal__detail">
-                  <span className="void-modal__detail-label">Payment</span>
-                  <span className="void-modal__detail-value">{paymentMethodName}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-red-950 text-sm">Payment</span>
+                  <span className="font-semibold text-red-900">{paymentMethodName}</span>
                 </div>
                 {orderTime && (
-                  <div className="void-modal__detail">
-                    <span className="void-modal__detail-label">Time</span>
-                    <span className="void-modal__detail-value">{orderTime}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-red-950 text-sm">Time</span>
+                    <span className="font-semibold text-red-900">{orderTime}</span>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Reason Selection */}
-            <div className="void-modal__field">
-              <label className="void-modal__label">
-                Reason for void <span className="required">*</span>
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-semibold text-foreground">
+                Reason for void <span className="text-red-600">*</span>
               </label>
               <select
-                className="void-modal__select"
+                className="form-select"
                 value={reasonCode}
                 onChange={(e) => setReasonCode(e.target.value as TVoidReasonCode)}
                 disabled={isProcessing}
@@ -184,10 +178,10 @@ export default function VoidModal({
             </div>
 
             {/* Additional Notes */}
-            <div className="void-modal__field">
-              <label className="void-modal__label">Additional notes</label>
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-semibold text-foreground">Additional notes</label>
               <textarea
-                className="void-modal__textarea"
+                className="form-textarea"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Optional notes..."
@@ -197,7 +191,7 @@ export default function VoidModal({
             </div>
 
             {/* Warning */}
-            <div className="void-modal__warning">
+            <div className="flex items-start gap-2 p-4 bg-amber-50 border border-yellow-300 rounded text-sm text-amber-800 [&>svg]:shrink-0 [&>svg]:mt-0.5">
               <AlertTriangle size={16} />
               <span>
                 This action cannot be undone.
@@ -206,7 +200,7 @@ export default function VoidModal({
             </div>
           </div>
 
-          <div className="modal__footer void-modal__footer">
+          <div className="modal__footer flex justify-end gap-4 px-6 py-4 border-t border-border">
             <button
               type="button"
               className="btn btn-secondary"
@@ -234,7 +228,6 @@ export default function VoidModal({
         </div>
       </div>
 
-      {/* PIN Verification Modal */}
       {showPinModal && (
         <PinVerificationModal
           title="Manager Verification"

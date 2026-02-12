@@ -130,7 +130,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
     return (
         <div className="space-y-6">
             {/* Base Unit Card */}
-            <div className="card">
+            <div className="card p-6 mb-6">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <div style={{
                         width: '48px',
@@ -171,10 +171,10 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
             </div>
 
             {/* UOM List Card */}
-            <div className="card">
+            <div className="card p-6 mb-6">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                     <div>
-                        <h3 className="card-title" style={{ marginBottom: '0.25rem' }}>Alternative Units</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1 flex justify-between items-center">Alternative Units</h3>
                         <p style={{ margin: 0, fontSize: '0.8125rem', color: '#8B7355' }}>
                             Define purchase or consumption units
                         </p>
@@ -279,8 +279,8 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
             </div>
 
             {/* Context Preferences Card */}
-            <div className="card">
-                <h3 className="card-title" style={{ marginBottom: '0.5rem' }}>Unités par Contexte</h3>
+            <div className="card p-6 mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 flex justify-between items-center">Unités par Contexte</h3>
                 <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.8125rem', color: '#8B7355' }}>
                     Choisissez l'unité à utiliser dans chaque contexte de l'application
                 </p>

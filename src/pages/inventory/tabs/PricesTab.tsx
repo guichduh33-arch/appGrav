@@ -16,16 +16,16 @@ export const PricesTab: React.FC<PricesTabProps> = ({ product, priceHistory }) =
     }
 
     return (
-        <div className="card">
+        <div className="card p-6 mb-6">
             <div className="flex justify-between items-center mb-6">
-                <h3 className="card-title">Price History</h3>
+                <h3 className="text-lg font-semibold text-gray-900 flex justify-between items-center">Price History</h3>
                 <div className="bg-green-50 px-4 py-2 rounded-lg border border-green-100">
                     <span className="text-green-700 text-sm">Estimated current price: </span>
                     <span className="font-bold text-lg text-green-900 ml-2">{formattedPrice(product.cost_price || 0)}</span>
                 </div>
             </div>
             <div className="overflow-hidden rounded-lg border border-gray-200">
-                <table className="detail-table">
+                <table className="w-full border-collapse text-[0.95rem] [&_th]:text-left [&_th]:px-4 [&_th]:py-3 [&_th]:bg-gray-50 [&_th]:text-gray-600 [&_th]:font-semibold [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-wide [&_th]:border-b-2 [&_th]:border-gray-100 [&_td]:px-4 [&_td]:py-3 [&_td]:border-b [&_td]:border-gray-100 [&_td]:text-gray-700 [&_tbody_tr:hover_td]:bg-gray-50">
                     <thead>
                         <tr>
                             <th>Order Date</th>

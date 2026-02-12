@@ -4,9 +4,9 @@ import {
     Plus, Search, FileText, Truck, CreditCard,
     Eye, Edit2, Clock, CheckCircle, Package, AlertCircle
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { useB2BOrders } from '@/hooks/useB2BOrders'
 import { formatCurrency } from '../../utils/helpers'
-import './B2BOrdersPage.css'
 
 const STATUS_CONFIG = {
     draft: { label: 'Draft', color: 'gray', icon: FileText },
@@ -22,6 +22,29 @@ const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string }> = 
     unpaid: { label: 'Unpaid', color: 'red' },
     partial: { label: 'Partial', color: 'orange' },
     paid: { label: 'Paid', color: 'green' },
+}
+
+const statusBadgeColorMap: Record<string, string> = {
+    gray: 'bg-[rgba(108,117,125,0.1)] text-[#6c757d]',
+    blue: 'bg-[rgba(123,163,181,0.15)] text-info',
+    yellow: 'bg-[rgba(234,192,134,0.2)] text-[#b38600]',
+    purple: 'bg-[rgba(138,118,171,0.15)] text-[#7c5cbf]',
+    orange: 'bg-[rgba(255,153,0,0.15)] text-[#cc7a00]',
+    green: 'bg-[rgba(107,142,107,0.15)] text-success',
+    red: 'bg-[rgba(220,53,69,0.1)] text-[var(--color-urgent)]',
+}
+
+const paymentBadgeColorMap: Record<string, string> = {
+    green: 'bg-[rgba(107,142,107,0.15)] text-success',
+    orange: 'bg-[rgba(255,153,0,0.15)] text-[#cc7a00]',
+    red: 'bg-[rgba(220,53,69,0.1)] text-[var(--color-urgent)]',
+}
+
+const statIconStyles: Record<string, string> = {
+    primary: 'bg-[rgba(186,144,162,0.15)] text-[var(--color-rose-poudre)]',
+    warning: 'bg-[rgba(234,192,134,0.15)] text-warning',
+    info: 'bg-[rgba(123,163,181,0.15)] text-info',
+    danger: 'bg-[rgba(220,53,69,0.15)] text-[var(--color-urgent)]',
 }
 
 export default function B2BOrdersPage() {
@@ -82,7 +105,10 @@ export default function B2BOrdersPage() {
         const config = STATUS_CONFIG[status]
         const Icon = config.icon
         return (
-            <span className={`b2b-status-badge b2b-status-badge--${config.color}`}>
+            <span className={cn(
+                'inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap',
+                statusBadgeColorMap[config.color] || ''
+            )}>
                 <Icon size={14} />
                 {config.label}
             </span>
@@ -92,26 +118,29 @@ export default function B2BOrdersPage() {
     const getPaymentBadge = (status: string) => {
         const config = PAYMENT_STATUS_CONFIG[status] || { label: status, color: 'gray' }
         return (
-            <span className={`b2b-payment-badge b2b-payment-badge--${config.color}`}>
+            <span className={cn(
+                'inline-flex px-2.5 py-1 rounded-xl text-[11px] font-semibold whitespace-nowrap',
+                paymentBadgeColorMap[config.color] || ''
+            )}>
                 {config.label}
             </span>
         )
     }
 
     return (
-        <div className="b2b-orders-page">
+        <div className="p-lg h-full overflow-y-auto bg-[var(--color-blanc-creme)]">
             {/* Header */}
-            <div className="b2b-orders-page__header">
-                <div className="b2b-orders-page__title-section">
-                    <h1 className="b2b-orders-page__title">
+            <div className="flex items-start justify-between mb-xl gap-lg max-md:flex-col max-md:items-stretch">
+                <div>
+                    <h1 className="flex items-center gap-sm font-display text-3xl font-bold text-[var(--color-brun-chocolat)]">
                         <FileText size={28} />
                         B2B Orders
                     </h1>
-                    <p className="b2b-orders-page__subtitle">
+                    <p className="text-[var(--color-gris-chaud)] text-sm mt-xs">
                         Manage your wholesale orders and track deliveries
                     </p>
                 </div>
-                <div className="b2b-orders-page__actions">
+                <div className="flex gap-sm max-md:justify-end">
                     <button className="btn btn-secondary" onClick={() => navigate('/b2b/payments')}>
                         <CreditCard size={18} />
                         Payments
@@ -124,61 +153,42 @@ export default function B2BOrdersPage() {
             </div>
 
             {/* Stats Cards */}
-            <div className="b2b-orders-stats">
-                <div className="b2b-stat-card">
-                    <div className="b2b-stat-card__icon b2b-stat-card__icon--primary">
-                        <FileText size={24} />
+            <div className="grid grid-cols-4 gap-md mb-xl max-md:grid-cols-1" style={{ '--tw-grid-cols-1200': 'repeat(2, 1fr)' } as React.CSSProperties}>
+                {[
+                    { icon: FileText, style: 'primary', value: stats.total, label: 'Total Orders' },
+                    { icon: Clock, style: 'warning', value: stats.pending, label: 'In Progress' },
+                    { icon: Truck, style: 'info', value: stats.toDeliver, label: 'To Deliver' },
+                    { icon: CreditCard, style: 'danger', value: formatCurrency(stats.totalDue), label: 'To Collect' },
+                ].map((stat, i) => (
+                    <div key={i} className="bg-white rounded-lg shadow p-lg flex items-center gap-md transition-all duration-fast ease-standard hover:shadow-md hover:-translate-y-0.5">
+                        <div className={cn('w-12 h-12 rounded-md flex items-center justify-center shrink-0', statIconStyles[stat.style])}>
+                            <stat.icon size={24} />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-2xl font-bold text-[var(--color-brun-chocolat)] leading-tight">{stat.value}</span>
+                            <span className="text-sm text-[var(--color-gris-chaud)]">{stat.label}</span>
+                        </div>
                     </div>
-                    <div className="b2b-stat-card__content">
-                        <span className="b2b-stat-card__value">{stats.total}</span>
-                        <span className="b2b-stat-card__label">Total Orders</span>
-                    </div>
-                </div>
-                <div className="b2b-stat-card">
-                    <div className="b2b-stat-card__icon b2b-stat-card__icon--warning">
-                        <Clock size={24} />
-                    </div>
-                    <div className="b2b-stat-card__content">
-                        <span className="b2b-stat-card__value">{stats.pending}</span>
-                        <span className="b2b-stat-card__label">In Progress</span>
-                    </div>
-                </div>
-                <div className="b2b-stat-card">
-                    <div className="b2b-stat-card__icon b2b-stat-card__icon--info">
-                        <Truck size={24} />
-                    </div>
-                    <div className="b2b-stat-card__content">
-                        <span className="b2b-stat-card__value">{stats.toDeliver}</span>
-                        <span className="b2b-stat-card__label">To Deliver</span>
-                    </div>
-                </div>
-                <div className="b2b-stat-card">
-                    <div className="b2b-stat-card__icon b2b-stat-card__icon--danger">
-                        <CreditCard size={24} />
-                    </div>
-                    <div className="b2b-stat-card__content">
-                        <span className="b2b-stat-card__value">{formatCurrency(stats.totalDue)}</span>
-                        <span className="b2b-stat-card__label">To Collect</span>
-                    </div>
-                </div>
+                ))}
             </div>
 
             {/* Filters */}
-            <div className="b2b-orders-filters">
-                <div className="b2b-orders-search">
-                    <Search size={20} />
+            <div className="flex items-center gap-md mb-lg flex-wrap max-md:flex-col max-md:items-stretch">
+                <div className="flex-1 min-w-[280px] max-w-[400px] flex items-center gap-sm bg-white border border-border rounded-md px-md py-sm transition-all duration-fast ease-standard focus-within:border-[var(--color-rose-poudre)] focus-within:shadow-[0_0_0_3px_rgba(186,144,162,0.1)] max-md:max-w-none">
+                    <Search size={20} className="text-[var(--color-gris-chaud)] shrink-0" />
                     <input
                         type="text"
                         placeholder="Search by order # or customer..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        className="flex-1 border-none bg-transparent text-sm text-[var(--color-brun-chocolat)] outline-none placeholder:text-[var(--color-gris-chaud)]"
                     />
                 </div>
-                <div className="b2b-orders-filter-group">
+                <div className="flex gap-sm max-md:flex-wrap">
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="b2b-orders-filter"
+                        className="px-md py-sm bg-white border border-border rounded-md text-sm text-[var(--color-brun-chocolat)] cursor-pointer transition-all duration-fast ease-standard hover:border-[var(--color-rose-poudre)] focus:outline-none focus:border-[var(--color-rose-poudre)] focus:shadow-[0_0_0_3px_rgba(186,144,162,0.1)]"
                     >
                         <option value="all">All statuses</option>
                         <option value="draft">Draft</option>
@@ -192,7 +202,7 @@ export default function B2BOrdersPage() {
                     <select
                         value={paymentFilter}
                         onChange={(e) => setPaymentFilter(e.target.value)}
-                        className="b2b-orders-filter"
+                        className="px-md py-sm bg-white border border-border rounded-md text-sm text-[var(--color-brun-chocolat)] cursor-pointer transition-all duration-fast ease-standard hover:border-[var(--color-rose-poudre)] focus:outline-none focus:border-[var(--color-rose-poudre)] focus:shadow-[0_0_0_3px_rgba(186,144,162,0.1)]"
                     >
                         <option value="all">All payments</option>
                         <option value="unpaid">Unpaid</option>
@@ -204,20 +214,12 @@ export default function B2BOrdersPage() {
 
             {/* Customer filter banner */}
             {customerFilter && customerName && (
-                <div className="b2b-orders-customer-filter-banner" style={{
-                    display: 'flex', alignItems: 'center', gap: '8px',
-                    padding: '8px 16px', background: 'var(--color-primary-50, #eff6ff)',
-                    borderRadius: '8px', marginBottom: '16px', fontSize: '14px'
-                }}>
+                <div className="flex items-center gap-2 px-4 py-2 bg-[var(--color-primary-50,#eff6ff)] rounded-lg mb-4 text-sm">
                     <span>Showing orders for <strong>{customerName}</strong></span>
                     <button
                         type="button"
                         onClick={() => setSearchParams({})}
-                        style={{
-                            marginLeft: 'auto', background: 'none', border: 'none',
-                            cursor: 'pointer', fontSize: '14px', color: 'var(--color-primary-600, #2563eb)',
-                            textDecoration: 'underline'
-                        }}
+                        className="ml-auto bg-transparent border-none cursor-pointer text-sm text-[var(--color-primary-600,#2563eb)] underline"
                     >
                         Show all orders
                     </button>
@@ -226,67 +228,66 @@ export default function B2BOrdersPage() {
 
             {/* Orders Table */}
             {loading ? (
-                <div className="b2b-orders-loading">
-                    <div className="spinner"></div>
+                <div className="flex flex-col items-center justify-center p-2xl gap-md text-[var(--color-gris-chaud)]">
+                    <div className="w-10 h-10 border-3 border-border border-t-[var(--color-rose-poudre)] rounded-full animate-spin"></div>
                     <span>Loading orders...</span>
                 </div>
             ) : filteredOrders.length === 0 ? (
-                <div className="b2b-orders-empty">
-                    <FileText size={48} />
-                    <h3>No B2B orders</h3>
-                    <p>Create your first wholesale order</p>
+                <div className="flex flex-col items-center justify-center p-2xl text-center bg-white rounded-lg shadow">
+                    <FileText size={48} className="text-[var(--color-gris-chaud)] opacity-40 mb-md" />
+                    <h3 className="text-lg font-semibold text-[var(--color-brun-chocolat)] mb-xs">No B2B orders</h3>
+                    <p className="text-[var(--color-gris-chaud)] text-sm mb-lg">Create your first wholesale order</p>
                     <button className="btn btn-primary" onClick={() => navigate('/b2b/orders/new')}>
                         <Plus size={18} />
                         New Order
                     </button>
                 </div>
             ) : (
-                <div className="b2b-orders-table-container">
-                    <table className="b2b-orders-table">
+                <div className="bg-white rounded-lg shadow overflow-hidden max-md:overflow-x-auto">
+                    <table className="w-full border-collapse max-md:min-w-[900px]">
                         <thead>
                             <tr>
-                                <th>Order #</th>
-                                <th>Customer</th>
-                                <th>Date</th>
-                                <th>Delivery</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Payment</th>
-                                <th>Actions</th>
+                                {['Order #', 'Customer', 'Date', 'Delivery', 'Amount', 'Status', 'Payment', 'Actions'].map(th => (
+                                    <th key={th} className="px-lg py-md text-left text-xs font-semibold text-[var(--color-gris-chaud)] uppercase tracking-wide bg-[var(--color-blanc-creme)] border-b border-border whitespace-nowrap">{th}</th>
+                                ))}
                             </tr>
                         </thead>
                         <tbody>
                             {filteredOrders.map(order => (
-                                <tr key={order.id} onClick={() => navigate(`/b2b/orders/${order.id}`)}>
-                                    <td>
-                                        <span className="b2b-order-number">{order.order_number}</span>
+                                <tr
+                                    key={order.id}
+                                    onClick={() => navigate(`/b2b/orders/${order.id}`)}
+                                    className="cursor-pointer transition-colors duration-fast ease-standard hover:bg-[rgba(186,144,162,0.05)] [&:last-child>td]:border-b-0"
+                                >
+                                    <td className="px-lg py-md text-sm text-[var(--color-brun-chocolat)] border-b border-border align-middle">
+                                        <span className="font-mono font-semibold text-[var(--color-rose-poudre)]">{order.order_number}</span>
                                     </td>
-                                    <td>
-                                        <div className="b2b-customer-cell">
-                                            <span className="b2b-customer-name">
+                                    <td className="px-lg py-md text-sm text-[var(--color-brun-chocolat)] border-b border-border align-middle">
+                                        <div className="flex flex-col gap-0.5">
+                                            <span className="font-medium">
                                                 {order.customer?.company_name || order.customer?.name}
                                             </span>
                                             {order.customer?.company_name && (
-                                                <span className="b2b-customer-contact">{order.customer.name}</span>
+                                                <span className="text-xs text-[var(--color-gris-chaud)]">{order.customer.name}</span>
                                             )}
                                         </div>
                                     </td>
-                                    <td>{formatDate(order.order_date)}</td>
-                                    <td>{formatDate(order.requested_delivery_date)}</td>
-                                    <td>
-                                        <div className="b2b-amount-cell">
-                                            <span className="b2b-amount-total">{formatCurrency(order.total_amount)}</span>
+                                    <td className="px-lg py-md text-sm text-[var(--color-brun-chocolat)] border-b border-border align-middle">{formatDate(order.order_date)}</td>
+                                    <td className="px-lg py-md text-sm text-[var(--color-brun-chocolat)] border-b border-border align-middle">{formatDate(order.requested_delivery_date)}</td>
+                                    <td className="px-lg py-md text-sm text-[var(--color-brun-chocolat)] border-b border-border align-middle">
+                                        <div className="flex flex-col gap-0.5">
+                                            <span className="font-semibold">{formatCurrency(order.total_amount)}</span>
                                             {order.amount_due > 0 && (
-                                                <span className="b2b-amount-due">Due: {formatCurrency(order.amount_due)}</span>
+                                                <span className="text-xs text-[var(--color-urgent)]">Due: {formatCurrency(order.amount_due)}</span>
                                             )}
                                         </div>
                                     </td>
-                                    <td>{getStatusBadge(order.status)}</td>
-                                    <td>{getPaymentBadge(order.payment_status)}</td>
-                                    <td>
-                                        <div className="b2b-actions-cell" onClick={e => e.stopPropagation()}>
+                                    <td className="px-lg py-md text-sm text-[var(--color-brun-chocolat)] border-b border-border align-middle">{getStatusBadge(order.status)}</td>
+                                    <td className="px-lg py-md text-sm text-[var(--color-brun-chocolat)] border-b border-border align-middle">{getPaymentBadge(order.payment_status)}</td>
+                                    <td className="px-lg py-md text-sm text-[var(--color-brun-chocolat)] border-b border-border align-middle">
+                                        <div className="flex gap-xs" onClick={e => e.stopPropagation()}>
                                             <button
-                                                className="btn-icon"
+                                                className="w-8 h-8 flex items-center justify-center bg-transparent border border-border rounded-md text-[var(--color-gris-chaud)] cursor-pointer transition-all duration-fast ease-standard hover:bg-[var(--color-blanc-creme)] hover:border-[var(--color-rose-poudre)] hover:text-[var(--color-rose-poudre)]"
                                                 onClick={() => navigate(`/b2b/orders/${order.id}`)}
                                                 title="View details"
                                             >
@@ -294,7 +295,7 @@ export default function B2BOrdersPage() {
                                             </button>
                                             {order.status === 'draft' && (
                                                 <button
-                                                    className="btn-icon"
+                                                    className="w-8 h-8 flex items-center justify-center bg-transparent border border-border rounded-md text-[var(--color-gris-chaud)] cursor-pointer transition-all duration-fast ease-standard hover:bg-[var(--color-blanc-creme)] hover:border-[var(--color-rose-poudre)] hover:text-[var(--color-rose-poudre)]"
                                                     onClick={() => navigate(`/b2b/orders/${order.id}/edit`)}
                                                     title="Edit"
                                                 >

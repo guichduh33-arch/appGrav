@@ -76,9 +76,9 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
 
     return (
         <div className="grid grid-cols-2 gap-6">
-            <div className="card">
-                <h3 className="card-title">Product Identity</h3>
-                <div className="form-section">
+            <div className="card p-6 mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-5 flex justify-between items-center">Product Identity</h3>
+                <div className="grid gap-6">
                     <div className="form-group">
                         <label htmlFor="prod-name">Product Name</label>
                         <input
@@ -128,31 +128,31 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                 </div>
             </div>
 
-            <div className="card">
-                <h3 className="card-title">Finance & POS</h3>
-                <div className="form-section">
+            <div className="card p-6 mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-5 flex justify-between items-center">Finance & POS</h3>
+                <div className="grid gap-6">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="form-group">
                             <label htmlFor="prod-price">Retail Price</label>
-                            <div className="form-input-prefix">
-                                <span>Rp</span>
+                            <div className="relative flex items-center">
+                                <span className="absolute left-3 text-gray-500 pointer-events-none">Rp</span>
                                 <input
                                     id="prod-price"
                                     type="number"
-                                    className="form-input"
+                                    className="form-input pl-9"
                                     value={product.retail_price || 0}
                                     onChange={e => onChange({ ...product, retail_price: parseFloat(e.target.value) })}
                                 />
                             </div>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="prod-cost">Fixed Cost <span className="label-unit-suffix">/ {costUnitLabel}</span></label>
-                            <div className="form-input-prefix">
-                                <span>Rp</span>
+                            <label htmlFor="prod-cost">Fixed Cost <span className="font-normal text-gray-500 text-sm">/ {costUnitLabel}</span></label>
+                            <div className="relative flex items-center">
+                                <span className="absolute left-3 text-gray-500 pointer-events-none">Rp</span>
                                 <input
                                     id="prod-cost"
                                     type="number"
-                                    className="form-input"
+                                    className="form-input pl-9"
                                     value={product.cost_price || 0}
                                     onChange={e => onChange({ ...product, cost_price: parseFloat(e.target.value) })}
                                 />
@@ -195,10 +195,10 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
             </div>
 
             {/* Sections Card - Full Width */}
-            <div className="card col-span-2">
+            <div className="card p-6 mb-6 col-span-2">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                     <div>
-                        <h3 className="card-title" style={{ marginBottom: '0.25rem' }}>Usage Sections</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1 flex justify-between items-center">Usage Sections</h3>
                         <p style={{ fontSize: '0.8125rem', color: '#8B7355', margin: 0 }}>
                             Select where this product can be used. Click the star to set the primary section.
                         </p>

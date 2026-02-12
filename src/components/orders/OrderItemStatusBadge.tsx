@@ -7,7 +7,7 @@
  */
 
 import { ChefHat, CheckCircle, Clock, UtensilsCrossed } from 'lucide-react';
-import './OrderItemStatusBadge.css';
+import { cn } from '@/lib/utils';
 
 export type TItemStatus = 'new' | 'preparing' | 'ready' | 'served';
 
@@ -18,28 +18,35 @@ interface OrderItemStatusBadgeProps {
   animate?: boolean;
 }
 
-const STATUS_CONFIG: Record<TItemStatus, { label: string; icon: React.ReactNode; className: string }> = {
+const STATUS_CONFIG: Record<TItemStatus, { label: string; icon: React.ReactNode; colors: string; animateClass?: string }> = {
   new: {
     label: 'New',
     icon: <Clock size={12} />,
-    className: 'order-item-badge--new',
+    colors: 'bg-blue-500/15 text-blue-500 border-blue-500/30',
   },
   preparing: {
     label: 'Preparing',
     icon: <ChefHat size={12} />,
-    className: 'order-item-badge--preparing',
+    colors: 'bg-amber-500/15 text-amber-500 border-amber-500/30',
+    animateClass: 'animate-pulse-preparing',
   },
   ready: {
     label: 'Ready',
     icon: <CheckCircle size={12} />,
-    className: 'order-item-badge--ready',
+    colors: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30',
+    animateClass: 'animate-pulse-ready',
   },
   served: {
     label: 'Served',
     icon: <UtensilsCrossed size={12} />,
-    className: 'order-item-badge--served',
+    colors: 'bg-gray-500/15 text-gray-500 border-gray-500/30',
   },
 };
+
+const SIZE_CLASSES = {
+  sm: 'px-1.5 py-0.5 text-[0.65rem]',
+  md: 'px-2.5 py-1 text-xs',
+} as const;
 
 export function OrderItemStatusBadge({
   status,
@@ -47,25 +54,23 @@ export function OrderItemStatusBadge({
   size = 'sm',
   animate = false,
 }: OrderItemStatusBadgeProps) {
-  // Warn if invalid status received - helps catch bugs early
   if (!(status in STATUS_CONFIG)) {
     console.warn(`[OrderItemStatusBadge] Invalid status "${status}", falling back to "new"`);
   }
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.new;
 
-  const classNames = [
-    'order-item-badge',
-    config.className,
-    `order-item-badge--${size}`,
-    animate && 'order-item-badge--animate',
-  ]
-    .filter(Boolean)
-    .join(' ');
-
   return (
-    <span className={classNames}>
+    <span
+      className={cn(
+        'inline-flex items-center gap-1 px-2 py-0.5 rounded-xl text-[0.7rem] font-semibold whitespace-nowrap transition-all duration-300 border',
+        config.colors,
+        SIZE_CLASSES[size],
+        animate && config.animateClass,
+        'motion-reduce:!animate-none'
+      )}
+    >
       {config.icon}
-      {showLabel && <span className="order-item-badge__label">{config.label}</span>}
+      {showLabel && <span className="leading-none">{config.label}</span>}
     </span>
   );
 }

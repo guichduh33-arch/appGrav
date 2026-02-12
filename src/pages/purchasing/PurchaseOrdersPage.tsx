@@ -11,7 +11,6 @@ import {
     type TPaymentStatus
 } from '@/hooks/purchasing/usePurchaseOrders'
 import { toast } from 'sonner'
-import './PurchaseOrdersPage.css'
 
 export default function PurchaseOrdersPage() {
     const navigate = useNavigate()
@@ -112,23 +111,23 @@ export default function PurchaseOrdersPage() {
 
     const getStatusBadgeClass = (status: TPOStatus) => {
         switch (status) {
-            case 'draft': return 'status-badge--gray'
-            case 'sent': return 'status-badge--blue'
-            case 'confirmed': return 'status-badge--yellow'
-            case 'partially_received': return 'status-badge--orange'
-            case 'received': return 'status-badge--success'
-            case 'cancelled': return 'status-badge--danger'
-            case 'modified': return 'status-badge--purple'
-            default: return 'status-badge--gray'
+            case 'draft': return 'bg-gray-500/15 text-[var(--color-gray-400)]'
+            case 'sent': return 'bg-blue-500/15 text-primary'
+            case 'confirmed': return 'bg-amber-500/15 text-amber-500'
+            case 'partially_received': return 'bg-orange-400/15 text-orange-400'
+            case 'received': return 'bg-emerald-500/15 text-success'
+            case 'cancelled': return 'bg-red-500/15 text-danger'
+            case 'modified': return 'bg-violet-500/15 text-violet-500'
+            default: return 'bg-gray-500/15 text-[var(--color-gray-400)]'
         }
     }
 
     const getPaymentBadgeClass = (status: TPaymentStatus) => {
         switch (status) {
-            case 'paid': return 'status-badge--success'
-            case 'partially_paid': return 'status-badge--orange'
-            case 'unpaid': return 'status-badge--danger'
-            default: return 'status-badge--gray'
+            case 'paid': return 'bg-emerald-500/15 text-success'
+            case 'partially_paid': return 'bg-orange-400/15 text-orange-400'
+            case 'unpaid': return 'bg-red-500/15 text-danger'
+            default: return 'bg-gray-500/15 text-[var(--color-gray-400)]'
         }
     }
 
@@ -155,23 +154,23 @@ export default function PurchaseOrdersPage() {
     }
 
     return (
-        <div className="purchase-orders-page">
+        <div className="p-xl max-w-[1600px] mx-auto">
             {/* Offline Warning Banner */}
             {!isOnline && (
-                <div className="purchase-orders-page__offline-banner">
+                <div className="flex items-center gap-sm px-lg py-md mb-lg bg-warning/10 border border-warning rounded-md text-warning font-medium">
                     <WifiOff size={20} />
                     <span>This feature requires an internet connection</span>
                 </div>
             )}
 
             {/* Header */}
-            <div className="purchase-orders-page__header">
+            <div className="flex justify-between items-start mb-xl">
                 <div>
-                    <h1 className="purchase-orders-page__title">
+                    <h1 className="flex items-center gap-md text-3xl font-bold text-white m-0 mb-sm">
                         <FileText size={32} />
                         Purchase Orders
                     </h1>
-                    <p className="purchase-orders-page__subtitle">
+                    <p className="text-base text-muted-foreground m-0">
                         Manage your supplier orders
                     </p>
                 </div>
@@ -186,58 +185,59 @@ export default function PurchaseOrdersPage() {
             </div>
 
             {/* Stats */}
-            <div className="purchase-orders-stats">
-                <div className="purchase-orders-stat">
-                    <div className="purchase-orders-stat__icon purchase-orders-stat__icon--primary">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-lg mb-xl">
+                <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
+                    <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-blue-500/15 text-primary">
                         <FileText size={24} />
                     </div>
-                    <div className="purchase-orders-stat__content">
-                        <div className="purchase-orders-stat__value">{stats.total}</div>
-                        <div className="purchase-orders-stat__label">Total Orders</div>
+                    <div className="flex-1">
+                        <div className="text-2xl font-bold text-white leading-none mb-1">{stats.total}</div>
+                        <div className="text-sm text-muted-foreground">Total Orders</div>
                     </div>
                 </div>
-                <div className="purchase-orders-stat">
-                    <div className="purchase-orders-stat__icon purchase-orders-stat__icon--warning">
+                <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
+                    <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-amber-500/15 text-amber-500">
                         <Clock size={24} />
                     </div>
-                    <div className="purchase-orders-stat__content">
-                        <div className="purchase-orders-stat__value">{stats.pending}</div>
-                        <div className="purchase-orders-stat__label">Pending</div>
+                    <div className="flex-1">
+                        <div className="text-2xl font-bold text-white leading-none mb-1">{stats.pending}</div>
+                        <div className="text-sm text-muted-foreground">Pending</div>
                     </div>
                 </div>
-                <div className="purchase-orders-stat">
-                    <div className="purchase-orders-stat__icon purchase-orders-stat__icon--success">
+                <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
+                    <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-emerald-500/15 text-success">
                         <Check size={24} />
                     </div>
-                    <div className="purchase-orders-stat__content">
-                        <div className="purchase-orders-stat__value">{stats.completed}</div>
-                        <div className="purchase-orders-stat__label">Completed</div>
+                    <div className="flex-1">
+                        <div className="text-2xl font-bold text-white leading-none mb-1">{stats.completed}</div>
+                        <div className="text-sm text-muted-foreground">Completed</div>
                     </div>
                 </div>
-                <div className="purchase-orders-stat">
-                    <div className="purchase-orders-stat__icon purchase-orders-stat__icon--info">
+                <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
+                    <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-violet-500/15 text-violet-500">
                         <DollarSign size={24} />
                     </div>
-                    <div className="purchase-orders-stat__content">
-                        <div className="purchase-orders-stat__value">{formatCurrency(stats.totalValue)}</div>
-                        <div className="purchase-orders-stat__label">Total Value</div>
+                    <div className="flex-1">
+                        <div className="text-2xl font-bold text-white leading-none mb-1">{formatCurrency(stats.totalValue)}</div>
+                        <div className="text-sm text-muted-foreground">Total Value</div>
                     </div>
                 </div>
             </div>
 
             {/* Filters */}
-            <div className="purchase-orders-filters">
-                <div className="purchase-orders-search">
-                    <Search size={20} />
+            <div className="flex gap-md mb-lg">
+                <div className="relative flex-1">
+                    <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <input
                         type="text"
                         placeholder="Search purchase orders..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full py-3 px-4 pl-12 bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg text-white text-base focus:outline-none focus:border-primary"
                     />
                 </div>
                 <select
-                    className="purchase-orders-filter"
+                    className="py-3 px-4 bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg text-white text-base min-w-[200px] focus:outline-none focus:border-primary"
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                     aria-label="Filter by status"
@@ -251,7 +251,7 @@ export default function PurchaseOrdersPage() {
                     <option value="cancelled">Cancelled</option>
                 </select>
                 <select
-                    className="purchase-orders-filter"
+                    className="py-3 px-4 bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg text-white text-base min-w-[200px] focus:outline-none focus:border-primary"
                     value={paymentFilter}
                     onChange={(e) => setPaymentFilter(e.target.value)}
                     aria-label="Filter by payment"
@@ -265,12 +265,12 @@ export default function PurchaseOrdersPage() {
 
             {/* Orders List */}
             {isLoading ? (
-                <div className="purchase-orders-loading">Loading...</div>
+                <div className="flex items-center justify-center p-3xl text-lg text-muted-foreground">Loading...</div>
             ) : filteredOrders.length === 0 ? (
-                <div className="purchase-orders-empty">
-                    <FileText size={48} />
-                    <h3>No purchase orders</h3>
-                    <p>Create your first purchase order to get started</p>
+                <div className="flex flex-col items-center justify-center p-3xl bg-[var(--color-gray-800)] border-2 border-dashed border-[var(--color-gray-700)] rounded-xl text-center">
+                    <FileText size={48} className="text-[var(--color-gray-600)] mb-md" />
+                    <h3 className="text-xl font-bold text-white m-0 mb-sm">No purchase orders</h3>
+                    <p className="text-base text-muted-foreground m-0 mb-lg">Create your first purchase order to get started</p>
                     <button
                         className="btn btn-primary"
                         onClick={() => navigate('/purchasing/purchase-orders/new')}
@@ -281,58 +281,58 @@ export default function PurchaseOrdersPage() {
                     </button>
                 </div>
             ) : (
-                <div className="purchase-orders-table">
-                    <table>
-                        <thead>
+                <div className="bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg overflow-hidden">
+                    <table className="w-full border-collapse">
+                        <thead className="bg-[var(--color-gray-750)] border-b border-[var(--color-gray-700)]">
                             <tr>
-                                <th>PO Number</th>
-                                <th>Supplier</th>
-                                <th>Date</th>
-                                <th>Expected Delivery</th>
-                                <th>Status</th>
-                                <th>Payment</th>
-                                <th>Total</th>
-                                <th>Actions</th>
+                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">PO Number</th>
+                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">Supplier</th>
+                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">Date</th>
+                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">Expected Delivery</th>
+                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">Status</th>
+                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">Payment</th>
+                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">Total</th>
+                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredOrders.map(po => (
-                                <tr key={po.id}>
-                                    <td>
+                                <tr key={po.id} className="hover:bg-[var(--color-gray-750)] [&:last-child>td]:border-b-0">
+                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">
                                         <strong>{po.po_number}</strong>
                                     </td>
-                                    <td>{po.supplier?.name || '-'}</td>
-                                    <td>{new Date(po.order_date).toLocaleDateString('fr-FR')}</td>
-                                    <td>
+                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">{po.supplier?.name || '-'}</td>
+                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">{new Date(po.order_date).toLocaleDateString('fr-FR')}</td>
+                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">
                                         {po.expected_delivery_date
                                             ? new Date(po.expected_delivery_date).toLocaleDateString('fr-FR')
                                             : '-'
                                         }
                                     </td>
-                                    <td>
-                                        <span className={`status-badge ${getStatusBadgeClass(po.status)}`}>
+                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">
+                                        <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-wider ${getStatusBadgeClass(po.status)}`}>
                                             {getStatusLabel(po.status)}
                                         </span>
                                     </td>
-                                    <td>
-                                        <span className={`status-badge ${getPaymentBadgeClass(po.payment_status)}`}>
+                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">
+                                        <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-wider ${getPaymentBadgeClass(po.payment_status)}`}>
                                             {getPaymentLabel(po.payment_status)}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">
                                         <strong>{formatCurrency(parseFloat(po.total_amount?.toString() ?? '0') || 0)}</strong>
                                     </td>
-                                    <td>
-                                        <div className="purchase-orders-table__actions">
+                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">
+                                        <div className="flex gap-1">
                                             <button
-                                                className="btn-icon"
+                                                className="flex items-center justify-center w-8 h-8 bg-transparent border-none rounded-md text-muted-foreground cursor-pointer transition-all duration-200 hover:bg-[var(--color-gray-700)] hover:text-primary-light"
                                                 onClick={() => navigate(`/purchasing/purchase-orders/${po.id}`)}
                                                 title="View"
                                             >
                                                 <Eye size={18} />
                                             </button>
                                             <button
-                                                className="btn-icon"
+                                                className="flex items-center justify-center w-8 h-8 bg-transparent border-none rounded-md text-muted-foreground cursor-pointer transition-all duration-200 hover:bg-[var(--color-gray-700)] hover:text-primary-light"
                                                 onClick={() => navigate(`/purchasing/purchase-orders/${po.id}/edit`)}
                                                 title="Edit"
                                                 disabled={!isOnline}
@@ -341,7 +341,7 @@ export default function PurchaseOrdersPage() {
                                             </button>
                                             {po.status === 'sent' && (
                                                 <button
-                                                    className="btn-icon"
+                                                    className="flex items-center justify-center w-8 h-8 bg-transparent border-none rounded-md text-muted-foreground cursor-pointer transition-all duration-200 hover:bg-[var(--color-gray-700)] hover:text-primary-light"
                                                     onClick={() => handleUpdateStatus(po.id, 'confirmed')}
                                                     title="Confirm"
                                                     disabled={!isOnline}
@@ -351,7 +351,7 @@ export default function PurchaseOrdersPage() {
                                             )}
                                             {po.status === 'confirmed' && (
                                                 <button
-                                                    className="btn-icon"
+                                                    className="flex items-center justify-center w-8 h-8 bg-transparent border-none rounded-md text-muted-foreground cursor-pointer transition-all duration-200 hover:bg-[var(--color-gray-700)] hover:text-primary-light"
                                                     onClick={() => handleUpdateStatus(po.id, 'received')}
                                                     title="Mark Received"
                                                     disabled={!isOnline}
@@ -361,7 +361,7 @@ export default function PurchaseOrdersPage() {
                                             )}
                                             {po.status === 'draft' && (
                                                 <button
-                                                    className="btn-icon btn-icon--danger"
+                                                    className="flex items-center justify-center w-8 h-8 bg-transparent border-none rounded-md text-muted-foreground cursor-pointer transition-all duration-200 hover:bg-red-500/15 hover:text-danger"
                                                     onClick={() => handleDelete(po.id)}
                                                     title="Delete"
                                                     disabled={!isOnline}

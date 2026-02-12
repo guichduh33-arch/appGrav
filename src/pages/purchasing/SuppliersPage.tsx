@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Plus, Search, Edit2, Trash2, Building2, Phone, Mail, MapPin, CheckCircle, XCircle } from 'lucide-react'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 import { useSuppliers, type ISupplier } from '@/hooks/purchasing/useSuppliers'
 import {
     useCreateSupplier,
@@ -9,7 +10,6 @@ import {
     useToggleSupplierActive,
 } from '@/hooks/purchasing/useSuppliersCrud'
 import type { ISupplierFormData } from '@/hooks/purchasing/useSuppliersCrud'
-import './SuppliersPage.css'
 
 // Extended supplier type for the page (the DB returns all columns via select('*'))
 interface Supplier extends ISupplier {
@@ -140,15 +140,15 @@ export default function SuppliersPage() {
     const inactiveSuppliers = filteredSuppliers.filter(s => !s.is_active)
 
     return (
-        <div className="suppliers-page">
+        <div className="p-xl max-w-[1400px] mx-auto">
             {/* Header */}
-            <div className="suppliers-page__header">
+            <div className="flex justify-between items-start mb-xl">
                 <div>
-                    <h1 className="suppliers-page__title">
+                    <h1 className="flex items-center gap-md text-3xl font-bold text-white m-0 mb-sm">
                         <Building2 size={32} />
                         Suppliers
                     </h1>
-                    <p className="suppliers-page__subtitle">
+                    <p className="text-base text-muted-foreground m-0">
                         Manage your suppliers and their contact information
                     </p>
                 </div>
@@ -159,73 +159,80 @@ export default function SuppliersPage() {
             </div>
 
             {/* Stats */}
-            <div className="suppliers-stats">
-                <div className="suppliers-stat">
-                    <div className="suppliers-stat__icon suppliers-stat__icon--primary">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-lg mb-xl">
+                <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
+                    <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-blue-500/15 text-primary">
                         <Building2 size={24} />
                     </div>
-                    <div className="suppliers-stat__content">
-                        <div className="suppliers-stat__value">{suppliers.length}</div>
-                        <div className="suppliers-stat__label">Total Suppliers</div>
+                    <div className="flex-1">
+                        <div className="text-3xl font-bold text-white leading-none mb-1">{suppliers.length}</div>
+                        <div className="text-sm text-muted-foreground">Total Suppliers</div>
                     </div>
                 </div>
-                <div className="suppliers-stat">
-                    <div className="suppliers-stat__icon suppliers-stat__icon--success">
+                <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
+                    <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-emerald-500/15 text-success">
                         <CheckCircle size={24} />
                     </div>
-                    <div className="suppliers-stat__content">
-                        <div className="suppliers-stat__value">{activeSuppliers.length}</div>
-                        <div className="suppliers-stat__label">Active</div>
+                    <div className="flex-1">
+                        <div className="text-3xl font-bold text-white leading-none mb-1">{activeSuppliers.length}</div>
+                        <div className="text-sm text-muted-foreground">Active</div>
                     </div>
                 </div>
-                <div className="suppliers-stat">
-                    <div className="suppliers-stat__icon suppliers-stat__icon--gray">
+                <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
+                    <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-gray-500/15 text-muted-foreground">
                         <XCircle size={24} />
                     </div>
-                    <div className="suppliers-stat__content">
-                        <div className="suppliers-stat__value">{inactiveSuppliers.length}</div>
-                        <div className="suppliers-stat__label">Inactive</div>
+                    <div className="flex-1">
+                        <div className="text-3xl font-bold text-white leading-none mb-1">{inactiveSuppliers.length}</div>
+                        <div className="text-sm text-muted-foreground">Inactive</div>
                     </div>
                 </div>
             </div>
 
             {/* Search */}
-            <div className="suppliers-search">
-                <Search size={20} />
+            <div className="relative mb-lg">
+                <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <input
                     type="text"
                     placeholder="Search for a supplier..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     aria-label="Search"
+                    className="w-full py-3 px-4 pl-12 bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg text-white text-base focus:outline-none focus:border-primary"
                 />
             </div>
 
             {/* Suppliers List */}
             {loading ? (
-                <div className="suppliers-loading">Loading...</div>
+                <div className="flex items-center justify-center p-3xl text-lg text-muted-foreground">Loading...</div>
             ) : filteredSuppliers.length === 0 ? (
-                <div className="suppliers-empty">
-                    <Building2 size={48} />
-                    <h3>No suppliers</h3>
-                    <p>Start by adding your first supplier</p>
+                <div className="flex flex-col items-center justify-center p-3xl bg-[var(--color-gray-800)] border-2 border-dashed border-[var(--color-gray-700)] rounded-xl text-center">
+                    <Building2 size={48} className="text-[var(--color-gray-600)] mb-md" />
+                    <h3 className="text-xl font-bold text-white m-0 mb-sm">No suppliers</h3>
+                    <p className="text-base text-muted-foreground m-0 mb-lg">Start by adding your first supplier</p>
                     <button className="btn btn-primary" onClick={() => handleOpenModal()}>
                         <Plus size={20} />
                         New Supplier
                     </button>
                 </div>
             ) : (
-                <div className="suppliers-grid">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(350px,1fr))] gap-lg">
                     {filteredSuppliers.map(supplier => (
-                        <div key={supplier.id} className={`supplier-card ${!supplier.is_active ? 'supplier-card--inactive' : ''}`}>
-                            <div className="supplier-card__header">
-                                <div className="supplier-card__name">
+                        <div
+                            key={supplier.id}
+                            className={cn(
+                                "bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg p-lg transition-all duration-200 hover:border-primary hover:shadow-md",
+                                !supplier.is_active && "opacity-60 border-[var(--color-gray-600)] hover:opacity-80"
+                            )}
+                        >
+                            <div className="flex justify-between items-start mb-md pb-md border-b border-[var(--color-gray-700)]">
+                                <div className="flex items-center gap-2 text-lg font-bold text-white">
                                     <Building2 size={20} />
                                     {supplier.name}
                                 </div>
-                                <div className="supplier-card__actions">
+                                <div className="flex gap-1">
                                     <button
-                                        className="btn-icon"
+                                        className="flex items-center justify-center w-8 h-8 bg-transparent border-none rounded-md text-muted-foreground cursor-pointer transition-all duration-200 hover:bg-[var(--color-gray-700)] hover:text-primary-light"
                                         onClick={() => handleToggleActive(supplier)}
                                         title={supplier.is_active ? 'Deactivate' : 'Activate'}
                                         aria-label={supplier.is_active ? 'Deactivate' : 'Activate'}
@@ -233,14 +240,14 @@ export default function SuppliersPage() {
                                         {supplier.is_active ? <CheckCircle size={18} /> : <XCircle size={18} />}
                                     </button>
                                     <button
-                                        className="btn-icon"
+                                        className="flex items-center justify-center w-8 h-8 bg-transparent border-none rounded-md text-muted-foreground cursor-pointer transition-all duration-200 hover:bg-[var(--color-gray-700)] hover:text-primary-light"
                                         onClick={() => handleOpenModal(supplier)}
                                         aria-label="Edit"
                                     >
                                         <Edit2 size={18} />
                                     </button>
                                     <button
-                                        className="btn-icon btn-icon--danger"
+                                        className="flex items-center justify-center w-8 h-8 bg-transparent border-none rounded-md text-muted-foreground cursor-pointer transition-all duration-200 hover:bg-red-500/15 hover:text-danger"
                                         onClick={() => handleDelete(supplier.id)}
                                         aria-label="Delete"
                                     >
@@ -249,33 +256,33 @@ export default function SuppliersPage() {
                                 </div>
                             </div>
 
-                            <div className="supplier-card__body">
+                            <div className="flex flex-col gap-sm">
                                 {supplier.contact_person && (
-                                    <div className="supplier-card__info">
-                                        <strong>Contact:</strong> {supplier.contact_person}
+                                    <div className="flex items-center gap-2 text-sm text-[var(--color-gray-300)]">
+                                        <strong className="text-muted-foreground font-semibold">Contact:</strong> {supplier.contact_person}
                                     </div>
                                 )}
                                 {supplier.email && (
-                                    <div className="supplier-card__info">
+                                    <div className="flex items-center gap-2 text-sm text-[var(--color-gray-300)] [&>svg]:text-primary [&>svg]:shrink-0">
                                         <Mail size={16} />
                                         {supplier.email}
                                     </div>
                                 )}
                                 {supplier.phone && (
-                                    <div className="supplier-card__info">
+                                    <div className="flex items-center gap-2 text-sm text-[var(--color-gray-300)] [&>svg]:text-primary [&>svg]:shrink-0">
                                         <Phone size={16} />
                                         {supplier.phone}
                                     </div>
                                 )}
                                 {supplier.city && (
-                                    <div className="supplier-card__info">
+                                    <div className="flex items-center gap-2 text-sm text-[var(--color-gray-300)] [&>svg]:text-primary [&>svg]:shrink-0">
                                         <MapPin size={16} />
                                         {supplier.city}, {supplier.country}
                                     </div>
                                 )}
                                 {supplier.payment_terms && (
-                                    <div className="supplier-card__info">
-                                        <strong>Terms:</strong> {formatPaymentTerms(supplier.payment_terms)}
+                                    <div className="flex items-center gap-2 text-sm text-[var(--color-gray-300)]">
+                                        <strong className="text-muted-foreground font-semibold">Terms:</strong> {formatPaymentTerms(supplier.payment_terms)}
                                     </div>
                                 )}
                             </div>
@@ -287,21 +294,21 @@ export default function SuppliersPage() {
             {/* Modal */}
             {showModal && (
                 <div className="modal-backdrop is-active" onClick={handleCloseModal}>
-                    <div className="modal modal-lg is-active" onClick={e => e.stopPropagation()}>
-                        <div className="modal__header">
+                    <div className="modal is-active w-[700px] max-w-[90vw] max-h-[85vh]" onClick={e => e.stopPropagation()}>
+                        <div className="modal__header px-lg py-md">
                             <h2 className="modal__title">
                                 {editingSupplier ? 'Edit Supplier' : 'New Supplier'}
                             </h2>
                         </div>
 
                         <form onSubmit={handleSubmit}>
-                            <div className="modal__body">
-                                <div className="supplier-form">
+                            <div className="modal__body p-lg overflow-y-auto">
+                                <div className="flex flex-col gap-lg max-h-[60vh] overflow-y-auto pr-sm">
                                     {/* Basic Info */}
-                                    <div className="supplier-form__section">
-                                        <h3>Basic Information</h3>
-                                        <div className="supplier-form__grid">
-                                            <div className="form-group form-group--full">
+                                    <div className="flex flex-col gap-md">
+                                        <h3 className="text-base font-bold text-white m-0 pb-sm border-b border-[var(--color-gray-700)]">Basic Information</h3>
+                                        <div className="grid grid-cols-2 gap-md max-md:grid-cols-1">
+                                            <div className="form-group col-span-full">
                                                 <label>Supplier Name *</label>
                                                 <input
                                                     type="text"
@@ -342,10 +349,10 @@ export default function SuppliersPage() {
                                     </div>
 
                                     {/* Address */}
-                                    <div className="supplier-form__section">
-                                        <h3>Address</h3>
-                                        <div className="supplier-form__grid">
-                                            <div className="form-group form-group--full">
+                                    <div className="flex flex-col gap-md">
+                                        <h3 className="text-base font-bold text-white m-0 pb-sm border-b border-[var(--color-gray-700)]">Address</h3>
+                                        <div className="grid grid-cols-2 gap-md max-md:grid-cols-1">
+                                            <div className="form-group col-span-full">
                                                 <label>Address</label>
                                                 <input
                                                     type="text"
@@ -385,9 +392,9 @@ export default function SuppliersPage() {
                                     </div>
 
                                     {/* Business Info */}
-                                    <div className="supplier-form__section">
-                                        <h3>Business Information</h3>
-                                        <div className="supplier-form__grid">
+                                    <div className="flex flex-col gap-md">
+                                        <h3 className="text-base font-bold text-white m-0 pb-sm border-b border-[var(--color-gray-700)]">Business Information</h3>
+                                        <div className="grid grid-cols-2 gap-md max-md:grid-cols-1">
                                             <div className="form-group">
                                                 <label>Tax ID</label>
                                                 <input
@@ -410,7 +417,7 @@ export default function SuppliersPage() {
                                                     <option value="net60">Net 60 days</option>
                                                 </select>
                                             </div>
-                                            <div className="form-group form-group--full">
+                                            <div className="form-group col-span-full">
                                                 <label>Notes</label>
                                                 <textarea
                                                     rows={3}
@@ -419,12 +426,13 @@ export default function SuppliersPage() {
                                                     aria-label="Notes"
                                                 />
                                             </div>
-                                            <div className="form-group form-group--full">
-                                                <label className="checkbox-label">
+                                            <div className="form-group col-span-full">
+                                                <label className="flex items-center gap-sm cursor-pointer !text-white !font-medium">
                                                     <input
                                                         type="checkbox"
                                                         checked={formData.is_active}
                                                         onChange={e => setFormData({ ...formData, is_active: e.target.checked })}
+                                                        className="w-5 h-5 cursor-pointer"
                                                     />
                                                     Supplier active
                                                 </label>
@@ -434,7 +442,7 @@ export default function SuppliersPage() {
                                 </div>
                             </div>
 
-                            <div className="modal__footer">
+                            <div className="modal__footer px-lg py-md">
                                 <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
                                     Cancel
                                 </button>

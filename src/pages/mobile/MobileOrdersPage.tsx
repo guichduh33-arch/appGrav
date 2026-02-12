@@ -10,7 +10,6 @@ import { Clock, CheckCircle, AlertCircle, Trash2 } from 'lucide-react';
 import { useMobileStore } from '@/stores/mobileStore';
 import { lanClient } from '@/services/lan/lanClient';
 import { LAN_MESSAGE_TYPES, type ILanMessage } from '@/services/lan/lanProtocol';
-import './MobileOrdersPage.css';
 
 /**
  * Format relative time
@@ -86,12 +85,13 @@ export default function MobileOrdersPage() {
   const sentOnlyOrders = sentOrders.filter((o) => o.status === 'sent');
 
   return (
-    <div className="mobile-orders">
-      <div className="mobile-orders__header">
-        <h1>My Orders</h1>
+    <div className="flex flex-col h-full bg-secondary">
+      {/* Header */}
+      <div className="flex items-center justify-between p-md bg-white border-b border-border">
+        <h1 className="text-xl font-semibold m-0">My Orders</h1>
         {sentOrders.length > 0 && (
           <button
-            className="mobile-orders__clear-btn"
+            className="bg-transparent border-none text-primary text-sm font-medium cursor-pointer"
             onClick={clearCompletedOrders}
           >
             Clear completed
@@ -100,50 +100,51 @@ export default function MobileOrdersPage() {
       </div>
 
       {sentOrders.length === 0 ? (
-        <div className="mobile-orders__empty">
-          <Clock size={48} className="mobile-orders__empty-icon" />
-          <h2>No orders</h2>
-          <p>Your sent orders will appear here</p>
+        /* Empty State */
+        <div className="flex-1 flex flex-col items-center justify-center text-center p-xl text-muted-foreground">
+          <Clock size={48} className="text-muted mb-md" />
+          <h2 className="text-xl m-0 mb-xs text-foreground">No orders</h2>
+          <p className="m-0">Your sent orders will appear here</p>
         </div>
       ) : (
-        <div className="mobile-orders__list">
+        <div className="flex-1 overflow-y-auto p-md">
           {/* Ready Orders */}
           {readyOrders.length > 0 && (
-            <section className="mobile-orders__section">
-              <h2 className="mobile-orders__section-title mobile-orders__section-title--ready">
+            <section className="mb-lg">
+              <h2 className="flex items-center gap-sm text-sm font-semibold uppercase text-success m-0 mb-sm">
                 <CheckCircle size={20} />
                 Ready ({readyOrders.length})
               </h2>
               {readyOrders.map((order) => (
                 <div
                   key={order.orderId}
-                  className="mobile-orders__card mobile-orders__card--ready"
+                  className="bg-success-bg rounded-lg p-md mb-sm border border-success"
                 >
-                  <div className="mobile-orders__card-main">
-                    <span className="mobile-orders__order-number">
+                  <div className="flex items-center gap-sm mb-xs">
+                    <span className="text-lg font-bold">
                       #{order.orderNumber}
                     </span>
                     {order.tableNumber && (
-                      <span className="mobile-orders__table">
+                      <span className="py-0.5 px-sm bg-white/50 rounded-full text-sm text-muted-foreground">
                         Table {order.tableNumber}
                       </span>
                     )}
                   </div>
-                  <div className="mobile-orders__card-details">
-                    <span className="mobile-orders__items">
+                  <div className="flex gap-md mb-sm text-sm text-[var(--color-success-dark,#16a34a)]">
+                    <span>
                       {order.itemCount} item{order.itemCount > 1 ? 's' : ''}
                     </span>
-                    <span className="mobile-orders__time">
+                    <span>
                       {formatTimeAgo(order.sentAt)}
                     </span>
                   </div>
-                  <div className="mobile-orders__card-status">
-                    <span className="mobile-orders__status mobile-orders__status--ready">
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-xs text-sm font-medium text-success">
                       <CheckCircle size={16} />
                       Ready to serve
                     </span>
                     <button
-                      className="mobile-orders__done-btn"
+                      className="py-xs px-md bg-success border-none rounded-md text-white font-semibold cursor-pointer min-h-[36px] active:bg-[var(--color-success-dark,#16a34a)]"
                       onClick={() => handleRemove(order.orderId)}
                     >
                       Served
@@ -156,36 +157,36 @@ export default function MobileOrdersPage() {
 
           {/* Preparing Orders */}
           {preparingOrders.length > 0 && (
-            <section className="mobile-orders__section">
-              <h2 className="mobile-orders__section-title mobile-orders__section-title--preparing">
+            <section className="mb-lg">
+              <h2 className="flex items-center gap-sm text-sm font-semibold uppercase text-warning m-0 mb-sm">
                 <Clock size={20} />
                 Preparing ({preparingOrders.length})
               </h2>
               {preparingOrders.map((order) => (
                 <div
                   key={order.orderId}
-                  className="mobile-orders__card mobile-orders__card--preparing"
+                  className="bg-white rounded-lg p-md mb-sm border border-warning"
                 >
-                  <div className="mobile-orders__card-main">
-                    <span className="mobile-orders__order-number">
+                  <div className="flex items-center gap-sm mb-xs">
+                    <span className="text-lg font-bold">
                       #{order.orderNumber}
                     </span>
                     {order.tableNumber && (
-                      <span className="mobile-orders__table">
+                      <span className="py-0.5 px-sm bg-secondary rounded-full text-sm text-muted-foreground">
                         Table {order.tableNumber}
                       </span>
                     )}
                   </div>
-                  <div className="mobile-orders__card-details">
-                    <span className="mobile-orders__items">
+                  <div className="flex gap-md mb-sm text-sm text-muted-foreground">
+                    <span>
                       {order.itemCount} item{order.itemCount > 1 ? 's' : ''}
                     </span>
-                    <span className="mobile-orders__time">
+                    <span>
                       {formatTimeAgo(order.sentAt)}
                     </span>
                   </div>
-                  <div className="mobile-orders__card-status">
-                    <span className="mobile-orders__status mobile-orders__status--preparing">
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-xs text-sm font-medium text-warning">
                       <Clock size={16} className="animate-pulse" />
                       Preparing
                     </span>
@@ -197,40 +198,40 @@ export default function MobileOrdersPage() {
 
           {/* Sent Orders */}
           {sentOnlyOrders.length > 0 && (
-            <section className="mobile-orders__section">
-              <h2 className="mobile-orders__section-title">
+            <section className="mb-lg">
+              <h2 className="flex items-center gap-sm text-sm font-semibold uppercase text-muted-foreground m-0 mb-sm">
                 <AlertCircle size={20} />
                 Sent ({sentOnlyOrders.length})
               </h2>
               {sentOnlyOrders.map((order) => (
                 <div
                   key={order.orderId}
-                  className="mobile-orders__card"
+                  className="bg-white rounded-lg p-md mb-sm border border-border"
                 >
-                  <div className="mobile-orders__card-main">
-                    <span className="mobile-orders__order-number">
+                  <div className="flex items-center gap-sm mb-xs">
+                    <span className="text-lg font-bold">
                       #{order.orderNumber}
                     </span>
                     {order.tableNumber && (
-                      <span className="mobile-orders__table">
+                      <span className="py-0.5 px-sm bg-secondary rounded-full text-sm text-muted-foreground">
                         Table {order.tableNumber}
                       </span>
                     )}
                   </div>
-                  <div className="mobile-orders__card-details">
-                    <span className="mobile-orders__items">
+                  <div className="flex gap-md mb-sm text-sm text-muted-foreground">
+                    <span>
                       {order.itemCount} item{order.itemCount > 1 ? 's' : ''}
                     </span>
-                    <span className="mobile-orders__time">
+                    <span>
                       {formatTimeAgo(order.sentAt)}
                     </span>
                   </div>
-                  <div className="mobile-orders__card-status">
-                    <span className="mobile-orders__status">
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-xs text-sm font-medium text-muted-foreground">
                       Sent
                     </span>
                     <button
-                      className="mobile-orders__remove-btn"
+                      className="p-xs bg-danger-bg border-none rounded-md text-danger cursor-pointer"
                       onClick={() => handleRemove(order.orderId)}
                     >
                       <Trash2 size={16} />

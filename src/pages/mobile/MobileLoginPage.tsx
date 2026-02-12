@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, AlertCircle, Lock } from 'lucide-react';
 import { useMobileStore } from '@/stores/mobileStore';
 import { supabase } from '@/lib/supabase';
-import './MobileLoginPage.css';
+import { cn } from '@/lib/utils';
 
 /**
  * PIN keypad configuration
@@ -147,29 +147,32 @@ export default function MobileLoginPage() {
   }, [pin, handleLogin]);
 
   return (
-    <div className="mobile-login">
-      <div className="mobile-login__container">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#BA90A2] to-[#DDB892] p-lg">
+      <div className="w-full max-w-[320px] flex flex-col items-center gap-xl">
         {/* Logo */}
-        <div className="mobile-login__logo">
-          <span className="mobile-login__logo-icon">🥐</span>
-          <h1 className="mobile-login__title">The Breakery</h1>
-          <p className="mobile-login__subtitle">Server App</p>
+        <div className="text-center text-white">
+          <span className="text-[4rem] block mb-md">🥐</span>
+          <h1 className="text-3xl font-bold m-0 [text-shadow:0_2px_4px_rgba(0,0,0,0.1)]">The Breakery</h1>
+          <p className="text-lg mt-xs m-0 opacity-90">Server App</p>
         </div>
 
         {/* PIN Display */}
-        <div className="mobile-login__pin-display">
-          <div className="mobile-login__pin-dots">
+        <div className="flex flex-col items-center gap-sm">
+          <div className="flex gap-md">
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className={`mobile-login__pin-dot ${i < pin.length ? 'mobile-login__pin-dot--filled' : ''}`}
+                className={cn(
+                  'w-4 h-4 rounded-full bg-white/30 border-2 border-white transition-all duration-150 ease-in-out',
+                  i < pin.length && 'bg-white scale-110'
+                )}
               />
             ))}
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mobile-login__error">
+            <div className="flex items-center gap-xs text-[#fee2e2] text-sm mt-sm animate-pin-shake">
               <AlertCircle size={16} />
               <span>{error}</span>
             </div>
@@ -177,7 +180,7 @@ export default function MobileLoginPage() {
 
           {/* Lockout Message */}
           {lockoutRemaining > 0 && (
-            <div className="mobile-login__lockout">
+            <div className="flex items-center gap-xs text-white/80 text-sm mt-sm">
               <Lock size={16} />
               <span>Try again in {lockoutRemaining}s</span>
             </div>
@@ -185,15 +188,18 @@ export default function MobileLoginPage() {
         </div>
 
         {/* Keypad */}
-        <div className="mobile-login__keypad">
+        <div className="flex flex-col gap-sm w-full">
           {KEYPAD_LAYOUT.map((row, rowIndex) => (
-            <div key={rowIndex} className="mobile-login__keypad-row">
+            <div key={rowIndex} className="flex justify-center gap-sm">
               {row.map((key) => (
                 <button
                   key={key}
-                  className={`mobile-login__key ${
-                    key === 'C' || key === '←' ? 'mobile-login__key--action' : ''
-                  }`}
+                  className={cn(
+                    'w-[72px] h-[72px] rounded-xl bg-white/20 border-none text-white text-2xl font-semibold cursor-pointer transition-all duration-150 ease-in-out min-w-[44px] min-h-[44px]',
+                    'hover:bg-white/30 active:bg-white/40 active:scale-95',
+                    'disabled:opacity-50 disabled:cursor-not-allowed',
+                    (key === 'C' || key === '←') && 'text-lg bg-white/10'
+                  )}
                   onClick={() => handleKeyPress(key)}
                   disabled={lockoutRemaining > 0 || isLoading}
                 >
@@ -206,7 +212,13 @@ export default function MobileLoginPage() {
 
         {/* Submit Button */}
         <button
-          className="mobile-login__submit"
+          className={cn(
+            'w-full p-md bg-white border-none rounded-xl text-primary text-lg font-semibold cursor-pointer transition-all duration-150 ease-in-out',
+            'flex items-center justify-center gap-sm min-h-[56px]',
+            'hover:not-disabled:bg-white/90 hover:not-disabled:-translate-y-px',
+            'active:not-disabled:translate-y-0',
+            'disabled:opacity-70 disabled:cursor-not-allowed'
+          )}
           onClick={handleLogin}
           disabled={pin.length < 4 || isLoading || lockoutRemaining > 0}
         >

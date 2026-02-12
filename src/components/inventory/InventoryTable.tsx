@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Edit2, AlertTriangle, Search, Package, FileText } from 'lucide-react'
 import type { Product } from '../../types/database'
-import './InventoryTable.css'
+import { cn } from '@/lib/utils'
 
 interface InventoryTableProps {
     items: (Product & { category: { name: string } | null })[]
@@ -38,40 +38,40 @@ export default function InventoryTable({ items, onAdjustStock, onViewDetails, is
     }, [items, debouncedSearchTerm])
 
     if (isLoading) {
-        return <div className="inventory-loading">Loading...</div>
+        return <div className="flex items-center justify-center py-16 px-8 text-gray-500 font-medium">Loading...</div>
     }
 
     return (
-        <div className="inventory-container">
-            <div className="inventory-controls">
-                <div className="inventory-search">
-                    <Search className="inventory-search__icon" size={20} />
+        <div className="flex flex-col h-full">
+            <div className="flex justify-between items-center px-5 py-4 border-b border-gray-100 bg-gray-50 shrink-0 max-md:flex-col max-md:gap-4 max-md:items-stretch">
+                <div className="relative w-80 max-lg:w-60 max-md:w-full">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
                     <input
                         type="text"
                         placeholder="Search by name, SKU, category..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="inventory-search__input"
+                        className="w-full py-3 pr-3 pl-[42px] border border-gray-200 rounded-lg text-sm outline-none transition-all duration-200 bg-white placeholder:text-gray-400 focus:border-primary focus:ring-[3px] focus:ring-primary/10"
                     />
                 </div>
-                <div className="inventory-stats">
-                    <span className="inventory-stat">
+                <div className="flex gap-3 max-md:justify-center">
+                    <span className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-full text-[0.8rem] font-semibold text-gray-600">
                         <Package size={16} />
                         {filteredItems.length} items
                     </span>
                 </div>
             </div>
 
-            <div className="inventory-table-wrapper">
-                <table className="inventory-table">
+            <div className="flex-1 overflow-auto">
+                <table className="w-full border-collapse text-sm">
                     <thead>
                         <tr>
-                            <th>Product</th>
-                            <th>SKU</th>
-                            <th>Category</th>
-                            <th>Type</th>
-                            <th className="text-right">Current Stock</th>
-                            <th className="text-center">Actions</th>
+                            <th className="sticky top-0 bg-white px-4 py-3.5 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 z-10 max-md:px-2 max-md:py-3 max-md:text-[0.8rem]">Product</th>
+                            <th className="sticky top-0 bg-white px-4 py-3.5 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 z-10 max-md:px-2 max-md:py-3 max-md:text-[0.8rem]">SKU</th>
+                            <th className="sticky top-0 bg-white px-4 py-3.5 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 z-10 max-md:px-2 max-md:py-3 max-md:text-[0.8rem]">Category</th>
+                            <th className="sticky top-0 bg-white px-4 py-3.5 text-left font-semibold text-xs text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 z-10 max-md:px-2 max-md:py-3 max-md:text-[0.8rem]">Type</th>
+                            <th className="sticky top-0 bg-white px-4 py-3.5 text-right font-semibold text-xs text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 z-10 max-md:px-2 max-md:py-3 max-md:text-[0.8rem]">Current Stock</th>
+                            <th className="sticky top-0 bg-white px-4 py-3.5 text-center font-semibold text-xs text-gray-500 uppercase tracking-wider border-b-2 border-gray-200 z-10 max-md:px-2 max-md:py-3 max-md:text-[0.8rem]">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -79,12 +79,18 @@ export default function InventoryTable({ items, onAdjustStock, onViewDetails, is
                             const isLowStock = (item.current_stock ?? 0) <= (item.min_stock_level ?? 0)
 
                             return (
-                                <tr key={item.id} className={isLowStock ? 'is-low-stock' : ''}>
-                                    <td className="cell-product">
-                                        <div className="product-cell">
+                                <tr
+                                    key={item.id}
+                                    className={cn(
+                                        'transition-colors duration-150 hover:bg-gray-50 [&:last-child_td]:border-b-0',
+                                        isLowStock && 'bg-gradient-to-r from-red-50 to-white hover:from-red-100 hover:to-gray-50'
+                                    )}
+                                >
+                                    <td className="px-4 py-4 border-b border-gray-100 text-gray-700 align-middle max-md:px-2 max-md:py-3 max-md:text-[0.8rem]">
+                                        <div className="flex items-center gap-4">
                                             <div>
                                                 <div
-                                                    className="product-name clickable"
+                                                    className="font-semibold text-gray-900 leading-snug cursor-pointer transition-colors duration-150 hover:text-primary"
                                                     onClick={() => onViewDetails(item)}
                                                     onKeyDown={(e) => {
                                                         if (e.key === 'Enter' || e.key === ' ') {
@@ -98,7 +104,7 @@ export default function InventoryTable({ items, onAdjustStock, onViewDetails, is
                                                     {item.name}
                                                 </div>
                                                 {isLowStock && (
-                                                    <div className="stock-warning">
+                                                    <div className="inline-flex items-center gap-1 text-[0.7rem] font-semibold text-destructive mt-1 px-2 py-0.5 bg-red-50 rounded-full w-fit">
                                                         <AlertTriangle size={12} />
                                                         Low stock
                                                     </div>
@@ -106,25 +112,27 @@ export default function InventoryTable({ items, onAdjustStock, onViewDetails, is
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="cell-sku">{item.sku}</td>
-                                    <td className="cell-category">
-                                        <span className="category-badge">
+                                    <td className="px-4 py-4 border-b border-gray-100 align-middle max-md:px-2 max-md:py-3 max-md:text-[0.8rem]">
+                                        <span className="font-mono text-gray-500 text-[0.8rem] bg-gray-50 px-2 py-1 rounded-sm tracking-wide">{item.sku}</span>
+                                    </td>
+                                    <td className="px-4 py-4 border-b border-gray-100 align-middle max-md:px-2 max-md:py-3 max-md:text-[0.8rem]">
+                                        <span className="inline-flex items-center py-1.5 px-3 bg-gradient-to-br from-primary/5 to-primary/10 rounded-full text-xs text-primary font-semibold">
                                             {item.category?.name || 'No category'}
                                         </span>
                                     </td>
-                                    <td className="cell-type">
+                                    <td className="px-4 py-4 border-b border-gray-100 text-[0.8rem] text-gray-600 align-middle max-md:px-2 max-md:py-3 max-md:text-[0.8rem]">
                                         {formatProductType(item.product_type)}
                                     </td>
-                                    <td className="cell-stock text-right">
-                                        <span className={`stock-value ${isLowStock ? 'text-urgent' : ''}`}>
+                                    <td className="px-4 py-4 border-b border-gray-100 text-right whitespace-nowrap align-middle max-md:px-2 max-md:py-3 max-md:text-[0.8rem]">
+                                        <span className={cn('font-bold text-lg text-gray-900', isLowStock && '!text-destructive')}>
                                             {item.current_stock}
                                         </span>
-                                        <span className="stock-unit">{item.unit}</span>
+                                        <span className="ml-1.5 text-xs text-gray-500 font-medium">{item.unit}</span>
                                     </td>
-                                    <td className="cell-action text-center">
-                                        <div className="action-buttons">
+                                    <td className="px-4 py-4 border-b border-gray-100 text-center align-middle max-md:px-2 max-md:py-3 max-md:text-[0.8rem]">
+                                        <div className="flex gap-2 justify-center">
                                             <button
-                                                className="btn-icon-sm"
+                                                className="w-9 h-9 rounded-md border border-gray-200 bg-white cursor-pointer inline-flex items-center justify-center text-gray-500 transition-all duration-200 hover:bg-primary/5 hover:text-primary hover:border-primary/20 hover:-translate-y-px hover:shadow-sm"
                                                 onClick={() => onViewDetails(item)}
                                                 title="View details"
                                             >
@@ -132,7 +140,7 @@ export default function InventoryTable({ items, onAdjustStock, onViewDetails, is
                                             </button>
                                             {onAdjustStock && (
                                                 <button
-                                                    className="btn-icon-sm"
+                                                    className="w-9 h-9 rounded-md border border-gray-200 bg-white cursor-pointer inline-flex items-center justify-center text-gray-500 transition-all duration-200 hover:bg-primary/5 hover:text-primary hover:border-primary/20 hover:-translate-y-px hover:shadow-sm"
                                                     onClick={() => onAdjustStock(item)}
                                                     title="Adjust stock"
                                                 >
@@ -148,9 +156,9 @@ export default function InventoryTable({ items, onAdjustStock, onViewDetails, is
                 </table>
 
                 {filteredItems.length === 0 && (
-                    <div className="inventory-empty">
+                    <div className="flex flex-col items-center justify-center py-16 px-8 text-gray-400 gap-4 text-center [&_svg]:opacity-50">
                         <Package size={48} />
-                        <p>No items found</p>
+                        <p className="text-base font-medium text-gray-500 m-0">No items found</p>
                     </div>
                 )}
             </div>

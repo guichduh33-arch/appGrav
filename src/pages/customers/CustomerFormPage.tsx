@@ -12,7 +12,7 @@ import {
     useDeleteCustomer,
     type ICustomerCategory,
 } from '@/hooks/customers'
-import './CustomerFormPage.css'
+import { cn } from '@/lib/utils'
 
 interface CustomerFormData {
     name: string
@@ -176,8 +176,8 @@ export default function CustomerFormPage() {
 
     if (loading) {
         return (
-            <div className="customer-form-page">
-                <div className="customer-form-loading">
+            <div className="p-6 max-w-[1200px] mx-auto max-md:p-4">
+                <div className="flex flex-col items-center justify-center py-16 px-8 text-muted-foreground gap-4">
                     <div className="spinner"></div>
                     <span>Loading...</span>
                 </div>
@@ -186,10 +186,10 @@ export default function CustomerFormPage() {
     }
 
     return (
-        <div className="customer-form-page">
+        <div className="p-6 max-w-[1200px] mx-auto max-md:p-4">
             {/* Header */}
-            <header className="customer-form-header">
-                <div className="customer-form-header__left">
+            <header className="flex justify-between items-center mb-6 gap-4 flex-wrap max-md:flex-col max-md:items-start">
+                <div className="flex items-center gap-3">
                     <button
                         type="button"
                         className="btn btn-ghost"
@@ -200,18 +200,18 @@ export default function CustomerFormPage() {
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <h1 className="customer-form-header__title">
+                        <h1 className="text-2xl font-bold text-foreground m-0">
                             {isEditing ? 'Edit Customer' : 'New Customer'}
                         </h1>
                         {membershipNumber && (
-                            <span className="customer-form-header__membership">
+                            <span className="flex items-center gap-1.5 mt-1 px-2 py-1 bg-slate-100 rounded font-mono text-xs text-muted-foreground w-fit">
                                 <QrCode size={14} />
                                 {membershipNumber}
                             </span>
                         )}
                     </div>
                 </div>
-                <div className="customer-form-header__actions">
+                <div className="flex gap-3 max-md:w-full max-md:[&>.btn]:flex-1">
                     {isEditing && (
                         <button
                             type="button"
@@ -234,11 +234,11 @@ export default function CustomerFormPage() {
                 </div>
             </header>
 
-            <form onSubmit={handleSubmit} className="customer-form">
-                <div className="customer-form__grid">
+            <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-2 gap-6 max-lg:grid-cols-1">
                     {/* Main Info */}
-                    <div className="form-section">
-                        <h2 className="form-section__title">
+                    <div className="bg-white rounded-xl border border-border p-6">
+                        <h2 className="flex items-center gap-2 text-base font-semibold text-foreground mb-5 pb-3 border-b border-slate-100 [&>svg]:text-primary">
                             <User size={20} />
                             General Information
                         </h2>
@@ -271,7 +271,7 @@ export default function CustomerFormPage() {
                             />
                         </div>
 
-                        <div className="form-row">
+                        <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
                             <div className="form-group">
                                 <label htmlFor="phone">
                                     <Phone size={14} />
@@ -333,26 +333,35 @@ export default function CustomerFormPage() {
                     </div>
 
                     {/* Category & Loyalty */}
-                    <div className="form-section">
-                        <h2 className="form-section__title">
+                    <div className="bg-white rounded-xl border border-border p-6">
+                        <h2 className="flex items-center gap-2 text-base font-semibold text-foreground mb-5 pb-3 border-b border-slate-100 [&>svg]:text-primary">
                             <Tag size={20} />
                             Category & Loyalty
                         </h2>
 
                         <div className="form-group">
                             <label>Customer Category</label>
-                            <div className="category-selector">
+                            <div className="flex flex-col gap-2">
                                 {categories.map(category => (
                                     <div
                                         key={category.id}
-                                        className={`category-option ${formData.category_id === category.id ? 'selected' : ''}`}
+                                        className={cn(
+                                            'flex items-center gap-3 py-3.5 px-4 border-2 border-border rounded-[10px] cursor-pointer transition-all',
+                                            'hover:border-[var(--category-color)] hover:bg-[color-mix(in_srgb,var(--category-color)_5%,white)]',
+                                            formData.category_id === category.id && 'border-[var(--category-color)] bg-[color-mix(in_srgb,var(--category-color)_10%,white)]'
+                                        )}
                                         onClick={() => handleCategoryChange(category.id)}
                                         style={{ '--category-color': category.color } as React.CSSProperties}
                                     >
-                                        <div className="category-option__indicator" />
-                                        <div className="category-option__content">
-                                            <span className="category-option__name">{category.name}</span>
-                                            <span className="category-option__desc">
+                                        <div
+                                            className={cn(
+                                                'w-4 h-4 rounded-full border-2 border-border shrink-0 relative transition-all',
+                                                formData.category_id === category.id && 'border-[var(--category-color)] bg-[var(--category-color)] after:content-[""] after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:w-1.5 after:h-1.5 after:rounded-full after:bg-white'
+                                            )}
+                                        />
+                                        <div className="flex-1">
+                                            <span className="block font-semibold text-foreground text-sm">{category.name}</span>
+                                            <span className="block text-xs text-muted-foreground mt-0.5">
                                                 {category.price_modifier_type === 'retail' && 'Standard price'}
                                                 {category.price_modifier_type === 'wholesale' && 'Wholesale price'}
                                                 {category.price_modifier_type === 'discount_percentage' && `${category.discount_percentage}% discount`}
@@ -360,7 +369,7 @@ export default function CustomerFormPage() {
                                             </span>
                                         </div>
                                         {category.discount_percentage && category.discount_percentage > 0 && (
-                                            <span className="category-option__discount">
+                                            <span className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-600 rounded text-xs font-semibold">
                                                 <Percent size={12} />
                                                 {category.discount_percentage}%
                                             </span>
@@ -371,16 +380,16 @@ export default function CustomerFormPage() {
                         </div>
 
                         {selectedCategory && (
-                            <div className="category-info">
+                            <div className="mt-4 p-4 bg-slate-50 rounded-lg">
                                 <div
-                                    className="category-info__badge"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-white text-sm font-medium"
                                     style={{ backgroundColor: selectedCategory.color }}
                                 >
                                     <Crown size={16} />
                                     {selectedCategory.name}
                                 </div>
                                 {selectedCategory.description && (
-                                    <p className="category-info__description">
+                                    <p className="mt-3 text-sm text-muted-foreground">
                                         {selectedCategory.description}
                                     </p>
                                 )}
@@ -389,17 +398,19 @@ export default function CustomerFormPage() {
 
                         {/* QR Code Display */}
                         {isEditing && customerQR && (
-                            <div className="qr-code-section">
-                                <h3>
+                            <div className="mt-6 pt-6 border-t border-slate-100">
+                                <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-600 mb-4">
                                     <QrCode size={18} />
                                     Loyalty QR Code
                                 </h3>
-                                <div className="qr-code-display">
-                                    <div className="qr-code-placeholder">
+                                <div className="flex gap-6 items-start max-md:flex-col max-md:items-center max-md:text-center">
+                                    <div className="flex flex-col items-center p-6 bg-white border-2 border-dashed border-border rounded-xl [&>svg]:text-slate-400">
                                         <QrCode size={100} />
-                                        <span className="qr-code-value">{customerQR}</span>
+                                        <span className="mt-3 font-mono text-sm text-slate-600 bg-slate-100 px-3 py-1.5 rounded">
+                                            {customerQR}
+                                        </span>
                                     </div>
-                                    <p className="qr-code-info">
+                                    <p className="flex-1 text-sm text-muted-foreground leading-relaxed">
                                         The customer can present this QR code during purchases
                                         to accumulate loyalty points.
                                     </p>
@@ -408,12 +419,13 @@ export default function CustomerFormPage() {
                         )}
 
                         <div className="form-group">
-                            <label className="checkbox-label">
+                            <label className="flex !flex-row items-center gap-2 cursor-pointer">
                                 <input
                                     type="checkbox"
                                     name="is_active"
                                     checked={formData.is_active}
                                     onChange={handleChange}
+                                    className="w-[18px] h-[18px] accent-primary"
                                 />
                                 <span>Active customer</span>
                             </label>
@@ -422,8 +434,8 @@ export default function CustomerFormPage() {
 
                     {/* B2B Settings */}
                     {formData.customer_type === 'wholesale' && (
-                        <div className="form-section">
-                            <h2 className="form-section__title">
+                        <div className="bg-white rounded-xl border border-border p-6">
+                            <h2 className="flex items-center gap-2 text-base font-semibold text-foreground mb-5 pb-3 border-b border-slate-100 [&>svg]:text-primary">
                                 <Building2 size={20} />
                                 B2B Settings
                             </h2>
@@ -440,7 +452,7 @@ export default function CustomerFormPage() {
                                 />
                             </div>
 
-                            <div className="form-row">
+                            <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
                                 <div className="form-group">
                                     <label htmlFor="payment_terms">Payment terms</label>
                                     <select
@@ -472,8 +484,8 @@ export default function CustomerFormPage() {
                     )}
 
                     {/* Notes */}
-                    <div className="form-section form-section--full">
-                        <h2 className="form-section__title">
+                    <div className="bg-white rounded-xl border border-border p-6 col-span-2 max-lg:col-span-1">
+                        <h2 className="flex items-center gap-2 text-base font-semibold text-foreground mb-5 pb-3 border-b border-slate-100 [&>svg]:text-primary">
                             <Star size={20} />
                             Notes
                         </h2>

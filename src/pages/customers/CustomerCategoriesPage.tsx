@@ -12,7 +12,7 @@ import {
     type ICustomerCategory,
 } from '@/hooks/customers'
 import { toast } from 'sonner'
-import './CustomerCategoriesPage.css'
+import { cn } from '@/lib/utils'
 
 interface CategoryFormData {
     name: string
@@ -138,24 +138,24 @@ export default function CustomerCategoriesPage() {
     }
 
     return (
-        <div className="categories-page">
+        <div className="p-6 max-w-[1400px] mx-auto max-md:p-4">
             {/* Header */}
-            <header className="categories-header">
-                <div className="categories-header__left">
+            <header className="flex justify-between items-center mb-6 gap-4 flex-wrap max-md:flex-col max-md:items-start">
+                <div className="flex items-center gap-3">
                     <button className="btn btn-ghost" onClick={() => navigate('/customers')} title="Back" aria-label="Back">
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <h1 className="categories-header__title">
+                        <h1 className="flex items-center gap-3 text-2xl font-bold text-foreground m-0 [&>svg]:text-primary">
                             <Tag size={28} />
                             Customer Categories
                         </h1>
-                        <p className="categories-header__subtitle">
+                        <p className="text-muted-foreground mt-1 text-sm">
                             Manage categories and their pricing
                         </p>
                     </div>
                 </div>
-                <button className="btn btn-primary" onClick={openCreateModal}>
+                <button className="btn btn-primary max-md:w-full" onClick={openCreateModal}>
                     <Plus size={18} />
                     New Category
                 </button>
@@ -163,35 +163,38 @@ export default function CustomerCategoriesPage() {
 
             {/* Categories Grid */}
             {loading ? (
-                <div className="categories-loading">
+                <div className="flex flex-col items-center justify-center py-16 px-8 text-muted-foreground gap-4">
                     <div className="spinner"></div>
                     <span>Loading...</span>
                 </div>
             ) : categories.length === 0 ? (
-                <div className="categories-empty">
+                <div className="flex flex-col items-center justify-center py-16 px-8 text-center bg-white rounded-xl border border-dashed border-border [&>svg]:text-slate-300 [&>svg]:mb-4">
                     <Tag size={64} />
-                    <h3>No categories</h3>
-                    <p>Create categories to organize your customers</p>
+                    <h3 className="m-0 mb-2 text-slate-600 text-lg">No categories</h3>
+                    <p className="m-0 mb-6 text-slate-400 text-sm">Create categories to organize your customers</p>
                     <button className="btn btn-primary" onClick={openCreateModal}>
                         <Plus size={18} />
                         Create a category
                     </button>
                 </div>
             ) : (
-                <div className="categories-grid">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4 max-md:grid-cols-1">
                     {categories.map(category => (
                         <div
                             key={category.id}
-                            className={`category-card ${!category.is_active ? 'inactive' : ''}`}
+                            className={cn(
+                                'bg-white rounded-xl border border-border p-5 transition-all hover:border-primary hover:shadow-[0_4px_12px_rgba(99,102,241,0.15)]',
+                                !category.is_active && 'opacity-60'
+                            )}
                         >
-                            <div className="category-card__header">
+                            <div className="flex justify-between items-start mb-4">
                                 <div
-                                    className="category-card__icon"
+                                    className="w-12 h-12 rounded-xl flex items-center justify-center text-white"
                                     style={{ backgroundColor: category.color }}
                                 >
                                     {getCategoryIcon(category.slug)}
                                 </div>
-                                <div className="category-card__actions">
+                                <div className="flex gap-1">
                                     <button
                                         className="btn-icon"
                                         onClick={() => openEditModal(category)}
@@ -200,7 +203,7 @@ export default function CustomerCategoriesPage() {
                                         <Edit size={16} />
                                     </button>
                                     <button
-                                        className="btn-icon btn-icon--danger"
+                                        className="btn-icon hover:!bg-red-50 hover:!text-red-600"
                                         onClick={() => handleDelete(category)}
                                         title="Delete"
                                     >
@@ -209,25 +212,30 @@ export default function CustomerCategoriesPage() {
                                 </div>
                             </div>
 
-                            <h3 className="category-card__name">{category.name}</h3>
-                            <span className="category-card__code">{category.slug}</span>
+                            <h3 className="m-0 mb-1 text-lg font-semibold text-foreground">{category.name}</h3>
+                            <span className="inline-block px-2 py-0.5 bg-slate-100 rounded font-mono text-xs text-muted-foreground mb-3">
+                                {category.slug}
+                            </span>
 
                             {category.description && (
-                                <p className="category-card__desc">{category.description}</p>
+                                <p className="m-0 mb-4 text-sm text-muted-foreground leading-relaxed">{category.description}</p>
                             )}
 
-                            <div className="category-card__pricing">
-                                <span className="pricing-label">{getPricingLabel(category.price_modifier_type)}</span>
+                            <div className="p-3 bg-slate-50 rounded-lg mb-4">
+                                <span className="block text-sm font-medium text-slate-600">{getPricingLabel(category.price_modifier_type)}</span>
                                 {category.price_modifier_type === 'discount_percentage' && category.discount_percentage && (
-                                    <span className="pricing-discount">
+                                    <span className="flex items-center gap-1 mt-1 text-xs text-green-600 font-medium">
                                         <Percent size={14} />
                                         {category.discount_percentage}% discount
                                     </span>
                                 )}
                             </div>
 
-                            <div className="category-card__footer">
-                                <span className={`status-badge ${category.is_active ? 'active' : 'inactive'}`}>
+                            <div className="flex justify-end">
+                                <span className={cn(
+                                    'px-2 py-1 rounded text-[0.7rem] font-medium',
+                                    category.is_active ? 'bg-green-100 text-green-600' : 'bg-red-50 text-red-600'
+                                )}>
                                     {category.is_active ? 'Active' : 'Inactive'}
                                 </span>
                             </div>
@@ -238,8 +246,14 @@ export default function CustomerCategoriesPage() {
 
             {/* Modal */}
             {showModal && (
-                <div className="modal-overlay" onClick={() => setShowModal(false)}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()}>
+                <div
+                    className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] p-4"
+                    onClick={() => setShowModal(false)}
+                >
+                    <div
+                        className="bg-white rounded-2xl w-full max-w-[540px] max-h-[90vh] overflow-y-auto shadow-[0_20px_60px_rgba(0,0,0,0.2)]"
+                        onClick={e => e.stopPropagation()}
+                    >
                         <div className="modal-header">
                             <h2>
                                 {editingCategory ? 'Edit Category' : 'New Category'}
@@ -250,7 +264,7 @@ export default function CustomerCategoriesPage() {
                         </div>
 
                         <div className="modal-body">
-                            <div className="form-row">
+                            <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
                                 <div className="form-group">
                                     <label>Name *</label>
                                     <input
@@ -284,12 +298,15 @@ export default function CustomerCategoriesPage() {
 
                             <div className="form-group">
                                 <label>Color</label>
-                                <div className="color-picker">
+                                <div className="flex flex-wrap gap-2">
                                     {COLOR_OPTIONS.map(color => (
                                         <button
                                             key={color}
                                             type="button"
-                                            className={`color-option ${formData.color === color ? 'selected' : ''}`}
+                                            className={cn(
+                                                'w-8 h-8 rounded-lg border-2 border-transparent cursor-pointer transition-all hover:scale-110',
+                                                formData.color === color && 'border-foreground shadow-[0_0_0_2px_white,0_0_0_4px_currentColor]'
+                                            )}
                                             style={{ backgroundColor: color }}
                                             title={`Color ${color}`}
                                             aria-label={`Select color ${color}`}
@@ -301,17 +318,25 @@ export default function CustomerCategoriesPage() {
 
                             <div className="form-group">
                                 <label>Pricing Type</label>
-                                <div className="pricing-options">
+                                <div className="grid grid-cols-2 gap-2 max-md:grid-cols-1">
                                     {PRICING_TYPES.map(pricing => (
                                         <div
                                             key={pricing.value}
-                                            className={`pricing-option ${formData.price_modifier_type === pricing.value ? 'selected' : ''}`}
+                                            className={cn(
+                                                'flex items-start gap-3 p-3 border-2 border-border rounded-[10px] cursor-pointer transition-all hover:border-primary hover:bg-slate-50',
+                                                formData.price_modifier_type === pricing.value && 'border-primary bg-indigo-50'
+                                            )}
                                             onClick={() => setFormData({ ...formData, price_modifier_type: pricing.value as CategoryFormData['price_modifier_type'] })}
                                         >
-                                            <div className="pricing-option__icon">{pricing.icon}</div>
-                                            <div className="pricing-option__content">
-                                                <span className="pricing-option__label">{pricing.label}</span>
-                                                <span className="pricing-option__desc">{pricing.desc}</span>
+                                            <div className={cn(
+                                                'w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-muted-foreground shrink-0',
+                                                formData.price_modifier_type === pricing.value && 'bg-primary text-white'
+                                            )}>
+                                                {pricing.icon}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <span className="block text-sm font-semibold text-foreground">{pricing.label}</span>
+                                                <span className="block text-[0.7rem] text-muted-foreground mt-0.5">{pricing.desc}</span>
                                             </div>
                                         </div>
                                     ))}
@@ -321,7 +346,7 @@ export default function CustomerCategoriesPage() {
                             {formData.price_modifier_type === 'discount_percentage' && (
                                 <div className="form-group">
                                     <label>Discount percentage</label>
-                                    <div className="input-with-suffix">
+                                    <div className="flex items-center border border-border rounded-lg overflow-hidden">
                                         <input
                                             type="number"
                                             aria-label="Discount percentage"
@@ -330,18 +355,20 @@ export default function CustomerCategoriesPage() {
                                             min="0"
                                             max="100"
                                             step="1"
+                                            className="flex-1 !border-none !rounded-none !shadow-none"
                                         />
-                                        <span className="suffix">%</span>
+                                        <span className="px-4 bg-slate-100 text-muted-foreground font-medium h-full flex items-center py-3">%</span>
                                     </div>
                                 </div>
                             )}
 
                             <div className="form-group">
-                                <label className="checkbox-label">
+                                <label className="flex !flex-row items-center gap-2 cursor-pointer">
                                     <input
                                         type="checkbox"
                                         checked={formData.is_active}
                                         onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                                        className="w-[18px] h-[18px] accent-primary"
                                     />
                                     <span>Active category</span>
                                 </label>

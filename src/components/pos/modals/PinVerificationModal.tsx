@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { X, Lock, AlertCircle, Loader2 } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
-import './PinVerificationModal.css'
+import { cn } from '@/lib/utils'
 
 interface VerifiedUser {
     id: string
@@ -196,40 +196,43 @@ export default function PinVerificationModal({
 
     return (
         <div className="modal-backdrop is-active" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className={`modal modal-sm is-active pin-modal ${isShaking ? 'shake' : ''}`}>
-                <div className="modal__header">
-                    <div className="pin-modal__icon">
+            <div className={cn('modal modal-sm is-active max-w-[360px]', isShaking && 'animate-pin-shake')}>
+                <div className="modal__header flex items-center">
+                    <div className="w-12 h-12 flex items-center justify-center bg-primary text-white rounded-xl mr-4">
                         <Lock size={24} />
                     </div>
                     <div>
                         <h3 className="modal__title">{title}</h3>
                         <p className="modal__subtitle">{message}</p>
                     </div>
-                    <button className="modal__close" onClick={onClose} title="Close">
+                    <button className="modal__close ml-auto" onClick={onClose} title="Close">
                         <X size={24} />
                     </button>
                 </div>
 
                 <div className="modal__body">
                     {isLoadingUsers ? (
-                        <div className="pin-loading">
-                            <Loader2 size={32} className="spin" />
+                        <div className="flex flex-col items-center justify-center py-8 gap-4 text-muted-foreground">
+                            <Loader2 size={32} className="animate-spin" />
                             <p>Loading...</p>
                         </div>
                     ) : (
                         <>
                             {/* PIN Display */}
-                            <div className="pin-entry">
-                                <div className="pin-display">
+                            <div className="text-center mb-6">
+                                <div className="flex justify-center gap-2 mb-4">
                                     {[...Array(6)].map((_, i) => (
-                                        <span key={i} className={`pin-dot ${i < pin.length ? 'filled' : ''}`}>
+                                        <span key={i} className={cn(
+                                            'w-4 h-4 text-xl transition-all duration-150',
+                                            i < pin.length ? 'text-primary' : 'text-gray-400'
+                                        )}>
                                             {i < pin.length ? '●' : '○'}
                                         </span>
                                     ))}
                                 </div>
 
                                 {error && (
-                                    <div className="pin-error">
+                                    <div className="flex items-center justify-center gap-1 text-destructive text-sm animate-in fade-in">
                                         <AlertCircle size={16} />
                                         {error}
                                     </div>
@@ -237,11 +240,14 @@ export default function PinVerificationModal({
                             </div>
 
                             {/* Numpad */}
-                            <div className="numpad">
+                            <div className="grid grid-cols-3 gap-2 max-w-[280px] mx-auto">
                                 {numpadKeys.map((key) => (
                                     <button
                                         key={key}
-                                        className={`numpad__key ${key === 'clear' || key === 'back' ? 'numpad__key--action' : ''}`}
+                                        className={cn(
+                                            'h-14 flex items-center justify-center text-2xl font-bold bg-white text-slate-800 border-2 border-slate-200 rounded-lg cursor-pointer shadow-sm transition-all duration-150 hover:bg-slate-100 hover:border-slate-400 active:scale-95 active:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-slate-200 disabled:active:scale-100',
+                                            (key === 'clear' || key === 'back') && 'bg-red-50 text-red-600 border-red-200 text-xl hover:bg-red-100 hover:border-red-400'
+                                        )}
                                         onClick={() => handleKeyPress(key)}
                                         disabled={isVerifying}
                                     >
@@ -264,7 +270,7 @@ export default function PinVerificationModal({
                     >
                         {isVerifying ? (
                             <>
-                                <Loader2 size={16} className="spin" />
+                                <Loader2 size={16} className="animate-spin" />
                                 Verifying...
                             </>
                         ) : (

@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Save, CheckCheck, Search, Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import type { InventoryCount, Product, ISection } from '../../types/database'
-import './StockOpname.css'
+import { cn } from '@/lib/utils'
 
 // Extended item type for UI (adds product relation and computed unit)
 interface CountItemWithProduct {
@@ -214,15 +214,19 @@ export default function StockOpnameForm() {
         i.product.sku.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
-    if (!session) return <div className="opname-container"><div className="p-8 text-center text-gray-500">Loading...</div></div>
+    if (!session) return <div className="flex h-screen flex-col bg-gray-50"><div className="p-8 text-center text-gray-500">Loading...</div></div>
 
     const isLocked = session.status !== 'draft'
 
     return (
-        <div className="opname-container">
-            <header className="opname-header sticky top-0 z-10">
+        <div className="flex h-screen flex-col bg-gray-50">
+            <header className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4 shadow-sm">
                 <div className="flex items-center gap-4">
-                    <button onClick={() => navigate('/inventory/stock-opname')} className="btn-back" aria-label="Back">
+                    <button
+                        onClick={() => navigate('/inventory/stock-opname')}
+                        className="flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                        aria-label="Back"
+                    >
                         <ArrowLeft size={20} />
                     </button>
                     <div>
@@ -235,7 +239,7 @@ export default function StockOpnameForm() {
                                 </span>
                             )}
                         </div>
-                        <p className="opname-subtitle">
+                        <p className="flex items-center gap-2 text-sm text-gray-500">
                             {session.created_at ? new Date(session.created_at).toLocaleDateString() : ''}
                         </p>
                     </div>
@@ -263,14 +267,14 @@ export default function StockOpnameForm() {
                 </div>
             </header>
 
-            <div className="opname-content">
+            <div className="flex-1 overflow-auto px-8 py-6">
 
                 {/* Controls */}
-                <div className="controls-bar">
-                    <div className="search-input-wrapper">
-                        <Search className="search-icon" size={18} />
+                <div className="mb-6 flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                    <div className="relative w-80">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                         <input
-                            className="search-input"
+                            className="w-full rounded-md border border-gray-300 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
                             placeholder="Search for a product..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
@@ -291,46 +295,51 @@ export default function StockOpnameForm() {
                 </div>
 
                 {/* Table */}
-                <div className="opname-table-card">
-                    <table className="opname-table">
+                <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+                    <table className="w-full border-collapse">
                         <thead>
                             <tr>
-                                <th>Product</th>
-                                <th className="text-right">System Stock</th>
-                                <th className="text-right real-stock-col">Actual (Physical)</th>
-                                <th className="text-right">Variance</th>
+                                <th className="border-b border-gray-200 bg-gray-50 p-4 text-left text-sm font-semibold text-gray-600">Product</th>
+                                <th className="border-b border-gray-200 bg-gray-50 p-4 text-right text-sm font-semibold text-gray-600">System Stock</th>
+                                <th className="w-[180px] border-b border-gray-200 bg-blue-50/50 p-4 text-right text-sm font-semibold text-gray-600">Actual (Physical)</th>
+                                <th className="border-b border-gray-200 bg-gray-50 p-4 text-right text-sm font-semibold text-gray-600">Variance</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredItems.map(item => (
-                                <tr key={item.id}>
-                                    <td>
+                                <tr key={item.id} className="hover:bg-gray-50">
+                                    <td className="border-b border-gray-100 p-4 text-gray-700">
                                         <div className="font-medium text-gray-900">{item.product.name}</div>
                                         <div className="text-xs text-gray-500">{item.product.sku}</div>
                                     </td>
-                                    <td className="text-right">
+                                    <td className="border-b border-gray-100 p-4 text-right text-gray-700">
                                         {blindMode && !isLocked ? (
                                             <span className="text-muted italic">Hidden</span>
                                         ) : (
                                             <span className="font-medium">{item.system_quantity} {item.unit}</span>
                                         )}
                                     </td>
-                                    <td className="text-right real-stock-col">
+                                    <td className="w-[180px] border-b border-gray-100 bg-blue-50/50 p-4 text-right">
                                         {isLocked ? (
                                             <span className="font-bold">{item.counted_quantity}</span>
                                         ) : (
                                             <input
                                                 type="number"
-                                                className="count-input"
+                                                className="w-full rounded-md border border-gray-300 p-2 text-right font-mono font-semibold transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                                 value={item.counted_quantity ?? ''}
                                                 placeholder="-"
                                                 onChange={e => handleUpdateCount(item.id, e.target.value ? parseFloat(e.target.value) : null)}
                                             />
                                         )}
                                     </td>
-                                    <td className="text-right">
+                                    <td className="border-b border-gray-100 p-4 text-right">
                                         {item.difference !== null && !blindMode ? (
-                                            <span className={item.difference === 0 ? 'variance-neutral' : (item.difference > 0 ? 'variance-positive' : 'variance-negative')}>
+                                            <span className={cn(
+                                                'font-semibold',
+                                                item.difference === 0 && 'text-gray-400',
+                                                item.difference > 0 && 'text-success',
+                                                item.difference < 0 && 'text-destructive'
+                                            )}>
                                                 {item.difference > 0 ? '+' : ''}{item.difference} {item.unit}
                                             </span>
                                         ) : (
@@ -351,12 +360,12 @@ export default function StockOpnameForm() {
 function StatusBadge({ status }: { status: string }) {
     switch (status) {
         case 'draft':
-            return <span className="status-badge draft">Draft</span>
+            return <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-primary">Draft</span>
         case 'completed':
-            return <span className="status-badge completed">Validated</span>
+            return <span className="inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-success">Validated</span>
         case 'cancelled':
-            return <span className="status-badge cancelled">Cancelled</span>
+            return <span className="inline-flex items-center gap-1.5 rounded-full border border-destructive/30 bg-destructive/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-destructive">Cancelled</span>
         default:
-            return <span className="status-badge">{status}</span>
+            return <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wider">{status}</span>
     }
 }

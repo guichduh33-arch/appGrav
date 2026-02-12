@@ -84,7 +84,7 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
 
             {/* Quantity Calculator for semi-finished */}
             {isSemiFinished && (
-                <div className="lg:col-span-2 card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+                <div className="lg:col-span-2 card p-6 mb-6" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                         <Calculator size={20} style={{ color: '#16A34A' }} />
                         <span style={{ fontWeight: 600, color: '#166534' }}>Cost calculator:</span>
@@ -139,13 +139,13 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
                 </div>
             )}
 
-            <div className="card lg:col-span-2">
-                <h3 className="card-title">
+            <div className="card p-6 mb-6 lg:col-span-2">
+                <h3 className="text-lg font-semibold text-gray-900 mb-5 flex justify-between items-center">
                     Cost Breakdown
                     {isSemiFinished && <span style={{ fontWeight: 400, color: '#8B7355', marginLeft: '0.5rem' }}>(for 1 kg)</span>}
                 </h3>
                 <div className="overflow-x-auto mt-4 rounded-lg border border-gray-200">
-                    <table className="detail-table">
+                    <table className="w-full border-collapse text-[0.95rem] [&_th]:text-left [&_th]:px-4 [&_th]:py-3 [&_th]:bg-gray-50 [&_th]:text-gray-600 [&_th]:font-semibold [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-wide [&_th]:border-b-2 [&_th]:border-gray-100 [&_td]:px-4 [&_td]:py-3 [&_td]:border-b [&_td]:border-gray-100 [&_td]:text-gray-700 [&_tbody_tr:hover_td]:bg-gray-50">
                         <thead>
                             <tr>
                                 <th>Ingredient</th>
@@ -173,9 +173,9 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
                                         <td className="text-right font-semibold">{formattedPrice(lineCost)}</td>
                                         <td className="text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                <div className="w-16 progress-bar-container">
+                                                <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
                                                     <div
-                                                        className="progress-bar-fill bg-blue-500"
+                                                        className="h-full bg-blue-500 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
                                                         style={{ '--progress-width': `${Math.min(percentage, 100)}%` } as React.CSSProperties}
                                                     />
                                                 </div>
@@ -209,8 +209,8 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
                 </div>
             </div>
 
-            <div className="card">
-                <h3 className="card-title">Financial Summary</h3>
+            <div className="card p-6 mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-5 flex justify-between items-center">Financial Summary</h3>
                 <div className="my-4 space-y-3">
                     <div className="flex justify-between py-2 border-b border-dashed border-gray-200">
                         <span className="text-gray-600">
@@ -266,13 +266,13 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
                 )}
             </div>
 
-            <div className="card">
-                <h3 className="card-title">{isSemiFinished ? 'Cost Analysis' : 'Margin Analysis'}</h3>
+            <div className="card p-6 mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-5 flex justify-between items-center">{isSemiFinished ? 'Cost Analysis' : 'Margin Analysis'}</h3>
                 {!isSemiFinished && (
                     <div className="mt-4">
-                        <div className="progress-bar-container h-8">
+                        <div className="h-8 bg-gray-200 rounded-full overflow-hidden">
                             <div
-                                className={`progress-bar-fill ${margin < 0 ? 'bg-red-500' : margin < 30 ? 'bg-yellow-500' : 'bg-green-500'}`}
+                                className={`h-full transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${margin < 0 ? 'bg-red-500' : margin < 30 ? 'bg-yellow-500' : 'bg-green-500'}`}
                                 style={{ '--progress-width': `${Math.max(0, Math.min(margin, 100))}%` } as React.CSSProperties}
                             />
                         </div>

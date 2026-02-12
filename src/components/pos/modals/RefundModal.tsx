@@ -21,7 +21,7 @@ import {
   type TRefundReasonCode,
 } from '@/services/financial/financialOperationService';
 import type { TPaymentMethod } from '@/types/payment';
-import './RefundModal.css';
+import { cn } from '@/lib/utils';
 
 interface RefundModalProps {
   orderId: string;
@@ -151,11 +151,11 @@ export default function RefundModal({
         className="modal-backdrop is-active"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
-        <div className="modal modal-md is-active refund-modal">
-          <div className="modal__header refund-modal__header">
-            <div className="refund-modal__header-content">
-              <DollarSign size={24} className="refund-modal__icon" />
-              <h3 className="modal__title">Process Refund</h3>
+        <div className="modal modal-md is-active max-w-[520px]">
+          <div className="modal__header bg-gradient-to-br from-blue-600 to-blue-700 !border-b-0">
+            <div className="flex items-center gap-2">
+              <DollarSign size={24} className="text-blue-200" />
+              <h3 className="modal__title !text-white">Process Refund</h3>
             </div>
             <button
               type="button"
@@ -168,65 +168,72 @@ export default function RefundModal({
             </button>
           </div>
 
-          <div className="modal__body refund-modal__body">
+          <div className="modal__body flex flex-col gap-4 p-6">
             {/* Order Summary */}
-            <div className="refund-modal__summary">
-              <div className="refund-modal__summary-header">
-                <span className="refund-modal__order-number">Order {orderNumber}</span>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="mb-2 pb-2 border-b border-blue-200">
+                <span className="text-lg font-bold text-blue-800">Order {orderNumber}</span>
               </div>
-              <div className="refund-modal__summary-details">
-                <div className="refund-modal__detail">
-                  <span className="refund-modal__detail-label">Original Total</span>
-                  <span className="refund-modal__detail-value">{formatPrice(orderTotal)}</span>
+              <div className="flex flex-col gap-1">
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-500 text-sm">Original Total</span>
+                  <span className="font-semibold text-blue-800">{formatPrice(orderTotal)}</span>
                 </div>
-                <div className="refund-modal__detail">
-                  <span className="refund-modal__detail-label">Payment Method</span>
-                  <span className="refund-modal__detail-value">{paymentMethodName}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-500 text-sm">Payment Method</span>
+                  <span className="font-semibold text-blue-800">{paymentMethodName}</span>
                 </div>
                 {paidAt && (
-                  <div className="refund-modal__detail">
-                    <span className="refund-modal__detail-label">Paid At</span>
-                    <span className="refund-modal__detail-value">{paidAt}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-blue-500 text-sm">Paid At</span>
+                    <span className="font-semibold text-blue-800">{paidAt}</span>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Refund Type Toggle */}
-            <div className="refund-modal__field">
-              <label className="refund-modal__label">Refund Type</label>
-              <div className="refund-modal__toggle">
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-semibold text-foreground">Refund Type</label>
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  className={`refund-modal__toggle-btn ${refundType === 'full' ? 'is-active' : ''}`}
+                  className={cn(
+                    'flex flex-col items-center p-4 bg-background border-2 border-border rounded-lg cursor-pointer transition-all duration-200 font-semibold hover:border-blue-600 disabled:opacity-50',
+                    refundType === 'full' && 'border-blue-600 bg-blue-50 text-blue-800'
+                  )}
                   onClick={() => setRefundType('full')}
                   disabled={isProcessing}
                 >
                   Full Refund
-                  <span className="refund-modal__toggle-amount">{formatPrice(orderTotal)}</span>
+                  <span className="text-lg font-bold mt-1">{formatPrice(orderTotal)}</span>
                 </button>
                 <button
                   type="button"
-                  className={`refund-modal__toggle-btn ${refundType === 'partial' ? 'is-active' : ''}`}
+                  className={cn(
+                    'flex flex-col items-center p-4 bg-background border-2 border-border rounded-lg cursor-pointer transition-all duration-200 font-semibold hover:border-blue-600 disabled:opacity-50',
+                    refundType === 'partial' && 'border-blue-600 bg-blue-50 text-blue-800'
+                  )}
                   onClick={() => setRefundType('partial')}
                   disabled={isProcessing}
                 >
                   Partial Refund
-                  <span className="refund-modal__toggle-hint">Enter amount</span>
+                  <span className="text-xs opacity-70 mt-1">Enter amount</span>
                 </button>
               </div>
             </div>
 
             {/* Partial Amount Input */}
             {refundType === 'partial' && (
-              <div className="refund-modal__field">
-                <label className="refund-modal__label">
-                  Refund Amount <span className="required">*</span>
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-semibold text-foreground">
+                  Refund Amount <span className="text-red-600">*</span>
                 </label>
-                <div className="refund-modal__amount-input">
-                  <span className="refund-modal__currency">Rp</span>
+                <div className="flex items-center bg-background border-2 border-primary rounded-lg py-2 px-4">
+                  <span className="text-lg font-semibold text-muted-foreground mr-2">Rp</span>
                   <input
                     type="text"
+                    className="border-none bg-transparent text-xl font-bold text-foreground w-full outline-none"
                     value={amount.toLocaleString('id-ID')}
                     onChange={(e) => {
                       const value = parseInt(e.target.value.replace(/\D/g, ''), 10) || 0;
@@ -235,19 +242,22 @@ export default function RefundModal({
                     disabled={isProcessing}
                   />
                 </div>
-                <span className="refund-modal__hint">Maximum: {formatPrice(orderTotal)}</span>
+                <span className="text-xs text-muted-foreground">Maximum: {formatPrice(orderTotal)}</span>
               </div>
             )}
 
             {/* Refund Method */}
-            <div className="refund-modal__field">
-              <label className="refund-modal__label">Refund Method</label>
-              <div className="refund-modal__methods">
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-semibold text-foreground">Refund Method</label>
+              <div className="grid grid-cols-2 gap-2">
                 {REFUND_METHODS.map((method) => (
                   <button
                     key={method.id}
                     type="button"
-                    className={`refund-modal__method-btn ${refundMethod === method.id ? 'is-active' : ''}`}
+                    className={cn(
+                      'py-2 px-4 bg-background border border-border rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 hover:border-blue-600 disabled:opacity-50',
+                      refundMethod === method.id && 'border-blue-600 bg-blue-50 text-blue-800'
+                    )}
                     onClick={() => setRefundMethod(method.id)}
                     disabled={isProcessing}
                   >
@@ -258,12 +268,12 @@ export default function RefundModal({
             </div>
 
             {/* Reason Selection */}
-            <div className="refund-modal__field">
-              <label className="refund-modal__label">
-                Reason for refund <span className="required">*</span>
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-semibold text-foreground">
+                Reason for refund <span className="text-red-600">*</span>
               </label>
               <select
-                className="refund-modal__select"
+                className="form-select"
                 value={reasonCode}
                 onChange={(e) => setReasonCode(e.target.value as TRefundReasonCode)}
                 disabled={isProcessing}
@@ -278,10 +288,10 @@ export default function RefundModal({
             </div>
 
             {/* Additional Notes */}
-            <div className="refund-modal__field">
-              <label className="refund-modal__label">Additional notes</label>
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-semibold text-foreground">Additional notes</label>
               <textarea
-                className="refund-modal__textarea"
+                className="form-textarea"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Optional notes..."
@@ -291,7 +301,7 @@ export default function RefundModal({
             </div>
           </div>
 
-          <div className="modal__footer refund-modal__footer">
+          <div className="modal__footer flex justify-end gap-4 px-6 py-4 border-t border-border">
             <button
               type="button"
               className="btn btn-secondary"
@@ -302,7 +312,7 @@ export default function RefundModal({
             </button>
             <button
               type="button"
-              className="btn btn-refund"
+              className="flex items-center gap-1 py-2 px-6 bg-blue-600 text-white border-none rounded-lg font-semibold cursor-pointer transition-all duration-200 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed"
               onClick={handleRefundClick}
               disabled={!canSubmit || isProcessing}
             >

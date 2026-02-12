@@ -23,7 +23,6 @@ import {
     ORDER_STATUSES,
 } from './ordersPageHelpers';
 import type { Order, OrderItem, OrderStatus, OrderType, PaymentStatus } from './ordersPageHelpers';
-import './OrdersPage.css';
 
 const OrdersPage = () => {
     const queryClient = useQueryClient();
@@ -232,16 +231,18 @@ const OrdersPage = () => {
     const stats = useMemo(() => computeStats(filteredOrders), [filteredOrders]);
 
     return (
-        <div className="orders-page">
-            <header className="orders-page__header">
-                <h1 className="orders-page__title">Live Orders</h1>
-                <div className="orders-page__actions">
+        <div className="p-lg max-md:p-md h-full overflow-y-auto" style={{ background: 'var(--color-blanc-creme)' }}>
+            <header className="flex items-center justify-between mb-lg">
+                <h1 className="font-display text-4xl font-bold" style={{ color: 'var(--color-brun-chocolat)' }}>
+                    Live Orders
+                </h1>
+                <div className="flex gap-sm">
                     <button
                         className="btn-secondary"
                         onClick={() => refetch()}
                         disabled={isFetching}
                     >
-                        <RefreshCw size={18} className={isFetching ? 'spinning' : ''} />
+                        <RefreshCw size={18} className={isFetching ? 'animate-spin' : ''} />
                         Refresh
                     </button>
                     <button className="btn-secondary" onClick={() => exportOrdersCsv(filteredOrders, dateFrom, dateTo)}>
@@ -252,78 +253,96 @@ const OrdersPage = () => {
             </header>
 
             {/* Stats Summary */}
-            <div className="orders-stats">
-                <div className="orders-stat">
-                    <span className="orders-stat__label">Total Orders</span>
-                    <span className="orders-stat__value">{stats.total}</span>
+            <div className="flex gap-md mb-lg flex-wrap max-md:flex-col">
+                <div className="orders-stat flex items-center gap-sm py-md px-lg bg-white rounded-md shadow-sm">
+                    <span className="orders-stat-label text-xs uppercase tracking-[0.5px]" style={{ color: 'var(--color-gris-chaud)' }}>
+                        Total Orders
+                    </span>
+                    <span className="text-xl font-bold" style={{ color: 'var(--color-brun-chocolat)' }}>{stats.total}</span>
                 </div>
-                <div className="orders-stat">
-                    <span className="orders-stat__label">Total Amount</span>
-                    <span className="orders-stat__value">{formatCurrency(stats.totalAmount)}</span>
+                <div className="orders-stat flex items-center gap-sm py-md px-lg bg-white rounded-md shadow-sm">
+                    <span className="orders-stat-label text-xs uppercase tracking-[0.5px]" style={{ color: 'var(--color-gris-chaud)' }}>
+                        Total Amount
+                    </span>
+                    <span className="text-xl font-bold" style={{ color: 'var(--color-brun-chocolat)' }}>{formatCurrency(stats.totalAmount)}</span>
                 </div>
-                <div className="orders-stat orders-stat--success">
-                    <Check size={16} />
-                    <span className="orders-stat__label">Paid</span>
-                    <span className="orders-stat__value">{stats.paid}</span>
-                    <span className="orders-stat__amount">{formatCurrency(stats.paidAmount)}</span>
+                <div className="orders-stat flex items-center gap-sm py-md px-lg bg-white rounded-md shadow-sm border-l-[3px] border-l-success">
+                    <Check size={16} className="text-success" />
+                    <span className="orders-stat-label text-xs uppercase tracking-[0.5px]" style={{ color: 'var(--color-gris-chaud)' }}>
+                        Paid
+                    </span>
+                    <span className="text-xl font-bold text-success">{stats.paid}</span>
+                    <span className="text-sm font-semibold font-mono" style={{ color: 'var(--color-gris-chaud)' }}>
+                        {formatCurrency(stats.paidAmount)}
+                    </span>
                 </div>
-                <div className="orders-stat orders-stat--warning">
-                    <Clock size={16} />
-                    <span className="orders-stat__label">Unpaid</span>
-                    <span className="orders-stat__value">{stats.unpaid}</span>
-                    <span className="orders-stat__amount">{formatCurrency(stats.unpaidAmount)}</span>
+                <div className="orders-stat flex items-center gap-sm py-md px-lg bg-white rounded-md shadow-sm" style={{ borderLeft: '3px solid var(--color-urgent)' }}>
+                    <Clock size={16} style={{ color: 'var(--color-urgent)' }} />
+                    <span className="orders-stat-label text-xs uppercase tracking-[0.5px]" style={{ color: 'var(--color-gris-chaud)' }}>
+                        Unpaid
+                    </span>
+                    <span className="text-xl font-bold" style={{ color: 'var(--color-urgent)' }}>{stats.unpaid}</span>
+                    <span className="text-sm font-semibold font-mono" style={{ color: 'var(--color-gris-chaud)' }}>
+                        {formatCurrency(stats.unpaidAmount)}
+                    </span>
                 </div>
             </div>
 
             {/* Filters */}
-            <div className="orders-filters">
-                <div className="filter-group">
-                    <label className="filter-group__label">Search</label>
-                    <div className="filter-group__search-wrapper">
+            <div className="flex gap-md mb-lg flex-wrap max-md:flex-col">
+                <div className="flex flex-col gap-xs">
+                    <label className="flex items-center gap-1 text-xs font-medium uppercase tracking-[0.5px]" style={{ color: 'var(--color-gris-chaud)' }}>
+                        Search
+                    </label>
+                    <div className="relative">
                         <input
                             type="text"
-                            className="filter-group__input filter-group__input--with-icon"
+                            className="op-filter-input h-10 pl-9 pr-md bg-white border border-border rounded-sm text-sm min-w-[150px] max-md:w-full"
+                            style={{ color: 'var(--color-brun-chocolat)' }}
                             placeholder="Order #, customer..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
-                        <Search size={16} className="filter-group__input-icon" />
+                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--color-gris-chaud)' }} />
                     </div>
                 </div>
 
-                <div className="filter-group">
-                    <label className="filter-group__label" htmlFor="date-from">
+                <div className="flex flex-col gap-xs">
+                    <label className="flex items-center gap-1 text-xs font-medium uppercase tracking-[0.5px]" style={{ color: 'var(--color-gris-chaud)' }} htmlFor="date-from">
                         <Calendar size={12} /> Start Date
                     </label>
                     <input
                         id="date-from"
                         type="date"
-                        className="filter-group__input"
+                        className="op-filter-input h-10 px-md bg-white border border-border rounded-sm text-sm min-w-[150px] max-md:w-full"
+                        style={{ color: 'var(--color-brun-chocolat)' }}
                         value={dateFrom}
                         onChange={(e) => setDateFrom(e.target.value)}
                     />
                 </div>
 
-                <div className="filter-group">
-                    <label className="filter-group__label" htmlFor="date-to">
+                <div className="flex flex-col gap-xs">
+                    <label className="flex items-center gap-1 text-xs font-medium uppercase tracking-[0.5px]" style={{ color: 'var(--color-gris-chaud)' }} htmlFor="date-to">
                         <Calendar size={12} /> End Date
                     </label>
                     <input
                         id="date-to"
                         type="date"
-                        className="filter-group__input"
+                        className="op-filter-input h-10 px-md bg-white border border-border rounded-sm text-sm min-w-[150px] max-md:w-full"
+                        style={{ color: 'var(--color-brun-chocolat)' }}
                         value={dateTo}
                         onChange={(e) => setDateTo(e.target.value)}
                     />
                 </div>
 
-                <div className="filter-group">
-                    <label className="filter-group__label" htmlFor="order-type">
+                <div className="flex flex-col gap-xs">
+                    <label className="flex items-center gap-1 text-xs font-medium uppercase tracking-[0.5px]" style={{ color: 'var(--color-gris-chaud)' }} htmlFor="order-type">
                         <Filter size={12} /> Type
                     </label>
                     <select
                         id="order-type"
-                        className="filter-group__input"
+                        className="op-filter-input h-10 px-md bg-white border border-border rounded-sm text-sm min-w-[150px]"
+                        style={{ color: 'var(--color-brun-chocolat)' }}
                         value={typeFilter}
                         onChange={(e) => setTypeFilter(e.target.value as OrderType)}
                     >
@@ -335,13 +354,14 @@ const OrdersPage = () => {
                     </select>
                 </div>
 
-                <div className="filter-group">
-                    <label className="filter-group__label" htmlFor="payment-status">
+                <div className="flex flex-col gap-xs">
+                    <label className="flex items-center gap-1 text-xs font-medium uppercase tracking-[0.5px]" style={{ color: 'var(--color-gris-chaud)' }} htmlFor="payment-status">
                         <CreditCard size={12} /> Payment
                     </label>
                     <select
                         id="payment-status"
-                        className="filter-group__input"
+                        className="op-filter-input h-10 px-md bg-white border border-border rounded-sm text-sm min-w-[150px]"
+                        style={{ color: 'var(--color-brun-chocolat)' }}
                         value={paymentFilter}
                         onChange={(e) => setPaymentFilter(e.target.value as PaymentStatus)}
                     >
@@ -353,11 +373,16 @@ const OrdersPage = () => {
             </div>
 
             {/* Status Filter Pills */}
-            <div className="status-filters status-filters--mb">
+            <div className="flex gap-xs items-end flex-wrap mb-lg">
                 {ORDER_STATUSES.map(status => (
                     <button
                         key={status}
-                        className={`status-pill ${statusFilter === status ? 'is-active' : ''}`}
+                        className="op-status-pill py-sm px-md bg-white border border-border rounded-xl text-sm font-medium cursor-pointer transition-all duration-fast ease-standard"
+                        style={{
+                            color: statusFilter === status ? 'white' : 'var(--color-gris-chaud)',
+                            background: statusFilter === status ? 'var(--color-rose-poudre)' : undefined,
+                            borderColor: statusFilter === status ? 'var(--color-rose-poudre)' : undefined,
+                        }}
                         onClick={() => setStatusFilter(status)}
                     >
                         {status === 'all' ? 'All' : getStatusLabel(status)}
@@ -384,6 +409,18 @@ const OrdersPage = () => {
                     onClose={() => setSelectedOrder(null)}
                 />
             )}
+
+            {/* Scoped styles for focus states and hover effects */}
+            <style>{`
+                .op-filter-input:focus {
+                    outline: none;
+                    border-color: var(--color-rose-poudre);
+                }
+                .op-status-pill:hover {
+                    border-color: var(--color-rose-poudre);
+                    color: var(--color-rose-poudre);
+                }
+            `}</style>
         </div>
     );
 };

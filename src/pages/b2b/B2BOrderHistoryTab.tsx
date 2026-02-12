@@ -8,15 +8,15 @@ interface B2BOrderHistoryTabProps {
 
 export default function B2BOrderHistoryTab({ history }: B2BOrderHistoryTabProps) {
     return (
-        <div className="b2b-history-list">
+        <div className="p-md">
             {history.map(entry => (
-                <div key={entry.id} className="history-entry">
-                    <div className="history-entry__icon">
+                <div key={entry.id} className="flex gap-md py-md border-b border-border last:border-b-0">
+                    <div className="w-8 h-8 flex items-center justify-center bg-[var(--color-blanc-creme)] rounded-full text-[var(--color-gris-chaud)] shrink-0">
                         <Clock size={16} />
                     </div>
-                    <div className="history-entry__content">
-                        <p className="history-entry__description">{entry.description}</p>
-                        <span className="history-entry__date">{formatDateTime(entry.created_at)}</span>
+                    <div className="flex-1">
+                        <p className="text-sm text-[var(--color-brun-chocolat)] mb-1">{entry.description}</p>
+                        <span className="text-xs text-[var(--color-gris-chaud)]">{formatDateTime(entry.created_at)}</span>
                     </div>
                 </div>
             ))}

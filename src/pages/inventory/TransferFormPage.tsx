@@ -5,7 +5,6 @@ import { toast } from 'sonner'
 import { useSectionsByType, useCreateTransfer, useTransfer } from '@/hooks/inventory'
 import { useProducts } from '@/hooks/products'
 import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'
-import './TransferFormPage.css'
 
 interface TransferItemForm {
   id?: string
@@ -177,44 +176,34 @@ export default function TransferFormPage() {
   const canSave = isOnline && !isSubmitting
 
   return (
-    <div className="transfer-form-page">
+    <div className="mx-auto max-w-[1400px] p-6">
       {/* Offline warning banner */}
       {!isOnline && (
-        <div className="offline-warning-banner" style={{
-          background: 'rgba(239, 68, 68, 0.1)',
-          border: '1px solid #ef4444',
-          borderRadius: '8px',
-          padding: '12px 16px',
-          marginBottom: '16px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          color: '#b91c1c'
-        }}>
+        <div className="mb-4 flex items-center gap-2 rounded-lg border border-destructive bg-destructive/10 px-4 py-3 text-red-800">
           <WifiOff size={18} />
           <span>Connection lost. Please reconnect to save changes.</span>
         </div>
       )}
 
-      <header className="transfer-form-header">
+      <header className="mb-6 flex items-start gap-4">
         <button className="btn btn-ghost" onClick={() => navigate('/inventory/transfers')}>
           <ArrowLeft size={20} />
         </button>
         <div>
-          <h1 className="transfer-form-title">
+          <h1 className="mb-1 text-2xl font-bold text-foreground">
             {isEditing ? 'Edit Transfer' : 'New Transfer'}
           </h1>
-          <p className="transfer-form-subtitle">
+          <p className="text-sm text-muted-foreground">
             Manage transfers between warehouse and sections
           </p>
         </div>
       </header>
 
-      <div className="transfer-form-container">
+      <div className="flex flex-col gap-6">
         {/* General Info */}
-        <div className="transfer-form-section">
-          <h2>Settings</h2>
-          <div className="form-grid">
+        <div className="rounded-lg border border-border bg-card p-5">
+          <h2 className="mb-4 text-lg font-bold text-foreground">Settings</h2>
+          <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
             <div className="form-group">
               <label>From *</label>
               <select
@@ -278,9 +267,9 @@ export default function TransferFormPage() {
         </div>
 
         {/* Items */}
-        <div className="transfer-form-section">
-          <div className="section-header">
-            <h2>Items</h2>
+        <div className="rounded-lg border border-border bg-card p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-foreground">Items</h2>
             <button
               className="btn btn-secondary btn-sm"
               onClick={addItem}
@@ -292,27 +281,28 @@ export default function TransferFormPage() {
           </div>
 
           {items.length === 0 ? (
-            <div className="no-items">
+            <div className="py-6 text-center text-muted-foreground">
               <p>No items added yet</p>
             </div>
           ) : (
-            <div className="items-table">
-              <table>
+            <div className="max-md:overflow-x-auto">
+              <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th style={{ width: '120px' }}>Quantity</th>
-                    <th style={{ width: '80px' }}>Unit</th>
-                    <th style={{ width: '120px' }}>Unit Cost</th>
-                    <th style={{ width: '120px' }}>Line Total</th>
-                    <th style={{ width: '60px' }}></th>
+                    <th className="border-b border-border bg-muted/50 p-3 text-left text-xs font-semibold uppercase text-muted-foreground">Product</th>
+                    <th className="border-b border-border bg-muted/50 p-3 text-left text-xs font-semibold uppercase text-muted-foreground" style={{ width: '120px' }}>Quantity</th>
+                    <th className="border-b border-border bg-muted/50 p-3 text-left text-xs font-semibold uppercase text-muted-foreground" style={{ width: '80px' }}>Unit</th>
+                    <th className="border-b border-border bg-muted/50 p-3 text-left text-xs font-semibold uppercase text-muted-foreground" style={{ width: '120px' }}>Unit Cost</th>
+                    <th className="border-b border-border bg-muted/50 p-3 text-left text-xs font-semibold uppercase text-muted-foreground" style={{ width: '120px' }}>Line Total</th>
+                    <th className="border-b border-border bg-muted/50 p-3 text-left text-xs font-semibold uppercase text-muted-foreground" style={{ width: '60px' }}></th>
                   </tr>
                 </thead>
                 <tbody>
                   {items.map((item, index) => (
                     <tr key={index}>
-                      <td>
+                      <td className="border-b border-border p-3">
                         <select
+                          className="w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground"
                           value={item.product_id}
                           onChange={(e) => updateItem(index, 'product_id', e.target.value)}
                           disabled={!isOnline}
@@ -325,8 +315,9 @@ export default function TransferFormPage() {
                           ))}
                         </select>
                       </td>
-                      <td>
+                      <td className="border-b border-border p-3">
                         <input
+                          className="w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground"
                           type="number"
                           min="0"
                           step="0.01"
@@ -335,11 +326,12 @@ export default function TransferFormPage() {
                           disabled={!isOnline}
                         />
                       </td>
-                      <td>
-                        <span className="unit-display">{item.unit || '-'}</span>
+                      <td className="border-b border-border p-3">
+                        <span className="text-sm font-medium text-muted-foreground">{item.unit || '-'}</span>
                       </td>
-                      <td>
+                      <td className="border-b border-border p-3">
                         <input
+                          className="w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground"
                           type="number"
                           min="0"
                           step="0.01"
@@ -348,8 +340,8 @@ export default function TransferFormPage() {
                           disabled={!isOnline}
                         />
                       </td>
-                      <td className="total-cell">Rp{item.line_total.toLocaleString('id-ID')}</td>
-                      <td>
+                      <td className="border-b border-border p-3 font-semibold text-foreground">Rp{item.line_total.toLocaleString('id-ID')}</td>
+                      <td className="border-b border-border p-3">
                         <button
                           className="btn-icon btn-icon--danger"
                           onClick={() => removeItem(index)}
@@ -366,28 +358,28 @@ export default function TransferFormPage() {
           )}
 
           {items.length > 0 && (
-            <div className="transfer-summary">
-              <div className="summary-row">
-                <span className="summary-label">Total Items:</span>
-                <span className="summary-value">{items.length}</span>
+            <div className="mt-4 rounded-md bg-muted/50 p-4">
+              <div className="flex justify-between py-2">
+                <span className="text-sm text-muted-foreground">Total Items:</span>
+                <span className="text-base font-semibold text-foreground">{items.length}</span>
               </div>
-              <div className="summary-row total">
-                <span className="summary-label">Total Value:</span>
-                <span className="summary-value">Rp{getTotalValue().toLocaleString('id-ID')}</span>
+              <div className="mt-2 flex justify-between border-t-2 border-border pt-4">
+                <span className="text-sm text-muted-foreground">Total Value:</span>
+                <span className="text-lg font-semibold text-primary">Rp{getTotalValue().toLocaleString('id-ID')}</span>
               </div>
             </div>
           )}
         </div>
 
         {/* Actions */}
-        <div className="transfer-form-actions">
+        <div className="flex justify-between border-t border-border pt-5 max-md:flex-col max-md:gap-3">
           <button
             className="btn btn-secondary"
             onClick={() => navigate('/inventory/transfers')}
           >
             Cancel
           </button>
-          <div className="action-group">
+          <div className="flex gap-3 max-md:flex-col">
             <button
               className="btn btn-outline"
               onClick={() => handleSubmit(false)}

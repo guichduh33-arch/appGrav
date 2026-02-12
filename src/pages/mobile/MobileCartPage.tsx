@@ -23,7 +23,6 @@ import { lanClient } from '@/services/lan/lanClient';
 import { LAN_MESSAGE_TYPES } from '@/services/lan/lanProtocol';
 import { supabase } from '@/lib/supabase';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import './MobileCartPage.css';
 
 /**
  * Mobile Cart Page Component
@@ -154,13 +153,13 @@ export default function MobileCartPage() {
   // Empty cart state
   if (!currentOrder || currentOrder.items.length === 0) {
     return (
-      <div className="mobile-cart mobile-cart--empty">
-        <div className="mobile-cart__empty-content">
-          <AlertCircle size={48} className="mobile-cart__empty-icon" />
-          <h2>Empty cart</h2>
-          <p>Add products to get started</p>
+      <div className="flex flex-col h-full bg-secondary justify-center items-center p-8">
+        <div className="text-center text-muted-foreground">
+          <AlertCircle size={48} className="text-muted mb-4 mx-auto" />
+          <h2 className="text-xl font-semibold mb-1 text-foreground">Empty cart</h2>
+          <p className="mb-6">Add products to get started</p>
           <button
-            className="mobile-cart__empty-btn"
+            className="py-2 px-6 bg-primary border-none rounded-xl text-white font-semibold cursor-pointer"
             onClick={() => navigate('/mobile/catalog')}
           >
             View products
@@ -171,15 +170,18 @@ export default function MobileCartPage() {
   }
 
   return (
-    <div className="mobile-cart">
+    <div className="flex flex-col h-full bg-secondary">
       {/* Header */}
-      <div className="mobile-cart__header">
-        <button className="mobile-cart__back" onClick={() => navigate(-1)}>
+      <div className="flex items-center gap-4 p-4 bg-white border-b border-border">
+        <button
+          className="bg-transparent border-none text-foreground cursor-pointer p-1"
+          onClick={() => navigate(-1)}
+        >
           <ArrowLeft size={24} />
         </button>
-        <h1>Cart</h1>
+        <h1 className="text-xl font-semibold m-0 flex-1">Cart</h1>
         {currentOrder.tableNumber && (
-          <span className="mobile-cart__table">
+          <span className="flex items-center gap-1 py-1 px-2 bg-secondary rounded-full text-sm text-muted-foreground">
             <Table2 size={16} />
             Table {currentOrder.tableNumber}
           </span>
@@ -187,42 +189,42 @@ export default function MobileCartPage() {
       </div>
 
       {/* Items */}
-      <div className="mobile-cart__items">
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
         {currentOrder.items.map((item) => (
-          <div key={item.id} className="mobile-cart__item">
-            <div className="mobile-cart__item-main">
-              <div className="mobile-cart__item-info">
-                <span className="mobile-cart__item-name">{item.productName}</span>
+          <div key={item.id} className="bg-white rounded-xl p-4 border border-border">
+            <div className="flex justify-between mb-2">
+              <div className="flex flex-col gap-0.5">
+                <span className="font-semibold">{item.productName}</span>
                 {item.modifiers.length > 0 && (
-                  <span className="mobile-cart__item-mods">
+                  <span className="text-sm text-muted-foreground">
                     {item.modifiers.map((m) => m.name).join(', ')}
                   </span>
                 )}
                 {item.notes && (
-                  <span className="mobile-cart__item-notes">{item.notes}</span>
+                  <span className="text-sm text-muted italic">{item.notes}</span>
                 )}
               </div>
-              <span className="mobile-cart__item-price">
+              <span className="font-semibold text-primary">
                 Rp {item.totalPrice.toLocaleString('id-ID')}
               </span>
             </div>
 
-            <div className="mobile-cart__item-actions">
+            <div className="flex items-center gap-2">
               <button
-                className="mobile-cart__qty-btn"
+                className="w-9 h-9 flex items-center justify-center bg-secondary border border-border rounded-full cursor-pointer active:bg-primary active:text-white active:border-primary"
                 onClick={() => handleQuantityChange(item.id, -1)}
               >
                 <Minus size={16} />
               </button>
-              <span className="mobile-cart__qty">{item.quantity}</span>
+              <span className="min-w-8 text-center font-semibold">{item.quantity}</span>
               <button
-                className="mobile-cart__qty-btn"
+                className="w-9 h-9 flex items-center justify-center bg-secondary border border-border rounded-full cursor-pointer active:bg-primary active:text-white active:border-primary"
                 onClick={() => handleQuantityChange(item.id, 1)}
               >
                 <Plus size={16} />
               </button>
               <button
-                className="mobile-cart__remove-btn"
+                className="ml-auto w-9 h-9 flex items-center justify-center bg-red-100 border-none rounded-full text-destructive cursor-pointer"
                 onClick={() => handleRemoveItem(item.id)}
               >
                 <Trash2 size={16} />
@@ -233,21 +235,21 @@ export default function MobileCartPage() {
       </div>
 
       {/* Total */}
-      <div className="mobile-cart__total">
-        <div className="mobile-cart__total-row">
+      <div className="bg-white p-4 border-t border-border">
+        <div className="flex justify-between mb-1 text-muted-foreground">
           <span>Subtotal</span>
           <span>Rp {currentOrder.subtotal.toLocaleString('id-ID')}</span>
         </div>
-        <div className="mobile-cart__total-row mobile-cart__total-row--final">
+        <div className="flex justify-between text-xl font-bold text-foreground mt-2 pt-2 border-t border-border">
           <span>Total</span>
           <span>Rp {currentOrder.total.toLocaleString('id-ID')}</span>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="mobile-cart__actions">
+      <div className="flex gap-2 p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] bg-white border-t border-border">
         <button
-          className="mobile-cart__action mobile-cart__action--clear"
+          className="flex-[0.4] flex items-center justify-center gap-2 p-4 border-none rounded-xl text-base font-semibold cursor-pointer transition-all duration-150 min-h-14 bg-secondary text-muted-foreground disabled:opacity-70 disabled:cursor-not-allowed"
           onClick={clearOrder}
           disabled={isSending}
         >
@@ -256,7 +258,7 @@ export default function MobileCartPage() {
         </button>
 
         <button
-          className="mobile-cart__action mobile-cart__action--send"
+          className="flex-1 flex items-center justify-center gap-2 p-4 border-none rounded-xl text-base font-semibold cursor-pointer transition-all duration-150 min-h-14 bg-green-500 text-white active:bg-green-600 disabled:opacity-70 disabled:cursor-not-allowed"
           onClick={handleSendToKitchen}
           disabled={isSending || sendStatus === 'success'}
         >
@@ -279,7 +281,7 @@ export default function MobileCartPage() {
 
       {/* Offline Warning */}
       {!isOnline && (
-        <div className="mobile-cart__warning">
+        <div className="flex items-center gap-2 mx-4 py-2 px-4 bg-amber-100 rounded-lg text-warning text-sm">
           <AlertCircle size={16} />
           <span>Offline mode - Order will be sent when reconnected</span>
         </div>
@@ -287,7 +289,7 @@ export default function MobileCartPage() {
 
       {/* Error Message */}
       {errorMessage && (
-        <div className="mobile-cart__error">
+        <div className="flex items-center gap-2 mx-4 py-2 px-4 bg-red-100 rounded-lg text-destructive text-sm">
           <AlertCircle size={16} />
           <span>{errorMessage}</span>
         </div>

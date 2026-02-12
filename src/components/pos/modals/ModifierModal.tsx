@@ -6,7 +6,7 @@ import { formatPrice } from '../../../utils/helpers'
 import { calculateCustomerPrice } from '@/services/sync/customerPricingService'
 import type { IOfflineProduct } from '@/lib/db'
 import type { ICustomerPriceResult } from '@/types/offline'
-import './ModifierModal.css'
+import { cn } from '@/lib/utils'
 
 interface ModifierModalProps {
     product: Product & { category?: { name: string } | null }
@@ -284,72 +284,99 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
     }
 
     return (
-        <div className="modal-backdrop is-active" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className="modal modal-md is-active">
-                <div className="modal__header">
+        <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center"
+            style={{ zIndex: 'var(--z-modal-backdrop)' }}
+            onClick={(e) => e.target === e.currentTarget && onClose()}
+        >
+            <div
+                className="relative bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] max-h-[90vh] flex flex-col text-white w-[500px] max-w-[90vw]"
+                style={{ zIndex: 'var(--z-modal)' }}
+            >
+                <div className="flex items-start justify-between p-[var(--space-lg)] border-b border-[var(--color-gray-700)]">
                     <div>
-                        <h3 className="modal__title">
+                        <h3 className="text-2xl font-bold flex items-center gap-2 m-0 text-white">
                             {product.name}
                         </h3>
-                        <p className="modal__subtitle">Customize your order</p>
+                        <p className="text-sm text-[var(--color-gray-400)] mt-1">Customize your order</p>
                     </div>
-                    <button className="modal__close" onClick={onClose} title="Close" aria-label="Close">
+                    <button
+                        className="w-10 h-10 flex items-center justify-center bg-transparent border-none rounded-lg text-[var(--color-gray-400)] cursor-pointer transition-all hover:bg-[var(--color-gray-700)] hover:text-white"
+                        onClick={onClose}
+                        title="Close"
+                        aria-label="Close"
+                    >
                         <X size={24} />
                     </button>
                 </div>
 
-                <div className="modal__body">
+                <div className="flex-1 overflow-y-auto p-[var(--space-lg)]">
                     {/* Modifier Groups */}
                     {modifierGroups.map(group => (
-                        <div key={group.name} className="modifier-section">
-                            <h4 className="modifier-section__title">
+                        <div key={group.name} className="mb-6 last:mb-0">
+                            <h4 className="flex items-center gap-2 text-sm font-semibold text-[var(--color-gray-400)] mb-[var(--space-md)] uppercase tracking-[0.05em]">
                                 {group.label}
-                                {group.required && <span className="required">*</span>}
+                                {group.required && <span className="text-destructive ml-1">*</span>}
                             </h4>
 
                             {group.type === 'single' ? (
-                                <div className="modifier-options">
+                                <div className="grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-3">
                                     {group.options.map(option => (
-                                        <div key={option.id} className="modifier-option">
+                                        <div key={option.id} className="relative">
                                             <input
                                                 type="radio"
                                                 name={group.name}
                                                 id={`${group.name}-${option.id}`}
                                                 checked={selections[group.name] === option.id}
                                                 onChange={() => handleSingleSelect(group.name, option.id)}
+                                                className="absolute opacity-0 pointer-events-none peer"
                                             />
-                                            <label htmlFor={`${group.name}-${option.id}`} className="modifier-option__label">
-                                                <span className="modifier-option__text">{option.label}</span>
+                                            <label
+                                                htmlFor={`${group.name}-${option.id}`}
+                                                className="flex flex-col items-center justify-center py-4 px-3 bg-[var(--color-gray-900)] border-2 border-transparent rounded-xl cursor-pointer transition-all text-center min-h-[80px] text-[var(--color-gray-300)] hover:bg-[var(--color-gray-750,#2a2a2e)] hover:text-white peer-checked:border-[var(--color-primary)] peer-checked:bg-blue-500/10 peer-checked:text-[var(--color-primary-light)]"
+                                            >
+                                                <span className="text-[15px] font-semibold">{option.label}</span>
                                                 {option.price > 0 && (
-                                                    <span className="modifier-option__price">+{formatPrice(option.price)}</span>
+                                                    <span className="text-[13px] text-[var(--color-gray-400)] mt-1 font-medium peer-checked:text-[var(--color-primary-light)]">+{formatPrice(option.price)}</span>
                                                 )}
                                             </label>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="modifier-checkboxes">
-                                    {group.options.map(option => (
-                                        <label key={option.id} className={`modifier-checkbox ${(selections[group.name] as string[]).includes(option.id) ? 'is-checked' : ''}`}>
-                                            <input
-                                                type="checkbox"
-                                                checked={(selections[group.name] as string[]).includes(option.id)}
-                                                onChange={() => handleMultiSelect(group.name, option.id)}
-                                            />
-                                            <span className="modifier-checkbox__label">{option.label}</span>
-                                            <span className="modifier-checkbox__price">+{formatPrice(option.price)}</span>
-                                        </label>
-                                    ))}
+                                <div className="flex flex-col gap-2">
+                                    {group.options.map(option => {
+                                        const isChecked = (selections[group.name] as string[]).includes(option.id)
+                                        return (
+                                            <label
+                                                key={option.id}
+                                                className={cn(
+                                                    'flex items-center py-3 px-4 bg-[var(--color-gray-900)] border border-transparent rounded-xl cursor-pointer transition-all min-h-[56px]',
+                                                    'hover:bg-[var(--color-gray-750,#2a2a2e)]',
+                                                    isChecked && 'border-[var(--color-primary)] bg-blue-500/10'
+                                                )}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isChecked}
+                                                    onChange={() => handleMultiSelect(group.name, option.id)}
+                                                    className="w-5 h-5 accent-[var(--color-primary)] mr-3"
+                                                />
+                                                <span className={cn('flex-1 text-[15px] font-medium text-[var(--color-gray-200)]', isChecked && 'text-[var(--color-primary-light)]')}>{option.label}</span>
+                                                <span className={cn('text-sm text-[var(--color-gray-400)]', isChecked && 'text-[var(--color-primary-light)]')}>+{formatPrice(option.price)}</span>
+                                            </label>
+                                        )
+                                    })}
                                 </div>
                             )}
                         </div>
                     ))}
 
                     {/* Notes */}
-                    <div className="modifier-section">
-                        <h4 className="modifier-section__title">Kitchen notes</h4>
+                    <div className="mb-6 last:mb-0">
+                        <h4 className="flex items-center gap-2 text-sm font-semibold text-[var(--color-gray-400)] mb-[var(--space-md)] uppercase tracking-[0.05em]">Kitchen notes</h4>
                         <textarea
-                            className="form-textarea"
+                            className="w-full min-h-[100px] p-3 font-[var(--font-body)] text-[15px] text-white bg-[var(--color-gray-900)] border border-[var(--color-gray-700)] rounded-xl resize-none transition-all focus:outline-none focus:border-[var(--color-primary)] focus:bg-[var(--color-gray-800)] placeholder:text-[var(--color-gray-600)]"
                             placeholder="Special instructions..."
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
@@ -357,20 +384,20 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                     </div>
 
                     {/* Quantity */}
-                    <div className="modifier-section">
-                        <h4 className="modifier-section__title">Quantity</h4>
-                        <div className="qty-selector">
+                    <div className="mb-6 last:mb-0">
+                        <h4 className="flex items-center gap-2 text-sm font-semibold text-[var(--color-gray-400)] mb-[var(--space-md)] uppercase tracking-[0.05em]">Quantity</h4>
+                        <div className="flex items-center gap-4 bg-[var(--color-gray-900)] p-1.5 rounded-2xl w-fit">
                             <button
-                                className="qty-selector__btn"
+                                className="w-12 h-12 flex items-center justify-center bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-xl text-white cursor-pointer transition-all hover:bg-[var(--color-gray-700)] hover:border-[var(--color-gray-600)]"
                                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                                 title="Decrease quantity"
                                 aria-label="Decrease quantity"
                             >
                                 <Minus size={18} />
                             </button>
-                            <span className="qty-selector__value">{quantity}</span>
+                            <span className="text-2xl font-bold min-w-[40px] text-center text-white tabular-nums">{quantity}</span>
                             <button
-                                className="qty-selector__btn"
+                                className="w-12 h-12 flex items-center justify-center bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-xl text-white cursor-pointer transition-all hover:bg-[var(--color-gray-700)] hover:border-[var(--color-gray-600)]"
                                 onClick={() => setQuantity(quantity + 1)}
                                 title="Increase quantity"
                                 aria-label="Increase quantity"
@@ -381,8 +408,11 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                     </div>
                 </div>
 
-                <div className="modal__footer">
-                    <button className="btn btn-primary btn-block" onClick={handleConfirm}>
+                <div className="p-[var(--space-lg)] border-t border-[var(--color-gray-700)] bg-[var(--color-gray-800)] rounded-b-2xl">
+                    <button
+                        className="w-full h-16 px-6 bg-[var(--color-primary)] text-white border-none rounded-xl text-lg font-semibold flex items-center justify-center gap-3 cursor-pointer transition-all hover:bg-[var(--color-primary-dark)] hover:shadow-[0_4px_12px_rgba(37,99,235,0.4)] hover:-translate-y-px active:translate-y-px"
+                        onClick={handleConfirm}
+                    >
                         <Check size={18} />
                         {editItem ? 'Update item' : 'Add to cart'} - {formatPrice(totalPrice)}
                     </button>

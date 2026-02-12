@@ -16,7 +16,7 @@ import { saveProduct } from '@/services/products/catalogSyncService'
 import type { IOfflineProduct } from '@/types/offline'
 import { formatCurrency } from '@/utils/helpers'
 import { toast } from 'sonner'
-import './ProductFormPage.css'
+import { cn } from '@/lib/utils'
 
 interface Category {
     id: string
@@ -263,7 +263,7 @@ export default function ProductFormPage() {
 
     if (loading) {
         return (
-            <div className="product-form-page loading">
+            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 p-5 max-w-[900px] mx-auto text-muted-foreground">
                 <div className="spinner" />
                 <span>Loading...</span>
             </div>
@@ -271,20 +271,22 @@ export default function ProductFormPage() {
     }
 
     return (
-        <div className="product-form-page">
-            <header className="product-form-page__header">
+        <div className="p-5 max-w-[900px] mx-auto max-md:p-4">
+            <header className="flex items-center gap-4 mb-6">
                 <button className="btn btn-ghost" onClick={() => navigate('/products')}>
                     <ArrowLeft size={20} />
                 </button>
-                <h1>{isEditing ? 'Edit Product' : 'New Product'}</h1>
+                <h1 className="text-2xl font-semibold m-0">{isEditing ? 'Edit Product' : 'New Product'}</h1>
             </header>
 
-            <form className="product-form" onSubmit={handleSubmit}>
+            <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
                 {/* Basic Info Section */}
-                <section className="form-section">
-                    <h2><Package size={20} /> Basic information</h2>
+                <section className="bg-white rounded-xl p-5 shadow-sm">
+                    <h2 className="flex items-center gap-2 text-base font-semibold m-0 mb-4 pb-3 border-b border-gray-200 text-gray-700">
+                        <Package size={20} /> Basic information
+                    </h2>
 
-                    <div className="form-row">
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 max-md:grid-cols-1">
                         <div className="form-group">
                             <label>SKU *</label>
                             <input
@@ -292,9 +294,9 @@ export default function ProductFormPage() {
                                 value={form.sku}
                                 onChange={e => setForm({ ...form, sku: e.target.value.toUpperCase() })}
                                 placeholder="PRD-0001"
-                                className={errors.sku ? 'error' : ''}
+                                className={cn(errors.sku && 'border-destructive')}
                             />
-                            {errors.sku && <span className="error-text">{errors.sku}</span>}
+                            {errors.sku && <span className="text-destructive text-xs">{errors.sku}</span>}
                         </div>
                         <div className="form-group">
                             <label>Name *</label>
@@ -303,9 +305,9 @@ export default function ProductFormPage() {
                                 value={form.name}
                                 onChange={e => setForm({ ...form, name: e.target.value })}
                                 placeholder="Product name"
-                                className={errors.name ? 'error' : ''}
+                                className={cn(errors.name && 'border-destructive')}
                             />
-                            {errors.name && <span className="error-text">{errors.name}</span>}
+                            {errors.name && <span className="text-destructive text-xs">{errors.name}</span>}
                         </div>
                     </div>
 
@@ -319,7 +321,7 @@ export default function ProductFormPage() {
                         />
                     </div>
 
-                    <div className="form-row">
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 max-md:grid-cols-1">
                         <div className="form-group">
                             <label>Category</label>
                             <select
@@ -348,7 +350,7 @@ export default function ProductFormPage() {
                             <select
                                 value={form.unit}
                                 onChange={e => setForm({ ...form, unit: e.target.value })}
-                                className={errors.unit ? 'error' : ''}
+                                className={cn(errors.unit && 'border-destructive')}
                             >
                                 {UNITS.map(unit => (
                                     <option key={unit} value={unit}>{unit}</option>
@@ -359,10 +361,12 @@ export default function ProductFormPage() {
                 </section>
 
                 {/* Pricing Section */}
-                <section className="form-section">
-                    <h2><DollarSign size={20} /> Price</h2>
+                <section className="bg-white rounded-xl p-5 shadow-sm">
+                    <h2 className="flex items-center gap-2 text-base font-semibold m-0 mb-4 pb-3 border-b border-gray-200 text-gray-700">
+                        <DollarSign size={20} /> Price
+                    </h2>
 
-                    <div className="form-row">
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 max-md:grid-cols-1">
                         <div className="form-group">
                             <label>Retail price</label>
                             <input
@@ -371,9 +375,9 @@ export default function ProductFormPage() {
                                 onChange={e => setForm({ ...form, sale_price: parseFloat(e.target.value) || 0 })}
                                 min="0"
                                 step="100"
-                                className={errors.sale_price ? 'error' : ''}
+                                className={cn(errors.sale_price && 'border-destructive')}
                             />
-                            <small>{formatCurrency(form.sale_price)}</small>
+                            <small className="text-muted-foreground text-xs">{formatCurrency(form.sale_price)}</small>
                         </div>
                         <div className="form-group">
                             <label>Wholesale price</label>
@@ -384,7 +388,7 @@ export default function ProductFormPage() {
                                 min="0"
                                 step="100"
                             />
-                            <small>{formatCurrency(form.wholesale_price)}</small>
+                            <small className="text-muted-foreground text-xs">{formatCurrency(form.wholesale_price)}</small>
                         </div>
                         <div className="form-group">
                             <label>Cost price</label>
@@ -394,17 +398,17 @@ export default function ProductFormPage() {
                                 onChange={e => setForm({ ...form, cost_price: parseFloat(e.target.value) || 0 })}
                                 min="0"
                                 step="100"
-                                className={errors.cost_price ? 'error' : ''}
+                                className={cn(errors.cost_price && 'border-destructive')}
                             />
-                            <small>{formatCurrency(form.cost_price)}</small>
+                            <small className="text-muted-foreground text-xs">{formatCurrency(form.cost_price)}</small>
                         </div>
                     </div>
 
                     {form.cost_price > 0 && form.sale_price > 0 && (
-                        <div className="margin-display">
+                        <div className="flex items-center gap-2 px-4 py-3 bg-green-50 rounded-lg text-green-600 font-medium">
                             <Tag size={16} />
                             <span>Margin: {calculateMargin().toFixed(1)}%</span>
-                            <span className="margin-amount">
+                            <span className="text-green-700 text-sm">
                                 ({formatCurrency(form.sale_price - form.cost_price)})
                             </span>
                         </div>
@@ -412,10 +416,12 @@ export default function ProductFormPage() {
                 </section>
 
                 {/* Stock Section */}
-                <section className="form-section">
-                    <h2><Warehouse size={20} /> Stock</h2>
+                <section className="bg-white rounded-xl p-5 shadow-sm">
+                    <h2 className="flex items-center gap-2 text-base font-semibold m-0 mb-4 pb-3 border-b border-gray-200 text-gray-700">
+                        <Warehouse size={20} /> Stock
+                    </h2>
 
-                    <div className="form-row">
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 max-md:grid-cols-1">
                         <div className="form-group">
                             <label>Current stock</label>
                             <input
@@ -439,23 +445,25 @@ export default function ProductFormPage() {
                 </section>
 
                 {/* Image Section */}
-                <section className="form-section">
-                    <h2><ImageIcon size={20} /> Image</h2>
+                <section className="bg-white rounded-xl p-5 shadow-sm">
+                    <h2 className="flex items-center gap-2 text-base font-semibold m-0 mb-4 pb-3 border-b border-gray-200 text-gray-700">
+                        <ImageIcon size={20} /> Image
+                    </h2>
 
-                    <div className="image-upload">
+                    <div className="flex justify-center">
                         {form.image_url ? (
-                            <div className="image-preview">
-                                <img src={form.image_url} alt="Product" />
+                            <div className="relative w-[200px] h-[200px] rounded-xl overflow-hidden">
+                                <img src={form.image_url} alt="Product" className="w-full h-full object-cover" />
                                 <button
                                     type="button"
-                                    className="btn-remove-image"
+                                    className="absolute top-2 right-2 w-8 h-8 border-none rounded-full bg-black/60 text-white cursor-pointer flex items-center justify-center transition-colors hover:bg-destructive"
                                     onClick={() => setForm({ ...form, image_url: '' })}
                                 >
                                     <X size={16} />
                                 </button>
                             </div>
                         ) : (
-                            <label className="image-upload-zone">
+                            <label className="w-[200px] h-[200px] border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center gap-2 text-muted-foreground cursor-pointer transition-all hover:border-blue-500 hover:text-blue-500 hover:bg-blue-50">
                                 <Upload size={24} />
                                 <span>Click to add an image</span>
                                 <input
@@ -470,34 +478,39 @@ export default function ProductFormPage() {
                 </section>
 
                 {/* Options Section */}
-                <section className="form-section">
-                    <h2><FileText size={20} /> Options</h2>
+                <section className="bg-white rounded-xl p-5 shadow-sm">
+                    <h2 className="flex items-center gap-2 text-base font-semibold m-0 mb-4 pb-3 border-b border-gray-200 text-gray-700">
+                        <FileText size={20} /> Options
+                    </h2>
 
-                    <div className="form-options">
-                        <label className="checkbox-option">
+                    <div className="flex gap-6 flex-wrap max-md:flex-col max-md:gap-3">
+                        <label className="flex items-center gap-2.5 cursor-pointer">
                             <input
                                 type="checkbox"
                                 checked={form.pos_visible}
                                 onChange={e => setForm({ ...form, pos_visible: e.target.checked })}
+                                className="w-5 h-5 accent-blue-500"
                             />
-                            <span>Visible on POS</span>
+                            <span className="text-[0.95rem] text-gray-700">Visible on POS</span>
                         </label>
-                        <label className="checkbox-option">
+                        <label className="flex items-center gap-2.5 cursor-pointer">
                             <input
                                 type="checkbox"
                                 checked={form.is_active}
                                 onChange={e => setForm({ ...form, is_active: e.target.checked })}
+                                className="w-5 h-5 accent-blue-500"
                             />
-                            <span>Product active</span>
+                            <span className="text-[0.95rem] text-gray-700">Product active</span>
                         </label>
-                        <label className="checkbox-option">
+                        <label className="flex items-center gap-2.5 cursor-pointer">
                             <input
                                 type="checkbox"
                                 checked={form.deduct_ingredients}
                                 onChange={e => setForm({ ...form, deduct_ingredients: e.target.checked })}
+                                className="w-5 h-5 accent-blue-500"
                             />
-                            <span>Deduct ingredients on sale</span>
-                            <small style={{ display: 'block', marginTop: '4px', color: '#6b7280' }}>
+                            <span className="text-[0.95rem] text-gray-700">Deduct ingredients on sale</span>
+                            <small className="block mt-1 text-muted-foreground">
                                 For products made to order (coffee, sandwiches, etc.)
                             </small>
                         </label>
@@ -505,17 +518,17 @@ export default function ProductFormPage() {
                 </section>
 
                 {/* Actions */}
-                <div className="form-actions">
+                <div className="flex justify-end gap-3 p-5 bg-white rounded-xl shadow-sm max-md:flex-col">
                     <button
                         type="button"
-                        className="btn btn-secondary"
+                        className="btn btn-secondary max-md:w-full max-md:justify-center"
                         onClick={() => navigate('/products')}
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
-                        className="btn btn-primary"
+                        className="btn btn-primary max-md:w-full max-md:justify-center"
                         disabled={saving}
                     >
                         <Save size={18} />

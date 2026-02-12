@@ -3,7 +3,7 @@ import { X, Percent, DollarSign, Tag } from 'lucide-react'
 import { formatPrice } from '../../../utils/helpers'
 import PinVerificationModal from './PinVerificationModal'
 import { usePOSConfigSettings } from '@/hooks/settings/useModuleConfigSettings'
-import './DiscountModal.css'
+import { cn } from '@/lib/utils'
 
 interface DiscountModalProps {
     itemName?: string
@@ -15,7 +15,6 @@ interface DiscountModalProps {
 
 export default function DiscountModal({
     itemName,
-    // itemPrice is kept for potential future per-item discount features
     totalPrice,
     onApplyDiscount,
     onClose
@@ -28,7 +27,6 @@ export default function DiscountModal({
     const posConfig = usePOSConfigSettings()
     const isItemDiscount = !!itemName
 
-    // Calculate discount amount
     const calculateDiscountAmount = (): number => {
         const value = parseFloat(discountValue)
         if (isNaN(value) || value <= 0) return 0
@@ -37,8 +35,7 @@ export default function DiscountModal({
             const percentage = Math.min(value, posConfig.maxDiscountPercentage)
             return (totalPrice * percentage) / 100
         } else {
-            // Fixed amount (IDR)
-            return Math.min(value, totalPrice) // Cannot exceed total
+            return Math.min(value, totalPrice)
         }
     }
 
@@ -52,7 +49,6 @@ export default function DiscountModal({
 
     const handleApply = () => {
         if (discountAmount > 0) {
-            // Show PIN modal for verification
             setPendingDiscount({
                 amount: discountAmount,
                 type: discountType,
@@ -75,7 +71,6 @@ export default function DiscountModal({
         <>
             <div className="modal-backdrop is-active" onClick={onClose}>
                 <div className="modal modal-md is-active" onClick={e => e.stopPropagation()}>
-                    {/* Header */}
                     <div className="modal__header">
                         <div>
                             <h2 className="modal__title">
@@ -91,33 +86,32 @@ export default function DiscountModal({
                         </button>
                     </div>
 
-                    {/* Body */}
-                    <div className="modal__body discount-modal__body">
+                    <div className="modal__body p-6">
                         {/* Discount Type Selector */}
-                        <div className="discount-type-selector">
-                            <button
-                                className={`discount-type-btn ${discountType === 'percentage' ? 'is-active' : ''}`}
-                                onClick={() => setDiscountType('percentage')}
-                            >
-                                <Percent size={20} />
-                                Percentage
-                            </button>
-                            <button
-                                className={`discount-type-btn ${discountType === 'fixed' ? 'is-active' : ''}`}
-                                onClick={() => setDiscountType('fixed')}
-                            >
-                                <DollarSign size={20} />
-                                Fixed Amount (IDR)
-                            </button>
+                        <div className="grid grid-cols-2 gap-3 mb-6">
+                            {(['percentage', 'fixed'] as const).map(type => (
+                                <button
+                                    key={type}
+                                    className={cn(
+                                        'p-4 rounded-lg text-sm font-semibold cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 border-2',
+                                        discountType === type
+                                            ? 'bg-blue-500/15 border-primary text-primary-light'
+                                            : 'bg-gray-800 border-transparent text-gray-300 hover:bg-gray-750 hover:text-white'
+                                    )}
+                                    onClick={() => setDiscountType(type)}
+                                >
+                                    {type === 'percentage' ? <><Percent size={20} /> Percentage</> : <><DollarSign size={20} /> Fixed Amount (IDR)</>}
+                                </button>
+                            ))}
                         </div>
 
                         {/* Quick Percentage Buttons */}
                         {discountType === 'percentage' && (
-                            <div className="quick-percentages">
+                            <div className="grid grid-cols-3 gap-2 mb-6">
                                 {posConfig.quickDiscountPercentages.map(pct => (
                                     <button
                                         key={pct}
-                                        className="quick-percentage-btn"
+                                        className="p-3 bg-gray-800 border border-gray-700 rounded text-sm font-semibold text-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-700 hover:border-primary hover:text-white"
                                         onClick={() => handleQuickPercentage(pct)}
                                     >
                                         {pct}%
@@ -127,16 +121,16 @@ export default function DiscountModal({
                         )}
 
                         {/* Discount Input */}
-                        <div className="discount-input-group">
-                            <label className="discount-input-label">
+                        <div className="mb-8">
+                            <label className="block text-sm font-semibold text-gray-400 mb-2 uppercase tracking-wide">
                                 {discountType === 'percentage' ? 'Percentage (%)' : 'Amount (IDR)'}
                             </label>
                             <input
                                 type="number"
-                                className="discount-input"
+                                className="w-full h-16 px-6 text-center text-3xl font-bold text-white bg-gray-900 border-2 border-gray-700 rounded-lg transition-all duration-200 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(59,130,246,0.1)]"
                                 value={discountValue}
                                 onChange={(e) => setDiscountValue(e.target.value)}
-                                placeholder={discountType === 'percentage' ? '0' : '0'}
+                                placeholder="0"
                                 min="0"
                                 max={discountType === 'percentage' ? posConfig.maxDiscountPercentage.toString() : totalPrice.toString()}
                                 autoFocus
@@ -144,26 +138,26 @@ export default function DiscountModal({
                         </div>
 
                         {/* Price Summary */}
-                        <div className="discount-summary">
-                            <div className="discount-summary-row">
-                                <span className="discount-summary-label">
+                        <div className="bg-gray-800 rounded-lg p-6 mb-6">
+                            <div className="flex justify-between items-center mb-3 text-sm">
+                                <span className="text-gray-400 font-medium">
                                     {isItemDiscount ? 'Item Price' : 'Order Total'}
                                 </span>
-                                <span className="discount-summary-value">{formatPrice(totalPrice)}</span>
+                                <span className="font-semibold text-white">{formatPrice(totalPrice)}</span>
                             </div>
                             {discountAmount > 0 && (
                                 <>
-                                    <div className="discount-summary-row discount-row">
-                                        <span className="discount-summary-label">
+                                    <div className="flex justify-between items-center mb-3 text-sm">
+                                        <span className="text-destructive font-medium">
                                             Discount ({discountType === 'percentage' ? `${discountValue}%` : 'fixed'})
                                         </span>
-                                        <span className="discount-summary-value text-danger">
+                                        <span className="text-destructive font-bold">
                                             -{formatPrice(discountAmount)}
                                         </span>
                                     </div>
-                                    <div className="discount-summary-row final-price-row">
-                                        <span className="discount-summary-label">Final Price</span>
-                                        <span className="discount-summary-value final-price">
+                                    <div className="flex justify-between items-center mt-4 pt-4 border-t-2 border-dashed border-gray-700">
+                                        <span className="text-lg font-bold text-white">Final Price</span>
+                                        <span className="text-2xl font-extrabold text-success">
                                             {formatPrice(finalPrice)}
                                         </span>
                                     </div>
@@ -171,13 +165,12 @@ export default function DiscountModal({
                             )}
                         </div>
 
-                        <div className="discount-warning">
+                        <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/30 rounded text-xs text-warning font-medium">
                             <Tag size={16} />
                             PIN verification required to apply discount
                         </div>
                     </div>
 
-                    {/* Footer */}
                     <div className="modal__footer">
                         <button className="btn btn-secondary" onClick={onClose}>
                             Cancel
@@ -194,7 +187,6 @@ export default function DiscountModal({
                 </div>
             </div>
 
-            {/* PIN Verification Modal */}
             {showPinModal && (
                 <PinVerificationModal
                     title="Verification Required"

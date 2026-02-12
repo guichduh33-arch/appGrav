@@ -33,10 +33,10 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
     }, 0)
 
     return (
-        <div className="card">
+        <div className="card p-6 mb-6">
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <div>
-                    <h3 className="card-title" style={{ marginBottom: '0.25rem' }}>Recipe Ingredients</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1 flex justify-between items-center">Recipe Ingredients</h3>
                     {productType === 'semi_finished' && (
                         <div style={{
                             display: 'flex',
@@ -70,11 +70,11 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
 
             {showIngredientSearch && (
                 <div className="mb-4">
-                    <div className="ingredient-picker">
+                    <div className="bg-white border border-gray-200 rounded-lg shadow-lg max-h-[300px] overflow-y-auto p-2 grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-2 mb-4">
                         {allIngredients.map(ing => (
                             <button
                                 key={ing.id}
-                                className="ingredient-btn"
+                                className="text-left p-3 border border-gray-200 rounded-md bg-gray-50 transition-all duration-200 hover:border-primary hover:bg-primary/5"
                                 onClick={() => onAddIngredient(ing.id)}
                                 title={`Add ${ing.name}`}
                             >
@@ -87,7 +87,7 @@ export const RecipeTab: React.FC<RecipeTabProps> = ({
             )}
 
             <div className="overflow-hidden rounded-lg border border-gray-200 mt-2">
-                <table className="detail-table">
+                <table className="w-full border-collapse text-[0.95rem] [&_th]:text-left [&_th]:px-4 [&_th]:py-3 [&_th]:bg-gray-50 [&_th]:text-gray-600 [&_th]:font-semibold [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-wide [&_th]:border-b-2 [&_th]:border-gray-100 [&_td]:px-4 [&_td]:py-3 [&_td]:border-b [&_td]:border-gray-100 [&_td]:text-gray-700 [&_tbody_tr:hover_td]:bg-gray-50">
                     <thead>
                         <tr>
                             <th>Material</th>

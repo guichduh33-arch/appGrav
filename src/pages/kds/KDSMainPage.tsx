@@ -12,8 +12,8 @@ import { useKdsOrderQueue, type IKdsOrder, type IKdsOrderItem } from '../../hook
 import { useKDSConfigSettings } from '../../hooks/settings/useModuleConfigSettings'
 import { LanConnectionIndicator } from '../../components/lan/LanConnectionIndicator'
 import { playNewOrderSound } from '../../utils/audio'
+import { cn } from '../../lib/utils'
 import type { IKdsNewOrderPayload, TKitchenStation } from '../../types/offline'
-import './KDSMainPage.css'
 
 // Story 4.4: Use IKdsOrder and IKdsOrderItem from hook for type consistency
 
@@ -454,81 +454,93 @@ export default function KDSMainPage() {
     )
 
     return (
-        <div className="kds-app" style={{ '--station-color': stationConfig.color } as React.CSSProperties}>
+        <div className="flex flex-col h-screen overflow-hidden bg-[#1a1a1a] text-white" style={{ '--station-color': stationConfig.color } as React.CSSProperties}>
             {/* Header */}
-            <header className="kds-header">
-                <div className="kds-header__left">
-                    <button className="kds-header__back" onClick={() => navigate('/kds')}>
+            <header className="flex items-center justify-between h-[70px] px-5 bg-[#2a2a2a] border-b-2 border-[var(--station-color,#333)] max-md:flex-wrap max-md:h-auto max-md:px-4 max-md:py-3 max-md:gap-3">
+                <div className="flex items-center gap-4 max-md:order-1">
+                    <button
+                        className="bg-[#333] border-none text-white w-10 h-10 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#444] hover:scale-105"
+                        onClick={() => navigate('/kds')}
+                    >
                         <ArrowLeft size={20} />
                     </button>
-                    <div className="kds-header__logo">
+                    <div className="flex items-center gap-2.5 text-xl font-bold text-pink-300">
                         <span>🥐</span>
                         <span>The Breakery KDS</span>
                     </div>
                 </div>
 
-                <div className="kds-header__station" style={{ backgroundColor: stationConfig.color }}>
+                <div
+                    className="flex items-center gap-2.5 text-[1.1rem] font-bold py-2.5 px-6 rounded-[30px] text-white max-md:order-2"
+                    style={{ backgroundColor: stationConfig.color }}
+                >
                     {stationConfig.icon}
                     <span>{stationConfig.name}</span>
                 </div>
 
-                <div className="kds-header__right">
-                    <div className="kds-header__stats">
+                <div className="flex items-center gap-4 max-md:order-3 max-md:w-full max-md:justify-between">
+                    <div className="flex gap-3 max-md:flex-1">
                         {/* Story 4.4: Urgent orders badge */}
                         {urgentCount > 0 && (
-                            <span className="kds-header__stat kds-header__stat--urgent">
+                            <span className="flex items-center gap-1.5 bg-[#EF4444] text-white py-1.5 px-3.5 rounded-[20px] font-bold animate-pulse-urgent">
                                 <AlertTriangle size={14} />
                                 {urgentCount} Urgent
                             </span>
                         )}
-                        <span className="kds-header__stat kds-header__stat--new">{newOrders.length} New</span>
-                        <span className="kds-header__stat kds-header__stat--preparing">{preparingOrders.length} Prep</span>
-                        <span className="kds-header__stat kds-header__stat--ready">{readyOrders.length} Ready</span>
+                        <span className="py-1.5 px-3.5 rounded-[20px] text-[0.85rem] font-semibold bg-blue-500/20 text-blue-400">{newOrders.length} New</span>
+                        <span className="py-1.5 px-3.5 rounded-[20px] text-[0.85rem] font-semibold bg-amber-500/20 text-amber-300">{preparingOrders.length} Prep</span>
+                        <span className="py-1.5 px-3.5 rounded-[20px] text-[0.85rem] font-semibold bg-emerald-500/20 text-emerald-300">{readyOrders.length} Ready</span>
                     </div>
                     {/* Story 4.2: LAN Connection Indicator */}
                     <LanConnectionIndicator
                         status={connectionStatus}
                         reconnectAttempts={reconnectAttempts}
-                        className="kds-header__lan-indicator"
+                        className="mr-2 p-2 bg-[#333] rounded-[10px]"
                     />
                     <button
-                        className={`kds-header__sound ${!soundEnabled ? 'kds-header__sound--muted' : ''}`}
+                        className={cn(
+                            'bg-[#333] border-none text-white w-10 h-10 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#444]',
+                            !soundEnabled && 'text-[#EF4444]'
+                        )}
                         onClick={() => setSoundEnabled(!soundEnabled)}
                     >
                         {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
                     </button>
-                    <button className="kds-header__refresh" onClick={fetchOrders}>
+                    <button
+                        className="bg-[#333] border-none text-white w-10 h-10 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[#444]"
+                        onClick={fetchOrders}
+                    >
                         <RefreshCw size={20} />
                     </button>
-                    <div className="kds-header__time">
+                    <div className="font-mono text-xl font-semibold py-2 px-4 bg-[#333] rounded-[10px]">
                         {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                     </div>
                 </div>
             </header>
 
             {/* Main Content */}
-            <main className="kds-main">
+            <main className="flex-1 overflow-y-auto p-5">
                 {loading ? (
-                    <div className="kds-loading">
-                        <RefreshCw className="kds-loading__spinner" size={48} />
+                    <div className="flex flex-col items-center justify-center h-full gap-4 text-[#888]">
+                        <RefreshCw className="animate-spin" size={48} />
                         <p>Loading orders...</p>
                     </div>
                 ) : orders.length === 0 ? (
-                    <div className="kds-empty">
-                        <div className="kds-empty__icon">{stationConfig.icon}</div>
-                        <h2>No Orders</h2>
-                        <p>Waiting for new orders...</p>
+                    <div className="flex flex-col items-center justify-center h-full text-center">
+                        <div className="w-[120px] h-[120px] rounded-[30px] bg-[#2a2a2a] flex items-center justify-center mb-6 text-[var(--station-color)] [&_svg]:w-[60px] [&_svg]:h-[60px]">{stationConfig.icon}</div>
+                        <h2 className="text-[2rem] m-0 mb-2 text-white">No Orders</h2>
+                        <p className="text-[1.1rem] text-[#888] m-0">Waiting for new orders...</p>
                     </div>
                 ) : (
                     <>
                         {/* Story 4.4: Urgent Orders Section */}
                         {urgentOrders.length > 0 && (
-                            <div className="kds-section kds-section--urgent">
-                                <h2 className="kds-section__title">
+                            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border-2 border-red-500/30">
+                                <h2 className="flex items-center gap-2 text-[1.1rem] font-bold mb-4 py-2 px-4 rounded-lg bg-[#EF4444] text-white animate-pulse-urgent">
                                     <AlertTriangle size={20} />
                                     URGENT ({urgentOrders.length})
                                 </h2>
-                                <div className="kds-orders-grid">
+                                <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-5 max-md:grid-cols-1 min-[1400px]:grid-cols-4 min-[1800px]:grid-cols-5">
                                     {urgentOrders.map((order) => (
                                         <KDSOrderCard
                                             key={order.id}
@@ -553,13 +565,13 @@ export default function KDSMainPage() {
                         )}
 
                         {/* Story 4.4: Normal Orders Section */}
-                        <div className="kds-section kds-section--normal">
+                        <div className="mb-6">
                             {urgentOrders.length > 0 && (
-                                <h2 className="kds-section__title">
+                                <h2 className="flex items-center gap-2 text-[1.1rem] font-bold mb-4 py-2 px-4 rounded-lg bg-[#2a2a2a] text-[#888]">
                                     Waiting ({normalOrders.length})
                                 </h2>
                             )}
-                            <div className="kds-orders-grid">
+                            <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-5 max-md:grid-cols-1 min-[1400px]:grid-cols-4 min-[1800px]:grid-cols-5">
                                 {normalOrders.map((order) => (
                                     <KDSOrderCard
                                         key={order.id}

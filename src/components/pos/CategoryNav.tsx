@@ -4,7 +4,7 @@ import type { Category } from '../../types/database'
 import { NetworkIndicator } from '../ui/NetworkIndicator'
 import { SyncIndicator } from '../ui/SyncIndicator'
 import { OfflineSessionIndicator } from '../ui/OfflineSessionIndicator'
-import './CategoryNav.css'
+import { cn } from '@/lib/utils'
 
 interface CategoryNavProps {
     categories: Category[]
@@ -14,6 +14,8 @@ interface CategoryNavProps {
     onOpenMenu?: () => void
 }
 
+const itemBase = 'w-full flex items-center py-5 px-6 min-h-[80px] border-none rounded-lg cursor-pointer text-left transition-all duration-200 text-white relative overflow-hidden shadow-[0_2px_5px_rgba(0,0,0,0.1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_12px_rgba(0,0,0,0.15)] hover:brightness-110'
+const itemActive = 'shadow-[inset_0_0_0_4px_rgba(255,255,255,0.3),0_8px_16px_rgba(0,0,0,0.2)] scale-[1.02] z-[2]'
 
 export default memo(function CategoryNav({
     categories,
@@ -26,7 +28,7 @@ export default memo(function CategoryNav({
         return (
             <aside className="pos-categories">
                 {[...Array(6)].map((_, i) => (
-                    <div key={i} className="pos-categories__item-skeleton" />
+                    <div key={i} className="h-20 w-full bg-gray-100 rounded-lg mb-3 animate-pulse" />
                 ))}
             </aside>
         )
@@ -39,32 +41,27 @@ export default memo(function CategoryNav({
                 <button className="pos-menu-btn" onClick={onOpenMenu} title="Menu">
                     <Menu size={28} />
                 </button>
-                {/* Network Status Indicator - Always visible per NFR-U4 */}
                 <NetworkIndicator compact className="mt-2" />
-                {/* Offline Session Indicator - Story 1.2 */}
                 <OfflineSessionIndicator compact className="mt-1" />
-                {/* Sync Status Indicator - Story 2.6 */}
                 <SyncIndicator compact className="mt-1" />
             </div>
 
             <button
-                className={`pos-categories__item is-all ${selectedCategory === null ? 'is-active' : ''}`}
+                className={cn(itemBase, selectedCategory === null && itemActive)}
+                style={{ backgroundColor: '#334155' }}
                 onClick={() => onSelectCategory(null)}
             >
-                <span className="pos-categories__label">All</span>
+                <span className="text-[1.1rem] font-bold tracking-tight uppercase">All</span>
             </button>
 
-            {/* Category buttons */}
             {categories.map(category => (
                 <button
                     key={category.id}
-                    className={`pos-categories__item ${selectedCategory === category.id ? 'is-active' : ''}`}
+                    className={cn(itemBase, selectedCategory === category.id && itemActive)}
                     onClick={() => onSelectCategory(category.id)}
-                    style={{
-                        '--category-color': category.color
-                    } as React.CSSProperties}
+                    style={{ backgroundColor: category.color || '#6b7280' }}
                 >
-                    <span className="pos-categories__label">
+                    <span className="text-[1.1rem] font-bold tracking-tight uppercase">
                         {category.name}
                     </span>
                 </button>
