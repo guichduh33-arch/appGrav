@@ -302,6 +302,35 @@ POS (menu, grids, modals, shift), KDS, inventory, B2B, customers, orders, purcha
 - Colors: `bakery-*` (amber/warm palette), `kds-*`, `pos-*`, semantic status colors
 - Utilities: `scrollbar-hide`, `line-clamp-*`, `text-shadow-*`
 
+## Security Audit Cycle 3: RLS Policy Always True (2026-02-12)
+
+Fixed 156 "RLS Policy Always True" warnings reported by Supabase security advisors across 47 tables.
+
+### Problem
+INSERT/UPDATE/DELETE policies used `USING (true)` or `WITH CHECK (true)`, allowing any request (including unauthenticated via anon key) to write. Additionally, 8 tables had duplicate policies for the same operation.
+
+### Migration (`20260212180000_fix_rls_always_true.sql`)
+
+**Part 1 — Drop 20 duplicate policies** on 8 tables:
+| Table | Duplicates Dropped |
+|-------|--------------------|
+| `kds_order_queue`, `lan_messages`, `lan_nodes`, `sync_conflicts`, `sync_devices`, `sync_queue` | 3 each (INSERT/UPDATE/DELETE) |
+| `settings_history` | 1 (INSERT) |
+| `user_sessions` | 1 (INSERT) |
+
+**Part 2 — Tighten 136 remaining policies** by replacing `true` with `(auth.uid() IS NOT NULL)`:
+| Policy Type | Count | ALTER Clause |
+|-------------|-------|-------------|
+| DELETE | 44 | `USING (auth.uid() IS NOT NULL)` |
+| INSERT | 47 | `WITH CHECK (auth.uid() IS NOT NULL)` |
+| UPDATE (both qual+check) | 37 | `USING (...) WITH CHECK (...)` |
+| UPDATE (qual only) | 8 | `USING (...)` |
+
+### Result
+- Supabase security advisors: **156 → 0** "RLS Policy Always True" warnings
+- Only remaining warning: `auth_leaked_password_protection` (Auth config, not RLS)
+- No test regressions: 93 files, 1,650 tests pass
+
 ## Known Issues
 
 - `StockAlerts.test.tsx > StaleDataWarning > renders nothing when data is fresh` is flaky (timing issue in full suite, passes alone)
