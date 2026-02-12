@@ -5,7 +5,7 @@ import {
     FileText, Building2,
     ShoppingCart, BarChart3, Users, Settings, Store, Utensils,
     ChevronLeft, ChevronRight, LogOut, Truck, UserCircle, Coffee, Boxes,
-    Shield, ScrollText, CloudCog, Calculator
+    Shield, ScrollText, CloudCog, Calculator, LayoutDashboard
 } from 'lucide-react';
 import { NetworkIndicator } from '../components/ui/NetworkIndicator';
 import { SyncIndicator } from '../components/ui/SyncIndicator';
@@ -85,6 +85,10 @@ const BackOfficeLayout: React.FC = () => {
                                 Operations
                             </h3>
                         )}
+                        <NavLink to="/" end className="bo-nav-item" title={isCollapsed ? "Dashboard" : ""} data-collapsed={isCollapsed || undefined}>
+                            <LayoutDashboard size={22} strokeWidth={2} />
+                            {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Dashboard</span>}
+                        </NavLink>
                         <NavLink to="/pos" className="bo-nav-item" title={isCollapsed ? "POS Terminal" : ""} data-collapsed={isCollapsed || undefined}>
                             <Store size={22} strokeWidth={2} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">POS Terminal</span>}

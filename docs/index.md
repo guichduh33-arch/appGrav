@@ -1,6 +1,6 @@
 # AppGrav Documentation
 
-> Last updated: 2026-02-11
+> Last updated: 2026-02-12
 
 ## Root-Level Documentation
 
@@ -52,6 +52,10 @@
 - [security/PHASE2_SECURITY_AUDIT.md](security/PHASE2_SECURITY_AUDIT.md) - Phase 2 security audit
 
 ## Audit & Strategic Planning
+
+### Pre-Production Plan (Feb 12, 2026)
+- **[audit/project-status-summary.md](audit/project-status-summary.md)** - Synthese rapide du projet (START HERE)
+- **[audit/production-readiness-plan.md](audit/production-readiness-plan.md)** - Plan final pre-production (4 phases, 24 semaines)
 
 ### Strategic Audit (`docs/audit/` - Feb 9, 2026)
 - [audit/appgrav-audit-report.md](audit/appgrav-audit-report.md) - Full audit report (4/5 stars)

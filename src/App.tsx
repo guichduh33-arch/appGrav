@@ -97,6 +97,9 @@ const DisplaySettingsPage = lazy(() => import('./pages/settings/DisplaySettingsP
 const SyncAdvancedSettingsPage = lazy(() => import('./pages/settings/SyncAdvancedSettingsPage'))
 const SecurityPinSettingsPage = lazy(() => import('./pages/settings/SecurityPinSettingsPage'))
 
+// Dashboard
+const DashboardPage = lazy(() => import('./pages/dashboard/DashboardPage'))
+
 // Profile
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
 
@@ -304,6 +307,9 @@ function App() {
                             isAuthenticated ? <BackOfficeLayout /> : <Navigate to="/login" replace />
                         }
                     >
+                        {/* Dashboard (Home) */}
+                        <Route index element={<DashboardPage />} />
+
                         {/* Inventory Module with Tabs */}
                         <Route path="/inventory" element={<RouteGuard permission="inventory.view"><InventoryLayout /></RouteGuard>}>
                             <Route index element={<StockPage />} />
@@ -436,8 +442,7 @@ function App() {
                     </Route>
 
                     {/* Default redirect */}
-                    <Route path="/" element={<Navigate to="/pos" replace />} />
-                    <Route path="*" element={<Navigate to="/pos" replace />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </Suspense>
         </ErrorBoundary>
