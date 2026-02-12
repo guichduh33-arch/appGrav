@@ -59,7 +59,7 @@
 | S2 | Architecture | 13 `error: any` dans catch blocks | S | ~~FAIT~~ |
 | S3 | Architecture | 46 eslint-disable suppressions | M | ~~FAIT~~ (46 → 2 justifies) |
 | S4 | Architecture | Pas de vendor chunk splitting | S | ~~FAIT~~ |
-| S5 | Architecture | 84 CSS files alongside Tailwind | L |
+| S5 | Architecture | 84 CSS files alongside Tailwind | L | ~~FAIT~~ (55 CSS files supprimés, migré vers Tailwind utilities) |
 | S6 | Architecture | 413 inline styles | L |
 | S7 | Security | Pas de Content-Security-Policy | S | ~~FAIT~~ (meta CSP dans index.html) |
 | S8 | Security | Pas de rate limiting IP sur auth online | M |

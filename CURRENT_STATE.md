@@ -283,6 +283,24 @@ Replaces ~40 hardcoded operational constants across 17 files with configurable s
 - 93 test files, 1,650 tests pass
 - 17 files changed, +168/-84 lines
 
+## CSS → Tailwind Migration (2026-02-12)
+
+Eliminated all standalone CSS files in favor of Tailwind utility classes.
+
+### Scope
+- **55 CSS files deleted** (~18,000 lines removed)
+- **86 TSX files updated** with inline Tailwind classes
+- **tailwind.config.js** extended with custom utilities (animations, colors, component patterns)
+- **Net change**: -18,125 lines (22,569 deleted, 4,444 added)
+
+### Modules Covered
+POS (menu, grids, modals, shift), KDS, inventory, B2B, customers, orders, purchasing, mobile, reports, auth/login, settings, layouts, and display.
+
+### Custom Tailwind Extensions
+- Animations: `fade-in`, `slide-up`, `shimmer`, `countdown`, `pulse-urgent`, `bounce-in`
+- Colors: `bakery-*` (amber/warm palette), `kds-*`, `pos-*`, semantic status colors
+- Utilities: `scrollbar-hide`, `line-clamp-*`, `text-shadow-*`
+
 ## Known Issues
 
 - `StockAlerts.test.tsx > StaleDataWarning > renders nothing when data is fresh` is flaky (timing issue in full suite, passes alone)
