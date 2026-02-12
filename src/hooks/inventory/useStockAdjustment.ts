@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/stores/authStore'
+import logger from '@/utils/logger'
 
 // Local type definition to avoid import issues
 interface ISupplier {
@@ -95,7 +96,7 @@ export function useStockAdjustment() {
       queryClient.invalidateQueries({ queryKey: ['stock-movements'] })
     },
     onError: (error: Error) => {
-      console.error('[useStockAdjustment] Stock adjustment failed:', error.message)
+      logger.error('[useStockAdjustment] Stock adjustment failed:', error.message)
     }
   })
 }

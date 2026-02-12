@@ -134,8 +134,7 @@ export function useOfflineSession(): UseOfflineSessionResult {
       setError(null);
 
       try {
-        // Always use offline service for now
-        // TODO: Add online routing when useShift is integrated
+        // POST-LAUNCH: Add online routing when useShift is fully integrated with session management
         const session = await openSessionOffline(user.id, openingAmount);
         return session;
       } catch (err) {

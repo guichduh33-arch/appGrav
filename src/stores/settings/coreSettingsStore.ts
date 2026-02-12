@@ -11,6 +11,7 @@ import type {
   AppearanceSettings,
   LocalizationSettings,
 } from '../../types/settings';
+import logger from '@/utils/logger';
 
 interface CoreSettingsState {
   categories: SettingsCategory[];
@@ -106,16 +107,16 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
           cacheAllSettingsData()
             .then((result) => {
               if (result.success) {
-                console.debug('[Settings] Offline cache updated at', result.lastSyncAt);
+                logger.debug('[Settings] Offline cache updated at', result.lastSyncAt);
               } else {
-                console.warn('[Settings] Offline cache partial failure:', result.errors);
+                logger.warn('[Settings] Offline cache partial failure:', result.errors);
               }
             })
             .catch((error) => {
-              console.warn('[Settings] Failed to cache settings for offline:', error);
+              logger.warn('[Settings] Failed to cache settings for offline:', error);
             });
         } catch (error) {
-          console.error('Failed to initialize settings:', error);
+          logger.error('Failed to initialize settings:', error);
           set({
             isLoading: false,
             error: error instanceof Error ? error.message : 'Failed to load settings',
@@ -194,7 +195,7 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
           }
           return true;
         } catch (error) {
-          console.error('Failed to update setting:', error);
+          logger.error('Failed to update setting:', error);
           return false;
         }
       },
@@ -208,7 +209,7 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
           await get().loadSettings();
           return data > 0;
         } catch (error) {
-          console.error('Failed to update settings:', error);
+          logger.error('Failed to update settings:', error);
           return false;
         }
       },
@@ -220,7 +221,7 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
           if (data) await get().loadSettings();
           return data;
         } catch (error) {
-          console.error('Failed to reset setting:', error);
+          logger.error('Failed to reset setting:', error);
           return false;
         }
       },
@@ -234,7 +235,7 @@ export const useCoreSettingsStore = create<CoreSettingsState>()(
           if (data > 0) await get().loadSettings();
           return data;
         } catch (error) {
-          console.error('Failed to reset category settings:', error);
+          logger.error('Failed to reset category settings:', error);
           return 0;
         }
       },

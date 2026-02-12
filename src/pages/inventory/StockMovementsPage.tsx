@@ -14,7 +14,6 @@ const formatNumber = (num: number | null | undefined): string => {
     if (num === null || num === undefined) return '-'
     return num.toLocaleString('en-US')
 }
-import * as XLSX from 'xlsx'
 import { toast } from 'sonner'
 import './StockMovementsPage.css'
 
@@ -110,8 +109,10 @@ export default function StockMovementsPage() {
     }
 
     // Export to Excel
-    const handleExportExcel = () => {
+    const handleExportExcel = async () => {
         try {
+            const XLSX = await import('xlsx')
+
             // Prepare data for export
             const exportData = filteredMovements.map((m: IStockMovement) => {
                 const { date, time } = formatDate(m.created_at)

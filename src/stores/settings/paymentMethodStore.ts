@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../../lib/supabase';
 import type { PaymentMethod } from '../../types/settings';
+import logger from '@/utils/logger';
 
 interface PaymentMethodState {
   paymentMethods: PaymentMethod[];
@@ -47,7 +48,7 @@ export const usePaymentMethodStore = create<PaymentMethodState>()((set, get) => 
       set({ paymentMethods: [...get().paymentMethods, data] });
       return data;
     } catch (error) {
-      console.error('Failed to create payment method:', error);
+      logger.error('Failed to create payment method:', error);
       return null;
     }
   },
@@ -68,7 +69,7 @@ export const usePaymentMethodStore = create<PaymentMethodState>()((set, get) => 
       });
       return true;
     } catch (error) {
-      console.error('Failed to update payment method:', error);
+      logger.error('Failed to update payment method:', error);
       return false;
     }
   },
@@ -85,7 +86,7 @@ export const usePaymentMethodStore = create<PaymentMethodState>()((set, get) => 
       set({ paymentMethods: get().paymentMethods.filter((p) => p.id !== id) });
       return true;
     } catch (error) {
-      console.error('Failed to delete payment method:', error);
+      logger.error('Failed to delete payment method:', error);
       return false;
     }
   },

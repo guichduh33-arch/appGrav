@@ -9,6 +9,7 @@
 
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import logger from '@/utils/logger';
 import { TReportCacheType } from '@/types/offline';
 import {
   cacheReportData,
@@ -89,7 +90,7 @@ export function useOfflineReports<T>({
 
   // Purge expired cache on mount
   useEffect(() => {
-    purgeExpiredCache().catch(console.error);
+    purgeExpiredCache().catch(err => logger.error('Failed to purge expired cache', err));
   }, []);
 
   // Offline query function - returns cached data

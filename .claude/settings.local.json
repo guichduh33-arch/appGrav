@@ -124,7 +124,17 @@
       "Bash(start:*)",
       "Bash(\"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\data\\\\_extract.ps1\" << 'HEREDOC'\n$lines = Get-Content 'C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\hooks\\\\useProducts.ts'\n$mockLines = $lines[169..2858]\n$mockLines[$mockLines.Count - 1] = '] as ProductWithCategory[];'\n$header = @\\(\n    \"import type { ProductWithCategory } from '../types/database';\"\n    ''\n    '// Mock products for demo mode \\(matches CSV files\\)'\n\\)\n$output = $header + $mockLines\nSet-Content -Path 'C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\data\\\\mockProducts.ts' -Value $output -Encoding UTF8\nWrite-Host \"Done. Output file has $\\($output.Count\\) lines.\"\nHEREDOC)",
       "Bash(del \"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\services\\\\sync\\\\syncEngineV2.ts\")",
-      "Bash(del \"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\services\\\\sync\\\\__tests__\\\\syncEngineV2.test.ts\")"
+      "Bash(del \"C:\\\\Users\\\\MamatCEO\\\\App\\\\AppGrav\\\\src\\\\services\\\\sync\\\\__tests__\\\\syncEngineV2.test.ts\")",
+      "Bash(npx depcheck:*)",
+      "Bash(test:*)",
+      "Bash(do taskkill //PID $pid //F)",
+      "Bash(taskkill:*)",
+      "Bash(FILEPATH=\"C:/Users/MamatCEO/.claude/projects/C--Users-MamatCEO-App-AppGrav/370918cf-2aae-43b4-8915-047b5ae7673f/tool-results/mcp-plugin_supabase_supabase-get_advisors-1770873601994.txt\")",
+      "Bash(export:*)",
+      "Bash(npx playwright:*)",
+      "WebFetch(domain:localhost)",
+      "Bash(npx puppeteer:*)",
+      "Bash(sort:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

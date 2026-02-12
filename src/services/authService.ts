@@ -3,6 +3,7 @@
 
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
+import { logError, logInfo, logDebug, logWarn } from '@/utils/logger';
 import type {
   Role,
   EffectivePermission,
@@ -111,13 +112,13 @@ export const authService = {
           });
 
           if (authError) {
-            console.error('Supabase Auth session creation failed:', authError);
+            logError('Supabase Auth session creation failed', authError);
             // Continue anyway - the app will work but RLS might not
           } else {
             logger.debug('[Auth] Supabase Auth session created successfully');
           }
         } catch (authErr) {
-          console.error('Error creating Supabase Auth session:', authErr);
+          logError('Error creating Supabase Auth session', authErr);
           // Non-blocking - continue with the login
         }
       }
@@ -130,7 +131,7 @@ export const authService = {
         permissions: data.permissions,
       };
     } catch (error) {
-      console.error('Login error:', error);
+      logError('Login error', error);
       return {
         success: false,
         error: 'Network error. Please try again.',
@@ -148,7 +149,7 @@ export const authService = {
         await supabase.auth.signOut();
         logger.debug('[Auth] Supabase Auth session ended');
       } catch (authErr) {
-        console.error('Supabase Auth signOut error:', authErr);
+        logError('Supabase Auth signOut error', authErr);
         // Continue anyway
       }
 
@@ -178,7 +179,7 @@ export const authService = {
         return { success: true };
       }
     } catch (error) {
-      console.error('Logout error:', error);
+      logError('Logout error', error);
       return {
         success: false,
         error: 'Network error during logout',
@@ -219,7 +220,7 @@ export const authService = {
         permissions: data.permissions,
       };
     } catch (error) {
-      console.error('Session validation error:', error);
+      logError('Session validation error', error);
       return {
         valid: false,
         error: 'Network error',
@@ -260,7 +261,7 @@ export const authService = {
         error: response.ok ? undefined : (data.error || data.message || 'Unknown error'),
       };
     } catch (error) {
-      console.error('Change PIN error:', error);
+      logError('Change PIN error', error);
       return {
         success: false,
         error: 'Network error',
@@ -308,7 +309,7 @@ export const authService = {
         error: response.ok ? undefined : (data.error || data.message || 'Unknown error'),
       };
     } catch (error) {
-      console.error('Create user error:', error);
+      logError('Create user error', error);
       return {
         success: false,
         error: 'Network error',
@@ -357,7 +358,7 @@ export const authService = {
         error: response.ok ? undefined : (data.error || data.message || 'Unknown error'),
       };
     } catch (error) {
-      console.error('Update user error:', error);
+      logError('Update user error', error);
       return {
         success: false,
         error: 'Network error',
@@ -393,7 +394,7 @@ export const authService = {
         error: response.ok ? undefined : (data.error || data.message || 'Unknown error'),
       };
     } catch (error) {
-      console.error('Delete user error:', error);
+      logError('Delete user error', error);
       return {
         success: false,
         error: 'Network error',
@@ -431,7 +432,7 @@ export const authService = {
         error: response.ok ? undefined : (data.error || data.message || 'Unknown error'),
       };
     } catch (error) {
-      console.error('Toggle user active error:', error);
+      logError('Toggle user active error', error);
       return {
         success: false,
         error: 'Network error',
@@ -477,7 +478,7 @@ export const authService = {
         .single();
 
       if (userError) {
-        console.error('Create user error:', userError);
+        logError('Create user error', userError);
         return { success: false, error: userError.message };
       }
 
@@ -489,7 +490,7 @@ export const authService = {
         });
 
         if (pinError) {
-          console.error('Set PIN error:', pinError);
+          logError('Set PIN error', pinError);
           // User created but PIN failed - not critical, can be set later
         }
       }
@@ -507,14 +508,14 @@ export const authService = {
           .insert(roleAssignments);
 
         if (rolesError) {
-          console.error('Assign roles error:', rolesError);
+          logError('Assign roles error', rolesError);
           // User created but roles failed - not critical
         }
       }
 
       return { success: true, user: newUser as UserProfileExtended };
     } catch (error) {
-      console.error('Create user direct error:', error);
+      logError('Create user direct error', error);
       return { success: false, error: 'Erreur lors de la création' };
     }
   },
@@ -555,7 +556,7 @@ export const authService = {
           .eq('id', userId);
 
         if (updateError) {
-          console.error('Update user error:', updateError);
+          logError('Update user error', updateError);
           return { success: false, error: updateError.message };
         }
       }
@@ -580,13 +581,13 @@ export const authService = {
           .insert(roleAssignments);
 
         if (rolesError) {
-          console.error('Update roles error:', rolesError);
+          logError('Update roles error', rolesError);
         }
       }
 
       return { success: true };
     } catch (error) {
-      console.error('Update user direct error:', error);
+      logError('Update user direct error', error);
       return { success: false, error: 'Erreur lors de la mise à jour' };
     }
   },
@@ -607,7 +608,7 @@ export const authService = {
 
       return { success: true };
     } catch (error) {
-      console.error('Delete user direct error:', error);
+      logError('Delete user direct error', error);
       return { success: false, error: 'Erreur lors de la suppression' };
     }
   },
@@ -631,7 +632,7 @@ export const authService = {
 
       return { success: true };
     } catch (error) {
-      console.error('Toggle user active error:', error);
+      logError('Toggle user active error', error);
       return { success: false, error: 'Erreur' };
     }
   },
@@ -659,7 +660,7 @@ export const authService = {
     const { data, error } = await query;
 
     if (error) {
-      console.error('Get users error:', error);
+      logError('Get users error', error);
       return [];
     }
 
@@ -682,7 +683,7 @@ export const authService = {
     const { data, error } = await query;
 
     if (error) {
-      console.error('Get roles error:', error);
+      logError('Get roles error', error);
       return [];
     }
 
@@ -700,7 +701,7 @@ export const authService = {
       .order('action');
 
     if (error) {
-      console.error('Get permissions error:', error);
+      logError('Get permissions error', error);
       return {};
     }
 
@@ -783,7 +784,7 @@ export const authService = {
     const { data, error, count } = await query;
 
     if (error) {
-      console.error('Get audit logs error:', error);
+      logError('Get audit logs error', error);
       return { data: [], count: 0 };
     }
 

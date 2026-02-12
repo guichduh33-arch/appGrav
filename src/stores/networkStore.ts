@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import logger from '@/utils/logger';
 
 /**
  * Network mode representing the current connectivity state
@@ -95,7 +96,7 @@ export const useNetworkStore = create<INetworkState>()(
             return parsed;
           } catch (error) {
             // If localStorage is corrupted, return null to use default state
-            console.warn('[networkStore] Failed to parse persisted state, using defaults:', error);
+            logger.warn('[networkStore] Failed to parse persisted state, using defaults:', error);
             return null;
           }
         },
@@ -103,14 +104,14 @@ export const useNetworkStore = create<INetworkState>()(
           try {
             localStorage.setItem(name, JSON.stringify(value));
           } catch (error) {
-            console.warn('[networkStore] Failed to persist state:', error);
+            logger.warn('[networkStore] Failed to persist state:', error);
           }
         },
         removeItem: (name) => {
           try {
             localStorage.removeItem(name);
           } catch (error) {
-            console.warn('[networkStore] Failed to remove persisted state:', error);
+            logger.warn('[networkStore] Failed to remove persisted state:', error);
           }
         },
       },

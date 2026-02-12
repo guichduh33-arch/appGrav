@@ -5,8 +5,8 @@
  * Export reports to PDF format with professional formatting
  */
 
-import jsPDF from 'jspdf';
-import autoTable, { RowInput, CellDef } from 'jspdf-autotable';
+import type jsPDF from 'jspdf';
+import type { RowInput, CellDef } from 'jspdf-autotable';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -94,13 +94,16 @@ function getNestedValue(obj: object, path: string): unknown {
 /**
  * Export data to PDF with professional formatting
  */
-export function exportToPDF<T extends object>(
+export async function exportToPDF<T extends object>(
   data: T[],
   columns: PdfColumn<T>[],
   options: PdfExportOptions,
   summaries?: PdfSummary[]
-): { success: boolean; error?: string } {
+): Promise<{ success: boolean; error?: string }> {
   try {
+    const { default: jsPDF } = await import('jspdf');
+    const { default: autoTable } = await import('jspdf-autotable');
+
     const doc = new jsPDF({
       orientation: options.orientation || 'portrait',
       unit: 'mm',

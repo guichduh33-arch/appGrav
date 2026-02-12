@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useLanStore, type IConnectedDevice } from '../stores/lanStore';
 import { getOnlineNodes, getHubNode, type TDeviceType } from '../services/lan/lanProtocol';
 import type { ILanNode } from '../types/database';
+import logger from '@/utils/logger';
 
 /**
  * LAN device with online status
@@ -84,7 +85,7 @@ export function useLanDevices(): IUseLanDevicesReturn {
       setDbDevices(nodes);
       setHubNode(hub);
     } catch (error) {
-      console.error('[useLanDevices] Error fetching devices:', error);
+      logger.error('[useLanDevices] Error fetching devices:', error);
     } finally {
       setIsLoading(false);
     }

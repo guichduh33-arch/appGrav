@@ -398,7 +398,7 @@ export function useReceiveTransfer() {
           reference_type: 'transfer',
           reference_id: params.transferId,
           reason: `Transfer ${transfer.transfer_number} - OUT`,
-          // TODO: Query actual stock levels for accurate tracking
+          // POST-LAUNCH: Query actual stock levels per location for accurate before/after tracking
           stock_before: 0,
           stock_after: 0,
         })
@@ -414,7 +414,7 @@ export function useReceiveTransfer() {
           reference_type: 'transfer',
           reference_id: params.transferId,
           reason: `Transfer ${transfer.transfer_number} - IN`,
-          // TODO: Query actual stock levels for accurate tracking
+          // POST-LAUNCH: Query actual stock levels per location for accurate before/after tracking
           stock_before: 0,
           stock_after: 0,
         })

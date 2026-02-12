@@ -4,10 +4,23 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
 
+// Bundle analyzer - run with: ANALYZE=true npm run build
+const analyzePlugin = async () => {
+    if (process.env.ANALYZE) {
+        const { visualizer } = await import('rollup-plugin-visualizer')
+        return visualizer({ open: true, filename: 'dist/bundle-stats.html', gzipSize: true })
+    }
+    return null
+}
+
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+// @ts-expect-error async defineConfig is valid at runtime
+export default defineConfig(async ({ mode }) => {
+    const analyzer = await analyzePlugin()
+    return {
     plugins: [
         react(),
+        ...(analyzer ? [analyzer] : []),
         VitePWA({
             registerType: 'autoUpdate',
             includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
@@ -155,12 +168,16 @@ export default defineConfig(({ mode }) => ({
         sourcemap: mode !== 'production',
         rollupOptions: {
             output: {
-                manualChunks(id) {
+                manualChunks(id: string) {
                     if (id.includes('node_modules')) {
                         if (id.includes('react-dom') || id.includes('react-router')) return 'vendor-react'
                         if (id.includes('@tanstack') || id.includes('tanstack')) return 'vendor-query'
                         if (id.includes('@supabase') || id.includes('supabase')) return 'vendor-supabase'
                         if (id.includes('lucide-react') || id.includes('lucide') || id.includes('sonner')) return 'vendor-ui'
+                        if (id.includes('recharts') || id.includes('d3-')) return 'vendor-charts'
+                        if (id.includes('jspdf') || id.includes('jspdf-autotable')) return 'vendor-pdf'
+                        if (id.includes('xlsx')) return 'vendor-xlsx'
+                        if (id.includes('html2canvas')) return 'vendor-html2canvas'
                     }
                 },
             },
@@ -173,4 +190,4 @@ export default defineConfig(({ mode }) => ({
         css: true,
         testTimeout: 15000,
     },
-}))
+}})

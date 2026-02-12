@@ -103,7 +103,7 @@ export async function syncPromotionsToOffline(): Promise<number> {
   const { data: promotionsData, error: promotionsError } = await query;
 
   if (promotionsError) {
-    console.error('[PromotionSync] Error fetching promotions:', promotionsError);
+    logger.error('[PromotionSync] Error fetching promotions:', promotionsError);
     throw promotionsError;
   }
 
@@ -113,7 +113,7 @@ export async function syncPromotionsToOffline(): Promise<number> {
     .select('id, promotion_id, product_id, category_id');
 
   if (ppError) {
-    console.error('[PromotionSync] Error fetching promotion_products:', ppError);
+    logger.error('[PromotionSync] Error fetching promotion_products:', ppError);
     throw ppError;
   }
 
@@ -123,7 +123,7 @@ export async function syncPromotionsToOffline(): Promise<number> {
     .select('id, promotion_id, free_product_id, quantity');
 
   if (fpError) {
-    console.error('[PromotionSync] Error fetching promotion_free_products:', fpError);
+    logger.error('[PromotionSync] Error fetching promotion_free_products:', fpError);
     throw fpError;
   }
 

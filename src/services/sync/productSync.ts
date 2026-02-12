@@ -112,7 +112,7 @@ export async function syncProductsToOffline(): Promise<number> {
   const { data, error } = await query;
 
   if (error) {
-    console.error('[ProductSync] Error fetching products:', error);
+    logger.error('[ProductSync] Error fetching products:', error);
     throw error;
   }
 
@@ -207,7 +207,7 @@ export async function syncCategoriesToOffline(): Promise<number> {
   const { data, error } = await query;
 
   if (error) {
-    console.error('[ProductSync] Error fetching categories:', error);
+    logger.error('[ProductSync] Error fetching categories:', error);
     throw error;
   }
 
@@ -274,7 +274,7 @@ export async function syncModifiersToOffline(): Promise<number> {
     .eq('is_active', true);
 
   if (error) {
-    console.error('[ProductSync] Error fetching modifiers:', error);
+    logger.error('[ProductSync] Error fetching modifiers:', error);
     throw error;
   }
 

@@ -217,8 +217,8 @@ export async function validateAndFilterCartItems(
         removedNames.push(item.product.name);
       }
     } else if (item.type === 'combo' && item.combo) {
-      // Combos: for MVP, assume valid if combo object exists
-      // TODO: validate combo still exists in offline cache when combos are cached
+      // Combos: assume valid if combo object exists
+      // POST-LAUNCH: Validate combo still exists in offline cache when combos are cached offline
       validItems.push(item);
     }
   }

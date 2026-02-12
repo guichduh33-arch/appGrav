@@ -12,6 +12,7 @@ import type {
   IOfflineCustomer,
   ILegacySyncQueueItem,
 } from '@/types/offline';
+import logger from '@/utils/logger';
 
 // Legacy type aliases for backward compatibility
 type ISyncQueueItem = ILegacySyncQueueItem;
@@ -65,7 +66,7 @@ export type { ISyncQueueItem };
  * Returns empty array to allow graceful degradation
  */
 function handleDbError(error: unknown): [] {
-  console.error('[useOfflineData] IndexedDB error:', error);
+  logger.error('[useOfflineData] IndexedDB error:', error);
   return [];
 }
 
@@ -206,7 +207,7 @@ export function useOfflineCustomerById(customerId: string | null): IOfflineCusto
  * @returns Empty array (feature deprecated)
  */
 export function useOfflineFloorPlan(): ILegacyFloorPlanItem[] | undefined {
-  console.warn('[useOfflineData] useOfflineFloorPlan is deprecated - floor plan items not in unified schema');
+  logger.warn('[useOfflineData] useOfflineFloorPlan is deprecated - floor plan items not in unified schema');
   return [];
 }
 
@@ -221,7 +222,7 @@ export function useOfflineSyncQueueCount(): number | undefined {
       try {
         return await db.offline_legacy_sync_queue.where('status').equals('pending').count();
       } catch (error) {
-        console.error('[useOfflineData] IndexedDB error:', error);
+        logger.error('[useOfflineData] IndexedDB error:', error);
         return 0;
       }
     }

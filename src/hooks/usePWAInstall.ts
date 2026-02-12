@@ -117,7 +117,7 @@ export function usePWAInstall(): IPWAInstallState & IPWAInstallActions {
    */
   const promptInstall = useCallback(async (): Promise<boolean> => {
     if (!deferredPrompt) {
-      console.warn('[PWA] Install prompt not available');
+      logger.warn('[PWA] Install prompt not available');
       return false;
     }
 
@@ -139,7 +139,7 @@ export function usePWAInstall(): IPWAInstallState & IPWAInstallActions {
         return false;
       }
     } catch (error) {
-      console.error('[PWA] Error prompting install:', error);
+      logger.error('[PWA] Error prompting install:', error);
       return false;
     }
   }, [deferredPrompt]);

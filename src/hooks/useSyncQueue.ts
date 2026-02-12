@@ -9,6 +9,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSyncStore } from '../stores/syncStore';
 import { getQueueCounts, hasItemsToSync } from '../services/sync/syncQueue';
+import logger from '@/utils/logger';
 
 /**
  * Queue counts structure
@@ -87,7 +88,7 @@ export function useSyncQueue(): IUseSyncQueueReturn {
       const itemsToSync = await hasItemsToSync();
       setHasItems(itemsToSync);
     } catch (error) {
-      console.error('[useSyncQueue] Error refreshing counts:', error);
+      logger.error('[useSyncQueue] Error refreshing counts:', error);
     }
   }, []);
 

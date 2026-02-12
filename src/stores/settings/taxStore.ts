@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../../lib/supabase';
 import type { TaxRate } from '../../types/settings';
+import logger from '@/utils/logger';
 
 interface TaxState {
   taxRates: TaxRate[];
@@ -47,7 +48,7 @@ export const useTaxStore = create<TaxState>()((set, get) => ({
       set({ taxRates: [...get().taxRates, data] });
       return data;
     } catch (error) {
-      console.error('Failed to create tax rate:', error);
+      logger.error('Failed to create tax rate:', error);
       return null;
     }
   },
@@ -68,7 +69,7 @@ export const useTaxStore = create<TaxState>()((set, get) => ({
       });
       return true;
     } catch (error) {
-      console.error('Failed to update tax rate:', error);
+      logger.error('Failed to update tax rate:', error);
       return false;
     }
   },
@@ -85,7 +86,7 @@ export const useTaxStore = create<TaxState>()((set, get) => ({
       set({ taxRates: get().taxRates.filter((t) => t.id !== id) });
       return true;
     } catch (error) {
-      console.error('Failed to delete tax rate:', error);
+      logger.error('Failed to delete tax rate:', error);
       return false;
     }
   },

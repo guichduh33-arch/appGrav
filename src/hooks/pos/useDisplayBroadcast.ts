@@ -9,6 +9,8 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import type { CartItem } from '@/stores/cartStore';
+import { logError, logWarn } from '@/utils/logger';
+import { logError, logWarn } from '@/utils/logger';
 
 // =====================================================
 // Types
@@ -135,14 +137,14 @@ export function useDisplayBroadcast(): IUseDisplayBroadcastReturn {
   // Initialize BroadcastChannel
   useEffect(() => {
     if (!isSupported) {
-      console.warn('BroadcastChannel not supported in this browser');
+      logWarn('BroadcastChannel not supported in this browser');
       return;
     }
 
     try {
       channelRef.current = new BroadcastChannel(DISPLAY_CHANNEL);
     } catch (err) {
-      console.error('Failed to create BroadcastChannel:', err);
+      logError('Failed to create BroadcastChannel', err);
     }
 
     return () => {
@@ -185,7 +187,7 @@ export function useDisplayBroadcast(): IUseDisplayBroadcastReturn {
       try {
         channelRef.current.postMessage(message);
       } catch (err) {
-        console.error('Failed to broadcast cart update:', err);
+        logError('Failed to broadcast cart update', err);
       }
     },
     []
@@ -211,7 +213,7 @@ export function useDisplayBroadcast(): IUseDisplayBroadcastReturn {
       try {
         channelRef.current.postMessage(message);
       } catch (err) {
-        console.error('Failed to broadcast order complete:', err);
+        logError('Failed to broadcast order complete', err);
       }
     },
     []
@@ -233,7 +235,7 @@ export function useDisplayBroadcast(): IUseDisplayBroadcastReturn {
     try {
       channelRef.current.postMessage(message);
     } catch (err) {
-      console.error('Failed to broadcast clear:', err);
+      logError('Failed to broadcast clear', err);
     }
   }, []);
 
@@ -301,7 +303,7 @@ export function useDisplayBroadcastListener(onMessage: TDisplayMessageHandler): 
 
   useEffect(() => {
     if (!isSupported) {
-      console.warn('BroadcastChannel not supported in this browser');
+      logWarn('BroadcastChannel not supported in this browser');
       return;
     }
 

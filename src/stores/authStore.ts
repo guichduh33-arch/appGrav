@@ -4,6 +4,7 @@ import type { UserProfile } from '../types/database';
 import type { Role, EffectivePermission } from '../types/auth';
 import { authService } from '../services/authService';
 import { offlineAuthService } from '../services/offline/offlineAuthService';
+import logger from '@/utils/logger';
 
 // Session storage keys
 const SESSION_TOKEN_KEY = 'breakery-session-token';
@@ -84,7 +85,7 @@ export const useAuthStore = create<IAuthState>()(
           }
 
           // Update state with user data
-          console.debug('[auth] Login successful:', {
+          logger.debug('[auth] Login successful:', {
             userId: response.user?.id,
             roles: response.roles?.map(r => r.code),
             permissionsCount: response.permissions?.length
@@ -112,7 +113,7 @@ export const useAuthStore = create<IAuthState>()(
 
           return { success: true };
         } catch (error) {
-          console.error('Login error:', error);
+          logger.error('Login error:', error);
           set({ isLoading: false });
           return { success: false, error: 'Login failed' };
         }
@@ -129,7 +130,7 @@ export const useAuthStore = create<IAuthState>()(
           try {
             await authService.logout(sessionId, user.id);
           } catch (error) {
-            console.error('Logout API error:', error);
+            logger.error('Logout API error:', error);
             // Continue with local logout even if API fails
           }
         }
@@ -177,7 +178,7 @@ export const useAuthStore = create<IAuthState>()(
           }
 
           // Update state with fresh data
-          console.debug('[auth] Session refreshed:', {
+          logger.debug('[auth] Session refreshed:', {
             userId: response.user?.id,
             roles: response.roles?.map(r => r.code),
             permissionsCount: response.permissions?.length
@@ -203,7 +204,7 @@ export const useAuthStore = create<IAuthState>()(
 
           return true;
         } catch (error) {
-          console.error('Session refresh error:', error);
+          logger.error('Session refresh error:', error);
           set({ isLoading: false });
           return false;
         }
@@ -272,7 +273,7 @@ export const useAuthStore = create<IAuthState>()(
           sessionToken: null,
         });
 
-        console.debug('[authStore] Offline session created for user:', userData.id);
+        logger.debug('[authStore] Offline session created for user:', userData.id);
       },
 
       // ========================================

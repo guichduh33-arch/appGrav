@@ -106,7 +106,7 @@ async function syncOrder(item: ISyncQueueItem): Promise<void> {
       .insert(orderItems as never);
 
     if (itemsError) {
-      console.error('[SyncEngine] Error inserting order items:', itemsError);
+      logger.error('[SyncEngine] Error inserting order items:', itemsError);
     }
   }
 
@@ -195,7 +195,7 @@ async function dispatchSync(item: ISyncQueueItem): Promise<void> {
       await syncProductCategoryPrice(item);
       break;
     default:
-      console.warn(`[SyncEngine] Unknown item type: ${item.type}`);
+      logger.warn(`[SyncEngine] Unknown item type: ${item.type}`);
   }
 }
 
@@ -309,7 +309,7 @@ export async function runSyncEngine(): Promise<{
       failed: engineState.itemsFailed,
     };
   } catch (error) {
-    console.error('[SyncEngine] Error during sync:', error);
+    logger.error('[SyncEngine] Error during sync:', error);
     syncStore.setSyncStatus('error');
     syncStore.setSyncProgress(null);
     throw error;
@@ -332,7 +332,7 @@ export function startSyncWithDelay(): void {
   startDelayTimeoutId = setTimeout(() => {
     startDelayTimeoutId = null;
     runSyncEngine().catch((err) => {
-      console.error('[SyncEngine] Error during sync:', err);
+      logger.error('[SyncEngine] Error during sync:', err);
     });
   }, SYNC_START_DELAY);
 }

@@ -69,7 +69,7 @@ export async function syncProductCategoryPricesToOffline(): Promise<number> {
   const { data: pricesData, error: pricesError } = await query;
 
   if (pricesError) {
-    console.error('[ProductCategoryPriceSync] Error fetching product category prices:', pricesError);
+    logger.error('[ProductCategoryPriceSync] Error fetching product category prices:', pricesError);
     throw pricesError;
   }
 

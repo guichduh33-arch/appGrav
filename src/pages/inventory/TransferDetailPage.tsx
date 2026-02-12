@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRightLeft, CheckCircle, Clock, Package, AlertTriangle, 
 import { toast } from 'sonner'
 import { useTransfer, useReceiveTransfer } from '@/hooks/inventory'
 import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'
-import './TransferDetailPage.css'
+import { cn } from '@/lib/utils'
 
 // Status colors
 const STATUS_COLORS = {
@@ -138,8 +138,8 @@ export default function TransferDetailPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="transfer-detail-page">
-        <div className="transfer-detail-loading">Loading...</div>
+      <div className="p-6 md:p-4 max-w-[1200px] mx-auto">
+        <div className="flex items-center justify-center p-12 text-lg text-gray-400">Loading...</div>
       </div>
     )
   }
@@ -147,11 +147,11 @@ export default function TransferDetailPage() {
   // Not found state
   if (!transfer) {
     return (
-      <div className="transfer-detail-page">
-        <div className="transfer-detail-error">
-          <AlertTriangle size={48} />
-          <h3>Error</h3>
-          <p>Transfer not found</p>
+      <div className="p-6 md:p-4 max-w-[1200px] mx-auto">
+        <div className="flex flex-col items-center justify-center p-12 text-center">
+          <AlertTriangle size={48} className="text-red-500 mb-4" />
+          <h3 className="text-xl font-bold text-white m-0 mb-2">Error</h3>
+          <p className="text-base text-gray-400 m-0 mb-6">Transfer not found</p>
           <button className="btn btn-primary" onClick={() => navigate('/inventory/transfers')}>
             Back
           </button>
@@ -176,29 +176,29 @@ export default function TransferDetailPage() {
   }
 
   return (
-    <div className="transfer-detail-page">
+    <div className="p-6 md:p-4 max-w-[1200px] mx-auto">
       {/* Offline Banner */}
       {!isOnline && (
-        <div className="offline-banner">
+        <div className="flex items-center gap-2 rounded-lg border border-amber-500 bg-amber-500/10 px-4 py-3 mb-6 text-amber-700">
           <WifiOff size={18} />
           <span>Reception is blocked while offline</span>
         </div>
       )}
 
       {/* Header */}
-      <header className="transfer-detail-header">
-        <div className="transfer-detail-header__left">
+      <header className="flex justify-between items-start mb-6">
+        <div className="flex items-center gap-6 md:flex-col md:items-start md:gap-4">
           <button className="btn btn-ghost" onClick={() => navigate('/inventory/transfers')}>
             <ArrowLeft size={20} />
             Back
           </button>
-          <div className="transfer-detail-header__info">
-            <h1 className="transfer-detail-title">
+          <div className="flex flex-col gap-2">
+            <h1 className="flex items-center gap-4 text-2xl font-bold text-white m-0">
               <ArrowRightLeft size={28} />
               {transfer.transfer_number}
             </h1>
             <span
-              className="transfer-detail-status"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold w-fit"
               style={{ background: `${statusColor}20`, color: statusColor }}
             >
               {isReceived ? <CheckCircle size={14} /> : <Clock size={14} />}
@@ -209,18 +209,18 @@ export default function TransferDetailPage() {
       </header>
 
       {/* Route Information */}
-      <div className="transfer-detail-route">
-        <div className="route-location from">
-          <span className="route-label">From</span>
-          <span className="route-name">
+      <div className="flex items-center gap-6 p-4 bg-gray-800 border border-gray-700 rounded-lg mb-4 md:flex-col md:gap-4">
+        <div className="flex-1 text-center">
+          <span className="block text-xs text-gray-500 uppercase tracking-wider mb-1">From</span>
+          <span className="block text-lg font-semibold" style={{ color: 'var(--color-primary)' }}>
             {transfer.from_section?.icon && `${transfer.from_section.icon} `}
             {transfer.from_section?.name ?? transfer.from_location?.name ?? 'Unknown'}
           </span>
         </div>
-        <ArrowRightLeft size={32} className="route-arrow" />
-        <div className="route-location to">
-          <span className="route-label">To</span>
-          <span className="route-name">
+        <ArrowRightLeft size={32} className="text-gray-500 shrink-0 md:rotate-90" />
+        <div className="flex-1 text-center">
+          <span className="block text-xs text-gray-500 uppercase tracking-wider mb-1">To</span>
+          <span className="block text-lg font-semibold text-emerald-500">
             {transfer.to_section?.icon && `${transfer.to_section.icon} `}
             {transfer.to_section?.name ?? transfer.to_location?.name ?? 'Unknown'}
           </span>
@@ -228,21 +228,21 @@ export default function TransferDetailPage() {
       </div>
 
       {/* Transfer Info */}
-      <div className="transfer-detail-info">
-        <div className="info-item">
-          <span className="info-label">Date</span>
-          <span className="info-value">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] md:grid-cols-2 gap-4 p-4 bg-gray-800 border border-gray-700 rounded-lg mb-4">
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-gray-500 uppercase tracking-wider">Date</span>
+          <span className="text-base text-white font-medium">
             {transfer.transfer_date ? new Date(transfer.transfer_date).toLocaleDateString('en-US') : '-'}
           </span>
         </div>
-        <div className="info-item">
-          <span className="info-label">Responsible</span>
-          <span className="info-value">{transfer.responsible_person}</span>
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-gray-500 uppercase tracking-wider">Responsible</span>
+          <span className="text-base text-white font-medium">{transfer.responsible_person}</span>
         </div>
         {isReceived && transfer.approved_at && (
-          <div className="info-item">
-            <span className="info-label">Received On</span>
-            <span className="info-value">
+          <div className="flex flex-col gap-1">
+            <span className="text-xs text-gray-500 uppercase tracking-wider">Received On</span>
+            <span className="text-base text-white font-medium">
               {new Date(transfer.approved_at).toLocaleDateString('en-US')}
             </span>
           </div>
@@ -251,7 +251,7 @@ export default function TransferDetailPage() {
 
       {/* Already Received Notice */}
       {isReceived && (
-        <div className="already-received-notice">
+        <div className="flex items-center gap-2 px-4 py-3 bg-emerald-500/10 border border-emerald-500 rounded-lg mb-4 text-emerald-500 font-medium">
           <CheckCircle size={20} />
           <span>This transfer has already been received</span>
         </div>
@@ -259,27 +259,27 @@ export default function TransferDetailPage() {
 
       {/* Variance Warning */}
       {hasVariances && !isReceived && (
-        <div className="variance-warning">
+        <div className="flex items-center gap-2 px-4 py-3 bg-amber-500/10 border border-amber-500 rounded-lg mb-4 text-amber-500 font-medium">
           <AlertTriangle size={20} />
           <span>There are variances between requested and received quantities</span>
         </div>
       )}
 
       {/* Items Table */}
-      <div className="transfer-detail-items">
-        <h2 className="items-title">
+      <div className="bg-gray-800 border border-gray-700 rounded-lg mb-4 overflow-hidden">
+        <h2 className="flex items-center gap-2 text-lg font-semibold text-white p-4 m-0 border-b border-gray-700">
           <Package size={20} />
           Items ({transfer.items.length})
         </h2>
 
-        <div className="items-table-wrapper">
-          <table className="items-table">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
             <thead>
               <tr>
-                <th>Product</th>
-                <th className="text-center">Qty Requested</th>
-                <th className="text-center">Qty Received</th>
-                <th className="text-center">Variance</th>
+                <th className="px-4 py-3 md:px-3 md:py-2 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider bg-gray-700/50 border-b border-gray-700">Product</th>
+                <th className="px-4 py-3 md:px-3 md:py-2 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider bg-gray-700/50 border-b border-gray-700">Qty Requested</th>
+                <th className="px-4 py-3 md:px-3 md:py-2 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider bg-gray-700/50 border-b border-gray-700">Qty Received</th>
+                <th className="px-4 py-3 md:px-3 md:py-2 text-center text-xs font-semibold text-gray-400 uppercase tracking-wider bg-gray-700/50 border-b border-gray-700">Variance</th>
               </tr>
             </thead>
             <tbody>
@@ -293,26 +293,31 @@ export default function TransferDetailPage() {
                 const hasError = validationErrors.has(item.id)
 
                 return (
-                  <tr key={item.id} className={hasError ? 'has-error' : ''}>
-                    <td>
-                      <div className="product-cell">
-                        <span className="product-name">{item.product?.name ?? 'Unknown'}</span>
+                  <tr key={item.id} className={hasError ? 'bg-red-500/5' : ''}>
+                    <td className="px-4 py-3 md:px-3 md:py-2 border-b border-gray-700 align-middle last:border-b-0">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-sm font-medium text-white">{item.product?.name ?? 'Unknown'}</span>
                         {item.product?.sku && (
-                          <span className="product-sku">{item.product.sku}</span>
+                          <span className="text-xs text-gray-500">{item.product.sku}</span>
                         )}
                       </div>
                     </td>
-                    <td className="text-center">
-                      <span className="quantity-requested">{item.quantity_requested}</span>
+                    <td className="px-4 py-3 md:px-3 md:py-2 border-b border-gray-700 align-middle text-center last:border-b-0">
+                      <span className="text-sm text-gray-400">{item.quantity_requested}</span>
                     </td>
-                    <td className="text-center">
+                    <td className="px-4 py-3 md:px-3 md:py-2 border-b border-gray-700 align-middle text-center last:border-b-0">
                       {isReceived ? (
-                        <span className="quantity-received">{item.quantity_received ?? 0}</span>
+                        <span className="text-sm text-white font-semibold">{item.quantity_received ?? 0}</span>
                       ) : (
-                        <div className="quantity-input-wrapper">
+                        <div className="flex flex-col items-center gap-1">
                           <input
                             type="number"
-                            className={`quantity-input ${hasError ? 'input-error' : ''}`}
+                            className={cn(
+                              'w-20 md:w-[60px] px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white text-sm text-center',
+                              'focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20',
+                              'disabled:opacity-50 disabled:cursor-not-allowed',
+                              hasError && 'border-red-500'
+                            )}
                             value={quantityReceived ?? ''}
                             onChange={(e) => handleQuantityChange(item.id, e.target.value)}
                             min="0"
@@ -320,13 +325,17 @@ export default function TransferDetailPage() {
                             disabled={!canReceive}
                           />
                           {hasError && (
-                            <span className="error-message">{validationErrors.get(item.id)}</span>
+                            <span className="text-xs text-red-500">{validationErrors.get(item.id)}</span>
                           )}
                         </div>
                       )}
                     </td>
-                    <td className="text-center">
-                      <span className={`variance ${variance > 0 ? 'positive' : variance < 0 ? 'negative' : ''}`}>
+                    <td className="px-4 py-3 md:px-3 md:py-2 border-b border-gray-700 align-middle text-center last:border-b-0">
+                      <span className={cn(
+                        'text-sm font-semibold text-gray-400',
+                        variance > 0 && 'text-emerald-500',
+                        variance < 0 && 'text-red-500'
+                      )}>
                         {variance > 0 ? '+' : ''}{variance}
                       </span>
                     </td>
@@ -340,13 +349,17 @@ export default function TransferDetailPage() {
 
       {/* Reception Notes */}
       {!isReceived && (
-        <div className="reception-notes-section">
-          <label className="notes-label">
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-white mb-2">
             Reception Notes
-            {hasVariances && <span className="required">*</span>}
+            {hasVariances && <span className="text-red-500 ml-1">*</span>}
           </label>
           <textarea
-            className="reception-notes-input"
+            className={cn(
+              'w-full p-4 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm font-inherit resize-y',
+              'focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20',
+              'disabled:opacity-50 disabled:cursor-not-allowed'
+            )}
             value={receptionNotes}
             onChange={(e) => setReceptionNotes(e.target.value)}
             placeholder="Add any notes about the reception..."
@@ -358,23 +371,23 @@ export default function TransferDetailPage() {
 
       {/* Existing Notes */}
       {transfer.notes && (
-        <div className="existing-notes-section">
-          <label className="notes-label">Notes</label>
-          <div className="existing-notes">{transfer.notes}</div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-white mb-2">Notes</label>
+          <div className="p-4 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 text-sm whitespace-pre-wrap">{transfer.notes}</div>
         </div>
       )}
 
       {/* Actions */}
       {!isReceived && (
-        <div className="transfer-detail-actions">
+        <div className="flex justify-end gap-4 pt-4 border-t border-gray-700 md:flex-col-reverse">
           <button
-            className="btn btn-secondary"
+            className="btn btn-secondary md:w-full"
             onClick={() => navigate('/inventory/transfers')}
           >
             Cancel
           </button>
           <button
-            className="btn btn-primary"
+            className="btn btn-primary md:w-full"
             onClick={handleReceive}
             disabled={!canReceive || receiveTransferMutation.isPending}
           >

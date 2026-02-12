@@ -109,7 +109,7 @@ export function ExportButtons<T extends object>({
         footerText: 'The Breakery - Lombok, Indonesia',
       };
 
-      const result = exportToPDF(config.data, pdfColumns, pdfOptions, config.summaries);
+      const result = await exportToPDF(config.data, pdfColumns, pdfOptions, config.summaries);
       onExportComplete?.('pdf', result.success);
     } catch (error) {
       console.error('PDF export error:', error);
@@ -224,7 +224,7 @@ export function ExportDropdown<T extends object>({
             format: col.format,
           }));
 
-          exportToPDF(config.data, pdfColumns, {
+          await exportToPDF(config.data, pdfColumns, {
             filename: config.filename,
             title: config.title,
             subtitle: config.subtitle,

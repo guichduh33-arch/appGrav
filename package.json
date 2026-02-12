@@ -9,7 +9,8 @@
     "lint": "eslint . --max-warnings 150",
     "preview": "vite preview",
     "test:claude": "ts-node --esm scripts/test-claude.ts",
-    "test:smoke": "vitest run src/__tests__/smoke/pos-smoke.test.ts"
+    "test:smoke": "vitest run src/__tests__/smoke/pos-smoke.test.ts",
+    "build:analyze": "set ANALYZE=true && vite build"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
@@ -68,6 +69,7 @@
     "globals": "^17.3.0",
     "jsdom": "^27.4.0",
     "postcss": "^8.5.6",
+    "rollup-plugin-visualizer": "^6.0.5",
     "supabase": "^2.75.0",
     "tailwindcss": "^3.4.19",
     "tailwindcss-animate": "^1.0.7",

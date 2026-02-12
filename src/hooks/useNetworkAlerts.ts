@@ -78,7 +78,7 @@ export function useNetworkAlerts(): void {
           currentPeriodIdRef.current = periodId;
         })
         .catch((err) => {
-          console.error('[useNetworkAlerts] Failed to start offline period:', err);
+          logger.error('[useNetworkAlerts] Failed to start offline period:', err);
         });
     } else {
       // Coming back online
@@ -98,7 +98,7 @@ export function useNetworkAlerts(): void {
             currentPeriodIdRef.current = null;
           })
           .catch((err) => {
-            console.error('[useNetworkAlerts] Failed to end offline period:', err);
+            logger.error('[useNetworkAlerts] Failed to end offline period:', err);
           });
       }
 

@@ -12,6 +12,7 @@ import {
   retryFailedItem,
   deleteQueueItem,
 } from '@/services/sync/syncQueueHelpers';
+import logger from '@/utils/logger';
 
 /**
  * Grouped items by entity type
@@ -96,7 +97,7 @@ export function usePendingSyncItems(): IUsePendingSyncItemsReturn {
       const allItems = await db.offline_sync_queue.toArray();
       setItems(allItems);
     } catch (error) {
-      console.error('[usePendingSyncItems] Error loading items:', error);
+      logger.error('[usePendingSyncItems] Error loading items:', error);
     } finally {
       setIsLoading(false);
     }

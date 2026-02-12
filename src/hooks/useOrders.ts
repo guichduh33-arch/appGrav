@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/authStore'
 import { useCartStore } from '../stores/cartStore'
 import type { Insertable } from '../types/database'
+import logger from '@/utils/logger'
 
 export function useOrders() {
     const queryClient = useQueryClient()
@@ -42,7 +43,7 @@ export function useOrders() {
                 .single()
 
             if (orderError) {
-                console.error('Supabase Order Error:', orderError)
+                logger.error('Supabase Order Error:', orderError)
                 throw orderError
             }
 
@@ -68,7 +69,7 @@ export function useOrders() {
                 .insert(itemsData)
 
             if (itemsError) {
-                console.error('Supabase Items Error:', itemsError)
+                logger.error('Supabase Items Error:', itemsError)
                 throw itemsError
             }
 

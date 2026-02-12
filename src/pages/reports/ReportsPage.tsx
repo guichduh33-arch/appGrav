@@ -1,43 +1,55 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { ChevronRight, ArrowLeft, Download } from 'lucide-react';
 import { OfflineReportBanner } from '@/components/reports/OfflineReportBanner';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { getLastSyncTime } from '@/services/reports/offlineReportCache';
-import { OverviewTab } from './components/OverviewTab';
-import { SalesTab } from './components/SalesTab';
-import { InventoryTab } from './components/InventoryTab';
-import { StockMovementTab } from './components/StockMovementTab';
-import { SalesByCategoryTab } from './components/SalesByCategoryTab';
-import { PaymentMethodTab } from './components/PaymentMethodTab';
-import { PurchaseDetailsTab } from './components/PurchaseDetailsTab';
-import { PurchaseBySupplierTab } from './components/PurchaseBySupplierTab';
-import { AuditTab } from './components/AuditTab';
-import { DailySalesTab } from './components/DailySalesTab';
-import { ProductPerformanceTab } from './components/ProductPerformanceTab';
-// Epic 4: Sales Reports
-import { ProfitLossTab } from './components/ProfitLossTab';
-import { SalesByCustomerTab } from './components/SalesByCustomerTab';
-import { SalesByHourTab } from './components/SalesByHourTab';
-import { SalesCancellationTab } from './components/SalesCancellationTab';
-// Epic 5: Inventory Reports
-import { StockWarningTab } from './components/StockWarningTab';
-import { ExpiredStockTab } from './components/ExpiredStockTab';
-import { UnsoldProductsTab } from './components/UnsoldProductsTab';
-// Epic 6: Finance Reports
-import { SessionCashBalanceTab } from './components/SessionCashBalanceTab';
-import { B2BReceivablesTab } from './components/B2BReceivablesTab';
-import { ExpensesTab } from './components/ExpensesTab';
-// Epic 7: Audit & Purchases
-import { PriceChangesTab } from './components/PriceChangesTab';
-import { DeletedProductsTab } from './components/DeletedProductsTab';
-import { PurchaseByDateTab } from './components/PurchaseByDateTab';
-import { OutstandingPurchasePaymentTab } from './components/OutstandingPurchasePaymentTab';
-// Epic 8: Financial Reports
-import { DiscountsVoidsTab } from './components/DiscountsVoidsTab';
-import { AlertsDashboardTab } from './components/AlertsDashboardTab';
 import { REPORT_CATEGORIES } from './ReportsConfig';
 import { ReportPlaceholder } from '@/components/reports/ReportPlaceholder';
 import { cn } from '@/lib/utils';
+
+// Lazy-loaded report tab components
+const OverviewTab = lazy(() => import('./components/OverviewTab').then(m => ({ default: m.OverviewTab })));
+const SalesTab = lazy(() => import('./components/SalesTab').then(m => ({ default: m.SalesTab })));
+const InventoryTab = lazy(() => import('./components/InventoryTab').then(m => ({ default: m.InventoryTab })));
+const StockMovementTab = lazy(() => import('./components/StockMovementTab').then(m => ({ default: m.StockMovementTab })));
+const SalesByCategoryTab = lazy(() => import('./components/SalesByCategoryTab').then(m => ({ default: m.SalesByCategoryTab })));
+const PaymentMethodTab = lazy(() => import('./components/PaymentMethodTab').then(m => ({ default: m.PaymentMethodTab })));
+const PurchaseDetailsTab = lazy(() => import('./components/PurchaseDetailsTab').then(m => ({ default: m.PurchaseDetailsTab })));
+const PurchaseBySupplierTab = lazy(() => import('./components/PurchaseBySupplierTab').then(m => ({ default: m.PurchaseBySupplierTab })));
+const AuditTab = lazy(() => import('./components/AuditTab').then(m => ({ default: m.AuditTab })));
+const DailySalesTab = lazy(() => import('./components/DailySalesTab').then(m => ({ default: m.DailySalesTab })));
+const ProductPerformanceTab = lazy(() => import('./components/ProductPerformanceTab').then(m => ({ default: m.ProductPerformanceTab })));
+const ProfitLossTab = lazy(() => import('./components/ProfitLossTab').then(m => ({ default: m.ProfitLossTab })));
+const SalesByCustomerTab = lazy(() => import('./components/SalesByCustomerTab').then(m => ({ default: m.SalesByCustomerTab })));
+const SalesByHourTab = lazy(() => import('./components/SalesByHourTab').then(m => ({ default: m.SalesByHourTab })));
+const SalesCancellationTab = lazy(() => import('./components/SalesCancellationTab').then(m => ({ default: m.SalesCancellationTab })));
+const StockWarningTab = lazy(() => import('./components/StockWarningTab').then(m => ({ default: m.StockWarningTab })));
+const ExpiredStockTab = lazy(() => import('./components/ExpiredStockTab').then(m => ({ default: m.ExpiredStockTab })));
+const UnsoldProductsTab = lazy(() => import('./components/UnsoldProductsTab').then(m => ({ default: m.UnsoldProductsTab })));
+const SessionCashBalanceTab = lazy(() => import('./components/SessionCashBalanceTab').then(m => ({ default: m.SessionCashBalanceTab })));
+const B2BReceivablesTab = lazy(() => import('./components/B2BReceivablesTab').then(m => ({ default: m.B2BReceivablesTab })));
+const ExpensesTab = lazy(() => import('./components/ExpensesTab').then(m => ({ default: m.ExpensesTab })));
+const PriceChangesTab = lazy(() => import('./components/PriceChangesTab').then(m => ({ default: m.PriceChangesTab })));
+const DeletedProductsTab = lazy(() => import('./components/DeletedProductsTab').then(m => ({ default: m.DeletedProductsTab })));
+const PurchaseByDateTab = lazy(() => import('./components/PurchaseByDateTab').then(m => ({ default: m.PurchaseByDateTab })));
+const OutstandingPurchasePaymentTab = lazy(() => import('./components/OutstandingPurchasePaymentTab').then(m => ({ default: m.OutstandingPurchasePaymentTab })));
+const DiscountsVoidsTab = lazy(() => import('./components/DiscountsVoidsTab').then(m => ({ default: m.DiscountsVoidsTab })));
+const AlertsDashboardTab = lazy(() => import('./components/AlertsDashboardTab').then(m => ({ default: m.AlertsDashboardTab })));
+
+function ReportSkeleton() {
+    return (
+        <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-1/3" />
+            <div className="h-4 bg-gray-200 rounded w-2/3" />
+            <div className="grid grid-cols-3 gap-4 mt-6">
+                <div className="h-24 bg-gray-200 rounded-lg" />
+                <div className="h-24 bg-gray-200 rounded-lg" />
+                <div className="h-24 bg-gray-200 rounded-lg" />
+            </div>
+            <div className="h-64 bg-gray-200 rounded-lg mt-4" />
+        </div>
+    );
+}
 
 const ReportsPage = () => {
     const [activeCategoryId, setActiveCategoryId] = useState<string>('sales');
@@ -54,66 +66,94 @@ const ReportsPage = () => {
 
     // Component Mapping
     const renderReportComponent = (reportId: string) => {
+        let component: React.ReactNode;
         switch (reportId) {
             case 'dashboard':
-                return <OverviewTab />;
+                component = <OverviewTab />;
+                break;
             case 'sales_dashboard':
-                return <SalesTab />;
+                component = <SalesTab />;
+                break;
             case 'daily_sales':
-                return <DailySalesTab />;
+                component = <DailySalesTab />;
+                break;
             case 'product_performance':
-                return <ProductPerformanceTab />;
+                component = <ProductPerformanceTab />;
+                break;
             case 'sales_by_category':
-                return <SalesByCategoryTab />;
+                component = <SalesByCategoryTab />;
+                break;
             case 'stock_movement':
-                return <StockMovementTab />;
+                component = <StockMovementTab />;
+                break;
             case 'payment_by_method':
-                return <PaymentMethodTab />;
+                component = <PaymentMethodTab />;
+                break;
             case 'purchase_details':
-                return <PurchaseDetailsTab />;
+                component = <PurchaseDetailsTab />;
+                break;
             case 'purchase_by_supplier':
-                return <PurchaseBySupplierTab />;
+                component = <PurchaseBySupplierTab />;
+                break;
             case 'inventory_dashboard':
-                return <InventoryTab />;
+                component = <InventoryTab />;
+                break;
             case 'audit_log':
-                return <AuditTab />;
+                component = <AuditTab />;
+                break;
             // Epic 4: Sales Reports
             case 'profit_loss':
-                return <ProfitLossTab />;
+                component = <ProfitLossTab />;
+                break;
             case 'sales_by_customer':
-                return <SalesByCustomerTab />;
+                component = <SalesByCustomerTab />;
+                break;
             case 'sales_by_hour':
-                return <SalesByHourTab />;
+                component = <SalesByHourTab />;
+                break;
             case 'sales_cancellation':
-                return <SalesCancellationTab />;
+                component = <SalesCancellationTab />;
+                break;
             // Epic 5: Inventory Reports
             case 'stock_warning':
-                return <StockWarningTab />;
+                component = <StockWarningTab />;
+                break;
             case 'expired_stock':
-                return <ExpiredStockTab />;
+                component = <ExpiredStockTab />;
+                break;
             case 'unsold_products':
-                return <UnsoldProductsTab />;
+                component = <UnsoldProductsTab />;
+                break;
             // Epic 6: Finance Reports
             case 'cash_balance':
-                return <SessionCashBalanceTab />;
+                component = <SessionCashBalanceTab />;
+                break;
             case 'receivables':
-                return <B2BReceivablesTab />;
+                component = <B2BReceivablesTab />;
+                break;
             case 'expenses':
-                return <ExpensesTab />;
+                component = <ExpensesTab />;
+                break;
             // Epic 7: Audit & Purchases
             case 'price_changes':
-                return <PriceChangesTab />;
+                component = <PriceChangesTab />;
+                break;
             case 'deleted_products':
-                return <DeletedProductsTab />;
+                component = <DeletedProductsTab />;
+                break;
             case 'purchase_by_date':
-                return <PurchaseByDateTab />;
+                component = <PurchaseByDateTab />;
+                break;
             case 'outstanding_purchase_payment':
-                return <OutstandingPurchasePaymentTab />;
+                component = <OutstandingPurchasePaymentTab />;
+                break;
             // Epic 8: Discounts & Alerts
             case 'discounts_voids':
-                return <DiscountsVoidsTab />;
+                component = <DiscountsVoidsTab />;
+                break;
             case 'alerts_dashboard':
-                return <AlertsDashboardTab />;
+                component = <AlertsDashboardTab />;
+                break;
             // Placeholders for remaining reports
             default: {
                 // Check if report has a custom placeholder message
@@ -131,6 +171,7 @@ const ReportsPage = () => {
                 );
             }
         }
+        return <Suspense fallback={<ReportSkeleton />}>{component}</Suspense>;
     };
 
     return (

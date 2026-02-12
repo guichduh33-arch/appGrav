@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Receipt, Calendar, DollarSign, TrendingDown } from 'lucide-react';
 import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
-// import { supabase } from '@/lib/supabase'; // TODO: uncomment when expenses table is created
+// POST-LAUNCH: Enable supabase import when expenses table is created
+// import { supabase } from '@/lib/supabase';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
 import { useDateRange } from '@/hooks/reports/useDateRange';

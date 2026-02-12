@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../../lib/supabase';
 import type { BusinessHours } from '../../types/settings';
+import logger from '@/utils/logger';
 
 interface BusinessHoursState {
   businessHours: BusinessHours[];
@@ -38,7 +39,7 @@ export const useBusinessHoursStore = create<BusinessHoursState>()((set, get) => 
       });
       return true;
     } catch (error) {
-      console.error('Failed to update business hours:', error);
+      logger.error('Failed to update business hours:', error);
       return false;
     }
   },

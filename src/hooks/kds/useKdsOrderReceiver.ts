@@ -93,7 +93,7 @@ export function useKdsOrderReceiver(options: IUseKdsOrderReceiverOptions): IUseK
 
       // Validate payload
       if (!payload || !payload.order_id || !payload.station) {
-        console.warn('[useKdsOrderReceiver] Invalid payload received:', payload);
+        logger.warn('[useKdsOrderReceiver] Invalid payload received:', payload);
         return;
       }
 
@@ -148,7 +148,7 @@ export function useKdsOrderReceiver(options: IUseKdsOrderReceiverOptions): IUseK
       });
       logger.debug(`[useKdsOrderReceiver] ACK sent for order ${orderId}`);
     } catch (error) {
-      console.error('[useKdsOrderReceiver] Failed to send ACK:', error);
+      logger.error('[useKdsOrderReceiver] Failed to send ACK:', error);
     }
   };
 

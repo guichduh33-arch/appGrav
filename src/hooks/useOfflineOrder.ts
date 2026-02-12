@@ -8,6 +8,7 @@
 import { useState, useCallback } from 'react';
 import { useNetworkStore } from '@/stores/networkStore';
 import { useTerminalStore } from '@/stores/terminalStore';
+import logger from '@/utils/logger';
 import {
   saveOrderOffline,
   getOfflineOrders,
@@ -102,7 +103,7 @@ export function useOfflineOrder(): IUseOfflineOrderReturn {
       const count = await getPendingOrdersCount();
       setPendingCount(count);
     } catch (err) {
-      console.error('[useOfflineOrder] Error getting pending count:', err);
+      logger.error('[useOfflineOrder] Error getting pending count:', err);
     }
   }, []);
 
@@ -141,7 +142,7 @@ export function useOfflineOrder(): IUseOfflineOrderReturn {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to save order offline';
         setError(errorMessage);
-        console.error('[useOfflineOrder] Error creating offline order:', err);
+        logger.error('[useOfflineOrder] Error creating offline order:', err);
         throw err;
       } finally {
         setIsLoading(false);
@@ -157,7 +158,7 @@ export function useOfflineOrder(): IUseOfflineOrderReturn {
     try {
       return await getOfflineOrders();
     } catch (err) {
-      console.error('[useOfflineOrder] Error getting pending orders:', err);
+      logger.error('[useOfflineOrder] Error getting pending orders:', err);
       return [];
     }
   }, []);

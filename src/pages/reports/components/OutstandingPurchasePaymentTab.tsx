@@ -51,7 +51,7 @@ async function getOutstandingPayments(): Promise<OutstandingPayment[]> {
   return (data || [])
     .map((po: PurchaseOrderQueryResult) => {
       const isPartial = po.payment_status === 'partial';
-      // TODO: Replace with actual amount_paid from po_payments table when available
+      // POST-LAUNCH: Replace with actual amount_paid from po_payments table when supplier payments module is built
       // Currently estimating 50% for partial payments - this is INACCURATE
       const amountPaid = isPartial ? (po.total_amount || 0) * 0.5 : 0;
       const amountDue = (po.total_amount || 0) - amountPaid;

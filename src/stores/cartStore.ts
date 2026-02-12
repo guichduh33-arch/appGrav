@@ -4,6 +4,7 @@ import type { Product, ProductCombo } from '../types/database'
 import { saveCart, clearPersistedCart, type TSaveCartInput } from '@/services/offline/cartPersistenceService'
 import type { TPriceType } from '@/types/offline'
 import type { IItemPromotionDiscount, IPromotionEvaluationResult } from '@/services/pos/promotionEngine'
+import logger from '@/utils/logger'
 
 export interface CartModifier {
     groupName: string
@@ -263,7 +264,7 @@ export const useCartStore = create<CartState>()(
 
         // If trying to reduce quantity of locked item, don't allow
         if (isLocked && currentItem && quantity < currentItem.quantity) {
-            console.warn('Cannot reduce quantity of locked item without PIN')
+            logger.warn('Cannot reduce quantity of locked item without PIN')
             return
         }
 
@@ -289,7 +290,7 @@ export const useCartStore = create<CartState>()(
         const state = get()
         // Check if item is locked - if so, don't allow removal
         if (state.lockedItemIds.includes(itemId)) {
-            console.warn('Cannot remove locked item without PIN verification')
+            logger.warn('Cannot remove locked item without PIN verification')
             return
         }
 
@@ -305,7 +306,7 @@ export const useCartStore = create<CartState>()(
         // Caller must use forceClearCart() after PIN verification
         const state = get()
         if (state.lockedItemIds.length > 0) {
-            console.warn('Cannot clear cart: locked items present. Use forceClearCart() after PIN verification.')
+            logger.warn('Cannot clear cart: locked items present. Use forceClearCart() after PIN verification.')
             return false
         }
         clearPersistedCart()

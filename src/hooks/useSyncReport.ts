@@ -15,6 +15,7 @@ import {
   type IOfflinePeriod,
 } from '../services/sync/offlinePeriod';
 import { db } from '@/lib/db';
+import logger from '@/utils/logger';
 
 interface ISyncReportState {
   /** Whether to show the report modal */
@@ -116,7 +117,7 @@ export function useSyncReport(): ISyncReportState {
         }
       }
     } catch (error) {
-      console.error('[useSyncReport] Error checking for completed period:', error);
+      logger.error('[useSyncReport] Error checking for completed period:', error);
     }
   }, []);
 
@@ -154,7 +155,7 @@ export function useSyncReport(): ISyncReportState {
       // Close the report
       dismissReport();
     } catch (error) {
-      console.error('[useSyncReport] Error retrying failed:', error);
+      logger.error('[useSyncReport] Error retrying failed:', error);
     }
   }, [dismissReport]);
 

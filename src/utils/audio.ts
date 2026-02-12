@@ -3,6 +3,8 @@
  * Shared audio functions for notifications across the application
  */
 
+import logger from '@/utils/logger';
+
 /** Window with webkit-prefixed AudioContext for Safari compatibility */
 interface WebkitWindow extends Window {
   webkitAudioContext?: typeof AudioContext;
@@ -27,7 +29,7 @@ export function playNotificationSound(
       (window as WebkitWindow).webkitAudioContext;
 
     if (!AudioContextClass) {
-      console.warn('[audio] Web Audio API not supported');
+      logger.warn('[audio] Web Audio API not supported');
       return;
     }
 
@@ -48,7 +50,7 @@ export function playNotificationSound(
     oscillator.stop(audioContext.currentTime + duration);
   } catch (error) {
     // Audio API not available or blocked by browser
-    console.warn('[audio] Failed to play notification sound:', error);
+    logger.warn('[audio] Failed to play notification sound:', error);
   }
 }
 

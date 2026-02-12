@@ -8,6 +8,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import logger from '@/utils/logger';
 
 /** Storage bucket name for company assets */
 const BUCKET_NAME = 'company-assets';
@@ -63,7 +64,7 @@ export const companyAssetsService = {
         });
 
       if (uploadError) {
-        console.error('[companyAssets] Upload error:', uploadError);
+        logger.error('[companyAssets] Upload error:', uploadError);
         return { success: false, error: uploadError.message };
       }
 
@@ -74,7 +75,7 @@ export const companyAssetsService = {
 
       return { success: true, publicUrl: publicUrlData.publicUrl };
     } catch (error) {
-      console.error('[companyAssets] Upload error:', error);
+      logger.error('[companyAssets] Upload error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       return { success: false, error: errorMessage };
     }
@@ -91,7 +92,7 @@ export const companyAssetsService = {
       // Extract path from URL
       const path = logoUrl.split(`/${BUCKET_NAME}/`)[1];
       if (!path) {
-        console.warn('[companyAssets] Could not extract path from URL:', logoUrl);
+        logger.warn('[companyAssets] Could not extract path from URL:', logoUrl);
         return false;
       }
 
@@ -100,13 +101,13 @@ export const companyAssetsService = {
         .remove([path]);
 
       if (error) {
-        console.error('[companyAssets] Delete error:', error);
+        logger.error('[companyAssets] Delete error:', error);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('[companyAssets] Delete error:', error);
+      logger.error('[companyAssets] Delete error:', error);
       return false;
     }
   },

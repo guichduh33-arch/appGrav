@@ -42,7 +42,7 @@ export interface IUseOfflineOrderResult {
  * Hook for creating orders with automatic online/offline routing
  *
  * Automatically detects network status and routes to:
- * - Online: Supabase API call (TODO: integrate with existing online order creation)
+ * - Online: Creates order locally, then synced to Supabase via sync engine
  * - Offline: IndexedDB via offlineOrderService
  *
  * @example
@@ -109,22 +109,11 @@ export function useOfflineOrder(): IUseOfflineOrderResult {
         total: cartState.total,
       };
 
-      // TODO: Get current session ID from POS session context
-      // For now, sessionId is null - will be implemented in Story 3.5
+      // POST-LAUNCH: Wire up session ID from useOfflineSession hook when POS checkout uses this hook
       const sessionId: string | null = null;
 
-      let result: ICreateOrderResult;
-
-      if (isOnline) {
-        // Online mode: For now, use offline storage even when online
-        // This ensures orders are always saved locally first
-        // Story 3.6 (Sync Queue Processing) will handle syncing to server
-        // TODO: In future, could call Supabase directly for online orders
-        result = await createOfflineOrder(cart, user.id, sessionId);
-      } else {
-        // Offline mode: Create order locally
-        result = await createOfflineOrder(cart, user.id, sessionId);
-      }
+      // Offline-first: Always save to IndexedDB first, sync engine handles server upload
+      const result = await createOfflineOrder(cart, user.id, sessionId);
 
       // Clear cart after successful creation
       // clearCart() also clears the persisted cart (Story 3.2)

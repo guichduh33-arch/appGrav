@@ -134,7 +134,7 @@ export function useShift() {
             })
 
             if (error) {
-                console.error('Error fetching session:', error)
+                logger.error('Error fetching session:', error)
                 return null
             }
 
@@ -160,7 +160,7 @@ export function useShift() {
             })
 
             if (error) {
-                console.error('Error fetching terminal sessions:', error)
+                logger.error('Error fetching terminal sessions:', error)
                 return []
             }
 
@@ -229,7 +229,7 @@ export function useShift() {
                     .order('created_at', { ascending: false })
 
                 if (fallbackError) {
-                    console.error('Error fetching transactions:', fallbackError)
+                    logger.error('Error fetching transactions:', fallbackError)
                     return []
                 }
                 return (fallbackData as ShiftTransaction[] | null) || []
@@ -281,7 +281,7 @@ export function useShift() {
             })
 
             if (error) {
-                console.error('Error opening shift:', error.message)
+                logger.error('Error opening shift:', error.message)
                 // If RPC fails for any reason, try one more time to find existing shift using RPC
                 const { data: retryData } = await supabase.rpc('get_user_open_shift', {
                     p_user_id: userId
@@ -367,7 +367,7 @@ export function useShift() {
                 .limit(10)
 
             if (error) {
-                console.error('Error fetching history:', error)
+                logger.error('Error fetching history:', error)
                 return []
             }
 
@@ -409,7 +409,7 @@ export function useShift() {
         logger.debug('Recovery RPC result:', { data, error })
 
         if (error) {
-            console.error('Error recovering shift:', error)
+            logger.error('Error recovering shift:', error)
             // Show more specific error message
             if (error.message?.includes('function') || error.code === '42883') {
                 toast.error('Fonction RPC manquante - appliquez la migration SQL')

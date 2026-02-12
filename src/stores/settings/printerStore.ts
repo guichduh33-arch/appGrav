@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '../../lib/supabase';
 import type { PrinterConfiguration } from '../../types/settings';
+import logger from '@/utils/logger';
 
 interface PrinterState {
   printers: PrinterConfiguration[];
@@ -37,7 +38,7 @@ export const usePrinterStore = create<PrinterState>()((set, get) => ({
       set({ printers: [...get().printers, data] });
       return data;
     } catch (error) {
-      console.error('Failed to create printer:', error);
+      logger.error('Failed to create printer:', error);
       return null;
     }
   },
@@ -58,7 +59,7 @@ export const usePrinterStore = create<PrinterState>()((set, get) => ({
       });
       return true;
     } catch (error) {
-      console.error('Failed to update printer:', error);
+      logger.error('Failed to update printer:', error);
       return false;
     }
   },
@@ -75,7 +76,7 @@ export const usePrinterStore = create<PrinterState>()((set, get) => ({
       set({ printers: get().printers.filter((p) => p.id !== id) });
       return true;
     } catch (error) {
-      console.error('Failed to delete printer:', error);
+      logger.error('Failed to delete printer:', error);
       return false;
     }
   },
