@@ -14,7 +14,8 @@ import {
     ClipboardList,
     Clock,
     CreditCard,
-    List
+    List,
+    Timer
 } from 'lucide-react';
 
 export type ReportDefinition = {
@@ -258,6 +259,19 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 title: 'Discounts & Voids',
                 description: 'Analysis of discounts, voids and refunds',
                 icon: AlertTriangle
+            }
+        ]
+    },
+    {
+        id: 'operations',
+        title: 'Operations',
+        icon: Timer,
+        reports: [
+            {
+                id: 'service_speed',
+                title: 'KDS Service Speed',
+                description: 'Kitchen preparation time analysis',
+                icon: Timer
             }
         ]
     },

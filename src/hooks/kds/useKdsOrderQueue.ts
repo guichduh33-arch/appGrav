@@ -162,10 +162,25 @@ export function useKdsOrderQueue(
   }, []);
 
   /**
+   * Periodic tick to re-evaluate urgency classification
+   * Without this, orders only get reclassified when the orders array changes,
+   * not when time passes and an order crosses the threshold.
+   */
+  const [urgencyTick, setUrgencyTick] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setUrgencyTick(t => t + 1);
+    }, 30000); // Re-evaluate every 30s
+    return () => clearInterval(interval);
+  }, []);
+
+  /**
    * Separate orders into urgent and normal categories
    * Uses useMemo to avoid recalculating on every render
    */
   const { urgentOrders, normalOrders } = useMemo(() => {
+    // urgencyTick forces re-evaluation periodically
+    void urgencyTick;
     const now = Date.now();
     const urgent: IKdsOrder[] = [];
     const normal: IKdsOrder[] = [];
@@ -180,7 +195,7 @@ export function useKdsOrderQueue(
     }
 
     return { urgentOrders: urgent, normalOrders: normal };
-  }, [orders, urgentThresholdSeconds]);
+  }, [orders, urgentThresholdSeconds, urgencyTick]);
 
   /**
    * Track when orders become urgent and trigger callback

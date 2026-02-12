@@ -232,6 +232,19 @@ export interface IUnsoldProductsReport {
 /**
  * Cancellations Report (FR38)
  */
+/**
+ * KDS Service Speed Statistics
+ */
+export interface IKdsServiceSpeedStat {
+    dispatch_station: string;
+    report_date: string;
+    hour_of_day: number;
+    avg_prep_seconds: number;
+    max_prep_seconds: number;
+    min_prep_seconds: number;
+    item_count: number;
+}
+
 export interface ICancellationsReport {
     order_id: string;
     order_number: string;

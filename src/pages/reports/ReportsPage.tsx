@@ -35,6 +35,7 @@ const PurchaseByDateTab = lazy(() => import('./components/PurchaseByDateTab').th
 const OutstandingPurchasePaymentTab = lazy(() => import('./components/OutstandingPurchasePaymentTab').then(m => ({ default: m.OutstandingPurchasePaymentTab })));
 const DiscountsVoidsTab = lazy(() => import('./components/DiscountsVoidsTab').then(m => ({ default: m.DiscountsVoidsTab })));
 const AlertsDashboardTab = lazy(() => import('./components/AlertsDashboardTab').then(m => ({ default: m.AlertsDashboardTab })));
+const ServiceSpeedTab = lazy(() => import('./components/ServiceSpeedTab').then(m => ({ default: m.ServiceSpeedTab })));
 
 function ReportSkeleton() {
     return (
@@ -153,6 +154,10 @@ const ReportsPage = () => {
                 break;
             case 'alerts_dashboard':
                 component = <AlertsDashboardTab />;
+                break;
+            // Operations
+            case 'service_speed':
+                component = <ServiceSpeedTab />;
                 break;
             // Placeholders for remaining reports
             default: {

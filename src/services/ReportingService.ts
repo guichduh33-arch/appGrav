@@ -21,6 +21,7 @@ import {
     IExpiredStockReport,
     IUnsoldProductsReport,
     ICancellationsReport,
+    IKdsServiceSpeedStat,
 } from '../types/reporting';
 
 export const ReportingService = {
@@ -505,6 +506,28 @@ export const ReportingService = {
 
         if (error) throw error;
         return data || [];
+    },
+
+    /**
+     * Get KDS Service Speed Statistics
+     */
+    async getKdsServiceSpeed(
+        startDate: Date,
+        endDate: Date,
+        station?: string
+    ): Promise<IKdsServiceSpeedStat[]> {
+        const params: Record<string, unknown> = {
+            p_start_date: startDate.toISOString(),
+            p_end_date: endDate.toISOString(),
+        };
+        if (station) {
+            params.p_station = station;
+        }
+
+        const { data, error } = await untypedRpc('get_kds_service_speed_stats', params);
+
+        if (error) throw error;
+        return (data || []) as IKdsServiceSpeedStat[];
     },
 
     /**
