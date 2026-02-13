@@ -460,4 +460,5 @@ export default function CombosPage() {
                 </div>
             )}
         </div>
+    );
 }

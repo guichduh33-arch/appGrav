@@ -262,163 +262,231 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
   }
 
   return (
-    <div className="modal-backdrop is-active" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal modal-lg is-active">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-gold)]/10 bg-[var(--theme-bg-primary)]">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-bold uppercase tracking-[0.15em] text-white">THE BREAKERY</span>
-            <span className="text-xs text-[var(--theme-text-muted)]">Station 04 &bull; Terminal 12</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-xs text-[var(--theme-text-muted)]">Server: <span className="text-white font-medium">{user?.name || user?.email || 'Cashier'}</span></span>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-transparent text-[var(--theme-text-muted)] hover:text-white hover:border-white/20 cursor-pointer transition-colors" onClick={onClose} aria-label="Close" title="Close">
-              <X size={18} />
-            </button>
-          </div>
+    <div className="fixed inset-0 bg-[#0D0D0F] flex flex-col" style={{ zIndex: 'var(--z-modal-backdrop)' }}>
+      {/* Top Bar */}
+      <div className="flex items-center justify-between px-8 py-4 border-b border-[var(--color-gold)]/10 bg-[#0D0D0F] shrink-0">
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-bold uppercase tracking-[0.15em] text-white">THE BREAKERY</span>
+          <span className="text-xs text-[var(--theme-text-muted)]">Station 04 &bull; Terminal 12</span>
         </div>
-
-        <div className="modal-body payment-body">
-          <PaymentOrderSummary
-            totalPaid={totalPaid}
-            total={total}
-            remainingAmount={remainingAmount}
-            status={status}
-            progressPercent={progressPercent}
-          />
-
-          {/* Added Payments List */}
-          {payments.length > 0 && (
-            <div className="mt-2">
-              <label className="section-label">PAYMENTS ADDED</label>
-              {payments.map((payment) => {
-                const methodConfig = PAYMENT_METHODS.find((m) => m.id === payment.method);
-                const Icon = methodConfig?.icon || Banknote;
-                return (
-                  <div key={payment.id} className="payment-list__item">
-                    <div className="payment-list__info">
-                      <Icon size={20} />
-                      <span className="payment-list__method">{methodConfig?.name}</span>
-                      <span className="payment-list__amount">{formatPrice(payment.amount)}</span>
-                    </div>
-                    <button type="button" className="payment-list__remove" onClick={() => removePayment(payment.id)} title="Remove payment">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Payment Method Selection */}
-          {status !== 'complete' && (
-            <>
-              <PaymentMethodSelector
-                methods={availableMethods}
-                currentMethod={currentMethod}
-                onSelectMethod={handleSelectMethod}
-                isOnline={isOnline}
-                label={payments.length > 0 ? 'ADD ANOTHER PAYMENT' : 'PAYMENT METHOD'}
-              />
-
-              {/* Amount Entry */}
-              {currentMethod && (
-                <div className={`payment-grid ${currentMethod !== 'cash' ? 'payment-grid--single' : ''}`}>
-                  <div className="payment-left">
-                    {/* Amount display */}
-                    <div className="text-center p-6 bg-[var(--theme-bg-secondary)]/50 border border-[var(--color-gold)]/20 rounded-xl">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--theme-text-muted)] mb-2">
-                        {currentMethod === 'cash' ? 'Enter Amount' : 'Payment Amount'}
-                      </p>
-                      <p className="text-5xl font-light text-white leading-none">
-                        {formatPrice(currentAmount)}
-                      </p>
-                    </div>
-
-                    {/* Quick Amounts for Cash */}
-                    {currentMethod === 'cash' && (
-                      <>
-                        <div className="flex-grow flex flex-col">
-                          <p className="section-label">AMOUNT RECEIVED</p>
-                          <div className="grid grid-cols-3 gap-2 flex-grow">
-                            <button className="quick-amount-btn is-exact" onClick={() => handleQuickAmount('remaining')}>
-                              Exact ({formatPrice(remainingAmount)})
-                            </button>
-                            {posConfig.quickPaymentAmounts.filter((a) => a >= remainingAmount * 0.5).map((amount) => (
-                              <button key={amount} className="quick-amount-btn" onClick={() => handleQuickAmount(amount)}>
-                                {formatPrice(amount)}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                        {cashReceived > currentAmount && (
-                          <div className="payment-change">
-                            <span className="payment-change__label">Change</span>
-                            <span className="payment-change__value">{formatPrice(cashReceived - currentAmount)}</span>
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    {/* Non-cash amount input */}
-                    {currentMethod !== 'cash' && (
-                      <div className="mt-3">
-                        <label className="section-label">AMOUNT</label>
-                        <div className="amount-input">
-                          <span className="currency-prefix">Rp</span>
-                          <input
-                            type="text"
-                            value={currentAmount.toLocaleString('id-ID')}
-                            onChange={(e) => {
-                              const value = parseInt(e.target.value.replace(/\D/g, ''), 10) || 0;
-                              setCurrentAmount(Math.min(value, remainingAmount));
-                            }}
-                            aria-label="Payment amount"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Right: Numpad for Cash */}
-                  {currentMethod === 'cash' && (
-                    <div className="payment-right">
-                      <div className="mb-3">
-                        <label className="section-label">Cash received</label>
-                        <div className="amount-input">
-                          <span className="currency-prefix">Rp</span>
-                          <input type="text" value={cashReceived.toLocaleString('id-ID')} readOnly aria-label="Cash received" />
-                        </div>
-                      </div>
-                      <PaymentNumpad onKey={handleNumpadKey} />
-                    </div>
-                  )}
-                </div>
-              )}
-            </>
-          )}
-        </div>
-
-        <div className="payment-footer">
-          <button className="flex-1 py-4 border border-[var(--color-gold)]/20 rounded-lg bg-transparent text-[10px] font-bold uppercase tracking-widest text-[var(--theme-text-secondary)] cursor-pointer transition-all hover:border-[var(--color-gold)]/40 hover:text-white" onClick={onClose}>Cancel</button>
-
-          {currentMethod && status !== 'complete' && (
-            <button className="flex-1 py-4 border border-[var(--color-gold)]/20 rounded-lg bg-transparent text-[10px] font-bold uppercase tracking-widest text-[var(--color-gold)] cursor-pointer transition-all hover:bg-[var(--color-gold)]/10 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2" onClick={handleAddPayment} disabled={!canAddCurrent}>
-              <Plus size={14} /> Add Payment
-            </button>
-          )}
-
-          <button
-            className="flex items-center justify-center gap-2 py-6 px-8 rounded-lg text-sm font-bold cursor-pointer transition-all duration-200 uppercase tracking-[0.25em] bg-[var(--color-gold)] text-black shadow-lg shadow-[var(--color-gold)]/20 hover:brightness-110 disabled:bg-[var(--theme-bg-tertiary)] disabled:text-[var(--theme-text-muted)] disabled:shadow-none disabled:cursor-not-allowed min-w-[260px]"
-            onClick={handleCompletePayment}
-            disabled={!isComplete() || isProcessing}
-          >
-            {isProcessing ? (
-              <><Loader2 size={18} className="animate-spin" /> Processing...</>
-            ) : (
-              <><Check size={18} /> {payments.length > 1 ? 'Complete Split' : 'Process Payment'}</>
-            )}
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-[var(--theme-text-muted)]">Server: <span className="text-white font-medium">{user?.name || user?.email || 'Cashier'}</span></span>
+          <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-transparent text-[var(--theme-text-muted)] hover:text-white hover:border-white/20 cursor-pointer transition-colors" onClick={onClose} aria-label="Close" title="Close">
+            <X size={18} />
           </button>
         </div>
+      </div>
+
+      {/* Two-Column Layout */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* LEFT: Order Summary */}
+        <div className="w-[45%] border-r border-white/5 flex flex-col bg-[#0D0D0F] overflow-hidden">
+          <div className="px-8 pt-6 pb-3">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-gold)]">Current Order</h3>
+          </div>
+          <div className="flex-1 overflow-y-auto px-8">
+            {/* Order items table */}
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-[10px] uppercase tracking-widest text-[#8E8E93] border-b border-white/5">
+                  <th className="text-left py-3 font-semibold">Item</th>
+                  <th className="text-center py-3 font-semibold w-16">Qty</th>
+                  <th className="text-right py-3 font-semibold w-24">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cartItems.map((item, idx) => (
+                  <tr key={item.id || idx} className="border-b border-white/5">
+                    <td className="py-3 text-white font-medium">
+                      {item.type === 'combo' ? item.combo?.name : item.product?.name}
+                      {item.modifiers.length > 0 && (
+                        <span className="block text-[11px] text-[#8E8E93] mt-0.5">{item.modifiers.map(m => m.optionLabel).join(', ')}</span>
+                      )}
+                    </td>
+                    <td className="py-3 text-center text-[#8E8E93]">{item.quantity}</td>
+                    <td className="py-3 text-right text-white font-medium">{formatPrice(item.totalPrice)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {/* Order totals */}
+          <div className="px-8 py-6 border-t border-white/5 mt-auto">
+            <div className="flex justify-between text-xs text-[#8E8E93] mb-2">
+              <span>Subtotal</span>
+              <span className="text-white font-semibold">{formatPrice(subtotal)}</span>
+            </div>
+            {discountAmount > 0 && (
+              <div className="flex justify-between text-xs text-[#8E8E93] mb-2">
+                <span>Discount</span>
+                <span className="text-green-400 font-semibold">-{formatPrice(discountAmount)}</span>
+              </div>
+            )}
+            <div className="flex justify-between text-xs text-[#8E8E93] mb-4">
+              <span>Tax (incl.)</span>
+              <span>{formatPrice(Math.round(total * 10 / 110))}</span>
+            </div>
+            <div className="flex justify-between pt-4 border-t border-white/10">
+              <span className="text-sm font-bold text-white uppercase tracking-widest">Total Amount</span>
+              <span className="text-2xl font-bold text-[var(--color-gold)]">{formatPrice(total)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT: Payment Controls */}
+        <div className="flex-1 flex flex-col bg-[#161618] overflow-y-auto">
+          <div className="px-8 py-6 flex flex-col gap-6 flex-1">
+            {/* Payment Progress */}
+            <PaymentOrderSummary
+              totalPaid={totalPaid}
+              total={total}
+              remainingAmount={remainingAmount}
+              status={status}
+              progressPercent={progressPercent}
+            />
+
+            {/* Added Payments List */}
+            {payments.length > 0 && (
+              <div>
+                <label className="section-label">PAYMENTS ADDED</label>
+                {payments.map((payment) => {
+                  const methodConfig = PAYMENT_METHODS.find((m) => m.id === payment.method);
+                  const Icon = methodConfig?.icon || Banknote;
+                  return (
+                    <div key={payment.id} className="payment-list__item">
+                      <div className="payment-list__info">
+                        <Icon size={20} />
+                        <span className="payment-list__method">{methodConfig?.name}</span>
+                        <span className="payment-list__amount">{formatPrice(payment.amount)}</span>
+                      </div>
+                      <button type="button" className="payment-list__remove" onClick={() => removePayment(payment.id)} title="Remove payment">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Payment Method Selection */}
+            {status !== 'complete' && (
+              <>
+                <PaymentMethodSelector
+                  methods={availableMethods}
+                  currentMethod={currentMethod}
+                  onSelectMethod={handleSelectMethod}
+                  isOnline={isOnline}
+                  label={payments.length > 0 ? 'ADD ANOTHER PAYMENT' : 'SELECT PAYMENT METHOD'}
+                />
+
+                {/* Amount Entry */}
+                {currentMethod && (
+                  <div className={`payment-grid ${currentMethod !== 'cash' ? 'payment-grid--single' : ''}`}>
+                    <div className="payment-left">
+                      {/* Amount display */}
+                      <div className="text-center p-6 bg-[var(--theme-bg-secondary)]/50 border border-[var(--color-gold)]/20 rounded-xl">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--theme-text-muted)] mb-2">
+                          {currentMethod === 'cash' ? 'Enter Amount' : 'Payment Amount'}
+                        </p>
+                        <p className="text-5xl font-light text-white leading-none">
+                          {formatPrice(currentAmount)}
+                        </p>
+                      </div>
+
+                      {/* Quick Amounts for Cash */}
+                      {currentMethod === 'cash' && (
+                        <>
+                          <div className="flex-grow flex flex-col">
+                            <p className="section-label">AMOUNT RECEIVED</p>
+                            <div className="grid grid-cols-3 gap-2 flex-grow">
+                              <button className="quick-amount-btn is-exact" onClick={() => handleQuickAmount('remaining')}>
+                                Exact ({formatPrice(remainingAmount)})
+                              </button>
+                              {posConfig.quickPaymentAmounts.filter((a) => a >= remainingAmount * 0.5).map((amount) => (
+                                <button key={amount} className="quick-amount-btn" onClick={() => handleQuickAmount(amount)}>
+                                  {formatPrice(amount)}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          {cashReceived > currentAmount && (
+                            <div className="payment-change">
+                              <span className="payment-change__label">Change</span>
+                              <span className="payment-change__value">{formatPrice(cashReceived - currentAmount)}</span>
+                            </div>
+                          )}
+                        </>
+                      )}
+
+                      {/* Non-cash amount input */}
+                      {currentMethod !== 'cash' && (
+                        <div className="mt-3">
+                          <label className="section-label">AMOUNT</label>
+                          <div className="amount-input">
+                            <span className="currency-prefix">Rp</span>
+                            <input
+                              type="text"
+                              value={currentAmount.toLocaleString('id-ID')}
+                              onChange={(e) => {
+                                const value = parseInt(e.target.value.replace(/\D/g, ''), 10) || 0;
+                                setCurrentAmount(Math.min(value, remainingAmount));
+                              }}
+                              aria-label="Payment amount"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right: Numpad for Cash */}
+                    {currentMethod === 'cash' && (
+                      <div className="payment-right">
+                        <div className="mb-3">
+                          <label className="section-label">Cash received</label>
+                          <div className="amount-input">
+                            <span className="currency-prefix">Rp</span>
+                            <input type="text" value={cashReceived.toLocaleString('id-ID')} readOnly aria-label="Cash received" />
+                          </div>
+                        </div>
+                        <PaymentNumpad onKey={handleNumpadKey} />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Footer Actions */}
+          <div className="px-8 py-5 border-t border-white/5 flex items-center gap-3 mt-auto shrink-0">
+            <button className="py-4 px-6 border border-white/10 rounded-lg bg-transparent text-[10px] font-bold uppercase tracking-widest text-[var(--theme-text-secondary)] cursor-pointer transition-all hover:border-white/20 hover:text-white" onClick={onClose}>Cancel</button>
+
+            {currentMethod && status !== 'complete' && (
+              <button className="py-4 px-6 border border-[var(--color-gold)]/20 rounded-lg bg-transparent text-[10px] font-bold uppercase tracking-widest text-[var(--color-gold)] cursor-pointer transition-all hover:bg-[var(--color-gold)]/10 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2" onClick={handleAddPayment} disabled={!canAddCurrent}>
+                <Plus size={14} /> Add Payment
+              </button>
+            )}
+
+            <button
+              className="flex-1 flex items-center justify-center gap-2 py-5 px-8 rounded-lg text-sm font-bold cursor-pointer transition-all duration-200 uppercase tracking-[0.25em] bg-[var(--color-gold)] text-black shadow-lg shadow-[var(--color-gold)]/20 hover:brightness-110 disabled:bg-[var(--theme-bg-tertiary)] disabled:text-[var(--theme-text-muted)] disabled:shadow-none disabled:cursor-not-allowed"
+              onClick={handleCompletePayment}
+              disabled={!isComplete() || isProcessing}
+            >
+              {isProcessing ? (
+                <><Loader2 size={18} className="animate-spin" /> Processing...</>
+              ) : (
+                <><Check size={18} /> {payments.length > 1 ? 'Complete Split' : 'Process Payment'}</>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Status Bar */}
+      <div className="flex items-center justify-between px-8 py-2 border-t border-white/5 bg-[#0D0D0F] text-[10px] text-[#8E8E93] tracking-wider shrink-0">
+        <span>Terminal: POS-12</span>
+        <span>Server Sync: {isOnline ? <span className="text-green-400">● Connected</span> : <span className="text-amber-400">● Offline</span>}</span>
+        <span>v2.4.1</span>
       </div>
     </div>
   );

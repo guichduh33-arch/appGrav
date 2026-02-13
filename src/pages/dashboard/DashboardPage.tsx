@@ -1,12 +1,13 @@
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+
 import {
   DollarSign,
   ShoppingBag,
   TrendingUp,
-  Users,
   AlertTriangle,
-  ArrowRight,
-  Package,
+
+
+  RefreshCw,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -23,9 +24,9 @@ import {
 import { format, parseISO } from 'date-fns';
 import { useAuthStore } from '@/stores/authStore';
 import { useDashboardData, type TAggregatedPayment } from '@/hooks/useDashboardData';
-import { ComparisonKpiCard, ComparisonKpiGrid } from '@/components/reports/ComparisonKpiCard';
+import { DashboardKpiCard } from './DashboardKpiCard';
+import { InventoryMonitor, type InventoryItem } from './InventoryMonitor';
 import { formatCurrency } from '@/utils/helpers';
-import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 const PAYMENT_COLORS: Record<string, string> = {
@@ -49,79 +50,94 @@ function formatAxisValue(value: number): string {
   return String(value);
 }
 
-
 export default function DashboardPage() {
   const user = useAuthStore(s => s.user);
   const { kpis, revenueTrend, topProducts, paymentMethods, lowStock, isLoading } = useDashboardData();
+  const [lastRefresh, setLastRefresh] = useState<string>('');
+
+  useEffect(() => {
+    setLastRefresh(format(new Date(), 'HH:mm'));
+  }, [kpis.dataUpdatedAt]);
 
   const todayKpi = kpis.data?.today;
-  const yesterdayKpi = kpis.data?.yesterday;
   const trendData = revenueTrend.data ?? [];
   const topProductsList = (topProducts.data ?? []).slice(0, 5);
   const paymentData = paymentMethods.data ?? [];
-  const lowStockItems = (lowStock.data ?? []).filter(i => i.severity !== 'normal').slice(0, 10);
+  const lowStockItems: InventoryItem[] = (lowStock.data ?? [])
+    .filter(i => i.severity !== 'normal')
+    .slice(0, 10)
+    .map(i => ({
+      id: i.id,
+      name: i.name,
+      current_stock: i.current_stock,
+      min_stock_level: i.min_stock_level,
+      unit_name: i.unit_name,
+      severity: i.severity,
+      supplier_name: (i as any).supplier_name,
+    }));
 
   const displayName = user?.display_name || user?.name || 'there';
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1400px] mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-[var(--theme-text-primary)] font-display">
-            {getGreeting()}, {displayName}
-          </h1>
-          <p className="text-sm text-[var(--theme-text-secondary)] mt-1">
-            {format(new Date(), 'EEEE, d MMMM yyyy')} — The Breakery Dashboard
-          </p>
-        </div>
+      {/* ---- Executive Summary Header ---- */}
+      <div>
+        <h1 className="text-3xl font-bold text-[var(--theme-text-primary)] font-display">
+          Executive Summary
+        </h1>
+        <p className="text-sm text-[var(--theme-text-secondary)] mt-1">
+          {getGreeting()}, {displayName}. Here's what's happening at The Breakery today.
+        </p>
       </div>
 
-      {/* Section 1: KPI Cards */}
+      {/* ---- KPI Cards Row (Stitch-style) ---- */}
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-32" />)}
+          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-36" />)}
         </div>
       ) : (
-        <ComparisonKpiGrid columns={4}>
-          <ComparisonKpiCard
-            label="Revenue"
-            currentValue={todayKpi?.total_revenue ?? 0}
-            previousValue={yesterdayKpi?.total_revenue ?? null}
-            format="currency"
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <DashboardKpiCard
+            label="Total Sales"
+            value={formatCurrency(todayKpi?.total_revenue ?? 0)}
             icon={<DollarSign size={18} className="text-[var(--color-success-text)]" />}
+            iconColor="var(--color-success-text)"
           />
-          <ComparisonKpiCard
-            label="Orders"
-            currentValue={todayKpi?.total_orders ?? 0}
-            previousValue={yesterdayKpi?.total_orders ?? null}
-            format="number"
+          <DashboardKpiCard
+            label="Active Orders"
+            value={String(todayKpi?.total_orders ?? 0)}
             icon={<ShoppingBag size={18} className="text-[#3b82f6]" />}
+            iconColor="#3b82f6"
           />
-          <ComparisonKpiCard
+          <DashboardKpiCard
+            label="Stock Alerts"
+            value={String(lowStockItems.length)}
+            icon={<AlertTriangle size={18} className="text-[var(--color-warning-text)]" />}
+            iconColor="var(--color-warning-text)"
+          />
+          <DashboardKpiCard
             label="Avg Order"
-            currentValue={todayKpi?.avg_order_value ?? 0}
-            previousValue={yesterdayKpi?.avg_order_value ?? null}
-            format="currency"
+            value={formatCurrency(todayKpi?.avg_order_value ?? 0)}
             icon={<TrendingUp size={18} className="text-[var(--color-gold)]" />}
+            iconColor="var(--color-gold)"
           />
-          <ComparisonKpiCard
-            label="Customers"
-            currentValue={todayKpi?.unique_customers ?? 0}
-            previousValue={yesterdayKpi?.unique_customers ?? null}
-            format="number"
-            icon={<Users size={18} className="text-[#a855f7]" />}
-          />
-        </ComparisonKpiGrid>
+        </div>
       )}
 
-      {/* Section 2: Revenue Trend */}
-      <div className="bg-[var(--theme-bg-secondary)] rounded-xl p-6 border border-[var(--theme-border)] shadow-sm">
-        <h3 className="text-sm font-semibold text-[var(--theme-text-secondary)] mb-4 uppercase tracking-wider">Revenue Trend (Last 30 Days)</h3>
+      {/* ---- Sales Performance Chart ---- */}
+      <div className="bg-[var(--theme-bg-secondary)] rounded-2xl p-6 border border-[var(--theme-border)] shadow-sm">
+        <div className="flex items-center justify-between mb-1">
+          <h3 className="text-sm font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">
+            Sales Performance
+          </h3>
+          <span className="text-xs text-[var(--theme-text-muted)]">Last 30 days</span>
+        </div>
+        <p className="text-xs text-[var(--theme-text-muted)] mb-4">Weekly overview of revenue streams</p>
+
         {revenueTrend.isLoading ? (
           <Skeleton className="h-64 w-full" />
         ) : trendData.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-16">No data available</p>
+          <p className="text-sm text-[var(--theme-text-muted)] text-center py-16">No data available</p>
         ) : (
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -151,9 +167,9 @@ export default function DashboardPage() {
                   contentStyle={{
                     backgroundColor: 'var(--theme-bg-tertiary)',
                     borderColor: 'var(--theme-border)',
-                    borderRadius: '8px',
+                    borderRadius: '12px',
                     fontSize: '13px',
-                    color: 'var(--theme-text-primary)'
+                    color: 'var(--theme-text-primary)',
                   }}
                   itemStyle={{ color: 'var(--color-gold)' }}
                   formatter={(v) => [formatCurrency(Number(v ?? 0)), 'Revenue']}
@@ -174,15 +190,17 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* Section 3: Two-column */}
+      {/* ---- Two-column: Top Products + Payment Methods ---- */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top 5 Products */}
-        <div className="bg-[var(--theme-bg-secondary)] rounded-xl p-6 border border-[var(--theme-border)] shadow-sm">
-          <h3 className="text-sm font-semibold text-[var(--theme-text-secondary)] mb-4 uppercase tracking-wider">Top Products Today</h3>
+        <div className="bg-[var(--theme-bg-secondary)] rounded-2xl p-6 border border-[var(--theme-border)] shadow-sm">
+          <h3 className="text-sm font-semibold text-[var(--theme-text-secondary)] mb-4 uppercase tracking-wider">
+            Top Products Today
+          </h3>
           {topProducts.isLoading ? (
             <div className="space-y-4">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-8" />)}</div>
           ) : topProductsList.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-8">No sales today yet</p>
+            <p className="text-sm text-[var(--theme-text-muted)] text-center py-8">No sales today yet</p>
           ) : (
             <div className="space-y-4">
               {topProductsList.map((product, i) => {
@@ -190,7 +208,7 @@ export default function DashboardPage() {
                 const barWidth = (product.quantity_sold / maxQty) * 100;
                 return (
                   <div key={product.product_id} className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-gray-400 w-5 text-right">{i + 1}</span>
+                    <span className="text-sm font-medium text-[var(--theme-text-muted)] w-5 text-right">{i + 1}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between text-sm mb-1">
                         <span className="font-medium text-[var(--theme-text-primary)] truncate">{product.product_name}</span>
@@ -211,12 +229,14 @@ export default function DashboardPage() {
         </div>
 
         {/* Payment Methods Donut */}
-        <div className="bg-[var(--theme-bg-secondary)] rounded-xl p-6 border border-[var(--theme-border)] shadow-sm">
-          <h3 className="text-sm font-semibold text-[var(--theme-text-secondary)] mb-4 uppercase tracking-wider">Payment Methods (30 Days)</h3>
+        <div className="bg-[var(--theme-bg-secondary)] rounded-2xl p-6 border border-[var(--theme-border)] shadow-sm">
+          <h3 className="text-sm font-semibold text-[var(--theme-text-secondary)] mb-4 uppercase tracking-wider">
+            Payment Methods (30 Days)
+          </h3>
           {paymentMethods.isLoading ? (
             <Skeleton className="h-48 w-48 mx-auto rounded-full" />
           ) : paymentData.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-8">No payment data</p>
+            <p className="text-sm text-[var(--theme-text-muted)] text-center py-8">No payment data</p>
           ) : (
             <div className="flex items-center justify-center gap-6">
               <div className="w-48 h-48">
@@ -241,8 +261,8 @@ export default function DashboardPage() {
                       contentStyle={{
                         backgroundColor: 'var(--theme-bg-tertiary)',
                         borderColor: 'var(--theme-border)',
-                        borderRadius: '8px',
-                        color: 'var(--theme-text-primary)'
+                        borderRadius: '12px',
+                        color: 'var(--theme-text-primary)',
                       }}
                       formatter={(v) => formatCurrency(Number(v ?? 0))}
                     />
@@ -270,68 +290,15 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Section 4: Inventory Alerts */}
-      <div className="bg-[var(--theme-bg-secondary)] rounded-xl p-6 border border-[var(--theme-border)] shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Package size={16} className="text-[var(--theme-text-secondary)]" />
-            <h3 className="text-sm font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">Inventory Alerts</h3>
-            {lowStockItems.length > 0 && (
-              <span className="bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] text-xs font-medium px-2 py-0.5 rounded-full border border-[var(--theme-border)]">
-                {lowStockItems.length}
-              </span>
-            )}
-          </div>
-          <Link
-            to="/inventory"
-            className="text-sm text-[var(--color-gold)] hover:text-[var(--color-gold-light)] flex items-center gap-1 transition-colors"
-          >
-            View all <ArrowRight size={14} />
-          </Link>
-        </div>
+      {/* ---- Inventory Monitor (Stitch-style) ---- */}
+      <InventoryMonitor items={lowStockItems} isLoading={lowStock.isLoading} />
 
-        {lowStock.isLoading ? (
-          <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10" />)}</div>
-        ) : lowStockItems.length === 0 ? (
-          <p className="text-sm text-[var(--theme-text-muted)] text-center py-6">All stock levels are healthy</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-[var(--theme-text-muted)] border-b border-[var(--theme-border)]">
-                  <th className="pb-3 font-semibold uppercase tracking-wider text-[11px]">Product</th>
-                  <th className="pb-3 font-semibold uppercase tracking-wider text-[11px] text-right">Stock</th>
-                  <th className="pb-3 font-semibold uppercase tracking-wider text-[11px] text-right">Min Level</th>
-                  <th className="pb-3 font-semibold uppercase tracking-wider text-[11px] text-right">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {lowStockItems.map(item => (
-                  <tr key={item.id} className="border-b border-[var(--theme-border)] last:border-0 hover:bg-[var(--theme-bg-tertiary)]/30 transition-colors">
-                    <td className="py-3 font-medium text-[var(--theme-text-primary)]">{item.name}</td>
-                    <td className="py-3 text-right text-[var(--theme-text-secondary)] font-mono-num">
-                      {item.current_stock} {item.unit_name}
-                    </td>
-                    <td className="py-3 text-right text-[var(--theme-text-muted)] font-mono-num">{item.min_stock_level}</td>
-                    <td className="py-3 text-right">
-                      <span
-                        className={cn(
-                          'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider',
-                          item.severity === 'critical'
-                            ? 'bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] border border-[var(--color-danger-border)]'
-                            : 'bg-[var(--color-warning-bg)] text-[var(--color-warning-text)] border border-[var(--color-warning-border)]'
-                        )}
-                      >
-                        {item.severity === 'critical' && <AlertTriangle size={10} />}
-                        {item.severity}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+      {/* ---- Sync Status Footer ---- */}
+      <div className="flex items-center justify-center gap-2 py-3 text-[var(--theme-text-muted)]">
+        <RefreshCw size={12} className="text-[var(--color-success-text)]" />
+        <span className="text-xs">
+          Sync Complete — Dashboard data refreshed at {lastRefresh || '--:--'}
+        </span>
       </div>
     </div>
   );

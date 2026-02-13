@@ -295,7 +295,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
             onClick={(e) => e.target === e.currentTarget && onClose()}
         >
             <div
-                className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl shadow-2xl max-h-[90vh] flex flex-col md:flex-row text-white w-[700px] max-w-full overflow-hidden"
+                className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl shadow-2xl max-h-[90vh] flex flex-col md:flex-row text-white w-[800px] max-w-full overflow-hidden"
                 style={{ zIndex: 'var(--z-modal)' }}
             >
                 {/* Left: Product image */}
@@ -316,7 +316,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                             <h3 className="text-xl font-bold flex items-center gap-2 m-0 text-[var(--theme-text-primary)]">
                                 {product.name}
                             </h3>
-                            <p className="text-xs text-[var(--theme-text-muted)] mt-1">Customize your selection</p>
+                            <p className="text-xs text-[var(--theme-text-muted)] mt-1">Personalize this selection</p>
                         </div>
                         <button
                             className="w-8 h-8 flex items-center justify-center bg-transparent border-none rounded-lg text-[var(--theme-text-muted)] cursor-pointer transition-all hover:bg-[var(--theme-bg-tertiary)] hover:text-white"
@@ -329,112 +329,112 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-8">
-                    {/* Modifier Groups */}
-                    {modifierGroups.map(group => (
-                        <div key={group.name} className="mb-6 last:mb-0">
-                            <h4 className="flex items-center gap-2 text-[10px] font-bold text-[var(--color-gold)] mb-3 uppercase tracking-[0.2em]">
-                                {group.label}
-                                {group.required && <span className="text-destructive ml-1">*</span>}
-                            </h4>
+                        {/* Modifier Groups */}
+                        {modifierGroups.map(group => (
+                            <div key={group.name} className="mb-6 last:mb-0">
+                                <h4 className="flex items-center gap-2 text-[10px] font-bold text-[var(--color-gold)] mb-3 uppercase tracking-[0.2em]">
+                                    {group.label}
+                                    {group.required && <span className="text-destructive ml-1">*</span>}
+                                </h4>
 
-                            {group.type === 'single' ? (
-                                <div className="flex flex-col gap-2">
-                                    {group.options.map(option => (
-                                        <div key={option.id} className="relative">
-                                            <input
-                                                type="radio"
-                                                name={group.name}
-                                                id={`${group.name}-${option.id}`}
-                                                checked={selections[group.name] === option.id}
-                                                onChange={() => handleSingleSelect(group.name, option.id)}
-                                                className="absolute opacity-0 pointer-events-none peer"
-                                            />
-                                            <label
-                                                htmlFor={`${group.name}-${option.id}`}
-                                                className="flex items-center justify-between p-4 bg-transparent border border-[var(--theme-border)] rounded-lg cursor-pointer transition-all text-left text-[var(--theme-text-secondary)] hover:border-[var(--color-gold)]/50 peer-checked:border-[var(--color-gold)] peer-checked:bg-[var(--color-gold)]/5"
-                                            >
-                                                <span className="text-sm font-medium">{option.label}</span>
-                                                {option.price > 0 && (
+                                {group.type === 'single' ? (
+                                    <div className="flex flex-col gap-2">
+                                        {group.options.map(option => (
+                                            <div key={option.id} className="relative">
+                                                <input
+                                                    type="radio"
+                                                    name={group.name}
+                                                    id={`${group.name}-${option.id}`}
+                                                    checked={selections[group.name] === option.id}
+                                                    onChange={() => handleSingleSelect(group.name, option.id)}
+                                                    className="absolute opacity-0 pointer-events-none peer"
+                                                />
+                                                <label
+                                                    htmlFor={`${group.name}-${option.id}`}
+                                                    className="flex items-center justify-between p-4 bg-transparent border border-[var(--theme-border)] rounded-lg cursor-pointer transition-all text-left text-[var(--theme-text-secondary)] hover:border-[var(--color-gold)]/50 peer-checked:border-[var(--color-gold)] peer-checked:bg-[var(--color-gold)]/5"
+                                                >
+                                                    <span className="text-sm font-medium">{option.label}</span>
+                                                    {option.price > 0 && (
+                                                        <span className="text-xs font-semibold text-[var(--color-gold)]">+{formatPrice(option.price)}</span>
+                                                    )}
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col gap-2">
+                                        {group.options.map(option => {
+                                            const isChecked = (selections[group.name] as string[]).includes(option.id)
+                                            return (
+                                                <label
+                                                    key={option.id}
+                                                    className={cn(
+                                                        'flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all',
+                                                        'hover:border-[var(--color-gold)]/50',
+                                                        isChecked ? 'border-[var(--color-gold)] bg-[var(--color-gold)]/5' : 'border-[var(--theme-border)]'
+                                                    )}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={isChecked}
+                                                            onChange={() => handleMultiSelect(group.name, option.id)}
+                                                            className="w-4 h-4 accent-[var(--color-gold)]"
+                                                        />
+                                                        <span className="text-sm font-medium text-[var(--theme-text-secondary)]">{option.label}</span>
+                                                    </div>
                                                     <span className="text-xs font-semibold text-[var(--color-gold)]">+{formatPrice(option.price)}</span>
-                                                )}
-                                            </label>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="flex flex-col gap-2">
-                                    {group.options.map(option => {
-                                        const isChecked = (selections[group.name] as string[]).includes(option.id)
-                                        return (
-                                            <label
-                                                key={option.id}
-                                                className={cn(
-                                                    'flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all',
-                                                    'hover:border-[var(--color-gold)]/50',
-                                                    isChecked ? 'border-[var(--color-gold)] bg-[var(--color-gold)]/5' : 'border-[var(--theme-border)]'
-                                                )}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={isChecked}
-                                                        onChange={() => handleMultiSelect(group.name, option.id)}
-                                                        className="w-4 h-4 accent-[var(--color-gold)]"
-                                                    />
-                                                    <span className="text-sm font-medium text-[var(--theme-text-secondary)]">{option.label}</span>
-                                                </div>
-                                                <span className="text-xs font-semibold text-[var(--color-gold)]">+{formatPrice(option.price)}</span>
-                                            </label>
-                                        )
-                                    })}
-                                </div>
-                            )}
+                                                </label>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+
+                        {/* Notes */}
+                        <div className="mb-6 last:mb-0">
+                            <h4 className="flex items-center gap-2 text-[10px] font-bold text-[var(--color-gold)] mb-3 uppercase tracking-[0.2em]">Kitchen notes</h4>
+                            <textarea
+                                className="w-full min-h-[100px] p-3 font-[var(--font-body)] text-[15px] text-white bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-xl resize-none transition-all focus:outline-none focus:border-gold focus:bg-[var(--theme-bg-tertiary)] placeholder:text-[var(--theme-text-muted)]"
+                                placeholder="Special instructions..."
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                            />
                         </div>
-                    ))}
 
-                    {/* Notes */}
-                    <div className="mb-6 last:mb-0">
-                        <h4 className="flex items-center gap-2 text-[10px] font-bold text-[var(--color-gold)] mb-3 uppercase tracking-[0.2em]">Kitchen notes</h4>
-                        <textarea
-                            className="w-full min-h-[100px] p-3 font-[var(--font-body)] text-[15px] text-white bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-xl resize-none transition-all focus:outline-none focus:border-gold focus:bg-[var(--theme-bg-tertiary)] placeholder:text-[var(--theme-text-muted)]"
-                            placeholder="Special instructions..."
-                            value={notes}
-                            onChange={(e) => setNotes(e.target.value)}
-                        />
-                    </div>
-
-                    {/* Quantity */}
-                    <div className="mb-6 last:mb-0">
-                        <h4 className="flex items-center gap-2 text-[10px] font-bold text-[var(--color-gold)] mb-3 uppercase tracking-[0.2em]">Quantity</h4>
-                        <div className="flex items-center gap-4 bg-[var(--theme-bg-tertiary)] p-1.5 rounded-2xl w-fit border border-[var(--theme-border)]">
-                            <button
-                                className="w-12 h-12 flex items-center justify-center bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl text-white cursor-pointer transition-all hover:bg-[var(--theme-bg-tertiary)]"
-                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                title="Decrease quantity"
-                                aria-label="Decrease quantity"
-                            >
-                                <Minus size={18} />
-                            </button>
-                            <span className="text-2xl font-bold min-w-[40px] text-center text-white tabular-nums">{quantity}</span>
-                            <button
-                                className="w-12 h-12 flex items-center justify-center bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl text-white cursor-pointer transition-all hover:bg-[var(--theme-bg-tertiary)]"
-                                onClick={() => setQuantity(quantity + 1)}
-                                title="Increase quantity"
-                                aria-label="Increase quantity"
-                            >
-                                <Plus size={18} />
-                            </button>
+                        {/* Quantity */}
+                        <div className="mb-6 last:mb-0">
+                            <h4 className="flex items-center gap-2 text-[10px] font-bold text-[var(--color-gold)] mb-3 uppercase tracking-[0.2em]">Quantity</h4>
+                            <div className="flex items-center gap-4 bg-[var(--theme-bg-tertiary)] p-1.5 rounded-2xl w-fit border border-[var(--theme-border)]">
+                                <button
+                                    className="w-12 h-12 flex items-center justify-center bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl text-white cursor-pointer transition-all hover:bg-[var(--theme-bg-tertiary)]"
+                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                    title="Decrease quantity"
+                                    aria-label="Decrease quantity"
+                                >
+                                    <Minus size={18} />
+                                </button>
+                                <span className="text-2xl font-bold min-w-[40px] text-center text-white tabular-nums">{quantity}</span>
+                                <button
+                                    className="w-12 h-12 flex items-center justify-center bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl text-white cursor-pointer transition-all hover:bg-[var(--theme-bg-tertiary)]"
+                                    onClick={() => setQuantity(quantity + 1)}
+                                    title="Increase quantity"
+                                    aria-label="Increase quantity"
+                                >
+                                    <Plus size={18} />
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
                     <div className="p-6 border-t border-[var(--theme-border)] mt-auto">
                         <button
-                            className="w-full py-4 px-6 bg-[var(--color-gold)] text-black border-none rounded-lg text-sm font-bold flex items-center justify-center gap-3 cursor-pointer transition-all hover:brightness-110 active:scale-[0.98] uppercase tracking-widest"
+                            className="w-full py-4 px-6 bg-[var(--color-gold)] text-black border-none rounded-lg text-sm font-bold flex items-center justify-center gap-3 cursor-pointer transition-all hover:brightness-110 active:scale-[0.98] uppercase tracking-[0.15em]"
                             onClick={handleConfirm}
                         >
                             <Check size={16} />
-                            {editItem ? 'Update Cart' : 'Update Cart'} &mdash; {formatPrice(totalPrice)}
+                            {editItem ? 'Update Cart' : 'Add to Cart'} &mdash; {formatPrice(totalPrice)}
                         </button>
                     </div>
                 </div>

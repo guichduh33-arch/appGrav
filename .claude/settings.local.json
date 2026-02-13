@@ -158,7 +158,8 @@
       "WebFetch(domain:lh3.googleusercontent.com)",
       "WebFetch(domain:contribution.usercontent.google.com)",
       "mcp__stitch__get_screen",
-      "mcp__claude_ai_Supabase__list_migrations"
+      "mcp__claude_ai_Supabase__list_migrations",
+      "Bash(npx skills add:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     Tag, Plus, Search, Edit, Trash2, Eye, Percent, Gift,
-    Calendar, Clock, Users, TrendingDown, AlertCircle, CheckCircle, Ticket
+    Calendar, Clock, TrendingDown, AlertCircle, CheckCircle
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { formatCurrency } from '../../utils/helpers'
@@ -10,14 +10,6 @@ import { Promotion, PromotionType } from '../../types/database'
 import { cn } from '@/lib/utils'
 import { logError } from '@/utils/logger'
 
-const PROMOTION_TYPE_LABELS: Record<PromotionType, string> = {
-    percentage: 'Discount %',
-    fixed_amount: 'Fixed amount',
-    buy_x_get_y: 'Buy X get Y',
-    free_product: 'Free product',
-    fixed: 'Fixed amount',
-    free: 'Free'
-}
 
 const PROMOTION_TYPE_ICONS: Record<PromotionType, React.ReactNode> = {
     percentage: <Percent size={16} />,

@@ -1,8 +1,9 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
-import { Search, CheckCircle, Clock, Users, User, X } from 'lucide-react'
+import { Search, Clock, Users, CheckCircle } from 'lucide-react'
 
 import { useCartStore, CartItem } from '../../stores/cartStore'
 import { useAuthStore } from '../../stores/authStore'
+import { useOrderStore } from '../../stores/orderStore'
 import { useProducts, useCategories, usePOSCombos } from '../../hooks/products'
 import { useNetworkAlerts } from '../../hooks/useNetworkAlerts'
 import { useSyncReport } from '../../hooks/useSyncReport'
@@ -56,7 +57,7 @@ export default function POSMainPage() {
     })
 
     useEffect(() => {
-        if (lanHubError) logError('[POS] LAN Hub error:', lanHubError)
+        if (lanHubError) logger.error('[POS] LAN Hub error:', lanHubError)
     }, [lanHubError])
 
     useEffect(() => {
@@ -103,6 +104,7 @@ export default function POSMainPage() {
 
     // Order management
     const { handleSendToKitchen, handleRestoreHeldOrder } = usePOSOrders()
+    const heldOrdersCount = useOrderStore(s => s.heldOrders.length)
 
     // Data fetching
     const { data: categories = [], isLoading: categoriesLoading } = useCategories()
@@ -177,7 +179,8 @@ export default function POSMainPage() {
 
     return (
         <div className="pos-app">
-            <main className="pos-main">
+            <main className="pos-main bg-[#0D0D0F]">
+                {/* Category Navigation */}
                 <CategoryNav
                     categories={categories}
                     selectedCategory={selectedCategory}
@@ -186,75 +189,59 @@ export default function POSMainPage() {
                     onOpenMenu={() => openModal('menu')}
                 />
 
-                {/* Shift Indicator Banner (F2.9) */}
-                {hasOpenShift && currentSession && (
-                    <div className="pos-shift-banner">
-                        <div className="pos-shift-banner__info">
-                            <Clock size={16} />
-                            <span className="pos-shift-banner__session">Shift #{currentSession.session_number}</span>
-                            <span className="pos-shift-banner__divider">|</span>
-                            <User size={14} />
-                            <span className="pos-shift-banner__user">
-                                {currentSession.user_name || 'Cashier'}
-                            </span>
-                        </div>
-                        <span className="pos-shift-banner__time">
-                            Since {new Date(currentSession.opened_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                    </div>
-                )}
-
-                <section className="pos-products">
-                    <div className="pos-products__header">
-                        <div className="pos-products__search search-input">
-                            <Search className="search-input__icon" size={20} />
-                            <input
-                                type="text"
-                                placeholder="Search products..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                            {searchQuery && (
-                                <button
-                                    type="button"
-                                    className="pos-products__search-clear"
-                                    onClick={() => setSearchQuery('')}
-                                >
-                                    <X size={14} />
-                                </button>
-                            )}
-                        </div>
-                        {/* Session indicator */}
-                        {hasOpenShift && currentSession && (
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--color-gray-700)] rounded-lg text-xs text-[var(--color-gray-300)] whitespace-nowrap flex-shrink-0">
-                                <div className="w-6 h-6 rounded-full bg-gold flex items-center justify-center text-white text-[10px] font-bold">
-                                    {(currentSession.user_name || 'C')[0].toUpperCase()}
+                <div className="flex-1 flex flex-col overflow-hidden relative">
+                    <div className="px-10 pt-10 pb-4 flex flex-col gap-6">
+                        <div className="flex items-center justify-between">
+                            <h1 className="text-3xl font-display font-bold text-white tracking-tight">
+                                Artisan <span className="text-[var(--color-gold)] font-medium italic">Catalogue</span>
+                            </h1>
+                            <div className="flex items-center gap-4">
+                                {heldOrdersCount > 0 && (
+                                    <button
+                                        type="button"
+                                        className="h-11 px-6 flex items-center gap-3 bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 rounded-full text-[var(--color-gold)] text-[10px] uppercase tracking-widest font-black cursor-pointer transition-all hover:bg-[var(--color-gold)]/20 group"
+                                        onClick={() => openModal('heldOrders')}
+                                    >
+                                        <Clock size={16} className="group-hover:rotate-12 transition-transform" />
+                                        <span>{heldOrdersCount} Pending {heldOrdersCount === 1 ? 'Order' : 'Orders'}</span>
+                                    </button>
+                                )}
+                                <div className="pos-products__search w-80 relative">
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8E8E93]" size={16} />
+                                    <input
+                                        type="text"
+                                        placeholder="Search excellence..."
+                                        className="w-full bg-white/5 border border-white/5 rounded-full py-3 pl-12 pr-6 text-sm text-white focus:outline-none focus:border-[var(--color-gold)]/50 transition-all placeholder:text-[#8E8E93]/50"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                    />
                                 </div>
-                                <span className="font-semibold text-white">#{currentSession.session_number}</span>
                             </div>
-                        )}
+                        </div>
                     </div>
-                    <div className="pos-products__grid">
+
+                    <div className="flex-1 overflow-y-auto px-10 pb-10 custom-scrollbar">
                         {/* Combo deals (Story 6.6) */}
-                        {!selectedCategory && (
+                        {!selectedCategory && combos.length > 0 && (
                             <ComboGrid
                                 combos={combos}
                                 onComboClick={handleComboClick}
                                 isLoading={combosLoading}
                             />
                         )}
+
                         <ProductGrid
                             products={filteredProducts}
                             onProductClick={handleProductClick}
                             isLoading={productsLoading}
                         />
                     </div>
-                </section>
+                </div>
 
+                {/* Active Order Sidebar */}
                 <Cart
                     onCheckout={handleCheckout}
                     onSendToKitchen={() => handleSendToKitchen(hasOpenShift, () => openModal('noShift'))}
-                    onShowPendingOrders={() => openModal('heldOrders')}
                     onItemClick={handleCartItemClick}
                 />
             </main>
@@ -387,8 +374,8 @@ export default function POSMainPage() {
             )}
 
             {modals.noShift && (
-                <div className="pos-no-shift-modal-overlay">
-                    <div className="pos-no-shift-modal">
+                <div className="pos-no-shift-modal-overlay" onClick={() => closeModal('noShift')}>
+                    <div className="pos-no-shift-modal" onClick={e => e.stopPropagation()}>
                         <div className="pos-no-shift-modal__icon"><Clock size={48} /></div>
                         <h3 className="pos-no-shift-modal__title">No shift open</h3>
                         <p className="pos-no-shift-modal__message">You must open a shift to perform this action.</p>
@@ -411,5 +398,3 @@ export default function POSMainPage() {
         </div>
     )
 }
-
-import { logError } from '@/utils/logger'

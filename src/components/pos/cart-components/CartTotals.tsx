@@ -2,6 +2,7 @@ import { memo } from 'react'
 import { Tag, Percent } from 'lucide-react'
 import { formatPrice } from '@/utils/helpers'
 import { useCartStore } from '@/stores/cartStore'
+import { cn } from '@/lib/utils'
 
 interface CartTotalsProps {
     subtotal: number
@@ -12,56 +13,52 @@ interface CartTotalsProps {
 
 export const CartTotals = memo(function CartTotals({ subtotal, discountAmount, total, onDiscountClick }: CartTotalsProps) {
     const promotionTotalDiscount = useCartStore(state => state.promotionTotalDiscount)
-    const appliedPromotions = useCartStore(state => state.appliedPromotions)
 
     // Tax = total * 10/110 (10% included)
     const taxAmount = Math.round(total * 10 / 110)
 
     return (
-        <div className="px-md py-sm bg-[var(--theme-bg-secondary)] border-t border-[var(--theme-border)]">
+        <div className="px-8 py-6 bg-[var(--theme-bg-secondary)] border-t border-white/5">
             {/* Subtotal row */}
-            <div className="flex justify-between mb-1 text-xs text-[var(--theme-text-secondary)]">
+            <div className="flex justify-between mb-2 text-xs text-[#8E8E93] uppercase tracking-wider font-medium">
                 <span>Subtotal</span>
-                <span className="font-semibold text-white">{formatPrice(subtotal)}</span>
+                <span className="font-bold text-white tracking-normal">{formatPrice(subtotal)}</span>
             </div>
-            {/* Promotion discounts (Story 6.5) */}
+            {/* Promotion discounts */}
             {promotionTotalDiscount > 0 && (
-                <div className="flex justify-between mb-1 text-xs text-[var(--theme-text-secondary)]">
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#ea580c', fontSize: '13px' }}>
-                        <Percent size={12} />
-                        Promo
-                        {appliedPromotions.length === 1 && (
-                            <span style={{ fontWeight: 400, fontSize: '11px' }}>({appliedPromotions[0].promotionName})</span>
-                        )}
+                <div className="flex justify-between mb-2 text-xs text-[#8E8E93] uppercase tracking-wider font-medium">
+                    <span className="flex items-center gap-1.5 text-success">
+                        <Percent size={12} strokeWidth={2.5} />
+                        Promo Sav.
                     </span>
-                    <span className="font-semibold" style={{ color: '#ea580c' }}>
+                    <span className="font-bold text-success tracking-normal">
                         -{formatPrice(promotionTotalDiscount)}
                     </span>
                 </div>
             )}
             {/* Discount row */}
-            <div className="flex justify-between mb-1 text-xs text-[var(--theme-text-secondary)]">
+            <div className="flex justify-between mb-2 text-xs text-[#8E8E93] uppercase tracking-wider font-medium">
                 <button
                     type="button"
-                    className="bg-transparent border-none p-0 text-[var(--theme-text-secondary)] text-sm cursor-pointer transition-all duration-200 flex items-center gap-1.5 hover:text-gold-light"
+                    className="bg-transparent border-none p-0 text-[#8E8E93] text-[10px] uppercase tracking-widest font-bold cursor-pointer transition-all duration-200 flex items-center gap-1.5 hover:text-[var(--color-gold)]"
                     onClick={onDiscountClick}
                 >
-                    <Tag size={14} />
-                    Discount
+                    <Tag size={12} />
+                    Apply Discount
                 </button>
-                <span className="font-semibold text-white text-urgent">
+                <span className={cn("font-bold tracking-normal", discountAmount > 0 ? "text-success" : "text-white")}>
                     {discountAmount > 0 ? `-${formatPrice(discountAmount)}` : formatPrice(0)}
                 </span>
             </div>
             {/* Tax row */}
-            <div className="flex justify-between mb-1 text-xs text-[var(--theme-text-muted)]">
-                <span>Tax (10%)</span>
+            <div className="flex justify-between mb-4 text-[10px] text-[#8E8E93] uppercase tracking-widest font-medium opacity-50">
+                <span>Tax Included (10%)</span>
                 <span>{formatPrice(taxAmount)}</span>
             </div>
             {/* Grand total row */}
-            <div className="flex justify-between mt-1.5 pt-1.5 border-t border-dashed border-[var(--theme-border-strong)] mb-0">
-                <span className="text-base font-bold text-white font-display">TOTAL</span>
-                <span className="text-xl font-extrabold text-gold font-display">{formatPrice(total)}</span>
+            <div className="flex justify-between mt-4 pt-4 border-t border-white/10 mb-0">
+                <span className="text-sm font-bold text-white tracking-[0.2em] font-display uppercase">Total Amount</span>
+                <span className="text-2xl font-bold text-[var(--color-gold)] font-display tracking-tight">{formatPrice(total)}</span>
             </div>
         </div>
     )

@@ -43,6 +43,7 @@ const mockKpis = {
     },
   },
   isLoading: false,
+  dataUpdatedAt: Date.now(),
 };
 
 const mockRevenueTrend = {
@@ -102,15 +103,6 @@ vi.mock('@/utils/helpers', () => ({
   formatCurrency: (v: number) => `Rp${(v / 1000).toFixed(0)}K`,
 }));
 
-vi.mock('@/components/reports/ComparisonKpiCard', () => ({
-  ComparisonKpiCard: ({ label, currentValue }: { label: string; currentValue: number }) => (
-    <div data-testid={`kpi-${label.toLowerCase()}`}>{label}: {currentValue}</div>
-  ),
-  ComparisonKpiGrid: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="kpi-grid">{children}</div>
-  ),
-}));
-
 function renderDashboard() {
   return render(
     <MemoryRouter>
@@ -124,27 +116,35 @@ describe('DashboardPage', () => {
     vi.clearAllMocks();
   });
 
+  it('renders Executive Summary header', () => {
+    renderDashboard();
+    expect(screen.getByText('Executive Summary')).toBeInTheDocument();
+  });
+
   it('renders greeting with user name', () => {
     renderDashboard();
     expect(screen.getByText(/Admin User/)).toBeInTheDocument();
   });
 
-  it('renders date and dashboard label', () => {
+  it('renders Stitch-style KPI cards', () => {
     renderDashboard();
-    expect(screen.getByText(/The Breakery Dashboard/)).toBeInTheDocument();
+    expect(screen.getByText('Total Sales')).toBeInTheDocument();
+    expect(screen.getByText('Active Orders')).toBeInTheDocument();
+    expect(screen.getByText('Stock Alerts')).toBeInTheDocument();
+    expect(screen.getByText('Avg Order')).toBeInTheDocument();
   });
 
-  it('renders KPI cards', () => {
+  it('renders KPI values from data', () => {
     renderDashboard();
-    expect(screen.getByTestId('kpi-revenue')).toBeInTheDocument();
-    expect(screen.getByTestId('kpi-orders')).toBeInTheDocument();
-    expect(screen.getByTestId('kpi-avg order')).toBeInTheDocument();
-    expect(screen.getByTestId('kpi-customers')).toBeInTheDocument();
+    // formatCurrency mock returns RpXK
+    expect(screen.getByText('Rp4200K')).toBeInTheDocument(); // total_revenue
+    expect(screen.getByText('198')).toBeInTheDocument(); // total_orders
+    expect(screen.getByText('Rp21K')).toBeInTheDocument(); // avg_order_value
   });
 
-  it('renders revenue trend chart', () => {
+  it('renders Sales Performance chart', () => {
     renderDashboard();
-    expect(screen.getByText('Revenue Trend (Last 30 Days)')).toBeInTheDocument();
+    expect(screen.getByText('Sales Performance')).toBeInTheDocument();
     expect(screen.getByTestId('area-chart')).toBeInTheDocument();
   });
 
@@ -165,29 +165,25 @@ describe('DashboardPage', () => {
     expect(screen.getByText('qris')).toBeInTheDocument();
   });
 
-  it('renders inventory alerts table', () => {
+  it('renders Inventory Monitor with items', () => {
     renderDashboard();
-    expect(screen.getByText('Inventory Alerts')).toBeInTheDocument();
+    expect(screen.getByText('Inventory Monitor')).toBeInTheDocument();
     expect(screen.getByText('Butter')).toBeInTheDocument();
     expect(screen.getByText('Flour')).toBeInTheDocument();
     expect(screen.getByText('critical')).toBeInTheDocument();
     expect(screen.getByText('warning')).toBeInTheDocument();
   });
 
-  it('renders view all link to inventory', () => {
+  it('renders inventory view all link', () => {
     renderDashboard();
     const link = screen.getByText('View all');
     expect(link.closest('a')).toHaveAttribute('href', '/inventory');
   });
 
-  it('renders inventory alert count badge', () => {
+  it('renders sync footer', () => {
     renderDashboard();
-    // The badge is inside a span with specific classes
-    const badges = screen.getAllByText('2');
-    const alertBadge = badges.find(el =>
-      el.classList.contains('bg-red-100') && el.classList.contains('text-red-700')
-    );
-    expect(alertBadge).toBeDefined();
+    expect(screen.getByText(/Sync Complete/)).toBeInTheDocument();
+    expect(screen.getByText(/Dashboard data refreshed/)).toBeInTheDocument();
   });
 
   describe('loading state', () => {

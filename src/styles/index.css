@@ -46,9 +46,14 @@
 
     /* Artisan Accents */
     --color-gold-light: #E2D0A0;
-    --color-gold: #C9A55C;
+    --color-gold: #cab06d; /* Updated to exact Stitch Primary */
     --color-gold-dark: #9A7B3A;
     --color-gold-deep: #6B5425;
+
+    /* Stitch Direct Surface Tokens */
+    --onyx-surface: #161618;
+    --muted-smoke: #8E8E93;
+    --stone-text: #E5E7EB;
 
     /* Semantic Colors (Muted Professionalism) */
     --color-success: #4A5D4E;

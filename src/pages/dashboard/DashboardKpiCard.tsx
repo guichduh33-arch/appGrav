@@ -1,0 +1,60 @@
+import { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
+
+interface DashboardKpiCardProps {
+    label: string;
+    value: string;
+    icon: ReactNode;
+    iconColor?: string;
+    className?: string;
+}
+
+/**
+ * Stitch-style premium KPI card with large prominent value.
+ * Used on the Dashboard "Executive Summary" row.
+ */
+export function DashboardKpiCard({
+    label,
+    value,
+    icon,
+    iconColor = 'var(--color-gold)',
+    className,
+}: DashboardKpiCardProps) {
+    return (
+        <div
+            className={cn(
+                'relative overflow-hidden rounded-2xl p-6',
+                'bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)]',
+                'shadow-sm hover:shadow-md transition-shadow duration-300',
+                'group',
+                className
+            )}
+        >
+            {/* Subtle gradient accent at top */}
+            <div
+                className="absolute top-0 left-0 right-0 h-[2px] opacity-60"
+                style={{
+                    background: `linear-gradient(90deg, transparent 0%, ${iconColor} 50%, transparent 100%)`,
+                }}
+            />
+
+            {/* Icon */}
+            <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110"
+                style={{ backgroundColor: `color-mix(in srgb, ${iconColor} 12%, transparent)` }}
+            >
+                {icon}
+            </div>
+
+            {/* Label */}
+            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--theme-text-muted)] mb-2">
+                {label}
+            </p>
+
+            {/* Value */}
+            <p className="text-2xl lg:text-3xl font-display font-bold text-[var(--theme-text-primary)] tracking-tight">
+                {value}
+            </p>
+        </div>
+    );
+}

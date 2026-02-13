@@ -28,10 +28,10 @@ export const CartItemRow = memo(function CartItemRow({
     return (
         <div
             className={cn(
-                'bg-transparent py-5 mb-0 border-b border-white/5 transition-all duration-200 cursor-pointer',
-                'hover:bg-[rgba(59,130,246,0.05)]',
+                'bg-transparent py-5 border-b border-white/5 transition-all duration-300 cursor-pointer',
+                'hover:bg-[var(--color-gold)]/5',
                 'last:border-b-0',
-                isLocked && 'bg-[rgba(245,158,11,0.05)] border-l-[3px] border-l-warning pl-2 cursor-default'
+                isLocked && 'bg-[rgba(245,158,11,0.03)] border-l-2 border-l-warning pl-3 cursor-default'
             )}
             onClick={() => !isLocked && onItemClick?.(item)}
         >
@@ -78,30 +78,28 @@ export const CartItemRow = memo(function CartItemRow({
             </div>
 
             <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 rounded-md p-0">
+                <div className="flex items-center gap-1.5">
                     <button
                         type="button"
-                        className="w-6 h-6 flex items-center justify-center bg-transparent border border-white/10 rounded-full text-xs text-zinc-300 cursor-pointer transition-all duration-200 hover:enabled:border-gold hover:enabled:text-gold-light hover:enabled:bg-[rgba(59,130,246,0.1)] disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-7 h-7 flex items-center justify-center bg-transparent border border-white/10 rounded-full text-xs text-zinc-400 cursor-pointer transition-all duration-300 hover:enabled:border-[var(--color-gold)] hover:enabled:text-[var(--color-gold)] hover:enabled:bg-[var(--color-gold)]/5 disabled:opacity-30"
                         onClick={(e) => {
                             e.stopPropagation()
                             onQuantityChange(item.id, item.quantity - 1)
                         }}
                         disabled={isLocked}
                         title={isLocked ? 'PIN required' : 'Decrease quantity'}
-                        aria-label="Decrease quantity"
                     >
                         <Minus size={14} />
                     </button>
-                    <span className="text-sm font-semibold min-w-[16px] text-center text-white">{item.quantity}</span>
+                    <span className="text-sm font-bold min-w-[20px] text-center text-white">{item.quantity}</span>
                     <button
                         type="button"
-                        className="w-6 h-6 flex items-center justify-center bg-transparent border border-white/10 rounded-full text-xs text-zinc-300 cursor-pointer transition-all duration-200 hover:enabled:border-gold hover:enabled:text-gold-light hover:enabled:bg-[rgba(59,130,246,0.1)] disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-7 h-7 flex items-center justify-center bg-transparent border border-white/10 rounded-full text-xs text-zinc-400 cursor-pointer transition-all duration-300 hover:enabled:border-[var(--color-gold)] hover:enabled:text-[var(--color-gold)] hover:enabled:bg-[var(--color-gold)]/5 disabled:opacity-30"
                         onClick={(e) => {
                             e.stopPropagation()
                             onQuantityChange(item.id, item.quantity + 1)
                         }}
                         title="Increase quantity"
-                        aria-label="Increase quantity"
                     >
                         <Plus size={14} />
                     </button>
@@ -143,8 +141,8 @@ export const CartItemRow = memo(function CartItemRow({
                                     display: 'block',
                                     fontSize: '9px',
                                     color: item.appliedPriceType === 'wholesale' ? '#059669' :
-                                           item.appliedPriceType === 'discount' ? '#3b82f6' :
-                                           item.appliedPriceType === 'custom' ? '#8b5cf6' : '#64748b',
+                                        item.appliedPriceType === 'discount' ? '#3b82f6' :
+                                            item.appliedPriceType === 'custom' ? '#8b5cf6' : '#64748b',
                                     fontWeight: 500,
                                 }}
                             >

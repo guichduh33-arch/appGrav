@@ -42,8 +42,8 @@ const ProductCard = memo(function ProductCard({
     return (
         <button
             className={cn(
-                'group relative flex flex-col bg-[var(--theme-bg-secondary)] border border-white/5 rounded-xl p-0 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden h-full text-left',
-                'hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-[var(--color-gold)]/5 hover:border-[var(--color-gold)]/40',
+                'group relative flex flex-col bg-[#161618] border border-white/5 rounded-xl p-0 cursor-pointer transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden h-full text-left',
+                'hover:-translate-y-1 hover:shadow-2xl hover:shadow-[var(--color-gold)]/15 hover:border-[var(--color-gold)]/40',
                 'active:scale-[0.98]',
                 isOutOfStock && 'opacity-60 hover:opacity-80',
                 bouncing && 'pos-bounce'
@@ -79,7 +79,7 @@ const ProductCard = memo(function ProductCard({
                         src={product.image_url}
                         alt={product.name}
                         loading="lazy"
-                        className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                         onError={(e) => {
                             e.currentTarget.style.display = 'none'
                             const fallback = e.currentTarget.nextElementSibling as HTMLElement
@@ -96,11 +96,11 @@ const ProductCard = memo(function ProductCard({
             </div>
 
             {/* Product info */}
-            <div className="px-5 pt-4 pb-1 text-sm font-semibold text-[var(--theme-text-primary)] leading-snug line-clamp-2 flex-1">
+            <div className="px-5 pt-5 pb-1 text-sm font-medium text-[var(--stone-text)] leading-snug line-clamp-2 flex-1">
                 {product.name}
             </div>
 
-            <div className="px-5 pt-0.5 pb-4 text-sm font-semibold text-[var(--color-gold)] tracking-wider">
+            <div className="px-5 pt-0.5 pb-5 text-sm font-bold text-[var(--color-gold)] tracking-widest uppercase">
                 {formatPrice(product.retail_price || 0)}
             </div>
         </button>
@@ -130,9 +130,9 @@ function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) 
 
     if (isLoading) {
         return (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-6 w-full pb-xl">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6 w-full pb-xl">
                 {[...Array(8)].map((_, i) => (
-                    <div key={i} className="h-[200px] bg-[var(--theme-bg-secondary)] rounded-xl animate-pulse" />
+                    <div key={i} className="h-[260px] bg-[#161618] rounded-xl animate-pulse" />
                 ))}
             </div>
         )
@@ -148,7 +148,7 @@ function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) 
     }
 
     return (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-6 w-full pb-xl">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6 w-full pb-xl">
             {products.map((product) => {
                 const stockStatus = getStockStatus(product.id)
                 const stockLevel = stockMap.get(product.id)

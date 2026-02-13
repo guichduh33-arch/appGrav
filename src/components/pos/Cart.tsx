@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { toast } from 'sonner'
-import { Trash2, Tag, Lock, List, User, QrCode, Star, FileText, ChevronDown, ChevronUp, Building2, ShoppingCart } from 'lucide-react'
-import { EmptyState } from '@/components/ui/EmptyState'
+import { Trash2, Lock, User, FileText, ShoppingCart } from 'lucide-react'
 import { useCartStore } from '../../stores/cartStore'
-import { useOrderStore } from '../../stores/orderStore'
 import { PinVerificationModal, TableSelectionModal, DiscountModal, CustomerSearchModal } from './modals'
-import { LoyaltyBadge } from './LoyaltyBadge'
 import { CartItemRow, CartTotals, CartActions } from './cart-components'
-import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'
 import { useDisplayBroadcast } from '@/hooks/pos'
 import { getTierColor } from '@/constants/loyalty'
 import { cn } from '@/lib/utils'
@@ -25,18 +20,15 @@ interface SelectedCustomer {
 interface CartProps {
     onCheckout: () => void
     onSendToKitchen?: () => void
-    onShowPendingOrders?: () => void
     onItemClick?: (item: CartItem) => void
 }
 
-function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }: CartProps) {
-    const { isOffline } = useNetworkStatus()
-    const heldOrdersCount = useOrderStore(s => s.heldOrders.length)
+function Cart({ onCheckout, onSendToKitchen, onItemClick }: CartProps) {
     const {
-        items, orderType, setOrderType, tableNumber, setTableNumber,
+        items, orderType, setOrderType, setTableNumber,
         subtotal, discountAmount, total, updateItemQuantity, removeItem, clearCart, setDiscount,
         lockedItemIds, activeOrderNumber, isItemLocked, removeLockedItem,
-        customerId, customerName, customerCategorySlug, setCustomerWithCategorySlug,
+        customerId, customerName, setCustomerWithCategorySlug,
         orderNotes, setOrderNotes,
     } = useCartStore()
 
@@ -65,7 +57,6 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
         if (type === 'dine_in') {
             setShowTableModal(true)
         }
-        // Clear table for non-dine-in orders
         if (type !== 'dine_in') {
             setTableNumber(null)
         }
@@ -107,159 +98,96 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
         }
     }
 
-    const handleRedeemPointsClick = () => {
-        if (isOffline) {
-            toast.warning('Points redemption requires online connection', { description: 'Please connect to the internet to use loyalty points', duration: 3000 })
-        } else {
-            toast.info('Points redemption coming soon', { description: 'This feature will be available in a future update', duration: 2000 })
-        }
-    }
-
     return (
-        <aside className="w-[400px] bg-[var(--theme-bg-secondary)] border-l border-[var(--color-gold)]/10 flex flex-col flex-shrink-0 z-[15] shadow-[-4px_0_24px_rgba(0,0,0,0.4)] text-[var(--theme-text-primary)]">
-            {/* Pending Orders Button */}
-            <div className="px-md py-sm bg-[var(--theme-bg-primary)] border-b border-[var(--theme-border)]">
-                <button
-                    type="button"
-                    className="w-full p-2.5 bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border-strong)] rounded-md text-[var(--theme-text-primary)] font-semibold text-sm cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 hover:bg-[var(--theme-bg-secondary)] hover:border-gold hover:text-gold-light"
-                    onClick={onShowPendingOrders}
-                >
-                    <List size={18} />
-                    Pending Orders
-                    {heldOrdersCount > 0 && (
-                        <span className="bg-[var(--color-danger)] text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 font-bold">
-                            {heldOrdersCount}
+        <aside className="w-[480px] bg-[#161618] border-l border-white/5 flex flex-col flex-shrink-0 z-[15] shadow-[-8px_0_32px_rgba(0,0,0,0.5)] text-[#E5E7EB]">
+            {/* Header / Active Order Info */}
+            <div className="px-8 py-6 border-b border-white/5 bg-[#161618]">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                        <h2 className="text-base font-bold text-white uppercase tracking-[0.15em]">Active Order</h2>
+                        <span className="px-3 py-1 rounded-full bg-[var(--color-gold)]/10 text-[var(--color-gold)] text-xs font-bold tracking-wide">
+                            {displayOrderNumber}
                         </span>
-                    )}
-                </button>
-            </div>
-
-            {/* Header */}
-            <div className="px-md py-sm bg-[var(--theme-bg-secondary)] border-b border-[var(--theme-border)]">
-                <div className="flex items-center justify-between gap-sm">
-                    {/* Order Type Selector */}
-                    <div className="flex gap-1 flex-shrink-0">
-                        {(['dine_in', 'takeaway', 'delivery'] as const).map((type) => (
-                            <button
-                                key={type}
-                                type="button"
-                                className={cn(
-                                    'px-3 py-1.5 bg-[var(--theme-bg-tertiary)] border-2 border-transparent rounded-md text-xs font-bold text-[var(--theme-text-secondary)] cursor-pointer transition-all duration-200 uppercase tracking-wide whitespace-nowrap',
-                                    'hover:bg-[var(--theme-bg-secondary)] hover:text-white',
-                                    orderType === type && 'bg-gold border-gold-light text-black shadow-[0_2px_8px_rgba(201,165,92,0.3)]'
-                                )}
-                                onClick={() => handleOrderTypeChange(type)}
-                            >
-                                {type === 'dine_in' ? 'Dine In' : type === 'takeaway' ? 'Takeaway' : 'Delivery'}
-                            </button>
-                        ))}
+                        {hasLockedItems && <Lock size={14} className="text-warning opacity-80" />}
                     </div>
-                    <span className="font-display text-sm font-bold text-white tracking-tight flex items-center gap-2 flex-1 justify-center">
-                        Active Order
-                        <span className="bg-[var(--color-gold)]/10 text-[var(--color-gold)] text-xs px-2 py-1 rounded font-semibold">{displayOrderNumber}</span>
-                        {hasLockedItems && <Lock size={14} className="text-warning ml-1" />}
-                    </span>
-                    <button type="button" className="btn-icon btn-icon-sm" title="Clear cart" aria-label="Clear cart" onClick={clearCart} disabled={items.length === 0}>
-                        <Trash2 size={18} />
+                    <button
+                        type="button"
+                        className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 text-[#8E8E93] hover:text-white hover:bg-white/10 transition-all border-none cursor-pointer"
+                        title="Clear cart"
+                        onClick={clearCart}
+                        disabled={items.length === 0}
+                    >
+                        <Trash2 size={16} strokeWidth={1.5} />
                     </button>
                 </div>
+                {/* Order type subtitle */}
+                <p className="text-[11px] text-[#8E8E93] tracking-wide mb-4">
+                    {orderType === 'dine_in' ? 'Dine-in' : orderType === 'takeaway' ? 'Take-out' : 'Delivery'}
+                </p>
 
-                {/* B2B mode indicator (Story 6.7) */}
-                {customerCategorySlug === 'wholesale' && (
-                    <div className="mt-1.5 px-2.5 py-1.5 bg-[#4A5D4E]/15 border border-[#4A5D4E]/40 rounded-sm flex items-center gap-1.5 text-xs font-semibold text-[#A7C4AC]">
-                        <Building2 size={14} />
-                        <span>B2B Mode</span>
-                        <span className="ml-auto text-[10px] font-normal opacity-80">Store Credit Available</span>
-                    </div>
-                )}
-
-                {orderType === 'dine_in' && tableNumber && (
-                    <div className="mt-1.5 px-2.5 py-1.5 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-between text-xs text-gold-light">
-                        <span>Table: {tableNumber}</span>
+                {/* Order Type Selector */}
+                <div className="flex bg-black/20 p-1 rounded-xl border border-white/5 mb-6">
+                    {(['dine_in', 'takeaway', 'delivery'] as const).map((type) => (
                         <button
+                            key={type}
                             type="button"
-                            className="px-2 py-1 bg-transparent border border-gold rounded-sm text-gold-light text-xs font-semibold cursor-pointer transition-all duration-200 hover:bg-gold hover:text-black"
-                            onClick={() => setShowTableModal(true)}
+                            className={cn(
+                                'flex-1 py-2 rounded-lg text-[10px] uppercase tracking-widest font-black transition-all duration-300 border-none cursor-pointer',
+                                orderType === type
+                                    ? 'bg-[var(--color-gold)] text-black shadow-lg shadow-[var(--color-gold)]/10'
+                                    : 'text-[#8E8E93] hover:text-white hover:bg-white/5'
+                            )}
+                            onClick={() => handleOrderTypeChange(type)}
                         >
-                            Change
+                            {type === 'dine_in' ? 'Dine In' : type === 'takeaway' ? 'Take-out' : 'Delivery'}
                         </button>
-                    </div>
-                )}
+                    ))}
+                </div>
 
                 {/* Customer Selection */}
                 <div className="mt-2">
                     {selectedCustomer || customerId ? (
-                        <button type="button" className="w-full flex items-center gap-2.5 px-2.5 py-2 bg-[var(--theme-bg-tertiary)] border-2 border-gold rounded-md cursor-pointer transition-all duration-200 hover:bg-[var(--theme-bg-secondary)]" onClick={() => setShowCustomerModal(true)} style={{ borderColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze') }}>
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-semibold text-[0.85rem] flex-shrink-0" style={{ backgroundColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze') }}>
+                        <button
+                            type="button"
+                            className="w-full flex items-center gap-4 px-4 py-3 bg-white/5 border border-[var(--color-gold)]/30 rounded-xl cursor-pointer transition-all duration-300 hover:bg-white/10 group"
+                            onClick={() => setShowCustomerModal(true)}
+                        >
+                            <div
+                                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-inner"
+                                style={{ backgroundColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze') }}
+                            >
                                 {(selectedCustomer?.company_name || selectedCustomer?.name || customerName || '?')[0].toUpperCase()}
                             </div>
-                            <div className="flex-1 min-w-0 flex flex-col">
-                                <span className="text-sm font-semibold text-[var(--theme-text-primary)] whitespace-nowrap overflow-hidden text-ellipsis">{selectedCustomer?.company_name || selectedCustomer?.name || customerName}</span>
-                                {selectedCustomer && (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <LoyaltyBadge tier={selectedCustomer.loyalty_tier || 'bronze'} points={selectedCustomer.loyalty_points || 0} isOffline={isOffline} compact={true} />
-                                        <button type="button" onClick={(e) => { e.stopPropagation(); handleRedeemPointsClick() }} className="text-[10px] bg-transparent border-none underline px-1 py-0.5" style={{ color: isOffline ? 'var(--theme-text-muted)' : 'var(--color-gold)', cursor: isOffline ? 'not-allowed' : 'pointer' }} title={isOffline ? 'Requires online connection' : 'Use loyalty points'}>
-                                            <Star size={10} style={{ marginRight: '2px' }} />Use pts
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                            <div>
-                                {selectedCustomer?.category?.discount_percentage && selectedCustomer.category.discount_percentage > 0 && (
-                                    <span className="px-2 py-1 rounded text-xs font-bold text-[#A7C4AC] bg-[#4A5D4E]/20" title={`Category: ${selectedCustomer.category.name}`}>
-                                        <Tag size={10} />-{selectedCustomer.category.discount_percentage}%
-                                    </span>
-                                )}
+                            <div className="flex-1 min-w-0 flex flex-col text-left">
+                                <span className="text-sm font-semibold text-white truncate">{selectedCustomer?.company_name || selectedCustomer?.name || customerName}</span>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                    <span className="text-[10px] uppercase tracking-widest font-bold text-[#8E8E93] group-hover:text-[var(--color-gold)] transition-colors">VIP Client</span>
+                                    {selectedCustomer?.loyalty_points && (
+                                        <span className="text-[10px] text-success font-bold">· {selectedCustomer.loyalty_points} pts</span>
+                                    )}
+                                </div>
                             </div>
                         </button>
                     ) : (
                         <button
                             type="button"
-                            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-[var(--theme-bg-tertiary)] border border-dashed border-[var(--theme-border-strong)] rounded-md text-[var(--theme-text-secondary)] text-xs font-semibold cursor-pointer transition-all duration-200 hover:bg-[var(--theme-bg-secondary)] hover:border-gold hover:text-gold-light"
+                            className="w-full flex items-center justify-center gap-3 py-4 bg-transparent border-2 border-dashed border-white/10 rounded-xl text-[#8E8E93] text-[10px] uppercase tracking-[0.2em] font-black cursor-pointer transition-all duration-300 hover:border-[var(--color-gold)]/50 hover:text-white hover:bg-white/5"
                             onClick={() => setShowCustomerModal(true)}
                         >
-                            <QrCode size={16} /><User size={16} /><span>Client</span>
+                            <User size={14} strokeWidth={2.5} />
+                            Add Client
                         </button>
-                    )}
-                </div>
-
-                {/* Order Notes (F3.3) */}
-                <div className="mt-sm pt-sm border-t border-[var(--theme-border)]">
-                    <button
-                        type="button"
-                        className={cn(
-                            'w-full flex items-center gap-2 px-3 py-2 bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border-strong)] rounded-md text-[var(--theme-text-secondary)] text-sm cursor-pointer transition-all duration-200',
-                            'hover:bg-[var(--theme-bg-secondary)] hover:text-white',
-                            (showOrderNotes || orderNotes) && 'text-gold-light border-gold',
-                            '[&>svg:last-child]:ml-auto'
-                        )}
-                        onClick={() => setShowOrderNotes(!showOrderNotes)}
-                    >
-                        <FileText size={16} />
-                        <span>{orderNotes ? 'Order Notes' : 'Add Notes'}</span>
-                        {showOrderNotes ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                    </button>
-                    {showOrderNotes && (
-                        <textarea
-                            className="w-full mt-2 px-3 py-2.5 bg-[var(--theme-bg-primary)] border border-[var(--theme-border-strong)] rounded-md text-white text-sm font-[inherit] resize-none transition-colors duration-200 focus:outline-none focus:border-gold placeholder:text-[var(--theme-text-muted)]"
-                            placeholder="Add special instructions for this order..."
-                            value={orderNotes}
-                            onChange={(e) => setOrderNotes(e.target.value)}
-                            rows={2}
-                        />
                     )}
                 </div>
             </div>
 
-            {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto p-md bg-[var(--theme-bg-primary)]">
+            {/* Cart Items Area */}
+            <div className="flex-1 overflow-y-auto px-8 py-4 custom-scrollbar bg-transparent">
                 {items.length === 0 ? (
-                    <EmptyState
-                        icon={ShoppingCart}
-                        title="Your cart is empty"
-                        description="Select products to get started."
-                        className="h-full text-[var(--theme-text-muted)]"
-                    />
+                    <div className="h-full flex flex-col items-center justify-center opacity-30">
+                        <ShoppingCart size={48} strokeWidth={1} className="mb-4" />
+                        <span className="text-[10px] uppercase font-bold tracking-[0.3em]">Empty Bag</span>
+                    </div>
                 ) : (
                     items.map(item => (
                         <CartItemRow
@@ -275,6 +203,32 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                 )}
             </div>
 
+            {/* Order Notes / Meta */}
+            {items.length > 0 && (
+                <div className="px-8 py-4 border-t border-white/5">
+                    <button
+                        type="button"
+                        className={cn(
+                            'w-full flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg text-[#8E8E93] text-[10px] uppercase tracking-widest font-bold cursor-pointer transition-all border-none',
+                            (showOrderNotes || orderNotes) && 'text-[var(--color-gold)] bg-[var(--color-gold)]/5'
+                        )}
+                        onClick={() => setShowOrderNotes(!showOrderNotes)}
+                    >
+                        <FileText size={14} />
+                        <span>{orderNotes ? 'Special Instructions added' : 'Add special instructions'}</span>
+                    </button>
+                    {showOrderNotes && (
+                        <textarea
+                            className="w-full mt-3 px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-white text-sm font-[inherit] resize-none focus:outline-none focus:border-[var(--color-gold)]/50 placeholder:text-[#8E8E93]/50"
+                            placeholder="Type instructions here..."
+                            value={orderNotes}
+                            onChange={(e) => setOrderNotes(e.target.value)}
+                            rows={2}
+                        />
+                    )}
+                </div>
+            )}
+
             {items.length > 0 && (
                 <CartTotals subtotal={subtotal} discountAmount={discountAmount} total={total} onDiscountClick={() => setShowDiscountModal(true)} />
             )}
@@ -282,7 +236,7 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
             <CartActions hasLockedItems={hasLockedItems} hasUnlockedItems={hasUnlockedItems} itemCount={items.length} total={total} onSendToKitchen={onSendToKitchen} onCheckout={onCheckout} />
 
             {showPinModal && (
-                <PinVerificationModal title="Item removal" message="This item is in the kitchen. Manager PIN required." onVerify={handlePinVerify} onClose={() => { setShowPinModal(false); setPendingDeleteItemId(null) }} />
+                <PinVerificationModal title="Secure access" message="Manager PIN required to modify kitchen items." onVerify={handlePinVerify} onClose={() => { setShowPinModal(false); setPendingDeleteItemId(null) }} />
             )}
             {showTableModal && <TableSelectionModal onSelectTable={(t) => { setTableNumber(t); setShowTableModal(false) }} onClose={() => setShowTableModal(false)} />}
             {showDiscountModal && (
