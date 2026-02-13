@@ -61,11 +61,11 @@ function getStatusPriority(status: TStockStatus): number {
 function StatusIcon({ status }: { status: TStockStatus }) {
   switch (status) {
     case 'out_of_stock':
-      return <XCircle className="w-4 h-4 text-red-600" aria-hidden="true" />;
+      return <XCircle className="w-4 h-4 text-[var(--color-danger)]" aria-hidden="true" />;
     case 'critical':
-      return <AlertTriangle className="w-4 h-4 text-red-500" aria-hidden="true" />;
+      return <AlertTriangle className="w-4 h-4 text-[var(--color-danger)]" aria-hidden="true" />;
     case 'warning':
-      return <AlertCircle className="w-4 h-4 text-amber-500" aria-hidden="true" />;
+      return <AlertCircle className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />;
     default:
       return null;
   }
@@ -77,27 +77,18 @@ function StatusIcon({ status }: { status: TStockStatus }) {
 function getStatusBadgeClasses(status: TStockStatus): string {
   switch (status) {
     case 'out_of_stock':
-      return 'bg-red-100 text-red-700 border-red-200';
+      return 'bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] border-[var(--theme-border)]';
     case 'critical':
-      return 'bg-red-50 text-red-600 border-red-200';
+      return 'bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] border-[var(--theme-border)]';
     case 'warning':
-      return 'bg-amber-50 text-amber-600 border-amber-200';
+      return 'bg-[var(--color-warning-bg)] text-[var(--color-warning-text)] border-[var(--theme-border)]';
     default:
-      return 'bg-green-50 text-green-600 border-green-200';
+      return 'bg-[var(--color-success-bg)] text-[var(--color-success-text)] border-[var(--theme-border)]';
   }
 }
 
 /**
  * Panel showing stock alerts with filtering capability
- *
- * @example
- * ```tsx
- * // Show all alerts
- * <StockAlertsPanel />
- *
- * // Show only critical with max 5 items
- * <StockAlertsPanel initialFilter="critical" maxItems={5} />
- * ```
  */
 export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
   initialFilter = 'all',
@@ -180,55 +171,52 @@ export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
 
   return (
     <div
-      className={`bg-white rounded-lg border border-gray-200 shadow-sm ${className}`}
+      className={`bg-[var(--theme-bg-secondary)] rounded-lg border border-[var(--theme-border)] shadow-sm ${className}`}
       role="region"
       aria-label="Stock Alerts"
     >
       {/* Header with filter tabs */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--theme-border)]">
         <div className="flex items-center gap-2">
-          <AlertTriangle className="w-5 h-5 text-amber-500" aria-hidden="true" />
-          <h3 className="text-sm font-semibold text-gray-900">
+          <AlertTriangle className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
+          <h3 className="text-sm font-semibold text-[var(--theme-text-primary)] font-display">
             Stock Alerts
           </h3>
-          <span className="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">
+          <span className="px-2 py-0.5 text-xs font-medium bg-[var(--theme-bg-tertiary)] text-[var(--theme-text-secondary)] rounded-full border border-[var(--theme-border)]">
             {counts.all}
           </span>
         </div>
 
         {/* Filter tabs */}
         <div className="flex items-center gap-1">
-          <Filter className="w-4 h-4 text-gray-400 mr-1" aria-hidden="true" />
+          <Filter className="w-4 h-4 text-[var(--theme-text-muted)] mr-1" aria-hidden="true" />
           <button
             type="button"
             onClick={() => setFilter('all')}
-            className={`px-2 py-1 text-xs rounded transition-colors ${
-              filter === 'all'
-                ? 'bg-gray-200 text-gray-900 font-medium'
-                : 'text-gray-500 hover:bg-gray-100'
-            }`}
+            className={`px-2 py-1 text-xs rounded transition-colors ${filter === 'all'
+                ? 'bg-[var(--color-gold)] text-[var(--theme-bg-primary)] font-bold'
+                : 'text-[var(--theme-text-secondary)] hover:bg-[var(--theme-bg-tertiary)]'
+              }`}
           >
             All ({counts.all})
           </button>
           <button
             type="button"
             onClick={() => setFilter('critical')}
-            className={`px-2 py-1 text-xs rounded transition-colors ${
-              filter === 'critical'
-                ? 'bg-red-100 text-red-700 font-medium'
-                : 'text-gray-500 hover:bg-gray-100'
-            }`}
+            className={`px-2 py-1 text-xs rounded transition-colors ${filter === 'critical'
+                ? 'bg-[var(--color-danger)] text-white font-bold'
+                : 'text-[var(--theme-text-secondary)] hover:bg-[var(--theme-bg-tertiary)]'
+              }`}
           >
             Critical ({counts.critical})
           </button>
           <button
             type="button"
             onClick={() => setFilter('warning')}
-            className={`px-2 py-1 text-xs rounded transition-colors ${
-              filter === 'warning'
-                ? 'bg-amber-100 text-amber-700 font-medium'
-                : 'text-gray-500 hover:bg-gray-100'
-            }`}
+            className={`px-2 py-1 text-xs rounded transition-colors ${filter === 'warning'
+                ? 'bg-[var(--color-warning)] text-white font-bold'
+                : 'text-[var(--theme-text-secondary)] hover:bg-[var(--theme-bg-tertiary)]'
+              }`}
           >
             Warning ({counts.warning})
           </button>
@@ -236,24 +224,24 @@ export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
       </div>
 
       {/* Alert list */}
-      <div className="divide-y divide-gray-100">
+      <div className="divide-y divide-[var(--theme-border)]">
         {filteredItems.length === 0 ? (
-          <div className="px-4 py-6 text-center text-sm text-gray-500">
+          <div className="px-4 py-6 text-center text-sm text-[var(--theme-text-muted)]">
             No alerts
           </div>
         ) : (
           filteredItems.map((item) => (
             <div
               key={item.productId}
-              className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
+              className="flex items-center justify-between px-4 py-3 hover:bg-[var(--theme-bg-tertiary)] transition-colors"
             >
               <div className="flex items-center gap-3">
                 <StatusIcon status={item.status} />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-semibold text-[var(--theme-text-primary)]">
                     {item.productName}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-[var(--theme-text-muted)]">
                     Min stock: {item.minStockLevel}
                   </p>
                 </div>
@@ -261,10 +249,10 @@ export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
 
               <div className="flex items-center gap-3">
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-sm font-bold text-[var(--theme-text-primary)]">
                     {item.quantity}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-[var(--theme-text-muted)]">
                     Current stock
                   </p>
                 </div>
@@ -276,8 +264,8 @@ export const StockAlertsPanel: React.FC<IStockAlertsPanelProps> = ({
                   {item.status === 'out_of_stock'
                     ? 'Out of Stock'
                     : item.status === 'critical'
-                    ? 'Critical'
-                    : 'Warning'}
+                      ? 'Critical'
+                      : 'Warning'}
                 </span>
               </div>
             </div>

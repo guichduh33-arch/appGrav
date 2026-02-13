@@ -44,16 +44,16 @@ export default function ProductsLayout() {
     const activeTab = getActiveTab()
 
     return (
-        <div className="min-h-screen bg-slate-50">
-            <div className="bg-white border-b-2 border-slate-200 flex gap-2 px-4 md:px-8 sticky top-0 z-10 overflow-x-auto">
+        <div className="min-h-screen bg-[var(--theme-bg-primary)]">
+            <div className="bg-[var(--theme-bg-secondary)] border-b border-[var(--theme-border)] flex gap-2 px-4 md:px-8 sticky top-0 z-10 overflow-x-auto shadow-sm">
                 {TABS.map(tab => (
                     <button
                         key={tab.id}
                         className={cn(
                             'flex items-center gap-2 py-3.5 md:py-4 px-4 md:px-6 bg-transparent text-sm md:text-[0.95rem] font-medium cursor-pointer relative transition-all duration-200 border-b-[3px] border-transparent whitespace-nowrap [&>svg]:shrink-0',
                             activeTab === tab.id
-                                ? 'text-indigo-500 border-b-indigo-500'
-                                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                                ? 'text-[var(--color-gold)] border-b-[var(--color-gold)]'
+                                : 'text-[var(--theme-text-secondary)] hover:text-[var(--theme-text-primary)] hover:bg-[var(--theme-bg-tertiary)]'
                         )}
                         onClick={() => navigate(tab.path)}
                     >

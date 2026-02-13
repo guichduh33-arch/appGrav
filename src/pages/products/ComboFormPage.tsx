@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Box, Plus, X, Save, ArrowLeft, Search, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
+import { Box, Plus, X, Save, ArrowLeft, Search, Trash2, ChevronDown, ChevronUp, Package } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { Product } from '../../types/database'
 import { toast } from 'sonner'
-import './ComboFormPage.css'
+import { cn } from '@/lib/utils'
+import { formatCurrency } from '@/utils/helpers'
+import { logError } from '@/utils/logger'
 
 interface GroupItem {
     id?: string
@@ -421,119 +423,156 @@ export default function ComboFormPage() {
     }
 
     return (
-        <div className="combo-form-page">
-            <header className="combo-form-header">
+        <div className="p-8 max-w-[1200px] mx-auto md:p-4 font-body">
+            <header className="flex items-center gap-4 mb-8">
                 <button
                     type="button"
-                    className="btn-back"
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] text-[var(--theme-text-secondary)] transition-all hover:bg-[var(--theme-bg-tertiary)] hover:text-[var(--color-gold)] shadow-sm"
                     onClick={() => navigate('/products/combos')}
                 >
                     <ArrowLeft size={20} />
-                    Back
                 </button>
-                <h1>
-                    <Box size={28} />
-                    {isEditing ? 'Edit combo' : 'New combo'}
-                </h1>
+                <div className="flex flex-col">
+                    <h1 className="font-display text-3xl font-semibold text-[var(--theme-text-primary)] m-0 flex items-center gap-3">
+                        <Box size={28} className="text-[var(--color-gold)]" />
+                        {isEditing ? 'Curate Artisan Combo' : 'Craft New Combo'}
+                    </h1>
+                    <p className="text-[var(--theme-text-secondary)] text-sm opacity-60 mt-1">
+                        Design a premium bundle experience for your customers
+                    </p>
+                </div>
             </header>
 
-            <form onSubmit={handleSubmit} className="combo-form">
-                <div className="form-grid">
+            <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="grid grid-cols-[1fr_400px] gap-8 xl:grid-cols-1">
                     {/* Left column - General info */}
-                    <div className="form-section">
-                        <h2>General Information</h2>
+                    <div className="space-y-8">
+                        <div className="bg-[var(--theme-bg-secondary)] rounded-2xl p-8 border border-[var(--theme-border)] shadow-sm">
+                            <h2 className="flex items-center gap-3 font-display text-xl font-semibold text-[var(--theme-text-primary)] m-0 mb-8 pb-4 border-b border-[var(--theme-border)]">
+                                <Box size={20} className="text-[var(--color-gold)]" /> General Curation
+                            </h2>
 
-                        <div className="form-group">
-                            <label htmlFor="name">Combo Name *</label>
-                            <input
-                                id="name"
-                                type="text"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="Ex: Full Breakfast Pack"
-                                required
-                            />
-                        </div>
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <label htmlFor="name" className="text-sm font-semibold text-[var(--theme-text-secondary)]">Combo Identity *</label>
+                                    <input
+                                        id="name"
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        placeholder="Name your curated bundle (e.g., Parisian Breakfast)"
+                                        className="w-full px-5 py-3.5 bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)] focus:shadow-[0_0_0_4px_rgba(201,165,92,0.1)] placeholder:opacity-30"
+                                        required
+                                    />
+                                </div>
 
-                        <div className="form-group">
-                            <label htmlFor="description">Description</label>
-                            <textarea
-                                id="description"
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                placeholder="Choose your drink and pastry..."
-                                rows={3}
-                            />
-                        </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="description" className="text-sm font-semibold text-[var(--theme-text-secondary)]">Experience Description</label>
+                                    <textarea
+                                        id="description"
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        placeholder="Describe the artisan choices available in this set..."
+                                        rows={4}
+                                        className="w-full px-5 py-3.5 bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)] focus:shadow-[0_0_0_4px_rgba(201,165,92,0.1)] placeholder:opacity-30 resize-none"
+                                    />
+                                </div>
 
-                        <div className="form-group">
-                            <label htmlFor="comboPrice">Base Price (IDR) *</label>
-                            <input
-                                id="comboPrice"
-                                type="number"
-                                value={comboPrice}
-                                onChange={(e) => setComboPrice(Number(e.target.value))}
-                                min="0"
-                                step="1000"
-                                required
-                            />
-                            <small>Surcharges will be added based on the customer's choices</small>
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="imageUrl">Image URL</label>
-                            <input
-                                id="imageUrl"
-                                type="text"
-                                value={imageUrl}
-                                onChange={(e) => setImageUrl(e.target.value)}
-                                placeholder="https://..."
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="sortOrder">Display Order</label>
-                            <input
-                                id="sortOrder"
-                                type="number"
-                                value={sortOrder}
-                                onChange={(e) => setSortOrder(Number(e.target.value))}
-                                min="0"
-                            />
-                        </div>
-
-                        <div className="form-group-horizontal">
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={isActive}
-                                    onChange={(e) => setIsActive(e.target.checked)}
-                                />
-                                <span>Active</span>
-                            </label>
-
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={availableAtPos}
-                                    onChange={(e) => setAvailableAtPos(e.target.checked)}
-                                />
-                                <span>Visible in POS</span>
-                            </label>
-                        </div>
-
-                        {/* Price summary */}
-                        {groups.length > 0 && (
-                            <div className="pricing-preview">
-                                <h3>Price Preview</h3>
-                                <div className="price-range">
-                                    <div className="price-item">
-                                        <span>Minimum price:</span>
-                                        <span className="price">{new Intl.NumberFormat('id-ID').format(minPrice)} IDR</span>
+                                <div className="grid grid-cols-2 gap-6 md:grid-cols-1">
+                                    <div className="space-y-2">
+                                        <label htmlFor="comboPrice" className="text-sm font-semibold text-[var(--theme-text-secondary)]">Artisan Base Price (IDR) *</label>
+                                        <div className="relative">
+                                            <input
+                                                id="comboPrice"
+                                                type="number"
+                                                value={comboPrice}
+                                                onChange={(e) => setComboPrice(Number(e.target.value))}
+                                                min="0"
+                                                step="1000"
+                                                className="w-full px-5 py-3.5 bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)] focus:shadow-[0_0_0_4px_rgba(201,165,92,0.1)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                required
+                                            />
+                                            <div className="absolute right-5 top-1/2 -translate-y-1/2 text-[var(--theme-text-muted)] font-bold text-xs pointer-events-none">IDR</div>
+                                        </div>
+                                        <p className="text-[0.7rem] text-[var(--theme-text-muted)] mt-1 opacity-70 italic">Surcharges from specific artisan choices will be added</p>
                                     </div>
-                                    <div className="price-item">
-                                        <span>Maximum price:</span>
-                                        <span className="price highlight">{new Intl.NumberFormat('id-ID').format(maxPrice)} IDR</span>
+
+                                    <div className="space-y-2">
+                                        <label htmlFor="sortOrder" className="text-sm font-semibold text-[var(--theme-text-secondary)]">Display Hierarchy</label>
+                                        <input
+                                            id="sortOrder"
+                                            type="number"
+                                            value={sortOrder}
+                                            onChange={(e) => setSortOrder(Number(e.target.value))}
+                                            min="0"
+                                            className="w-full px-5 py-3.5 bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)] focus:shadow-[0_0_0_4px_rgba(201,165,92,0.1)]"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label htmlFor="imageUrl" className="text-sm font-semibold text-[var(--theme-text-secondary)]">Signature Reveal (Image URL)</label>
+                                    <input
+                                        id="imageUrl"
+                                        type="text"
+                                        value={imageUrl}
+                                        onChange={(e) => setImageUrl(e.target.value)}
+                                        placeholder="https://artisan-bakery.com/combos/revealed.jpg"
+                                        className="w-full px-5 py-3.5 bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)] focus:shadow-[0_0_0_4px_rgba(201,165,92,0.1)] placeholder:opacity-30"
+                                    />
+                                </div>
+
+                                <div className="flex gap-10 pt-4 md:flex-col md:gap-4">
+                                    <label className="flex items-center gap-3 cursor-pointer group">
+                                        <div className={cn(
+                                            "w-6 h-6 rounded-md border-2 transition-all flex items-center justify-center",
+                                            isActive ? "bg-[var(--color-gold)] border-[var(--color-gold)] text-white shadow-[0_2px_8px_rgba(201,165,92,0.4)]" : "bg-transparent border-[var(--theme-border)] group-hover:border-[var(--color-gold-light)]"
+                                        )}>
+                                            <input
+                                                type="checkbox"
+                                                className="hidden"
+                                                checked={isActive}
+                                                onChange={(e) => setIsActive(e.target.checked)}
+                                            />
+                                            {isActive && <Save size={14} strokeWidth={3} />}
+                                        </div>
+                                        <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Acitvate Set</span>
+                                    </label>
+
+                                    <label className="flex items-center gap-3 cursor-pointer group">
+                                        <div className={cn(
+                                            "w-6 h-6 rounded-md border-2 transition-all flex items-center justify-center",
+                                            availableAtPos ? "bg-[var(--color-gold)] border-[var(--color-gold)] text-white shadow-[0_2px_8px_rgba(201,165,92,0.4)]" : "bg-transparent border-[var(--theme-border)] group-hover:border-[var(--color-gold-light)]"
+                                        )}>
+                                            <input
+                                                type="checkbox"
+                                                className="hidden"
+                                                checked={availableAtPos}
+                                                onChange={(e) => setAvailableAtPos(e.target.checked)}
+                                            />
+                                            {availableAtPos && <Box size={14} strokeWidth={3} />}
+                                        </div>
+                                        <span className="text-sm font-semibold text-[var(--theme-text-primary)]">Show in POS Display</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Price summary box */}
+                        {groups.length > 0 && (
+                            <div className="bg-gradient-to-br from-[var(--theme-bg-secondary)] to-[var(--theme-bg-tertiary)] rounded-2xl p-8 border border-[var(--color-gold)]/20 shadow-lg relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--color-gold)]/5 rounded-full blur-3xl -mr-16 -mt-16" />
+                                <h3 className="font-display font-bold text-[var(--color-gold)] uppercase tracking-widest text-[0.7rem] mb-6 flex items-center gap-2">
+                                    <Save size={14} /> Artisan Price Preview
+                                </h3>
+                                <div className="grid grid-cols-2 gap-8 md:grid-cols-1">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-[var(--theme-text-muted)] text-[0.65rem] uppercase tracking-widest font-bold">Minimum Curated Price</span>
+                                        <span className="text-3xl font-display font-bold text-[var(--theme-text-primary)]">{formatCurrency(minPrice)}</span>
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-[var(--theme-text-muted)] text-[0.65rem] uppercase tracking-widest font-bold">Peak Curated Value</span>
+                                        <span className="text-3xl font-display font-bold text-[var(--color-gold)]">{formatCurrency(maxPrice)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -541,62 +580,65 @@ export default function ComboFormPage() {
                     </div>
 
                     {/* Right column - Groups */}
-                    <div className="form-section">
-                        <div className="section-header">
-                            <h2>Choice Groups</h2>
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center mb-2">
+                            <h2 className="font-display font-semibold text-xl text-[var(--theme-text-primary)] m-0">Artisan Curation Groups</h2>
                             <button
                                 type="button"
-                                className="btn btn-secondary"
+                                className="inline-flex items-center gap-2 py-2 px-5 rounded-lg font-body text-xs font-bold uppercase tracking-widest transition-all border-2 border-[var(--color-gold)] text-[var(--color-gold)] hover:bg-[var(--color-gold)] hover:text-white"
                                 onClick={addGroup}
                             >
-                                <Plus size={18} />
-                                Add Group
+                                <Plus size={16} />
+                                Add Selection Group
                             </button>
                         </div>
 
-                        <div className="groups-list">
+                        <div className="space-y-6">
                             {groups.length === 0 ? (
-                                <div className="empty-state">
-                                    <Box size={48} />
-                                    <p>No group added</p>
-                                    <small>Ex: "Drinks", "Pastries", "Sides"</small>
+                                <div className="flex flex-col items-center justify-center p-16 bg-[var(--theme-bg-secondary)]/50 rounded-2xl border-2 border-dashed border-[var(--theme-border)] text-[var(--theme-text-muted)] text-center">
+                                    <div className="w-16 h-16 rounded-full bg-[var(--theme-bg-tertiary)] flex items-center justify-center mb-6 opacity-30">
+                                        <Plus size={32} />
+                                    </div>
+                                    <h4 className="text-lg font-display font-semibold mb-2">Build Your First Collection</h4>
+                                    <p className="text-sm max-w-xs opacity-60">Add artisanal groups like "Morning Pastries" or "Select Beverage" to build your bundle.</p>
                                 </div>
                             ) : (
                                 groups.map((group, groupIndex) => (
-                                    <div key={groupIndex} className="group-card">
-                                        <div className="group-header">
+                                    <div key={groupIndex} className="bg-[var(--theme-bg-secondary)] rounded-2xl border border-[var(--theme-border)] overflow-hidden transition-all hover:border-[var(--color-gold-light)]/40 shadow-sm">
+                                        <div className="flex items-center gap-4 px-6 py-4 bg-[var(--theme-bg-tertiary)] border-b border-[var(--theme-border)]">
                                             <button
                                                 type="button"
-                                                className="group-expand"
+                                                className="text-[var(--theme-text-muted)] hover:text-[var(--color-gold)] transition-colors p-1"
                                                 onClick={() => toggleGroupExpanded(groupIndex)}
                                             >
-                                                {group.expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                                {group.expanded ? <ChevronUp size={22} strokeWidth={2.5} /> : <ChevronDown size={22} strokeWidth={2.5} />}
                                             </button>
                                             <input
                                                 type="text"
-                                                className="group-name-input"
+                                                className="flex-1 bg-transparent border-none text-[var(--theme-text-primary)] font-display font-bold text-lg outline-none placeholder:opacity-20"
                                                 value={group.group_name}
                                                 onChange={(e) => updateGroup(groupIndex, { group_name: e.target.value })}
-                                                placeholder="Group name (ex: Drinks)"
+                                                placeholder="Group Selection Name (e.g., Choice of Sourdough)"
                                             />
                                             <button
                                                 type="button"
-                                                className="btn-icon danger"
+                                                className="text-[var(--theme-text-muted)] hover:text-destructive transition-colors p-2 rounded-lg hover:bg-destructive/5"
                                                 onClick={() => removeGroup(groupIndex)}
-                                                title="Delete group"
+                                                title="Dissolve group"
                                             >
-                                                <Trash2 size={18} />
+                                                <Trash2 size={20} />
                                             </button>
                                         </div>
 
                                         {group.expanded && (
-                                            <div className="group-body">
-                                                <div className="group-settings">
-                                                    <div className="form-group">
-                                                        <label htmlFor={`group-type-${groupIndex}`}>Selection Type</label>
+                                            <div className="p-8 space-y-8">
+                                                <div className="bg-[var(--theme-bg-tertiary)]/50 rounded-xl p-6 border border-[var(--theme-border)] grid grid-cols-2 gap-8 md:grid-cols-1">
+                                                    <div className="space-y-4">
+                                                        <label htmlFor={`group-type-${groupIndex}`} className="text-[0.7rem] uppercase tracking-widest font-bold text-[var(--theme-text-muted)] block">Curation Type</label>
                                                         <select
                                                             id={`group-type-${groupIndex}`}
                                                             value={group.group_type}
+                                                            className="w-full px-4 py-3 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] outline-none focus:border-[var(--color-gold)]"
                                                             onChange={(e) => {
                                                                 const type = e.target.value as 'single' | 'multiple'
                                                                 updateGroup(groupIndex, {
@@ -605,146 +647,166 @@ export default function ComboFormPage() {
                                                                 })
                                                             }}
                                                         >
-                                                            <option value="single">Single choice (1 option)</option>
-                                                            <option value="multiple">Multiple choice</option>
+                                                            <option value="single">Single Choice (Artisanal Default)</option>
+                                                            <option value="multiple">Multiple Artisan Selections</option>
                                                         </select>
-                                                    </div>
-
-                                                    <div className="form-group">
-                                                        <label>
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={group.is_required}
-                                                                onChange={(e) => updateGroup(groupIndex, { is_required: e.target.checked })}
-                                                            />
-                                                            <span>Required</span>
+                                                        <label className="flex items-center gap-3 cursor-pointer mt-4">
+                                                            <div className={cn(
+                                                                "w-5 h-5 rounded border transition-all flex items-center justify-center",
+                                                                group.is_required ? "bg-[var(--color-gold)] border-[var(--color-gold)] text-white" : "bg-transparent border-[var(--theme-border)]"
+                                                            )}>
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="hidden"
+                                                                    checked={group.is_required}
+                                                                    onChange={(e) => updateGroup(groupIndex, { is_required: e.target.checked })}
+                                                                />
+                                                                {group.is_required && <Plus size={12} strokeWidth={4} />}
+                                                            </div>
+                                                            <span className="text-sm font-medium text-[var(--theme-text-secondary)]">Required Collection</span>
                                                         </label>
                                                     </div>
 
                                                     {group.group_type === 'multiple' && (
-                                                        <div className="form-row">
-                                                            <div className="form-group">
-                                                                <label htmlFor={`min-sel-${groupIndex}`}>Min selections</label>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div className="space-y-2">
+                                                                <label htmlFor={`min-sel-${groupIndex}`} className="text-[0.7rem] uppercase tracking-widest font-bold text-[var(--theme-text-muted)] block">Min Range</label>
                                                                 <input
                                                                     id={`min-sel-${groupIndex}`}
                                                                     type="number"
                                                                     value={group.min_selections}
                                                                     onChange={(e) => updateGroup(groupIndex, { min_selections: Number(e.target.value) })}
                                                                     min="0"
-                                                                    title="Minimum number of selections"
+                                                                    className="w-full px-4 py-3 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] outline-none focus:border-[var(--color-gold)]"
                                                                 />
                                                             </div>
-                                                            <div className="form-group">
-                                                                <label htmlFor={`max-sel-${groupIndex}`}>Max selections</label>
+                                                            <div className="space-y-2">
+                                                                <label htmlFor={`max-sel-${groupIndex}`} className="text-[0.7rem] uppercase tracking-widest font-bold text-[var(--theme-text-muted)] block">Max Range</label>
                                                                 <input
                                                                     id={`max-sel-${groupIndex}`}
                                                                     type="number"
                                                                     value={group.max_selections}
                                                                     onChange={(e) => updateGroup(groupIndex, { max_selections: Number(e.target.value) })}
                                                                     min="1"
-                                                                    title="Maximum number of selections"
+                                                                    className="w-full px-4 py-3 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] outline-none focus:border-[var(--color-gold)]"
                                                                 />
                                                             </div>
                                                         </div>
                                                     )}
                                                 </div>
 
-                                                <div className="group-items-header">
-                                                    <h4>Available Options</h4>
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-sm"
-                                                        onClick={() => setShowProductSearch(groupIndex)}
-                                                    >
-                                                        <Plus size={16} />
-                                                        Add
-                                                    </button>
-                                                </div>
-
-                                                {showProductSearch === groupIndex && (
-                                                    <div className="product-search">
-                                                        <div className="search-input">
-                                                            <Search size={18} />
-                                                            <input
-                                                                type="text"
-                                                                value={searchTerm}
-                                                                onChange={(e) => setSearchTerm(e.target.value)}
-                                                                placeholder="Search for a product..."
-                                                                autoFocus
-                                                            />
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => setShowProductSearch(null)}
-                                                                title="Close search"
-                                                                aria-label="Close search"
-                                                            >
-                                                                <X size={18} />
-                                                            </button>
-                                                        </div>
-                                                        <div className="product-list">
-                                                            {filteredProducts.map(product => (
-                                                                <div
-                                                                    key={product.id}
-                                                                    className="product-item"
-                                                                    onClick={() => addProductToGroup(groupIndex, product)}
-                                                                >
-                                                                    <span className="product-name">{product.name}</span>
-                                                                    <span className="product-price">
-                                                                        {new Intl.NumberFormat('id-ID').format(product.retail_price || 0)} IDR
-                                                                    </span>
-                                                                </div>
-                                                            ))}
-                                                        </div>
+                                                <div className="space-y-6">
+                                                    <div className="flex justify-between items-center">
+                                                        <h4 className="font-display font-bold text-sm tracking-wide text-[var(--theme-text-primary)] m-0">Avaliable Curation Options</h4>
+                                                        <button
+                                                            type="button"
+                                                            className="text-[var(--color-gold)] text-xs font-bold uppercase tracking-widest flex items-center gap-1.5 hover:underline"
+                                                            onClick={() => setShowProductSearch(groupIndex)}
+                                                        >
+                                                            <Search size={14} /> Add Product
+                                                        </button>
                                                     </div>
-                                                )}
 
-                                                <div className="group-items-list">
-                                                    {group.items.length === 0 ? (
-                                                        <div className="empty-items">
-                                                            <small>No option added</small>
-                                                        </div>
-                                                    ) : (
-                                                        group.items.map((item, itemIndex) => (
-                                                            <div key={itemIndex} className="group-item">
-                                                                <div className="item-info">
-                                                                    <span className="item-name">
-                                                                        {item.product?.name}
-                                                                        {item.is_default && <span className="default-badge">Default</span>}
-                                                                    </span>
-                                                                    <div className="item-controls">
-                                                                        <div className="price-adjustment">
-                                                                            <label>Surcharge:</label>
-                                                                            <input
-                                                                                type="number"
-                                                                                value={item.price_adjustment}
-                                                                                onChange={(e) => updateGroupItem(groupIndex, itemIndex, { price_adjustment: Number(e.target.value) })}
-                                                                                step="1000"
-                                                                                placeholder="0"
-                                                                            />
-                                                                            <span>IDR</span>
+                                                    {showProductSearch === groupIndex && (
+                                                        <div className="bg-[var(--theme-bg-tertiary)] border border-[var(--color-gold)]/30 rounded-xl overflow-hidden shadow-2xl animate-in fade-in slide-in-from-top-4 duration-300">
+                                                            <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--theme-border)]">
+                                                                <Search size={18} className="text-[var(--color-gold)] opacity-50" />
+                                                                <input
+                                                                    type="text"
+                                                                    value={searchTerm}
+                                                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                                                    placeholder="Search artisan catalog..."
+                                                                    autoFocus
+                                                                    className="flex-1 bg-transparent border-none text-[var(--theme-text-primary)] outline-none placeholder:opacity-20"
+                                                                />
+                                                                <button
+                                                                    type="button"
+                                                                    className="p-1 hover:bg-[var(--theme-bg-secondary)] rounded-md transition-colors"
+                                                                    onClick={() => setShowProductSearch(null)}
+                                                                >
+                                                                    <X size={18} />
+                                                                </button>
+                                                            </div>
+                                                            <div className="max-h-64 overflow-y-auto p-2 scrollbar-thin">
+                                                                {filteredProducts.map(product => (
+                                                                    <div
+                                                                        key={product.id}
+                                                                        className="flex justify-between items-center p-3 rounded-lg hover:bg-[var(--color-gold)]/10 cursor-pointer group transition-colors"
+                                                                        onClick={() => addProductToGroup(groupIndex, product)}
+                                                                    >
+                                                                        <div className="flex flex-col">
+                                                                            <span className="font-semibold text-sm text-[var(--theme-text-primary)] group-hover:text-[var(--color-gold)]">{product.name}</span>
+                                                                            <span className="text-[0.65rem] opacity-40 uppercase tracking-tighter">SKU: {product.sku || 'N/A'}</span>
                                                                         </div>
-                                                                        <button
-                                                                            type="button"
-                                                                            className="btn-sm"
-                                                                            onClick={() => setAsDefault(groupIndex, itemIndex)}
-                                                                            disabled={item.is_default}
-                                                                        >
-                                                                            Default
-                                                                        </button>
-                                                                        <button
-                                                                            type="button"
-                                                                            className="btn-icon danger"
-                                                                            onClick={() => removeProductFromGroup(groupIndex, itemIndex)}
-                                                                            title="Remove this product"
-                                                                            aria-label="Remove this product"
-                                                                        >
-                                                                            <X size={16} />
-                                                                        </button>
+                                                                        <span className="text-xs font-bold text-[var(--theme-text-secondary)]">{formatCurrency(product.retail_price || 0)}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="space-y-4">
+                                                        {group.items.length === 0 ? (
+                                                            <div className="py-10 text-center opacity-30 italic text-sm">No artisan options revealed in this group.</div>
+                                                        ) : (
+                                                            group.items.map((item, itemIndex) => (
+                                                                <div key={itemIndex} className="bg-[var(--theme-bg-tertiary)] p-5 rounded-xl border border-[var(--theme-border)] flex flex-wrap items-center justify-between gap-6 hover:border-[var(--theme-border-strong)] transition-all">
+                                                                    <div className="flex items-center gap-4 flex-1">
+                                                                        <div className="w-10 h-10 rounded-lg bg-[var(--theme-bg-secondary)] flex items-center justify-center text-[var(--color-gold)] shadow-inner">
+                                                                            <Package size={20} />
+                                                                        </div>
+                                                                        <div className="flex flex-col">
+                                                                            <div className="flex items-center gap-3">
+                                                                                <span className="font-semibold text-[var(--theme-text-primary)]">{item.product?.name}</span>
+                                                                                {item.is_default && (
+                                                                                    <span className="px-2 py-0.5 rounded bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 text-[var(--color-gold)] text-[0.6rem] font-black uppercase tracking-widest">Master Default</span>
+                                                                                )}
+                                                                            </div>
+                                                                            <span className="text-[0.7rem] text-[var(--theme-text-muted)] opacity-60">Base value: {formatCurrency(item.product?.retail_price || 0)}</span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="flex items-center gap-6">
+                                                                        <div className="flex flex-col gap-1.5">
+                                                                            <span className="text-[0.6rem] uppercase tracking-widest font-black text-[var(--theme-text-muted)]">Premium Surcharge</span>
+                                                                            <div className="relative">
+                                                                                <input
+                                                                                    type="number"
+                                                                                    value={item.price_adjustment}
+                                                                                    onChange={(e) => updateGroupItem(groupIndex, itemIndex, { price_adjustment: Number(e.target.value) })}
+                                                                                    step="500"
+                                                                                    className="w-24 px-3 py-1.5 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-lg text-xs font-bold text-[var(--theme-text-primary)] focus:border-[var(--color-gold)] outline-none"
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className="flex items-center gap-2">
+                                                                            <button
+                                                                                type="button"
+                                                                                className={cn(
+                                                                                    "px-3 py-1.5 rounded-lg text-[0.65rem] font-black uppercase tracking-widest transition-all",
+                                                                                    item.is_default
+                                                                                        ? "bg-[var(--color-gold)] text-white shadow-[0_2px_8px_rgba(201,165,92,0.3)]"
+                                                                                        : "bg-[var(--theme-bg-secondary)] text-[var(--theme-text-muted)] hover:text-[var(--color-gold)] border border-[var(--theme-border)]"
+                                                                                )}
+                                                                                onClick={() => setAsDefault(groupIndex, itemIndex)}
+                                                                                disabled={item.is_default}
+                                                                            >
+                                                                                {item.is_default ? 'Default' : 'Set Default'}
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                className="p-2 text-[var(--theme-text-muted)] hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all"
+                                                                                onClick={() => removeProductFromGroup(groupIndex, itemIndex)}
+                                                                            >
+                                                                                <X size={18} />
+                                                                            </button>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        ))
-                                                    )}
+                                                            ))
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}
@@ -755,10 +817,10 @@ export default function ComboFormPage() {
                     </div>
                 </div>
 
-                <div className="form-actions">
+                <div className="flex justify-end gap-5 pt-8 border-t border-[var(--theme-border)] sticky bottom-0 bg-[var(--theme-bg-primary)]/80 backdrop-blur-md pb-8 z-40">
                     <button
                         type="button"
-                        className="btn btn-secondary"
+                        className="py-3 px-10 rounded-xl font-body text-sm font-semibold border-2 border-[var(--theme-border)] bg-transparent text-[var(--theme-text-primary)] transition-all hover:bg-[var(--theme-bg-tertiary)] active:scale-[0.98]"
                         onClick={() => navigate('/products/combos')}
                         disabled={saving}
                     >
@@ -766,18 +828,18 @@ export default function ComboFormPage() {
                     </button>
                     <button
                         type="submit"
-                        className="btn btn-primary"
+                        className="inline-flex items-center justify-center gap-3 py-3 px-14 rounded-xl font-body text-sm font-bold border-2 border-transparent transition-all duration-[300ms] bg-gradient-to-b from-[var(--color-gold)] to-[var(--color-gold-dark)] text-white shadow-[0_10px_30px_rgba(201,165,92,0.3)] hover:-translate-y-1 hover:shadow-[0_15px_40px_rgba(201,165,92,0.4)] disabled:opacity-50 active:scale-[0.98]"
                         disabled={saving}
                     >
                         {saving ? (
                             <>
-                                <div className="spinner-small"></div>
-                                Saving...
+                                <div className="w-5 h-5 border-3 border-white/20 border-t-white rounded-full animate-spin" />
+                                <span>Curating...</span>
                             </>
                         ) : (
                             <>
-                                <Save size={18} />
-                                {isEditing ? 'Update' : 'Create Combo'}
+                                <Save size={20} />
+                                <span>{isEditing ? 'Commit Update' : 'Initialize Combo'}</span>
                             </>
                         )}
                     </button>
@@ -786,5 +848,3 @@ export default function ComboFormPage() {
         </div>
     )
 }
-
-import { logError } from '@/utils/logger'

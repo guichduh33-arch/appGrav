@@ -197,17 +197,16 @@ export default function ProductsPage() {
             default: return ''
         }
     }
-
     return (
         <div className="p-8 max-w-[1600px] mx-auto md:p-4">
             {/* Header */}
             <header className="flex justify-between items-start mb-8 gap-4 flex-wrap md:flex-col">
                 <div className="flex-1">
-                    <h1 className="flex items-center gap-3 font-display text-[2rem] font-semibold text-charcoal m-0 mb-1 md:text-2xl [&>svg]:text-gold">
+                    <h1 className="flex items-center gap-3 font-display text-[2rem] font-semibold text-[var(--theme-text-primary)] m-0 mb-1 md:text-2xl [&>svg]:text-[var(--color-gold)]">
                         <Package size={28} />
                         Product Management
                     </h1>
-                    <p className="font-display italic text-stone text-base m-0">
+                    <p className="font-display italic text-[var(--theme-text-secondary)] text-base m-0">
                         Manage your products, prices and customer category pricing
                     </p>
                 </div>
@@ -284,15 +283,15 @@ export default function ProductsPage() {
                     <div
                         key={stat.tab}
                         className={cn(
-                            'flex items-center gap-4 p-5 bg-flour rounded-lg border border-parchment cursor-pointer transition-all duration-[250ms] shadow-sm hover:border-gold-light hover:-translate-y-0.5 hover:shadow-md md:p-4 [&>svg]:text-gold [&>svg]:shrink-0',
-                            activeTab === stat.tab && 'border-gold bg-gradient-to-br from-[rgba(201,165,92,0.08)] to-flour shadow-[0_0_0_2px_rgba(201,165,92,0.2)]'
+                            'flex items-center gap-4 p-5 bg-[var(--theme-bg-secondary)] rounded-lg border border-[var(--theme-border)] cursor-pointer transition-all duration-[250ms] shadow-sm hover:border-[var(--color-gold-light)] hover:-translate-y-0.5 hover:shadow-md md:p-4 [&>svg]:text-[var(--color-gold)] [&>svg]:shrink-0',
+                            activeTab === stat.tab && 'border-[var(--color-gold)] bg-gradient-to-br from-[rgba(201,165,92,0.12)] to-[var(--theme-bg-secondary)] shadow-[0_0_0_2px_rgba(201,165,92,0.3)]'
                         )}
                         onClick={() => setActiveTab(stat.tab)}
                     >
                         {stat.icon}
                         <div className="flex flex-col">
-                            <span className="font-display text-[1.75rem] font-bold text-charcoal md:text-2xl">{stat.value}</span>
-                            <span className="font-body text-xs text-stone uppercase tracking-[0.05em]">{stat.label}</span>
+                            <span className="font-display text-[1.75rem] font-bold text-[var(--theme-text-primary)] md:text-2xl">{stat.value}</span>
+                            <span className="font-body text-xs text-[var(--theme-text-secondary)] uppercase tracking-[0.05em]">{stat.label}</span>
                         </div>
                     </div>
                 ))}
@@ -300,20 +299,20 @@ export default function ProductsPage() {
 
             {/* Filters */}
             <div className="flex gap-4 mb-6 items-center flex-wrap md:flex-col">
-                <div className="flex-1 min-w-[280px] flex items-center gap-3 px-4 bg-flour border-[1.5px] border-parchment rounded-lg transition-all duration-200 focus-within:border-gold focus-within:shadow-[0_0_0_3px_rgba(201,165,92,0.15)] [&>svg]:text-stone [&>svg]:shrink-0 md:w-full md:min-w-0">
+                <div className="flex-1 min-w-[280px] flex items-center gap-3 px-4 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-lg transition-all duration-200 focus-within:border-[var(--color-gold)] focus-within:shadow-[0_0_0_3px_rgba(201,165,92,0.15)] [&>svg]:text-[var(--theme-text-secondary)] [&>svg]:shrink-0 md:w-full md:min-w-0">
                     <Search size={20} />
                     <input
                         type="text"
                         placeholder="Search by name or SKU..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="flex-1 border-none py-3.5 font-body text-sm bg-transparent text-charcoal outline-none placeholder:text-stone placeholder:opacity-70"
+                        className="flex-1 border-none py-3.5 font-body text-sm bg-transparent text-[var(--theme-text-primary)] outline-none placeholder:text-[var(--theme-text-muted)] placeholder:opacity-70"
                     />
                 </div>
                 <select
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="py-3.5 px-4 border-[1.5px] border-parchment rounded-lg bg-flour font-body text-sm text-charcoal min-w-[180px] cursor-pointer transition-all duration-200 appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2716%27%20height=%2716%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%236b6358%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpolyline%20points=%276%209%2012%2015%2018%209%27%3E%3C/polyline%3E%3C/svg%3E')] bg-no-repeat bg-[right_1rem_center] pr-10 focus:outline-none focus:border-gold focus:shadow-[0_0_0_3px_rgba(201,165,92,0.15)] md:w-full md:min-w-0"
+                    className="py-3.5 px-4 border border-[var(--theme-border)] rounded-lg bg-[var(--theme-bg-secondary)] font-body text-sm text-[var(--theme-text-primary)] min-w-[180px] cursor-pointer transition-all duration-200 appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2716%27%20height=%2716%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%239CA3AF%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpolyline%20points=%276%209%2012%2015%2018%209%27%3E%3C/polyline%3E%3C/svg%3E')] bg-no-repeat bg-[right_1rem_center] pr-10 focus:outline-none focus:border-[var(--color-gold)] focus:shadow-[0_0_0_3px_rgba(201,165,92,0.15)] md:w-full md:min-w-0"
                     aria-label="Filter by category"
                 >
                     <option value="all">All categories</option>
@@ -321,11 +320,11 @@ export default function ProductsPage() {
                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                     ))}
                 </select>
-                <div className="flex bg-kraft rounded-md p-1 border border-parchment">
+                <div className="flex bg-[var(--theme-bg-secondary)] rounded-md p-1 border border-[var(--theme-border)]">
                     <button
                         className={cn(
-                            'py-2 px-2.5 border-none bg-transparent rounded-sm cursor-pointer text-stone transition-all duration-200 flex items-center justify-center hover:text-charcoal',
-                            viewMode === 'grid' && 'bg-flour text-gold shadow-sm'
+                            'py-2 px-2.5 border-none bg-transparent rounded-sm cursor-pointer text-[var(--theme-text-secondary)] transition-all duration-200 flex items-center justify-center hover:text-[var(--theme-text-primary)]',
+                            viewMode === 'grid' && 'bg-[var(--theme-bg-tertiary)] text-[var(--color-gold)] shadow-sm'
                         )}
                         onClick={() => setViewMode('grid')}
                         title="Grid view"
@@ -335,8 +334,8 @@ export default function ProductsPage() {
                     </button>
                     <button
                         className={cn(
-                            'py-2 px-2.5 border-none bg-transparent rounded-sm cursor-pointer text-stone transition-all duration-200 flex items-center justify-center hover:text-charcoal',
-                            viewMode === 'list' && 'bg-flour text-gold shadow-sm'
+                            'py-2 px-2.5 border-none bg-transparent rounded-sm cursor-pointer text-[var(--theme-text-secondary)] transition-all duration-200 flex items-center justify-center hover:text-[var(--theme-text-primary)]',
+                            viewMode === 'list' && 'bg-[var(--theme-bg-tertiary)] text-[var(--color-gold)] shadow-sm'
                         )}
                         onClick={() => setViewMode('list')}
                         title="List view"
@@ -349,14 +348,14 @@ export default function ProductsPage() {
 
             {/* Products List */}
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-16 px-8 bg-flour rounded-xl border-2 border-dashed border-parchment text-stone gap-4">
-                    <div className="w-10 h-10 border-[3px] border-parchment border-t-gold rounded-full animate-spin" />
+                <div className="flex flex-col items-center justify-center py-16 px-8 bg-[var(--theme-bg-secondary)] rounded-xl border-2 border-dashed border-[var(--theme-border)] text-[var(--theme-text-secondary)] gap-4">
+                    <div className="w-10 h-10 border-[3px] border-[var(--theme-border)] border-t-[var(--color-gold)] rounded-full animate-spin" />
                     <span>Loading products...</span>
                 </div>
             ) : filteredProducts.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 px-8 bg-flour rounded-xl border-2 border-dashed border-parchment text-stone gap-4">
+                <div className="flex flex-col items-center justify-center py-16 px-8 bg-[var(--theme-bg-secondary)] rounded-xl border-2 border-dashed border-[var(--theme-border)] text-[var(--theme-text-secondary)] gap-4">
                     <Package size={64} />
-                    <h3 className="m-0 font-display text-smoke">No product found</h3>
+                    <h3 className="m-0 font-display text-[var(--theme-text-primary)]">No product found</h3>
                     <p className="m-0 font-body">
                         {searchTerm || categoryFilter !== 'all'
                             ? 'Try modifying your filters'
@@ -369,16 +368,16 @@ export default function ProductsPage() {
                         <div
                             key={product.id}
                             className={cn(
-                                'bg-flour rounded-lg border border-parchment overflow-hidden cursor-pointer transition-all duration-[250ms] relative shadow-sm hover:-translate-y-1 hover:shadow-lg hover:border-gold-light group',
+                                'bg-[var(--theme-bg-secondary)] rounded-lg border border-[var(--theme-border)] overflow-hidden cursor-pointer transition-all duration-[250ms] relative shadow-sm hover:-translate-y-1 hover:shadow-lg hover:border-[var(--color-gold-light)] group',
                                 !product.is_active && 'opacity-60'
                             )}
                             onClick={() => navigate(`/products/${product.id}`)}
                         >
-                            <div className="h-[140px] bg-gradient-to-br from-kraft to-parchment relative flex items-center justify-center">
+                            <div className="h-[140px] bg-gradient-to-br from-[var(--theme-bg-tertiary)] to-[var(--theme-bg-secondary)] relative flex items-center justify-center">
                                 {product.image_url ? (
                                     <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="text-stone [&>svg]:w-12 [&>svg]:h-12">
+                                    <div className="text-[var(--theme-text-muted)] [&>svg]:w-12 [&>svg]:h-12">
                                         {getProductTypeIcon(product.product_type)}
                                     </div>
                                 )}
@@ -391,8 +390,8 @@ export default function ProductsPage() {
                                 </span>
                             </div>
                             <div className="p-4">
-                                <h3 className="m-0 mb-1 font-display text-[1.1rem] font-semibold text-charcoal whitespace-nowrap overflow-hidden text-ellipsis">{product.name}</h3>
-                                <span className="block font-mono text-[0.7rem] text-stone mb-2">{product.sku}</span>
+                                <h3 className="m-0 mb-1 font-display text-[1.1rem] font-semibold text-[var(--theme-text-primary)] whitespace-nowrap overflow-hidden text-ellipsis">{product.name}</h3>
+                                <span className="block font-mono text-[0.7rem] text-[var(--theme-text-secondary)] mb-2">{product.sku}</span>
                                 {product.category && (
                                     <span
                                         className="inline-flex items-center gap-1 py-0.5 px-2 rounded-sm font-body text-[0.7rem] text-white mb-3"
@@ -404,18 +403,18 @@ export default function ProductsPage() {
                                 )}
                                 <div className="flex gap-4 mt-2">
                                     <div className="flex flex-col">
-                                        <span className="font-body text-[0.6rem] text-stone uppercase tracking-[0.05em]">Retail</span>
-                                        <span className="font-mono text-[0.95rem] font-semibold text-charcoal">{formatCurrency(product.retail_price)}</span>
+                                        <span className="font-body text-[0.6rem] text-[var(--theme-text-secondary)] uppercase tracking-[0.05em]">Retail</span>
+                                        <span className="font-mono text-[0.95rem] font-semibold text-[var(--theme-text-primary)]">{formatCurrency(product.retail_price)}</span>
                                     </div>
                                     {product.wholesale_price && (
                                         <div className="flex flex-col">
-                                            <span className="font-body text-[0.6rem] text-stone uppercase tracking-[0.05em]">Wholesale</span>
-                                            <span className="font-mono text-[0.95rem] font-semibold text-charcoal">{formatCurrency(product.wholesale_price)}</span>
+                                            <span className="font-body text-[0.6rem] text-[var(--theme-text-secondary)] uppercase tracking-[0.05em]">Wholesale</span>
+                                            <span className="font-mono text-[0.95rem] font-semibold text-[var(--theme-text-primary)]">{formatCurrency(product.wholesale_price)}</span>
                                         </div>
                                     )}
                                 </div>
                             </div>
-                            <div className="flex gap-2 py-3 px-4 bg-kraft border-t border-parchment">
+                            <div className="flex gap-2 py-3 px-4 bg-[var(--theme-bg-tertiary)] border-t border-[var(--theme-border)]">
                                 <span className={cn(
                                     'py-0.5 px-2 rounded-sm font-body text-[0.7rem] font-semibold',
                                     product.is_active ? 'bg-success-bg text-success-text' : 'bg-danger-bg text-danger-text'
@@ -423,7 +422,7 @@ export default function ProductsPage() {
                                     {product.is_active ? 'Active' : 'Inactive'}
                                 </span>
                                 <span className={cn(
-                                    'py-0.5 px-2 rounded-sm font-body text-[0.7rem] font-medium bg-kraft text-stone',
+                                    'py-0.5 px-2 rounded-sm font-body text-[0.7rem] font-medium bg-[var(--theme-bg-tertiary)] text-[var(--theme-text-secondary)]',
                                     product.pos_visible && 'bg-info-bg text-info-text'
                                 )}>
                                     {product.pos_visible ? 'POS' : 'Hidden'}
@@ -431,7 +430,7 @@ export default function ProductsPage() {
                             </div>
                             <div className="absolute top-2.5 right-2.5 flex gap-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                                 <button
-                                    className="w-[34px] h-[34px] p-0 rounded-md bg-flour border border-parchment text-smoke cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-gold hover:border-gold hover:text-white"
+                                    className="w-[34px] h-[34px] p-0 rounded-md bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] text-[var(--theme-text-secondary)] cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-[var(--color-gold)] hover:border-[var(--color-gold)] hover:text-white"
                                     onClick={(e) => {
                                         e.stopPropagation()
                                         navigate(`/products/${product.id}`)
@@ -442,7 +441,7 @@ export default function ProductsPage() {
                                     <Eye size={16} />
                                 </button>
                                 <button
-                                    className="w-[34px] h-[34px] p-0 rounded-md bg-flour border border-parchment text-smoke cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-gold hover:border-gold hover:text-white"
+                                    className="w-[34px] h-[34px] p-0 rounded-md bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] text-[var(--theme-text-secondary)] cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-[var(--color-gold)] hover:border-[var(--color-gold)] hover:text-white"
                                     onClick={(e) => {
                                         e.stopPropagation()
                                         navigate(`/products/${product.id}/edit`)
@@ -453,7 +452,7 @@ export default function ProductsPage() {
                                     <Edit size={16} />
                                 </button>
                                 <button
-                                    className="w-[34px] h-[34px] p-0 rounded-md bg-flour border border-parchment text-smoke cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-gold hover:border-gold hover:text-white"
+                                    className="w-[34px] h-[34px] p-0 rounded-md bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] text-[var(--theme-text-secondary)] cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-[var(--color-gold)] hover:border-[var(--color-gold)] hover:text-white"
                                     onClick={(e) => {
                                         e.stopPropagation()
                                         navigate(`/products/${product.id}/pricing`)
@@ -468,18 +467,18 @@ export default function ProductsPage() {
                     ))}
                 </div>
             ) : (
-                <div className="bg-flour rounded-lg border border-parchment overflow-hidden shadow-sm">
+                <div className="bg-[var(--theme-bg-secondary)] rounded-lg border border-[var(--theme-border)] overflow-hidden shadow-sm">
                     <table className="w-full border-collapse">
                         <thead>
                             <tr>
-                                <th className="text-left p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">Product</th>
-                                <th className="text-left p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">SKU</th>
-                                <th className="text-left p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">Type</th>
-                                <th className="text-left p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">Category</th>
-                                <th className="text-right p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">Retail Price</th>
-                                <th className="text-right p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">Wholesale Price</th>
-                                <th className="text-left p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">Status</th>
-                                <th className="text-left p-4 bg-kraft font-body text-[0.7rem] font-bold text-stone uppercase tracking-[0.05em] border-b-2 border-parchment">Actions</th>
+                                <th className="text-left p-4 bg-[var(--theme-bg-tertiary)] font-body text-[0.7rem] font-bold text-[var(--theme-text-secondary)] uppercase tracking-[0.05em] border-b-2 border-[var(--theme-border)]">Product</th>
+                                <th className="text-left p-4 bg-[var(--theme-bg-tertiary)] font-body text-[0.7rem] font-bold text-[var(--theme-text-secondary)] uppercase tracking-[0.05em] border-b-2 border-[var(--theme-border)]">SKU</th>
+                                <th className="text-left p-4 bg-[var(--theme-bg-tertiary)] font-body text-[0.7rem] font-bold text-[var(--theme-text-secondary)] uppercase tracking-[0.05em] border-b-2 border-[var(--theme-border)]">Type</th>
+                                <th className="text-left p-4 bg-[var(--theme-bg-tertiary)] font-body text-[0.7rem] font-bold text-[var(--theme-text-secondary)] uppercase tracking-[0.05em] border-b-2 border-[var(--theme-border)]">Category</th>
+                                <th className="text-right p-4 bg-[var(--theme-bg-tertiary)] font-body text-[0.7rem] font-bold text-[var(--theme-text-secondary)] uppercase tracking-[0.05em] border-b-2 border-[var(--theme-border)]">Retail Price</th>
+                                <th className="text-right p-4 bg-[var(--theme-bg-tertiary)] font-body text-[0.7rem] font-bold text-[var(--theme-text-secondary)] uppercase tracking-[0.05em] border-b-2 border-[var(--theme-border)]">Wholesale Price</th>
+                                <th className="text-left p-4 bg-[var(--theme-bg-tertiary)] font-body text-[0.7rem] font-bold text-[var(--theme-text-secondary)] uppercase tracking-[0.05em] border-b-2 border-[var(--theme-border)]">Status</th>
+                                <th className="text-left p-4 bg-[var(--theme-bg-tertiary)] font-body text-[0.7rem] font-bold text-[var(--theme-text-secondary)] uppercase tracking-[0.05em] border-b-2 border-[var(--theme-border)]">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -487,16 +486,16 @@ export default function ProductsPage() {
                                 <tr
                                     key={product.id}
                                     className={cn(
-                                        'cursor-pointer transition-colors duration-200 hover:bg-kraft',
+                                        'cursor-pointer transition-colors duration-200 hover:bg-[var(--theme-bg-tertiary)]',
                                         !product.is_active && 'opacity-50'
                                     )}
                                     onClick={() => navigate(`/products/${product.id}`)}
                                 >
-                                    <td className="py-3.5 px-4 font-body border-b border-kraft text-sm text-espresso">
-                                        <span className="font-display font-semibold text-charcoal">{product.name}</span>
+                                    <td className="py-3.5 px-4 font-body border-b border-[var(--theme-border)] text-sm">
+                                        <span className="font-display font-semibold text-[var(--theme-text-primary)]">{product.name}</span>
                                     </td>
-                                    <td className="py-3.5 px-4 font-mono text-stone text-xs border-b border-kraft">{product.sku}</td>
-                                    <td className="py-3.5 px-4 font-body border-b border-kraft text-sm text-espresso">
+                                    <td className="py-3.5 px-4 font-mono text-[var(--theme-text-secondary)] text-xs border-b border-[var(--theme-border)]">{product.sku}</td>
+                                    <td className="py-3.5 px-4 font-body border-b border-[var(--theme-border)] text-sm">
                                         <span className={cn(
                                             'inline-flex items-center gap-1 py-1 px-2.5 rounded-md font-body text-[0.7rem] font-semibold',
                                             getTypeBadgeClasses(product.product_type)
@@ -505,7 +504,7 @@ export default function ProductsPage() {
                                             {getProductTypeLabel(product.product_type)}
                                         </span>
                                     </td>
-                                    <td className="py-3.5 px-4 font-body border-b border-kraft text-sm text-espresso">
+                                    <td className="py-3.5 px-4 font-body border-b border-[var(--theme-border)] text-sm">
                                         {product.category && (
                                             <span
                                                 className="inline-block py-0.5 px-2 rounded-sm font-body text-[0.7rem] text-white"
@@ -515,13 +514,13 @@ export default function ProductsPage() {
                                             </span>
                                         )}
                                     </td>
-                                    <td className="text-right py-3.5 px-4 font-mono font-medium text-charcoal border-b border-kraft">
+                                    <td className="text-right py-3.5 px-4 font-mono font-medium text-[var(--theme-text-primary)] border-b border-[var(--theme-border)]">
                                         {formatCurrency(product.retail_price)}
                                     </td>
-                                    <td className="text-right py-3.5 px-4 font-mono font-medium text-charcoal border-b border-kraft">
+                                    <td className="text-right py-3.5 px-4 font-mono font-medium text-[var(--theme-text-primary)] border-b border-[var(--theme-border)]">
                                         {product.wholesale_price ? formatCurrency(product.wholesale_price) : '-'}
                                     </td>
-                                    <td className="py-3.5 px-4 font-body border-b border-kraft text-sm text-espresso">
+                                    <td className="py-3.5 px-4 font-body border-b border-[var(--theme-border)] text-sm">
                                         <span className={cn(
                                             'py-0.5 px-2 rounded-sm font-body text-[0.7rem] font-semibold',
                                             product.is_active ? 'bg-success-bg text-success-text' : 'bg-danger-bg text-danger-text'
@@ -529,10 +528,10 @@ export default function ProductsPage() {
                                             {product.is_active ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
-                                    <td className="py-3.5 px-4 font-body border-b border-kraft text-sm text-espresso">
+                                    <td className="py-3.5 px-4 font-body border-b border-[var(--theme-border)] text-sm">
                                         <div className="flex gap-1.5">
                                             <button
-                                                className="w-[34px] h-[34px] p-0 rounded-md bg-flour border border-parchment text-smoke cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-gold hover:border-gold hover:text-white"
+                                                className="w-[34px] h-[34px] p-0 rounded-md bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] text-[var(--theme-text-secondary)] cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-[var(--color-gold)] hover:border-[var(--color-gold)] hover:text-white"
                                                 onClick={(e) => {
                                                     e.stopPropagation()
                                                     navigate(`/products/${product.id}`)
@@ -543,7 +542,7 @@ export default function ProductsPage() {
                                                 <Eye size={16} />
                                             </button>
                                             <button
-                                                className="w-[34px] h-[34px] p-0 rounded-md bg-flour border border-parchment text-smoke cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-gold hover:border-gold hover:text-white"
+                                                className="w-[34px] h-[34px] p-0 rounded-md bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] text-[var(--theme-text-secondary)] cursor-pointer flex items-center justify-center transition-all duration-200 shadow-sm hover:bg-[var(--color-gold)] hover:border-[var(--color-gold)] hover:text-white"
                                                 onClick={(e) => {
                                                     e.stopPropagation()
                                                     navigate(`/products/${product.id}/pricing`)

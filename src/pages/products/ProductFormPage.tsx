@@ -272,62 +272,73 @@ export default function ProductFormPage() {
     }
 
     return (
-        <div className="p-5 max-w-[900px] mx-auto max-md:p-4">
-            <header className="flex items-center gap-4 mb-6">
-                <button className="btn btn-ghost" onClick={() => navigate('/products')}>
+        <div className="p-8 max-w-[900px] mx-auto max-md:p-4">
+            <header className="flex items-center gap-4 mb-8">
+                <button
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] text-[var(--theme-text-secondary)] transition-all hover:bg-[var(--theme-bg-tertiary)] hover:text-[var(--color-gold)] shadow-sm"
+                    onClick={() => navigate('/products')}
+                >
                     <ArrowLeft size={20} />
                 </button>
-                <h1 className="text-2xl font-semibold m-0">{isEditing ? 'Edit Product' : 'New Product'}</h1>
+                <h1 className="font-display text-3xl font-semibold text-[var(--theme-text-primary)] m-0">{isEditing ? 'Edit Product' : 'New Product'}</h1>
             </header>
 
             <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
                 {/* Basic Info Section */}
-                <section className="bg-white rounded-xl p-5 shadow-sm">
-                    <h2 className="flex items-center gap-2 text-base font-semibold m-0 mb-4 pb-3 border-b border-gray-200 text-gray-700">
-                        <Package size={20} /> Basic information
+                <section className="bg-[var(--theme-bg-secondary)] rounded-xl p-6 border border-[var(--theme-border)] shadow-sm">
+                    <h2 className="flex items-center gap-2 font-display text-lg font-semibold m-0 mb-6 pb-4 border-b border-[var(--theme-border)] text-[var(--theme-text-primary)]">
+                        <Package size={20} className="text-[var(--color-gold)]" /> Basic information
                     </h2>
 
-                    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 max-md:grid-cols-1">
-                        <div className="form-group">
-                            <label>SKU *</label>
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 max-md:grid-cols-1">
+                        <div className="flex flex-col gap-1.5">
+                            <label className="font-body text-xs font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">SKU *</label>
                             <input
                                 type="text"
                                 value={form.sku}
                                 onChange={e => setForm({ ...form, sku: e.target.value.toUpperCase() })}
                                 placeholder="PRD-0001"
-                                className={cn(errors.sku && 'border-destructive')}
+                                className={cn(
+                                    "py-3 px-4 rounded-lg bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)] focus:shadow-[0_0_0_3px_rgba(201,165,92,0.15)]",
+                                    errors.sku && 'border-destructive'
+                                )}
                             />
-                            {errors.sku && <span className="text-destructive text-xs">{errors.sku}</span>}
+                            {errors.sku && <span className="text-destructive text-xs mt-1">{errors.sku}</span>}
                         </div>
-                        <div className="form-group">
-                            <label>Name *</label>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="font-body text-xs font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">Name *</label>
                             <input
                                 type="text"
                                 value={form.name}
                                 onChange={e => setForm({ ...form, name: e.target.value })}
                                 placeholder="Product name"
-                                className={cn(errors.name && 'border-destructive')}
+                                className={cn(
+                                    "py-3 px-4 rounded-lg bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)] focus:shadow-[0_0_0_3px_rgba(201,165,92,0.15)]",
+                                    errors.name && 'border-destructive'
+                                )}
                             />
-                            {errors.name && <span className="text-destructive text-xs">{errors.name}</span>}
+                            {errors.name && <span className="text-destructive text-xs mt-1">{errors.name}</span>}
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label>Description</label>
+                    <div className="flex flex-col gap-1.5 mt-5">
+                        <label className="font-body text-xs font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">Description</label>
                         <textarea
                             value={form.description}
                             onChange={e => setForm({ ...form, description: e.target.value })}
                             placeholder="Product description..."
                             rows={3}
+                            className="py-3 px-4 rounded-lg bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)] focus:shadow-[0_0_0_3px_rgba(201,165,92,0.15)] resize-none"
                         />
                     </div>
 
-                    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 max-md:grid-cols-1">
-                        <div className="form-group">
-                            <label>Category</label>
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 mt-5 max-md:grid-cols-1">
+                        <div className="flex flex-col gap-1.5">
+                            <label className="font-body text-xs font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">Category</label>
                             <select
                                 value={form.category_id}
                                 onChange={e => setForm({ ...form, category_id: e.target.value })}
+                                className="py-3 px-4 rounded-lg bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)] appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2716%27%20height=%2716%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%239CA3AF%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpolyline%20points=%276%209%2012%2015%2018%209%27%3E%3C/polyline%3E%3C/svg%3E')] bg-no-repeat bg-[right_1rem_center] pr-10"
                             >
                                 <option value="">No category</option>
                                 {categories.map(cat => (
@@ -335,23 +346,27 @@ export default function ProductFormPage() {
                                 ))}
                             </select>
                         </div>
-                        <div className="form-group">
-                            <label>Product Type</label>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="font-body text-xs font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">Product Type</label>
                             <select
                                 value={form.product_type}
                                 onChange={e => setForm({ ...form, product_type: e.target.value as ProductForm['product_type'] })}
+                                className="py-3 px-4 rounded-lg bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)] appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2716%27%20height=%2716%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%239CA3AF%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpolyline%20points=%276%209%2012%2015%2018%209%27%3E%3C/polyline%3E%3C/svg%3E')] bg-no-repeat bg-[right_1rem_center] pr-10"
                             >
                                 {PRODUCT_TYPES.map(type => (
                                     <option key={type.value} value={type.value}>{type.label}</option>
                                 ))}
                             </select>
                         </div>
-                        <div className="form-group">
-                            <label>Unit *</label>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="font-body text-xs font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">Unit *</label>
                             <select
                                 value={form.unit}
                                 onChange={e => setForm({ ...form, unit: e.target.value })}
-                                className={cn(errors.unit && 'border-destructive')}
+                                className={cn(
+                                    "py-3 px-4 rounded-lg bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)] appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2716%27%20height=%2716%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%239CA3AF%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpolyline%20points=%276%209%2012%2015%2018%209%27%3E%3C/polyline%3E%3C/svg%3E')] bg-no-repeat bg-[right_1rem_center] pr-10",
+                                    errors.unit && 'border-destructive'
+                                )}
                             >
                                 {UNITS.map(unit => (
                                     <option key={unit} value={unit}>{unit}</option>
@@ -362,111 +377,134 @@ export default function ProductFormPage() {
                 </section>
 
                 {/* Pricing Section */}
-                <section className="bg-white rounded-xl p-5 shadow-sm">
-                    <h2 className="flex items-center gap-2 text-base font-semibold m-0 mb-4 pb-3 border-b border-gray-200 text-gray-700">
-                        <DollarSign size={20} /> Price
+                <section className="bg-[var(--theme-bg-secondary)] rounded-xl p-6 border border-[var(--theme-border)] shadow-sm">
+                    <h2 className="flex items-center gap-2 font-display text-lg font-semibold m-0 mb-6 pb-4 border-b border-[var(--theme-border)] text-[var(--theme-text-primary)]">
+                        <DollarSign size={20} className="text-[var(--color-gold)]" /> Price
                     </h2>
 
-                    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 max-md:grid-cols-1">
-                        <div className="form-group">
-                            <label>Retail price</label>
-                            <input
-                                type="number"
-                                value={form.sale_price}
-                                onChange={e => setForm({ ...form, sale_price: parseFloat(e.target.value) || 0 })}
-                                min="0"
-                                step="100"
-                                className={cn(errors.sale_price && 'border-destructive')}
-                            />
-                            <small className="text-muted-foreground text-xs">{formatCurrency(form.sale_price)}</small>
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 max-md:grid-cols-1">
+                        <div className="flex flex-col gap-1.5">
+                            <label className="font-body text-xs font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">Retail price</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--theme-text-muted)] text-sm">Rp</span>
+                                <input
+                                    type="number"
+                                    value={form.sale_price}
+                                    onChange={e => setForm({ ...form, sale_price: parseFloat(e.target.value) || 0 })}
+                                    min="0"
+                                    step="100"
+                                    className={cn(
+                                        "w-full py-3 pl-10 pr-4 rounded-lg bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)]",
+                                        errors.sale_price && 'border-destructive'
+                                    )}
+                                />
+                            </div>
+                            <small className="text-[var(--theme-text-muted)] text-xs mt-1">{formatCurrency(form.sale_price)}</small>
                         </div>
-                        <div className="form-group">
-                            <label>Wholesale price</label>
-                            <input
-                                type="number"
-                                value={form.wholesale_price}
-                                onChange={e => setForm({ ...form, wholesale_price: parseFloat(e.target.value) || 0 })}
-                                min="0"
-                                step="100"
-                            />
-                            <small className="text-muted-foreground text-xs">{formatCurrency(form.wholesale_price)}</small>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="font-body text-xs font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">Wholesale price</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--theme-text-muted)] text-sm">Rp</span>
+                                <input
+                                    type="number"
+                                    value={form.wholesale_price}
+                                    onChange={e => setForm({ ...form, wholesale_price: parseFloat(e.target.value) || 0 })}
+                                    min="0"
+                                    step="100"
+                                    className="w-full py-3 pl-10 pr-4 rounded-lg bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)]"
+                                />
+                            </div>
+                            <small className="text-[var(--theme-text-muted)] text-xs mt-1">{formatCurrency(form.wholesale_price)}</small>
                         </div>
-                        <div className="form-group">
-                            <label>Cost price</label>
-                            <input
-                                type="number"
-                                value={form.cost_price}
-                                onChange={e => setForm({ ...form, cost_price: parseFloat(e.target.value) || 0 })}
-                                min="0"
-                                step="100"
-                                className={cn(errors.cost_price && 'border-destructive')}
-                            />
-                            <small className="text-muted-foreground text-xs">{formatCurrency(form.cost_price)}</small>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="font-body text-xs font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">Cost price</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--theme-text-muted)] text-sm">Rp</span>
+                                <input
+                                    type="number"
+                                    value={form.cost_price}
+                                    onChange={e => setForm({ ...form, cost_price: parseFloat(e.target.value) || 0 })}
+                                    min="0"
+                                    step="100"
+                                    className={cn(
+                                        "w-full py-3 pl-10 pr-4 rounded-lg bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)]",
+                                        errors.cost_price && 'border-destructive'
+                                    )}
+                                />
+                            </div>
+                            <small className="text-[var(--theme-text-muted)] text-xs mt-1">{formatCurrency(form.cost_price)}</small>
                         </div>
                     </div>
 
                     {form.cost_price > 0 && form.sale_price > 0 && (
-                        <div className="flex items-center gap-2 px-4 py-3 bg-green-50 rounded-lg text-green-600 font-medium">
-                            <Tag size={16} />
-                            <span>Margin: {calculateMargin().toFixed(1)}%</span>
-                            <span className="text-green-700 text-sm">
-                                ({formatCurrency(form.sale_price - form.cost_price)})
-                            </span>
+                        <div className="flex items-center gap-3 px-5 py-4 mt-6 bg-[rgba(34,197,94,0.1)] rounded-xl text-green-500 font-medium border border-[rgba(34,197,94,0.2)]">
+                            <Tag size={18} className="text-green-500" />
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-lg font-bold">Margin: {calculateMargin().toFixed(1)}%</span>
+                                <span className="text-[var(--theme-text-muted)] text-sm">
+                                    ({formatCurrency(form.sale_price - form.cost_price)})
+                                </span>
+                            </div>
                         </div>
                     )}
                 </section>
 
                 {/* Stock Section */}
-                <section className="bg-white rounded-xl p-5 shadow-sm">
-                    <h2 className="flex items-center gap-2 text-base font-semibold m-0 mb-4 pb-3 border-b border-gray-200 text-gray-700">
-                        <Warehouse size={20} /> Stock
+                <section className="bg-[var(--theme-bg-secondary)] rounded-xl p-6 border border-[var(--theme-border)] shadow-sm">
+                    <h2 className="flex items-center gap-2 font-display text-lg font-semibold m-0 mb-6 pb-4 border-b border-[var(--theme-border)] text-[var(--theme-text-primary)]">
+                        <Warehouse size={20} className="text-[var(--color-gold)]" /> Stock
                     </h2>
 
-                    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 max-md:grid-cols-1">
-                        <div className="form-group">
-                            <label>Current stock</label>
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 max-md:grid-cols-1">
+                        <div className="flex flex-col gap-1.5">
+                            <label className="font-body text-xs font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">Current stock</label>
                             <input
                                 type="number"
                                 value={form.stock_quantity}
                                 onChange={e => setForm({ ...form, stock_quantity: parseFloat(e.target.value) || 0 })}
                                 step="0.01"
+                                className="py-3 px-4 rounded-lg bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)]"
                             />
                         </div>
-                        <div className="form-group">
-                            <label>Minimum stock</label>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="font-body text-xs font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">Minimum stock</label>
                             <input
                                 type="number"
                                 value={form.min_stock_level}
                                 onChange={e => setForm({ ...form, min_stock_level: parseFloat(e.target.value) || 0 })}
                                 min="0"
                                 step="1"
+                                className="py-3 px-4 rounded-lg bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)]"
                             />
                         </div>
                     </div>
                 </section>
 
                 {/* Image Section */}
-                <section className="bg-white rounded-xl p-5 shadow-sm">
-                    <h2 className="flex items-center gap-2 text-base font-semibold m-0 mb-4 pb-3 border-b border-gray-200 text-gray-700">
-                        <ImageIcon size={20} /> Image
+                <section className="bg-[var(--theme-bg-secondary)] rounded-xl p-6 border border-[var(--theme-border)] shadow-sm">
+                    <h2 className="flex items-center gap-2 font-display text-lg font-semibold m-0 mb-6 pb-4 border-b border-[var(--theme-border)] text-[var(--theme-text-primary)]">
+                        <ImageIcon size={20} className="text-[var(--color-gold)]" /> Image
                     </h2>
 
                     <div className="flex justify-center">
                         {form.image_url ? (
-                            <div className="relative w-[200px] h-[200px] rounded-xl overflow-hidden">
-                                <img src={form.image_url} alt="Product" className="w-full h-full object-cover" />
+                            <div className="relative w-[240px] h-[240px] rounded-xl overflow-hidden border border-[var(--theme-border)] shadow-md group">
+                                <img src={form.image_url} alt="Product" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                 <button
                                     type="button"
-                                    className="absolute top-2 right-2 w-8 h-8 border-none rounded-full bg-black/60 text-white cursor-pointer flex items-center justify-center transition-colors hover:bg-destructive"
+                                    className="absolute top-3 right-3 w-9 h-9 border-none rounded-full bg-black/60 text-white cursor-pointer flex items-center justify-center transition-all hover:bg-destructive shadow-lg"
                                     onClick={() => setForm({ ...form, image_url: '' })}
                                 >
-                                    <X size={16} />
+                                    <X size={18} />
                                 </button>
                             </div>
                         ) : (
-                            <label className="w-[200px] h-[200px] border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center gap-2 text-muted-foreground cursor-pointer transition-all hover:border-blue-500 hover:text-blue-500 hover:bg-blue-50">
-                                <Upload size={24} />
-                                <span>Click to add an image</span>
+                            <label className="w-[240px] h-[240px] border-2 border-dashed border-[var(--theme-border)] rounded-xl flex flex-col items-center justify-center gap-3 text-[var(--theme-text-muted)] cursor-pointer transition-all hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] hover:bg-[rgba(201,165,92,0.05)]">
+                                <div className="w-12 h-12 rounded-full bg-[var(--theme-bg-tertiary)] flex items-center justify-center mb-1">
+                                    <Upload size={24} />
+                                </div>
+                                <span className="font-body text-sm font-medium">Click to add an image</span>
+                                <span className="text-[10px] uppercase tracking-widest opacity-60">PNG, JPG up to 5MB</span>
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -479,61 +517,74 @@ export default function ProductFormPage() {
                 </section>
 
                 {/* Options Section */}
-                <section className="bg-white rounded-xl p-5 shadow-sm">
-                    <h2 className="flex items-center gap-2 text-base font-semibold m-0 mb-4 pb-3 border-b border-gray-200 text-gray-700">
-                        <FileText size={20} /> Options
+                <section className="bg-[var(--theme-bg-secondary)] rounded-xl p-6 border border-[var(--theme-border)] shadow-sm">
+                    <h2 className="flex items-center gap-2 font-display text-lg font-semibold m-0 mb-6 pb-4 border-b border-[var(--theme-border)] text-[var(--theme-text-primary)]">
+                        <FileText size={20} className="text-[var(--color-gold)]" /> Options
                     </h2>
 
-                    <div className="flex gap-6 flex-wrap max-md:flex-col max-md:gap-3">
-                        <label className="flex items-center gap-2.5 cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={form.pos_visible}
-                                onChange={e => setForm({ ...form, pos_visible: e.target.checked })}
-                                className="w-5 h-5 accent-blue-500"
-                            />
-                            <span className="text-[0.95rem] text-gray-700">Visible on POS</span>
+                    <div className="flex gap-10 flex-wrap max-md:flex-col max-md:gap-5">
+                        <label className="flex items-center gap-3 cursor-pointer group">
+                            <div className="relative flex items-center">
+                                <input
+                                    type="checkbox"
+                                    checked={form.pos_visible}
+                                    onChange={e => setForm({ ...form, pos_visible: e.target.checked })}
+                                    className="w-5 h-5 accent-[var(--color-gold)] cursor-pointer"
+                                />
+                            </div>
+                            <span className="text-[0.95rem] font-medium text-[var(--theme-text-primary)]">Visible on POS</span>
                         </label>
-                        <label className="flex items-center gap-2.5 cursor-pointer">
+                        <label className="flex items-center gap-3 cursor-pointer group">
                             <input
                                 type="checkbox"
                                 checked={form.is_active}
                                 onChange={e => setForm({ ...form, is_active: e.target.checked })}
-                                className="w-5 h-5 accent-blue-500"
+                                className="w-5 h-5 accent-[var(--color-gold)] cursor-pointer"
                             />
-                            <span className="text-[0.95rem] text-gray-700">Product active</span>
+                            <span className="text-[0.95rem] font-medium text-[var(--theme-text-primary)]">Product active</span>
                         </label>
-                        <label className="flex items-center gap-2.5 cursor-pointer">
+                        <label className="flex items-start gap-3 cursor-pointer group">
                             <input
                                 type="checkbox"
                                 checked={form.deduct_ingredients}
                                 onChange={e => setForm({ ...form, deduct_ingredients: e.target.checked })}
-                                className="w-5 h-5 accent-blue-500"
+                                className="w-5 h-5 accent-[var(--color-gold)] cursor-pointer mt-1"
                             />
-                            <span className="text-[0.95rem] text-gray-700">Deduct ingredients on sale</span>
-                            <small className="block mt-1 text-muted-foreground">
-                                For products made to order (coffee, sandwiches, etc.)
-                            </small>
+                            <div className="flex flex-col">
+                                <span className="text-[0.95rem] font-medium text-[var(--theme-text-primary)]">Deduct ingredients on sale</span>
+                                <small className="block mt-1 text-[var(--theme-text-muted)] text-xs leading-relaxed">
+                                    For products made to order (coffee, sandwiches, etc.)
+                                </small>
+                            </div>
                         </label>
                     </div>
                 </section>
 
                 {/* Actions */}
-                <div className="flex justify-end gap-3 p-5 bg-white rounded-xl shadow-sm max-md:flex-col">
+                <div className="flex justify-end gap-4 p-6 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl shadow-sm max-md:flex-col">
                     <button
                         type="button"
-                        className="btn btn-secondary max-md:w-full max-md:justify-center"
+                        className="py-3 px-8 rounded-lg font-body text-sm font-semibold cursor-pointer border-2 border-[var(--theme-border)] bg-transparent text-[var(--theme-text-primary)] transition-all hover:bg-[var(--theme-bg-tertiary)] max-md:w-full"
                         onClick={() => navigate('/products')}
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
-                        className="btn btn-primary max-md:w-full max-md:justify-center"
+                        className="inline-flex items-center justify-center gap-2 py-3 px-10 rounded-lg font-body text-sm font-semibold cursor-pointer border-2 border-transparent transition-all duration-[250ms] bg-gradient-to-b from-[var(--color-gold)] to-[var(--color-gold-dark)] text-white shadow-[0_4px_12px_rgba(201,165,92,0.25)] hover:-translate-y-px hover:shadow-[0_6px_16px_rgba(201,165,92,0.35)] disabled:opacity-50 disabled:transform-none max-md:w-full"
                         disabled={saving}
                     >
-                        <Save size={18} />
-                        {saving ? 'Saving...' : 'Save'}
+                        {saving ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                <span>Saving...</span>
+                            </>
+                        ) : (
+                            <>
+                                <Save size={18} />
+                                <span>Save Product</span>
+                            </>
+                        )}
                     </button>
                 </div>
             </form>

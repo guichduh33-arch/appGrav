@@ -295,37 +295,50 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
             onClick={(e) => e.target === e.currentTarget && onClose()}
         >
             <div
-                className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border-strong)] rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] max-h-[90vh] flex flex-col text-white w-[500px] max-w-full"
+                className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl shadow-2xl max-h-[90vh] flex flex-col md:flex-row text-white w-[700px] max-w-full overflow-hidden"
                 style={{ zIndex: 'var(--z-modal)' }}
             >
-                <div className="flex items-start justify-between p-[var(--space-lg)] border-b border-[var(--theme-border)]">
-                    <div>
-                        <h3 className="text-2xl font-bold flex items-center gap-2 m-0 text-[var(--theme-text-primary)]">
-                            {product.name}
-                        </h3>
-                        <p className="text-sm text-[var(--theme-text-secondary)] mt-1">Customize your order</p>
+                {/* Left: Product image */}
+                {product.image_url && (
+                    <div className="w-full md:w-5/12 shrink-0">
+                        <img
+                            src={product.image_url}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                        />
                     </div>
-                    <button
-                        className="w-10 h-10 flex items-center justify-center bg-transparent border-none rounded-lg text-[var(--theme-text-secondary)] cursor-pointer transition-all hover:bg-[var(--theme-bg-tertiary)] hover:text-[var(--theme-text-primary)]"
-                        onClick={onClose}
-                        title="Close"
-                        aria-label="Close"
-                    >
-                        <X size={24} />
-                    </button>
-                </div>
+                )}
 
-                <div className="flex-1 overflow-y-auto p-[var(--space-lg)]">
+                {/* Right: Options */}
+                <div className="flex-1 flex flex-col min-w-0">
+                    <div className="flex items-start justify-between p-6 border-b border-[var(--theme-border)]">
+                        <div>
+                            <h3 className="text-xl font-bold flex items-center gap-2 m-0 text-[var(--theme-text-primary)]">
+                                {product.name}
+                            </h3>
+                            <p className="text-xs text-[var(--theme-text-muted)] mt-1">Customize your selection</p>
+                        </div>
+                        <button
+                            className="w-8 h-8 flex items-center justify-center bg-transparent border-none rounded-lg text-[var(--theme-text-muted)] cursor-pointer transition-all hover:bg-[var(--theme-bg-tertiary)] hover:text-white"
+                            onClick={onClose}
+                            title="Close"
+                            aria-label="Close"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-8">
                     {/* Modifier Groups */}
                     {modifierGroups.map(group => (
                         <div key={group.name} className="mb-6 last:mb-0">
-                            <h4 className="flex items-center gap-2 text-sm font-semibold text-[var(--theme-text-secondary)] mb-[var(--space-md)] uppercase tracking-[0.05em]">
+                            <h4 className="flex items-center gap-2 text-[10px] font-bold text-[var(--color-gold)] mb-3 uppercase tracking-[0.2em]">
                                 {group.label}
                                 {group.required && <span className="text-destructive ml-1">*</span>}
                             </h4>
 
                             {group.type === 'single' ? (
-                                <div className="grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-3">
+                                <div className="flex flex-col gap-2">
                                     {group.options.map(option => (
                                         <div key={option.id} className="relative">
                                             <input
@@ -338,11 +351,11 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                                             />
                                             <label
                                                 htmlFor={`${group.name}-${option.id}`}
-                                                className="flex flex-col items-center justify-center py-4 px-3 bg-[var(--theme-bg-tertiary)] border-2 border-transparent rounded-xl cursor-pointer transition-all text-center min-h-[80px] text-[var(--theme-text-secondary)] hover:bg-[var(--theme-bg-tertiary)] hover:border-gold/30 hover:text-white peer-checked:border-gold peer-checked:bg-gold/10 peer-checked:text-gold"
+                                                className="flex items-center justify-between p-4 bg-transparent border border-[var(--theme-border)] rounded-lg cursor-pointer transition-all text-left text-[var(--theme-text-secondary)] hover:border-[var(--color-gold)]/50 peer-checked:border-[var(--color-gold)] peer-checked:bg-[var(--color-gold)]/5"
                                             >
-                                                <span className="text-[15px] font-semibold">{option.label}</span>
+                                                <span className="text-sm font-medium">{option.label}</span>
                                                 {option.price > 0 && (
-                                                    <span className="text-[13px] text-[var(--theme-text-muted)] mt-1 font-medium peer-checked:text-gold">+{formatPrice(option.price)}</span>
+                                                    <span className="text-xs font-semibold text-[var(--color-gold)]">+{formatPrice(option.price)}</span>
                                                 )}
                                             </label>
                                         </div>
@@ -356,19 +369,21 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                                             <label
                                                 key={option.id}
                                                 className={cn(
-                                                    'flex items-center py-3 px-4 bg-[var(--theme-bg-tertiary)] border border-transparent rounded-xl cursor-pointer transition-all min-h-[56px]',
-                                                    'hover:bg-[var(--theme-bg-tertiary)] hover:border-gold/30',
-                                                    isChecked && 'border-gold bg-gold/10'
+                                                    'flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all',
+                                                    'hover:border-[var(--color-gold)]/50',
+                                                    isChecked ? 'border-[var(--color-gold)] bg-[var(--color-gold)]/5' : 'border-[var(--theme-border)]'
                                                 )}
                                             >
-                                                <input
-                                                    type="checkbox"
-                                                    checked={isChecked}
-                                                    onChange={() => handleMultiSelect(group.name, option.id)}
-                                                    className="w-5 h-5 accent-gold mr-3"
-                                                />
-                                                <span className={cn('flex-1 text-[15px] font-medium text-[var(--theme-text-secondary)]', isChecked && 'text-gold')}>{option.label}</span>
-                                                <span className={cn('text-sm text-[var(--theme-text-muted)]', isChecked && 'text-gold')}>+{formatPrice(option.price)}</span>
+                                                <div className="flex items-center gap-3">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isChecked}
+                                                        onChange={() => handleMultiSelect(group.name, option.id)}
+                                                        className="w-4 h-4 accent-[var(--color-gold)]"
+                                                    />
+                                                    <span className="text-sm font-medium text-[var(--theme-text-secondary)]">{option.label}</span>
+                                                </div>
+                                                <span className="text-xs font-semibold text-[var(--color-gold)]">+{formatPrice(option.price)}</span>
                                             </label>
                                         )
                                     })}
@@ -379,7 +394,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
 
                     {/* Notes */}
                     <div className="mb-6 last:mb-0">
-                        <h4 className="flex items-center gap-2 text-sm font-semibold text-[var(--theme-text-secondary)] mb-[var(--space-md)] uppercase tracking-[0.05em]">Kitchen notes</h4>
+                        <h4 className="flex items-center gap-2 text-[10px] font-bold text-[var(--color-gold)] mb-3 uppercase tracking-[0.2em]">Kitchen notes</h4>
                         <textarea
                             className="w-full min-h-[100px] p-3 font-[var(--font-body)] text-[15px] text-white bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-xl resize-none transition-all focus:outline-none focus:border-gold focus:bg-[var(--theme-bg-tertiary)] placeholder:text-[var(--theme-text-muted)]"
                             placeholder="Special instructions..."
@@ -390,7 +405,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
 
                     {/* Quantity */}
                     <div className="mb-6 last:mb-0">
-                        <h4 className="flex items-center gap-2 text-sm font-semibold text-[var(--theme-text-secondary)] mb-[var(--space-md)] uppercase tracking-[0.05em]">Quantity</h4>
+                        <h4 className="flex items-center gap-2 text-[10px] font-bold text-[var(--color-gold)] mb-3 uppercase tracking-[0.2em]">Quantity</h4>
                         <div className="flex items-center gap-4 bg-[var(--theme-bg-tertiary)] p-1.5 rounded-2xl w-fit border border-[var(--theme-border)]">
                             <button
                                 className="w-12 h-12 flex items-center justify-center bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl text-white cursor-pointer transition-all hover:bg-[var(--theme-bg-tertiary)]"
@@ -413,14 +428,15 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                     </div>
                 </div>
 
-                <div className="p-[var(--space-lg)] border-t border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] rounded-b-2xl">
-                    <button
-                        className="w-full h-16 px-6 bg-gradient-to-r from-gold-dark via-gold to-gold-light text-black border-none rounded-xl text-lg font-bold flex items-center justify-center gap-3 cursor-pointer transition-all hover:shadow-[0_8px_25px_rgba(201,165,92,0.3)] hover:-translate-y-px active:translate-y-px uppercase tracking-wider"
-                        onClick={handleConfirm}
-                    >
-                        <Check size={18} />
-                        {editItem ? 'Update item' : 'Add to cart'} - {formatPrice(totalPrice)}
-                    </button>
+                    <div className="p-6 border-t border-[var(--theme-border)] mt-auto">
+                        <button
+                            className="w-full py-4 px-6 bg-[var(--color-gold)] text-black border-none rounded-lg text-sm font-bold flex items-center justify-center gap-3 cursor-pointer transition-all hover:brightness-110 active:scale-[0.98] uppercase tracking-widest"
+                            onClick={handleConfirm}
+                        >
+                            <Check size={16} />
+                            {editItem ? 'Update Cart' : 'Update Cart'} &mdash; {formatPrice(totalPrice)}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
     Tag, Plus, Search, Edit, Trash2, Eye, Percent, Gift,
-    Calendar, Clock, Users, TrendingDown, AlertCircle, CheckCircle
+    Calendar, Clock, Users, TrendingDown, AlertCircle, CheckCircle, Ticket
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { formatCurrency } from '../../utils/helpers'
@@ -176,111 +176,124 @@ export default function PromotionsPage() {
     }
 
     return (
-        <div className="p-8 max-w-[1400px] mx-auto md:p-4">
+        <div className="p-8 max-w-[1400px] mx-auto md:p-4 font-body">
             {/* Header */}
             <header className="flex justify-between items-center mb-8 max-md:flex-col max-md:items-start max-md:gap-4">
-                <div className="flex-1">
-                    <h1 className="flex items-center gap-3 text-[1.75rem] font-bold text-slate-800 mb-2">
-                        <Tag size={28} />
-                        Promotion Management
+                <div className="flex-col">
+                    <h1 className="font-display text-3xl font-semibold text-[var(--theme-text-primary)] m-0 flex items-center gap-3">
+                        <Tag size={28} className="text-[var(--color-gold)]" />
+                        Artisan Promotions
                     </h1>
-                    <p className="text-slate-500 text-[0.95rem] m-0">
-                        Create promotions with time rules and purchase conditions
+                    <p className="text-[var(--theme-text-secondary)] text-sm opacity-60 mt-1">
+                        Curate special experiences and value for your patrons
                     </p>
                 </div>
                 <button
-                    className="inline-flex items-center gap-2 px-6 py-3 border-none rounded-lg text-[0.95rem] font-medium cursor-pointer transition-all duration-200 bg-indigo-500 text-white hover:bg-indigo-600 hover:-translate-y-px hover:shadow-[0_4px_6px_rgba(99,102,241,0.25)]"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-bold transition-all duration-300 bg-gradient-to-b from-[var(--color-gold)] to-[var(--color-gold-dark)] text-white shadow-[0_10px_30px_rgba(201,165,92,0.3)] hover:-translate-y-1 hover:shadow-[0_15px_40px_rgba(201,165,92,0.4)] active:scale-[0.98]"
                     onClick={() => navigate('/products/promotions/new')}
+                    title="Design new promotion"
                 >
-                    <Plus size={18} />
-                    New Promotion
+                    <Plus size={20} />
+                    <span>Inaugurate Promotion</span>
                 </button>
             </header>
 
             {/* Stats */}
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mb-8 max-md:grid-cols-1">
-                <div className="group bg-white p-6 rounded-xl shadow-sm flex items-center gap-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 [&>svg]:text-indigo-500 [&>svg]:shrink-0">
-                    <Tag size={24} />
+            <div className="grid grid-cols-4 gap-4 mb-8 max-md:grid-cols-1">
+                <div className="bg-[var(--theme-bg-secondary)] p-6 rounded-2xl border border-[var(--theme-border)] shadow-sm flex items-center gap-4 transition-all hover:border-[var(--color-gold-muted)]">
+                    <div className="w-12 h-12 rounded-xl bg-[var(--color-gold-muted)]/10 flex items-center justify-center text-[var(--color-gold)]">
+                        <Tag size={24} />
+                    </div>
                     <div className="flex flex-col">
-                        <span className="text-[1.75rem] font-bold text-slate-800 leading-none">{stats.total}</span>
-                        <span className="text-sm text-slate-500 mt-1">Total Promotions</span>
+                        <span className="text-2xl font-display font-bold text-[var(--theme-text-primary)]">{stats.total}</span>
+                        <span className="text-xs uppercase tracking-wider font-semibold text-[var(--theme-text-secondary)] opacity-50">Total</span>
                     </div>
                 </div>
-                <div className="group bg-white p-6 rounded-xl shadow-sm flex items-center gap-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 [&>svg]:text-emerald-500 [&>svg]:shrink-0">
-                    <CheckCircle size={24} />
+                <div className="bg-[var(--theme-bg-secondary)] p-6 rounded-2xl border border-[var(--theme-border)] shadow-sm flex items-center gap-4 transition-all hover:border-emerald-500/30">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                        <CheckCircle size={24} />
+                    </div>
                     <div className="flex flex-col">
-                        <span className="text-[1.75rem] font-bold text-slate-800 leading-none">{stats.active}</span>
-                        <span className="text-sm text-slate-500 mt-1">Active</span>
+                        <span className="text-2xl font-display font-bold text-[var(--theme-text-primary)]">{stats.active}</span>
+                        <span className="text-xs uppercase tracking-wider font-semibold text-[var(--theme-text-secondary)] opacity-50">Active</span>
                     </div>
                 </div>
-                <div className="group bg-white p-6 rounded-xl shadow-sm flex items-center gap-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 [&>svg]:text-amber-500 [&>svg]:shrink-0">
-                    <AlertCircle size={24} />
+                <div className="bg-[var(--theme-bg-secondary)] p-6 rounded-2xl border border-[var(--theme-border)] shadow-sm flex items-center gap-4 transition-all hover:border-amber-500/30">
+                    <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                        <AlertCircle size={24} />
+                    </div>
                     <div className="flex flex-col">
-                        <span className="text-[1.75rem] font-bold text-slate-800 leading-none">{stats.inactive}</span>
-                        <span className="text-sm text-slate-500 mt-1">Inactive</span>
+                        <span className="text-2xl font-display font-bold text-[var(--theme-text-primary)]">{stats.inactive}</span>
+                        <span className="text-xs uppercase tracking-wider font-semibold text-[var(--theme-text-secondary)] opacity-50">Inactive</span>
                     </div>
                 </div>
-                <div className="group bg-white p-6 rounded-xl shadow-sm flex items-center gap-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 [&>svg]:text-red-500 [&>svg]:shrink-0">
-                    <Calendar size={24} />
+                <div className="bg-[var(--theme-bg-secondary)] p-6 rounded-2xl border border-[var(--theme-border)] shadow-sm flex items-center gap-4 transition-all hover:border-red-500/30">
+                    <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500">
+                        <Calendar size={24} />
+                    </div>
                     <div className="flex flex-col">
-                        <span className="text-[1.75rem] font-bold text-slate-800 leading-none">{stats.expired}</span>
-                        <span className="text-sm text-slate-500 mt-1">Expired</span>
+                        <span className="text-2xl font-display font-bold text-[var(--theme-text-primary)]">{stats.expired}</span>
+                        <span className="text-xs uppercase tracking-wider font-semibold text-[var(--theme-text-secondary)] opacity-50">Expired</span>
                     </div>
                 </div>
             </div>
 
             {/* Filters */}
-            <div className="flex gap-4 mb-8 max-md:flex-col">
-                <div className="flex-1 relative flex items-center [&>svg:first-child]:absolute [&>svg:first-child]:left-4 [&>svg:first-child]:text-slate-400">
-                    <Search size={20} />
+            <div className="bg-[var(--theme-bg-secondary)] p-4 rounded-2xl border border-[var(--theme-border)] flex gap-4 mb-8 max-md:flex-col">
+                <div className="flex-1 relative flex items-center">
+                    <Search size={18} className="absolute left-4 text-[var(--color-gold)] opacity-50" />
                     <input
                         type="text"
                         placeholder="Search by name, code or description..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full py-3 pr-4 pl-12 border border-slate-200 rounded-lg text-[0.95rem] transition-all duration-200 focus:outline-none focus:border-indigo-500 focus:ring-[3px] focus:ring-indigo-500/10"
+                        className="w-full py-3 pr-4 pl-12 bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] outline-none transition-all focus:border-[var(--color-gold)] placeholder:opacity-30"
                     />
                 </div>
                 <select
                     value={filterType}
                     onChange={(e) => setFilterType(e.target.value as PromotionType | 'all')}
-                    className="py-3 px-4 border border-slate-200 rounded-lg text-[0.95rem] bg-white cursor-pointer transition-all duration-200 focus:outline-none focus:border-indigo-500 focus:ring-[3px] focus:ring-indigo-500/10"
+                    className="py-3 px-6 bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] outline-none cursor-pointer transition-all focus:border-[var(--color-gold)]"
+                    title="Filter by type"
                 >
-                    <option value="all">All types</option>
-                    <option value="percentage">Discount %</option>
-                    <option value="fixed_amount">Fixed amount</option>
-                    <option value="buy_x_get_y">Buy X get Y</option>
-                    <option value="free_product">Free product</option>
+                    <option value="all">All Disciplines</option>
+                    <option value="percentage">Percentage Discount</option>
+                    <option value="fixed_amount">Fixed Amount</option>
+                    <option value="buy_x_get_y">Transactional (Buy/Get)</option>
+                    <option value="free_product">Complimentary Item</option>
                 </select>
                 <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value as 'all' | 'active' | 'inactive')}
-                    className="py-3 px-4 border border-slate-200 rounded-lg text-[0.95rem] bg-white cursor-pointer transition-all duration-200 focus:outline-none focus:border-indigo-500 focus:ring-[3px] focus:ring-indigo-500/10"
+                    className="py-3 px-6 bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text-primary)] outline-none cursor-pointer transition-all focus:border-[var(--color-gold)]"
+                    title="Filter by status"
                 >
-                    <option value="all">All statuses</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="all">All Statuses</option>
+                    <option value="active">Currently Active</option>
+                    <option value="inactive">Idle/Scheduled</option>
                 </select>
             </div>
 
             {/* Promotions List */}
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-16 px-8 gap-4">
-                    <div className="w-10 h-10 border-[3px] border-slate-200 border-t-indigo-500 rounded-full animate-spin" />
-                    <span className="text-slate-500 text-[0.95rem]">Loading promotions...</span>
+                <div className="flex flex-col items-center justify-center py-24 gap-4">
+                    <div className="w-12 h-12 border-3 border-[var(--color-gold-muted)]/20 border-t-[var(--color-gold)] rounded-full animate-spin" />
+                    <span className="text-[var(--theme-text-secondary)] opacity-50 font-display italic">Summoning Artisan Promotions...</span>
                 </div>
             ) : filteredPromotions.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 px-8 text-center [&>svg:first-child]:text-slate-300 [&>svg:first-child]:mb-4">
-                    <Tag size={64} />
-                    <h3 className="text-xl text-slate-800 m-0 mb-2">No promotion found</h3>
-                    <p className="text-slate-500 text-[0.95rem] m-0">
+                <div className="bg-[var(--theme-bg-secondary)] rounded-3xl p-24 text-center border border-dashed border-[var(--theme-border)]">
+                    <div className="w-20 h-20 bg-[var(--theme-bg-tertiary)] rounded-full flex items-center justify-center mx-auto mb-6 text-[var(--color-gold)]/30">
+                        <Tag size={40} />
+                    </div>
+                    <h3 className="font-display text-2xl font-semibold text-[var(--theme-text-primary)] mb-2">The Archive is Empty</h3>
+                    <p className="text-[var(--theme-text-secondary)] opacity-50 max-w-md mx-auto">
                         {searchTerm || filterType !== 'all'
-                            ? 'Try modifying your filters'
-                            : 'Start by creating your first promotion'}
+                            ? 'No promotions match your refined search criteria.'
+                            : 'Start crafting your first artisanal promotion to offer special value to your clientele.'}
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(380px,1fr))] gap-6 max-md:grid-cols-1">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(420px,1fr))] gap-8 max-md:grid-cols-1">
                     {filteredPromotions.map(promo => {
                         const active = isPromotionActive(promo)
                         const timeConstraints = formatTimeConstraints(promo)
@@ -289,113 +302,142 @@ export default function PromotionsPage() {
                             <div
                                 key={promo.id}
                                 className={cn(
-                                    'bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-200 flex flex-col hover:shadow-md hover:-translate-y-0.5',
-                                    !active && 'opacity-70'
+                                    'group relative bg-[var(--theme-bg-secondary)] rounded-[2rem] border border-[var(--theme-border)] overflow-hidden transition-all duration-500 flex flex-col hover:border-[var(--color-gold-muted)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]',
+                                    !active && 'grayscale opacity-60'
                                 )}
                             >
-                                <div className="flex justify-between items-center px-6 py-4 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white">
-                                    <div className="flex items-center gap-2 text-sm font-semibold">
-                                        {PROMOTION_TYPE_ICONS[promo.promotion_type as PromotionType]}
-                                        <span>{PROMOTION_TYPE_LABELS[promo.promotion_type as PromotionType]}</span>
+                                {/* Promotion Header Card */}
+                                <div className="relative p-8 pb-4">
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--color-gold)] to-[var(--color-gold-dark)] flex items-center justify-center text-white shadow-lg shadow-[var(--color-gold)]/20">
+                                            {PROMOTION_TYPE_ICONS[promo.promotion_type as PromotionType]}
+                                        </div>
+                                        <div className={cn(
+                                            "px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border",
+                                            active
+                                                ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                                                : "bg-red-500/10 text-red-500 border-red-500/20"
+                                        )}>
+                                            {active ? 'Active Engagement' : 'Dormant'}
+                                        </div>
                                     </div>
-                                    <span className={cn(
-                                        'text-xs py-1.5 px-3 rounded-md font-medium bg-white/20',
-                                        active ? 'text-white' : 'text-white/80'
-                                    )}>
-                                        {active ? 'Active' : 'Inactive'}
-                                    </span>
-                                </div>
 
-                                <div className="p-6 flex-1 flex flex-col gap-4">
-                                    <h3 className="text-xl font-semibold text-slate-800 m-0">{promo.name}</h3>
-                                    <div className="text-sm py-2 px-3 bg-slate-50 border border-dashed border-slate-300 rounded-md text-slate-600 font-mono font-semibold w-fit">
-                                        Code: {promo.code}
+                                    <h3 className="font-display text-2xl font-bold text-[var(--theme-text-primary)] mb-2 group-hover:text-[var(--color-gold)] transition-colors">
+                                        {promo.name}
+                                    </h3>
+
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <div className="px-3 py-1 bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-lg text-xs font-mono font-bold text-[var(--color-gold)]">
+                                            CODE: {promo.code}
+                                        </div>
+                                        <span className="text-[10px] text-[var(--theme-text-secondary)] opacity-40 uppercase tracking-tighter">
+                                            Ref: {promo.id.substring(0, 8)}
+                                        </span>
                                     </div>
 
                                     {promo.description && (
-                                        <p className="text-slate-500 text-[0.9rem] m-0 leading-relaxed">{promo.description}</p>
+                                        <p className="text-sm text-[var(--theme-text-secondary)] opacity-60 line-clamp-2 leading-relaxed mb-6 italic">
+                                            "{promo.description}"
+                                        </p>
                                     )}
 
-                                    <div className="text-lg font-bold text-emerald-500 py-3 px-4 bg-green-50 rounded-lg text-center">
-                                        {formatPromotionValue(promo)}
+                                    {/* Value Badge */}
+                                    <div className="bg-gradient-to-r from-[var(--theme-bg-tertiary)] to-transparent p-6 rounded-2xl border-l-4 border-[var(--color-gold)] mb-6">
+                                        <div className="text-xs uppercase tracking-[0.2em] font-bold text-[var(--color-gold)] mb-1 opacity-70">
+                                            Promotion Value
+                                        </div>
+                                        <div className="text-3xl font-display font-black text-[var(--theme-text-primary)]">
+                                            {formatPromotionValue(promo)}
+                                        </div>
                                     </div>
 
-                                    {timeConstraints.length > 0 && (
-                                        <div className="flex gap-3 py-3 px-4 bg-amber-100 rounded-lg text-amber-900 text-sm [&>svg]:shrink-0 [&>svg]:mt-0.5">
-                                            <Clock size={14} />
-                                            <div className="flex flex-col gap-1">
-                                                {timeConstraints.map((constraint, idx) => (
-                                                    <span key={idx}>{constraint}</span>
-                                                ))}
+                                    {/* Constraints & Limits */}
+                                    <div className="space-y-3">
+                                        {timeConstraints.length > 0 && (
+                                            <div className="flex gap-4 p-4 rounded-xl bg-[var(--theme-bg-tertiary)]/50 border border-[var(--theme-border)]">
+                                                <Clock size={16} className="text-[var(--color-gold)] shrink-0 mt-0.5" />
+                                                <div className="flex flex-col gap-1.5">
+                                                    {timeConstraints.map((constraint, idx) => (
+                                                        <span key={idx} className="text-xs font-semibold text-[var(--theme-text-primary)] opacity-80">{constraint}</span>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
-                                    {promo.min_purchase_amount && (
-                                        <div className="py-2 px-3 bg-violet-100 text-violet-800 rounded-md text-sm font-medium">
-                                            Minimum purchase: {formatCurrency(promo.min_purchase_amount)}
-                                        </div>
-                                    )}
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {promo.min_purchase_amount && (
+                                                <div className="p-3 rounded-xl bg-violet-500/5 border border-violet-500/10 flex flex-col gap-1">
+                                                    <span className="text-[9px] uppercase tracking-wider font-bold text-violet-500/70">Min Purchase</span>
+                                                    <span className="text-sm font-bold text-[var(--theme-text-primary)]">
+                                                        {formatCurrency(promo.min_purchase_amount)}
+                                                    </span>
+                                                </div>
+                                            )}
 
-                                    {(promo.max_uses_total || promo.max_uses_per_customer) && (
-                                        <div className="flex items-center gap-2 py-2 px-3 bg-blue-100 text-blue-800 rounded-md text-sm [&>svg]:shrink-0">
-                                            <Users size={14} />
-                                            <span>
-                                                {promo.current_uses} / {promo.max_uses_total || '\u221E'} uses
-                                            </span>
-                                            {promo.max_uses_per_customer && (
-                                                <span className="ml-auto text-[0.8rem] opacity-80">
-                                                    (Max {promo.max_uses_per_customer}/customer)
-                                                </span>
+                                            {(promo.max_uses_total || promo.max_uses_per_customer) && (
+                                                <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 flex flex-col gap-1">
+                                                    <span className="text-[9px] uppercase tracking-wider font-bold text-blue-500/70">Redemptions</span>
+                                                    <span className="text-sm font-bold text-[var(--theme-text-primary)] flex items-center gap-2">
+                                                        {promo.current_uses} / {promo.max_uses_total || '∞'}
+                                                    </span>
+                                                </div>
                                             )}
                                         </div>
-                                    )}
-
-                                    <div className="flex gap-2 pt-2 border-t border-slate-200">
-                                        <span className="text-xs py-1.5 px-3 bg-slate-100 text-slate-600 rounded-md font-medium">
-                                            Priority: {promo.priority}
-                                        </span>
-                                        {promo.is_stackable && (
-                                            <span className="text-xs py-1.5 px-3 bg-green-100 text-green-800 rounded-md font-medium">
-                                                Stackable
-                                            </span>
-                                        )}
                                     </div>
                                 </div>
 
-                                <div className="flex gap-2 px-6 py-4 bg-slate-50 border-t border-slate-200">
-                                    <button
-                                        className="p-2 border-none bg-white rounded-md cursor-pointer transition-all duration-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-                                        onClick={() => navigate(`/products/promotions/${promo.id}`)}
-                                        title="View details"
-                                    >
-                                        <Eye size={16} />
-                                    </button>
-                                    <button
-                                        className="p-2 border-none bg-white rounded-md cursor-pointer transition-all duration-200 flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-                                        onClick={() => navigate(`/products/promotions/${promo.id}/edit`)}
-                                        title="Edit"
-                                    >
-                                        <Edit size={16} />
-                                    </button>
-                                    <button
-                                        className={cn(
-                                            'p-2 border-none bg-white rounded-md cursor-pointer transition-all duration-200 flex items-center justify-center hover:bg-slate-100',
-                                            promo.is_active ? 'text-emerald-500' : 'text-slate-400'
+                                {/* Footer Actions */}
+                                <div className="mt-auto px-8 py-6 bg-[var(--theme-bg-tertiary)]/30 border-t border-[var(--theme-border)] flex items-center justify-between">
+                                    <div className="flex gap-2">
+                                        <span className="px-3 py-1 rounded-full bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] text-[9px] font-bold text-[var(--theme-text-secondary)] opacity-60">
+                                            PRIORITY {promo.priority}
+                                        </span>
+                                        {promo.is_stackable && (
+                                            <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-bold text-emerald-500">
+                                                STACKABLE
+                                            </span>
                                         )}
-                                        onClick={() => handleToggleActive(promo)}
-                                        title={promo.is_active ? 'Deactivate' : 'Activate'}
-                                    >
-                                        <CheckCircle size={16} />
-                                    </button>
-                                    <button
-                                        className="p-2 border-none bg-white rounded-md cursor-pointer transition-all duration-200 flex items-center justify-center text-red-500 hover:bg-red-50"
-                                        onClick={() => handleDelete(promo.id)}
-                                        title="Delete"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
+                                    </div>
+
+                                    <div className="flex gap-1.5">
+                                        <button
+                                            className="w-9 h-9 flex items-center justify-center rounded-xl bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] text-[var(--theme-text-secondary)] transition-all hover:bg-[var(--theme-bg-tertiary)] hover:text-[var(--color-gold)]"
+                                            onClick={() => navigate(`/products/promotions/${promo.id}`)}
+                                            title="View Details"
+                                        >
+                                            <Eye size={16} />
+                                        </button>
+                                        <button
+                                            className="w-9 h-9 flex items-center justify-center rounded-xl bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] text-[var(--theme-text-secondary)] transition-all hover:bg-[var(--theme-bg-tertiary)] hover:text-[var(--color-gold)]"
+                                            onClick={() => navigate(`/products/promotions/${promo.id}/edit`)}
+                                            title="Edit Promotion"
+                                        >
+                                            <Edit size={16} />
+                                        </button>
+                                        <button
+                                            className={cn(
+                                                "w-9 h-9 flex items-center justify-center rounded-xl border transition-all",
+                                                promo.is_active
+                                                    ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500 hover:text-white"
+                                                    : "bg-red-500/5 border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white"
+                                            )}
+                                            onClick={() => handleToggleActive(promo)}
+                                            title={promo.is_active ? 'Deactivate' : 'Activate'}
+                                        >
+                                            <CheckCircle size={16} />
+                                        </button>
+                                        <button
+                                            className="w-9 h-9 flex items-center justify-center rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 transition-all hover:bg-red-500 hover:text-white"
+                                            onClick={() => handleDelete(promo.id)}
+                                            title="Dissolve Promotion"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
                                 </div>
+
+                                {/* Hover Glow Effect */}
+                                <div className="absolute -inset-px bg-gradient-to-br from-[var(--color-gold)]/0 via-[var(--color-gold)]/0 to-[var(--color-gold)]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
                             </div>
                         )
                     })}

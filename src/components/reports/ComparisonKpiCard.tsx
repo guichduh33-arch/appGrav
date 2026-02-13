@@ -62,19 +62,19 @@ export function ComparisonKpiCard({
   };
 
   return (
-    <div className={`bg-white rounded-xl p-5 border border-gray-200 shadow-sm ${className}`}>
+    <div className={`bg-[var(--theme-bg-secondary)] rounded-xl p-5 border border-[var(--theme-border)] shadow-sm ${className}`}>
       {/* Header with icon and label */}
       <div className="flex items-center gap-3 mb-3">
         {icon && (
-          <div className="p-2 bg-gray-50 rounded-lg">
+          <div className="p-2 bg-[var(--theme-bg-tertiary)] rounded-lg">
             {icon}
           </div>
         )}
-        <span className="text-sm text-gray-600">{label}</span>
+        <span className="text-sm text-[var(--theme-text-secondary)]">{label}</span>
       </div>
 
       {/* Current Value */}
-      <p className="text-2xl font-bold text-gray-900 mb-2">
+      <p className="text-2xl font-bold text-[var(--theme-text-primary)] mb-2 font-display">
         {formatValue(currentValue)}
       </p>
 
@@ -82,7 +82,7 @@ export function ComparisonKpiCard({
       {hasComparison && (
         <div className="flex items-center gap-2 flex-wrap">
           {/* Previous Value */}
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-[var(--theme-text-muted)]">
             vs {formatValue(previousValue)}
           </span>
 
@@ -92,10 +92,10 @@ export function ComparisonKpiCard({
               className={`
                 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium
                 ${isPositive
-                  ? 'bg-green-100 text-green-700'
+                  ? 'bg-[var(--color-success-bg)] text-[var(--color-success-text)]'
                   : isNegative
-                    ? 'bg-red-100 text-red-700'
-                    : 'bg-gray-100 text-gray-600'
+                    ? 'bg-[var(--color-danger-bg)] text-[var(--color-danger-text)]'
+                    : 'bg-[var(--theme-bg-tertiary)] text-[var(--theme-text-muted)]'
                 }
               `}
             >
@@ -108,7 +108,7 @@ export function ComparisonKpiCard({
 
           {/* Absolute Change */}
           {absoluteChange !== null && absoluteChange !== 0 && format === 'currency' && (
-            <span className={`text-xs ${isPositive ? 'text-green-600' : isNegative ? 'text-red-600' : 'text-gray-500'}`}>
+            <span className={`text-xs ${isPositive ? 'text-[var(--color-success-text)]' : isNegative ? 'text-[var(--color-danger-text)]' : 'text-[var(--theme-text-muted)]'}`}>
               ({absoluteChange > 0 ? '+' : ''}{formatCurrency(absoluteChange)})
             </span>
           )}

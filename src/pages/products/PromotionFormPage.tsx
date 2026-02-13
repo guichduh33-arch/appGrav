@@ -1,4 +1,4 @@
-import { ArrowLeft, Save, Tag, Sparkles, Info } from 'lucide-react'
+import { ArrowLeft, Save, Sparkles, Info, Tag } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { PROMOTION_TYPES } from './promotionFormConstants'
 import { usePromotionForm } from './usePromotionForm'
@@ -6,7 +6,6 @@ import PromotionProductSearch from './PromotionProductSearch'
 import PromotionConstraintsSection from './PromotionConstraintsSection'
 
 const GRAIN_TEXTURE = "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E\")"
-const HEADER_WAVE = "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 12 Q50 0 100 12 Q150 24 200 12' fill='none' stroke='%23c9a55c' stroke-width='1'/%3E%3C/svg%3E\")"
 
 export default function PromotionFormPage() {
     const {
@@ -33,250 +32,279 @@ export default function PromotionFormPage() {
 
     if (loading) {
         return (
-            <div className="relative min-h-screen bg-cream overflow-x-hidden">
+            <div className="relative min-h-screen bg-[var(--theme-bg-primary)] overflow-x-hidden flex items-center justify-center">
                 <div
                     className="fixed inset-0 opacity-[0.03] pointer-events-none z-0"
                     style={{ backgroundImage: GRAIN_TEXTURE }}
                 />
-                <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-                    <div className="w-12 h-12 border-[3px] border-parchment border-t-gold rounded-full animate-spin" />
-                    <span className="font-display text-lg italic text-smoke">Loading promotion...</span>
+                <div className="flex flex-col items-center gap-6">
+                    <div className="w-16 h-16 border-4 border-[var(--color-gold-muted)] border-t-[var(--color-gold)] rounded-full animate-spin" />
+                    <span className="font-display text-xl italic text-[var(--theme-text-secondary)] animate-pulse">
+                        Summoning Artisan Data...
+                    </span>
                 </div>
             </div>
         )
     }
 
     return (
-        <div className="relative min-h-screen bg-cream overflow-x-hidden">
-            {/* Grain texture overlay */}
+        <div className="relative min-h-screen bg-[var(--theme-bg-primary)] overflow-x-hidden pt-8 pb-24">
+            {/* Background Texture */}
             <div
                 className="fixed inset-0 opacity-[0.03] pointer-events-none z-0"
                 style={{ backgroundImage: GRAIN_TEXTURE }}
             />
 
-            {/* Header */}
-            <header className="relative flex items-center gap-8 px-12 py-8 bg-gradient-to-b from-kraft to-cream border-b-2 border-parchment z-[1] max-md:flex-col max-md:items-start max-md:gap-4 max-md:px-6 max-md:py-5 max-lg:px-8 max-lg:py-6">
-                {/* Header wave decoration */}
-                <div
-                    className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[200px] h-6 bg-no-repeat bg-center opacity-60"
-                    style={{ backgroundImage: HEADER_WAVE }}
-                />
-                <button
-                    type="button"
-                    className="flex items-center gap-2 px-5 py-3 bg-flour border border-parchment rounded-md text-smoke font-body text-sm font-medium cursor-pointer transition-all duration-normal shadow-sm hover:bg-kraft hover:text-espresso hover:-translate-x-0.5 hover:shadow"
-                    onClick={() => navigate('/products/promotions')}
-                >
-                    <ArrowLeft size={18} />
-                    Back
-                </button>
-                <div className="flex flex-col gap-1">
-                    <h1 className="font-display text-4xl font-semibold text-charcoal m-0 tracking-tight flex items-center gap-3 max-md:text-3xl">
-                        <Sparkles size={28} className="text-gold" />
-                        {isEditing ? 'Edit Promotion' : 'New Promotion'}
-                    </h1>
-                    <span className="font-display italic text-smoke text-base">
-                        Create irresistible offers for your customers
-                    </span>
+            <div className="max-w-7xl mx-auto px-6 relative z-10">
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
+                    <div className="space-y-4">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="group flex items-center gap-2 text-[var(--theme-text-secondary)] hover:text-[var(--color-gold)] transition-all duration-300"
+                        >
+                            <div className="w-8 h-8 rounded-full border border-[var(--theme-border)] flex items-center justify-center group-hover:border-[var(--color-gold)] group-hover:bg-[var(--color-gold)]/10 transition-all">
+                                <ArrowLeft size={16} />
+                            </div>
+                            <span className="font-body text-sm font-medium tracking-wide">Return to Repertoire</span>
+                        </button>
+
+                        <div>
+                            <h1 className="font-display text-5xl font-bold text-[var(--theme-text-primary)] leading-tight tracking-tight">
+                                {isEditing ? 'Refine' : 'Curate New'} <span className="text-gradient-gold">Promotion</span>
+                            </h1>
+                            <p className="font-body text-[var(--theme-text-secondary)] opacity-60 mt-2 max-w-xl text-lg italic">
+                                {isEditing
+                                    ? "Perfecting the nuances of your promotional masterpiece."
+                                    : "Designing a new celebration of artisanal excellence."}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="px-8 py-4 font-body text-sm font-bold text-[var(--theme-text-secondary)] hover:text-[var(--theme-text-primary)] transition-all duration-300 rounded-2xl border border-[var(--theme-border)] hover:bg-white/5"
+                        >
+                            Relinquish
+                        </button>
+                        <button
+                            form="promotion-form"
+                            type="submit"
+                            disabled={saving}
+                            className="relative group px-10 py-4 font-body text-sm font-bold text-white rounded-2xl transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden shadow-2xl shadow-[var(--color-gold)]/20"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-gold)] via-[var(--color-gold-dark)] to-[var(--color-gold)] group-hover:scale-110 transition-transform duration-500" />
+                            <div className="relative flex items-center gap-2">
+                                {saving ? (
+                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                ) : (
+                                    <Save size={18} />
+                                )}
+                                {saving ? 'Curation in progress...' : (isEditing ? 'Update Masterpiece' : 'Invoke Promotion')}
+                            </div>
+                        </button>
+                    </div>
                 </div>
-            </header>
 
-            {/* Form Container */}
-            <div className="relative z-[1] max-w-[1400px] mx-auto px-12 pt-10 pb-16 max-md:px-5 max-lg:px-8">
-                <form onSubmit={handleSubmit} className="grid grid-cols-[1fr_1.2fr] gap-10 max-lg:grid-cols-1">
-                    {/* Left Column - Basic Info */}
-                    <div className="relative bg-flour border border-parchment rounded-xl p-8 shadow-[0_2px_8px_rgba(45,42,36,0.12),inset_0_1px_0_rgba(255,255,255,0.8)] before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-gold before:via-gold-dark before:to-gold before:rounded-t-xl animate-sh-slide-up [animation-delay:0.1s] max-md:p-6">
-                        <h2 className="font-display text-xl font-semibold text-charcoal mb-7 pb-4 border-b border-dashed border-parchment flex items-center gap-3">
-                            <Tag size={20} className="text-gold-dark" />
-                            Basic Information
-                        </h2>
+                <form id="promotion-form" onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                    {/* Left Column: Core Identity */}
+                    <div className="lg:col-span-2 space-y-12">
+                        {/* Basic Info */}
+                        <div className="bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-[2.5rem] p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--color-gold)]/5 blur-[80px] rounded-full" />
 
-                        <div className="mb-6">
-                            <label className="block font-body text-sm font-semibold text-espresso mb-2 tracking-wide uppercase after:content-['_*'] after:text-danger">
-                                Promotion code
-                            </label>
-                            <input
-                                type="text"
-                                className={cn(
-                                    'w-full py-3.5 px-4 font-body text-[0.95rem] text-charcoal bg-cream border-[1.5px] border-parchment rounded-lg transition-all duration-normal shadow-[inset_0_1px_3px_rgba(0,0,0,0.04)] placeholder:text-smoke/60 placeholder:italic focus:outline-none focus:border-gold focus:bg-flour focus:shadow-[0_0_0_3px_rgba(201,165,92,0.15),inset_0_1px_3px_rgba(0,0,0,0.02)]',
-                                    errors.code && 'border-danger bg-[rgba(181,68,43,0.03)]'
-                                )}
-                                value={form.code}
-                                onChange={(e) => updateField('code', e.target.value.toUpperCase())}
-                                placeholder="Ex: CROISSANT20"
-                                maxLength={20}
-                            />
-                            {errors.code && (
-                                <span className="text-xs text-danger mt-1.5 flex items-center gap-1">
-                                    <Info size={12} />{errors.code}
-                                </span>
-                            )}
-                            <span className="text-xs text-smoke mt-1.5 italic block">Unique code to apply the promotion</span>
-                        </div>
+                            <h2 className="font-display text-2xl font-semibold text-[var(--theme-text-primary)] mb-8 flex items-center gap-3">
+                                <Sparkles size={24} className="text-[var(--color-gold)]" />
+                                Artisan Essence
+                            </h2>
 
-                        <div className="mb-6">
-                            <label className="block font-body text-sm font-semibold text-espresso mb-2 tracking-wide uppercase after:content-['_*'] after:text-danger">
-                                Offer Name
-                            </label>
-                            <input
-                                type="text"
-                                className={cn(
-                                    'w-full py-3.5 px-4 font-body text-[0.95rem] text-charcoal bg-cream border-[1.5px] border-parchment rounded-lg transition-all duration-normal shadow-[inset_0_1px_3px_rgba(0,0,0,0.04)] placeholder:text-smoke/60 placeholder:italic focus:outline-none focus:border-gold focus:bg-flour focus:shadow-[0_0_0_3px_rgba(201,165,92,0.15),inset_0_1px_3px_rgba(0,0,0,0.02)]',
-                                    errors.name && 'border-danger bg-[rgba(181,68,43,0.03)]'
-                                )}
-                                value={form.name}
-                                onChange={(e) => updateField('name', e.target.value)}
-                                placeholder="Ex: Baker's Breakfast Special"
-                            />
-                            {errors.name && (
-                                <span className="text-xs text-danger mt-1.5 flex items-center gap-1">
-                                    <Info size={12} />{errors.name}
-                                </span>
-                            )}
-                        </div>
-
-                        <div className="mb-6">
-                            <label className="block font-body text-sm font-semibold text-espresso mb-2 tracking-wide uppercase">
-                                Description
-                            </label>
-                            <textarea
-                                className="w-full py-3.5 px-4 font-body text-[0.95rem] text-charcoal bg-cream border-[1.5px] border-parchment rounded-lg transition-all duration-normal shadow-[inset_0_1px_3px_rgba(0,0,0,0.04)] placeholder:text-smoke/60 placeholder:italic focus:outline-none focus:border-gold focus:bg-flour focus:shadow-[0_0_0_3px_rgba(201,165,92,0.15),inset_0_1px_3px_rgba(0,0,0,0.02)] resize-y min-h-[80px]"
-                                value={form.description}
-                                onChange={(e) => updateField('description', e.target.value)}
-                                placeholder="Describe your promotional offer..."
-                                rows={3}
-                            />
-                        </div>
-
-                        {/* Promotion Type Selection */}
-                        <div className="mb-6">
-                            <label className="block font-body text-sm font-semibold text-espresso mb-2 tracking-wide uppercase after:content-['_*'] after:text-danger">
-                                Promotion type
-                            </label>
-                            <div className="grid grid-cols-2 gap-4 mb-6 max-md:grid-cols-1">
-                                {PROMOTION_TYPES.map(({ type, label, desc, icon: Icon }) => (
-                                    <div
-                                        key={type}
-                                        className={cn(
-                                            'relative p-5 bg-cream border-2 border-parchment rounded-[10px] cursor-pointer transition-all duration-normal text-center',
-                                            'hover:border-gold hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(45,42,36,0.12)]',
-                                            form.promotion_type === type && 'border-gold bg-gradient-to-b from-gold/[0.08] to-flour shadow-[0_4px_12px_rgba(45,42,36,0.12),inset_0_0_0_1px_var(--color-gold)]'
-                                        )}
-                                        onClick={() => updateField('promotion_type', type)}
-                                    >
-                                        {/* Checkmark badge on selected */}
-                                        {form.promotion_type === type && (
-                                            <div
-                                                className="absolute -top-px -right-px w-6 h-6 bg-gold rounded-[0_8px_0_8px] bg-no-repeat bg-center bg-[length:12px]"
-                                                style={{
-                                                    backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E\")"
-                                                }}
-                                            />
-                                        )}
-                                        <div className={cn(
-                                            'w-12 h-12 mx-auto mb-3 flex items-center justify-center bg-kraft rounded-full text-gold-dark transition-all duration-normal',
-                                            (form.promotion_type === type) && 'bg-gold text-white scale-[1.08]'
-                                        )}>
-                                            <Icon size={24} />
-                                        </div>
-                                        <div className="font-body text-sm font-semibold text-charcoal mb-1">{label}</div>
-                                        <div className="text-xs text-smoke leading-snug">{desc}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Conditional Fields based on type */}
-                        <div className="p-5 bg-gradient-to-br from-gold/[0.06] to-gold/[0.02] border border-dashed border-gold rounded-lg mt-4">
-                            <div className="font-display text-base font-semibold text-gold-dark mb-4 flex items-center gap-2">
-                                <Sparkles size={16} />
-                                Discount settings
-                            </div>
-
-                            {form.promotion_type === 'percentage' && (
-                                <div className="mb-6 last:mb-0">
-                                    <label className="block font-body text-sm font-semibold text-espresso mb-2 tracking-wide uppercase after:content-['_*'] after:text-danger">
-                                        Discount percentage
-                                    </label>
-                                    <input
-                                        type="number"
-                                        className={cn(
-                                            'w-full py-3.5 px-4 font-body text-[0.95rem] text-charcoal bg-cream border-[1.5px] border-parchment rounded-lg transition-all duration-normal shadow-[inset_0_1px_3px_rgba(0,0,0,0.04)] focus:outline-none focus:border-gold focus:bg-flour focus:shadow-[0_0_0_3px_rgba(201,165,92,0.15),inset_0_1px_3px_rgba(0,0,0,0.02)]',
-                                            errors.discount_percentage && 'border-danger bg-[rgba(181,68,43,0.03)]'
-                                        )}
-                                        value={form.discount_percentage}
-                                        onChange={(e) => updateField('discount_percentage', Number(e.target.value))}
-                                        min={1}
-                                        max={100}
-                                    />
-                                    {errors.discount_percentage && (
-                                        <span className="text-xs text-danger mt-1.5 flex items-center gap-1">
-                                            <Info size={12} />{errors.discount_percentage}
-                                        </span>
-                                    )}
-                                </div>
-                            )}
-
-                            {form.promotion_type === 'fixed_amount' && (
-                                <div className="mb-6 last:mb-0">
-                                    <label className="block font-body text-sm font-semibold text-espresso mb-2 tracking-wide uppercase after:content-['_*'] after:text-danger">
-                                        Discount amount (IDR)
-                                    </label>
-                                    <input
-                                        type="number"
-                                        className={cn(
-                                            'w-full py-3.5 px-4 font-body text-[0.95rem] text-charcoal bg-cream border-[1.5px] border-parchment rounded-lg transition-all duration-normal shadow-[inset_0_1px_3px_rgba(0,0,0,0.04)] focus:outline-none focus:border-gold focus:bg-flour focus:shadow-[0_0_0_3px_rgba(201,165,92,0.15),inset_0_1px_3px_rgba(0,0,0,0.02)]',
-                                            errors.discount_amount && 'border-danger bg-[rgba(181,68,43,0.03)]'
-                                        )}
-                                        value={form.discount_amount}
-                                        onChange={(e) => updateField('discount_amount', Number(e.target.value))}
-                                        min={0}
-                                        step={1000}
-                                    />
-                                    {errors.discount_amount && (
-                                        <span className="text-xs text-danger mt-1.5 flex items-center gap-1">
-                                            <Info size={12} />{errors.discount_amount}
-                                        </span>
-                                    )}
-                                </div>
-                            )}
-
-                            {form.promotion_type === 'buy_x_get_y' && (
-                                <div className="grid grid-cols-2 gap-5 max-md:grid-cols-1">
-                                    <div className="mb-6 last:mb-0">
-                                        <label className="block font-body text-sm font-semibold text-espresso mb-2 tracking-wide uppercase after:content-['_*'] after:text-danger">
-                                            Buy (X)
+                            <div className="space-y-8">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                    <div className="md:col-span-2 group">
+                                        <label htmlFor="promo_name" className="block font-body text-xs font-bold text-[var(--color-gold)] mb-3 uppercase tracking-widest opacity-70 group-focus-within:opacity-100 transition-opacity">
+                                            Collection Name
                                         </label>
                                         <input
-                                            type="number"
+                                            id="promo_name"
+                                            type="text"
                                             className={cn(
-                                                'w-full py-3.5 px-4 font-body text-[0.95rem] text-charcoal bg-cream border-[1.5px] border-parchment rounded-lg transition-all duration-normal shadow-[inset_0_1px_3px_rgba(0,0,0,0.04)] focus:outline-none focus:border-gold focus:bg-flour focus:shadow-[0_0_0_3px_rgba(201,165,92,0.15),inset_0_1px_3px_rgba(0,0,0,0.02)]',
-                                                errors.buy_quantity && 'border-danger bg-[rgba(181,68,43,0.03)]'
+                                                "w-full bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-2xl px-6 py-5 font-body text-lg text-[var(--theme-text-primary)] transition-all duration-300",
+                                                "focus:outline-none focus:border-[var(--color-gold)] focus:shadow-[0_0_0_4px_rgba(201,165,92,0.1)]",
+                                                errors.name && "border-red-500/50 bg-red-500/5"
                                             )}
-                                            value={form.buy_quantity}
-                                            onChange={(e) => updateField('buy_quantity', Number(e.target.value))}
-                                            min={1}
+                                            placeholder="e.g., Morning Mist Delicacy"
+                                            value={form.name}
+                                            onChange={(e) => updateField('name', e.target.value)}
                                         />
+                                        {errors.name && (
+                                            <p className="mt-2 text-sm text-red-500 flex items-center gap-1.5 font-medium">
+                                                <Info size={14} /> {errors.name}
+                                            </p>
+                                        )}
                                     </div>
-                                    <div className="mb-6 last:mb-0">
-                                        <label className="block font-body text-sm font-semibold text-espresso mb-2 tracking-wide uppercase after:content-['_*'] after:text-danger">
-                                            Get free (Y)
+                                    <div className="group">
+                                        <label htmlFor="promo_code" className="block font-body text-xs font-bold text-[var(--color-gold)] mb-3 uppercase tracking-widest opacity-70 group-focus-within:opacity-100 transition-opacity">
+                                            Signature Code
                                         </label>
                                         <input
-                                            type="number"
-                                            className="w-full py-3.5 px-4 font-body text-[0.95rem] text-charcoal bg-cream border-[1.5px] border-parchment rounded-lg transition-all duration-normal shadow-[inset_0_1px_3px_rgba(0,0,0,0.04)] focus:outline-none focus:border-gold focus:bg-flour focus:shadow-[0_0_0_3px_rgba(201,165,92,0.15),inset_0_1px_3px_rgba(0,0,0,0.02)]"
-                                            value={form.get_quantity}
-                                            onChange={(e) => updateField('get_quantity', Number(e.target.value))}
-                                            min={1}
+                                            id="promo_code"
+                                            type="text"
+                                            className={cn(
+                                                "w-full bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-2xl px-6 py-5 font-body text-lg text-[var(--theme-text-primary)] transition-all duration-300 uppercase",
+                                                "focus:outline-none focus:border-[var(--color-gold)] focus:shadow-[0_0_0_4px_rgba(201,165,92,0.1)]",
+                                                errors.code && "border-red-500/50 bg-red-500/5"
+                                            )}
+                                            placeholder="LUXE24"
+                                            value={form.code}
+                                            onChange={(e) => updateField('code', e.target.value)}
                                         />
+                                        {errors.code && (
+                                            <p className="mt-2 text-sm text-red-500 flex items-center gap-1.5 font-medium">
+                                                <Info size={14} /> {errors.code}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
-                            )}
 
-                            {form.promotion_type === 'free_product' && (
+                                <div className="group">
+                                    <label htmlFor="promo_desc" className="block font-body text-xs font-bold text-[var(--color-gold)] mb-3 uppercase tracking-widest opacity-70 group-focus-within:opacity-100 transition-opacity">
+                                        Visionary Description
+                                    </label>
+                                    <textarea
+                                        id="promo_desc"
+                                        rows={3}
+                                        className="w-full bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-2xl px-6 py-5 font-body text-base text-[var(--theme-text-primary)] transition-all duration-300 focus:outline-none focus:border-[var(--color-gold)] focus:shadow-[0_0_0_4px_rgba(201,165,92,0.1)] resize-none"
+                                        placeholder="Describe the soul of this promotion..."
+                                        value={form.description || ''}
+                                        onChange={(e) => updateField('description', e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="p-8 bg-[var(--theme-bg-tertiary)] rounded-3xl border border-[var(--theme-border)] space-y-8">
+                                    <div className="group">
+                                        <label htmlFor="promo_type" className="block font-body text-xs font-bold text-[var(--color-gold)] mb-4 uppercase tracking-widest opacity-70 group-focus-within:opacity-100 transition-opacity">
+                                            Curation Type
+                                        </label>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            {PROMOTION_TYPES.map((type) => (
+                                                <button
+                                                    key={type.type}
+                                                    type="button"
+                                                    onClick={() => updateField('promotion_type', type.type)}
+                                                    className={cn(
+                                                        "flex flex-col items-center gap-3 p-4 rounded-2xl border transition-all duration-300 text-center group/btn",
+                                                        form.promotion_type === type.type
+                                                            ? "bg-[var(--color-gold)]/15 border-[var(--color-gold)] text-[var(--color-gold)]"
+                                                            : "bg-[var(--theme-bg-secondary)] border-[var(--theme-border)] text-[var(--theme-text-secondary)] hover:border-[var(--color-gold-muted)]"
+                                                    )}
+                                                >
+                                                    <type.icon size={24} className={cn(
+                                                        "transition-transform duration-300 group-hover/btn:scale-110",
+                                                        form.promotion_type === type.type ? "text-[var(--color-gold)]" : "text-[var(--theme-text-secondary)]"
+                                                    )} />
+                                                    <span className="font-body text-xs font-bold uppercase tracking-wider">{type.label}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Conditional fields based on promotion type */}
+                                    <div className="pt-6 border-t border-dashed border-[var(--theme-border)]">
+                                        {form.promotion_type === 'percentage' && (
+                                            <div className="group">
+                                                <label htmlFor="discount_percentage" className="block font-body text-xs font-bold text-[var(--color-gold)] mb-3 uppercase tracking-widest opacity-70">
+                                                    Gratitude Percentage
+                                                </label>
+                                                <div className="relative">
+                                                    <input
+                                                        id="discount_percentage"
+                                                        type="number"
+                                                        className={cn(
+                                                            "w-full bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-2xl px-6 py-5 font-body text-lg text-[var(--theme-text-primary)] pr-12 transition-all duration-300",
+                                                            "focus:outline-none focus:border-[var(--color-gold)]",
+                                                            errors.discount_percentage && "border-red-500/50"
+                                                        )}
+                                                        value={form.discount_percentage}
+                                                        onChange={(e) => updateField('discount_percentage', Number(e.target.value))}
+                                                    />
+                                                    <span className="absolute right-6 top-1/2 -translate-y-1/2 font-display text-2xl text-[var(--color-gold)] opacity-50">%</span>
+                                                </div>
+                                                {errors.discount_percentage && (
+                                                    <p className="mt-2 text-sm text-red-500 font-medium">{errors.discount_percentage}</p>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {form.promotion_type === 'fixed_amount' && (
+                                            <div className="group">
+                                                <label htmlFor="discount_amount" className="block font-body text-xs font-bold text-[var(--color-gold)] mb-3 uppercase tracking-widest opacity-70">
+                                                    Token of Appreciation (Amount)
+                                                </label>
+                                                <div className="relative">
+                                                    <span className="absolute left-6 top-1/2 -translate-y-1/2 font-display text-lg text-[var(--color-gold)] opacity-50">Rp</span>
+                                                    <input
+                                                        id="discount_amount"
+                                                        type="number"
+                                                        className={cn(
+                                                            "w-full bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-2xl pl-16 pr-6 py-5 font-body text-lg text-[var(--theme-text-primary)] transition-all duration-300",
+                                                            "focus:outline-none focus:border-[var(--color-gold)]",
+                                                            errors.discount_amount && "border-red-500/50"
+                                                        )}
+                                                        value={form.discount_amount}
+                                                        onChange={(e) => updateField('discount_amount', Number(e.target.value))}
+                                                    />
+                                                </div>
+                                                {errors.discount_amount && (
+                                                    <p className="mt-2 text-sm text-red-500 font-medium">{errors.discount_amount}</p>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {form.promotion_type === 'buy_x_get_y' && (
+                                            <div className="grid grid-cols-2 gap-8">
+                                                <div className="group">
+                                                    <label htmlFor="buy_quantity" className="block font-body text-xs font-bold text-[var(--color-gold)] mb-3 uppercase tracking-widest opacity-70">
+                                                        Purchase Quantity
+                                                    </label>
+                                                    <input
+                                                        id="buy_quantity"
+                                                        type="number"
+                                                        className="w-full bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-2xl px-6 py-5 font-body text-lg text-[var(--theme-text-primary)] focus:outline-none focus:border-[var(--color-gold)]"
+                                                        value={form.buy_quantity}
+                                                        onChange={(e) => updateField('buy_quantity', Number(e.target.value))}
+                                                    />
+                                                </div>
+                                                <div className="group">
+                                                    <label htmlFor="get_quantity" className="block font-body text-xs font-bold text-[var(--color-gold)] mb-3 uppercase tracking-widest opacity-70">
+                                                        Complimentary Quantity
+                                                    </label>
+                                                    <input
+                                                        id="get_quantity"
+                                                        type="number"
+                                                        className="w-full bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-2xl px-6 py-5 font-body text-lg text-[var(--theme-text-primary)] focus:outline-none focus:border-[var(--color-gold)]"
+                                                        value={form.get_quantity}
+                                                        onChange={(e) => updateField('get_quantity', Number(e.target.value))}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Special handling for free product selection */}
+                        {form.promotion_type === 'free_product' && (
+                            <div className="bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-[2rem] p-8 shadow-xl">
+                                <h2 className="font-display text-2xl font-semibold text-[var(--theme-text-primary)] mb-6 flex items-center gap-3">
+                                    <Tag size={24} className="text-[var(--color-gold)]" />
+                                    Gift Selection
+                                </h2>
                                 <PromotionProductSearch
-                                    title="Free products"
-                                    subtitle="Select gifts"
-                                    emptyText="No free product selected"
+                                    title="Complimentary Collections"
+                                    subtitle="Choose the treasures to be bestowed"
+                                    emptyText="No treasures nominated yet"
                                     type="free"
                                     selectedProducts={freeProducts}
                                     filteredProducts={filteredProducts}
@@ -287,70 +315,100 @@ export default function PromotionFormPage() {
                                     onAddProduct={addProduct}
                                     onRemoveProduct={removeProduct}
                                 />
-                            )}
-                        </div>
+                            </div>
+                        )}
+
+                        {/* Constraints Section */}
+                        <PromotionConstraintsSection
+                            form={form}
+                            errors={errors}
+                            selectedProducts={selectedProducts}
+                            filteredProducts={filteredProducts}
+                            showProductSearch={showProductSearch}
+                            searchTerm={searchTerm}
+                            updateField={updateField}
+                            toggleDay={toggleDay}
+                            setShowProductSearch={setShowProductSearch}
+                            setSearchTerm={setSearchTerm}
+                            addProduct={addProduct}
+                            removeProduct={removeProduct}
+                        />
                     </div>
 
-                    {/* Right Column - Constraints & Limits */}
-                    <PromotionConstraintsSection
-                        form={form}
-                        errors={errors}
-                        selectedProducts={selectedProducts}
-                        filteredProducts={filteredProducts}
-                        showProductSearch={showProductSearch}
-                        searchTerm={searchTerm}
-                        updateField={updateField}
-                        toggleDay={toggleDay}
-                        setShowProductSearch={setShowProductSearch}
-                        setSearchTerm={setSearchTerm}
-                        addProduct={addProduct}
-                        removeProduct={removeProduct}
-                    />
+                    {/* Right Column: Preview & Status */}
+                    <div className="space-y-8">
+                        {/* Live Preview Card */}
+                        <div className="sticky top-8 space-y-8">
+                            <div className="bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-[2rem] overflow-hidden shadow-2xl relative">
+                                <div className="h-2 bg-gradient-to-r from-[var(--color-gold)] via-[var(--color-gold-dark)] to-[var(--color-gold)]" />
 
-                    {/* Preview Section */}
-                    {form.name && (
-                        <div className="col-span-full mt-4 relative bg-flour border border-parchment rounded-xl p-8 shadow-[0_2px_8px_rgba(45,42,36,0.12),inset_0_1px_0_rgba(255,255,255,0.8)] before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-gold before:via-gold-dark before:to-gold before:rounded-t-xl animate-sh-slide-up [animation-delay:0.3s]">
-                            <div className="relative bg-flour border-2 border-dashed border-parchment rounded-xl p-8 text-center before:content-['\2726'] before:absolute before:top-1/2 before:left-6 before:-translate-y-1/2 before:text-2xl before:text-gold before:opacity-50 after:content-['\2726'] after:absolute after:top-1/2 after:right-6 after:-translate-y-1/2 after:text-2xl after:text-gold after:opacity-50">
-                                <div className="inline-block px-6 py-2 bg-gold text-white font-display text-sm font-semibold rounded-full mb-4 uppercase tracking-widest">
-                                    {form.code || 'CODE'}
+                                <div className="p-8">
+                                    <div className="flex items-center justify-between mb-8">
+                                        <span className="font-body text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-gold)] opacity-70">
+                                            Exclusivity Preview
+                                        </span>
+                                        <div className={cn(
+                                            "w-3 h-3 rounded-full animate-pulse shadow-[0_0_10px_rgba(201,165,92,0.5)]",
+                                            form.is_active ? "bg-[var(--color-gold)]" : "bg-[var(--theme-text-secondary)] opacity-30"
+                                        )} />
+                                    </div>
+
+                                    <div className="text-center py-6 space-y-4">
+                                        <div className="inline-block px-4 py-1.5 rounded-full bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20">
+                                            <span className="font-display text-sm font-bold text-[var(--color-gold)] uppercase tracking-widest">
+                                                {form.code || 'CODE'}
+                                            </span>
+                                        </div>
+
+                                        <h3 className="font-display text-4xl font-bold text-[var(--theme-text-primary)]">
+                                            {getPreviewValue()}
+                                        </h3>
+
+                                        <p className="font-body text-[var(--theme-text-secondary)] italic">
+                                            {form.name || 'Untitled Curation'}
+                                        </p>
+                                    </div>
+
+                                    <div className="mt-8 pt-8 border-t border-dashed border-[var(--theme-border)] space-y-4">
+                                        <div className="flex items-center justify-between font-body text-xs">
+                                            <span className="text-[var(--theme-text-secondary)]">Status</span>
+                                            <span className={cn(
+                                                "font-bold uppercase tracking-wider",
+                                                form.is_active ? "text-[var(--color-gold)]" : "text-[var(--theme-text-secondary)] opacity-40"
+                                            )}>
+                                                {form.is_active ? 'Active Essence' : 'Dormant'}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center justify-between font-body text-xs">
+                                            <span className="text-[var(--theme-text-secondary)]">Exclusivity</span>
+                                            <span className="text-[var(--theme-text-primary)] font-medium">
+                                                {form.is_stackable ? 'Layered' : 'Singular'}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="font-display text-[2.5rem] font-bold text-charcoal mb-2">
-                                    {getPreviewValue()}
-                                </div>
-                                <div className="font-display italic text-smoke text-lg">
-                                    {form.name}
+
+                                <div className="bg-[var(--color-gold)]/5 p-4 text-center">
+                                    <span className="font-body text-[9px] font-medium uppercase tracking-[0.1em] text-[var(--color-gold)] opacity-60">
+                                        Luxe Bakery Artisan System
+                                    </span>
                                 </div>
                             </div>
-                        </div>
-                    )}
 
-                    {/* Form Actions */}
-                    <div className="sticky bottom-0 bg-gradient-to-b from-transparent via-cream/80 to-cream pt-8 pb-4 mt-8 flex justify-end gap-4 z-10 max-md:flex-col col-span-full">
-                        <button
-                            type="button"
-                            className="py-3.5 px-7 font-body text-[0.95rem] font-semibold text-smoke bg-flour border-2 border-parchment rounded-lg cursor-pointer transition-all duration-normal flex items-center gap-2 hover:bg-kraft hover:border-smoke hover:text-charcoal max-md:w-full max-md:justify-center"
-                            onClick={() => navigate('/products/promotions')}
-                            disabled={saving}
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            className="py-3.5 px-8 font-body text-[0.95rem] font-semibold text-white bg-gradient-to-b from-gold to-gold-dark border-none rounded-lg cursor-pointer transition-all duration-normal flex items-center gap-2 shadow-[0_2px_8px_rgba(201,165,92,0.35),inset_0_1px_0_rgba(255,255,255,0.2)] hover:enabled:-translate-y-0.5 hover:enabled:shadow-[0_4px_16px_rgba(201,165,92,0.4),inset_0_1px_0_rgba(255,255,255,0.2)] disabled:opacity-60 disabled:cursor-not-allowed max-md:w-full max-md:justify-center"
-                            disabled={saving}
-                        >
-                            {saving ? (
-                                <>
-                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    Saving...
-                                </>
-                            ) : (
-                                <>
-                                    <Save size={18} />
-                                    {isEditing ? 'Update' : 'Create Promotion'}
-                                </>
-                            )}
-                        </button>
+                            {/* Artisan's Note */}
+                            <div className="bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-2xl p-6 relative group overflow-hidden">
+                                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Info size={48} />
+                                </div>
+                                <h4 className="font-display text-sm font-bold text-[var(--theme-text-primary)] mb-3 flex items-center gap-2">
+                                    <Info size={16} className="text-[var(--color-gold)]" />
+                                    Artisan's Note
+                                </h4>
+                                <p className="font-body text-xs text-[var(--theme-text-secondary)] leading-relaxed opacity-70">
+                                    Every promotion is a delicate balance. Ensure your <strong>Signature Code</strong> is memorable yet exclusive to your vision.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>

@@ -264,19 +264,17 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
   return (
     <div className="modal-backdrop is-active" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal modal-lg is-active">
-        <div className="modal-header">
-          <div>
-            <h3 className="modal-title">
-              <CreditCard size={24} />
-              Checkout
-            </h3>
-            <p className="modal-subtitle">
-              Total: <strong className="text-white text-lg font-display">{formatPrice(total)}</strong>
-            </p>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-gold)]/10 bg-[var(--theme-bg-primary)]">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-bold uppercase tracking-[0.15em] text-white">THE BREAKERY</span>
+            <span className="text-xs text-[var(--theme-text-muted)]">Station 04 &bull; Terminal 12</span>
           </div>
-          <button className="modal-close" onClick={onClose} aria-label="Close" title="Close">
-            <X size={24} />
-          </button>
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-[var(--theme-text-muted)]">Server: <span className="text-white font-medium">{user?.name || user?.email || 'Cashier'}</span></span>
+            <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-transparent text-[var(--theme-text-muted)] hover:text-white hover:border-white/20 cursor-pointer transition-colors" onClick={onClose} aria-label="Close" title="Close">
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         <div className="modal-body payment-body">
@@ -327,11 +325,11 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
                 <div className={`payment-grid ${currentMethod !== 'cash' ? 'payment-grid--single' : ''}`}>
                   <div className="payment-left">
                     {/* Amount display */}
-                    <div className="text-center p-4 bg-gradient-to-br from-[var(--theme-bg-tertiary)] to-[var(--theme-bg-secondary)] rounded-lg border border-gold-deep">
-                      <p className="text-[10px] font-bold text-gold-light uppercase tracking-[0.15em] mb-1">
-                        {currentMethod === 'cash' ? 'Amount to pay' : 'Payment amount'}
+                    <div className="text-center p-6 bg-[var(--theme-bg-secondary)]/50 border border-[var(--color-gold)]/20 rounded-xl">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--theme-text-muted)] mb-2">
+                        {currentMethod === 'cash' ? 'Enter Amount' : 'Payment Amount'}
                       </p>
-                      <p className="text-4xl font-extrabold text-gold font-display leading-none">
+                      <p className="text-5xl font-light text-white leading-none">
                         {formatPrice(currentAmount)}
                       </p>
                     </div>
@@ -401,23 +399,23 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
         </div>
 
         <div className="payment-footer">
-          <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
+          <button className="flex-1 py-4 border border-[var(--color-gold)]/20 rounded-lg bg-transparent text-[10px] font-bold uppercase tracking-widest text-[var(--theme-text-secondary)] cursor-pointer transition-all hover:border-[var(--color-gold)]/40 hover:text-white" onClick={onClose}>Cancel</button>
 
           {currentMethod && status !== 'complete' && (
-            <button className="btn btn-primary" onClick={handleAddPayment} disabled={!canAddCurrent}>
-              <Plus size={18} /> Add Payment
+            <button className="flex-1 py-4 border border-[var(--color-gold)]/20 rounded-lg bg-transparent text-[10px] font-bold uppercase tracking-widest text-[var(--color-gold)] cursor-pointer transition-all hover:bg-[var(--color-gold)]/10 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2" onClick={handleAddPayment} disabled={!canAddCurrent}>
+              <Plus size={14} /> Add Payment
             </button>
           )}
 
           <button
-            className="flex items-center justify-center gap-2 py-3 px-6 rounded-lg text-base font-bold cursor-pointer transition-all duration-200 uppercase tracking-wider bg-gradient-to-r from-gold-dark to-gold text-black shadow-[0_4px_12px_rgba(200,164,91,0.25)] hover:shadow-[0_6px_20px_rgba(200,164,91,0.35)] hover:-translate-y-0.5 disabled:bg-[var(--theme-bg-tertiary)] disabled:text-[var(--theme-text-muted)] disabled:shadow-none disabled:cursor-not-allowed disabled:translate-y-0 min-w-[220px] h-[52px]"
+            className="flex items-center justify-center gap-2 py-6 px-8 rounded-lg text-sm font-bold cursor-pointer transition-all duration-200 uppercase tracking-[0.25em] bg-[var(--color-gold)] text-black shadow-lg shadow-[var(--color-gold)]/20 hover:brightness-110 disabled:bg-[var(--theme-bg-tertiary)] disabled:text-[var(--theme-text-muted)] disabled:shadow-none disabled:cursor-not-allowed min-w-[260px]"
             onClick={handleCompletePayment}
             disabled={!isComplete() || isProcessing}
           >
             {isProcessing ? (
-              <><Loader2 size={20} className="animate-spin" /> Processing...</>
+              <><Loader2 size={18} className="animate-spin" /> Processing...</>
             ) : (
-              <><Check size={20} /> {payments.length > 1 ? 'Complete Split' : 'Complete Payment'}</>
+              <><Check size={18} /> {payments.length > 1 ? 'Complete Split' : 'Process Payment'}</>
             )}
           </button>
         </div>

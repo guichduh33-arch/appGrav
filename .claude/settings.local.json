@@ -157,7 +157,8 @@
       "mcp__stitch__list_screens",
       "WebFetch(domain:lh3.googleusercontent.com)",
       "WebFetch(domain:contribution.usercontent.google.com)",
-      "mcp__stitch__get_screen"
+      "mcp__stitch__get_screen",
+      "mcp__claude_ai_Supabase__list_migrations"
     ]
   },
   "enableAllProjectMcpServers": true,

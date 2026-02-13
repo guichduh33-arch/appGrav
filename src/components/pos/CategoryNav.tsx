@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { Menu } from 'lucide-react'
+import { Menu, Settings, User } from 'lucide-react'
 import type { Category } from '../../types/database'
 import { NetworkIndicator } from '../ui/NetworkIndicator'
 import { SyncIndicator } from '../ui/SyncIndicator'
@@ -14,9 +14,9 @@ interface CategoryNavProps {
     onOpenMenu?: () => void
 }
 
-const itemBase = 'w-full flex flex-col items-center justify-center py-3 px-1 min-h-[64px] border-none cursor-pointer text-left transition-all duration-200 relative border-l-3 border-l-transparent'
-const itemActive = 'border-l-[var(--color-gold)] bg-[var(--color-gold)]/10 text-white'
-const itemInactive = 'text-[var(--theme-text-muted)] hover:text-white hover:bg-[var(--theme-bg-tertiary)]'
+const itemBase = 'w-full flex flex-col items-center gap-1 py-4 px-1 border-none cursor-pointer text-left transition-all duration-200 relative border-r-2 border-r-transparent bg-transparent'
+const itemActive = 'border-r-[var(--color-gold)] bg-[var(--color-gold)]/10 text-[var(--color-gold)]'
+const itemInactive = 'text-[var(--theme-text-muted)] hover:text-[var(--color-gold)] hover:bg-[var(--theme-bg-tertiary)]'
 
 export default memo(function CategoryNav({
     categories,
@@ -37,15 +37,14 @@ export default memo(function CategoryNav({
 
     return (
         <aside className="pos-categories">
-            {/* Menu Button & Logo */}
+            {/* Logo */}
             <div className="pos-categories__header">
                 <div className="flex flex-col items-center mb-4">
-                    <span className="text-[0.55rem] uppercase tracking-[0.2em] text-gold font-bold mb-0.5 opacity-80">The</span>
-                    <span className="text-xs font-display font-bold tracking-[0.1em] text-white uppercase">Breakery</span>
+                    <span className="text-2xl font-display italic font-bold text-[var(--color-gold)]">B</span>
                 </div>
 
                 <button className="pos-menu-btn" onClick={onOpenMenu} title="Menu" aria-label="Open menu">
-                    <Menu size={22} />
+                    <Menu size={20} />
                 </button>
                 <NetworkIndicator compact className="mt-2" />
                 <OfflineSessionIndicator compact className="mt-1" />
@@ -56,7 +55,7 @@ export default memo(function CategoryNav({
                 className={cn(itemBase, selectedCategory === null ? itemActive : itemInactive)}
                 onClick={() => onSelectCategory(null)}
             >
-                <span className="text-xs font-bold tracking-tight uppercase">All</span>
+                <span className="text-[10px] uppercase tracking-widest font-medium">All</span>
             </button>
 
             {categories.map(category => (
@@ -67,15 +66,34 @@ export default memo(function CategoryNav({
                 >
                     {category.color && (
                         <div
-                            className="w-2.5 h-2.5 rounded-full mb-1 shrink-0"
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
                             style={{ backgroundColor: category.color }}
                         />
                     )}
-                    <span className="text-[0.65rem] font-semibold tracking-tight uppercase text-center leading-tight line-clamp-2">
+                    <span className="text-[10px] font-medium tracking-widest uppercase text-center leading-tight line-clamp-2">
                         {category.name}
                     </span>
                 </button>
             ))}
+
+            {/* Bottom icons */}
+            <div className="mt-auto flex flex-col items-center gap-1 py-4 border-t border-white/5">
+                <button
+                    className="w-10 h-10 flex items-center justify-center rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--color-gold)] hover:bg-[var(--theme-bg-tertiary)] transition-colors border-none bg-transparent cursor-pointer"
+                    title="Settings"
+                    aria-label="Settings"
+                    onClick={onOpenMenu}
+                >
+                    <Settings size={18} />
+                </button>
+                <button
+                    className="w-10 h-10 flex items-center justify-center rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--color-gold)] hover:bg-[var(--theme-bg-tertiary)] transition-colors border-none bg-transparent cursor-pointer"
+                    title="Account"
+                    aria-label="Account"
+                >
+                    <User size={18} />
+                </button>
+            </div>
         </aside>
     )
 })

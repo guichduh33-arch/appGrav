@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Banknote, QrCode, CreditCard, Clock, AlertTriangle, Lock } from 'lucide-react'
+import { X, Banknote, QrCode, CreditCard, AlertTriangle, Lock, Printer } from 'lucide-react'
 import { formatPrice } from '../../../utils/helpers'
 import { logError } from '@/utils/logger'
 
@@ -55,161 +55,227 @@ export default function CloseShiftModal({
         setter(value)
     }
 
+    const cashVariance = actualCash ? (parseInt(actualCash) || 0) - openingCash : 0
+
+    const now = new Date()
+    const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase()
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
+
     return (
-        <div className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/60 p-4">
-            <div className="flex w-full max-w-[560px] max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] max-[480px]:max-h-screen max-[480px]:rounded-none">
-                <div className="flex items-start gap-4 border-b border-slate-200 p-6">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600">
-                        <Lock size={24} />
+        <div className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div className="flex w-full max-w-[900px] max-h-[90vh] flex-col overflow-hidden rounded-xl bg-[var(--theme-bg-primary)] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] text-white">
+                {/* Header */}
+                <div className="flex items-center justify-between px-8 py-5 border-b border-white/5">
+                    <div className="flex items-center gap-4">
+                        <span className="text-2xl font-display italic font-bold text-[var(--color-gold)]">B</span>
+                        <span className="text-sm font-bold uppercase tracking-[0.2em]">Shift Summary</span>
                     </div>
-                    <div>
-                        <h2 className="m-0 text-xl font-bold text-slate-900">Close Shift</h2>
-                        <p className="mt-1 text-sm text-slate-500">Count and enter the actual amounts</p>
+                    <div className="flex items-center gap-6 text-xs text-[var(--theme-text-muted)]">
+                        <div className="text-right">
+                            <div className="font-bold text-white">{dateStr}</div>
+                            <div>{timeStr}</div>
+                        </div>
+                        <div className="text-right">
+                            <div className="font-bold text-white">Manager</div>
+                            <div>{formatDuration(sessionStats.duration)} on duty</div>
+                        </div>
                     </div>
                     <button
-                        className="ml-auto cursor-pointer rounded-lg border-none bg-transparent p-2 text-slate-400 transition-all duration-150 hover:bg-slate-100 hover:text-slate-500"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-transparent text-[var(--theme-text-muted)] hover:text-white hover:border-white/20 cursor-pointer transition-colors"
                         onClick={onClose}
+                        aria-label="Close"
                     >
-                        <X size={24} />
+                        <X size={18} />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
-                    {/* Session Summary */}
-                    <div className="mb-5 rounded-xl bg-slate-50 p-4">
-                        <h3 className="m-0 mb-3 text-sm font-bold text-slate-700">Shift Summary</h3>
-                        <div className="grid grid-cols-3 gap-3 max-[480px]:grid-cols-1">
-                            <div className="flex flex-col gap-1">
-                                <Clock size={16} className="text-slate-500" />
-                                <span className="text-xs text-slate-500">Duration</span>
-                                <span className="text-sm font-bold text-slate-900">{formatDuration(sessionStats.duration)}</span>
+                <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+                        {/* Left Column: Sales Summary */}
+                        <div className="p-8 border-r border-white/5">
+                            {/* Net Sales */}
+                            <h3 className="text-xs font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase mb-4">Net Sales by Category</h3>
+                            <div className="divide-y divide-white/5">
+                                <div className="flex justify-between py-3">
+                                    <span className="text-sm text-[var(--theme-text-secondary)]">Total Sales</span>
+                                    <span className="text-sm font-semibold">{formatPrice(sessionStats.totalSales)}</span>
+                                </div>
+                                <div className="flex justify-between py-3">
+                                    <span className="text-sm text-[var(--theme-text-secondary)]">Transactions</span>
+                                    <span className="text-sm font-semibold">{sessionStats.transactionCount}</span>
+                                </div>
+                                <div className="flex justify-between py-3">
+                                    <span className="text-sm text-[var(--theme-text-secondary)]">Opening Cash</span>
+                                    <span className="text-sm font-semibold">{formatPrice(openingCash)}</span>
+                                </div>
                             </div>
-                            <div className="flex flex-col gap-1">
-                                <span className="text-xs text-slate-500">Transactions</span>
-                                <span className="text-sm font-bold text-slate-900">{sessionStats.transactionCount}</span>
+
+                            <div className="flex justify-between py-4 mt-2 border-t border-white/10">
+                                <span className="text-xs font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase">Total Net Sales</span>
+                                <span className="text-lg font-bold">{formatPrice(sessionStats.totalSales)}</span>
                             </div>
-                            <div className="flex flex-col gap-1">
-                                <Banknote size={16} className="text-slate-500" />
-                                <span className="text-xs text-slate-500">Opening cash</span>
-                                <span className="text-sm font-bold text-slate-900">{formatPrice(openingCash)}</span>
+
+                            {/* Payments Received */}
+                            <h3 className="text-xs font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase mb-4 mt-6">Payments Received</h3>
+                            <div className="divide-y divide-white/5">
+                                <div className="flex items-center justify-between py-3">
+                                    <div className="flex items-center gap-2">
+                                        <Banknote size={16} className="text-[var(--theme-text-muted)]" />
+                                        <span className="text-sm text-[var(--theme-text-secondary)]">Cash Payments</span>
+                                    </div>
+                                    <span className="text-sm font-semibold">{formatPrice(0)}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-3">
+                                    <div className="flex items-center gap-2">
+                                        <QrCode size={16} className="text-[var(--theme-text-muted)]" />
+                                        <span className="text-sm text-[var(--theme-text-secondary)]">QRIS</span>
+                                    </div>
+                                    <span className="text-sm font-semibold">{formatPrice(0)}</span>
+                                </div>
+                                <div className="flex items-center justify-between py-3">
+                                    <div className="flex items-center gap-2">
+                                        <CreditCard size={16} className="text-[var(--theme-text-muted)]" />
+                                        <span className="text-sm text-[var(--theme-text-secondary)]">Card/EDC</span>
+                                    </div>
+                                    <span className="text-sm font-semibold">{formatPrice(0)}</span>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between py-4 mt-2 border-t border-white/10">
+                                <span className="text-xs font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase">Total Payments</span>
+                                <span className="text-2xl font-bold text-[var(--color-gold)]">{formatPrice(sessionStats.totalSales)}</span>
+                            </div>
+
+                            {/* Tax & Tips cards */}
+                            <div className="grid grid-cols-2 gap-3 mt-4">
+                                <div className="bg-[var(--theme-bg-secondary)] p-6 rounded-lg border border-white/5">
+                                    <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase block mb-1">Total Tax</span>
+                                    <span className="text-lg font-bold">{formatPrice(Math.round(sessionStats.totalSales * 10 / 110))}</span>
+                                </div>
+                                <div className="bg-[var(--theme-bg-secondary)] p-6 rounded-lg border border-white/5">
+                                    <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase block mb-1">Duration</span>
+                                    <span className="text-lg font-bold">{formatDuration(sessionStats.duration)}</span>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Anti-fraud notice */}
-                        <div className="mt-3 flex items-center gap-2 rounded-lg bg-amber-100 p-3 text-xs text-amber-800">
-                            <AlertTriangle size={16} className="shrink-0 text-amber-600" />
-                            <span>Expected amounts will be revealed after closing</span>
-                        </div>
-                    </div>
+                        {/* Right Column: Cash Reconciliation */}
+                        <div className="p-8">
+                            <h3 className="text-xs font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase mb-6 text-center">Cash Reconciliation</h3>
 
-                    {/* Actual Amounts Section */}
-                    <div className="mb-5">
-                        <h3 className="m-0 mb-3 text-sm font-bold text-slate-700">Counted Amounts</h3>
+                            {/* Expected Cash */}
+                            <div className="mb-6">
+                                <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase block mb-2">Expected Cash in Drawer</span>
+                                <div className="bg-[var(--theme-bg-secondary)] border border-white/5 rounded-xl py-5 px-6 text-2xl font-semibold text-center">
+                                    {formatPrice(openingCash)}
+                                </div>
+                                <span className="text-[10px] text-[var(--theme-text-muted)] mt-1 block text-center">
+                                    Opening float ({formatPrice(openingCash)})
+                                </span>
+                            </div>
 
-                        <div className="flex flex-col gap-4">
-                            {/* Cash */}
-                            <div className="rounded-xl bg-slate-50 p-4">
-                                <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
-                                    <Banknote size={18} className="rounded-md bg-emerald-100 p-0.5 text-emerald-700" />
-                                    Cash in drawer
-                                </label>
+                            {/* Actual Cash Input */}
+                            <div className="mb-6">
+                                <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase block mb-2">Actual Cash in Drawer</span>
                                 <div className="relative flex items-center">
-                                    <span className="absolute left-4 font-semibold text-slate-500">Rp</span>
+                                    <span className="absolute left-6 text-lg font-semibold text-[var(--theme-text-muted)]">Rp</span>
                                     <input
                                         type="text"
-                                        className="w-full rounded-xl border-2 border-slate-200 py-3 pl-10 pr-4 text-base font-semibold text-slate-900 transition-all duration-150 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] focus:outline-none"
+                                        className="w-full bg-black/40 border border-[var(--color-gold)]/30 rounded-xl py-6 pl-14 pr-6 text-2xl font-semibold text-white text-center transition-all duration-150 focus:border-[var(--color-gold)] focus:outline-none placeholder:text-[var(--theme-text-muted)]"
                                         value={actualCash}
                                         onChange={handleInputChange(setActualCash)}
                                         placeholder="0"
                                         autoFocus
                                     />
                                 </div>
-                                {actualCash && (
-                                    <span className="mt-1 block text-right text-sm font-semibold text-slate-500">{formatPrice(parseInt(actualCash) || 0)}</span>
-                                )}
                             </div>
 
-                            {/* QRIS */}
-                            <div className="rounded-xl bg-slate-50 p-4">
-                                <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
-                                    <QrCode size={18} className="rounded-md bg-blue-100 p-0.5 text-blue-600" />
-                                    Total QRIS
-                                </label>
+                            {/* QRIS Input */}
+                            <div className="mb-6">
+                                <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase block mb-2">Total QRIS</span>
                                 <div className="relative flex items-center">
-                                    <span className="absolute left-4 font-semibold text-slate-500">Rp</span>
+                                    <span className="absolute left-6 text-lg font-semibold text-[var(--theme-text-muted)]">Rp</span>
                                     <input
                                         type="text"
-                                        className="w-full rounded-xl border-2 border-slate-200 py-3 pl-10 pr-4 text-base font-semibold text-slate-900 transition-all duration-150 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] focus:outline-none"
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl py-4 pl-14 pr-6 text-lg font-semibold text-white text-center transition-all duration-150 focus:border-[var(--color-gold)] focus:outline-none placeholder:text-[var(--theme-text-muted)]"
                                         value={actualQris}
                                         onChange={handleInputChange(setActualQris)}
                                         placeholder="0"
                                     />
                                 </div>
-                                {actualQris && (
-                                    <span className="mt-1 block text-right text-sm font-semibold text-slate-500">{formatPrice(parseInt(actualQris) || 0)}</span>
-                                )}
                             </div>
 
-                            {/* EDC */}
-                            <div className="rounded-xl bg-slate-50 p-4">
-                                <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
-                                    <CreditCard size={18} className="rounded-md bg-purple-100 p-0.5 text-violet-600" />
-                                    Total EDC/Card
-                                </label>
+                            {/* EDC Input */}
+                            <div className="mb-6">
+                                <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase block mb-2">Total EDC/Card</span>
                                 <div className="relative flex items-center">
-                                    <span className="absolute left-4 font-semibold text-slate-500">Rp</span>
+                                    <span className="absolute left-6 text-lg font-semibold text-[var(--theme-text-muted)]">Rp</span>
                                     <input
                                         type="text"
-                                        className="w-full rounded-xl border-2 border-slate-200 py-3 pl-10 pr-4 text-base font-semibold text-slate-900 transition-all duration-150 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] focus:outline-none"
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl py-4 pl-14 pr-6 text-lg font-semibold text-white text-center transition-all duration-150 focus:border-[var(--color-gold)] focus:outline-none placeholder:text-[var(--theme-text-muted)]"
                                         value={actualEdc}
                                         onChange={handleInputChange(setActualEdc)}
                                         placeholder="0"
                                     />
                                 </div>
-                                {actualEdc && (
-                                    <span className="mt-1 block text-right text-sm font-semibold text-slate-500">{formatPrice(parseInt(actualEdc) || 0)}</span>
-                                )}
+                            </div>
+
+                            {/* Variance */}
+                            <div className="flex justify-between items-baseline mb-6">
+                                <span className="text-xs font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase">Variance</span>
+                                <span className={`text-2xl font-bold ${cashVariance === 0 ? 'text-white' : cashVariance > 0 ? 'text-[var(--color-success-text)]' : 'text-[var(--color-danger-text)]'}`}>
+                                    {formatPrice(cashVariance)}
+                                </span>
+                            </div>
+
+                            {/* Anti-fraud notice */}
+                            <div className="flex items-center gap-2 rounded-lg bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)] p-3 text-xs text-[var(--color-warning-text)] mb-6">
+                                <AlertTriangle size={14} className="shrink-0" />
+                                <span>Expected amounts will be revealed after closing</span>
+                            </div>
+
+                            {/* Notes */}
+                            <div className="mb-6">
+                                <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase block mb-2">Closing Notes</span>
+                                <textarea
+                                    className="w-full resize-none rounded-xl bg-black/40 border border-white/10 p-3 text-sm text-white transition-all duration-150 focus:border-[var(--color-gold)] focus:outline-none placeholder:text-[var(--theme-text-muted)]"
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                    placeholder="Observations, anomalies..."
+                                    rows={2}
+                                />
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-col gap-3">
+                                <button
+                                    type="button"
+                                    className="w-full border border-white/10 rounded-xl py-5 bg-transparent text-[11px] font-bold tracking-[0.25em] uppercase text-[var(--theme-text-secondary)] cursor-pointer transition-all hover:border-white/20 hover:text-white disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    onClick={onClose}
+                                    disabled={isLoading}
+                                >
+                                    <Printer size={14} />
+                                    Print Summary
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="w-full bg-[var(--color-gold)] rounded-xl text-black py-6 text-[13px] font-bold tracking-[0.25em] uppercase shadow-xl shadow-[var(--color-gold)]/10 cursor-pointer transition-all hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? (
+                                        <span className="inline-block h-[18px] w-[18px] animate-spin rounded-full border-2 border-black/30 border-t-black" />
+                                    ) : (
+                                        <>
+                                            <Lock size={16} />
+                                            Finalize & Close Shift
+                                        </>
+                                    )}
+                                </button>
+                                <p className="text-[10px] text-[var(--theme-text-muted)] text-center">
+                                    Shift closure cannot be undone once submitted.
+                                </p>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Notes */}
-                    <div className="mb-5">
-                        <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
-                            Closing notes (optional)
-                        </label>
-                        <textarea
-                            className="w-full resize-none rounded-xl border-2 border-slate-200 p-3 text-sm text-slate-900 transition-all duration-150 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] focus:outline-none"
-                            value={notes}
-                            onChange={(e) => setNotes(e.target.value)}
-                            placeholder="Observations, anomalies..."
-                            rows={2}
-                        />
-                    </div>
-
-                    <div className="mt-2 flex gap-3 border-t border-slate-200 pt-4">
-                        <button
-                            type="button"
-                            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border-none bg-slate-100 px-6 py-3 text-sm font-semibold text-slate-700 transition-all duration-150 hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
-                            onClick={onClose}
-                            disabled={isLoading}
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border-none bg-red-600 px-6 py-3 text-sm font-semibold text-white transition-all duration-150 hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
-                            disabled={isLoading}
-                        >
-                            {isLoading ? (
-                                <span className="inline-block h-[18px] w-[18px] animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                            ) : (
-                                <>
-                                    <Lock size={18} />
-                                    Close Shift
-                                </>
-                            )}
-                        </button>
                     </div>
                 </form>
             </div>

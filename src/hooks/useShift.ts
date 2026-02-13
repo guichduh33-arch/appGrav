@@ -274,7 +274,6 @@ export function useShift() {
 
             // No existing shift found, try to open a new one
             const { data, error } = await supabase.rpc('open_shift', {
-                p_user_id: userId,
                 p_opening_cash: openingCash,
                 p_terminal_id: terminalId,
                 p_notes: notes ?? undefined

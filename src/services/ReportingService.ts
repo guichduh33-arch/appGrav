@@ -79,14 +79,14 @@ export const ReportingService = {
     async getDailySales(startDate: Date, endDate: Date): Promise<DailySalesStat[]> {
         const { data, error } = await untypedFrom('view_daily_kpis')
             .select('*')
-            .gte('date', startDate.toISOString())
-            .lte('date', endDate.toISOString())
-            .order('date', { ascending: true }) as { data: unknown[] | null; error: Error | null };
+            .gte('report_date', startDate.toISOString())
+            .lte('report_date', endDate.toISOString())
+            .order('report_date', { ascending: true }) as { data: unknown[] | null; error: Error | null };
 
         if (error) throw error;
 
         type KpiRow = {
-            date: string | null;
+            report_date: string | null;
             total_revenue: number | null;
             total_orders: number | null;
             avg_order_value: number | null;
@@ -94,7 +94,7 @@ export const ReportingService = {
         };
         const rawData = (data || []) as KpiRow[];
         return rawData.map((row) => ({
-            date: row.date || '',
+            date: row.report_date || '',
             total_sales: row.total_revenue || 0,
             total_orders: row.total_orders || 0,
             avg_basket: row.avg_order_value || 0,

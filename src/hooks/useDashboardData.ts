@@ -6,7 +6,7 @@ import { untypedFrom } from '@/lib/supabase';
 
 // Raw row from view_daily_kpis
 interface TDailyKpiRow {
-  date: string;
+  report_date: string;
   total_revenue: number | null;
   total_orders: number | null;
   completed_orders: number | null;
@@ -39,14 +39,14 @@ export function useDashboardData() {
     queryFn: async () => {
       const { data, error } = await untypedFrom('view_daily_kpis')
         .select('*')
-        .gte('date', yesterdayStr)
-        .lte('date', todayStr)
+        .gte('report_date', yesterdayStr)
+        .lte('report_date', todayStr)
         .returns<TDailyKpiRow[]>();
       if (error) throw error;
       const rows = data || [];
       return {
-        today: rows.find(r => r.date === todayStr) ?? null,
-        yesterday: rows.find(r => r.date === yesterdayStr) ?? null,
+        today: rows.find(r => r.report_date === todayStr) ?? null,
+        yesterday: rows.find(r => r.report_date === yesterdayStr) ?? null,
       };
     },
     staleTime: STALE_5MIN,

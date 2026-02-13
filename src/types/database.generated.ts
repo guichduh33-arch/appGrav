@@ -6678,7 +6678,6 @@ export type Database = {
           p_notes?: string
           p_opening_cash: number
           p_terminal_id: string
-          p_user_id: string
         }
         Returns: Json
       }

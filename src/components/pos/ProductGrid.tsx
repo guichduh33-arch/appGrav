@@ -42,8 +42,8 @@ const ProductCard = memo(function ProductCard({
     return (
         <button
             className={cn(
-                'relative flex flex-col bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-lg p-0 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden h-full text-left',
-                'hover:-translate-y-0.5 hover:shadow-[0_0_16px_rgba(200,164,91,0.12)] hover:border-gold/50 hover:bg-[var(--theme-bg-tertiary)]',
+                'group relative flex flex-col bg-[var(--theme-bg-secondary)] border border-white/5 rounded-xl p-0 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden h-full text-left',
+                'hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-[var(--color-gold)]/5 hover:border-[var(--color-gold)]/40',
                 'active:scale-[0.98]',
                 isOutOfStock && 'opacity-60 hover:opacity-80',
                 bouncing && 'pos-bounce'
@@ -71,7 +71,7 @@ const ProductCard = memo(function ProductCard({
 
             {/* Product image or initial */}
             <div className={cn(
-                'w-full aspect-square bg-[var(--theme-bg-primary)] flex items-center justify-center overflow-hidden shrink-0 rounded-t-lg',
+                'w-full aspect-square bg-[var(--theme-bg-primary)] flex items-center justify-center overflow-hidden shrink-0 rounded-t-xl',
                 isOutOfStock && 'grayscale-[50%]'
             )}>
                 {product.image_url ? (
@@ -79,7 +79,7 @@ const ProductCard = memo(function ProductCard({
                         src={product.image_url}
                         alt={product.name}
                         loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-400 ease-in-out hover:scale-105"
+                        className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
                             e.currentTarget.style.display = 'none'
                             const fallback = e.currentTarget.nextElementSibling as HTMLElement
@@ -96,11 +96,11 @@ const ProductCard = memo(function ProductCard({
             </div>
 
             {/* Product info */}
-            <div className="px-3 pt-2.5 pb-1 text-sm font-semibold text-[var(--theme-text-primary)] leading-snug line-clamp-2 flex-1">
+            <div className="px-5 pt-4 pb-1 text-sm font-semibold text-[var(--theme-text-primary)] leading-snug line-clamp-2 flex-1">
                 {product.name}
             </div>
 
-            <div className="px-3 pt-0.5 pb-3 text-sm font-bold text-gold tracking-tight">
+            <div className="px-5 pt-0.5 pb-4 text-sm font-semibold text-[var(--color-gold)] tracking-wider">
                 {formatPrice(product.retail_price || 0)}
             </div>
         </button>
@@ -130,9 +130,9 @@ function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) 
 
     if (isLoading) {
         return (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-8 w-full pb-xl">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-6 w-full pb-xl">
                 {[...Array(8)].map((_, i) => (
-                    <div key={i} className="h-[200px] bg-[var(--theme-bg-secondary)] rounded-lg animate-pulse" />
+                    <div key={i} className="h-[200px] bg-[var(--theme-bg-secondary)] rounded-xl animate-pulse" />
                 ))}
             </div>
         )
@@ -148,7 +148,7 @@ function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) 
     }
 
     return (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-8 w-full pb-xl">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-6 w-full pb-xl">
             {products.map((product) => {
                 const stockStatus = getStockStatus(product.id)
                 const stockLevel = stockMap.get(product.id)

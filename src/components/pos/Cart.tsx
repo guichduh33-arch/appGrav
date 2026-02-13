@@ -116,7 +116,7 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
     }
 
     return (
-        <aside className="w-[380px] bg-[var(--theme-bg-secondary)] border-l border-[var(--theme-border)] flex flex-col flex-shrink-0 z-[15] shadow-[-4px_0_24px_rgba(0,0,0,0.4)] text-[var(--theme-text-primary)]">
+        <aside className="w-[400px] bg-[var(--theme-bg-secondary)] border-l border-[var(--color-gold)]/10 flex flex-col flex-shrink-0 z-[15] shadow-[-4px_0_24px_rgba(0,0,0,0.4)] text-[var(--theme-text-primary)]">
             {/* Pending Orders Button */}
             <div className="px-md py-sm bg-[var(--theme-bg-primary)] border-b border-[var(--theme-border)]">
                 <button
@@ -154,8 +154,9 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                             </button>
                         ))}
                     </div>
-                    <span className="font-display text-lg font-bold text-white tracking-tight flex items-center gap-1 flex-1 justify-center">
-                        {displayOrderNumber}
+                    <span className="font-display text-sm font-bold text-white tracking-tight flex items-center gap-2 flex-1 justify-center">
+                        Active Order
+                        <span className="bg-[var(--color-gold)]/10 text-[var(--color-gold)] text-xs px-2 py-1 rounded font-semibold">{displayOrderNumber}</span>
                         {hasLockedItems && <Lock size={14} className="text-warning ml-1" />}
                     </span>
                     <button type="button" className="btn-icon btn-icon-sm" title="Clear cart" aria-label="Clear cart" onClick={clearCart} disabled={items.length === 0}>

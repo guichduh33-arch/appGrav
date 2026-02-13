@@ -68,10 +68,10 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-[var(--theme-text-primary)] font-display">
             {getGreeting()}, {displayName}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-[var(--theme-text-secondary)] mt-1">
             {format(new Date(), 'EEEE, d MMMM yyyy')} — The Breakery Dashboard
           </p>
         </div>
@@ -89,35 +89,35 @@ export default function DashboardPage() {
             currentValue={todayKpi?.total_revenue ?? 0}
             previousValue={yesterdayKpi?.total_revenue ?? null}
             format="currency"
-            icon={<DollarSign size={18} className="text-green-600" />}
+            icon={<DollarSign size={18} className="text-[var(--color-success-text)]" />}
           />
           <ComparisonKpiCard
             label="Orders"
             currentValue={todayKpi?.total_orders ?? 0}
             previousValue={yesterdayKpi?.total_orders ?? null}
             format="number"
-            icon={<ShoppingBag size={18} className="text-blue-600" />}
+            icon={<ShoppingBag size={18} className="text-[#3b82f6]" />}
           />
           <ComparisonKpiCard
             label="Avg Order"
             currentValue={todayKpi?.avg_order_value ?? 0}
             previousValue={yesterdayKpi?.avg_order_value ?? null}
             format="currency"
-            icon={<TrendingUp size={18} className="text-amber-600" />}
+            icon={<TrendingUp size={18} className="text-[var(--color-gold)]" />}
           />
           <ComparisonKpiCard
             label="Customers"
             currentValue={todayKpi?.unique_customers ?? 0}
             previousValue={yesterdayKpi?.unique_customers ?? null}
             format="number"
-            icon={<Users size={18} className="text-purple-600" />}
+            icon={<Users size={18} className="text-[#a855f7]" />}
           />
         </ComparisonKpiGrid>
       )}
 
       {/* Section 2: Revenue Trend */}
-      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-        <h3 className="text-sm font-semibold text-gray-700 mb-4">Revenue Trend (Last 30 Days)</h3>
+      <div className="bg-[var(--theme-bg-secondary)] rounded-xl p-6 border border-[var(--theme-border)] shadow-sm">
+        <h3 className="text-sm font-semibold text-[var(--theme-text-secondary)] mb-4 uppercase tracking-wider">Revenue Trend (Last 30 Days)</h3>
         {revenueTrend.isLoading ? (
           <Skeleton className="h-64 w-full" />
         ) : trendData.length === 0 ? (
@@ -132,25 +132,32 @@ export default function DashboardPage() {
                     <stop offset="95%" stopColor="#C9A55C" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--theme-border)" />
                 <XAxis
                   dataKey="date"
                   tickFormatter={d => format(parseISO(d), 'dd MMM')}
-                  tick={{ fontSize: 12, fill: '#9ca3af' }}
+                  tick={{ fontSize: 12, fill: 'var(--theme-text-muted)' }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
                   tickFormatter={formatAxisValue}
-                  tick={{ fontSize: 12, fill: '#9ca3af' }}
+                  tick={{ fontSize: 12, fill: 'var(--theme-text-muted)' }}
                   axisLine={false}
                   tickLine={false}
                   width={50}
                 />
                 <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'var(--theme-bg-tertiary)',
+                    borderColor: 'var(--theme-border)',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    color: 'var(--theme-text-primary)'
+                  }}
+                  itemStyle={{ color: 'var(--color-gold)' }}
                   formatter={(v) => [formatCurrency(Number(v ?? 0)), 'Revenue']}
                   labelFormatter={d => format(parseISO(String(d)), 'dd MMM yyyy')}
-                  contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '13px' }}
                 />
                 <Area
                   type="monotone"
@@ -170,8 +177,8 @@ export default function DashboardPage() {
       {/* Section 3: Two-column */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top 5 Products */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-          <h3 className="text-sm font-semibold text-gray-700 mb-4">Top Products Today</h3>
+        <div className="bg-[var(--theme-bg-secondary)] rounded-xl p-6 border border-[var(--theme-border)] shadow-sm">
+          <h3 className="text-sm font-semibold text-[var(--theme-text-secondary)] mb-4 uppercase tracking-wider">Top Products Today</h3>
           {topProducts.isLoading ? (
             <div className="space-y-4">{[...Array(5)].map((_, i) => <Skeleton key={i} className="h-8" />)}</div>
           ) : topProductsList.length === 0 ? (
@@ -186,12 +193,12 @@ export default function DashboardPage() {
                     <span className="text-sm font-medium text-gray-400 w-5 text-right">{i + 1}</span>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium text-gray-900 truncate">{product.product_name}</span>
-                        <span className="text-gray-500 ml-2 shrink-0">{product.quantity_sold} sold</span>
+                        <span className="font-medium text-[var(--theme-text-primary)] truncate">{product.product_name}</span>
+                        <span className="text-[var(--theme-text-secondary)] ml-2 shrink-0">{product.quantity_sold} sold</span>
                       </div>
-                      <div className="h-2 bg-gray-100 rounded-full">
+                      <div className="h-2 bg-[var(--theme-bg-tertiary)] rounded-full overflow-hidden">
                         <div
-                          className="h-2 bg-gold rounded-full transition-all duration-500"
+                          className="h-2 bg-gradient-to-r from-[var(--color-gold-dark)] to-[var(--color-gold)] rounded-full transition-all duration-500"
                           style={{ width: `${barWidth}%` }}
                         />
                       </div>
@@ -204,8 +211,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Payment Methods Donut */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-          <h3 className="text-sm font-semibold text-gray-700 mb-4">Payment Methods (30 Days)</h3>
+        <div className="bg-[var(--theme-bg-secondary)] rounded-xl p-6 border border-[var(--theme-border)] shadow-sm">
+          <h3 className="text-sm font-semibold text-[var(--theme-text-secondary)] mb-4 uppercase tracking-wider">Payment Methods (30 Days)</h3>
           {paymentMethods.isLoading ? (
             <Skeleton className="h-48 w-48 mx-auto rounded-full" />
           ) : paymentData.length === 0 ? (
@@ -230,7 +237,15 @@ export default function DashboardPage() {
                         <Cell key={entry.method} fill={PAYMENT_COLORS[entry.method] || '#9ca3af'} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(v) => formatCurrency(Number(v ?? 0))} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'var(--theme-bg-tertiary)',
+                        borderColor: 'var(--theme-border)',
+                        borderRadius: '8px',
+                        color: 'var(--theme-text-primary)'
+                      }}
+                      formatter={(v) => formatCurrency(Number(v ?? 0))}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -244,8 +259,8 @@ export default function DashboardPage() {
                         className="w-3 h-3 rounded-full shrink-0"
                         style={{ backgroundColor: PAYMENT_COLORS[entry.method] || '#9ca3af' }}
                       />
-                      <span className="text-gray-700 capitalize">{entry.method}</span>
-                      <span className="text-gray-400 ml-auto">{pct}%</span>
+                      <span className="text-[var(--theme-text-secondary)] capitalize">{entry.method}</span>
+                      <span className="text-[var(--theme-text-muted)] ml-auto">{pct}%</span>
                     </div>
                   );
                 })}
@@ -256,20 +271,20 @@ export default function DashboardPage() {
       </div>
 
       {/* Section 4: Inventory Alerts */}
-      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+      <div className="bg-[var(--theme-bg-secondary)] rounded-xl p-6 border border-[var(--theme-border)] shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Package size={16} className="text-gray-500" />
-            <h3 className="text-sm font-semibold text-gray-700">Inventory Alerts</h3>
+            <Package size={16} className="text-[var(--theme-text-secondary)]" />
+            <h3 className="text-sm font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">Inventory Alerts</h3>
             {lowStockItems.length > 0 && (
-              <span className="bg-red-100 text-red-700 text-xs font-medium px-2 py-0.5 rounded-full">
+              <span className="bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] text-xs font-medium px-2 py-0.5 rounded-full border border-[var(--theme-border)]">
                 {lowStockItems.length}
               </span>
             )}
           </div>
           <Link
             to="/inventory"
-            className="text-sm text-gold-dark hover:text-gold flex items-center gap-1"
+            className="text-sm text-[var(--color-gold)] hover:text-[var(--color-gold-light)] flex items-center gap-1 transition-colors"
           >
             View all <ArrowRight size={14} />
           </Link>
@@ -278,33 +293,33 @@ export default function DashboardPage() {
         {lowStock.isLoading ? (
           <div className="space-y-2">{[...Array(3)].map((_, i) => <Skeleton key={i} className="h-10" />)}</div>
         ) : lowStockItems.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-6">All stock levels are healthy</p>
+          <p className="text-sm text-[var(--theme-text-muted)] text-center py-6">All stock levels are healthy</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-gray-500 border-b border-gray-100">
-                  <th className="pb-2 font-medium">Product</th>
-                  <th className="pb-2 font-medium text-right">Stock</th>
-                  <th className="pb-2 font-medium text-right">Min Level</th>
-                  <th className="pb-2 font-medium text-right">Status</th>
+                <tr className="text-left text-[var(--theme-text-muted)] border-b border-[var(--theme-border)]">
+                  <th className="pb-3 font-semibold uppercase tracking-wider text-[11px]">Product</th>
+                  <th className="pb-3 font-semibold uppercase tracking-wider text-[11px] text-right">Stock</th>
+                  <th className="pb-3 font-semibold uppercase tracking-wider text-[11px] text-right">Min Level</th>
+                  <th className="pb-3 font-semibold uppercase tracking-wider text-[11px] text-right">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {lowStockItems.map(item => (
-                  <tr key={item.id} className="border-b border-gray-50 last:border-0">
-                    <td className="py-2.5 font-medium text-gray-900">{item.name}</td>
-                    <td className="py-2.5 text-right text-gray-600">
+                  <tr key={item.id} className="border-b border-[var(--theme-border)] last:border-0 hover:bg-[var(--theme-bg-tertiary)]/30 transition-colors">
+                    <td className="py-3 font-medium text-[var(--theme-text-primary)]">{item.name}</td>
+                    <td className="py-3 text-right text-[var(--theme-text-secondary)] font-mono-num">
                       {item.current_stock} {item.unit_name}
                     </td>
-                    <td className="py-2.5 text-right text-gray-600">{item.min_stock_level}</td>
-                    <td className="py-2.5 text-right">
+                    <td className="py-3 text-right text-[var(--theme-text-muted)] font-mono-num">{item.min_stock_level}</td>
+                    <td className="py-3 text-right">
                       <span
                         className={cn(
-                          'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium',
+                          'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider',
                           item.severity === 'critical'
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-amber-100 text-amber-700'
+                            ? 'bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] border border-[var(--color-danger-border)]'
+                            : 'bg-[var(--color-warning-bg)] text-[var(--color-warning-text)] border border-[var(--color-warning-border)]'
                         )}
                       >
                         {item.severity === 'critical' && <AlertTriangle size={10} />}

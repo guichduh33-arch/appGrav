@@ -28,7 +28,7 @@ export const CartItemRow = memo(function CartItemRow({
     return (
         <div
             className={cn(
-                'bg-transparent py-2 mb-0 border-b border-zinc-700 transition-all duration-200 cursor-pointer',
+                'bg-transparent py-5 mb-0 border-b border-white/5 transition-all duration-200 cursor-pointer',
                 'hover:bg-[rgba(59,130,246,0.05)]',
                 'last:border-b-0',
                 isLocked && 'bg-[rgba(245,158,11,0.05)] border-l-[3px] border-l-warning pl-2 cursor-default'
@@ -60,7 +60,7 @@ export const CartItemRow = memo(function CartItemRow({
                     </div>
                 )}
                 {item.modifiers.length > 0 && (
-                    <div className="text-xs text-zinc-300 mt-0.5 leading-[1.4]">
+                    <div className="text-[10px] text-[var(--theme-text-muted)] mt-0.5 leading-[1.4]">
                         {item.modifiers.map(m => m.optionLabel).join(', ')}
                     </div>
                 )}
@@ -81,7 +81,7 @@ export const CartItemRow = memo(function CartItemRow({
                 <div className="flex items-center gap-1.5 rounded-md p-0">
                     <button
                         type="button"
-                        className="w-[22px] h-[22px] flex items-center justify-center bg-transparent border border-zinc-600 rounded-sm text-zinc-300 cursor-pointer transition-all duration-200 hover:enabled:border-gold hover:enabled:text-gold-light hover:enabled:bg-[rgba(59,130,246,0.1)] disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-6 h-6 flex items-center justify-center bg-transparent border border-white/10 rounded-full text-xs text-zinc-300 cursor-pointer transition-all duration-200 hover:enabled:border-gold hover:enabled:text-gold-light hover:enabled:bg-[rgba(59,130,246,0.1)] disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={(e) => {
                             e.stopPropagation()
                             onQuantityChange(item.id, item.quantity - 1)
@@ -95,7 +95,7 @@ export const CartItemRow = memo(function CartItemRow({
                     <span className="text-sm font-semibold min-w-[16px] text-center text-white">{item.quantity}</span>
                     <button
                         type="button"
-                        className="w-[22px] h-[22px] flex items-center justify-center bg-transparent border border-zinc-600 rounded-sm text-zinc-300 cursor-pointer transition-all duration-200 hover:enabled:border-gold hover:enabled:text-gold-light hover:enabled:bg-[rgba(59,130,246,0.1)] disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-6 h-6 flex items-center justify-center bg-transparent border border-white/10 rounded-full text-xs text-zinc-300 cursor-pointer transition-all duration-200 hover:enabled:border-gold hover:enabled:text-gold-light hover:enabled:bg-[rgba(59,130,246,0.1)] disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={(e) => {
                             e.stopPropagation()
                             onQuantityChange(item.id, item.quantity + 1)

@@ -113,8 +113,8 @@ export default function StockPage() {
                     <button
                         key={f.key}
                         className={cn(
-                            'flex items-center gap-2 py-2.5 px-4 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg cursor-pointer transition-all duration-200 max-md:shrink-0 hover:border-primary hover:text-primary',
-                            activeFilter === f.key && 'bg-primary border-primary text-white hover:text-white'
+                            'flex items-center gap-2 py-2.5 px-4 text-sm font-medium text-[var(--theme-text-secondary)] bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-lg cursor-pointer transition-all duration-200 max-md:shrink-0 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]',
+                            activeFilter === f.key && 'bg-[var(--color-gold)] border-[var(--color-gold)] text-[var(--theme-bg-primary)] hover:text-[var(--theme-bg-primary)]'
                         )}
                         onClick={() => setActiveFilter(f.key)}
                     >
@@ -123,7 +123,7 @@ export default function StockPage() {
                         {f.key === 'low_stock' && stats.lowStockItems > 0 && (
                             <span className={cn(
                                 'inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-semibold rounded-full',
-                                activeFilter === 'low_stock' ? 'bg-white text-primary' : 'bg-red-500 text-white'
+                                activeFilter === 'low_stock' ? 'bg-[var(--theme-bg-primary)] text-[var(--color-gold)]' : 'bg-[var(--color-danger)] text-white'
                             )}>
                                 {stats.lowStockItems}
                             </span>
@@ -135,19 +135,19 @@ export default function StockPage() {
             {/* KPI Stats Cards */}
             <div className="grid grid-cols-4 max-xl:grid-cols-2 max-md:grid-cols-1 gap-4">
                 {([
-                    { icon: <Boxes size={24} />, iconClass: 'bg-blue-500/10 text-primary', label: 'Total Products', value: stats.totalItems, trend: 'In stock', trendIcon: <TrendingUp size={12} />, trendUp: true },
-                    { icon: <Package size={24} />, iconClass: 'bg-amber-500/10 text-amber-500', label: 'Raw Materials', value: stats.rawMaterials, trend: 'Ingredients', trendUp: true },
-                    { icon: <Coffee size={24} />, iconClass: 'bg-emerald-500/10 text-emerald-500', label: 'Finished Products', value: stats.finishedProducts, trend: 'Ready to sell', trendUp: true },
-                    { icon: <AlertTriangle size={24} />, iconClass: 'bg-red-500/10 text-red-500', label: 'Low Stock Alerts', value: stats.lowStockItems, trend: stats.lowStockItems > 0 ? 'Needs attention' : 'All OK', trendUp: stats.lowStockItems === 0 },
+                    { icon: <Boxes size={24} />, iconClass: 'bg-[var(--color-gold)]/10 text-[var(--color-gold)]', label: 'Total Products', value: stats.totalItems, trend: 'In stock', trendIcon: <TrendingUp size={12} />, trendUp: true },
+                    { icon: <Package size={24} />, iconClass: 'bg-[var(--color-warning)]/10 text-[var(--color-warning)]', label: 'Raw Materials', value: stats.rawMaterials, trend: 'Ingredients', trendUp: true },
+                    { icon: <Coffee size={24} />, iconClass: 'bg-[var(--color-success)]/10 text-[var(--color-success)]', label: 'Finished Products', value: stats.finishedProducts, trend: 'Ready to sell', trendUp: true },
+                    { icon: <AlertTriangle size={24} />, iconClass: 'bg-[var(--color-danger)]/10 text-[var(--color-danger)]', label: 'Low Stock Alerts', value: stats.lowStockItems, trend: stats.lowStockItems > 0 ? 'Needs attention' : 'All OK', trendUp: stats.lowStockItems === 0 },
                 ]).map((stat, i) => (
-                    <div key={i} className="flex items-start gap-4 p-5 bg-white border border-gray-200 rounded-xl">
+                    <div key={i} className="flex items-start gap-4 p-5 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl shadow-sm">
                         <div className={cn('flex items-center justify-center w-12 h-12 rounded-xl', stat.iconClass)}>
                             {stat.icon}
                         </div>
                         <div className="flex-1">
-                            <div className="text-[0.8125rem] font-medium text-gray-500 uppercase tracking-wide">{stat.label}</div>
-                            <div className="text-[1.75rem] font-bold text-gray-900 leading-tight">{stat.value}</div>
-                            <div className={cn('flex items-center gap-1 text-[0.8125rem] font-medium mt-1', stat.trendUp ? 'text-emerald-600' : 'text-red-600')}>
+                            <div className="text-[0.8125rem] font-medium text-[var(--theme-text-muted)] uppercase tracking-wide">{stat.label}</div>
+                            <div className="text-[1.75rem] font-bold text-[var(--theme-text-primary)] leading-tight">{stat.value}</div>
+                            <div className={cn('flex items-center gap-1 text-[0.8125rem] font-medium mt-1', stat.trendUp ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]')}>
                                 {stat.trendIcon}
                                 {stat.trend}
                             </div>
@@ -163,7 +163,7 @@ export default function StockPage() {
             )}
 
             {/* Inventory Table */}
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl overflow-hidden shadow-sm">
                 <InventoryTable
                     items={filteredItems as unknown as InventoryItemWithCategory[]}
                     isLoading={isLoading}

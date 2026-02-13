@@ -80,20 +80,20 @@ export default function InventoryLayout() {
     const activeTab = getActiveTab()
 
     return (
-        <div className="flex flex-col h-full bg-gray-50">
-            <div className="px-4 md:px-8 pt-4 md:pt-6 pb-3 md:pb-4 bg-white border-b border-gray-200">
-                <h1 className="text-2xl md:text-[1.75rem] font-bold text-gray-900 mb-1">Stock & Inventory</h1>
-                <p className="text-[0.9375rem] text-gray-500">Manage stock, track movements, and monitor inventory</p>
+        <div className="flex flex-col h-full bg-[var(--theme-bg-primary)]">
+            <div className="px-4 md:px-8 pt-4 md:pt-6 pb-3 md:pb-4 bg-[var(--theme-bg-secondary)] border-b border-[var(--theme-border)]">
+                <h1 className="text-2xl md:text-[1.75rem] font-bold text-[var(--theme-text-primary)] mb-1 font-display">Stock & Inventory</h1>
+                <p className="text-[0.9375rem] text-[var(--theme-text-secondary)]">Manage stock, track movements, and monitor inventory</p>
             </div>
-            <div className="flex gap-1 px-4 md:px-8 bg-white border-b border-gray-200 overflow-x-auto">
+            <div className="flex gap-1 px-4 md:px-8 bg-[var(--theme-bg-secondary)] border-b border-[var(--theme-border)] overflow-x-auto">
                 {TABS.map(tab => (
                     <button
                         key={tab.id}
                         className={cn(
                             'flex items-center gap-2 py-3 md:py-3.5 px-4 md:px-5 text-sm md:text-[0.9375rem] font-medium bg-transparent border-b-2 border-transparent cursor-pointer transition-all duration-200 whitespace-nowrap [&>svg]:shrink-0',
                             activeTab === tab.id
-                                ? 'text-blue-500 border-b-blue-500'
-                                : 'text-gray-600 hover:text-blue-500 hover:bg-gray-50'
+                                ? 'text-[var(--color-gold)] border-b-[var(--color-gold)]'
+                                : 'text-[var(--theme-text-secondary)] hover:text-[var(--color-gold)] hover:bg-[var(--theme-bg-tertiary)]'
                         )}
                         onClick={() => navigate(tab.path)}
                     >
