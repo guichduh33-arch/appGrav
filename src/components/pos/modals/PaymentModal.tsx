@@ -440,7 +440,7 @@ export default function PaymentModal({ onClose }: PaymentModalProps) {
             </h3>
             <p className="modal-subtitle">
               Total to collect:{' '}
-              <strong style={{ color: 'var(--color-charcoal)', fontSize: 'var(--text-lg)' }}>
+              <strong style={{ color: 'var(--theme-text-primary)', fontSize: 'var(--text-lg)' }}>
                 {formatPrice(total)}
               </strong>
               {!isOnline && (

@@ -65,14 +65,14 @@ export function KDSHeader({
       <div className="flex items-center gap-4 max-md:order-3 max-md:w-full max-md:justify-between">
         <div className="flex gap-3 max-md:flex-1">
           {urgentCount > 0 && (
-            <span className="flex items-center gap-1.5 bg-[#EF4444] text-white py-1.5 px-3.5 rounded-[20px] font-bold animate-pulse-urgent">
+            <span className="flex items-center gap-1.5 bg-[#991B1B] text-white py-1.5 px-3.5 rounded-[20px] font-bold animate-pulse-urgent">
               <AlertTriangle size={14} />
               {urgentCount} Urgent
             </span>
           )}
-          <span className="py-1.5 px-3.5 rounded-[20px] text-[0.85rem] font-semibold bg-blue-500/20 text-blue-400">{newCount} New</span>
-          <span className="py-1.5 px-3.5 rounded-[20px] text-[0.85rem] font-semibold bg-amber-500/20 text-amber-300">{preparingCount} Prep</span>
-          <span className="py-1.5 px-3.5 rounded-[20px] text-[0.85rem] font-semibold bg-emerald-500/20 text-emerald-300">{readyCount} Ready</span>
+          <span className="py-1.5 px-3.5 rounded-[20px] text-[0.85rem] font-semibold bg-gold/20 text-gold">{newCount} New</span>
+          <span className="py-1.5 px-3.5 rounded-[20px] text-[0.85rem] font-semibold bg-[#A6634B]/20 text-[#D9A391]">{preparingCount} Prep</span>
+          <span className="py-1.5 px-3.5 rounded-[20px] text-[0.85rem] font-semibold bg-[#4A5D4E]/20 text-[#A7C4AC]">{readyCount} Ready</span>
         </div>
         <LanConnectionIndicator
           status={connectionStatus}
@@ -82,7 +82,7 @@ export function KDSHeader({
         <button
           className={cn(
             'bg-[var(--kds-surface-elevated)] border-none text-white w-12 h-12 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[var(--kds-surface-hover)]',
-            showAllDayCount && 'bg-[#3B82F6] text-white'
+            showAllDayCount && 'bg-gold text-white shadow-[0_0_10px_rgba(201,165,92,0.4)]'
           )}
           onClick={onToggleAllDayCount}
           aria-label="Toggle all-day count"
@@ -93,7 +93,7 @@ export function KDSHeader({
         <button
           className={cn(
             'bg-[var(--kds-surface-elevated)] border-none text-white w-12 h-12 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[var(--kds-surface-hover)]',
-            !soundEnabled && 'text-[#EF4444]'
+            !soundEnabled && 'text-danger'
           )}
           onClick={onSoundToggle}
           aria-label={soundEnabled ? 'Mute sound' : 'Enable sound'}

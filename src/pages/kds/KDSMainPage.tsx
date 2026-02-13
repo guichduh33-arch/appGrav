@@ -19,25 +19,25 @@ const STATION_CONFIG: Record<string, { name: string; icon: React.ReactNode; colo
     hot_kitchen: {
         name: 'Hot Kitchen',
         icon: <ChefHat size={24} />,
-        color: '#EF4444',
+        color: '#A6634B', // Clay Terracotta
         dbStation: 'kitchen'
     },
     barista: {
         name: 'Barista',
         icon: <Coffee size={24} />,
-        color: '#8B5CF6',
+        color: '#C9A55C', // Aged Gold
         dbStation: 'barista'
     },
     display: {
         name: 'Display',
         icon: <Store size={24} />,
-        color: '#10B981',
+        color: '#4A5D4E', // Olive Muted
         dbStation: 'display'
     },
     waiter: {
         name: 'Waiter',
         icon: <Users size={24} />,
-        color: '#3B82F6',
+        color: '#E5E7EB', // Stone Text
         dbStation: 'all'
     }
 }

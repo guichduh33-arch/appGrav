@@ -35,10 +35,10 @@ interface KDSOrderCardProps {
 }
 
 const ORDER_TYPE_ICONS: Record<string, { label: string; Icon: typeof UtensilsCrossed; color: string }> = {
-    dine_in: { label: 'Dine In', Icon: UtensilsCrossed, color: '#10B981' },
-    takeaway: { label: 'Takeaway', Icon: Package, color: '#F59E0B' },
-    delivery: { label: 'Delivery', Icon: Bike, color: '#3B82F6' },
-    b2b: { label: 'B2B', Icon: Building2, color: '#8B5CF6' }
+    dine_in: { label: 'Dine In', Icon: UtensilsCrossed, color: '#C9A55C' }, // Aged Gold
+    takeaway: { label: 'Takeaway', Icon: Package, color: '#D4B465' },
+    delivery: { label: 'Delivery', Icon: Bike, color: '#9CA3AF' },
+    b2b: { label: 'B2B', Icon: Building2, color: '#4A5D4E' } // Olive
 }
 
 function KDSOrderCard({
@@ -163,13 +163,13 @@ function KDSOrderCard({
     return (
         <div className={cn(
             'relative bg-[var(--kds-surface)] rounded-xl overflow-hidden flex flex-col transition-all duration-300 border-2 border-transparent motion-reduce:transition-none',
-            overallStatus === 'new' && 'border-[#3B82F6] animate-pulse-new motion-reduce:animate-none',
-            overallStatus === 'preparing' && 'border-[#F59E0B]',
-            overallStatus === 'ready' && 'border-[#10B981] bg-gradient-to-br from-[#2a2a2a] to-[#1a3a2a]',
-            overallStatus === 'served' && 'opacity-50 border-[#666]',
-            urgency === 'warning' && 'shadow-[0_0_20px_rgba(245,158,11,0.3)]',
+            overallStatus === 'new' && 'border-gold shadow-[0_0_15px_rgba(201,165,92,0.2)] animate-pulse-new motion-reduce:animate-none',
+            overallStatus === 'preparing' && 'border-[#A6634B]',
+            overallStatus === 'ready' && 'border-[#4A5D4E] bg-gradient-to-br from-[#1a1a1d] to-[#1a2a1a]', // Subtle olive gradient
+            overallStatus === 'served' && 'opacity-50 border-[#333]',
+            urgency === 'warning' && 'shadow-[0_0_20px_rgba(166,99,75,0.3)]',
             urgency === 'critical' && 'animate-pulse-critical motion-reduce:animate-none',
-            isCountingDown && 'shadow-[0_0_20px_rgba(16,185,129,0.4)] border-[#10B981] motion-reduce:shadow-[0_0_5px_rgba(16,185,129,0.3)]',
+            isCountingDown && 'shadow-[0_0_20px_rgba(74,93,78,0.4)] border-[#4A5D4E] motion-reduce:shadow-[0_0_5px_rgba(74,93,78,0.3)]',
             isExiting && 'animate-card-exit pointer-events-none motion-reduce:animate-none motion-reduce:opacity-0'
         )}>
             {/* Header */}
@@ -199,9 +199,9 @@ function KDSOrderCard({
                 </div>
                 <div className={cn(
                     'flex items-center gap-1.5 font-mono text-[20px] font-semibold py-1.5 px-3 rounded-lg bg-[var(--kds-surface-elevated)]',
-                    urgency === 'normal' && 'text-[#10B981]',
-                    urgency === 'warning' && 'text-[#F59E0B] bg-[rgba(245,158,11,0.2)]',
-                    urgency === 'critical' && 'text-[#EF4444] bg-[rgba(239,68,68,0.2)]'
+                    urgency === 'normal' && 'text-[#4A5D4E]', // Olive
+                    urgency === 'warning' && 'text-[#A6634B] bg-[rgba(166,99,75,0.2)]', // Clay
+                    urgency === 'critical' && 'text-[#991B1B] bg-[rgba(153,27,27,0.2)]' // Deep Red
                 )}>
                     <Clock size={16} />
                     <span>{formatTime(elapsedTime)}</span>
@@ -228,11 +228,11 @@ function KDSOrderCard({
                         key={item.id}
                         className={cn(
                             'py-2.5 px-3 bg-[var(--kds-bg)] rounded-lg border-l-4 transition-all duration-300',
-                            item.item_status === 'new' && 'border-l-[#3B82F6]',
-                            item.item_status === 'preparing' && 'border-l-[#F59E0B] bg-[rgba(245,158,11,0.1)]',
-                            item.item_status === 'ready' && 'border-l-[#10B981] bg-[rgba(16,185,129,0.1)] line-through opacity-70',
-                            item.item_status === 'served' && 'border-l-[#666] opacity-40 line-through',
-                            item.is_held && '!border-l-[#DC2626] !bg-[rgba(220,38,38,0.15)] opacity-90'
+                            item.item_status === 'new' && 'border-l-gold shadow-[inset_4px_0_0_var(--color-gold)]',
+                            item.item_status === 'preparing' && 'border-l-[#A6634B] bg-[rgba(166,99,75,0.1)]',
+                            item.item_status === 'ready' && 'border-l-[#4A5D4E] bg-[rgba(74,93,78,0.1)] line-through opacity-70',
+                            item.item_status === 'served' && 'border-l-[#333] opacity-40 line-through',
+                            item.is_held && '!border-l-[#991B1B] !bg-[rgba(153,27,27,0.15)] opacity-90'
                         )}
                     >
                         <div className="flex items-center gap-2">
@@ -287,16 +287,16 @@ function KDSOrderCard({
             <div className="py-3 px-4 bg-[var(--kds-bg)] border-t border-[var(--kds-border)]">
                 {overallStatus === 'new' && (
                     <button
-                        className="w-full py-4 px-5 border-none rounded-[10px] text-lg min-h-[48px] font-extrabold uppercase tracking-wide cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(59,130,246,0.4)]"
+                        className="w-full py-4 px-5 border-none rounded-[10px] text-lg min-h-[48px] font-extrabold uppercase tracking-wide cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-gold to-gold-dark text-black hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(201,165,92,0.4)]"
                         onClick={handleStartPreparing}
                     >
-                        <Play size={20} />
+                        <Play size={20} fill="currentColor" />
                         START
                     </button>
                 )}
                 {overallStatus === 'preparing' && (
                     <button
-                        className="w-full py-4 px-5 border-none rounded-[10px] text-lg min-h-[48px] font-extrabold uppercase tracking-wide cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#10B981] to-[#059669] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(16,185,129,0.4)]"
+                        className="w-full py-4 px-5 border-none rounded-[10px] text-lg min-h-[48px] font-extrabold uppercase tracking-wide cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#4A5D4E] to-[#2D3A31] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(74,93,78,0.4)]"
                         onClick={handleMarkReady}
                     >
                         <CheckCircle size={20} />

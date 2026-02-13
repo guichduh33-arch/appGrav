@@ -116,18 +116,18 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
     }
 
     return (
-        <aside className="w-[380px] bg-zinc-800 border-l border-zinc-700 flex flex-col flex-shrink-0 z-[15] shadow-[-4px_0_24px_rgba(0,0,0,0.2)] text-white">
+        <aside className="w-[380px] bg-[var(--theme-bg-secondary)] border-l border-[var(--theme-border)] flex flex-col flex-shrink-0 z-[15] shadow-[-4px_0_24px_rgba(0,0,0,0.4)] text-[var(--theme-text-primary)]">
             {/* Pending Orders Button */}
-            <div className="px-md py-sm bg-zinc-900 border-b border-zinc-700">
+            <div className="px-md py-sm bg-[var(--theme-bg-primary)] border-b border-[var(--theme-border)]">
                 <button
                     type="button"
-                    className="w-full p-2.5 bg-zinc-700 border border-zinc-600 rounded-md text-white font-semibold text-sm cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 hover:bg-zinc-600 hover:border-gold hover:text-gold-light"
+                    className="w-full p-2.5 bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border-strong)] rounded-md text-[var(--theme-text-primary)] font-semibold text-sm cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 hover:bg-[var(--theme-bg-secondary)] hover:border-gold hover:text-gold-light"
                     onClick={onShowPendingOrders}
                 >
                     <List size={18} />
                     Pending Orders
                     {heldOrdersCount > 0 && (
-                        <span className="bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 font-bold">
+                        <span className="bg-[var(--color-danger)] text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 font-bold">
                             {heldOrdersCount}
                         </span>
                     )}
@@ -144,9 +144,9 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                                 key={type}
                                 type="button"
                                 className={cn(
-                                    'px-3 py-1.5 bg-zinc-700 border-2 border-transparent rounded-md text-xs font-bold text-zinc-300 cursor-pointer transition-all duration-200 uppercase tracking-wide whitespace-nowrap',
-                                    'hover:bg-zinc-600 hover:text-white',
-                                    orderType === type && 'bg-gold border-gold-light text-white shadow-[0_2px_8px_rgba(59,130,246,0.3)]'
+                                    'px-3 py-1.5 bg-[var(--theme-bg-tertiary)] border-2 border-transparent rounded-md text-xs font-bold text-[var(--theme-text-secondary)] cursor-pointer transition-all duration-200 uppercase tracking-wide whitespace-nowrap',
+                                    'hover:bg-[var(--theme-bg-secondary)] hover:text-white',
+                                    orderType === type && 'bg-gold border-gold-light text-black shadow-[0_2px_8px_rgba(201,165,92,0.3)]'
                                 )}
                                 onClick={() => handleOrderTypeChange(type)}
                             >
@@ -165,7 +165,7 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
 
                 {/* B2B mode indicator (Story 6.7) */}
                 {customerCategorySlug === 'wholesale' && (
-                    <div className="mt-1.5 px-2.5 py-1.5 bg-[rgba(139,92,246,0.15)] border border-[rgba(139,92,246,0.4)] rounded-sm flex items-center gap-1.5 text-xs font-semibold text-[#a78bfa]">
+                    <div className="mt-1.5 px-2.5 py-1.5 bg-[#4A5D4E]/15 border border-[#4A5D4E]/40 rounded-sm flex items-center gap-1.5 text-xs font-semibold text-[#A7C4AC]">
                         <Building2 size={14} />
                         <span>B2B Mode</span>
                         <span className="ml-auto text-[10px] font-normal opacity-80">Store Credit Available</span>
@@ -173,11 +173,11 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                 )}
 
                 {orderType === 'dine_in' && tableNumber && (
-                    <div className="mt-1.5 px-2.5 py-1.5 bg-[rgba(59,130,246,0.1)] border border-[rgba(59,130,246,0.3)] rounded-sm flex items-center justify-between text-xs text-gold-light">
+                    <div className="mt-1.5 px-2.5 py-1.5 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-between text-xs text-gold-light">
                         <span>Table: {tableNumber}</span>
                         <button
                             type="button"
-                            className="px-2 py-1 bg-transparent border border-gold rounded-sm text-gold-light text-xs font-semibold cursor-pointer transition-all duration-200 hover:bg-gold hover:text-white"
+                            className="px-2 py-1 bg-transparent border border-gold rounded-sm text-gold-light text-xs font-semibold cursor-pointer transition-all duration-200 hover:bg-gold hover:text-black"
                             onClick={() => setShowTableModal(true)}
                         >
                             Change
@@ -188,16 +188,16 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                 {/* Customer Selection */}
                 <div className="mt-2">
                     {selectedCustomer || customerId ? (
-                        <button type="button" className="w-full flex items-center gap-2.5 px-2.5 py-2 bg-zinc-700 border-2 border-gold rounded-md cursor-pointer transition-all duration-200 hover:bg-zinc-600" onClick={() => setShowCustomerModal(true)} style={{ borderColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze') }}>
+                        <button type="button" className="w-full flex items-center gap-2.5 px-2.5 py-2 bg-[var(--theme-bg-tertiary)] border-2 border-gold rounded-md cursor-pointer transition-all duration-200 hover:bg-[var(--theme-bg-secondary)]" onClick={() => setShowCustomerModal(true)} style={{ borderColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze') }}>
                             <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-semibold text-[0.85rem] flex-shrink-0" style={{ backgroundColor: selectedCustomer?.category?.color || getTierColor(selectedCustomer?.loyalty_tier || 'bronze') }}>
                                 {(selectedCustomer?.company_name || selectedCustomer?.name || customerName || '?')[0].toUpperCase()}
                             </div>
                             <div className="flex-1 min-w-0 flex flex-col">
-                                <span className="text-sm font-semibold text-white whitespace-nowrap overflow-hidden text-ellipsis">{selectedCustomer?.company_name || selectedCustomer?.name || customerName}</span>
+                                <span className="text-sm font-semibold text-[var(--theme-text-primary)] whitespace-nowrap overflow-hidden text-ellipsis">{selectedCustomer?.company_name || selectedCustomer?.name || customerName}</span>
                                 {selectedCustomer && (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         <LoyaltyBadge tier={selectedCustomer.loyalty_tier || 'bronze'} points={selectedCustomer.loyalty_points || 0} isOffline={isOffline} compact={true} />
-                                        <button type="button" onClick={(e) => { e.stopPropagation(); handleRedeemPointsClick() }} className="text-[10px] bg-transparent border-none underline px-1 py-0.5" style={{ color: isOffline ? '#9ca3af' : '#3b82f6', cursor: isOffline ? 'not-allowed' : 'pointer' }} title={isOffline ? 'Requires online connection' : 'Use loyalty points'}>
+                                        <button type="button" onClick={(e) => { e.stopPropagation(); handleRedeemPointsClick() }} className="text-[10px] bg-transparent border-none underline px-1 py-0.5" style={{ color: isOffline ? 'var(--theme-text-muted)' : 'var(--color-gold)', cursor: isOffline ? 'not-allowed' : 'pointer' }} title={isOffline ? 'Requires online connection' : 'Use loyalty points'}>
                                             <Star size={10} style={{ marginRight: '2px' }} />Use pts
                                         </button>
                                     </div>
@@ -205,7 +205,7 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                             </div>
                             <div>
                                 {selectedCustomer?.category?.discount_percentage && selectedCustomer.category.discount_percentage > 0 && (
-                                    <span className="px-2 py-1 rounded text-xs font-bold text-[#22c55e]" style={{ backgroundColor: '#3b82f6' }} title={`Category: ${selectedCustomer.category.name}`}>
+                                    <span className="px-2 py-1 rounded text-xs font-bold text-[#A7C4AC] bg-[#4A5D4E]/20" title={`Category: ${selectedCustomer.category.name}`}>
                                         <Tag size={10} />-{selectedCustomer.category.discount_percentage}%
                                     </span>
                                 )}
@@ -214,7 +214,7 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                     ) : (
                         <button
                             type="button"
-                            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-700 border border-dashed border-zinc-500 rounded-md text-zinc-400 text-xs font-semibold cursor-pointer transition-all duration-200 hover:bg-zinc-600 hover:border-gold hover:text-gold-light"
+                            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-[var(--theme-bg-tertiary)] border border-dashed border-[var(--theme-border-strong)] rounded-md text-[var(--theme-text-secondary)] text-xs font-semibold cursor-pointer transition-all duration-200 hover:bg-[var(--theme-bg-secondary)] hover:border-gold hover:text-gold-light"
                             onClick={() => setShowCustomerModal(true)}
                         >
                             <QrCode size={16} /><User size={16} /><span>Client</span>

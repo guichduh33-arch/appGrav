@@ -14,8 +14,8 @@ interface CategoryNavProps {
     onOpenMenu?: () => void
 }
 
-const itemBase = 'w-full flex items-center py-5 px-6 min-h-[80px] border-none rounded-lg cursor-pointer text-left transition-all duration-200 text-white relative overflow-hidden shadow-[0_2px_5px_rgba(0,0,0,0.1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 hover:shadow-[0_6px_12px_rgba(0,0,0,0.15)] hover:brightness-110'
-const itemActive = 'shadow-[inset_0_0_0_4px_rgba(255,255,255,0.3),0_8px_16px_rgba(0,0,0,0.2)] scale-[1.02] z-[2]'
+const itemBase = 'w-full flex items-center py-5 px-6 min-h-[80px] border-none rounded-lg cursor-pointer text-left transition-all duration-200 text-white relative overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.3)] [text-shadow:0_1px_4px_rgba(0,0,0,0.5)] hover:-translate-y-0.5 hover:shadow-[0_6px_15px_rgba(0,0,0,0.4)] hover:brightness-110'
+const itemActive = 'shadow-[inset_0_0_0_3px_rgba(201,165,92,0.8),0_8px_20px_rgba(0,0,0,0.5)] scale-[1.02] z-[2]'
 
 export default memo(function CategoryNav({
     categories,
@@ -28,7 +28,7 @@ export default memo(function CategoryNav({
         return (
             <aside className="pos-categories">
                 {[...Array(6)].map((_, i) => (
-                    <div key={i} className="h-20 w-full bg-gray-100 rounded-lg mb-3 animate-pulse" />
+                    <div key={i} className="h-20 w-full bg-[var(--theme-bg-secondary)] rounded-lg mb-3 animate-pulse" />
                 ))}
             </aside>
         )
@@ -36,8 +36,13 @@ export default memo(function CategoryNav({
 
     return (
         <aside className="pos-categories">
-            {/* Menu Button */}
+            {/* Menu Button & Logo */}
             <div className="pos-categories__header">
+                <div className="flex flex-col items-center mb-6">
+                    <span className="text-[0.65rem] uppercase tracking-[0.2em] text-gold font-bold mb-1 opacity-80">The</span>
+                    <span className="text-sm font-display font-bold tracking-[0.1em] text-white uppercase">Breakery</span>
+                </div>
+
                 <button className="pos-menu-btn" onClick={onOpenMenu} title="Menu" aria-label="Open menu">
                     <Menu size={28} />
                 </button>
@@ -48,7 +53,7 @@ export default memo(function CategoryNav({
 
             <button
                 className={cn(itemBase, selectedCategory === null && itemActive)}
-                style={{ backgroundColor: '#334155' }}
+                style={{ backgroundColor: '#1A1A1D' }} // Warm Charcoal
                 onClick={() => onSelectCategory(null)}
             >
                 <span className="text-[1.1rem] font-bold tracking-tight uppercase">All</span>

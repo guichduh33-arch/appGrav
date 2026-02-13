@@ -290,23 +290,23 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
 
     return (
         <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center"
+            className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
             style={{ zIndex: 'var(--z-modal-backdrop)' }}
             onClick={(e) => e.target === e.currentTarget && onClose()}
         >
             <div
-                className="relative bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] max-h-[90vh] flex flex-col text-white w-[500px] max-w-[90vw]"
+                className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border-strong)] rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] max-h-[90vh] flex flex-col text-white w-[500px] max-w-full"
                 style={{ zIndex: 'var(--z-modal)' }}
             >
-                <div className="flex items-start justify-between p-[var(--space-lg)] border-b border-[var(--color-gray-700)]">
+                <div className="flex items-start justify-between p-[var(--space-lg)] border-b border-[var(--theme-border)]">
                     <div>
-                        <h3 className="text-2xl font-bold flex items-center gap-2 m-0 text-white">
+                        <h3 className="text-2xl font-bold flex items-center gap-2 m-0 text-[var(--theme-text-primary)]">
                             {product.name}
                         </h3>
-                        <p className="text-sm text-[var(--color-gray-400)] mt-1">Customize your order</p>
+                        <p className="text-sm text-[var(--theme-text-secondary)] mt-1">Customize your order</p>
                     </div>
                     <button
-                        className="w-10 h-10 flex items-center justify-center bg-transparent border-none rounded-lg text-[var(--color-gray-400)] cursor-pointer transition-all hover:bg-[var(--color-gray-700)] hover:text-white"
+                        className="w-10 h-10 flex items-center justify-center bg-transparent border-none rounded-lg text-[var(--theme-text-secondary)] cursor-pointer transition-all hover:bg-[var(--theme-bg-tertiary)] hover:text-[var(--theme-text-primary)]"
                         onClick={onClose}
                         title="Close"
                         aria-label="Close"
@@ -319,7 +319,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                     {/* Modifier Groups */}
                     {modifierGroups.map(group => (
                         <div key={group.name} className="mb-6 last:mb-0">
-                            <h4 className="flex items-center gap-2 text-sm font-semibold text-[var(--color-gray-400)] mb-[var(--space-md)] uppercase tracking-[0.05em]">
+                            <h4 className="flex items-center gap-2 text-sm font-semibold text-[var(--theme-text-secondary)] mb-[var(--space-md)] uppercase tracking-[0.05em]">
                                 {group.label}
                                 {group.required && <span className="text-destructive ml-1">*</span>}
                             </h4>
@@ -338,11 +338,11 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                                             />
                                             <label
                                                 htmlFor={`${group.name}-${option.id}`}
-                                                className="flex flex-col items-center justify-center py-4 px-3 bg-[var(--color-gray-900)] border-2 border-transparent rounded-xl cursor-pointer transition-all text-center min-h-[80px] text-[var(--color-gray-300)] hover:bg-[var(--color-gray-750,#2a2a2e)] hover:text-white peer-checked:border-[var(--color-primary)] peer-checked:bg-blue-500/10 peer-checked:text-[var(--color-primary-light)]"
+                                                className="flex flex-col items-center justify-center py-4 px-3 bg-[var(--theme-bg-tertiary)] border-2 border-transparent rounded-xl cursor-pointer transition-all text-center min-h-[80px] text-[var(--theme-text-secondary)] hover:bg-[var(--theme-bg-tertiary)] hover:border-gold/30 hover:text-white peer-checked:border-gold peer-checked:bg-gold/10 peer-checked:text-gold"
                                             >
                                                 <span className="text-[15px] font-semibold">{option.label}</span>
                                                 {option.price > 0 && (
-                                                    <span className="text-[13px] text-[var(--color-gray-400)] mt-1 font-medium peer-checked:text-[var(--color-primary-light)]">+{formatPrice(option.price)}</span>
+                                                    <span className="text-[13px] text-[var(--theme-text-muted)] mt-1 font-medium peer-checked:text-gold">+{formatPrice(option.price)}</span>
                                                 )}
                                             </label>
                                         </div>
@@ -356,19 +356,19 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                                             <label
                                                 key={option.id}
                                                 className={cn(
-                                                    'flex items-center py-3 px-4 bg-[var(--color-gray-900)] border border-transparent rounded-xl cursor-pointer transition-all min-h-[56px]',
-                                                    'hover:bg-[var(--color-gray-750,#2a2a2e)]',
-                                                    isChecked && 'border-[var(--color-primary)] bg-blue-500/10'
+                                                    'flex items-center py-3 px-4 bg-[var(--theme-bg-tertiary)] border border-transparent rounded-xl cursor-pointer transition-all min-h-[56px]',
+                                                    'hover:bg-[var(--theme-bg-tertiary)] hover:border-gold/30',
+                                                    isChecked && 'border-gold bg-gold/10'
                                                 )}
                                             >
                                                 <input
                                                     type="checkbox"
                                                     checked={isChecked}
                                                     onChange={() => handleMultiSelect(group.name, option.id)}
-                                                    className="w-5 h-5 accent-[var(--color-primary)] mr-3"
+                                                    className="w-5 h-5 accent-gold mr-3"
                                                 />
-                                                <span className={cn('flex-1 text-[15px] font-medium text-[var(--color-gray-200)]', isChecked && 'text-[var(--color-primary-light)]')}>{option.label}</span>
-                                                <span className={cn('text-sm text-[var(--color-gray-400)]', isChecked && 'text-[var(--color-primary-light)]')}>+{formatPrice(option.price)}</span>
+                                                <span className={cn('flex-1 text-[15px] font-medium text-[var(--theme-text-secondary)]', isChecked && 'text-gold')}>{option.label}</span>
+                                                <span className={cn('text-sm text-[var(--theme-text-muted)]', isChecked && 'text-gold')}>+{formatPrice(option.price)}</span>
                                             </label>
                                         )
                                     })}
@@ -379,9 +379,9 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
 
                     {/* Notes */}
                     <div className="mb-6 last:mb-0">
-                        <h4 className="flex items-center gap-2 text-sm font-semibold text-[var(--color-gray-400)] mb-[var(--space-md)] uppercase tracking-[0.05em]">Kitchen notes</h4>
+                        <h4 className="flex items-center gap-2 text-sm font-semibold text-[var(--theme-text-secondary)] mb-[var(--space-md)] uppercase tracking-[0.05em]">Kitchen notes</h4>
                         <textarea
-                            className="w-full min-h-[100px] p-3 font-[var(--font-body)] text-[15px] text-white bg-[var(--color-gray-900)] border border-[var(--color-gray-700)] rounded-xl resize-none transition-all focus:outline-none focus:border-[var(--color-primary)] focus:bg-[var(--color-gray-800)] placeholder:text-[var(--color-gray-600)]"
+                            className="w-full min-h-[100px] p-3 font-[var(--font-body)] text-[15px] text-white bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border)] rounded-xl resize-none transition-all focus:outline-none focus:border-gold focus:bg-[var(--theme-bg-tertiary)] placeholder:text-[var(--theme-text-muted)]"
                             placeholder="Special instructions..."
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
@@ -390,10 +390,10 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
 
                     {/* Quantity */}
                     <div className="mb-6 last:mb-0">
-                        <h4 className="flex items-center gap-2 text-sm font-semibold text-[var(--color-gray-400)] mb-[var(--space-md)] uppercase tracking-[0.05em]">Quantity</h4>
-                        <div className="flex items-center gap-4 bg-[var(--color-gray-900)] p-1.5 rounded-2xl w-fit">
+                        <h4 className="flex items-center gap-2 text-sm font-semibold text-[var(--theme-text-secondary)] mb-[var(--space-md)] uppercase tracking-[0.05em]">Quantity</h4>
+                        <div className="flex items-center gap-4 bg-[var(--theme-bg-tertiary)] p-1.5 rounded-2xl w-fit border border-[var(--theme-border)]">
                             <button
-                                className="w-12 h-12 flex items-center justify-center bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-xl text-white cursor-pointer transition-all hover:bg-[var(--color-gray-700)] hover:border-[var(--color-gray-600)]"
+                                className="w-12 h-12 flex items-center justify-center bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl text-white cursor-pointer transition-all hover:bg-[var(--theme-bg-tertiary)]"
                                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                                 title="Decrease quantity"
                                 aria-label="Decrease quantity"
@@ -402,7 +402,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                             </button>
                             <span className="text-2xl font-bold min-w-[40px] text-center text-white tabular-nums">{quantity}</span>
                             <button
-                                className="w-12 h-12 flex items-center justify-center bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-xl text-white cursor-pointer transition-all hover:bg-[var(--color-gray-700)] hover:border-[var(--color-gray-600)]"
+                                className="w-12 h-12 flex items-center justify-center bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl text-white cursor-pointer transition-all hover:bg-[var(--theme-bg-tertiary)]"
                                 onClick={() => setQuantity(quantity + 1)}
                                 title="Increase quantity"
                                 aria-label="Increase quantity"
@@ -413,9 +413,9 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                     </div>
                 </div>
 
-                <div className="p-[var(--space-lg)] border-t border-[var(--color-gray-700)] bg-[var(--color-gray-800)] rounded-b-2xl">
+                <div className="p-[var(--space-lg)] border-t border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] rounded-b-2xl">
                     <button
-                        className="w-full h-16 px-6 bg-[var(--color-primary)] text-white border-none rounded-xl text-lg font-semibold flex items-center justify-center gap-3 cursor-pointer transition-all hover:bg-[var(--color-primary-dark)] hover:shadow-[0_4px_12px_rgba(37,99,235,0.4)] hover:-translate-y-px active:translate-y-px"
+                        className="w-full h-16 px-6 bg-gradient-to-r from-gold-dark via-gold to-gold-light text-black border-none rounded-xl text-lg font-bold flex items-center justify-center gap-3 cursor-pointer transition-all hover:shadow-[0_8px_25px_rgba(201,165,92,0.3)] hover:-translate-y-px active:translate-y-px uppercase tracking-wider"
                         onClick={handleConfirm}
                     >
                         <Check size={18} />

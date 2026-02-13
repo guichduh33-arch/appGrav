@@ -42,8 +42,8 @@ const ProductCard = memo(function ProductCard({
     return (
         <button
             className={cn(
-                'relative flex flex-col bg-[var(--color-gray-700)] border border-[var(--color-gray-600)] rounded-xl p-0 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden h-full text-left',
-                'hover:-translate-y-1 hover:shadow-[0_0_12px_rgba(201,165,92,0.15)] hover:border-gold hover:bg-[var(--color-gray-600)]',
+                'relative flex flex-col bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl p-0 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden h-full text-left',
+                'hover:-translate-y-1 hover:shadow-[0_0_12px_rgba(201,165,92,0.15)] hover:border-gold hover:bg-[var(--theme-bg-tertiary)]',
                 'active:scale-[0.98]',
                 isOutOfStock && 'opacity-60 hover:opacity-80',
                 bouncing && 'pos-bounce'
@@ -71,7 +71,7 @@ const ProductCard = memo(function ProductCard({
 
             {/* Product image or initial */}
             <div className={cn(
-                'w-full aspect-square bg-[var(--color-gray-800)] flex items-center justify-center overflow-hidden shrink-0 rounded-t-xl',
+                'w-full aspect-square bg-[var(--theme-bg-primary)] flex items-center justify-center overflow-hidden shrink-0 rounded-t-xl',
                 isOutOfStock && 'grayscale-[50%]'
             )}>
                 {product.image_url ? (
@@ -88,7 +88,7 @@ const ProductCard = memo(function ProductCard({
                     />
                 ) : null}
                 <span
-                    className="text-3xl font-display font-bold text-[var(--color-gray-500)] flex items-center justify-center"
+                    className="text-3xl font-display font-bold text-[var(--theme-text-muted)] flex items-center justify-center"
                     style={{ display: product.image_url ? 'none' : 'flex' }}
                 >
                     {product.name.charAt(0).toUpperCase()}
@@ -132,7 +132,7 @@ function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) 
         return (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-8 w-full pb-xl">
                 {[...Array(8)].map((_, i) => (
-                    <div key={i} className="h-[200px] bg-[var(--color-gray-100)] rounded-xl animate-pulse" />
+                    <div key={i} className="h-[200px] bg-[var(--theme-bg-secondary)] rounded-xl animate-pulse" />
                 ))}
             </div>
         )
@@ -140,7 +140,7 @@ function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) 
 
     if (products.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center h-[300px] text-[var(--color-gray-400)] text-center">
+            <div className="flex flex-col items-center justify-center h-[300px] text-[var(--theme-text-muted)] text-center">
                 <Search size={48} className="mb-md opacity-50" />
                 <p>No items found</p>
             </div>

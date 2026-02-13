@@ -203,15 +203,18 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
     if (isLoading) {
         return (
             <div
-                className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center"
+                className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
                 style={{ zIndex: 'var(--z-modal-backdrop)' }}
                 onClick={(e) => e.target === e.currentTarget && onClose()}
             >
                 <div
-                    className="relative bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] w-[500px] max-w-[90vw] text-white p-8 text-center"
+                    className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border-strong)] rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] w-[500px] max-w-full text-white p-8 text-center"
                     style={{ zIndex: 'var(--z-modal)' }}
                 >
-                    Loading options...
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="w-12 h-12 border-4 border-gold/20 border-t-gold rounded-full animate-spin" />
+                        <p className="text-lg font-medium text-[var(--theme-text-secondary)]">Loading options...</p>
+                    </div>
                 </div>
             </div>
         )
@@ -219,31 +222,31 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
 
     return (
         <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center"
+            className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
             style={{ zIndex: 'var(--z-modal-backdrop)' }}
             onClick={(e) => e.target === e.currentTarget && onClose()}
         >
             <div
-                className="relative bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] max-h-[90vh] flex flex-col text-white w-[500px] max-w-[90vw]"
+                className="relative bg-[var(--theme-bg-secondary)] border border-[var(--theme-border-strong)] rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] max-h-[90vh] flex flex-col text-white w-[500px] max-w-full"
                 style={{ zIndex: 'var(--z-modal)' }}
             >
                 {/* Header */}
-                <div className="flex items-start justify-between p-[var(--space-lg)] border-b border-[var(--color-gray-700)]">
+                <div className="flex items-start justify-between p-[var(--space-lg)] border-b border-[var(--theme-border)]">
                     <div className="flex items-center gap-4">
                         {baseProduct.image_url && (
                             <img
                                 src={baseProduct.image_url}
                                 alt={baseProduct.name}
-                                className="w-16 h-16 rounded-xl object-cover"
+                                className="w-16 h-16 rounded-xl object-cover border border-[var(--theme-border)]"
                             />
                         )}
                         <div>
-                            <h3 className="text-xl font-bold text-white m-0">{baseProduct.name}</h3>
-                            <p className="text-sm text-[var(--color-gray-400)] mt-1">Choose your options</p>
+                            <h3 className="text-xl font-bold text-[var(--theme-text-primary)] m-0">{baseProduct.name}</h3>
+                            <p className="text-sm text-[var(--theme-text-secondary)] mt-1">Choose your options</p>
                         </div>
                     </div>
                     <button
-                        className="w-10 h-10 flex items-center justify-center bg-transparent border-none rounded-lg text-[var(--color-gray-400)] cursor-pointer transition-all hover:bg-[var(--color-gray-700)] hover:text-white"
+                        className="w-10 h-10 flex items-center justify-center bg-transparent border-none rounded-lg text-[var(--theme-text-secondary)] cursor-pointer transition-all hover:bg-[var(--theme-bg-tertiary)] hover:text-[var(--theme-text-primary)]"
                         onClick={onClose}
                         title="Close"
                         aria-label="Close"
@@ -279,8 +282,8 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                                                 className={cn(
                                                     'flex flex-col items-center justify-center gap-2 p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 min-h-[80px]',
                                                     isSelected
-                                                        ? 'border-gold bg-gold/15 text-white'
-                                                        : 'border-[var(--color-gray-600)] bg-[var(--color-gray-900)] text-[var(--color-gray-300)] hover:border-gold/50 hover:bg-[var(--color-gray-800)]'
+                                                        ? 'border-gold bg-gold/10 text-white shadow-[0_0_15px_rgba(201,165,92,0.1)]'
+                                                        : 'border-[var(--theme-border)] bg-[var(--theme-bg-tertiary)] text-[var(--theme-text-secondary)] hover:border-gold/30 hover:bg-[var(--theme-bg-tertiary)]'
                                                 )}
                                                 onClick={() => handleOptionSelect(group, option.option_id)}
                                             >
@@ -309,9 +312,9 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                 </div>
 
                 {/* Footer */}
-                <div className="p-[var(--space-lg)] border-t border-[var(--color-gray-700)] bg-[var(--color-gray-800)] rounded-b-2xl">
+                <div className="p-[var(--space-lg)] border-t border-[var(--theme-border)] bg-[var(--theme-bg-secondary)] rounded-b-2xl">
                     <button
-                        className="w-full h-14 px-6 bg-gradient-to-r from-gold-dark via-gold to-gold-light text-white border-none rounded-xl text-lg font-bold flex items-center justify-center gap-3 cursor-pointer transition-all hover:shadow-[0_4px_20px_rgba(201,165,92,0.3)] hover:-translate-y-px active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full h-14 px-6 bg-gradient-to-r from-gold-dark via-gold to-gold-light text-black border-none rounded-xl text-lg font-bold flex items-center justify-center gap-3 cursor-pointer transition-all hover:shadow-[0_8px_25px_rgba(201,165,92,0.3)] hover:-translate-y-px active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
                         onClick={handleAddToCart}
                         disabled={!isValidSelection}
                     >
