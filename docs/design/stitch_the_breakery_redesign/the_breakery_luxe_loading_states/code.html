@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery Luxe - Loading States</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#c8a45b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#0D0D0F", // Deep Onyx as requested
+                        "surface": "#161618",
+                        "shimmer-base": "#161618",
+                        "shimmer-highlight": "#1A1A1C",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem", 
+                        "lg": "0.25rem", 
+                        "xl": "0.5rem", 
+                        "full": "0.75rem"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .skeleton-shimmer {
+            background: linear-gradient(
+                90deg, 
+                #161618 25%, 
+                rgba(200, 164, 91, 0.05) 50%, 
+                #161618 75%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite linear;
+        }
+
+        .skeleton-shimmer-subtle {
+            background: linear-gradient(
+                90deg, 
+                #121214 25%, 
+                #1A1A1C 50%, 
+                #121214 75%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 4s infinite linear;
+        }
+
+        /* Chart Grid Lines Simulation */
+        .chart-grid {
+            background-image: linear-gradient(to bottom, rgba(200, 164, 91, 0.03) 1px, transparent 1px);
+            background-size: 100% 40px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-white overflow-hidden">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Skeleton -->
+<aside class="w-64 border-r border-primary/10 flex flex-col bg-background-dark z-20">
+<div class="p-8">
+<!-- Logo Placeholder -->
+<div class="w-12 h-12 rounded-full skeleton-shimmer mb-10"></div>
+<!-- Nav Items -->
+<div class="space-y-6">
+<div class="flex items-center space-x-4">
+<div class="w-5 h-5 rounded-sm skeleton-shimmer-subtle"></div>
+<div class="h-3 w-32 rounded-sm skeleton-shimmer-subtle"></div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="w-5 h-5 rounded-sm skeleton-shimmer-subtle"></div>
+<div class="h-3 w-24 rounded-sm skeleton-shimmer-subtle"></div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="w-5 h-5 rounded-sm skeleton-shimmer-subtle"></div>
+<div class="h-3 w-28 rounded-sm skeleton-shimmer-subtle"></div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="w-5 h-5 rounded-sm skeleton-shimmer-subtle"></div>
+<div class="h-3 w-36 rounded-sm skeleton-shimmer-subtle"></div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="w-5 h-5 rounded-sm skeleton-shimmer-subtle"></div>
+<div class="h-3 w-20 rounded-sm skeleton-shimmer-subtle"></div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="w-5 h-5 rounded-sm skeleton-shimmer-subtle"></div>
+<div class="h-3 w-24 rounded-sm skeleton-shimmer-subtle"></div>
+</div>
+</div>
+</div>
+<div class="mt-auto p-8">
+<div class="flex items-center space-x-3 p-3 bg-primary/5 rounded-lg">
+<div class="w-8 h-8 rounded-full skeleton-shimmer"></div>
+<div class="space-y-2">
+<div class="h-2 w-20 rounded-sm skeleton-shimmer-subtle"></div>
+<div class="h-2 w-16 rounded-sm skeleton-shimmer-subtle opacity-50"></div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<main class="flex-1 flex flex-col overflow-y-auto">
+<!-- Top Header Skeleton -->
+<header class="h-20 border-b border-primary/10 px-8 flex items-center justify-between shrink-0">
+<div class="w-96 h-10 rounded-lg skeleton-shimmer-subtle bg-primary/5"></div>
+<div class="flex items-center space-x-6">
+<div class="w-6 h-6 rounded-full skeleton-shimmer-subtle"></div>
+<div class="w-6 h-6 rounded-full skeleton-shimmer-subtle"></div>
+<div class="h-10 w-32 rounded-lg skeleton-shimmer-subtle"></div>
+</div>
+</header>
+<!-- Dashboard Content Skeleton -->
+<div class="p-8 space-y-8">
+<!-- KPI Metrics Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="p-6 bg-surface/40 border border-primary/5 rounded-xl space-y-4">
+<div class="h-3 w-24 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+<div class="h-8 w-32 rounded-sm skeleton-shimmer"></div>
+<div class="h-2 w-16 rounded-sm skeleton-shimmer-subtle opacity-30"></div>
+</div>
+<div class="p-6 bg-surface/40 border border-primary/5 rounded-xl space-y-4">
+<div class="h-3 w-20 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+<div class="h-8 w-28 rounded-sm skeleton-shimmer"></div>
+<div class="h-2 w-20 rounded-sm skeleton-shimmer-subtle opacity-30"></div>
+</div>
+<div class="p-6 bg-surface/40 border border-primary/5 rounded-xl space-y-4">
+<div class="h-3 w-28 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+<div class="h-8 w-24 rounded-sm skeleton-shimmer"></div>
+<div class="h-2 w-12 rounded-sm skeleton-shimmer-subtle opacity-30"></div>
+</div>
+<div class="p-6 bg-surface/40 border border-primary/5 rounded-xl space-y-4">
+<div class="h-3 w-16 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+<div class="h-8 w-36 rounded-sm skeleton-shimmer"></div>
+<div class="h-2 w-24 rounded-sm skeleton-shimmer-subtle opacity-30"></div>
+</div>
+</div>
+<!-- Chart Area Placeholder -->
+<div class="bg-surface/20 border border-primary/5 rounded-xl p-8 h-[340px] relative overflow-hidden chart-grid">
+<div class="flex justify-between items-start mb-12">
+<div class="space-y-3">
+<div class="h-4 w-48 rounded-sm skeleton-shimmer"></div>
+<div class="h-3 w-32 rounded-sm skeleton-shimmer-subtle opacity-50"></div>
+</div>
+<div class="flex space-x-2">
+<div class="h-8 w-16 rounded-sm skeleton-shimmer-subtle"></div>
+<div class="h-8 w-16 rounded-sm skeleton-shimmer-subtle"></div>
+</div>
+</div>
+<!-- Simulated Data Viz -->
+<div class="absolute bottom-0 left-0 w-full px-8 pb-8 flex items-end justify-between h-40">
+<div class="w-12 skeleton-shimmer-subtle opacity-20 rounded-t-sm" style="height: 40%"></div>
+<div class="w-12 skeleton-shimmer-subtle opacity-20 rounded-t-sm" style="height: 65%"></div>
+<div class="w-12 skeleton-shimmer-subtle opacity-20 rounded-t-sm" style="height: 35%"></div>
+<div class="w-12 skeleton-shimmer-subtle opacity-20 rounded-t-sm" style="height: 85%"></div>
+<div class="w-12 skeleton-shimmer-subtle opacity-20 rounded-t-sm" style="height: 55%"></div>
+<div class="w-12 skeleton-shimmer-subtle opacity-20 rounded-t-sm" style="height: 95%"></div>
+<div class="w-12 skeleton-shimmer-subtle opacity-20 rounded-t-sm" style="height: 75%"></div>
+<div class="w-12 skeleton-shimmer-subtle opacity-20 rounded-t-sm" style="height: 45%"></div>
+<div class="w-12 skeleton-shimmer-subtle opacity-20 rounded-t-sm" style="height: 60%"></div>
+</div>
+</div>
+<!-- Product Grid Title -->
+<div class="h-6 w-56 rounded-sm skeleton-shimmer mb-6"></div>
+<!-- Product Grid Skeleton -->
+<div class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+<!-- Repeated Cards -->
+<div class="space-y-4">
+<div class="aspect-square bg-surface/60 rounded-xl skeleton-shimmer"></div>
+<div class="h-3 w-full rounded-sm skeleton-shimmer-subtle"></div>
+<div class="h-3 w-1/2 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+</div>
+<div class="space-y-4">
+<div class="aspect-square bg-surface/60 rounded-xl skeleton-shimmer"></div>
+<div class="h-3 w-full rounded-sm skeleton-shimmer-subtle"></div>
+<div class="h-3 w-1/2 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+</div>
+<div class="space-y-4">
+<div class="aspect-square bg-surface/60 rounded-xl skeleton-shimmer"></div>
+<div class="h-3 w-full rounded-sm skeleton-shimmer-subtle"></div>
+<div class="h-3 w-1/2 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+</div>
+<div class="space-y-4">
+<div class="aspect-square bg-surface/60 rounded-xl skeleton-shimmer"></div>
+<div class="h-3 w-full rounded-sm skeleton-shimmer-subtle"></div>
+<div class="h-3 w-1/2 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+</div>
+<div class="space-y-4">
+<div class="aspect-square bg-surface/60 rounded-xl skeleton-shimmer"></div>
+<div class="h-3 w-full rounded-sm skeleton-shimmer-subtle"></div>
+<div class="h-3 w-1/2 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+</div>
+<div class="space-y-4">
+<div class="aspect-square bg-surface/60 rounded-xl skeleton-shimmer"></div>
+<div class="h-3 w-full rounded-sm skeleton-shimmer-subtle"></div>
+<div class="h-3 w-1/2 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+</div>
+</div>
+<!-- Table Content Skeleton -->
+<div class="mt-12 bg-surface/10 rounded-xl border border-primary/5 overflow-hidden">
+<div class="p-6 border-b border-primary/5 flex justify-between">
+<div class="h-4 w-40 rounded-sm skeleton-shimmer"></div>
+<div class="h-4 w-20 rounded-sm skeleton-shimmer-subtle"></div>
+</div>
+<div class="p-6 space-y-8">
+<!-- Rows -->
+<div class="flex items-center space-x-12">
+<div class="w-12 h-12 rounded-lg skeleton-shimmer-subtle"></div>
+<div class="flex-1 space-y-3">
+<div class="h-3 w-48 rounded-sm skeleton-shimmer"></div>
+<div class="h-2 w-24 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+</div>
+<div class="w-32 h-3 rounded-sm skeleton-shimmer-subtle"></div>
+<div class="w-24 h-3 rounded-sm skeleton-shimmer-subtle"></div>
+<div class="w-16 h-8 rounded-lg skeleton-shimmer-subtle"></div>
+</div>
+<div class="flex items-center space-x-12">
+<div class="w-12 h-12 rounded-lg skeleton-shimmer-subtle"></div>
+<div class="flex-1 space-y-3">
+<div class="h-3 w-64 rounded-sm skeleton-shimmer"></div>
+<div class="h-2 w-32 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+</div>
+<div class="w-32 h-3 rounded-sm skeleton-shimmer-subtle"></div>
+<div class="w-24 h-3 rounded-sm skeleton-shimmer-subtle"></div>
+<div class="w-16 h-8 rounded-lg skeleton-shimmer-subtle"></div>
+</div>
+<div class="flex items-center space-x-12">
+<div class="w-12 h-12 rounded-lg skeleton-shimmer-subtle"></div>
+<div class="flex-1 space-y-3">
+<div class="h-3 w-40 rounded-sm skeleton-shimmer"></div>
+<div class="h-2 w-20 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+</div>
+<div class="w-32 h-3 rounded-sm skeleton-shimmer-subtle"></div>
+<div class="w-24 h-3 rounded-sm skeleton-shimmer-subtle"></div>
+<div class="w-16 h-8 rounded-lg skeleton-shimmer-subtle"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Status Bar -->
+<footer class="h-10 bg-surface border-t border-primary/10 px-8 flex items-center justify-between mt-auto">
+<div class="flex items-center space-x-4">
+<div class="w-2 h-2 rounded-full bg-primary/40"></div>
+<div class="h-2 w-32 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+</div>
+<div class="h-2 w-24 rounded-sm skeleton-shimmer-subtle opacity-40"></div>
+</footer>
+</main>
+</div>
+<!-- Hidden Images for data-alt requirement -->
+<div class="hidden">
+<img data-alt="Minimalist gold leaf logo for high-end bakery" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOOpb4CZbS5C35ePNYhp9c34EzE-oq94hOSU_lYNJOEvYLfTjH3hTv4xFHSlPffg4IVCbUlq-7m-BXl9oH5nKmneV6DY8xmTBw2ry4DzmkNB0VQJFVzcMxPEQNkpPFXtg0e_HJHFbogWWTsu5Q3DwYe2LwktpfAN3r_nr83IM2K-codivht10uCx29i8WuvMlkWuuF1JnPdYMIABBEQGgFWbq3O2evwLA2ds2mIiB4BXwi_0Aq2YI1Z8NMYyndr-_rrdzvRjb0ihA"/>
+<img data-alt="Faint horizontal grid lines for analytics visualization" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTF07PuQb-UeKFcZSCwzahRWLy0iTKm91iZbPbILW8paCM5oxEyLQ_7SbJR-0VcBaZZxu_E4GfzBYZp1XsL00DuyjBdRTO6EDHmRLpOrS5ntJbpgIUL6ifmL2A4tAhQeeCsX_tR3HRRBZUq7dgSD8wU4olKwJlciiTmpy9aLilmjOkBK00kAk1HCeegEvrkUf4P2KTQjXel8-CzFICGHwyvv6oMAjd5Xp48D8rY5T7FutbWAX9n4ieqjNBWLYzeoOdScEr5GN_T34"/>
+<img data-alt="Square placeholder for artisanal sourdough bread photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTyHVpky1jjeD1irIgaYP2fHYcJRKHNzciTT2u97ZN-09ph__VpNPkYKjfrLd1n-zTUCUo467A_LPtlhl_3w5rWJkvw19ygwHQuw9i1kD6CcnCAotUcVYMcvRqtgkcJgDs7FKrygsd0XjAhMHIdGElX_wwRIQHZ78cRxsQW1FbN1z9fflPd8oFSlCwZs-npBccJJ6ZMeKhR4qCAXQQMg8kcA9oID0SWGh90dAT17eQakB6YugR5Zci3JbFYLO-yq4pY9nM3BKX5rk"/>
+<img data-alt="Square placeholder for luxury chocolate croissant photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTiHsrsKRV1B_Uy7yxr3H2HcprqU2gGeE384WeClt60IFNTZDdT07BpMjoHSAR5Ki24-7zU7XoC0w1UeMs-oKtENnvvdvYVOV4LKGbl-4-WFLUG3ryA4NpKNs_YF1iRq1tQGnPOuCMmfEE7kgfYrJeAWZ0KI1f6X-drzTo-OMtE1a3tcCl42_BApKPYE0pVgUfVeOZt7ySzSHDNW37Ushu5mtAZw3mXFoinjLGYMOsiNeBQFb4eOKj9v0cXvJ-T5JelSfVEg1wess"/>
+<img data-alt="Subtle map pattern showing bakery delivery zones" data-location="Paris" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB11WyN6EJLgywHljaqCfb8qLes5xc70iRgLDLZzSpCBO-90ExyseMlgv69w-f_EBix319OC1xVBIJmvN7ReZioQovqX1wLJVpOdG9MFvc53RQ4Oj_9Zb8xBU1LJuv4E_-brOiwBafJQEwYhA77eak21Sbz35P2gwtlIQ0txzfHrbiYV0c6fgXOe6vYs3CdJXRnJ5Ma__z1qcnqfOLeJugL6UIDDZ4d-u6UZRUbj0x722Gl-ERIZu2Y4wUipo_-0bdTB1CAPgGKaNo"/>
+</div>
+</body></html>

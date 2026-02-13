@@ -84,6 +84,14 @@ export default {
           dark: 'var(--color-gold-dark)',
           deep: 'var(--color-gold-deep)'
         },
+        kds: {
+          accent: '#ec5b13',
+          bg: 'var(--kds-bg)',
+          surface: 'var(--kds-surface)',
+          'surface-elevated': 'var(--kds-surface-elevated)',
+          'surface-hover': 'var(--kds-surface-hover)',
+          border: 'var(--kds-border)',
+        },
         chart: {
           '1': 'hsl(var(--chart-1))',
           '2': 'hsl(var(--chart-2))',

@@ -1,0 +1,95 @@
+/* ============================================
+   POS SHIFT BANNER & MULTI-SHIFT BAR
+   ============================================ */
+
+.pos-shift-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1.25rem;
+    background: linear-gradient(90deg, var(--color-gold-deep) 0%, var(--theme-bg-secondary) 100%);
+    border-bottom: 1px solid var(--color-gold-dark);
+    color: var(--theme-text-primary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    z-index: 50;
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pos-shift-banner__info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.pos-shift-banner__session {
+    font-weight: 600;
+}
+
+.pos-shift-banner__divider {
+    opacity: 0.5;
+}
+
+.pos-shift-banner__user {
+    opacity: 0.9;
+}
+
+.pos-shift-banner__time {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+}
+
+.pos-shift-banner__btn {
+    padding: 6px 16px;
+    background: #0F172A;
+    color: #F59E0B;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pos-shift-banner__btn:hover {
+    background: #1E293B;
+}
+
+/* Multi-Shift Bar */
+.pos-multi-shift-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 8px 24px;
+    background: linear-gradient(90deg, var(--color-gold-dark), var(--color-gold-deep));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    z-index: 1100;
+}
+
+.pos-multi-shift-bar__btn {
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-md);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pos-multi-shift-bar__btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}

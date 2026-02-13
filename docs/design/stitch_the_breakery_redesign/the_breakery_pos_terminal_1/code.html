@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery Shift Summary &amp; Cash Out</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@1,500;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#C9A55C",
+                "background-dark": "#0D0D0F",
+                "onyx-surface": "#161618",
+                "muted-smoke": "#8E8E93",
+                "stone-text": "#E5E7EB",
+                "aged-gold": "#C9A55C"
+              },
+              fontFamily: {
+                "sans": ["Inter", "sans-serif"],
+                "script": ["Playfair Display", "serif"]
+              },
+            },
+          },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            @apply bg-background-dark text-stone-text font-sans antialiased;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2a2a2c;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+<header class="h-20 flex items-center justify-between px-12 border-b border-white/5">
+<div class="flex items-center gap-6">
+<span class="font-script italic text-aged-gold text-3xl select-none">B</span>
+<h1 class="text-xl font-medium tracking-tight uppercase">Shift Summary</h1>
+</div>
+<div class="flex items-center gap-8 text-[11px] tracking-[0.15em] font-medium text-muted-smoke">
+<div class="flex flex-col items-end">
+<span class="text-stone-text">OCTOBER 24, 2023</span>
+<span>18:45 PM</span>
+</div>
+<div class="h-8 w-[1px] bg-white/10"></div>
+<div class="flex flex-col items-end">
+<span class="text-stone-text">JEAN-LUC</span>
+<span>MANAGER ON DUTY</span>
+</div>
+</div>
+</header>
+<main class="flex-1 flex overflow-hidden">
+<section class="flex-1 p-12 overflow-y-auto custom-scrollbar border-r border-white/5 bg-background-dark">
+<div class="max-w-3xl mx-auto space-y-12">
+<div>
+<h2 class="text-xs font-bold tracking-[0.2em] text-muted-smoke uppercase mb-6">Net Sales by Category</h2>
+<table class="w-full text-sm">
+<tbody class="divide-y divide-white/5">
+<tr class="group">
+<td class="py-4 text-stone-text/80">Boulangerie</td>
+<td class="py-4 text-right font-medium">$1,245.50</td>
+</tr>
+<tr class="group">
+<td class="py-4 text-stone-text/80">Pâtisserie</td>
+<td class="py-4 text-right font-medium">$892.25</td>
+</tr>
+<tr class="group">
+<td class="py-4 text-stone-text/80">Café</td>
+<td class="py-4 text-right font-medium">$456.00</td>
+</tr>
+<tr class="group border-t-2 border-white/10">
+<td class="py-6 font-semibold uppercase tracking-widest text-muted-smoke">Total Net Sales</td>
+<td class="py-6 text-right font-bold text-stone-text">$2,593.75</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div>
+<h2 class="text-xs font-bold tracking-[0.2em] text-muted-smoke uppercase mb-6">Payments Received</h2>
+<table class="w-full text-sm">
+<tbody class="divide-y divide-white/5">
+<tr class="group">
+<td class="py-4 text-stone-text/80">Cash Payments</td>
+<td class="py-4 text-right font-medium">$420.00</td>
+</tr>
+<tr class="group">
+<td class="py-4 text-stone-text/80">Card (Visa/MC/Amex)</td>
+<td class="py-4 text-right font-medium">$2,115.50</td>
+</tr>
+<tr class="group">
+<td class="py-4 text-stone-text/80">Gift Card</td>
+<td class="py-4 text-right font-medium">$125.00</td>
+</tr>
+<tr class="group border-t-2 border-white/10">
+<td class="py-6 font-semibold uppercase tracking-widest text-muted-smoke">Total Payments</td>
+<td class="py-6 text-right font-bold text-aged-gold text-2xl">$2,660.50</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="grid grid-cols-2 gap-12 pt-6">
+<div class="bg-onyx-surface p-6 rounded-lg border border-white/5">
+<span class="block text-[10px] tracking-widest text-muted-smoke uppercase mb-1">Total Tax</span>
+<span class="text-lg font-medium">$226.40</span>
+</div>
+<div class="bg-onyx-surface p-6 rounded-lg border border-white/5">
+<span class="block text-[10px] tracking-widest text-muted-smoke uppercase mb-1">Total Tips</span>
+<span class="text-lg font-medium">$342.00</span>
+</div>
+</div>
+</div>
+</section>
+<aside class="w-[480px] bg-onyx-surface flex flex-col">
+<div class="p-12 flex flex-col h-full">
+<div class="flex-1">
+<h2 class="text-xs font-bold tracking-[0.2em] text-muted-smoke uppercase mb-8 text-center">Cash Reconciliation</h2>
+<div class="space-y-8">
+<div>
+<label class="block text-[11px] tracking-widest text-muted-smoke uppercase mb-3">Expected Cash in Drawer</label>
+<div class="text-2xl font-light text-stone-text/60 bg-black/20 p-6 rounded-xl border border-white/5">
+                                $520.00
+                            </div>
+<p class="mt-2 text-[10px] text-muted-smoke italic">Opening float ($100) + Cash Sales ($420)</p>
+</div>
+<div>
+<label class="block text-[11px] tracking-widest text-muted-smoke uppercase mb-3">Actual Cash in Drawer</label>
+<div class="relative">
+<span class="absolute left-6 top-1/2 -translate-y-1/2 text-2xl text-muted-smoke">$</span>
+<input class="w-full bg-black/40 border-primary/30 rounded-xl py-6 pl-12 pr-6 text-2xl font-semibold text-stone-text focus:ring-primary focus:border-primary transition-all" step="0.01" type="number" value="520.00"/>
+</div>
+</div>
+<div class="pt-6 border-t border-white/10">
+<div class="flex justify-between items-center">
+<span class="text-[11px] tracking-widest text-muted-smoke uppercase">Variance</span>
+<span class="text-2xl font-semibold text-stone-text">$0.00</span>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<button class="w-full py-5 border border-white/10 rounded-xl text-[11px] font-bold tracking-[0.25em] uppercase text-stone-text hover:bg-white/5 transition-all">
+                        Print Summary
+                    </button>
+<button class="w-full py-6 bg-aged-gold rounded-xl text-black text-[13px] font-bold tracking-[0.25em] uppercase hover:brightness-110 active:scale-[0.98] transition-all shadow-xl shadow-aged-gold/10">
+                        Finalize &amp; Close Shift
+                    </button>
+<p class="text-center text-[10px] text-muted-smoke mt-4 uppercase tracking-tighter">
+                        Shift closure cannot be undone once submitted.
+                    </p>
+</div>
+</div>
+</aside>
+</main>
+
+</body></html>

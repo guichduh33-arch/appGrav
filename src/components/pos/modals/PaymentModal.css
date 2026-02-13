@@ -1,3 +1,5 @@
+@import './PaymentSplit.css';
+
 .modal-lg {
     width: 900px;
     max-width: 95vw;
@@ -32,61 +34,7 @@
     margin-bottom: var(--space-xs);
 }
 
-/* 1. Top Section: Payment Methods */
-.payment-methods-container {
-    padding-bottom: var(--space-md);
-    border-bottom: 1px solid var(--theme-border);
-}
-
-.payment-methods {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: var(--space-sm);
-}
-
-.payment-method__label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-sm);
-    background: var(--theme-bg-tertiary);
-    border: 2px solid var(--theme-border);
-    border-radius: var(--radius-lg);
-    cursor: pointer;
-    transition: all var(--duration-normal) var(--ease-standard);
-    height: 70px;
-}
-
-.payment-method input:checked+.payment-method__label {
-    border-color: var(--color-gold);
-    background: linear-gradient(135deg, var(--theme-bg-tertiary), var(--theme-bg-secondary));
-    box-shadow: 0 0 15px rgba(201, 165, 92, 0.2);
-}
-
-.payment-method input {
-    display: none;
-}
-
-.payment-method__icon {
-    /* Lucide icon size is handled in TSX, but we can add margins here if needed */
-    margin-bottom: var(--space-2xs);
-}
-
-.payment-method__name {
-    font-weight: 600;
-    font-size: var(--text-xs);
-    color: var(--theme-text-secondary);
-    margin-top: var(--space-2xs);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.payment-method__icon {
-    color: var(--color-gold);
-}
-
-/* 2. Main Grid Layout */
+/* Main Grid Layout */
 .payment-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -94,7 +42,6 @@
     min-height: 280px;
 }
 
-/* Adaptive Layout for non-cash */
 .payment-grid--single {
     grid-template-columns: 1fr;
     max-width: 400px;
@@ -104,59 +51,13 @@
     min-height: 200px;
 }
 
-/* LEFT COLUMN components */
 .payment-left {
     display: flex;
     flex-direction: column;
     gap: var(--space-lg);
 }
 
-/* Amount Display - Tighter Proportions */
-.payment-amount-display {
-    text-align: center;
-    padding: var(--space-lg);
-    background: linear-gradient(135deg, var(--theme-bg-tertiary) 0%, var(--theme-bg-secondary) 100%);
-    color: var(--color-gold);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--color-gold-deep);
-    box-shadow: var(--shadow-lg);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 90px;
-}
-
-.payment-amount-display__label {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--color-gold-light);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin-bottom: var(--space-xs);
-}
-
-.payment-amount-display__value {
-    font-family: var(--font-display);
-    font-size: 2.5rem;
-    font-weight: 800;
-    line-height: 1;
-}
-
-/* Quick Amounts Section Wrapper (needs to be added to TSX if not present, but using child selector approach generally safe or just targeting the container) */
-.quick-amounts-section {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Quick Amounts Grid - 3 Columns and Grow */
-.quick-amounts {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-md);
-    flex-grow: 1;
-}
-
+/* Quick Amounts */
 .quick-amount-btn {
     padding: var(--space-sm);
     background: var(--theme-bg-tertiary);
@@ -175,7 +76,7 @@
 }
 
 .quick-amount-btn:hover {
-    background: #3a3a3a;
+    background: #2a2a2e;
     border-color: var(--color-gold);
     color: var(--color-gold);
 }
@@ -190,30 +91,30 @@
 .payment-change {
     background: var(--color-success-bg);
     border: 1px solid var(--color-success);
-    color: var(--color-success-dark);
     padding: var(--space-lg);
     border-radius: var(--radius-lg);
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: auto;
-    /* Push to bottom of col if space permits */
 }
 
 .payment-change__value {
     font-size: var(--text-2xl);
     font-weight: 800;
+    color: var(--color-success-text);
 }
 
-/* RIGHT COLUMN components */
+.payment-change__label {
+    color: var(--color-success-text);
+    font-weight: 600;
+}
+
+/* RIGHT COLUMN */
 .payment-right {
     display: flex;
     flex-direction: column;
-    gap: var(--space-lg);
-}
-
-.amount-input-container {
-    margin-bottom: var(--space-md);
+    gap: var(--space-sm);
 }
 
 .amount-input {
@@ -245,229 +146,17 @@
     font-family: var(--font-display);
 }
 
-/* Numpad - Full Width */
-.numpad {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-md);
-    flex-grow: 1;
-    width: 100%;
-}
-
-.numpad__key {
-    background: var(--theme-bg-tertiary);
-    border: 1px solid var(--theme-border);
-    border-radius: var(--radius-md);
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--theme-text-primary);
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-select: none;
-    transition: all var(--duration-fast) var(--ease-standard);
-    min-height: 55px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-}
-
-.numpad__key:hover {
-    background: #3a3a3a;
-    color: var(--color-gold);
-}
-
-.numpad__key:active {
-    transform: scale(0.98);
-}
-
-.numpad__key.clear {
-    background-color: var(--color-error-bg);
-    color: var(--color-error);
-    border-color: var(--color-error-light);
-}
-
-.numpad__key.backspace {
-    background-color: var(--color-warning-bg);
-    color: var(--color-warning-dark);
-    border-color: var(--color-warning-light);
-}
-
-/* Button Overrides */
-.btn-primary-lg {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-sm);
-    padding: var(--space-md) var(--space-xl);
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-    color: white;
-    border: none;
-    border-radius: var(--radius-lg);
-    font-size: var(--text-lg);
-    font-weight: 700;
-    cursor: pointer;
-    transition: all var(--duration-fast) ease;
-    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
-    width: 250px;
-    height: 60px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.btn-primary-lg:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(var(--color-primary-rgb), 0.4);
-    filter: brightness(1.1);
-}
-
-.btn-primary-lg:active:not(:disabled) {
-    transform: translateY(0);
-}
-
-.btn-primary-lg:disabled {
-    background: var(--color-kraft);
-    color: var(--color-stone);
-    cursor: not-allowed;
-    box-shadow: none;
-}
-
 /* Footer overrides */
 .payment-footer {
-    border-top: 1px solid var(--color-border);
+    border-top: 1px solid var(--theme-border);
     padding: var(--space-lg) var(--space-xl);
     display: flex;
     justify-content: space-between;
-    background: var(--color-surface-obs);
+    align-items: center;
+    gap: var(--space-md);
+    background: var(--theme-bg-secondary);
     position: relative;
     z-index: 10;
-    /* Footer background */
-}
-
-/* Utility to ensure contrast in dark mode/light mode */
-:root {
-    --color-primary-dark: #1e3a8a;
-    /* Example dark blue */
-}
-
-/* ============================================
-   SPLIT PAYMENT STYLES (F2.2)
-   ============================================ */
-
-/* Payment Progress Bar */
-.payment-progress {
-    padding: var(--space-md);
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--color-border);
-}
-
-.payment-progress__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-sm);
-}
-
-.payment-progress__label {
-    font-size: var(--text-sm);
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.8);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.payment-progress__amount {
-    font-size: var(--text-md);
-    font-weight: 700;
-    color: #ffffff;
-}
-
-.payment-progress__bar {
-    height: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.payment-progress__fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.3s ease, background-color 0.3s ease;
-}
-
-.payment-progress__remaining {
-    margin-top: var(--space-xs);
-    font-size: var(--text-sm);
-    color: rgba(255, 255, 255, 0.7);
-    text-align: right;
-}
-
-.payment-progress__remaining strong {
-    color: #ffffff;
-}
-
-/* Payment List (Added Payments) */
-.payment-list {
-    margin-top: var(--space-md);
-}
-
-.payment-list__item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--space-sm) var(--space-md);
-    background: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.3);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--space-sm);
-}
-
-.payment-list__info {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    color: rgba(255, 255, 255, 0.9);
-}
-
-.payment-list__method {
-    font-weight: 600;
-    min-width: 60px;
-}
-
-.payment-list__amount {
-    font-weight: 700;
-    color: #22c55e;
-}
-
-.payment-list__remove {
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.5);
-    cursor: pointer;
-    padding: var(--space-xs);
-    border-radius: var(--radius-sm);
-    transition: all 0.2s;
-}
-
-.payment-list__remove:hover {
-    background: rgba(239, 68, 68, 0.2);
-    color: #ef4444;
-}
-
-/* Payment Amount Input (for non-cash methods) */
-.payment-amount-input {
-    margin-top: var(--space-md);
-}
-
-.payment-amount-input .amount-input {
-    max-width: 300px;
-    margin: 0 auto;
-}
-
-/* Footer with multiple buttons */
-.payment-footer {
-    gap: var(--space-md);
 }
 
 .payment-footer .btn-primary {

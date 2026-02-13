@@ -150,7 +150,14 @@
       "Bash(git config:*)",
       "Bash(git hash-object:*)",
       "Bash(git update-index:*)",
-      "Bash(git diff:*)"
+      "Bash(git diff:*)",
+      "Bash(claude mcp add:*)",
+      "Bash(cmd /c \"set CLAUDECODE= && claude mcp add stitch --transport http https://stitch.googleapis.com/mcp --header \"X-Goog-Api-Key: api-key\" -s user\")",
+      "mcp__stitch__list_projects",
+      "mcp__stitch__list_screens",
+      "WebFetch(domain:lh3.googleusercontent.com)",
+      "WebFetch(domain:contribution.usercontent.google.com)",
+      "mcp__stitch__get_screen"
     ]
   },
   "enableAllProjectMcpServers": true,

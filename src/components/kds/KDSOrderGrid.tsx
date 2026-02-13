@@ -13,7 +13,7 @@ interface IKDSOrderGridProps {
   onOrderComplete: (orderId: string) => void;
 }
 
-const GRID_CLASSES = 'grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-5 max-md:grid-cols-1 min-[1400px]:grid-cols-4 min-[1800px]:grid-cols-5';
+const GRID_CLASSES = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4';
 
 function OrderCard({ order, station, handlers }: {
   order: IKdsOrder;

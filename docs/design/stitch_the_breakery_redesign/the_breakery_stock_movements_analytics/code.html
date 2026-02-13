@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Stock Movements Analytics Redux</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,700;1,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --onyx: #0D0D0F;
+            --surface: #161618;
+            --aged-gold: #C9A55C;
+            --stone-text: #A1A1AA;
+            --muted-green: #2E7D32;
+            --accent-blue: #2563EB;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--onyx);
+        }
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        .tabular {
+            font-variant-numeric: tabular-nums;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2D2D2F;
+            border-radius: 10px;
+        }
+        .abstract-pattern {
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="text-slate-200 min-h-screen flex">
+<aside class="w-64 border-r border-white/5 flex flex-col bg-[#08080A] shrink-0">
+<div class="p-8">
+<div class="flex items-center gap-4 mb-12">
+<div class="w-10 h-10 rounded-sm bg-[var(--aged-gold)] flex items-center justify-center text-[#08080A] font-bold text-xl">B</div>
+<div>
+<h2 class="font-serif text-lg leading-tight text-white italic">The Breakery</h2>
+<p class="text-[10px] uppercase tracking-[0.2em] text-[var(--stone-text)]">Back Office</p>
+</div>
+</div>
+<nav class="space-y-8">
+<div>
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Operations</p>
+<ul class="space-y-2">
+<li><a class="flex items-center gap-3 px-3 py-2 text-sm rounded text-slate-400 hover:text-white transition-all" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span> Dashboard</a></li>
+<li><a class="flex items-center gap-3 px-3 py-2 text-sm rounded text-slate-400 hover:text-white transition-all" href="#"><span class="material-symbols-outlined text-[20px]">point_of_sale</span> POS Terminal</a></li>
+</ul>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Management</p>
+<ul class="space-y-2">
+<li><a class="flex items-center gap-3 px-3 py-2 text-sm rounded text-slate-400 hover:text-white transition-all" href="#"><span class="material-symbols-outlined text-[20px]">inventory_2</span> Products</a></li>
+<li><a class="flex items-center gap-3 px-3 py-2 text-sm rounded bg-white/5 text-[var(--aged-gold)] border-l-2 border-[var(--aged-gold)] font-medium" href="#"><span class="material-symbols-outlined text-[20px]">analytics</span> Stock &amp; Inventory</a></li>
+<li><a class="flex items-center gap-3 px-3 py-2 text-sm rounded text-slate-400 hover:text-white transition-all" href="#"><span class="material-symbols-outlined text-[20px]">business</span> B2B Wholesale</a></li>
+</ul>
+</div>
+</nav>
+</div>
+<div class="mt-auto p-6 border-t border-white/5">
+<div class="flex items-center gap-3 p-3 rounded bg-white/5">
+<div class="w-8 h-8 rounded bg-slate-700 flex items-center justify-center text-xs font-bold text-white uppercase">MA</div>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-semibold truncate text-white">M. Ahmad</p>
+<p class="text-[10px] text-[var(--stone-text)]">Administrator</p>
+</div>
+<button class="material-symbols-outlined text-slate-500 hover:text-white text-lg">logout</button>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col overflow-hidden">
+<header class="h-28 px-10 flex items-center justify-between border-b border-white/5 bg-[var(--onyx)] shrink-0">
+<div>
+<h1 class="font-serif text-3xl text-white mb-1">Stock Movements</h1>
+<p class="text-sm text-[var(--stone-text)] font-light">Inventory lifecycle analytics and real-time movement tracking.</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 bg-emerald-500/5 text-emerald-500 px-4 py-1.5 rounded-full text-[11px] font-semibold border border-emerald-500/10 uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                System Live
+            </div>
+</div>
+</header>
+<div class="px-10 border-b border-white/5 flex gap-10 bg-[var(--onyx)] shrink-0">
+<button class="py-4 text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Overview</button>
+<button class="py-4 text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Incoming</button>
+<button class="py-4 text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Transfers</button>
+<button class="py-4 text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">Wastage</button>
+<button class="py-4 text-xs font-bold uppercase tracking-widest text-white border-b-2 border-[var(--aged-gold)]">Movements</button>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-10">
+<div class="grid grid-cols-12 gap-6 mb-10">
+<div class="col-span-12 lg:col-span-4 bg-[var(--accent-blue)] rounded-none p-8 text-white relative overflow-hidden group">
+<div class="absolute inset-0 abstract-pattern opacity-30"></div>
+<div class="relative z-10">
+<p class="text-[10px] font-bold uppercase tracking-[0.2em] mb-4 text-white/70">Total Movements</p>
+<h3 class="text-5xl font-light tabular leading-none mb-4">37</h3>
+<div class="flex items-center gap-2 text-[10px] font-medium text-white/60">
+<span class="material-symbols-outlined text-sm">history_edu</span>
+                        Last 30 days of inventory activity
+                    </div>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-8 grid grid-cols-4 gap-6">
+<div class="glass-card p-6 flex flex-col justify-between">
+<div>
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Total In</p>
+<h4 class="text-2xl font-semibold text-emerald-400 tabular">+4,032.19</h4>
+</div>
+<p class="text-[10px] text-slate-400 mt-2 font-medium">KG / UNIT VOLUME</p>
+</div>
+<div class="glass-card p-6 flex flex-col justify-between">
+<div>
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Total Out</p>
+<h4 class="text-2xl font-semibold text-rose-400 tabular">-842.50</h4>
+</div>
+<p class="text-[10px] text-slate-400 mt-2 font-medium">KG / UNIT VOLUME</p>
+</div>
+<div class="glass-card p-6 flex flex-col justify-between">
+<div>
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Prod. In</p>
+<h4 class="text-2xl font-semibold text-white tabular">12</h4>
+</div>
+<p class="text-[10px] text-slate-400 mt-2 font-medium">COMPLETED SKU</p>
+</div>
+<div class="glass-card p-6 flex flex-col justify-between">
+<div>
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Prod. Out</p>
+<h4 class="text-2xl font-semibold text-white tabular">-13.6</h4>
+</div>
+<p class="text-[10px] text-slate-400 mt-2 font-medium">BASE INGREDIENTS</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-6 mb-10">
+<div class="flex gap-4 items-stretch">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-slate-600">search</span>
+<input class="w-full bg-[#1A1A1C] border-none text-sm rounded-none pl-14 pr-4 py-4 text-white placeholder-slate-600 focus:ring-1 focus:ring-[var(--aged-gold)] transition-all" placeholder="Search by SKU, product, or movement batch..." type="text"/>
+</div>
+<div class="flex items-center bg-[#1A1A1C] px-6 py-2">
+<div class="flex flex-col">
+<span class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Period</span>
+<div class="flex items-center gap-3">
+<input class="bg-transparent border-none p-0 text-xs focus:ring-0 text-white font-medium [color-scheme:dark]" type="date" value="2026-02-01"/>
+<span class="text-slate-700">/</span>
+<input class="bg-transparent border-none p-0 text-xs focus:ring-0 text-white font-medium [color-scheme:dark]" type="date" value="2026-02-11"/>
+</div>
+</div>
+</div>
+<button class="bg-[var(--muted-green)] hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-widest px-8 transition-all flex items-center gap-3">
+<span class="material-symbols-outlined text-lg">download</span>
+                    Excel Export
+                </button>
+</div>
+<div class="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
+<button class="px-6 py-2 text-[10px] font-bold uppercase tracking-widest bg-white text-black">All Movements (37)</button>
+<button class="px-6 py-2 text-[10px] font-bold uppercase tracking-widest border border-white/10 text-slate-400 hover:text-white hover:border-white/30 transition-all">Production In (3)</button>
+<button class="px-6 py-2 text-[10px] font-bold uppercase tracking-widest border border-white/10 text-slate-400 hover:text-white hover:border-white/30 transition-all">Production Out (14)</button>
+<button class="px-6 py-2 text-[10px] font-bold uppercase tracking-widest border border-white/10 text-slate-400 hover:text-white hover:border-white/30 transition-all">Sale POS (9)</button>
+<button class="px-6 py-2 text-[10px] font-bold uppercase tracking-widest border border-white/10 text-slate-400 hover:text-white hover:border-white/30 transition-all">Waste (11)</button>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between mb-6 border-b border-white/5 pb-4">
+<h5 class="text-[11px] font-bold text-[var(--stone-text)] uppercase tracking-[0.2em] flex items-center gap-3">
+<span class="w-1 h-4 bg-[var(--aged-gold)]"></span>
+                    Recent Activity Logs
+                </h5>
+<span class="text-[10px] text-slate-600 uppercase font-medium">Sorted by timestamp (Newest)</span>
+</div>
+<div class="bg-[var(--surface)] border border-white/5 p-6 hover:border-white/20 transition-all group">
+<div class="flex items-start gap-8">
+<div class="w-14 h-14 bg-white/5 flex items-center justify-center text-slate-500 group-hover:text-[var(--aged-gold)] transition-colors">
+<span class="material-symbols-outlined text-3xl">deployed_code</span>
+</div>
+<div class="flex-1">
+<div class="flex items-start justify-between mb-6">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<h4 class="font-serif text-xl text-white italic">Ice Sugar</h4>
+<span class="px-2 py-0.5 border border-white/10 text-[9px] font-bold text-slate-500 uppercase tracking-widest">DRY-LOG-11</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[10px] font-bold uppercase tracking-widest text-[var(--aged-gold)] px-2 py-1 bg-[var(--aged-gold)]/5">Transfer In</span>
+<span class="text-[11px] text-slate-500 tabular font-mono">ID: TR-2026-IHI3</span>
+</div>
+</div>
+<div class="text-right">
+<p class="text-3xl font-light text-emerald-400 tabular leading-none mb-1">+1,000 Kg</p>
+<p class="text-[11px] text-[var(--aged-gold)] font-bold tabular uppercase tracking-tighter">+ Rp 25,000.00 Value</p>
+</div>
+</div>
+<div class="grid grid-cols-4 gap-12 pt-6 border-t border-white/5">
+<div>
+<p class="text-[9px] text-slate-600 uppercase font-bold tracking-widest mb-1">Previous Stock</p>
+<p class="text-sm font-medium text-slate-400 tabular">0 Kg</p>
+</div>
+<div>
+<p class="text-[9px] text-slate-600 uppercase font-bold tracking-widest mb-1">Current Balance</p>
+<p class="text-sm font-bold text-white tabular">1,000 Kg</p>
+</div>
+<div class="col-span-2 text-right">
+<p class="text-[9px] text-slate-600 uppercase font-bold tracking-widest mb-1">Timestamp</p>
+<div class="flex items-center justify-end gap-2 text-slate-400 tabular text-xs">
+<span>Feb 11, 2026</span>
+<span class="w-1 h-1 rounded-full bg-slate-700"></span>
+<span>20:28:44</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-[var(--surface)] border border-white/5 p-6 hover:border-white/20 transition-all group opacity-75 grayscale hover:grayscale-0 hover:opacity-100">
+<div class="flex items-start gap-8">
+<div class="w-14 h-14 bg-white/5 flex items-center justify-center text-slate-500 group-hover:text-rose-400 transition-colors">
+<span class="material-symbols-outlined text-3xl">logout</span>
+</div>
+<div class="flex-1">
+<div class="flex items-start justify-between mb-6">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<h4 class="font-serif text-xl text-white italic">Balsamic Vinegar</h4>
+<span class="px-2 py-0.5 border border-white/10 text-[9px] font-bold text-slate-500 uppercase tracking-widest">CON-LIQ-05</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[10px] font-bold uppercase tracking-widest text-rose-500 px-2 py-1 bg-rose-500/5">Transfer Out</span>
+<span class="text-[11px] text-slate-500 tabular font-mono">ID: TR-2026-RB5S</span>
+</div>
+</div>
+<div class="text-right">
+<p class="text-3xl font-light text-rose-400 tabular leading-none mb-1">-2.5 Ltr</p>
+<p class="text-[11px] text-[var(--aged-gold)] font-bold tabular uppercase tracking-tighter">- Rp 12,450.00 Value</p>
+</div>
+</div>
+<div class="grid grid-cols-4 gap-12 pt-6 border-t border-white/5">
+<div>
+<p class="text-[9px] text-slate-600 uppercase font-bold tracking-widest mb-1">Previous Stock</p>
+<p class="text-sm font-medium text-slate-400 tabular">15.0 Ltr</p>
+</div>
+<div>
+<p class="text-[9px] text-slate-600 uppercase font-bold tracking-widest mb-1">Current Balance</p>
+<p class="text-sm font-bold text-white tabular">12.5 Ltr</p>
+</div>
+<div class="col-span-2 text-right">
+<p class="text-[9px] text-slate-600 uppercase font-bold tracking-widest mb-1">Timestamp</p>
+<div class="flex items-center justify-end gap-2 text-slate-400 tabular text-xs">
+<span>Feb 11, 2026</span>
+<span class="w-1 h-1 rounded-full bg-slate-700"></span>
+<span>19:15:22</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-[var(--surface)] border border-white/5 p-6 hover:border-white/20 transition-all group">
+<div class="flex items-start gap-8">
+<div class="w-14 h-14 bg-white/5 flex items-center justify-center text-slate-500 group-hover:text-[var(--aged-gold)] transition-colors">
+<span class="material-symbols-outlined text-3xl">liquor</span>
+</div>
+<div class="flex-1">
+<div class="flex items-start justify-between mb-6">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<h4 class="font-serif text-xl text-white italic">Extra Virgin Olive Oil</h4>
+<span class="px-2 py-0.5 border border-white/10 text-[9px] font-bold text-slate-500 uppercase tracking-widest">CON-LIQ-02</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[10px] font-bold uppercase tracking-widest text-[var(--aged-gold)] px-2 py-1 bg-[var(--aged-gold)]/5">Transfer In</span>
+<span class="text-[11px] text-slate-500 tabular font-mono">ID: TR-2026-XVO9</span>
+</div>
+</div>
+<div class="text-right">
+<p class="text-3xl font-light text-emerald-400 tabular leading-none mb-1">+5.0 Ltr</p>
+<p class="text-[11px] text-[var(--aged-gold)] font-bold tabular uppercase tracking-tighter">+ Rp 42,000.00 Value</p>
+</div>
+</div>
+<div class="grid grid-cols-4 gap-12 pt-6 border-t border-white/5">
+<div>
+<p class="text-[9px] text-slate-600 uppercase font-bold tracking-widest mb-1">Previous Stock</p>
+<p class="text-sm font-medium text-slate-400 tabular">2.0 Ltr</p>
+</div>
+<div>
+<p class="text-[9px] text-slate-600 uppercase font-bold tracking-widest mb-1">Current Balance</p>
+<p class="text-sm font-bold text-white tabular">7.0 Ltr</p>
+</div>
+<div class="col-span-2 text-right">
+<p class="text-[9px] text-slate-600 uppercase font-bold tracking-widest mb-1">Timestamp</p>
+<div class="flex items-center justify-end gap-2 text-slate-400 tabular text-xs">
+<span>Feb 11, 2026</span>
+<span class="w-1 h-1 rounded-full bg-slate-700"></span>
+<span>18:42:10</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

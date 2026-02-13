@@ -1,0 +1,57 @@
+/* ============================================
+   SPLIT PAYMENT STYLES (F2.2)
+   ============================================ */
+
+/* Payment List (Added Payments) */
+.payment-list__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-sm);
+}
+
+.payment-list__info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.payment-list__method {
+    font-weight: 600;
+    min-width: 60px;
+}
+
+.payment-list__amount {
+    font-weight: 700;
+    color: #22c55e;
+}
+
+.payment-list__remove {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: var(--space-xs);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+}
+
+.payment-list__remove:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+/* Payment Amount Input (for non-cash methods) */
+.payment-amount-input {
+    margin-top: var(--space-md);
+}
+
+.payment-amount-input .amount-input {
+    max-width: 300px;
+    margin: 0 auto;
+}

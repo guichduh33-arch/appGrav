@@ -15,6 +15,8 @@ import { playNewOrderSound, playUrgentSound } from '../../utils/audio'
 import { logError } from '@/utils/logger'
 import type { IKdsNewOrderPayload, TKitchenStation } from '../../types/offline'
 
+const KDS_ACCENT = '#ec5b13'
+
 const STATION_CONFIG: Record<string, { name: string; icon: React.ReactNode; color: string; dbStation: string }> = {
     hot_kitchen: {
         name: 'Hot Kitchen',
@@ -239,7 +241,7 @@ export default function KDSMainPage() {
     )
 
     return (
-        <div className="flex flex-col h-screen overflow-hidden bg-[var(--kds-bg)] text-white" style={{ '--station-color': stationConfig.color } as React.CSSProperties}>
+        <div data-kds className="flex flex-col h-screen overflow-hidden bg-[var(--kds-bg)] text-white" style={{ '--station-color': stationConfig.color, '--kds-accent': KDS_ACCENT } as React.CSSProperties}>
             <KDSHeader
                 stationConfig={stationConfig}
                 urgentCount={urgentCount}

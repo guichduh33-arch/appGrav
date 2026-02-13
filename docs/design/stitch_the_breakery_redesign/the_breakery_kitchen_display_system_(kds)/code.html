@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery KDS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#0D0D0F", // Deep Onyx specified in prompt
+                        "stone-text": "#E5E7EB",
+                        "muted-smoke": "#9CA3AF",
+                        "muted-green": "#4A5D4E",
+                        "muted-orange": "#A6634B"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0D0D0F;
+        }
+        .order-card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+        @media (max-width: 1024px) {
+            .order-card-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 640px) {
+            .order-card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-stone-text font-display antialiased min-h-screen">
+<!-- Header Section -->
+<header class="border-b border-primary/10 bg-background-dark/80 backdrop-blur-md sticky top-0 z-50">
+<div class="max-w-[1600px] mx-auto px-6 py-4 flex justify-between items-center">
+<div class="flex items-center space-x-4">
+<span class="text-xs font-bold tracking-[0.3em] uppercase text-primary">The Breakery KDS</span>
+<span class="h-4 w-px bg-stone-text/20"></span>
+<h1 class="text-sm font-semibold tracking-widest uppercase text-stone-text">Savoureux Station</h1>
+</div>
+<div class="flex items-center space-x-6">
+<div class="flex items-center space-x-2">
+<div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+<span class="text-[10px] font-medium tracking-widest uppercase text-muted-smoke">Live Connection</span>
+</div>
+<div class="text-right">
+<p class="text-lg font-bold tabular-nums" id="clock">08:42:15</p>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Grid -->
+<main class="max-w-[1600px] mx-auto p-6">
+<div class="order-card-grid">
+<!-- Order Card: New -->
+<div class="relative bg-background-dark border border-stone-text/10 rounded-lg flex flex-col min-h-[500px] overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-muted-green"></div>
+<div class="p-5 flex justify-between items-start border-b border-stone-text/5">
+<div>
+<h2 class="text-3xl font-bold tracking-tight">#204</h2>
+<p class="text-[10px] uppercase tracking-widest text-muted-smoke mt-1">Dine In</p>
+</div>
+<div class="text-right">
+<span class="text-xl font-mono font-medium tabular-nums text-muted-green">04:20s</span>
+</div>
+</div>
+<div class="p-5 flex-grow space-y-6">
+<div class="space-y-1">
+<div class="flex items-baseline justify-between">
+<span class="text-xl font-bold tracking-wide">2x Almond Croissant</span>
+</div>
+<p class="text-sm text-muted-smoke ml-4">+ Extra Almonds</p>
+</div>
+<div class="space-y-1">
+<div class="flex items-baseline justify-between">
+<span class="text-xl font-bold tracking-wide">1x Pain au Chocolat</span>
+</div>
+<p class="text-sm text-muted-smoke ml-4">+ Warm Up</p>
+</div>
+<div class="space-y-1">
+<div class="flex items-baseline justify-between">
+<span class="text-xl font-bold tracking-wide">1x Baguette Tradition</span>
+</div>
+<p class="text-sm text-muted-smoke ml-4">+ Sliced</p>
+</div>
+</div>
+<button class="w-full py-5 bg-stone-text/5 hover:bg-muted-green/20 transition-colors border-t border-stone-text/10 uppercase tracking-[0.2em] font-bold text-xs">
+                    Complete
+                </button>
+</div>
+<!-- Order Card: Delayed -->
+<div class="relative bg-background-dark border border-stone-text/10 rounded-lg flex flex-col min-h-[500px] overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-muted-orange"></div>
+<div class="p-5 flex justify-between items-start border-b border-stone-text/5">
+<div>
+<h2 class="text-3xl font-bold tracking-tight">#201</h2>
+<p class="text-[10px] uppercase tracking-widest text-muted-smoke mt-1">Takeaway</p>
+</div>
+<div class="text-right">
+<span class="text-xl font-mono font-medium tabular-nums text-muted-orange">12:45s</span>
+</div>
+</div>
+<div class="p-5 flex-grow space-y-6">
+<div class="space-y-1">
+<div class="flex items-baseline justify-between">
+<span class="text-xl font-bold tracking-wide">4x Macaron Box (Large)</span>
+</div>
+<p class="text-sm text-muted-smoke ml-4">+ Gift Wrap</p>
+</div>
+<div class="space-y-1">
+<div class="flex items-baseline justify-between">
+<span class="text-xl font-bold tracking-wide">2x Espresso</span>
+</div>
+<p class="text-sm text-muted-smoke ml-4">+ Double Shot</p>
+</div>
+</div>
+<button class="w-full py-5 bg-stone-text/5 hover:bg-muted-orange/20 transition-colors border-t border-stone-text/10 uppercase tracking-[0.2em] font-bold text-xs">
+                    Complete
+                </button>
+</div>
+<!-- Order Card: New -->
+<div class="relative bg-background-dark border border-stone-text/10 rounded-lg flex flex-col min-h-[500px] overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-muted-green"></div>
+<div class="p-5 flex justify-between items-start border-b border-stone-text/5">
+<div>
+<h2 class="text-3xl font-bold tracking-tight">#205</h2>
+<p class="text-[10px] uppercase tracking-widest text-muted-smoke mt-1">Dine In</p>
+</div>
+<div class="text-right">
+<span class="text-xl font-mono font-medium tabular-nums text-muted-green">02:15s</span>
+</div>
+</div>
+<div class="p-5 flex-grow space-y-6">
+<div class="space-y-1">
+<div class="flex items-baseline justify-between">
+<span class="text-xl font-bold tracking-wide">1x Quiche Lorraine</span>
+</div>
+<p class="text-sm text-muted-smoke ml-4">+ Side Salad</p>
+</div>
+<div class="space-y-1">
+<div class="flex items-baseline justify-between">
+<span class="text-xl font-bold tracking-wide">1x Eclair au Chocolat</span>
+</div>
+</div>
+</div>
+<button class="w-full py-5 bg-stone-text/5 hover:bg-muted-green/20 transition-colors border-t border-stone-text/10 uppercase tracking-[0.2em] font-bold text-xs">
+                    Complete
+                </button>
+</div>
+<!-- Order Card: New -->
+<div class="relative bg-background-dark border border-stone-text/10 rounded-lg flex flex-col min-h-[500px] overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-muted-green"></div>
+<div class="p-5 flex justify-between items-start border-b border-stone-text/5">
+<div>
+<h2 class="text-3xl font-bold tracking-tight">#206</h2>
+<p class="text-[10px] uppercase tracking-widest text-muted-smoke mt-1">Delivery</p>
+</div>
+<div class="text-right">
+<span class="text-xl font-mono font-medium tabular-nums text-muted-green">00:45s</span>
+</div>
+</div>
+<div class="p-5 flex-grow space-y-6">
+<div class="space-y-1">
+<div class="flex items-baseline justify-between">
+<span class="text-xl font-bold tracking-wide">3x Croissant Pur Beurre</span>
+</div>
+</div>
+<div class="space-y-1">
+<div class="flex items-baseline justify-between">
+<span class="text-xl font-bold tracking-wide">1x Brioche Nanterre</span>
+</div>
+</div>
+</div>
+<button class="w-full py-5 bg-stone-text/5 hover:bg-muted-green/20 transition-colors border-t border-stone-text/10 uppercase tracking-[0.2em] font-bold text-xs">
+                    Complete
+                </button>
+</div>
+<!-- Order Card: Delayed -->
+<div class="relative bg-background-dark border border-stone-text/10 rounded-lg flex flex-col min-h-[500px] overflow-hidden opacity-90">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-muted-orange"></div>
+<div class="p-5 flex justify-between items-start border-b border-stone-text/5">
+<div>
+<h2 class="text-3xl font-bold tracking-tight">#198</h2>
+<p class="text-[10px] uppercase tracking-widest text-muted-smoke mt-1">Dine In</p>
+</div>
+<div class="text-right">
+<span class="text-xl font-mono font-medium tabular-nums text-muted-orange">22:10s</span>
+</div>
+</div>
+<div class="p-5 flex-grow space-y-6">
+<div class="space-y-1">
+<div class="flex items-baseline justify-between">
+<span class="text-xl font-bold tracking-wide">1x Tarte au Citron</span>
+</div>
+</div>
+</div>
+<button class="w-full py-5 bg-stone-text/5 hover:bg-muted-orange/20 transition-colors border-t border-stone-text/10 uppercase tracking-[0.2em] font-bold text-xs">
+                    Complete
+                </button>
+</div>
+<!-- Order Card: New -->
+<div class="relative bg-background-dark border border-stone-text/10 rounded-lg flex flex-col min-h-[500px] overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-muted-green"></div>
+<div class="p-5 flex justify-between items-start border-b border-stone-text/5">
+<div>
+<h2 class="text-3xl font-bold tracking-tight">#207</h2>
+<p class="text-[10px] uppercase tracking-widest text-muted-smoke mt-1">Dine In</p>
+</div>
+<div class="text-right">
+<span class="text-xl font-mono font-medium tabular-nums text-muted-green">00:12s</span>
+</div>
+</div>
+<div class="p-5 flex-grow space-y-6">
+<div class="space-y-1">
+<div class="flex items-baseline justify-between">
+<span class="text-xl font-bold tracking-wide">2x Cafe au Lait</span>
+</div>
+<p class="text-sm text-muted-smoke ml-4">+ Oat Milk</p>
+</div>
+</div>
+<button class="w-full py-5 bg-stone-text/5 hover:bg-muted-green/20 transition-colors border-t border-stone-text/10 uppercase tracking-[0.2em] font-bold text-xs">
+                    Complete
+                </button>
+</div>
+<!-- Empty Slot Filler (Stylistic) -->
+<div class="relative bg-background-dark/30 border border-stone-text/5 border-dashed rounded-lg flex flex-col items-center justify-center min-h-[500px]">
+<span class="material-icons text-stone-text/10 text-6xl">hourglass_empty</span>
+<p class="text-stone-text/10 uppercase tracking-widest text-xs mt-4">Waiting for orders</p>
+</div>
+<!-- Empty Slot Filler (Stylistic) -->
+<div class="relative bg-background-dark/30 border border-stone-text/5 border-dashed rounded-lg flex flex-col items-center justify-center min-h-[500px]">
+<span class="material-icons text-stone-text/10 text-6xl">hourglass_empty</span>
+<p class="text-stone-text/10 uppercase tracking-widest text-xs mt-4">Waiting for orders</p>
+</div>
+</div>
+</main>
+<!-- Footer Status Bar -->
+<footer class="fixed bottom-0 left-0 right-0 bg-background-dark border-t border-stone-text/10 p-4">
+<div class="max-w-[1600px] mx-auto flex justify-between items-center text-[10px] tracking-widest uppercase font-semibold text-muted-smoke">
+<div class="flex space-x-8">
+<div class="flex items-center space-x-2">
+<span class="w-3 h-3 bg-muted-green rounded-sm"></span>
+<span>New (5)</span>
+</div>
+<div class="flex items-center space-x-2">
+<span class="w-3 h-3 bg-muted-orange rounded-sm"></span>
+<span>Delayed (2)</span>
+</div>
+<div class="flex items-center space-x-2">
+<span class="w-3 h-3 bg-stone-text/20 rounded-sm"></span>
+<span>Total Orders: 7</span>
+</div>
+</div>
+<div>
+                Station: Main Kitchen • Terminal ID: KDS-001
+            </div>
+</div>
+</footer>
+</body></html>

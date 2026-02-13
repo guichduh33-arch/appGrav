@@ -135,7 +135,7 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
             </div>
 
             {/* Header */}
-            <div className="px-md py-sm bg-zinc-800 border-b border-zinc-700">
+            <div className="px-md py-sm bg-[var(--theme-bg-secondary)] border-b border-[var(--theme-border)]">
                 <div className="flex items-center justify-between gap-sm">
                     {/* Order Type Selector */}
                     <div className="flex gap-1 flex-shrink-0">
@@ -154,7 +154,7 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                             </button>
                         ))}
                     </div>
-                    <span className="font-display text-base font-bold text-white tracking-tight flex items-center gap-1 flex-1 justify-center">
+                    <span className="font-display text-lg font-bold text-white tracking-tight flex items-center gap-1 flex-1 justify-center">
                         {displayOrderNumber}
                         {hasLockedItems && <Lock size={14} className="text-warning ml-1" />}
                     </span>
@@ -223,12 +223,12 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                 </div>
 
                 {/* Order Notes (F3.3) */}
-                <div className="mt-sm pt-sm border-t border-zinc-700">
+                <div className="mt-sm pt-sm border-t border-[var(--theme-border)]">
                     <button
                         type="button"
                         className={cn(
-                            'w-full flex items-center gap-2 px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-zinc-300 text-sm cursor-pointer transition-all duration-200',
-                            'hover:bg-zinc-600 hover:text-white',
+                            'w-full flex items-center gap-2 px-3 py-2 bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border-strong)] rounded-md text-[var(--theme-text-secondary)] text-sm cursor-pointer transition-all duration-200',
+                            'hover:bg-[var(--theme-bg-secondary)] hover:text-white',
                             (showOrderNotes || orderNotes) && 'text-gold-light border-gold',
                             '[&>svg:last-child]:ml-auto'
                         )}
@@ -240,7 +240,7 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                     </button>
                     {showOrderNotes && (
                         <textarea
-                            className="w-full mt-2 px-3 py-2.5 bg-zinc-900 border border-zinc-600 rounded-md text-white text-sm font-[inherit] resize-none transition-colors duration-200 focus:outline-none focus:border-gold placeholder:text-zinc-500"
+                            className="w-full mt-2 px-3 py-2.5 bg-[var(--theme-bg-primary)] border border-[var(--theme-border-strong)] rounded-md text-white text-sm font-[inherit] resize-none transition-colors duration-200 focus:outline-none focus:border-gold placeholder:text-[var(--theme-text-muted)]"
                             placeholder="Add special instructions for this order..."
                             value={orderNotes}
                             onChange={(e) => setOrderNotes(e.target.value)}
@@ -251,13 +251,13 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
             </div>
 
             {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto p-md bg-zinc-900">
+            <div className="flex-1 overflow-y-auto p-md bg-[var(--theme-bg-primary)]">
                 {items.length === 0 ? (
                     <EmptyState
                         icon={ShoppingCart}
                         title="Your cart is empty"
                         description="Select products to get started."
-                        className="h-full text-zinc-500"
+                        className="h-full text-[var(--theme-text-muted)]"
                     />
                 ) : (
                     items.map(item => (

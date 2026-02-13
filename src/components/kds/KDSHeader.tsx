@@ -56,7 +56,7 @@ export function KDSHeader({
 
       <div
         className="flex items-center gap-2.5 text-[1.1rem] font-bold py-2.5 px-6 rounded-[30px] text-white max-md:order-2"
-        style={{ backgroundColor: stationConfig.color }}
+        style={{ backgroundColor: 'var(--kds-accent, #ec5b13)' }}
       >
         {stationConfig.icon}
         <span>{stationConfig.name}</span>
@@ -109,7 +109,7 @@ export function KDSHeader({
         >
           <RefreshCw size={20} />
         </button>
-        <div className="font-mono text-xl font-semibold py-2 px-4 bg-[var(--kds-surface-elevated)] rounded-[10px]">
+        <div className="font-body text-xl font-semibold py-2 px-4 bg-[var(--kds-surface-elevated)] rounded-[10px] tabular-nums">
           {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
         </div>
       </div>

@@ -162,8 +162,8 @@ function KDSOrderCard({
 
     return (
         <div className={cn(
-            'relative bg-[var(--kds-surface)] rounded-xl overflow-hidden flex flex-col transition-all duration-300 border-2 border-transparent motion-reduce:transition-none',
-            overallStatus === 'new' && 'border-gold shadow-[0_0_15px_rgba(201,165,92,0.2)] animate-pulse-new motion-reduce:animate-none',
+            'relative bg-[var(--kds-surface)] rounded-lg overflow-hidden flex flex-col transition-all duration-300 border-2 border-transparent motion-reduce:transition-none',
+            overallStatus === 'new' && 'border-[var(--kds-accent,#ec5b13)] shadow-[0_0_15px_rgba(236,91,19,0.2)] animate-pulse-new motion-reduce:animate-none',
             overallStatus === 'preparing' && 'border-[#A6634B]',
             overallStatus === 'ready' && 'border-[#4A5D4E] bg-gradient-to-br from-[#1a1a1d] to-[#1a2a1a]', // Subtle olive gradient
             overallStatus === 'served' && 'opacity-50 border-[#333]',
@@ -200,7 +200,7 @@ function KDSOrderCard({
                 <div className={cn(
                     'flex items-center gap-1.5 font-mono text-[20px] font-semibold py-1.5 px-3 rounded-lg bg-[var(--kds-surface-elevated)]',
                     urgency === 'normal' && 'text-[#4A5D4E]', // Olive
-                    urgency === 'warning' && 'text-[#A6634B] bg-[rgba(166,99,75,0.2)]', // Clay
+                    urgency === 'warning' && 'text-[var(--kds-accent,#ec5b13)] bg-[rgba(236,91,19,0.15)]', // KDS Orange
                     urgency === 'critical' && 'text-[#991B1B] bg-[rgba(153,27,27,0.2)]' // Deep Red
                 )}>
                     <Clock size={16} />
@@ -228,7 +228,7 @@ function KDSOrderCard({
                         key={item.id}
                         className={cn(
                             'py-2.5 px-3 bg-[var(--kds-bg)] rounded-lg border-l-4 transition-all duration-300',
-                            item.item_status === 'new' && 'border-l-gold shadow-[inset_4px_0_0_var(--color-gold)]',
+                            item.item_status === 'new' && 'border-l-[var(--kds-accent,#ec5b13)] shadow-[inset_4px_0_0_var(--kds-accent,#ec5b13)]',
                             item.item_status === 'preparing' && 'border-l-[#A6634B] bg-[rgba(166,99,75,0.1)]',
                             item.item_status === 'ready' && 'border-l-[#4A5D4E] bg-[rgba(74,93,78,0.1)] line-through opacity-70',
                             item.item_status === 'served' && 'border-l-[#333] opacity-40 line-through',
@@ -287,7 +287,7 @@ function KDSOrderCard({
             <div className="py-3 px-4 bg-[var(--kds-bg)] border-t border-[var(--kds-border)]">
                 {overallStatus === 'new' && (
                     <button
-                        className="w-full py-4 px-5 border-none rounded-[10px] text-lg min-h-[48px] font-extrabold uppercase tracking-wide cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-gold to-gold-dark text-black hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(201,165,92,0.4)]"
+                        className="w-full py-4 px-5 border-none rounded-[10px] text-lg min-h-[48px] font-extrabold uppercase tracking-wide cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#ec5b13] to-[#c44a0f] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(236,91,19,0.4)]"
                         onClick={handleStartPreparing}
                     >
                         <Play size={20} fill="currentColor" />

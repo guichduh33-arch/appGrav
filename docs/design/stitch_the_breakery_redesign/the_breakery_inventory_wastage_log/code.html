@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery | Inventory Wastage Log</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#c8a45b",
+                "background-light": "#f8f7f6",
+                "background-dark": "#0D0D0F", // Deep Onyx as requested
+                "stone-text": "#E5E7EB",
+                "charcoal": "#1a1a1c"
+              },
+              fontFamily: {
+                "display": ["Inter", "sans-serif"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0D0D0F;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c8a45b33;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #c8a45b66;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-stone-text font-display antialiased">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 flex-shrink-0 border-r border-primary/10 bg-background-dark hidden lg:flex flex-col">
+<div class="p-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary flex items-center justify-center rounded">
+<span class="text-background-dark font-bold text-xl">B</span>
+</div>
+<span class="text-lg font-semibold tracking-widest uppercase text-primary">The Breakery</span>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 text-stone-text/60 hover:text-primary transition-colors duration-200" href="#">
+<span class="material-icons-outlined text-[20px]">dashboard</span>
+<span class="text-sm font-medium uppercase tracking-wider">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-stone-text/60 hover:text-primary transition-colors duration-200" href="#">
+<span class="material-icons-outlined text-[20px]">inventory_2</span>
+<span class="text-sm font-medium uppercase tracking-wider">Stock Levels</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary bg-primary/10 rounded-lg" href="#">
+<span class="material-icons-outlined text-[20px]">delete_sweep</span>
+<span class="text-sm font-medium uppercase tracking-wider">Wastage Log</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-stone-text/60 hover:text-primary transition-colors duration-200" href="#">
+<span class="material-icons-outlined text-[20px]">analytics</span>
+<span class="text-sm font-medium uppercase tracking-wider">Financials</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-stone-text/60 hover:text-primary transition-colors duration-200" href="#">
+<span class="material-icons-outlined text-[20px]">settings</span>
+<span class="text-sm font-medium uppercase tracking-wider">Preferences</span>
+</a>
+</nav>
+<div class="p-6 mt-auto border-t border-primary/10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-charcoal flex items-center justify-center border border-primary/20">
+<span class="material-icons-outlined text-primary">account_circle</span>
+</div>
+<div>
+<p class="text-xs font-bold text-stone-text uppercase">Jean-Luc Durand</p>
+<p class="text-[10px] text-stone-text/40 uppercase tracking-tighter">Master Boulanger</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-background-dark">
+<!-- Header -->
+<header class="h-20 flex items-center justify-between px-8 border-b border-primary/10">
+<h1 class="text-2xl font-light tracking-tight text-stone-text uppercase">Inventory <span class="font-bold">Wastage</span></h1>
+<div class="flex items-center gap-6">
+<div class="relative w-64">
+<span class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-text/40 text-sm">search</span>
+<input class="w-full bg-charcoal border border-primary/20 rounded-lg py-2 pl-10 pr-4 text-xs text-stone-text focus:outline-none focus:border-primary transition-all" placeholder="Search entries..." type="text"/>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-background-dark font-bold text-[11px] px-6 py-2.5 rounded shadow-lg shadow-primary/10 transition-all uppercase tracking-widest flex items-center gap-2">
+<span class="material-icons-outlined text-sm">add</span> Report Waste
+                    </button>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-8">
+<!-- KPI Row -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+<div class="bg-charcoal border border-primary/10 p-6 rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons-outlined text-6xl text-primary">equalizer</span>
+</div>
+<p class="text-[10px] uppercase tracking-[0.2em] text-stone-text/50 mb-2">Total Waste (MTD)</p>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-bold text-primary">142.5</span>
+<span class="text-xs text-stone-text/40">Units</span>
+</div>
+</div>
+<div class="bg-charcoal border border-primary/10 p-6 rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons-outlined text-6xl text-primary">category</span>
+</div>
+<p class="text-[10px] uppercase tracking-[0.2em] text-stone-text/50 mb-2">Highest Waste Category</p>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-bold text-primary tracking-tight">Pastry</span>
+<span class="text-xs text-stone-text/40">38% total</span>
+</div>
+</div>
+<div class="bg-charcoal border border-primary/10 p-6 rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons-outlined text-6xl text-primary">payments</span>
+</div>
+<p class="text-[10px] uppercase tracking-[0.2em] text-stone-text/50 mb-2">Est. Financial Loss</p>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-bold text-primary">€1,842.00</span>
+<span class="text-xs text-stone-text/40">+12% vs LY</span>
+</div>
+</div>
+</div>
+<!-- Data Table Section -->
+<div class="bg-charcoal border border-primary/10 rounded-xl overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-primary/10">
+<th class="px-6 py-4 text-[10px] font-bold text-stone-text/40 uppercase tracking-widest">Date</th>
+<th class="px-6 py-4 text-[10px] font-bold text-stone-text/40 uppercase tracking-widest">Item Name</th>
+<th class="px-6 py-4 text-[10px] font-bold text-stone-text/40 uppercase tracking-widest text-center">Qty</th>
+<th class="px-6 py-4 text-[10px] font-bold text-stone-text/40 uppercase tracking-widest">Reason</th>
+<th class="px-6 py-4 text-[10px] font-bold text-stone-text/40 uppercase tracking-widest text-right">Loss Value</th>
+<th class="w-10"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-primary/5">
+<!-- Row 1 -->
+<tr class="hover:bg-primary/5 transition-colors group cursor-pointer">
+<td class="px-6 py-5 text-sm text-stone-text/70 tabular-nums">2023-11-24</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-background-dark flex items-center justify-center border border-primary/10 overflow-hidden">
+<img class="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-300" data-alt="Freshly baked croissants on tray" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmKXCu7DZ1RMhkMIq9jbbM5iyAuxeAat07aElP6NJky1BTZ3TEhW4KPdf0npXNdY7cHiJ--4dte1O1DISkiaUvwln58mog1UnrGB7oBitEgGxVHIQo181wBTcG6JXyLDGmvIhhyJ0xdk-jAKRec-ZQ0qKC2U-lB0RvS1Eh8N14emdxeCMLSiV-83-tIZ2CAHDo27APuIqK6fBg_xt_hTjXzBQclAHrV67OdNYSJCzfHSCou7mv5m7wFtIX_Ulp9VKxQKXDDV8rtVU"/>
+</div>
+<span class="text-sm font-medium text-stone-text uppercase">Almond Croissant</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm text-stone-text/70 text-center tabular-nums font-semibold">12</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-red-900/20 text-red-400 border border-red-900/30">Expired</span>
+</td>
+<td class="px-6 py-5 text-sm text-primary font-bold text-right tabular-nums">€54.00</td>
+<td class="px-6 py-5 text-right">
+<span class="material-icons-outlined text-stone-text/20 group-hover:text-primary transition-colors">expand_more</span>
+</td>
+</tr>
+<!-- Expanded Details for Row 1 -->
+<tr class="bg-background-dark/50">
+<td class="px-6 py-0 overflow-hidden" colspan="6">
+<div class="grid grid-cols-2 gap-8 py-6 border-l-2 border-primary ml-4">
+<div class="pl-8">
+<p class="text-[10px] uppercase tracking-widest text-stone-text/40 mb-1">Waste Reason Note</p>
+<p class="text-sm text-stone-text/80 leading-relaxed italic">"Batch failed internal quality check due to temperature fluctuation in Proofing Unit 04. Exterior over-browning while core remained doughy."</p>
+</div>
+<div class="pr-8">
+<p class="text-[10px] uppercase tracking-widest text-stone-text/40 mb-1">Reported By</p>
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="text-[10px] text-primary font-bold">MB</span>
+</div>
+<span class="text-xs text-stone-text font-medium uppercase tracking-tight">Marc-Antoine Boulanger</span>
+</div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-primary/5 transition-colors group cursor-pointer">
+<td class="px-6 py-5 text-sm text-stone-text/70 tabular-nums">2023-11-23</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-background-dark flex items-center justify-center border border-primary/10 overflow-hidden text-[10px]">
+<img class="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-300" data-alt="Glass bottle of organic milk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnO29WDKACBcNPGaGmTR079lKf8F0wYQzkmzmlN25I7Q_baBjjCvohfs7458iO1UCnZ-3IxNchYKb9xfeS_y353Q5DM6aWn2ZeA_Nv0p6-Bx3TyvHeYiodZ1VRrefaz1yeFw66D1VOoujEvZH1ApmMHYHgDvoaVqT3dbbus_5dOm43nwMgZppcTagnx2bwXmEfJ31lCE1XULuDGKuSofzHuYKDP_MbKij-eCpzdAVQSr-ym0v4GV23vpI6kqFRo3ds18l-CqVjyRg"/>
+</div>
+<span class="text-sm font-medium text-stone-text uppercase">Whole Milk (2L)</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm text-stone-text/70 text-center tabular-nums font-semibold">4</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-amber-900/20 text-amber-400 border border-amber-900/30">Damaged</span>
+</td>
+<td class="px-6 py-5 text-sm text-primary font-bold text-right tabular-nums">€11.20</td>
+<td class="px-6 py-5 text-right">
+<span class="material-icons-outlined text-stone-text/20 group-hover:text-primary transition-colors">expand_more</span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-primary/5 transition-colors group cursor-pointer">
+<td class="px-6 py-5 text-sm text-stone-text/70 tabular-nums">2023-11-22</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-background-dark flex items-center justify-center border border-primary/10 overflow-hidden">
+<img class="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-300" data-alt="Baguette tradition on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqUnqhuq4HWkM_YTzhyoDFwTIZOUNGiev1rKQqW9MH9Sy2RKoxOirWPp2iozKMZwHn86QSFCI_xqpeVraHfcdHD0jwCfvUD3l83NELWYufwivyGhXw6q-pYgUAVRa4R_Pwo05GkzlWCtEcHhj6ZTP9ZLnd8nvvVlNys4uXLJpgZ83qnGowgBgy8MCtL8P73jBchyOpEHNfCsVbCIQmG4GZBMnMYvyoC7FsK9RTp71ZLeMQ68uail8vNATBOy5wKAHddEyCaagqhok"/>
+</div>
+<span class="text-sm font-medium text-stone-text uppercase">Baguette Tradition</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm text-stone-text/70 text-center tabular-nums font-semibold">25</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-blue-900/20 text-blue-400 border border-blue-900/30">Quality Control</span>
+</td>
+<td class="px-6 py-5 text-sm text-primary font-bold text-right tabular-nums">€37.50</td>
+<td class="px-6 py-5 text-right">
+<span class="material-icons-outlined text-stone-text/20 group-hover:text-primary transition-colors">expand_more</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-primary/5 transition-colors group cursor-pointer">
+<td class="px-6 py-5 text-sm text-stone-text/70 tabular-nums">2023-11-21</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-background-dark flex items-center justify-center border border-primary/10 overflow-hidden">
+<img class="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-300" data-alt="Fruit tart with strawberries" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxZmdEQS6IlZLhDCva4jLW6fO8_YPHS-0oX5WGFkTEsgoHTwmQ0gBZX9bmDnPe4er-NFDvlJBHZP1sSqQLIW5Mh58J7ef87DuH85u45U19v63wBn66x_h9Cd2gmmqV0t-zF0eAEXlpmSm1IxbMK5va1kOkEL8uxAnN7ObFYIhb6SvtLH6dsb1mJnVqMJdGe2bcskJfjfGmfm0uSTSFU31QoYMojMnDeDTcaLktCUXW-FH_66eBV94iJpj5p-KUX-sXnDXQ7ZyrmrY"/>
+</div>
+<span class="text-sm font-medium text-stone-text uppercase">Fruit Tartlet</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm text-stone-text/70 text-center tabular-nums font-semibold">8</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-red-900/20 text-red-400 border border-red-900/30">Expired</span>
+</td>
+<td class="px-6 py-5 text-sm text-primary font-bold text-right tabular-nums">€48.00</td>
+<td class="px-6 py-5 text-right">
+<span class="material-icons-outlined text-stone-text/20 group-hover:text-primary transition-colors">expand_more</span>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-primary/5 transition-colors group cursor-pointer">
+<td class="px-6 py-5 text-sm text-stone-text/70 tabular-nums">2023-11-20</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-background-dark flex items-center justify-center border border-primary/10 overflow-hidden">
+<img class="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-300" data-alt="Gourmet chocolate cookies" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB87VQCaQDnlmEsezhgQeq7Wz_Td0y9LDB7maNdQ9PZ4LUwuNCCS7i1V1hbjby3qlRZwS_maWpms7WVLCP__pgCvHnFgje29HsFXK7OitVYEBP9Z2hCI3BkjUUmZGtb4NSEu2vhHavaGifQ1spzKQlI4nHMPMAmgfijH9LU7fkYQEiR3miaFUoPABJwxB4ajXmjKNVxvaY_vyNOBkjt-SI2lmNH2LUvvFmIAXDz3P5aoRZBINV9NXE8IcJB3YYjmvtawX4W7B45CJA"/>
+</div>
+<span class="text-sm font-medium text-stone-text uppercase">Pain au Chocolat</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm text-stone-text/70 text-center tabular-nums font-semibold">15</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-red-900/20 text-red-400 border border-red-900/30">Expired</span>
+</td>
+<td class="px-6 py-5 text-sm text-primary font-bold text-right tabular-nums">€33.75</td>
+<td class="px-6 py-5 text-right">
+<span class="material-icons-outlined text-stone-text/20 group-hover:text-primary transition-colors">expand_more</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Pagination -->
+<div class="px-6 py-4 flex items-center justify-between border-t border-primary/10">
+<p class="text-[10px] text-stone-text/40 uppercase tracking-widest font-medium">Showing 1-15 of 24 entries</p>
+<div class="flex gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded border border-primary/10 text-stone-text/40 hover:text-primary transition-colors">
+<span class="material-icons-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded bg-primary/20 border border-primary/30 text-primary">
+<span class="text-[10px] font-bold">1</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-primary/10 text-stone-text/40 hover:text-primary transition-colors">
+<span class="text-[10px] font-bold">2</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-primary/10 text-stone-text/40 hover:text-primary transition-colors">
+<span class="material-icons-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Subtle footer area -->
+<div class="mt-8 flex justify-between items-center opacity-40 grayscale pointer-events-none">
+<p class="text-[9px] uppercase tracking-widest leading-loose">Automated Financial Reconciliation Active • Audit Log V2.4.0</p>
+<div class="flex gap-4">
+<span class="text-[9px] font-bold uppercase tracking-widest">Inventory Management System</span>
+<span class="text-[9px] font-bold uppercase tracking-widest">Paris • Lyon • Bordeaux</span>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
