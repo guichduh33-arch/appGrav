@@ -38,7 +38,7 @@ export default memo(function CategoryNav({
         <aside className="pos-categories">
             {/* Menu Button */}
             <div className="pos-categories__header">
-                <button className="pos-menu-btn" onClick={onOpenMenu} title="Menu">
+                <button className="pos-menu-btn" onClick={onOpenMenu} title="Menu" aria-label="Open menu">
                     <Menu size={28} />
                 </button>
                 <NetworkIndicator compact className="mt-2" />

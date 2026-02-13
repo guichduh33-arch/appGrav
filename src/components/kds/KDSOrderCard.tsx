@@ -263,6 +263,7 @@ function KDSOrderCard({
                                         onToggleHold(item.id, item.is_held)
                                     }}
                                     title={item.is_held ? 'Resume' : 'Hold'}
+                                    aria-label={item.is_held ? 'Resume item' : 'Hold item'}
                                 >
                                     {item.is_held ? <Play size={14} /> : <Pause size={14} />}
                                 </button>

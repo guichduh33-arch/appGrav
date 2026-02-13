@@ -54,40 +54,40 @@ export default function HeldOrdersModal({ onClose, onRestore }: HeldOrdersModalP
                     ) : (
                         <div className="flex flex-col gap-4 max-h-[60vh] overflow-y-auto">
                             {heldOrders.map((order) => (
-                                <div key={order.id} className="bg-white border border-border rounded-lg p-4 transition-all duration-fast hover:border-warning hover:shadow">
+                                <div key={order.id} className="bg-[var(--color-gray-900)] border border-[var(--color-gray-600)] rounded-lg p-4 transition-all duration-fast hover:border-gold hover:shadow">
                                     <div className="flex justify-between items-start mb-2">
                                         <div className="flex flex-col">
-                                            <span className="font-mono text-lg font-bold text-warning">{order.orderNumber}</span>
-                                            <span className="text-xs text-muted-foreground uppercase">
+                                            <span className="font-mono text-lg font-bold text-gold">{order.orderNumber}</span>
+                                            <span className="text-xs text-[var(--color-gray-400)] uppercase">
                                                 {order.orderType === 'dine_in' ? 'Dine In' :
                                                     order.orderType === 'takeaway' ? 'Takeaway' : 'Delivery'}
                                                 {order.tableNumber && ` - Table ${order.tableNumber}`}
                                             </span>
                                         </div>
-                                        <span className="flex items-center gap-1 text-sm text-muted-foreground bg-warning-bg px-2 py-1 rounded">
+                                        <span className="flex items-center gap-1 text-sm text-[var(--color-gray-400)] bg-[rgba(251,191,36,0.1)] px-2 py-1 rounded">
                                             <Clock size={14} />
                                             {formatHeldTime(order.heldAt)}
                                         </span>
                                     </div>
 
-                                    <div className="py-2 border-t border-b border-dashed border-border my-2">
+                                    <div className="py-2 border-t border-b border-dashed border-[var(--color-gray-600)] my-2">
                                         {order.items.slice(0, 3).map((item, idx) => (
                                             <div key={idx} className="flex items-center gap-1 py-1 text-sm">
-                                                <span className="text-muted-foreground min-w-[24px]">{item.quantity}x</span>
-                                                <span className="text-espresso">
+                                                <span className="text-[var(--color-gray-400)] min-w-[24px]">{item.quantity}x</span>
+                                                <span className="text-white">
                                                     {item.type === 'combo' ? item.combo?.name : item.product?.name}
                                                 </span>
                                             </div>
                                         ))}
                                         {order.items.length > 3 && (
-                                            <div className="flex items-center gap-1 py-1 text-xs text-muted-foreground italic">
+                                            <div className="flex items-center gap-1 py-1 text-xs text-[var(--color-gray-500)] italic">
                                                 +{order.items.length - 3} more items
                                             </div>
                                         )}
                                     </div>
 
                                     <div className="flex justify-between items-center">
-                                        <span className="text-lg font-bold text-espresso">
+                                        <span className="text-lg font-bold text-gold">
                                             {formatPrice(order.total)}
                                         </span>
                                         <div className="flex gap-2">

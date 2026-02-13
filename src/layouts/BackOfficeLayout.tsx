@@ -14,6 +14,7 @@ import { PostOfflineSyncReport } from '../components/sync/PostOfflineSyncReport'
 import { StockAlertsBadge } from '../components/inventory/StockAlertsBadge';
 import { useNetworkAlerts } from '../hooks/useNetworkAlerts';
 import { useSyncReport } from '../hooks/useSyncReport';
+import { BreakeryLogo } from '@/components/ui/BreakeryLogo';
 import { cn } from '@/lib/utils';
 
 const BackOfficeLayout: React.FC = () => {
@@ -59,12 +60,11 @@ const BackOfficeLayout: React.FC = () => {
                     )}
                 >
                     <div className="flex items-center gap-md overflow-hidden whitespace-nowrap">
-                        <div
-                            className="flex items-center justify-center text-[2rem] transition-all duration-300 text-white p-2 rounded-xl shadow-lg shadow-gold/20"
-                            style={{ background: 'linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-dark) 100%)' }}
-                        >
-                            <Utensils size={isCollapsed ? 24 : 28} />
-                        </div>
+                        <BreakeryLogo
+                            size={isCollapsed ? 'sm' : 'lg'}
+                            variant="gold"
+                            showText={false}
+                        />
                         {!isCollapsed && (
                             <div className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">
                                 <h1 className="text-lg font-bold tracking-tight text-gray-900">The Breakery</h1>

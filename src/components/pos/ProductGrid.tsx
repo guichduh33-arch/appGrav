@@ -71,7 +71,7 @@ const ProductCard = memo(function ProductCard({
 
             {/* Product image or initial */}
             <div className={cn(
-                'w-full h-[80px] bg-[var(--color-gray-800)] flex items-center justify-center overflow-hidden shrink-0',
+                'w-full aspect-square bg-[var(--color-gray-800)] flex items-center justify-center overflow-hidden shrink-0 rounded-t-xl',
                 isOutOfStock && 'grayscale-[50%]'
             )}>
                 {product.image_url ? (
@@ -79,28 +79,28 @@ const ProductCard = memo(function ProductCard({
                         src={product.image_url}
                         alt={product.name}
                         loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-400 ease-in-out group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-400 ease-in-out hover:scale-105"
                         onError={(e) => {
                             e.currentTarget.style.display = 'none'
                             const fallback = e.currentTarget.nextElementSibling as HTMLElement
-                            if (fallback) fallback.style.display = 'block'
+                            if (fallback) fallback.style.display = 'flex'
                         }}
                     />
                 ) : null}
                 <span
-                    className="text-2xl font-display font-semibold text-[var(--color-gray-400)]"
-                    style={{ display: product.image_url ? 'none' : 'block' }}
+                    className="text-3xl font-display font-bold text-[var(--color-gray-500)] flex items-center justify-center"
+                    style={{ display: product.image_url ? 'none' : 'flex' }}
                 >
                     {product.name.charAt(0).toUpperCase()}
                 </span>
             </div>
 
             {/* Product info */}
-            <div className="px-4 pt-4 pb-1 text-[1.3rem] font-bold text-white leading-tight line-clamp-3 flex-1">
+            <div className="px-3 pt-2.5 pb-1 text-sm font-semibold text-white leading-snug line-clamp-2 flex-1">
                 {product.name}
             </div>
 
-            <div className="px-4 pt-1 pb-4 text-base font-bold text-primary-light">
+            <div className="px-3 pt-0.5 pb-3 text-sm font-bold text-gold">
                 {formatPrice(product.retail_price || 0)}
             </div>
         </button>

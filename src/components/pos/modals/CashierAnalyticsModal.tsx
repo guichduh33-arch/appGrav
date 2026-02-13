@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import { ReportingService } from '../../../services/ReportingService'
 import { formatCurrency } from '../../../utils/helpers'
+import { logError } from '@/utils/logger'
 import './CashierAnalyticsModal.css'
 
 interface CashierAnalyticsModalProps {
@@ -211,7 +212,7 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
                             </p>
                         </div>
                     </div>
-                    <button className="analytics-close" onClick={onClose}>
+                    <button className="analytics-close" onClick={onClose} aria-label="Close" title="Close analytics">
                         <X size={24} />
                     </button>
                 </header>
@@ -437,5 +438,3 @@ export default function CashierAnalyticsModal({ onClose }: CashierAnalyticsModal
         </div>
     )
 }
-
-import { logError } from '@/utils/logger'

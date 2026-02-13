@@ -635,3 +635,77 @@
 .pos-no-shift-modal__btn--primary:hover {
     background: var(--color-primary-dark, #2563eb);
 }
+
+/* ============================================
+   POS DARK MODAL OVERRIDES
+   Converts light .modal styles to dark theme
+   when rendered inside POS context
+   ============================================ */
+
+.pos-app .modal-backdrop {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+}
+
+.pos-app .modal {
+    background: var(--color-gray-800, #27272a);
+    border: 1px solid var(--color-gray-700, #3f3f46);
+    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+.pos-app .modal__header {
+    border-bottom-color: var(--color-gray-700, #3f3f46);
+    background: var(--color-gray-800, #27272a);
+}
+
+.pos-app .modal__title {
+    color: white;
+}
+
+.pos-app .modal__subtitle {
+    color: var(--color-gray-400, #a1a1aa);
+}
+
+.pos-app .modal__close {
+    color: var(--color-gray-400, #a1a1aa);
+}
+
+.pos-app .modal__close:hover {
+    background: var(--color-gray-700, #3f3f46);
+    color: white;
+}
+
+.pos-app .modal__body {
+    color: white;
+}
+
+.pos-app .modal__footer {
+    border-top-color: var(--color-gray-700, #3f3f46);
+    background: var(--color-gray-800, #27272a);
+}
+
+/* Override light-themed btn inside POS modals */
+.pos-app .modal .btn-primary,
+.pos-app .modal .btn-primary-lg {
+    background: linear-gradient(135deg, var(--color-gold-dark) 0%, var(--color-gold) 50%, var(--color-gold-light) 100%);
+    color: white;
+    border: none;
+    font-weight: 700;
+}
+
+.pos-app .modal .btn-primary:hover,
+.pos-app .modal .btn-primary-lg:hover {
+    box-shadow: 0 4px 20px rgba(201, 165, 92, 0.3);
+}
+
+.pos-app .modal .btn-secondary {
+    background: var(--color-gray-700, #3f3f46);
+    color: var(--color-gray-300, #d4d4d8);
+    border: 1px solid var(--color-gray-600, #52525b);
+}
+
+.pos-app .modal .btn-secondary:hover {
+    background: var(--color-gray-600, #52525b);
+    color: white;
+}

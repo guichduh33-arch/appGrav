@@ -132,22 +132,22 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
     const ModeIcon = MODE_ICONS[mode]
 
     return (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] p-4" onClick={onClose}>
-            <div className="bg-white rounded-2xl w-full max-w-[500px] max-h-[80vh] flex flex-col shadow-[0_20px_60px_rgba(0,0,0,0.3)] max-[600px]:max-w-full max-[600px]:max-h-full max-[600px]:rounded-none" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[1000] p-4" onClick={onClose}>
+            <div className="bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-2xl w-full max-w-[500px] max-h-[80vh] flex flex-col shadow-[0_20px_60px_rgba(0,0,0,0.5)] text-white max-[600px]:max-w-full max-[600px]:max-h-full max-[600px]:rounded-none" onClick={e => e.stopPropagation()}>
                 {selectedDetailCustomer ? (
                     <CustomerDetailView customer={selectedDetailCustomer} orderHistory={orderHistory}
                         frequentProducts={frequentProducts} loadingHistory={loadingHistory}
                         onBack={() => setSelectedDetailCustomer(null)} onSelectCustomer={selectAndClose} onReorder={handleReorder} />
                 ) : (
                     <>
-                        <div className="flex justify-between items-center px-5 py-4 border-b border-slate-200">
-                            <h2 className="flex items-center gap-2 m-0 text-lg text-slate-800 [&>svg]:text-indigo-500">
+                        <div className="flex justify-between items-center px-5 py-4 border-b border-[var(--color-gray-700)]">
+                            <h2 className="flex items-center gap-2 m-0 text-lg text-white [&>svg]:text-gold">
                                 <ModeIcon size={22} />
                                 {MODE_TITLES[mode]}
                                 {!isOnline && (
                                     <span className={cn(
                                         'ml-2.5 text-xs inline-flex items-center gap-1',
-                                        isStale ? 'text-red-500' : 'text-amber-500'
+                                        isStale ? 'text-red-400' : 'text-amber-400'
                                     )}>
                                         <WifiOff size={14} /> Offline
                                         {ageDisplay && (
@@ -160,19 +160,19 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
                                 )}
                             </h2>
                             <button
-                                className="w-9 h-9 rounded-lg border-none bg-slate-100 text-slate-500 cursor-pointer flex items-center justify-center transition-all duration-200 hover:bg-slate-200 hover:text-slate-800"
+                                className="w-9 h-9 rounded-lg border-none bg-[var(--color-gray-700)] text-[var(--color-gray-400)] cursor-pointer flex items-center justify-center transition-all duration-200 hover:bg-[var(--color-gray-600)] hover:text-white"
                                 onClick={onClose}
                             >
                                 <X size={20} />
                             </button>
                         </div>
 
-                        <div className="flex gap-2 px-4 py-3 bg-slate-50 border-b border-slate-200">
+                        <div className="flex gap-2 px-4 py-3 bg-[var(--color-gray-900)] border-b border-[var(--color-gray-700)]">
                             <button
                                 className={cn(
-                                    'flex-1 flex items-center justify-center gap-2 px-2.5 py-2.5 border-none bg-transparent rounded-lg text-[0.85rem] font-medium text-slate-500 cursor-pointer transition-all duration-200',
-                                    'hover:bg-slate-200 hover:text-slate-600',
-                                    mode === 'search' && 'bg-indigo-500 text-white'
+                                    'flex-1 flex items-center justify-center gap-2 px-2.5 py-2.5 border-none bg-transparent rounded-lg text-[0.85rem] font-medium text-[var(--color-gray-400)] cursor-pointer transition-all duration-200',
+                                    'hover:bg-[var(--color-gray-700)] hover:text-white',
+                                    mode === 'search' && 'bg-gold text-white'
                                 )}
                                 onClick={() => setMode('search')}
                             >
@@ -180,9 +180,9 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
                             </button>
                             <button
                                 className={cn(
-                                    'flex-1 flex items-center justify-center gap-2 px-2.5 py-2.5 border-none bg-transparent rounded-lg text-[0.85rem] font-medium text-slate-500 cursor-pointer transition-all duration-200 relative',
-                                    'hover:bg-slate-200 hover:text-slate-600',
-                                    mode === 'favorites' && 'bg-indigo-500 text-white'
+                                    'flex-1 flex items-center justify-center gap-2 px-2.5 py-2.5 border-none bg-transparent rounded-lg text-[0.85rem] font-medium text-[var(--color-gray-400)] cursor-pointer transition-all duration-200 relative',
+                                    'hover:bg-[var(--color-gray-700)] hover:text-white',
+                                    mode === 'favorites' && 'bg-gold text-white'
                                 )}
                                 onClick={() => setMode('favorites')}
                             >
@@ -198,9 +198,9 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
                             </button>
                             <button
                                 className={cn(
-                                    'flex-1 flex items-center justify-center gap-2 px-2.5 py-2.5 border-none bg-transparent rounded-lg text-[0.85rem] font-medium text-slate-500 cursor-pointer transition-all duration-200',
-                                    'hover:bg-slate-200 hover:text-slate-600',
-                                    mode === 'scan' && 'bg-indigo-500 text-white',
+                                    'flex-1 flex items-center justify-center gap-2 px-2.5 py-2.5 border-none bg-transparent rounded-lg text-[0.85rem] font-medium text-[var(--color-gray-400)] cursor-pointer transition-all duration-200',
+                                    'hover:bg-[var(--color-gray-700)] hover:text-white',
+                                    mode === 'scan' && 'bg-gold text-white',
                                     !isOnline && 'opacity-50 cursor-not-allowed'
                                 )}
                                 onClick={() => isOnline && setMode('scan')} disabled={!isOnline}
@@ -211,9 +211,9 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
                             <button
                                 className={cn(
                                     'flex-1 flex items-center justify-center gap-2 px-2.5 py-2.5 border-none rounded-lg text-[0.85rem] font-medium cursor-pointer transition-all duration-200',
-                                    'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white',
-                                    'hover:bg-gradient-to-br hover:from-emerald-600 hover:to-emerald-700',
-                                    mode === 'create' && 'bg-gradient-to-br from-emerald-600 to-emerald-700 shadow-[0_2px_8px_rgba(16,185,129,0.3)]',
+                                    'bg-gradient-to-br from-emerald-600 to-emerald-700 text-white',
+                                    'hover:from-emerald-700 hover:to-emerald-800',
+                                    mode === 'create' && 'shadow-[0_2px_8px_rgba(16,185,129,0.3)]',
                                     !isOnline && 'opacity-50 cursor-not-allowed'
                                 )}
                                 onClick={() => { if (isOnline) setMode('create') }} disabled={!isOnline}
@@ -231,21 +231,21 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
                             ) : mode === 'favorites' ? (
                                 <div className="flex-1 overflow-y-auto flex flex-col gap-2">
                                     {loading ? (
-                                        <div className="flex flex-col items-center justify-center py-12 px-4 text-slate-400 gap-3">
-                                            <div className="w-8 h-8 border-[3px] border-slate-200 border-t-indigo-500 rounded-full animate-spin"></div>
+                                        <div className="flex flex-col items-center justify-center py-12 px-4 text-[var(--color-gray-400)] gap-3">
+                                            <div className="w-8 h-8 border-[3px] border-[var(--color-gray-600)] border-t-gold rounded-full animate-spin"></div>
                                             <span>Loading...</span>
                                         </div>
                                     ) : favoriteCustomers.length === 0 ? (
-                                        <div className="flex flex-col items-center justify-center py-12 px-4 text-slate-400 gap-3">
+                                        <div className="flex flex-col items-center justify-center py-12 px-4 text-[var(--color-gray-500)] gap-3">
                                             <Heart size={40} />
                                             <p className="m-0 text-[0.9rem]">No favorite customers</p>
-                                            <span className="text-[0.8rem] text-slate-400 mt-2">Click the heart to add favorites</span>
+                                            <span className="text-[0.8rem] text-[var(--color-gray-500)] mt-2">Click the heart to add favorites</span>
                                         </div>
                                     ) : renderCustomerList(favoriteCustomers)}
                                 </div>
                             ) : (
                                 <>
-                                    <div className="flex items-center gap-3 px-4 bg-slate-100 rounded-[10px] mb-3 [&>svg]:text-slate-400 [&>svg]:shrink-0">
+                                    <div className="flex items-center gap-3 px-4 bg-[var(--color-gray-900)] rounded-[10px] mb-3 [&>svg]:text-[var(--color-gray-400)] [&>svg]:shrink-0">
                                         <Search size={20} />
                                         <input
                                             type="text"
@@ -253,12 +253,12 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
                                             onChange={e => setSearchTerm(e.target.value)}
                                             placeholder="Search by name, phone, email..."
                                             autoFocus
-                                            className="flex-1 border-none bg-transparent py-3.5 text-[0.95rem] outline-none placeholder:text-slate-400"
+                                            className="flex-1 border-none bg-transparent py-3.5 text-[0.95rem] text-white outline-none placeholder:text-[var(--color-gray-500)]"
                                         />
                                     </div>
                                     {selectedCustomerId && (
                                         <button
-                                            className="flex items-center justify-center gap-2 p-2 mb-3 border border-dashed border-red-300 bg-red-50 rounded-lg text-red-600 text-[0.8rem] cursor-pointer transition-all duration-200 hover:bg-red-100 hover:border-red-400"
+                                            className="flex items-center justify-center gap-2 p-2 mb-3 border border-dashed border-red-700 bg-red-900/20 rounded-lg text-red-400 text-[0.8rem] cursor-pointer transition-all duration-200 hover:bg-red-900/40 hover:border-red-500"
                                             onClick={handleRemoveCustomer}
                                         >
                                             <X size={16} /> Remove selected customer
@@ -266,12 +266,12 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
                                     )}
                                     <div className="flex-1 overflow-y-auto flex flex-col gap-2">
                                         {loading ? (
-                                            <div className="flex flex-col items-center justify-center py-12 px-4 text-slate-400 gap-3">
-                                                <div className="w-8 h-8 border-[3px] border-slate-200 border-t-indigo-500 rounded-full animate-spin"></div>
+                                            <div className="flex flex-col items-center justify-center py-12 px-4 text-[var(--color-gray-400)] gap-3">
+                                                <div className="w-8 h-8 border-[3px] border-[var(--color-gray-600)] border-t-gold rounded-full animate-spin"></div>
                                                 <span>Loading...</span>
                                             </div>
                                         ) : customers.length === 0 ? (
-                                            <div className="flex flex-col items-center justify-center py-12 px-4 text-slate-400 gap-3">
+                                            <div className="flex flex-col items-center justify-center py-12 px-4 text-[var(--color-gray-500)] gap-3">
                                                 <User size={40} />
                                                 <p className="m-0 text-[0.9rem]">{searchTerm ? 'No customer found' : 'No recent customers'}</p>
                                             </div>

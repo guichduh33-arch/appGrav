@@ -43,6 +43,8 @@ export function KDSHeader({
         <button
           className="bg-[var(--kds-surface-elevated)] border-none text-white w-12 h-12 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[var(--kds-surface-hover)] hover:scale-105"
           onClick={onBack}
+          aria-label="Go back"
+          title="Back"
         >
           <ArrowLeft size={20} />
         </button>
@@ -83,6 +85,7 @@ export function KDSHeader({
             showAllDayCount && 'bg-[#3B82F6] text-white'
           )}
           onClick={onToggleAllDayCount}
+          aria-label="Toggle all-day count"
           title="All-Day Count"
         >
           <ClipboardList size={20} />
@@ -93,12 +96,16 @@ export function KDSHeader({
             !soundEnabled && 'text-[#EF4444]'
           )}
           onClick={onSoundToggle}
+          aria-label={soundEnabled ? 'Mute sound' : 'Enable sound'}
+          title={soundEnabled ? 'Mute' : 'Unmute'}
         >
           {soundEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
         </button>
         <button
           className="bg-[var(--kds-surface-elevated)] border-none text-white w-12 h-12 rounded-[10px] flex items-center justify-center cursor-pointer transition-all duration-200 hover:bg-[var(--kds-surface-hover)]"
           onClick={onRefresh}
+          aria-label="Refresh orders"
+          title="Refresh"
         >
           <RefreshCw size={20} />
         </button>

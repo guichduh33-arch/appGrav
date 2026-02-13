@@ -30,10 +30,10 @@ export default function CustomerCard({
     return (
         <div
             className={cn(
-                'flex items-center gap-3 p-3 bg-slate-50 border-2 border-transparent rounded-[10px] cursor-pointer transition-all duration-200',
-                'hover:bg-slate-100 hover:border-slate-200',
+                'flex items-center gap-3 p-3 bg-[var(--color-gray-900)] border-2 border-transparent rounded-[10px] cursor-pointer transition-all duration-200',
+                'hover:bg-[var(--color-gray-700)] hover:border-[var(--color-gray-600)]',
                 'max-[600px]:flex-wrap',
-                isSelected && 'bg-indigo-50 border-indigo-500'
+                isSelected && 'bg-gold/10 border-gold'
             )}
         >
             <div
@@ -47,19 +47,19 @@ export default function CustomerCard({
             </div>
 
             <div className="flex-1 min-w-0" onClick={() => onSelect(customer)}>
-                <div className="flex items-center gap-1.5 font-semibold text-slate-800 text-[0.9rem]">
+                <div className="flex items-center gap-1.5 font-semibold text-white text-[0.9rem]">
                     {customer.company_name || customer.name}
                     {isSelected && (
-                        <Check size={16} className="text-indigo-500" />
+                        <Check size={16} className="text-gold" />
                     )}
                 </div>
                 {customer.company_name && (
-                    <span className="block text-xs text-slate-500 mt-0.5">{customer.name}</span>
+                    <span className="block text-xs text-[var(--color-gray-400)] mt-0.5">{customer.name}</span>
                 )}
                 <div className="flex flex-wrap gap-2 mt-1">
-                    {customer.phone && <span className="text-[0.7rem] text-slate-400">{customer.phone}</span>}
+                    {customer.phone && <span className="text-[0.7rem] text-[var(--color-gray-500)]">{customer.phone}</span>}
                     {customer.membership_number && (
-                        <span className="flex items-center gap-1 px-1.5 py-0.5 bg-slate-100 rounded text-[0.7rem] text-slate-400 font-mono">
+                        <span className="flex items-center gap-1 px-1.5 py-0.5 bg-[var(--color-gray-700)] rounded text-[0.7rem] text-[var(--color-gray-400)] font-mono">
                             <QrCode size={10} />
                             {customer.membership_number}
                         </span>
@@ -88,12 +88,12 @@ export default function CustomerCard({
                         <Star size={10} />
                         {customer.loyalty_tier}
                     </span>
-                    <span className="text-[0.7rem] text-slate-500 font-medium">
+                    <span className="text-[0.7rem] text-[var(--color-gray-400)] font-medium">
                         {customer.loyalty_points.toLocaleString()} pts
                     </span>
                 </div>
                 {(customer.category?.discount_percentage ?? TIER_DISCOUNTS[customer.loyalty_tier]) > 0 && (
-                    <span className="px-1.5 py-0.5 bg-green-100 text-green-600 rounded text-[0.7rem] font-semibold">
+                    <span className="px-1.5 py-0.5 bg-green-900/30 text-green-400 rounded text-[0.7rem] font-semibold">
                         -{customer.category?.discount_percentage || TIER_DISCOUNTS[customer.loyalty_tier]}%
                     </span>
                 )}
@@ -107,9 +107,9 @@ export default function CustomerCard({
                     <button
                         type="button"
                         className={cn(
-                            'w-8 h-8 border-none bg-slate-100 rounded-md text-slate-400 cursor-pointer flex items-center justify-center transition-all duration-200',
-                            'hover:bg-red-100 hover:text-red-400',
-                            isFavorite && 'bg-red-100 text-red-500'
+                            'w-8 h-8 border-none bg-[var(--color-gray-700)] rounded-md text-[var(--color-gray-400)] cursor-pointer flex items-center justify-center transition-all duration-200',
+                            'hover:bg-red-900/30 hover:text-red-400',
+                            isFavorite && 'bg-red-900/30 text-red-400'
                         )}
                         onClick={(e) => {
                             e.stopPropagation()
@@ -123,7 +123,7 @@ export default function CustomerCard({
                 {isOnline && (
                     <button
                         type="button"
-                        className="w-8 h-8 border-none bg-slate-100 rounded-md text-slate-400 cursor-pointer flex items-center justify-center transition-all duration-200 hover:bg-indigo-100 hover:text-indigo-500"
+                        className="w-8 h-8 border-none bg-[var(--color-gray-700)] rounded-md text-[var(--color-gray-400)] cursor-pointer flex items-center justify-center transition-all duration-200 hover:bg-gold/10 hover:text-gold"
                         onClick={(e) => {
                             e.stopPropagation()
                             onShowDetail(customer)

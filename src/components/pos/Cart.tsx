@@ -158,7 +158,7 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                         {displayOrderNumber}
                         {hasLockedItems && <Lock size={14} className="text-warning ml-1" />}
                     </span>
-                    <button type="button" className="btn-icon btn-icon-sm" title="Clear cart" onClick={clearCart} disabled={items.length === 0}>
+                    <button type="button" className="btn-icon btn-icon-sm" title="Clear cart" aria-label="Clear cart" onClick={clearCart} disabled={items.length === 0}>
                         <Trash2 size={18} />
                     </button>
                 </div>

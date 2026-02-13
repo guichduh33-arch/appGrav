@@ -95,8 +95,8 @@ export default function DiscountModal({
                                     className={cn(
                                         'p-4 rounded-lg text-sm font-semibold cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 border-2',
                                         discountType === type
-                                            ? 'bg-blue-500/15 border-primary text-primary-light'
-                                            : 'bg-gray-800 border-transparent text-gray-300 hover:bg-gray-750 hover:text-white'
+                                            ? 'bg-gold/15 border-gold text-gold'
+                                            : 'bg-[var(--color-gray-800)] border-transparent text-[var(--color-gray-300)] hover:bg-[var(--color-gray-700)] hover:text-white'
                                     )}
                                     onClick={() => setDiscountType(type)}
                                 >
@@ -111,7 +111,7 @@ export default function DiscountModal({
                                 {posConfig.quickDiscountPercentages.map(pct => (
                                     <button
                                         key={pct}
-                                        className="p-3 bg-gray-800 border border-gray-700 rounded text-sm font-semibold text-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-700 hover:border-primary hover:text-white"
+                                        className="p-3 bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded text-sm font-semibold text-[var(--color-gray-300)] cursor-pointer transition-all duration-200 hover:bg-[var(--color-gray-700)] hover:border-gold hover:text-white"
                                         onClick={() => handleQuickPercentage(pct)}
                                     >
                                         {pct}%
@@ -127,7 +127,7 @@ export default function DiscountModal({
                             </label>
                             <input
                                 type="number"
-                                className="w-full h-16 px-6 text-center text-3xl font-bold text-white bg-gray-900 border-2 border-gray-700 rounded-lg transition-all duration-200 focus:outline-none focus:border-primary focus:shadow-[0_0_0_4px_rgba(59,130,246,0.1)]"
+                                className="w-full h-16 px-6 text-center text-3xl font-bold text-white bg-[var(--color-gray-900)] border-2 border-[var(--color-gray-700)] rounded-lg transition-all duration-200 focus:outline-none focus:border-gold focus:shadow-[0_0_0_4px_rgba(201,165,92,0.1)]"
                                 value={discountValue}
                                 onChange={(e) => setDiscountValue(e.target.value)}
                                 placeholder="0"

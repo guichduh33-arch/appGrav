@@ -202,64 +202,75 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
 
     if (isLoading) {
         return (
-            <div className="modal-backdrop is-active" onClick={(e) => e.target === e.currentTarget && onClose()}>
-                <div className="modal modal-md is-active max-w-[500px]">
-                    <div className="modal__header">
-                        <h3 className="modal__title">Loading...</h3>
-                        <button className="modal__close" onClick={onClose} title="Close" aria-label="Close">
-                            <X size={24} />
-                        </button>
-                    </div>
-                    <div className="modal__body">
-                        <div className="text-center p-8">
-                            Loading options...
-                        </div>
-                    </div>
+            <div
+                className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center"
+                style={{ zIndex: 'var(--z-modal-backdrop)' }}
+                onClick={(e) => e.target === e.currentTarget && onClose()}
+            >
+                <div
+                    className="relative bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] w-[500px] max-w-[90vw] text-white p-8 text-center"
+                    style={{ zIndex: 'var(--z-modal)' }}
+                >
+                    Loading options...
                 </div>
             </div>
         )
     }
 
     return (
-        <div className="modal-backdrop is-active" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className="modal modal-md is-active max-w-[500px]">
-                <div className="modal__header">
+        <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center"
+            style={{ zIndex: 'var(--z-modal-backdrop)' }}
+            onClick={(e) => e.target === e.currentTarget && onClose()}
+        >
+            <div
+                className="relative bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] max-h-[90vh] flex flex-col text-white w-[500px] max-w-[90vw]"
+                style={{ zIndex: 'var(--z-modal)' }}
+            >
+                {/* Header */}
+                <div className="flex items-start justify-between p-[var(--space-lg)] border-b border-[var(--color-gray-700)]">
                     <div className="flex items-center gap-4">
                         {baseProduct.image_url && (
                             <img
                                 src={baseProduct.image_url}
                                 alt={baseProduct.name}
-                                className="w-20 h-20 rounded-xl object-cover"
+                                className="w-16 h-16 rounded-xl object-cover"
                             />
                         )}
                         <div>
-                            <h3 className="modal__title">{baseProduct.name}</h3>
-                            <p className="modal__subtitle">Choose your options</p>
+                            <h3 className="text-xl font-bold text-white m-0">{baseProduct.name}</h3>
+                            <p className="text-sm text-[var(--color-gray-400)] mt-1">Choose your options</p>
                         </div>
                     </div>
-                    <button className="modal__close" onClick={onClose} title="Close" aria-label="Close">
+                    <button
+                        className="w-10 h-10 flex items-center justify-center bg-transparent border-none rounded-lg text-[var(--color-gray-400)] cursor-pointer transition-all hover:bg-[var(--color-gray-700)] hover:text-white"
+                        onClick={onClose}
+                        title="Close"
+                        aria-label="Close"
+                    >
                         <X size={24} />
                     </button>
                 </div>
 
-                <div className="modal__body">
+                {/* Body */}
+                <div className="flex-1 overflow-y-auto p-[var(--space-lg)]">
                     {variantGroups.length === 0 ? (
-                        <div className="text-center p-4 text-gray-500">
+                        <div className="text-center p-4 text-[var(--color-gray-400)]">
                             No options available for this product
                         </div>
                     ) : (
                         variantGroups.map(group => (
-                            <div key={group.group_name} className="mb-6">
-                                <h4 className="text-[0.95rem] font-semibold text-foreground mb-3 flex items-center gap-2">
+                            <div key={group.group_name} className="mb-6 last:mb-0">
+                                <h4 className="text-sm font-semibold text-[var(--color-gray-400)] mb-3 uppercase tracking-[0.05em] flex items-center gap-2">
                                     {group.group_name}
-                                    {group.group_required && <span className="text-red-500 ml-1">*</span>}
+                                    {group.group_required && <span className="text-destructive ml-1">*</span>}
                                     {group.group_type === 'multiple' && (
-                                        <span className="text-xs font-normal ml-2 text-gray-500">
+                                        <span className="text-xs font-normal ml-2 text-[var(--color-gray-500)]">
                                             (Multiple choice)
                                         </span>
                                     )}
                                 </h4>
-                                <div className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-3">
+                                <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-3">
                                     {group.options.map(option => {
                                         const isSelected = (selections[group.group_name] || []).includes(option.option_id)
                                         return (
@@ -268,16 +279,16 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                                                 className={cn(
                                                     'flex flex-col items-center justify-center gap-2 p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 min-h-[80px]',
                                                     isSelected
-                                                        ? 'border-primary bg-primary text-white'
-                                                        : 'border-border bg-background hover:border-primary hover:bg-primary-light'
+                                                        ? 'border-gold bg-gold/15 text-white'
+                                                        : 'border-[var(--color-gray-600)] bg-[var(--color-gray-900)] text-[var(--color-gray-300)] hover:border-gold/50 hover:bg-[var(--color-gray-800)]'
                                                 )}
                                                 onClick={() => handleOptionSelect(group, option.option_id)}
                                             >
-                                                <span className="text-[0.9rem] font-medium text-center">{option.option_label}</span>
+                                                <span className="text-[0.9rem] font-semibold text-center">{option.option_label}</span>
                                                 {option.price_adjustment !== 0 && (
                                                     <span className={cn(
-                                                        'text-xs opacity-80',
-                                                        isSelected ? 'text-white/90' : 'text-success'
+                                                        'text-xs font-medium',
+                                                        isSelected ? 'text-gold' : 'text-[var(--color-gray-400)]'
                                                     )}>
                                                         {option.price_adjustment > 0 ? '+' : ''}{formatPrice(option.price_adjustment)}
                                                     </span>
@@ -290,21 +301,22 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                         ))
                     )}
 
-                    {/* Selected Price Display */}
-                    <div className="flex justify-between items-center p-4 bg-muted rounded-lg mt-4 text-lg">
-                        <span>Total price:</span>
-                        <strong className="text-xl text-primary">{formatPrice(totalPrice)}</strong>
+                    {/* Total Price */}
+                    <div className="flex justify-between items-center p-4 bg-[var(--color-gray-900)] border border-[var(--color-gray-700)] rounded-xl mt-4">
+                        <span className="text-[var(--color-gray-300)] text-lg">Total price:</span>
+                        <strong className="text-xl font-bold text-gold">{formatPrice(totalPrice)}</strong>
                     </div>
                 </div>
 
-                <div className="modal__footer">
+                {/* Footer */}
+                <div className="p-[var(--space-lg)] border-t border-[var(--color-gray-700)] bg-[var(--color-gray-800)] rounded-b-2xl">
                     <button
-                        className="btn btn-primary btn-block"
+                        className="w-full h-14 px-6 bg-gradient-to-r from-gold-dark via-gold to-gold-light text-white border-none rounded-xl text-lg font-bold flex items-center justify-center gap-3 cursor-pointer transition-all hover:shadow-[0_4px_20px_rgba(201,165,92,0.3)] hover:-translate-y-px active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={handleAddToCart}
                         disabled={!isValidSelection}
                     >
                         <Check size={18} />
-                        Add to cart • {formatPrice(totalPrice)}
+                        Add to cart {'\u00B7'} {formatPrice(totalPrice)}
                     </button>
                 </div>
             </div>

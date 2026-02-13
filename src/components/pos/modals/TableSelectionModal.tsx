@@ -96,8 +96,8 @@ export default function TableSelectionModal({ onSelectTable, onClose: _onClose }
                                 className={cn(
                                     'px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer transition-all duration-200 border-2',
                                     selectedSection === section
-                                        ? 'bg-primary border-primary-light text-white'
-                                        : 'bg-gray-700 border-transparent text-gray-300 hover:bg-gray-600 hover:text-white'
+                                        ? 'bg-gold/20 border-gold text-gold'
+                                        : 'bg-[var(--color-gray-700)] border-transparent text-[var(--color-gray-300)] hover:bg-[var(--color-gray-600)] hover:text-white'
                                 )}
                                 onClick={() => setSelectedSection(section)}
                             >
@@ -114,7 +114,7 @@ export default function TableSelectionModal({ onSelectTable, onClose: _onClose }
                                 className={cn(
                                     'absolute w-20 h-20 flex flex-col items-center justify-center rounded-lg cursor-pointer transition-all duration-200 -translate-x-1/2 -translate-y-1/2 border-2',
                                     TABLE_STATUS_STYLES[table.status],
-                                    selectedTable === table.number && 'bg-primary border-primary-light shadow-[0_0_20px_rgba(59,130,246,0.5)] !scale-115'
+                                    selectedTable === table.number && 'bg-gold/30 border-gold shadow-[0_0_20px_rgba(201,165,92,0.5)] !scale-115'
                                 )}
                                 style={{
                                     left: `${table.x}%`,

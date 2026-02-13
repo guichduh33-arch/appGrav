@@ -200,7 +200,8 @@ export default function PinVerificationModal({
         <div className="modal-backdrop is-active" onClick={(e) => e.target === e.currentTarget && onClose()}>
             <div className={cn('modal modal-sm is-active max-w-[360px]', isShaking && 'animate-pin-shake')}>
                 <div className="modal__header flex items-center">
-                    <div className="w-12 h-12 flex items-center justify-center bg-primary text-white rounded-xl mr-4">
+                    <div className="w-12 h-12 flex items-center justify-center rounded-xl mr-4 text-white"
+                        style={{ background: 'linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-dark) 100%)' }}>
                         <Lock size={24} />
                     </div>
                     <div>
@@ -214,7 +215,7 @@ export default function PinVerificationModal({
 
                 <div className="modal__body">
                     {isLoadingUsers ? (
-                        <div className="flex flex-col items-center justify-center py-8 gap-4 text-muted-foreground">
+                        <div className="flex flex-col items-center justify-center py-8 gap-4 text-[var(--color-gray-400)]">
                             <Loader2 size={32} className="animate-spin" />
                             <p>Loading...</p>
                         </div>
@@ -226,7 +227,7 @@ export default function PinVerificationModal({
                                     {[...Array(6)].map((_, i) => (
                                         <span key={i} className={cn(
                                             'w-4 h-4 text-xl transition-all duration-150',
-                                            i < pin.length ? 'text-primary' : 'text-gray-400'
+                                            i < pin.length ? 'text-gold' : 'text-[var(--color-gray-500)]'
                                         )}>
                                             {i < pin.length ? '●' : '○'}
                                         </span>
@@ -247,8 +248,8 @@ export default function PinVerificationModal({
                                     <button
                                         key={key}
                                         className={cn(
-                                            'h-14 flex items-center justify-center text-2xl font-bold bg-white text-slate-800 border-2 border-slate-200 rounded-lg cursor-pointer shadow-sm transition-all duration-150 hover:bg-slate-100 hover:border-slate-400 active:scale-95 active:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-slate-200 disabled:active:scale-100',
-                                            (key === 'clear' || key === 'back') && 'bg-red-50 text-red-600 border-red-200 text-xl hover:bg-red-100 hover:border-red-400'
+                                            'h-14 flex items-center justify-center text-2xl font-bold bg-[var(--color-gray-700)] text-white border-2 border-[var(--color-gray-600)] rounded-lg cursor-pointer shadow-sm transition-all duration-150 hover:bg-[var(--color-gray-600)] hover:border-[var(--color-gray-500)] active:scale-95 active:bg-[var(--color-gray-500)] disabled:opacity-50 disabled:cursor-not-allowed',
+                                            (key === 'clear' || key === 'back') && 'bg-red-900/30 text-red-400 border-red-800 text-xl hover:bg-red-900/50 hover:border-red-600'
                                         )}
                                         onClick={() => handleKeyPress(key)}
                                         disabled={isVerifying}
