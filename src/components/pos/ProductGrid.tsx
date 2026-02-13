@@ -1,4 +1,4 @@
-import { useMemo, memo, useCallback } from 'react'
+import { useMemo, memo, useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { Search } from 'lucide-react'
 import type { Product } from '../../types/database'
@@ -14,7 +14,7 @@ interface ProductGridProps {
 }
 
 interface ProductCardProps {
-    product: Product
+    product: Product & { category?: { color: string | null } | null }
     stockStatus: TStockStatus | null
     stockQuantity?: number
     minStockLevel?: number
@@ -29,20 +29,38 @@ const ProductCard = memo(function ProductCard({
     onClick,
 }: ProductCardProps) {
     const isOutOfStock = stockStatus === 'out_of_stock'
+    const showStockBadge = stockStatus === 'warning' || stockStatus === 'critical' || stockStatus === 'out_of_stock'
+    const [bouncing, setBouncing] = useState(false)
+    const categoryColor = (product as any).category?.color || null
+
+    const handleClick = useCallback(() => {
+        setBouncing(true)
+        setTimeout(() => setBouncing(false), 300)
+        onClick(product)
+    }, [onClick, product])
 
     return (
         <button
             className={cn(
                 'relative flex flex-col bg-[var(--color-gray-700)] border border-[var(--color-gray-600)] rounded-xl p-0 cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden h-full text-left',
-                'hover:-translate-y-1 hover:shadow-lg hover:border-primary hover:bg-[var(--color-gray-600)]',
+                'hover:-translate-y-1 hover:shadow-[0_0_12px_rgba(201,165,92,0.15)] hover:border-gold hover:bg-[var(--color-gray-600)]',
                 'active:scale-[0.98]',
-                isOutOfStock && 'opacity-60 hover:opacity-80'
+                isOutOfStock && 'opacity-60 hover:opacity-80',
+                bouncing && 'pos-bounce'
             )}
-            onClick={() => onClick(product)}
+            onClick={handleClick}
         >
-            {/* Stock badge with tooltip */}
-            {stockStatus && (
-                <div className="absolute top-1.5 left-1.5 z-[2] pointer-events-none">
+            {/* Category color dot */}
+            {categoryColor && (
+                <div
+                    className="absolute top-2 left-2 w-1.5 h-1.5 rounded-full z-[3]"
+                    style={{ backgroundColor: categoryColor }}
+                />
+            )}
+
+            {/* Stock badge - warning/critical only */}
+            {showStockBadge && stockStatus && (
+                <div className="absolute top-1.5 right-1.5 z-[2] pointer-events-none">
                     <StockBadge
                         status={stockStatus}
                         stockQuantity={stockQuantity}
@@ -112,7 +130,7 @@ function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) 
 
     if (isLoading) {
         return (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-8 w-full pb-xl">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-8 w-full pb-xl">
                 {[...Array(8)].map((_, i) => (
                     <div key={i} className="h-[200px] bg-[var(--color-gray-100)] rounded-xl animate-pulse" />
                 ))}
@@ -130,7 +148,7 @@ function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) 
     }
 
     return (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-8 w-full pb-xl">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-8 w-full pb-xl">
             {products.map((product) => {
                 const stockStatus = getStockStatus(product.id)
                 const stockLevel = stockMap.get(product.id)

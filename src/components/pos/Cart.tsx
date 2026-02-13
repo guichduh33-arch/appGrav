@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { Trash2, Tag, Lock, List, User, QrCode, Star, FileText, ChevronDown, ChevronUp, Building2, ShoppingCart } from 'lucide-react'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { useCartStore } from '../../stores/cartStore'
+import { useOrderStore } from '../../stores/orderStore'
 import { PinVerificationModal, TableSelectionModal, DiscountModal, CustomerSearchModal } from './modals'
 import { LoyaltyBadge } from './LoyaltyBadge'
 import { CartItemRow, CartTotals, CartActions } from './cart-components'
@@ -30,6 +31,7 @@ interface CartProps {
 
 function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }: CartProps) {
     const { isOffline } = useNetworkStatus()
+    const heldOrdersCount = useOrderStore(s => s.heldOrders.length)
     const {
         items, orderType, setOrderType, tableNumber, setTableNumber,
         subtotal, discountAmount, total, updateItemQuantity, removeItem, clearCart, setDiscount,
@@ -114,7 +116,7 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
     }
 
     return (
-        <aside className="w-[460px] bg-zinc-800 border-l border-zinc-700 flex flex-col flex-shrink-0 z-[15] shadow-[-4px_0_24px_rgba(0,0,0,0.2)] text-white">
+        <aside className="w-[380px] bg-zinc-800 border-l border-zinc-700 flex flex-col flex-shrink-0 z-[15] shadow-[-4px_0_24px_rgba(0,0,0,0.2)] text-white">
             {/* Pending Orders Button */}
             <div className="px-md py-sm bg-zinc-900 border-b border-zinc-700">
                 <button
@@ -122,7 +124,13 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                     className="w-full p-2.5 bg-zinc-700 border border-zinc-600 rounded-md text-white font-semibold text-sm cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 hover:bg-zinc-600 hover:border-gold hover:text-gold-light"
                     onClick={onShowPendingOrders}
                 >
-                    <List size={18} /> Pending Orders
+                    <List size={18} />
+                    Pending Orders
+                    {heldOrdersCount > 0 && (
+                        <span className="bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 font-bold">
+                            {heldOrdersCount}
+                        </span>
+                    )}
                 </button>
             </div>
 
@@ -270,7 +278,7 @@ function Cart({ onCheckout, onSendToKitchen, onShowPendingOrders, onItemClick }:
                 <CartTotals subtotal={subtotal} discountAmount={discountAmount} total={total} onDiscountClick={() => setShowDiscountModal(true)} />
             )}
 
-            <CartActions hasLockedItems={hasLockedItems} hasUnlockedItems={hasUnlockedItems} itemCount={items.length} onSendToKitchen={onSendToKitchen} onCheckout={onCheckout} />
+            <CartActions hasLockedItems={hasLockedItems} hasUnlockedItems={hasUnlockedItems} itemCount={items.length} total={total} onSendToKitchen={onSendToKitchen} onCheckout={onCheckout} />
 
             {showPinModal && (
                 <PinVerificationModal title="Item removal" message="This item is in the kitchen. Manager PIN required." onVerify={handlePinVerify} onClose={() => { setShowPinModal(false); setPendingDeleteItemId(null) }} />

@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
-import { Search, CheckCircle, Clock, Users, User } from 'lucide-react'
+import { Search, CheckCircle, Clock, Users, User, X } from 'lucide-react'
 
 import { useCartStore, CartItem } from '../../stores/cartStore'
 import { useAuthStore } from '../../stores/authStore'
@@ -206,20 +206,33 @@ export default function POSMainPage() {
 
                 <section className="pos-products">
                     <div className="pos-products__header">
-                        <h2 className="pos-products__title">
-                            {selectedCategory
-                                ? categories.find(c => c.id === selectedCategory)?.name || 'All Products'
-                                : 'All Products'}
-                        </h2>
                         <div className="pos-products__search search-input">
                             <Search className="search-input__icon" size={20} />
                             <input
                                 type="text"
-                                placeholder="Search a product..."
+                                placeholder="Search products..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
+                            {searchQuery && (
+                                <button
+                                    type="button"
+                                    className="pos-products__search-clear"
+                                    onClick={() => setSearchQuery('')}
+                                >
+                                    <X size={14} />
+                                </button>
+                            )}
                         </div>
+                        {/* Session indicator */}
+                        {hasOpenShift && currentSession && (
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--color-gray-700)] rounded-lg text-xs text-[var(--color-gray-300)] whitespace-nowrap flex-shrink-0">
+                                <div className="w-6 h-6 rounded-full bg-gold flex items-center justify-center text-white text-[10px] font-bold">
+                                    {(currentSession.user_name || 'C')[0].toUpperCase()}
+                                </div>
+                                <span className="font-semibold text-white">#{currentSession.session_number}</span>
+                            </div>
+                        )}
                     </div>
                     <div className="pos-products__grid">
                         {/* Combo deals (Story 6.6) */}

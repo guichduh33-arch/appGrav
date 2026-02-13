@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { toast } from 'sonner'
 import { X, Check, Plus, Minus } from 'lucide-react'
 import type { Product } from '../../../types/database'
 import { useCartStore, type CartModifier, type CartItem } from '../../../stores/cartStore'
@@ -280,6 +281,9 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                 // Fallback to standard addItem for retail customers
                 addItem(product, quantity, modifiers, notes)
             }
+        }
+        if (!editItem) {
+            toast.success(`Added ${product.name}`, { duration: 1500 })
         }
         onClose()
     }

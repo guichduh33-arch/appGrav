@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
+import { toast } from 'sonner'
 import { X, Check } from 'lucide-react'
 import type { Product } from '../../../types/database'
 import { useCartStore } from '../../../stores/cartStore'
@@ -87,6 +88,7 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
             } else {
                 addItem(baseProduct, 1, [], '', undefined)
             }
+            toast.success(`Added ${baseProduct.name}`, { duration: 1500 })
             onClose()
         }
     }, [isLoading, hasCheckedVariants, variantGroups.length, baseProduct, addItem, addItemWithPricing, customerPriceResult, onClose])
@@ -194,6 +196,7 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
             }
             addItem(productWithAdjustedPrice, 1, [], variantNote, selectedVariants)
         }
+        toast.success(`Added ${baseProduct.name}`, { duration: 1500 })
         onClose()
     }
 
