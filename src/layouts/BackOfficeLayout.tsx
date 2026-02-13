@@ -59,7 +59,10 @@ const BackOfficeLayout: React.FC = () => {
                     )}
                 >
                     <div className="flex items-center gap-md overflow-hidden whitespace-nowrap">
-                        <div className="flex items-center justify-center text-[2rem] transition-all duration-300 bg-blue-600 text-white p-2 rounded-xl shadow-lg shadow-blue-600/20">
+                        <div
+                            className="flex items-center justify-center text-[2rem] transition-all duration-300 text-white p-2 rounded-xl shadow-lg shadow-gold/20"
+                            style={{ background: 'linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-dark) 100%)' }}
+                        >
                             <Utensils size={isCollapsed ? 24 : 28} />
                         </div>
                         {!isCollapsed && (

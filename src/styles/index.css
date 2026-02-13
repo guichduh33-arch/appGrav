@@ -602,6 +602,19 @@ label {
     margin-top: 0.375rem;
 }
 
+/* Input error state */
+.input-error,
+input.input-error,
+select.input-error,
+textarea.input-error {
+    border-color: var(--color-danger) !important;
+    background: rgba(239, 68, 68, 0.04);
+}
+.input-error:focus-visible {
+    outline-color: var(--color-danger) !important;
+    border-color: var(--color-danger) !important;
+}
+
 /* Badges */
 .badge {
     display: inline-flex;
@@ -1051,6 +1064,12 @@ tbody tr:hover {
     right: 1rem;
     z-index: var(--z-toast);
 }
+
+/* Sonner toast type borders */
+.toast-success { border-left: 4px solid var(--color-success) !important; }
+.toast-error { border-left: 4px solid var(--color-danger) !important; }
+.toast-warning { border-left: 4px solid var(--color-warning) !important; }
+.toast-info { border-left: 4px solid var(--color-info) !important; }
 
 /* ============================================
    SCROLLBAR STYLES

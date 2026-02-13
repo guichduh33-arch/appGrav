@@ -128,8 +128,8 @@ export default function DashboardPage() {
               <AreaChart data={trendData}>
                 <defs>
                   <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#C9A55C" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#C9A55C" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
@@ -155,11 +155,11 @@ export default function DashboardPage() {
                 <Area
                   type="monotone"
                   dataKey="total_sales"
-                  stroke="#3b82f6"
+                  stroke="#C9A55C"
                   fill="url(#revenueGradient)"
                   strokeWidth={2}
                   dot={false}
-                  activeDot={{ r: 4, fill: '#3b82f6' }}
+                  activeDot={{ r: 4, fill: '#9A7B3A' }}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -191,7 +191,7 @@ export default function DashboardPage() {
                       </div>
                       <div className="h-2 bg-gray-100 rounded-full">
                         <div
-                          className="h-2 bg-blue-500 rounded-full transition-all duration-500"
+                          className="h-2 bg-gold rounded-full transition-all duration-500"
                           style={{ width: `${barWidth}%` }}
                         />
                       </div>
@@ -269,7 +269,7 @@ export default function DashboardPage() {
           </div>
           <Link
             to="/inventory"
-            className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+            className="text-sm text-gold-dark hover:text-gold flex items-center gap-1"
           >
             View all <ArrowRight size={14} />
           </Link>

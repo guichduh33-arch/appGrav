@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Clock, CheckCircle, ChefHat, AlertTriangle, Pause, Play, Smartphone, Wifi, UtensilsCrossed, Package, Bike, Building2, MapPin, User } from 'lucide-react'
+import { Clock, CheckCircle, CheckCheck, ChefHat, AlertTriangle, Pause, Play, Smartphone, Wifi, UtensilsCrossed, Package, Bike, Building2, MapPin, User } from 'lucide-react'
 import { useOrderAutoRemove } from '@/hooks/kds/useOrderAutoRemove'
 import { useKDSConfigSettings } from '@/hooks/settings/useModuleConfigSettings'
 import { KDSCountdownBar } from './KDSCountdownBar'
+import { OrderProgressBar } from './OrderProgressBar'
 import { cn } from '@/lib/utils'
 
 interface OrderItem {
@@ -174,7 +175,7 @@ function KDSOrderCard({
             {/* Header */}
             <div className="flex justify-between items-center py-3 px-4 bg-[var(--kds-bg)] border-b border-[var(--kds-border)]">
                 <div className="flex items-center gap-2.5">
-                    <span className="text-2xl font-bold text-white">#{orderNumber}</span>
+                    <span className="text-[28px] font-extrabold text-white">#{orderNumber}</span>
                     <span
                         className="text-[0.9rem] font-bold py-2 px-4 rounded-[20px] text-white whitespace-nowrap inline-flex items-center gap-1.5"
                         style={{ backgroundColor: orderConfig.color }}
@@ -197,7 +198,7 @@ function KDSOrderCard({
                     )}
                 </div>
                 <div className={cn(
-                    'flex items-center gap-1.5 font-mono text-[1.1rem] font-semibold py-1.5 px-3 rounded-lg bg-[var(--kds-surface-elevated)]',
+                    'flex items-center gap-1.5 font-mono text-[20px] font-semibold py-1.5 px-3 rounded-lg bg-[var(--kds-surface-elevated)]',
                     urgency === 'normal' && 'text-[#10B981]',
                     urgency === 'warning' && 'text-[#F59E0B] bg-[rgba(245,158,11,0.2)]',
                     urgency === 'critical' && 'text-[#EF4444] bg-[rgba(239,68,68,0.2)]'
@@ -206,6 +207,11 @@ function KDSOrderCard({
                     <span>{formatTime(elapsedTime)}</span>
                 </div>
             </div>
+
+            {/* Progress Bar */}
+            {overallStatus !== 'served' && (
+                <OrderProgressBar elapsedSeconds={elapsedTime} maxMinutes={kdsConfig.urgencyCriticalSeconds / 60 || 20} />
+            )}
 
             {/* Customer/Table Info */}
             {(tableName || customerName) && (
@@ -230,9 +236,9 @@ function KDSOrderCard({
                         )}
                     >
                         <div className="flex items-center gap-2">
-                            <span className="text-[1.2rem] font-bold text-[#F59E0B] min-w-[35px]">{item.quantity}x</span>
+                            <span className="text-[22px] font-extrabold text-[#F59E0B] min-w-[35px]">{item.quantity}x</span>
                             <span className={cn(
-                                'text-base font-semibold text-white flex-1',
+                                'text-lg font-semibold text-white flex-1',
                                 item.is_held && 'text-red-300'
                             )}>{item.product_name}</span>
                             {/* Story 8.4: Hold indicator */}
@@ -263,12 +269,12 @@ function KDSOrderCard({
                             )}
                         </div>
                         {item.modifiers && (
-                            <div className="mt-1.5 pl-[43px] text-[0.85rem] text-[#10B981] italic">
+                            <div className="mt-1.5 pl-[43px] text-sm text-[#10B981] italic">
                                 {item.modifiers}
                             </div>
                         )}
                         {item.notes && (
-                            <div className="mt-1.5 py-1.5 px-2.5 ml-[43px] bg-[rgba(239,68,68,0.2)] rounded-md text-[0.85rem] text-[#EF4444] flex items-center gap-1.5">
+                            <div className="mt-1.5 py-1.5 px-2.5 ml-[43px] bg-[rgba(239,68,68,0.2)] rounded-md text-sm text-[#EF4444] flex items-center gap-1.5">
                                 <AlertTriangle size={12} /> {item.notes}
                             </div>
                         )}
@@ -280,29 +286,29 @@ function KDSOrderCard({
             <div className="py-3 px-4 bg-[var(--kds-bg)] border-t border-[var(--kds-border)]">
                 {overallStatus === 'new' && (
                     <button
-                        className="w-full py-4 px-5 border-none rounded-[10px] text-[1.1rem] min-h-[48px] font-bold cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(59,130,246,0.4)]"
+                        className="w-full py-4 px-5 border-none rounded-[10px] text-lg min-h-[48px] font-extrabold uppercase tracking-wide cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#3B82F6] to-[#2563EB] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(59,130,246,0.4)]"
                         onClick={handleStartPreparing}
                     >
-                        <ChefHat size={20} />
-                        Start
+                        <Play size={20} />
+                        START
                     </button>
                 )}
                 {overallStatus === 'preparing' && (
                     <button
-                        className="w-full py-4 px-5 border-none rounded-[10px] text-[1.1rem] min-h-[48px] font-bold cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#10B981] to-[#059669] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(16,185,129,0.4)]"
+                        className="w-full py-4 px-5 border-none rounded-[10px] text-lg min-h-[48px] font-extrabold uppercase tracking-wide cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#10B981] to-[#059669] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(16,185,129,0.4)]"
                         onClick={handleMarkReady}
                     >
                         <CheckCircle size={20} />
-                        Ready
+                        READY
                     </button>
                 )}
                 {overallStatus === 'ready' && station === 'waiter' && (
                     <button
-                        className="w-full py-4 px-5 border-none rounded-[10px] text-[1.1rem] min-h-[48px] font-bold cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(139,92,246,0.4)]"
+                        className="w-full py-4 px-5 border-none rounded-[10px] text-lg min-h-[48px] font-extrabold uppercase tracking-wide cursor-pointer flex items-center justify-center gap-2.5 transition-all duration-200 bg-gradient-to-br from-[#6B7280] to-[#4B5563] text-white hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(107,114,128,0.4)]"
                         onClick={handleMarkServed}
                     >
-                        <CheckCircle size={20} />
-                        Served
+                        <CheckCheck size={20} />
+                        SERVED
                     </button>
                 )}
             </div>

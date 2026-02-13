@@ -26,9 +26,18 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                     duration={3000}
                     toastOptions={{
                         style: {
-                            background: '#4A3728',
-                            color: '#FDF8F3',
+                            background: '#FFFBF5',
+                            color: '#2D2A24',
                             borderRadius: '12px',
+                            border: '1px solid #E8E0D4',
+                            boxShadow: '0 4px 24px rgba(45,42,36,0.08)',
+                            fontSize: '14px',
+                        },
+                        classNames: {
+                            success: 'toast-success',
+                            error: 'toast-error',
+                            warning: 'toast-warning',
+                            info: 'toast-info',
                         },
                     }}
                 />

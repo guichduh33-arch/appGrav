@@ -110,7 +110,7 @@ const SettingsLayout = () => {
           {/* Dynamic categories from database */}
           {isLoading ? (
             <div className="flex justify-center p-lg">
-              <div className="w-6 h-6 border-3 border-border border-t-[var(--color-rose-poudre)] rounded-full animate-spin" />
+              <div className="w-6 h-6 border-3 border-border border-t-gold rounded-full animate-spin" />
             </div>
           ) : (
             <>
@@ -121,7 +121,7 @@ const SettingsLayout = () => {
                   className={({ isActive }) =>
                     cn(
                       'w-full flex items-center gap-sm p-md bg-transparent border-none rounded-md text-sm font-medium text-smoke cursor-pointer text-left transition-all duration-fast ease-standard hover:bg-cream hover:text-espresso',
-                      isActive && 'bg-[var(--color-rose-poudre)] text-white hover:bg-[var(--color-rose-poudre)] hover:text-white'
+                      isActive && 'bg-gold/10 text-gold-dark border-l-3 border-gold hover:bg-gold/10 hover:text-gold-dark'
                     )
                   }
                 >
@@ -143,7 +143,7 @@ const SettingsLayout = () => {
                   className={({ isActive }) =>
                     cn(
                       'w-full flex items-center gap-sm p-md bg-transparent border-none rounded-md text-sm font-medium text-smoke cursor-pointer text-left transition-all duration-fast ease-standard hover:bg-cream hover:text-espresso',
-                      isActive && 'bg-[var(--color-rose-poudre)] text-white hover:bg-[var(--color-rose-poudre)] hover:text-white'
+                      isActive && 'bg-gold/10 text-gold-dark border-l-3 border-gold hover:bg-gold/10 hover:text-gold-dark'
                     )
                   }
                 >
