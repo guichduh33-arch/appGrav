@@ -3,8 +3,6 @@ import {
   Plus,
   Edit2,
   Trash2,
-  Save,
-  X,
   CheckCircle,
   GripVertical,
   Banknote,
@@ -23,20 +21,10 @@ import {
   useDeletePaymentMethod,
 } from '../../hooks/settings';
 import type { PaymentMethod, PaymentType } from '../../types/settings';
+import { PaymentMethodModal } from './payment-methods/PaymentMethodModal';
+import type { PaymentMethodFormData } from './payment-methods/PaymentMethodModal';
 import { toast } from 'sonner';
 import { logError } from '@/utils/logger'
-
-interface PaymentMethodFormData {
-  code: string;
-  name: string;
-  payment_type: PaymentType;
-  icon: string;
-  is_active: boolean;
-  is_default: boolean;
-  requires_reference: boolean;
-  sort_order: number;
-  settings: Record<string, unknown>;
-}
 
 const emptyForm: PaymentMethodFormData = {
   code: '',
@@ -58,23 +46,13 @@ const PAYMENT_TYPES: { value: PaymentType; label: string; icon: React.ReactNode 
   { value: 'other', label: 'Other', icon: <QrCode size={16} /> },
 ];
 
-const ICONS = [
-  'Banknote', 'CreditCard', 'Building', 'Wallet', 'QrCode', 'Smartphone', 'Globe', 'DollarSign',
-];
-
-const getPaymentIcon = (iconName: string) => {
-  switch (iconName) {
-    case 'Banknote': return <Banknote size={20} />;
-    case 'CreditCard': return <CreditCard size={20} />;
-    case 'Building': return <Building size={20} />;
-    case 'Wallet': return <Wallet size={20} />;
-    case 'QrCode': return <QrCode size={20} />;
-    case 'Smartphone': return <Smartphone size={20} />;
-    case 'Globe': return <Globe size={20} />;
-    case 'DollarSign': return <DollarSign size={20} />;
-    default: return <Wallet size={20} />;
-  }
+const ICON_MAP: Record<string, React.ReactNode> = {
+  Banknote: <Banknote size={20} />, CreditCard: <CreditCard size={20} />,
+  Building: <Building size={20} />, Wallet: <Wallet size={20} />,
+  QrCode: <QrCode size={20} />, Smartphone: <Smartphone size={20} />,
+  Globe: <Globe size={20} />, DollarSign: <DollarSign size={20} />,
 };
+const getPaymentIcon = (name: string) => ICON_MAP[name] ?? <Wallet size={20} />;
 
 const PaymentMethodsPage = () => {
   const { data: methods, isLoading } = usePaymentMethods();
@@ -86,10 +64,8 @@ const PaymentMethodsPage = () => {
   const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
   const [formData, setFormData] = useState<PaymentMethodFormData>(emptyForm);
 
-  // Use English
   const nameKey = 'name_en' as const;
 
-  // Open create modal
   const openCreateModal = () => {
     setEditingMethod(null);
     setFormData({
@@ -99,7 +75,6 @@ const PaymentMethodsPage = () => {
     setShowModal(true);
   };
 
-  // Open edit modal
   const openEditModal = (method: PaymentMethod) => {
     setEditingMethod(method);
     setFormData({
@@ -116,29 +91,19 @@ const PaymentMethodsPage = () => {
     setShowModal(true);
   };
 
-  // Handle save
   const handleSave = async () => {
     if (!formData.code || !formData.name) {
       toast.error('Code and name are required');
       return;
     }
 
-    // Build save data - include all required fields for the PaymentMethod type
     const dataToSave = {
-      code: formData.code,
-      payment_type: formData.payment_type,
-      icon: formData.icon,
-      is_active: formData.is_active,
-      is_default: formData.is_default,
-      requires_reference: formData.requires_reference,
-      sort_order: formData.sort_order,
+      code: formData.code, payment_type: formData.payment_type, icon: formData.icon,
+      is_active: formData.is_active, is_default: formData.is_default,
+      requires_reference: formData.requires_reference, sort_order: formData.sort_order,
       settings: formData.settings as Record<string, unknown> | null,
-      // Copy name to all language columns for DB compatibility
-      name: formData.name, // Legacy field
-      name_fr: formData.name,
-      name_en: formData.name,
-      name_id: formData.name,
-      type: formData.payment_type, // Legacy field mirrors payment_type
+      name: formData.name, name_fr: formData.name, name_en: formData.name,
+      name_id: formData.name, type: formData.payment_type,
     };
 
     try {
@@ -160,15 +125,12 @@ const PaymentMethodsPage = () => {
     }
   };
 
-  // Handle delete
   const handleDelete = async (method: PaymentMethod) => {
     if (method.is_default) {
       toast.error('Cannot delete default payment method');
       return;
     }
-
     if (!confirm(`Delete "${method[nameKey]}"?`)) return;
-
     try {
       await deleteMethod.mutateAsync(method.id);
       toast.success('Payment method deleted');
@@ -179,7 +141,6 @@ const PaymentMethodsPage = () => {
     }
   };
 
-  // Toggle active
   const handleToggleActive = async (method: PaymentMethod) => {
     try {
       await updateMethod.mutateAsync({
@@ -194,10 +155,8 @@ const PaymentMethodsPage = () => {
     }
   };
 
-  // Set as default
   const handleSetDefault = async (method: PaymentMethod) => {
     try {
-      // Unset previous default
       const currentDefault = methods?.find((m) => m.is_default);
       if (currentDefault) {
         await updateMethod.mutateAsync({
@@ -205,13 +164,10 @@ const PaymentMethodsPage = () => {
           updates: { is_default: false },
         });
       }
-
-      // Set new default
       await updateMethod.mutateAsync({
         id: method.id,
         updates: { is_default: true },
       });
-
       toast.success(`${method[nameKey]} set as default`);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error setting default';
@@ -220,7 +176,6 @@ const PaymentMethodsPage = () => {
     }
   };
 
-  // Group methods by type
   const groupedMethods = methods?.reduce((acc: Record<string, PaymentMethod[]>, method: PaymentMethod) => {
     const type = method.payment_type;
     if (!acc[type]) acc[type] = [];
@@ -230,221 +185,107 @@ const PaymentMethodsPage = () => {
 
   return (
     <>
-      <div className="settings-section">
-        <div className="settings-section__header">
-          <div className="settings-section__header-content">
-            <div>
-              <h2 className="settings-section__title">Payment Methods</h2>
-              <p className="settings-section__description">
-                Configure payment methods accepted at POS
-              </p>
-            </div>
-            <button className="btn-primary" onClick={openCreateModal}>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-display font-bold text-white">Payment Methods</h2>
+            <p className="text-sm text-[var(--theme-text-muted)] mt-1">
+              Configure payment methods accepted at POS
+            </p>
+          </div>
+          <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-[var(--color-gold)] text-black font-bold rounded-xl text-sm" onClick={openCreateModal}>
+            <Plus size={16} />
+            New Payment Method
+          </button>
+        </div>
+
+        {/* Content */}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12 text-[var(--theme-text-muted)]">
+            <div className="animate-spin w-5 h-5 border-2 border-[var(--color-gold)] border-t-transparent rounded-full mr-3" />
+            <span>Loading...</span>
+          </div>
+        ) : methods?.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-[var(--theme-text-muted)]">
+            <Wallet size={48} className="mb-4 opacity-40" />
+            <h3 className="text-lg font-bold text-white mb-1">No payment methods</h3>
+            <p className="text-sm mb-4">Create your first payment method.</p>
+            <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-[var(--color-gold)] text-black font-bold rounded-xl text-sm" onClick={openCreateModal}>
               <Plus size={16} />
-              New Payment Method
+              Create Payment Method
             </button>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-6">
+            {PAYMENT_TYPES.map((type) => {
+              const typeMethods = groupedMethods?.[type.value] || [];
+              if (typeMethods.length === 0) return null;
 
-        <div className="settings-section__body">
-          {isLoading ? (
-            <div className="settings-section__loading">
-              <div className="spinner" />
-              <span>Loading...</span>
-            </div>
-          ) : methods?.length === 0 ? (
-            <div className="settings-section__empty">
-              <Wallet size={48} />
-              <h3>No payment methods</h3>
-              <p>Create your first payment method.</p>
-              <button className="btn-primary" onClick={openCreateModal}>
-                <Plus size={16} />
-                Create Payment Method
-              </button>
-            </div>
-          ) : (
-            <div className="payment-methods-grid">
-              {PAYMENT_TYPES.map((type) => {
-                const typeMethods = groupedMethods?.[type.value] || [];
-                if (typeMethods.length === 0) return null;
-
-                return (
-                  <div key={type.value} className="payment-methods-group">
-                    <h3 className="payment-methods-group__title">
-                      {type.icon}
-                      {type.label}
-                    </h3>
-                    <div className="payment-methods-list">
-                      {typeMethods.map((method: PaymentMethod) => (
-                        <div
-                          key={method.id}
-                          className={`payment-method-item ${!method.is_active ? 'is-inactive' : ''}`}
-                        >
-                          <div className="payment-method-item__drag">
-                            <GripVertical size={16} />
-                          </div>
-                          <div className="payment-method-item__icon">
-                            {getPaymentIcon(method.icon ?? '')}
-                          </div>
-                          <div className="payment-method-item__info">
-                            <div className="payment-method-item__name">
-                              {method[nameKey]}
-                              {method.is_default && (
-                                <span className="payment-method-item__default">
-                                  <CheckCircle size={12} />
-                                </span>
-                              )}
-                            </div>
-                            <div className="payment-method-item__code">{method.code}</div>
-                          </div>
-                          <div className="payment-method-item__actions">
-                            <button
-                              className={`toggle-mini ${method.is_active ? 'is-on' : ''}`}
-                              onClick={() => handleToggleActive(method)}
-                              title={method.is_active ? 'Disable' : 'Enable'}
-                            />
-                            {!method.is_default && method.is_active && (
-                              <button
-                                className="btn-icon"
-                                onClick={() => handleSetDefault(method)}
-                                title="Set as default"
-                              >
-                                <CheckCircle size={14} />
-                              </button>
-                            )}
-                            <button
-                              className="btn-icon"
-                              onClick={() => openEditModal(method)}
-                              title="Edit"
-                            >
-                              <Edit2 size={14} />
-                            </button>
-                            <button
-                              className="btn-icon btn-icon--danger"
-                              onClick={() => handleDelete(method)}
-                              title="Delete"
-                              disabled={method.is_default ?? false}
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
+              return (
+                <div key={type.value}>
+                  <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] flex items-center gap-2 mb-3">
+                    {type.icon}
+                    {type.label}
+                  </h3>
+                  <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+                    {typeMethods.map((method: PaymentMethod) => (
+                      <div
+                        key={method.id}
+                        className={`flex items-center gap-3 px-4 py-3 border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] transition-colors ${!method.is_active ? 'opacity-40' : ''}`}
+                      >
+                        <GripVertical size={16} className="text-[var(--theme-text-muted)] shrink-0 cursor-grab" />
+                        <div className="p-2 rounded-lg bg-white/5 text-[var(--color-gold)] shrink-0">
+                          {getPaymentIcon(method.icon ?? '')}
                         </div>
-                      ))}
-                    </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-white">{method[nameKey]}</span>
+                            {method.is_default && (
+                              <span className="text-emerald-400">
+                                <CheckCircle size={14} />
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-[var(--theme-text-muted)]">{method.code}</div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <div
+                            className={`w-9 h-5 rounded-full cursor-pointer transition-all relative shrink-0 after:content-[""] after:absolute after:top-[2px] after:left-[2px] after:w-4 after:h-4 after:rounded-full after:bg-white after:shadow-sm after:transition-all ${method.is_active ? 'bg-[var(--color-gold)] after:left-[18px]' : 'bg-white/10'}`}
+                            onClick={() => handleToggleActive(method)}
+                            title={method.is_active ? 'Disable' : 'Enable'}
+                          />
+                          {!method.is_default && method.is_active && (
+                            <button className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-emerald-400 hover:bg-white/5 transition-colors" onClick={() => handleSetDefault(method)} title="Set as default">
+                              <CheckCircle size={14} />
+                            </button>
+                          )}
+                          <button className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-white hover:bg-white/5 transition-colors" onClick={() => openEditModal(method)} title="Edit">
+                            <Edit2 size={14} />
+                          </button>
+                          <button className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-red-400 hover:bg-white/5 transition-colors disabled:opacity-30" onClick={() => handleDelete(method)} title="Delete" disabled={method.is_default ?? false}>
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* Modal */}
       {showModal && (
-        <div className="settings-modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="settings-modal__header">
-              <h2 className="settings-modal__title">
-                {editingMethod ? 'Edit Payment Method' : 'New Payment Method'}
-              </h2>
-              <button className="settings-modal__close" onClick={() => setShowModal(false)}>
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="settings-modal__body">
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Code *</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                    placeholder="CASH"
-                    disabled={!!editingMethod}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Type *</label>
-                  <select
-                    className="form-input form-select"
-                    value={formData.payment_type}
-                    onChange={(e) => setFormData({ ...formData, payment_type: e.target.value as PaymentType })}
-                  >
-                    {PAYMENT_TYPES.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Name *</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Cash"
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Icon</label>
-                <select
-                  className="form-input form-select"
-                  value={formData.icon}
-                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                >
-                  {ICONS.map((icon) => (
-                    <option key={icon} value={icon}>
-                      {icon}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label className="form-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={formData.requires_reference}
-                    onChange={(e) => setFormData({ ...formData, requires_reference: e.target.checked })}
-                  />
-                  <span>Requires reference (transaction number)</span>
-                </label>
-              </div>
-
-              <div className="form-group">
-                <label className="form-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_active}
-                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                  />
-                  <span>Active</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="settings-modal__footer">
-              <button className="btn-secondary" onClick={() => setShowModal(false)}>
-                Cancel
-              </button>
-              <button
-                className="btn-primary"
-                onClick={handleSave}
-                disabled={createMethod.isPending || updateMethod.isPending}
-              >
-                <Save size={16} />
-                {editingMethod ? 'Update' : 'Create'}
-              </button>
-            </div>
-          </div>
-        </div>
+        <PaymentMethodModal
+          isEditing={!!editingMethod}
+          formData={formData}
+          onFormChange={setFormData}
+          onSave={handleSave}
+          onClose={() => setShowModal(false)}
+          isSaving={createMethod.isPending || updateMethod.isPending}
+        />
       )}
     </>
   );

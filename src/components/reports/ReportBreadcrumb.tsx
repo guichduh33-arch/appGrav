@@ -25,17 +25,17 @@ export function ReportBreadcrumb({ levels }: ReportBreadcrumbProps) {
         return (
           <div key={index} className="flex items-center gap-1">
             {index > 0 && (
-              <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <ChevronRight className="w-4 h-4 text-white/30 flex-shrink-0" />
             )}
             {isClickable ? (
               <button
                 onClick={level.onClick}
-                className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                className="text-[var(--color-gold)] hover:text-[var(--color-gold)]/80 hover:underline transition-colors"
               >
                 {level.label}
               </button>
             ) : (
-              <span className={isLast ? 'text-gray-900 font-medium' : 'text-gray-600'}>
+              <span className={isLast ? 'text-white font-medium' : 'text-[var(--theme-text-muted)]'}>
                 {level.label}
               </span>
             )}

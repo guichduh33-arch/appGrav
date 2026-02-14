@@ -29,7 +29,7 @@ export const CartItemRow = memo(function CartItemRow({
         <div
             className={cn(
                 'bg-transparent py-5 border-b border-white/5 transition-all duration-300 cursor-pointer',
-                'hover:bg-[var(--color-gold)]/5',
+                'hover:bg-white/[0.02]',
                 'last:border-b-0',
                 isLocked && 'bg-[rgba(245,158,11,0.03)] border-l-2 border-l-warning pl-3 cursor-default'
             )}
@@ -37,7 +37,7 @@ export const CartItemRow = memo(function CartItemRow({
         >
             <div className="mb-1.5 flex-1">
                 <div className={cn(
-                    'font-semibold text-sm text-white flex items-center gap-1.5 leading-[1.4]',
+                    'font-medium text-sm text-[var(--stone-text)] flex items-center gap-1.5 leading-[1.4]',
                     isLocked && 'text-warning-text'
                 )}>
                     {isLocked && <Lock size={12} />}
@@ -81,7 +81,7 @@ export const CartItemRow = memo(function CartItemRow({
                 <div className="flex items-center gap-1.5">
                     <button
                         type="button"
-                        className="w-7 h-7 flex items-center justify-center bg-transparent border border-white/10 rounded-full text-xs text-zinc-400 cursor-pointer transition-all duration-300 hover:enabled:border-[var(--color-gold)] hover:enabled:text-[var(--color-gold)] hover:enabled:bg-[var(--color-gold)]/5 disabled:opacity-30"
+                        className="w-6 h-6 flex items-center justify-center bg-transparent border border-white/10 rounded-full text-xs text-zinc-400 cursor-pointer transition-all duration-300 hover:enabled:border-[var(--color-gold)] hover:enabled:text-[var(--color-gold)] hover:enabled:bg-[var(--color-gold)]/5 disabled:opacity-30"
                         onClick={(e) => {
                             e.stopPropagation()
                             onQuantityChange(item.id, item.quantity - 1)
@@ -94,7 +94,7 @@ export const CartItemRow = memo(function CartItemRow({
                     <span className="text-sm font-bold min-w-[20px] text-center text-white">{item.quantity}</span>
                     <button
                         type="button"
-                        className="w-7 h-7 flex items-center justify-center bg-transparent border border-white/10 rounded-full text-xs text-zinc-400 cursor-pointer transition-all duration-300 hover:enabled:border-[var(--color-gold)] hover:enabled:text-[var(--color-gold)] hover:enabled:bg-[var(--color-gold)]/5 disabled:opacity-30"
+                        className="w-6 h-6 flex items-center justify-center bg-transparent border border-white/10 rounded-full text-xs text-zinc-400 cursor-pointer transition-all duration-300 hover:enabled:border-[var(--color-gold)] hover:enabled:text-[var(--color-gold)] hover:enabled:bg-[var(--color-gold)]/5 disabled:opacity-30"
                         onClick={(e) => {
                             e.stopPropagation()
                             onQuantityChange(item.id, item.quantity + 1)

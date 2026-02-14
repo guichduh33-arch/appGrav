@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Save, RotateCcw, AlertCircle, Heart, Info, Award, Coins, Users } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { useSettingsByCategory, useUpdateSetting } from '@/hooks/settings';
@@ -102,119 +101,153 @@ const LoyaltySettingsPage = () => {
     toast.success('Changes discarded');
   };
 
-  if (isLoading) return <div className="settings-section"><div className="settings-section__body settings-section__loading"><div className="spinner" /><span>Loading settings...</span></div></div>;
-  if (error || !settings) return <div className="settings-section"><div className="settings-section__body settings-section__error"><AlertCircle size={24} /><span>Error loading settings</span></div></div>;
+  if (isLoading) {
+    return (
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+        <div className="flex flex-col items-center justify-center py-16 text-[var(--theme-text-muted)] gap-3">
+          <div className="w-6 h-6 border-2 border-white/10 border-t-[var(--color-gold)] rounded-full animate-spin" />
+          <span className="text-sm">Loading settings...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !settings) {
+    return (
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+        <div className="flex items-center justify-center gap-2 py-16 text-red-400">
+          <AlertCircle size={24} />
+          <span>Error loading settings</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <TooltipProvider>
-      <div className="settings-section">
-        <div className="settings-section__header">
-          <div className="settings-section__header-content">
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
+          <div className="flex items-center gap-2">
+            <Heart size={20} className="text-[var(--color-gold)]" />
             <div>
-              <h2 className="settings-section__title"><Heart size={20} /> Loyalty Program</h2>
-              <p className="settings-section__description">Configure loyalty tiers, points conversion, and default customer category</p>
+              <h2 className="text-lg font-bold text-white">Loyalty Program</h2>
+              <p className="text-sm text-[var(--theme-text-muted)]">Configure loyalty tiers, points conversion, and default customer category</p>
             </div>
-            {pendingChanges.size > 0 && (
-              <div className="settings-section__actions">
-                <button className="btn-secondary" onClick={handleCancel} disabled={isSaving}><RotateCcw size={16} /> Cancel</button>
-                <button className="btn-primary" onClick={handleSaveAll} disabled={isSaving}><Save size={16} /> {isSaving ? 'Saving...' : `Save (${pendingChanges.size})`}</button>
-              </div>
-            )}
           </div>
+          {pendingChanges.size > 0 && (
+            <div className="flex items-center gap-2">
+              <button className="inline-flex items-center gap-1.5 px-3 py-2 bg-transparent border border-white/10 text-white hover:border-white/20 rounded-xl text-sm transition-colors" onClick={handleCancel} disabled={isSaving}>
+                <RotateCcw size={14} /> Cancel
+              </button>
+              <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-[var(--color-gold)] text-black font-bold rounded-xl text-sm transition-colors hover:opacity-90 disabled:opacity-50" onClick={handleSaveAll} disabled={isSaving}>
+                <Save size={14} /> {isSaving ? 'Saving...' : `Save (${pendingChanges.size})`}
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="settings-section__body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {/* Tier configuration */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base"><Award size={18} className="text-rose-400" /> Loyalty Tiers</CardTitle>
-              <CardDescription>Set point thresholds, discount rates, and tier colors</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid var(--color-border)' }}>
-                      <th style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.8125rem', fontWeight: 600 }}>Tier</th>
-                      <th style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.8125rem', fontWeight: 600 }}>Points Threshold</th>
-                      <th style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.8125rem', fontWeight: 600 }}>Discount %</th>
-                      <th style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.8125rem', fontWeight: 600 }}>Color</th>
-                      <th style={{ textAlign: 'center', padding: '0.5rem', fontSize: '0.8125rem', fontWeight: 600 }}>Preview</th>
+        {/* Body */}
+        <div className="px-6 py-5 space-y-6">
+          {/* Tier Configuration */}
+          <div className="bg-black/20 border border-white/5 rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-white/5">
+              <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
+                <Award size={16} className="text-[var(--color-gold)]" /> Loyalty Tiers
+              </h3>
+              <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">Set point thresholds, discount rates, and tier colors</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    <th className="text-left px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Tier</th>
+                    <th className="text-left px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Points Threshold</th>
+                    <th className="text-left px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Discount %</th>
+                    <th className="text-left px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Color</th>
+                    <th className="text-center px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Preview</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {TIERS.map((tier) => (
+                    <tr key={tier} className="border-b border-white/5 hover:bg-white/[0.02]">
+                      <td className="px-4 py-2.5 text-sm font-semibold text-white">{TIER_LABELS[tier]}</td>
+                      <td className="px-4 py-2.5">
+                        <input type="number" className="w-24 px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20" min={0} value={form.tierThresholds[tier]} onChange={(e) => handleTierThreshold(tier, e.target.value)} />
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <div className="flex items-center gap-1.5">
+                          <input type="number" className="w-20 px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20" min={0} max={100} step={0.5} value={form.tierDiscounts[tier]} onChange={(e) => handleTierDiscount(tier, e.target.value)} />
+                          <span className="text-xs text-[var(--theme-text-muted)]">%</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full shrink-0 ring-1 ring-white/10" style={{ background: form.tierColors[tier] }} />
+                          <input type="text" className="w-24 px-2 py-1.5 bg-black/40 border border-white/10 rounded-xl text-white text-xs font-mono outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20" value={form.tierColors[tier]} onChange={(e) => handleTierColor(tier, e.target.value)} />
+                        </div>
+                      </td>
+                      <td className="px-4 py-2.5 text-center">
+                        <Badge style={{ backgroundColor: form.tierColors[tier], color: '#fff', border: 'none', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
+                          {TIER_LABELS[tier]}
+                        </Badge>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {TIERS.map((tier) => (
-                      <tr key={tier} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                        <td style={{ padding: '0.5rem', fontWeight: 600 }}>{TIER_LABELS[tier]}</td>
-                        <td style={{ padding: '0.5rem' }}>
-                          <input type="number" className="form-input form-input--narrow" min={0} value={form.tierThresholds[tier]} onChange={(e) => handleTierThreshold(tier, e.target.value)} />
-                        </td>
-                        <td style={{ padding: '0.5rem' }}>
-                          <div className="form-input-group">
-                            <input type="number" className="form-input form-input--narrow" min={0} max={100} step={0.5} value={form.tierDiscounts[tier]} onChange={(e) => handleTierDiscount(tier, e.target.value)} />
-                            <span className="form-input-suffix">%</span>
-                          </div>
-                        </td>
-                        <td style={{ padding: '0.5rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <span style={{ width: 20, height: 20, borderRadius: '50%', background: form.tierColors[tier], border: '1px solid #ccc', flexShrink: 0 }} />
-                            <input type="text" className="form-input form-input--narrow form-input--mono" value={form.tierColors[tier]} onChange={(e) => handleTierColor(tier, e.target.value)} style={{ width: 100 }} />
-                          </div>
-                        </td>
-                        <td style={{ padding: '0.5rem', textAlign: 'center' }}>
-                          <Badge style={{ backgroundColor: form.tierColors[tier], color: '#fff', border: 'none', textShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>
-                            {TIER_LABELS[tier]}
-                          </Badge>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
           {/* Points Conversion */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base"><Coins size={18} className="text-rose-400" /> Points Conversion</CardTitle>
-              <CardDescription>How much a customer spends to earn 1 loyalty point</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="form-group--inline">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <label className="form-label" style={{ marginBottom: 0 }}>1 point per</label>
+          <div className="bg-black/20 border border-white/5 rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-white/5">
+              <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
+                <Coins size={16} className="text-[var(--color-gold)]" /> Points Conversion
+              </h3>
+              <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">How much a customer spends to earn 1 loyalty point</p>
+            </div>
+            <div className="px-5 py-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm text-white/80">1 point per</span>
                   <Tooltip>
-                    <TooltipTrigger asChild><span style={{ cursor: 'help' }}><Info size={14} className="text-gray-400" /></span></TooltipTrigger>
+                    <TooltipTrigger asChild><span className="cursor-help"><Info size={12} className="text-[var(--theme-text-muted)]" /></span></TooltipTrigger>
                     <TooltipContent><p>Amount in IDR a customer must spend to earn 1 loyalty point</p></TooltipContent>
                   </Tooltip>
                 </div>
-                <div className="form-input-group">
-                  <input type="number" className="form-input form-input--narrow" min={1} value={form.pointsPerIdr} onChange={(e) => { setForm((prev) => ({ ...prev, pointsPerIdr: parseInt(e.target.value, 10) || 0 })); markDirty('pointsPerIdr'); }} />
-                  <span className="form-input-suffix">IDR spent</span>
+                <div className="flex items-center gap-2">
+                  <input type="number" className="w-28 px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 text-right" min={1} value={form.pointsPerIdr} onChange={(e) => { setForm((prev) => ({ ...prev, pointsPerIdr: parseInt(e.target.value, 10) || 0 })); markDirty('pointsPerIdr'); }} />
+                  <span className="text-xs text-[var(--theme-text-muted)]">IDR spent</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Default Customer Category */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base"><Users size={18} className="text-rose-400" /> Default Customer Category</CardTitle>
-              <CardDescription>Category slug assigned to new customers by default</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="form-group--inline">
-                <label className="form-label" style={{ marginBottom: 0 }}>Category Slug</label>
-                <input type="text" className="form-input form-input--narrow form-input--mono" value={form.defaultCustomerCategorySlug} onChange={(e) => { setForm((prev) => ({ ...prev, defaultCustomerCategorySlug: e.target.value })); markDirty('defaultCustomerCategorySlug'); }} />
+          <div className="bg-black/20 border border-white/5 rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-white/5">
+              <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
+                <Users size={16} className="text-[var(--color-gold)]" /> Default Customer Category
+              </h3>
+              <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">Category slug assigned to new customers by default</p>
+            </div>
+            <div className="px-5 py-4">
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-sm text-white/80">Category Slug</span>
+                <input type="text" className="w-40 px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm font-mono outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20" value={form.defaultCustomerCategorySlug} onChange={(e) => { setForm((prev) => ({ ...prev, defaultCustomerCategorySlug: e.target.value })); markDirty('defaultCustomerCategorySlug'); }} />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
+        {/* Unsaved notice */}
         {pendingChanges.size > 0 && (
-          <div className="settings-section__footer">
-            <div className="settings-unsaved-notice"><AlertCircle size={16} /><span>{pendingChanges.size} unsaved change{pendingChanges.size > 1 ? 's' : ''}</span></div>
+          <div className="px-6 py-3 border-t border-white/5 bg-[var(--color-gold)]/5">
+            <div className="flex items-center gap-2 text-[var(--color-gold)] text-sm">
+              <AlertCircle size={16} />
+              <span>{pendingChanges.size} unsaved change{pendingChanges.size > 1 ? 's' : ''}</span>
+            </div>
           </div>
         )}
       </div>

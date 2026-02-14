@@ -67,31 +67,29 @@ const EXTRA_TABS = [
 ];
 
 const EXTRA_TAB_NAMES: Record<string, { fr: string; en: string; id: string }> = {
-  payments: { fr: 'Méthodes de Paiement', en: 'Payment Methods', id: 'Metode Pembayaran' },
+  payments: { fr: 'Methodes de Paiement', en: 'Payment Methods', id: 'Metode Pembayaran' },
   hours: { fr: 'Horaires', en: 'Business Hours', id: 'Jam Buka' },
-  categories: { fr: 'Catégories', en: 'Categories', id: 'Kategori' },
+  categories: { fr: 'Categories', en: 'Categories', id: 'Kategori' },
   sections: { fr: 'Sections', en: 'Sections', id: 'Bagian' },
   floorplan: { fr: 'Plan de Salle', en: 'Floor Plan', id: 'Denah Lantai' },
   kds: { fr: 'Stations KDS', en: 'KDS Stations', id: 'Stasiun KDS' },
   history: { fr: 'Historique', en: 'History', id: 'Riwayat' },
-  lan: { fr: 'Réseau LAN', en: 'LAN Network', id: 'Jaringan LAN' },
+  lan: { fr: 'Reseau LAN', en: 'LAN Network', id: 'Jaringan LAN' },
 };
+
+const NAV_BASE = 'w-full flex items-center gap-3 px-3 py-2.5 bg-transparent border-none rounded-lg text-sm font-medium text-[var(--theme-text-secondary)] cursor-pointer text-left transition-all duration-150 hover:bg-white/5 hover:text-white';
+const NAV_ACTIVE = 'bg-[var(--color-gold)]/10 !text-[var(--color-gold)] border-r-2 border-[var(--color-gold)] hover:bg-[var(--color-gold)]/10 hover:!text-[var(--color-gold)]';
 
 const SettingsLayout = () => {
   const { data: categories, isLoading } = useSettingsCategories();
-
-  // Initialize settings store
   useInitializeSettings();
 
-  // Language is hardcoded to English (i18n suspended per CLAUDE.md)
   const nameKey = 'name_en' as const;
 
-  // Get category name based on language
   const getCategoryName = (category: { name_fr: string; name_en: string; name_id: string }) => {
     return category[nameKey] || category.name_en;
   };
 
-  // Get extra tab name
   const getExtraTabName = (code: string) => {
     const names = EXTRA_TAB_NAMES[code];
     if (!names) return code;
@@ -99,18 +97,17 @@ const SettingsLayout = () => {
   };
 
   return (
-    <div className="p-lg h-full overflow-y-auto bg-cream">
-      <header className="flex items-center justify-between mb-lg">
-        <h1 className="font-display text-4xl font-bold text-espresso">Settings</h1>
+    <div className="p-6 h-full overflow-y-auto min-h-screen bg-[var(--theme-bg-primary)] text-white">
+      <header className="flex items-center justify-between mb-6">
+        <h1 className="font-display text-4xl font-bold text-white">Settings</h1>
       </header>
 
-      <div className="grid grid-cols-[250px_1fr] gap-lg max-[900px]:grid-cols-1">
+      <div className="grid grid-cols-[250px_1fr] gap-6 max-[900px]:grid-cols-1">
         {/* Navigation */}
-        <nav className="bg-white rounded-lg shadow p-sm h-fit">
-          {/* Dynamic categories from database */}
+        <nav className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-2 h-fit">
           {isLoading ? (
-            <div className="flex justify-center p-lg">
-              <div className="w-6 h-6 border-3 border-border border-t-gold rounded-full animate-spin" />
+            <div className="flex justify-center p-6">
+              <div className="w-6 h-6 border-[3px] border-white/10 border-t-[var(--color-gold)] rounded-full animate-spin" />
             </div>
           ) : (
             <>
@@ -119,10 +116,7 @@ const SettingsLayout = () => {
                   key={category.code}
                   to={`/settings/${category.code}`}
                   className={({ isActive }) =>
-                    cn(
-                      'w-full flex items-center gap-sm p-md bg-transparent border-none rounded-md text-sm font-medium text-smoke cursor-pointer text-left transition-all duration-fast ease-standard hover:bg-cream hover:text-espresso',
-                      isActive && 'bg-gold/10 text-gold-dark border-l-3 border-gold hover:bg-gold/10 hover:text-gold-dark'
-                    )
+                    cn(NAV_BASE, isActive && NAV_ACTIVE)
                   }
                 >
                   <span className="w-5 h-5 flex items-center justify-center">
@@ -133,7 +127,7 @@ const SettingsLayout = () => {
               ))}
 
               {/* Divider */}
-              <div className="h-px bg-border my-sm" />
+              <div className="h-px bg-white/5 my-2" />
 
               {/* Extra static tabs */}
               {EXTRA_TABS.map((tab) => (
@@ -141,10 +135,7 @@ const SettingsLayout = () => {
                   key={tab.code}
                   to={`/settings/${tab.path}`}
                   className={({ isActive }) =>
-                    cn(
-                      'w-full flex items-center gap-sm p-md bg-transparent border-none rounded-md text-sm font-medium text-smoke cursor-pointer text-left transition-all duration-fast ease-standard hover:bg-cream hover:text-espresso',
-                      isActive && 'bg-gold/10 text-gold-dark border-l-3 border-gold hover:bg-gold/10 hover:text-gold-dark'
-                    )
+                    cn(NAV_BASE, isActive && NAV_ACTIVE)
                   }
                 >
                   <span className="w-5 h-5 flex items-center justify-center">{tab.icon}</span>
@@ -156,7 +147,7 @@ const SettingsLayout = () => {
         </nav>
 
         {/* Content */}
-        <div className="flex flex-col gap-lg">
+        <div className="flex flex-col gap-6">
           <Outlet />
         </div>
       </div>

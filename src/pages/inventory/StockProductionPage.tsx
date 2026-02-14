@@ -1,27 +1,25 @@
 import { useState, useEffect } from 'react'
 import {
-    Calendar, ChevronLeft, ChevronRight, Search,
-    Trash2, Save, Clock, Package, Lock, Eye, Layers
+    ChevronLeft, ChevronRight,
+    Layers
 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../stores/authStore'
 import { Product, Section, ProductionRecord } from '../../types/database'
 import { toast } from 'sonner'
 import { logError, logDebug } from '@/utils/logger'
+import ProductionForm from './components/ProductionForm'
+import ProductionSummary from './components/ProductionSummary'
+import ProductionHistory from './components/ProductionHistory'
 import './StockProductionPage.css'
 
-// Format number with thousand separators
-const formatNumber = (num: number): string => {
-    return num.toLocaleString('en-US')
-}
-
-interface AvailableUnit {
+export interface AvailableUnit {
     name: string
     conversionFactor: number
     isBase: boolean
 }
 
-interface ProductionItem {
+export interface ProductionItem {
     productId: string
     name: string
     category: string
@@ -35,14 +33,14 @@ interface ProductionItem {
     wasteReason: string
 }
 
-interface ProductUOM {
+export interface ProductUOM {
     id: string
     unit_name: string
     conversion_factor: number
     is_consumption_unit: boolean
 }
 
-interface ProductWithSection extends Product {
+export interface ProductWithSection extends Product {
     category?: { name: string; icon: string }
     product_uoms?: ProductUOM[]
 }
@@ -239,14 +237,6 @@ export default function StockProductionPage() {
             return { name: consumptionUom.unit_name, conversionFactor: consumptionUom.conversion_factor }
         }
         return { name: product.unit || 'pcs', conversionFactor: 1 }
-    }
-
-    type RecordWithProduct = { product?: { unit?: string; product_uoms?: ProductUOM[] } };
-    const getRecordUnit = (record: RecordWithProduct): string => {
-        const product = record.product
-        if (!product) return 'pcs'
-        const consumptionUom = product.product_uoms?.find((u) => u.is_consumption_unit)
-        return consumptionUom?.unit_name || product.unit || 'pcs'
     }
 
     const addProduct = (product: ProductWithSection) => {
@@ -525,301 +515,111 @@ export default function StockProductionPage() {
 
     if (isLoading) {
         return (
-            <div className="production-loading">
-                <div className="spinner" />
-                <p>Loading...</p>
+            <div className="flex flex-col items-center justify-center py-16 text-[var(--muted-smoke)]">
+                <div className="w-8 h-8 border-2 border-white/10 border-t-[var(--color-gold)] rounded-full animate-spin mb-3" />
+                <p className="text-sm">Loading...</p>
             </div>
         )
     }
 
     return (
-        <div className="stock-production-page">
+        <div className="flex flex-col gap-6">
             {/* Section & Date Selectors */}
-            <div className="production-selectors">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                 {/* Section Selector */}
-                <div className="selector-card">
-                    <div className="selector-header">
-                        <Layers size={18} />
-                        <span>Section</span>
-                    </div>
-                    <div className="selector-options">
-                        {sections.map(section => (
+                <div className="lg:col-span-8 bg-[var(--onyx-surface)] p-1 rounded-2xl flex border border-white/5">
+                    {sections.length > 0 ? (
+                        sections.map(section => (
                             <button
                                 key={section.id}
                                 onClick={() => setSelectedSectionId(section.id)}
-                                className={`selector-btn ${selectedSectionId === section.id ? 'active' : ''}`}
+                                className={`flex-1 py-3 px-4 text-sm font-medium rounded-xl transition-all ${
+                                    selectedSectionId === section.id
+                                        ? 'bg-[var(--color-gold)]/10 text-[var(--color-gold)] border border-[var(--color-gold)]/30'
+                                        : 'text-[var(--muted-smoke)] hover:text-white border border-transparent'
+                                }`}
                             >
                                 {section.name}
                             </button>
-                        ))}
-                        {sections.length === 0 && (
-                            <p className="no-sections">No production section configured</p>
-                        )}
-                    </div>
+                        ))
+                    ) : (
+                        <div className="flex-1 flex items-center justify-center gap-2 py-3 text-sm text-[var(--muted-smoke)] italic">
+                            <Layers size={16} />
+                            No production section configured
+                        </div>
+                    )}
                 </div>
 
                 {/* Date Selector */}
-                <div className="selector-card">
-                    <div className="selector-header">
-                        <Calendar size={18} />
-                        <span>Date</span>
+                <div className="lg:col-span-4 bg-[var(--onyx-surface)] p-1 rounded-2xl flex border border-white/5 items-center px-4">
+                    <button
+                        onClick={() => navigateDate(-1)}
+                        className="text-[var(--muted-smoke)] hover:text-white transition-colors p-1"
+                        title="Previous day"
+                        aria-label="Previous day"
+                    >
+                        <ChevronLeft size={20} />
+                    </button>
+                    <div className="flex-1 text-center">
+                        {isToday ? (
+                            <span className="text-sm font-semibold text-[var(--color-gold)]">Today</span>
+                        ) : (
+                            <span className="text-sm font-semibold text-white">{formatDate(selectedDate)}</span>
+                        )}
+                        <p className="text-[10px] text-[var(--muted-smoke)] uppercase tracking-[0.2em]">
+                            {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </p>
                     </div>
-                    <div className="date-nav">
-                        <button onClick={() => navigateDate(-1)} className="date-nav-btn" title="Previous day" aria-label="Previous day">
-                            <ChevronLeft size={20} />
-                        </button>
-                        <div className={`date-display ${isToday ? 'today' : ''}`}>
-                            {isToday ? "Today" : formatDate(selectedDate)}
-                        </div>
-                        <button onClick={() => navigateDate(1)} className="date-nav-btn" title="Next day" aria-label="Next day">
-                            <ChevronRight size={20} />
-                        </button>
-                    </div>
+                    <button
+                        onClick={() => navigateDate(1)}
+                        className="text-[var(--muted-smoke)] hover:text-white transition-colors p-1"
+                        title="Next day"
+                        aria-label="Next day"
+                    >
+                        <ChevronRight size={20} />
+                    </button>
                 </div>
             </div>
 
             {/* Main Content */}
             {!selectedSectionId ? (
-                <div className="production-empty-state">
-                    <Layers size={48} />
-                    <h3>Select a section</h3>
-                    <p>Choose a production section to start</p>
+                <div className="text-center py-16 bg-[var(--onyx-surface)] rounded-3xl border-2 border-dashed border-white/5">
+                    <Layers size={48} className="mx-auto text-[var(--muted-smoke)]/30 mb-4" />
+                    <h3 className="text-lg font-medium text-white mb-1">Select a section</h3>
+                    <p className="text-sm text-[var(--muted-smoke)]">Choose a production section to start</p>
                 </div>
             ) : (
-                <div className="production-content">
-                    {/* Left - Production Entry */}
-                    <div className="production-entry-card">
-                        <h2>Production Entry - {selectedSection?.name}</h2>
-
-                        {/* Product Search */}
-                        <div className="product-search-wrapper">
-                            <Search size={20} className="search-icon" />
-                            <input
-                                type="text"
-                                placeholder="Search for a product..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="product-search-input"
-                            />
-
-                            {/* Search Results */}
-                            {searchQuery && filteredProducts.length > 0 && (
-                                <div className="product-search-dropdown">
-                                    {filteredProducts.map(product => (
-                                        <button
-                                            key={product.id}
-                                            onClick={() => addProduct(product)}
-                                            className="product-search-item"
-                                        >
-                                            <div className="product-info">
-                                                <div className="product-name">{product.name}</div>
-                                                <div className="product-category">{product.category?.name}</div>
-                                            </div>
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-
-                            {searchQuery && filteredProducts.length === 0 && (
-                                <div className="product-search-empty">
-                                    No product found in this section
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Production Items Table */}
-                        {productionItems.length > 0 ? (
-                            <div className="production-table-wrapper">
-                                <table className="production-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Product</th>
-                                            <th className="text-center">Quantity</th>
-                                            <th className="text-center">Waste</th>
-                                            <th>Note</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {productionItems.map(item => (
-                                            <tr key={item.productId}>
-                                                <td>
-                                                    <div className="product-cell">
-                                                        <div className="product-name">{item.name}</div>
-                                                        <div className="product-category">{item.category}</div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div className="quantity-input-group">
-                                                        <input
-                                                            type="number"
-                                                            value={item.quantity}
-                                                            onChange={(e) => updateQuantity(item.productId, 'quantity', parseFloat(e.target.value) || 0)}
-                                                            className="qty-input"
-                                                            min="0"
-                                                            step="0.1"
-                                                            placeholder="0"
-                                                        />
-                                                        {item.availableUnits.length > 1 ? (
-                                                            <select
-                                                                value={item.selectedUnit}
-                                                                onChange={(e) => updateUnit(item.productId, e.target.value)}
-                                                                className="unit-select"
-                                                                title="Select unit"
-                                                                aria-label="Select unit"
-                                                            >
-                                                                {item.availableUnits.map(u => (
-                                                                    <option key={u.name} value={u.name}>
-                                                                        {u.name}
-                                                                    </option>
-                                                                ))}
-                                                            </select>
-                                                        ) : (
-                                                            <span className="unit-label">{item.selectedUnit}</span>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div className="quantity-input-group waste">
-                                                        <input
-                                                            type="number"
-                                                            value={item.wasted}
-                                                            onChange={(e) => updateQuantity(item.productId, 'wasted', parseFloat(e.target.value) || 0)}
-                                                            className={`qty-input ${item.wasted > 0 ? 'waste-active' : ''}`}
-                                                            min="0"
-                                                            step="0.1"
-                                                            placeholder="0"
-                                                        />
-                                                        <span className={`unit-label ${item.wasted > 0 ? 'text-red' : ''}`}>{item.selectedUnit}</span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    {item.wasted > 0 && (
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Reason..."
-                                                            value={item.wasteReason}
-                                                            onChange={(e) => updateReason(item.productId, e.target.value)}
-                                                            className="waste-reason-input"
-                                                        />
-                                                    )}
-                                                </td>
-                                                <td>
-                                                    <button onClick={() => removeItem(item.productId)} className="btn-remove" title="Delete row" aria-label="Delete row">
-                                                        <Trash2 size={18} />
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ) : (
-                            <div className="production-items-empty">
-                                <Package size={40} />
-                                <p>No product added</p>
-                                <span>Search for a product to add to production</span>
-                            </div>
-                        )}
-
-                        {/* Save Button */}
-                        {productionItems.length > 0 && (
-                            <div className="production-actions">
-                                <button
-                                    onClick={() => setProductionItems([])}
-                                    disabled={isSaving}
-                                    className="btn-cancel"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleSave}
-                                    disabled={isSaving}
-                                    className="btn-save"
-                                >
-                                    <Save size={18} />
-                                    {isSaving ? 'Saving...' : 'Save'}
-                                </button>
-                            </div>
-                        )}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    {/* Left -- Production Entry */}
+                    <div className="lg:col-span-8">
+                        <ProductionForm
+                            sectionName={selectedSection?.name || ''}
+                            searchQuery={searchQuery}
+                            onSearchChange={setSearchQuery}
+                            filteredProducts={filteredProducts}
+                            onAddProduct={addProduct}
+                            productionItems={productionItems}
+                            onUpdateQuantity={updateQuantity}
+                            onUpdateUnit={updateUnit}
+                            onUpdateReason={updateReason}
+                            onRemoveItem={removeItem}
+                            onClear={() => setProductionItems([])}
+                            onSave={handleSave}
+                            isSaving={isSaving}
+                        />
                     </div>
 
-                    {/* Right - Summary & History */}
-                    <div className="production-sidebar">
-                        {/* Summary Card */}
-                        <div className="summary-card">
-                            <h3>Today's summary</h3>
-                            <div className="summary-grid">
-                                <div className="summary-item produced">
-                                    <div className="summary-value">{formatNumber(totalProduced)}</div>
-                                    <div className="summary-label">Produced</div>
-                                </div>
-                                <div className="summary-item waste">
-                                    <div className="summary-value">{formatNumber(totalWaste)}</div>
-                                    <div className="summary-label">Waste</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* History Card */}
-                        <div className="history-card">
-                            <div className="history-header">
-                                <h3>Today's production ({todayHistory.length})</h3>
-                                {!isAdmin && (
-                                    <div className="read-only-badge">
-                                        <Eye size={14} />
-                                        Read-only
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="history-list">
-                                {todayHistory.length > 0 ? (
-                                    todayHistory.map(record => (
-                                        <div key={record.id} className="history-item">
-                                            <div className="history-item-info">
-                                                <div className="history-product">{record.product?.name}</div>
-                                                <div className="history-time">
-                                                    <Clock size={12} />
-                                                    {record.created_at ? new Date(record.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ''}
-                                                </div>
-                                            </div>
-                                            <div className="history-item-actions">
-                                                <span className="badge-produced">
-                                                    +{formatNumber(record.quantity_produced)} {getRecordUnit(record as RecordWithProduct)}
-                                                </span>
-                                                {record.quantity_waste && record.quantity_waste > 0 && (
-                                                    <span className="badge-waste">
-                                                        -{formatNumber(record.quantity_waste)} {getRecordUnit(record as RecordWithProduct)}
-                                                    </span>
-                                                )}
-                                                {isAdmin && (
-                                                    <button
-                                                        onClick={() => handleDeleteRecord(record.id)}
-                                                        className="btn-delete-record"
-                                                        title="Delete"
-                                                    >
-                                                        <Trash2 size={14} />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="history-empty">
-                                        <Clock size={32} />
-                                        <p>No production recorded</p>
-                                    </div>
-                                )}
-                            </div>
-
-                            {!isAdmin && todayHistory.length > 0 && (
-                                <div className="admin-notice">
-                                    <Lock size={16} />
-                                    <span>Only an administrator can modify entries</span>
-                                </div>
-                            )}
-                        </div>
+                    {/* Right -- Summary & History */}
+                    <div className="lg:col-span-4 flex flex-col gap-6">
+                        <ProductionSummary
+                            totalProduced={totalProduced}
+                            totalWaste={totalWaste}
+                        />
+                        <ProductionHistory
+                            todayHistory={todayHistory}
+                            isAdmin={isAdmin}
+                            onDeleteRecord={handleDeleteRecord}
+                        />
                     </div>
                 </div>
             )}

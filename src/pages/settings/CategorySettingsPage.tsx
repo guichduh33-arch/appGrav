@@ -43,13 +43,11 @@ const CategorySettingsPage = () => {
     }
   }, [settings]);
 
-  // Handle value change
   const handleChange = (key: string, value: unknown) => {
     setFormValues((prev) => ({ ...prev, [key]: value }));
     setPendingChanges((prev) => new Set(prev).add(key));
   };
 
-  // Handle reset single setting
   const handleReset = async (key: string) => {
     try {
       await resetSettingMutation.mutateAsync(key);
@@ -64,25 +62,18 @@ const CategorySettingsPage = () => {
     }
   };
 
-  // Handle save all changes
   const handleSaveAll = async () => {
     if (pendingChanges.size === 0) return;
-
     setIsSaving(true);
     const errors: string[] = [];
-
     try {
       for (const key of pendingChanges) {
         try {
-          await updateSettingMutation.mutateAsync({
-            key,
-            value: formValues[key],
-          });
+          await updateSettingMutation.mutateAsync({ key, value: formValues[key] });
         } catch {
           errors.push(key);
         }
       }
-
       if (errors.length === 0) {
         toast.success('Settings saved');
         setPendingChanges(new Set());
@@ -94,11 +85,8 @@ const CategorySettingsPage = () => {
     }
   };
 
-  // Handle reset all
   const handleResetAll = () => {
     if (!settings) return;
-
-    // Restore original values
     const values: Record<string, unknown> = {};
     settings.forEach((setting) => {
       values[setting.key] = setting.value;
@@ -110,10 +98,10 @@ const CategorySettingsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="settings-section">
-        <div className="settings-section__body settings-section__loading">
-          <div className="spinner" />
-          <span>Loading settings...</span>
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+        <div className="flex flex-col items-center justify-center py-16 text-[var(--theme-text-muted)] gap-3">
+          <div className="w-6 h-6 border-2 border-white/10 border-t-[var(--color-gold)] rounded-full animate-spin" />
+          <span className="text-sm">Loading settings...</span>
         </div>
       </div>
     );
@@ -121,8 +109,8 @@ const CategorySettingsPage = () => {
 
   if (error || !settings) {
     return (
-      <div className="settings-section">
-        <div className="settings-section__body settings-section__error">
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+        <div className="flex items-center justify-center gap-2 py-16 text-red-400">
           <AlertCircle size={24} />
           <span>Error loading settings</span>
         </div>
@@ -134,45 +122,45 @@ const CategorySettingsPage = () => {
   const categoryDescription = categoryInfo?.[descKey] || categoryInfo?.description_en;
 
   return (
-    <div className="settings-section">
-      <div className="settings-section__header">
-        <div className="settings-section__header-content">
-          <div>
-            <h2 className="settings-section__title">{categoryName}</h2>
-            {categoryDescription && (
-              <p className="settings-section__description">{categoryDescription}</p>
-            )}
-          </div>
-          {pendingChanges.size > 0 && (
-            <div className="settings-section__actions">
-              <button
-                className="btn-secondary"
-                onClick={handleResetAll}
-                disabled={isSaving}
-              >
-                <RotateCcw size={16} />
-                Cancel
-              </button>
-              <button
-                className="btn-primary"
-                onClick={handleSaveAll}
-                disabled={isSaving}
-              >
-                <Save size={16} />
-                {isSaving ? 'Saving...' : `Save (${pendingChanges.size})`}
-              </button>
-            </div>
+    <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
+        <div>
+          <h2 className="text-lg font-bold text-white">{categoryName}</h2>
+          {categoryDescription && (
+            <p className="text-sm text-[var(--theme-text-muted)] mt-0.5">{categoryDescription}</p>
           )}
         </div>
+        {pendingChanges.size > 0 && (
+          <div className="flex items-center gap-2">
+            <button
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-transparent border border-white/10 text-white hover:border-white/20 rounded-xl text-sm transition-colors"
+              onClick={handleResetAll}
+              disabled={isSaving}
+            >
+              <RotateCcw size={14} />
+              Cancel
+            </button>
+            <button
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[var(--color-gold)] text-black font-bold rounded-xl text-sm transition-colors hover:opacity-90 disabled:opacity-50"
+              onClick={handleSaveAll}
+              disabled={isSaving}
+            >
+              <Save size={14} />
+              {isSaving ? 'Saving...' : `Save (${pendingChanges.size})`}
+            </button>
+          </div>
+        )}
       </div>
 
-      <div className="settings-section__body">
+      {/* Body */}
+      <div className="px-6 py-4">
         {settings.length === 0 ? (
-          <div className="settings-section__empty">
+          <div className="text-center py-12 text-[var(--theme-text-muted)]">
             <p>No settings in this category.</p>
           </div>
         ) : (
-          <div className="settings-list">
+          <div className="divide-y divide-white/5">
             {settings.map((setting) => (
               <SettingField
                 key={setting.key}
@@ -187,9 +175,10 @@ const CategorySettingsPage = () => {
         )}
       </div>
 
+      {/* Unsaved notice */}
       {pendingChanges.size > 0 && (
-        <div className="settings-section__footer">
-          <div className="settings-unsaved-notice">
+        <div className="px-6 py-3 border-t border-white/5 bg-[var(--color-gold)]/5">
+          <div className="flex items-center gap-2 text-[var(--color-gold)] text-sm">
             <AlertCircle size={16} />
             <span>
               {pendingChanges.size} unsaved change{pendingChanges.size > 1 ? 's' : ''}

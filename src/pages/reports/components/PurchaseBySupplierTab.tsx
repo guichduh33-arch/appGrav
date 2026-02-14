@@ -36,7 +36,6 @@ export const PurchaseBySupplierTab = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // KPIs
   const kpis = useMemo(() => {
     const totalValue = data.reduce((acc, curr) => acc + curr.total_value, 0);
     const totalTransactions = data.reduce((acc, curr) => acc + curr.transaction_count, 0);
@@ -45,7 +44,6 @@ export const PurchaseBySupplierTab = () => {
     return { totalValue, totalTransactions, topSupplier, supplierCount: data.length };
   }, [data]);
 
-  // Export config
   const exportConfig: ExportConfig<SupplierData> = useMemo(() => ({
     data,
     columns: [
@@ -76,7 +74,7 @@ export const PurchaseBySupplierTab = () => {
 
   if (error) {
     return (
-      <div className="p-8 text-center text-red-600">
+      <div className="p-8 text-center text-red-400">
         Error loading data
       </div>
     );
@@ -96,63 +94,57 @@ export const PurchaseBySupplierTab = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <div className="bg-[var(--onyx-surface)] rounded-xl p-6 border border-white/5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-50 rounded-lg">
-              <DollarSign className="w-5 h-5 text-blue-600" />
+            <div className="p-2 bg-blue-500/10 rounded-lg">
+              <DollarSign className="w-5 h-5 text-blue-400" />
             </div>
-            <span className="text-sm text-gray-600">Total Purchases</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Total Purchases</span>
           </div>
-          <p className="text-2xl font-bold text-blue-600">
-            {formatCurrency(kpis.totalValue)}
-          </p>
+          <p className="text-2xl font-bold text-blue-400">{formatCurrency(kpis.totalValue)}</p>
         </div>
 
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <div className="bg-[var(--onyx-surface)] rounded-xl p-6 border border-white/5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-green-50 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-green-600" />
+            <div className="p-2 bg-green-500/10 rounded-lg">
+              <TrendingUp className="w-5 h-5 text-green-400" />
             </div>
-            <span className="text-sm text-gray-600">Transactions</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Transactions</span>
           </div>
-          <p className="text-2xl font-bold text-green-600">
-            {kpis.totalTransactions}
-          </p>
+          <p className="text-2xl font-bold text-green-400">{kpis.totalTransactions}</p>
         </div>
 
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <div className="bg-[var(--onyx-surface)] rounded-xl p-6 border border-white/5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-purple-50 rounded-lg">
-              <Building2 className="w-5 h-5 text-purple-600" />
+            <div className="p-2 bg-purple-500/10 rounded-lg">
+              <Building2 className="w-5 h-5 text-purple-400" />
             </div>
-            <span className="text-sm text-gray-600">Active Suppliers</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Active Suppliers</span>
           </div>
-          <p className="text-2xl font-bold text-purple-600">
-            {kpis.supplierCount}
-          </p>
+          <p className="text-2xl font-bold text-purple-400">{kpis.supplierCount}</p>
         </div>
 
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <div className="bg-[var(--onyx-surface)] rounded-xl p-6 border border-white/5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-yellow-50 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-yellow-600" />
+            <div className="p-2 bg-[var(--color-gold)]/10 rounded-lg">
+              <TrendingUp className="w-5 h-5 text-[var(--color-gold)]" />
             </div>
-            <span className="text-sm text-gray-600">Top Supplier</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Top Supplier</span>
           </div>
-          <p className="text-lg font-bold text-gray-900 truncate">
+          <p className="text-lg font-bold text-white truncate">
             {kpis.topSupplier?.supplier_name || '-'}
           </p>
           {kpis.topSupplier && (
-            <p className="text-xs text-gray-500">{formatCurrency(kpis.topSupplier.total_value)}</p>
+            <p className="text-xs text-[var(--theme-text-muted)]">{formatCurrency(kpis.topSupplier.total_value)}</p>
           )}
         </div>
       </div>
 
       {/* Chart */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Purchases by Supplier</h3>
+      <div className="bg-[var(--onyx-surface)] rounded-xl border border-white/5 p-6">
+        <h3 className="text-lg font-semibold text-white mb-4">Purchases by Supplier</h3>
         {data.length === 0 ? (
-          <div className="h-80 flex items-center justify-center text-gray-500">
+          <div className="h-80 flex items-center justify-center text-[var(--theme-text-muted)]">
             No data for this period
           </div>
         ) : (
@@ -162,10 +154,14 @@ export const PurchaseBySupplierTab = () => {
               layout="vertical"
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis type="number" tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`} tick={{ fontSize: 12 }} />
-              <YAxis dataKey="supplier_name" type="category" width={120} tick={{ fontSize: 12 }} />
-              <Tooltip formatter={(value) => formatCurrency(value as number)} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <XAxis type="number" tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`} tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.4)' }} />
+              <YAxis dataKey="supplier_name" type="category" width={120} tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.6)' }} />
+              <Tooltip
+                formatter={(value) => formatCurrency(value as number)}
+                contentStyle={{ backgroundColor: '#1a1a2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }}
+                labelStyle={{ color: 'rgba(255,255,255,0.6)' }}
+              />
               <Bar dataKey="total_value" name="Total Value" radius={[0, 4, 4, 0]}>
                 {data.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -177,32 +173,32 @@ export const PurchaseBySupplierTab = () => {
       </div>
 
       {/* Data Table */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Supplier Detail</h3>
+      <div className="bg-[var(--onyx-surface)] rounded-xl border border-white/5 overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/5">
+          <h3 className="text-lg font-semibold text-white">Supplier Detail</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supplier</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Transactions</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Value</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">% of Total</th>
+            <thead>
+              <tr className="border-b border-white/5">
+                <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Supplier</th>
+                <th className="px-6 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Transactions</th>
+                <th className="px-6 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Quantity</th>
+                <th className="px-6 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Total Value</th>
+                <th className="px-6 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">% of Total</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody>
               {data.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-[var(--theme-text-muted)]">
                     No data
                   </td>
                 </tr>
               ) : (
                 data.map((row, index) => (
-                  <tr key={row.supplier_name} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                  <tr key={row.supplier_name} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                    <td className="px-6 py-4 text-sm font-medium text-white">
                       <div className="flex items-center gap-2">
                         <div
                           className="w-3 h-3 rounded-full"
@@ -211,11 +207,11 @@ export const PurchaseBySupplierTab = () => {
                         {row.supplier_name}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 text-right">{row.transaction_count}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 text-right">{row.total_quantity.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-sm font-bold text-gray-900 text-right">{formatCurrency(row.total_value)}</td>
+                    <td className="px-6 py-4 text-sm text-[var(--theme-text-muted)] text-right">{row.transaction_count}</td>
+                    <td className="px-6 py-4 text-sm text-[var(--theme-text-muted)] text-right">{row.total_quantity.toLocaleString()}</td>
+                    <td className="px-6 py-4 text-sm font-bold text-white text-right">{formatCurrency(row.total_value)}</td>
                     <td className="px-6 py-4 text-sm text-right">
-                      <span className="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                      <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
                         {kpis.totalValue > 0 ? ((row.total_value / kpis.totalValue) * 100).toFixed(1) : 0}%
                       </span>
                     </td>

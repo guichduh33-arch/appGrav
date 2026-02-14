@@ -79,7 +79,6 @@ export function RoleModal({
 
   const handleSubmit = async () => {
     if (!validate()) return
-
     await onSave(formData)
   }
 
@@ -94,19 +93,19 @@ export function RoleModal({
   const hierarchyInfo = getHierarchyLabel(formData.hierarchy_level)
 
   return (
-    <div className="settings-modal-overlay" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="settings-modal max-w-[800px]"
+        className="w-full max-w-[800px] bg-[var(--theme-bg-secondary)] border border-white/10 rounded-xl shadow-2xl max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="settings-modal__header">
-          <h2 className="settings-modal__title">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 shrink-0">
+          <h2 className="text-lg font-bold text-white">
             {isEditing ? `Edit Role: ${getRoleName(role)}` : 'New Role'}
           </h2>
           <button
             type="button"
-            className="settings-modal__close"
+            className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-white hover:bg-white/5 transition-colors"
             onClick={onClose}
             title="Close"
           >
@@ -115,9 +114,9 @@ export function RoleModal({
         </div>
 
         {/* Modal Body */}
-        <div className="settings-modal__body max-h-[60vh] overflow-y-auto">
+        <div className="px-6 py-5 overflow-y-auto flex-1">
           {isSystemRole && (
-            <div className="flex items-center gap-3 p-4 bg-amber-500/10 rounded-lg mb-6 text-amber-600 text-sm">
+            <div className="flex items-center gap-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl mb-6 text-amber-400 text-sm">
               <AlertTriangle size={18} />
               <span>System role - limited modification allowed</span>
             </div>
@@ -125,18 +124,20 @@ export function RoleModal({
 
           <div className="grid grid-cols-2 gap-8">
             {/* Left: Role Info */}
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--color-brun-chocolat)] mb-4">
+            <div className="space-y-4">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">
                 Role Information
               </h3>
 
               {/* Code */}
-              <div className="form-group">
-                <label className="form-label">Code *</label>
+              <div className="space-y-1.5">
+                <label className="text-xs text-[var(--theme-text-muted)]">Code *</label>
                 <input
                   type="text"
-                  className={`form-input form-input--mono ${
-                    errors.code ? 'form-input--error' : ''
+                  className={`w-full px-3 py-2.5 bg-black/40 border rounded-xl text-white font-mono text-sm outline-none transition-colors ${
+                    errors.code
+                      ? 'border-red-500 focus:border-red-500'
+                      : 'border-white/10 focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20'
                   }`}
                   value={formData.code}
                   onChange={(e) =>
@@ -149,17 +150,19 @@ export function RoleModal({
                   disabled={isSystemRole}
                 />
                 {errors.code && (
-                  <p className="form-error">{errors.code}</p>
+                  <p className="text-xs text-red-400">{errors.code}</p>
                 )}
               </div>
 
               {/* Name */}
-              <div className="form-group">
-                <label className="form-label">Name *</label>
+              <div className="space-y-1.5">
+                <label className="text-xs text-[var(--theme-text-muted)]">Name *</label>
                 <input
                   type="text"
-                  className={`form-input ${
-                    errors.name ? 'form-input--error' : ''
+                  className={`w-full px-3 py-2.5 bg-black/40 border rounded-xl text-white text-sm outline-none transition-colors ${
+                    errors.name
+                      ? 'border-red-500 focus:border-red-500'
+                      : 'border-white/10 focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20'
                   }`}
                   value={formData.name}
                   onChange={(e) =>
@@ -168,15 +171,15 @@ export function RoleModal({
                   placeholder="Manager"
                 />
                 {errors.name && (
-                  <p className="form-error">{errors.name}</p>
+                  <p className="text-xs text-red-400">{errors.name}</p>
                 )}
               </div>
 
               {/* Description */}
-              <div className="form-group">
-                <label className="form-label">Description</label>
+              <div className="space-y-1.5">
+                <label className="text-xs text-[var(--theme-text-muted)]">Description</label>
                 <textarea
-                  className="form-input form-textarea"
+                  className="w-full px-3 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 resize-none"
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
@@ -187,8 +190,8 @@ export function RoleModal({
               </div>
 
               {/* Hierarchy Level */}
-              <div className="form-group">
-                <label className="form-label">Hierarchy Level</label>
+              <div className="space-y-1.5">
+                <label className="text-xs text-[var(--theme-text-muted)]">Hierarchy Level</label>
                 <div className="flex items-center gap-4">
                   <input
                     type="range"
@@ -201,22 +204,28 @@ export function RoleModal({
                         hierarchy_level: parseInt(e.target.value),
                       })
                     }
-                    className="flex-1"
+                    className="flex-1 accent-[var(--color-gold)]"
                     disabled={isSystemRole}
                     title="Hierarchy level"
                     aria-label="Hierarchy level"
                   />
-                  <span
-                    className={`section-badge ${hierarchyInfo.color} min-w-[50px] text-center`}
-                  >
+                  <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full min-w-[50px] text-center ${
+                    formData.hierarchy_level >= 90
+                      ? 'bg-red-500/10 text-red-400'
+                      : formData.hierarchy_level >= 70
+                      ? 'bg-amber-500/10 text-amber-400'
+                      : formData.hierarchy_level >= 40
+                      ? 'bg-sky-500/10 text-sky-400'
+                      : 'bg-white/5 text-[var(--theme-text-muted)]'
+                  }`}>
                     {formData.hierarchy_level}
                   </span>
                 </div>
-                <p className="form-hint">
+                <p className="text-[11px] text-[var(--theme-text-muted)]">
                   {hierarchyInfo.label} - Higher level = more authority
                 </p>
                 {errors.hierarchy_level && (
-                  <p className="form-error">{errors.hierarchy_level}</p>
+                  <p className="text-xs text-red-400">{errors.hierarchy_level}</p>
                 )}
               </div>
             </div>
@@ -234,10 +243,10 @@ export function RoleModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="settings-modal__footer">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/5 shrink-0">
           <button
             type="button"
-            className="btn-secondary"
+            className="px-4 py-2 bg-transparent border border-white/10 text-white hover:border-white/20 rounded-xl text-sm font-medium transition-colors"
             onClick={onClose}
             disabled={isSaving}
           >
@@ -245,13 +254,13 @@ export function RoleModal({
           </button>
           <button
             type="button"
-            className="btn-primary"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-gold)] text-black font-bold rounded-xl text-sm transition-colors hover:opacity-90 disabled:opacity-50"
             onClick={handleSubmit}
             disabled={isSaving}
           >
             {isSaving ? (
               <>
-                <RefreshCw size={16} className="spinning" />
+                <RefreshCw size={16} className="animate-spin" />
                 Saving...
               </>
             ) : (

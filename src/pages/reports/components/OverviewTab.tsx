@@ -18,7 +18,7 @@ interface KpiRow { label: string; value: string; trend: string }
 function TrendBadge({ value }: { value: number }) {
   const isUp = value >= 0;
   return (
-    <div className={`flex items-center gap-1 text-sm font-medium ${isUp ? 'text-green-600' : 'text-red-600'}`}>
+    <div className={`flex items-center gap-1 text-sm font-medium ${isUp ? 'text-emerald-400' : 'text-red-400'}`}>
       {isUp ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
       {Math.abs(value).toFixed(1)}%
     </div>
@@ -32,11 +32,11 @@ function KpiCard({
   trend?: number; children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+    <div className="bg-[var(--onyx-surface)] rounded-xl p-5 border border-white/5">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
           <div className={`p-2 rounded-lg ${iconBg}`}>{icon}</div>
-          <span className="text-sm text-gray-600">{label}</span>
+          <span className="text-sm text-[var(--theme-text-muted)]">{label}</span>
         </div>
         {trend !== undefined && <TrendBadge value={trend} />}
       </div>
@@ -122,7 +122,7 @@ export function OverviewTab() {
 
   if (error) {
     return (
-      <div className="p-8 text-center text-red-600">
+      <div className="p-8 text-center text-red-400">
         Error loading overview data. Please try again.
       </div>
     );
@@ -155,112 +155,112 @@ export function OverviewTab() {
             currentValue={current?.total_revenue ?? 0}
             previousValue={previous?.total_revenue ?? null}
             format="currency"
-            icon={<DollarSign className="w-5 h-5 text-blue-600" />}
+            icon={<DollarSign className="w-5 h-5 text-blue-400" />}
           />
           <ComparisonKpiCard
             label="Orders"
             currentValue={current?.transaction_count ?? 0}
             previousValue={previous?.transaction_count ?? null}
             format="number"
-            icon={<ShoppingBag className="w-5 h-5 text-indigo-600" />}
+            icon={<ShoppingBag className="w-5 h-5 text-indigo-400" />}
           />
           <ComparisonKpiCard
             label="Avg Transaction Value"
             currentValue={current?.avg_basket ?? 0}
             previousValue={previous?.avg_basket ?? null}
             format="currency"
-            icon={<BarChart3 className="w-5 h-5 text-purple-600" />}
+            icon={<BarChart3 className="w-5 h-5 text-purple-400" />}
           />
           <ComparisonKpiCard
             label="Net Revenue (excl. Tax)"
             currentValue={current?.net_revenue ?? 0}
             previousValue={previous?.net_revenue ?? null}
             format="currency"
-            icon={<Receipt className="w-5 h-5 text-green-600" />}
+            icon={<Receipt className="w-5 h-5 text-emerald-400" />}
           />
           <ComparisonKpiCard
             label="Total Tax (10%)"
             currentValue={totalTax}
             previousValue={previousTax}
             format="currency"
-            icon={<Landmark className="w-5 h-5 text-amber-600" />}
+            icon={<Landmark className="w-5 h-5 text-amber-400" />}
           />
         </ComparisonKpiGrid>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <KpiCard
-            icon={<DollarSign className="w-5 h-5 text-blue-600" />}
-            iconBg="bg-blue-50" label="Revenue"
+            icon={<DollarSign className="w-5 h-5 text-blue-400" />}
+            iconBg="bg-blue-500/10" label="Revenue"
             trend={revenueTrend}
           >
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-white">
               {formatCurrency(current?.total_revenue ?? 0)}
             </p>
           </KpiCard>
 
           <KpiCard
-            icon={<ShoppingBag className="w-5 h-5 text-indigo-600" />}
-            iconBg="bg-indigo-50" label="Orders"
+            icon={<ShoppingBag className="w-5 h-5 text-indigo-400" />}
+            iconBg="bg-indigo-500/10" label="Orders"
             trend={ordersTrend}
           >
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-white">
               {(current?.transaction_count ?? 0).toLocaleString()}
             </p>
           </KpiCard>
 
           <KpiCard
-            icon={<BarChart3 className="w-5 h-5 text-purple-600" />}
-            iconBg="bg-purple-50" label="Avg Transaction Value"
+            icon={<BarChart3 className="w-5 h-5 text-purple-400" />}
+            iconBg="bg-purple-500/10" label="Avg Transaction Value"
             trend={atvTrend}
           >
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-white">
               {formatCurrency(current?.avg_basket ?? 0)}
             </p>
           </KpiCard>
 
           <KpiCard
-            icon={<Receipt className="w-5 h-5 text-green-600" />}
-            iconBg="bg-green-50" label="Net Revenue (excl. Tax)"
+            icon={<Receipt className="w-5 h-5 text-emerald-400" />}
+            iconBg="bg-emerald-500/10" label="Net Revenue (excl. Tax)"
             trend={netRevenueTrend}
           >
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-2xl font-bold text-emerald-400">
               {formatCurrency(current?.net_revenue ?? 0)}
             </p>
           </KpiCard>
 
           <KpiCard
-            icon={<Landmark className="w-5 h-5 text-amber-600" />}
-            iconBg="bg-amber-50" label="Total Tax (10%)"
+            icon={<Landmark className="w-5 h-5 text-amber-400" />}
+            iconBg="bg-amber-500/10" label="Total Tax (10%)"
             trend={taxTrend}
           >
-            <p className="text-2xl font-bold text-amber-600">
+            <p className="text-2xl font-bold text-amber-400">
               {formatCurrency(totalTax)}
             </p>
           </KpiCard>
 
           <KpiCard
-            icon={<Star className="w-5 h-5 text-yellow-600" />}
-            iconBg="bg-yellow-50" label="Top Product"
+            icon={<Star className="w-5 h-5 text-[var(--color-gold)]" />}
+            iconBg="bg-[var(--color-gold)]/10" label="Top Product"
           >
             {summaryData?.top_product ? (
               <>
-                <p className="text-lg font-bold text-gray-900 truncate">{summaryData.top_product.name}</p>
-                <p className="text-sm text-gray-500">{summaryData.top_product.qty} units sold</p>
+                <p className="text-lg font-bold text-white truncate">{summaryData.top_product.name}</p>
+                <p className="text-sm text-[var(--theme-text-muted)]">{summaryData.top_product.qty} units sold</p>
               </>
             ) : (
-              <p className="text-lg text-gray-400">No data</p>
+              <p className="text-lg text-[var(--theme-text-muted)]">No data</p>
             )}
           </KpiCard>
 
           <KpiCard
-            icon={<AlertTriangle className="w-5 h-5 text-red-600" />}
-            iconBg="bg-red-50" label="Low Stock Alerts"
+            icon={<AlertTriangle className="w-5 h-5 text-red-400" />}
+            iconBg="bg-red-500/10" label="Low Stock Alerts"
           >
-            <p className={`text-2xl font-bold ${(summaryData?.low_stock_alerts ?? 0) > 0 ? 'text-red-600' : 'text-gray-900'}`}>
+            <p className={`text-2xl font-bold ${(summaryData?.low_stock_alerts ?? 0) > 0 ? 'text-red-400' : 'text-white'}`}>
               {summaryData?.low_stock_alerts ?? 0}
             </p>
             {(summaryData?.low_stock_alerts ?? 0) > 0 && (
-              <p className="text-sm text-red-500 mt-1">Items need restocking</p>
+              <p className="text-sm text-red-400/80 mt-1">Items need restocking</p>
             )}
           </KpiCard>
         </div>

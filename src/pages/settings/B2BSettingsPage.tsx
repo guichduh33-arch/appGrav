@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Save, RotateCcw, AlertCircle, Building2, Info, Clock, List, AlertTriangle, Plus, Trash2 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { useSettingsByCategory, useUpdateSetting } from '@/hooks/settings';
 import { B2B_DEFAULTS } from '@/hooks/settings/useModuleConfigSettings';
@@ -138,118 +137,165 @@ const B2BSettingsPage = () => {
 
   const bucketWarning = validateBuckets(form.agingBuckets);
 
-  if (isLoading) return <div className="settings-section"><div className="settings-section__body settings-section__loading"><div className="spinner" /><span>Loading settings...</span></div></div>;
-  if (error || !settings) return <div className="settings-section"><div className="settings-section__body settings-section__error"><AlertCircle size={24} /><span>Error loading settings</span></div></div>;
+  if (isLoading) {
+    return (
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+        <div className="flex flex-col items-center justify-center py-16 text-[var(--theme-text-muted)] gap-3">
+          <div className="w-6 h-6 border-2 border-white/10 border-t-[var(--color-gold)] rounded-full animate-spin" />
+          <span className="text-sm">Loading settings...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !settings) {
+    return (
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+        <div className="flex items-center justify-center gap-2 py-16 text-red-400">
+          <AlertCircle size={24} />
+          <span>Error loading settings</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <TooltipProvider>
-      <div className="settings-section">
-        <div className="settings-section__header">
-          <div className="settings-section__header-content">
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
+          <div className="flex items-center gap-2">
+            <Building2 size={20} className="text-[var(--color-gold)]" />
             <div>
-              <h2 className="settings-section__title"><Building2 size={20} /> B2B Settings</h2>
-              <p className="settings-section__description">Payment terms, overdue thresholds, and aging report configuration</p>
+              <h2 className="text-lg font-bold text-white">B2B Settings</h2>
+              <p className="text-sm text-[var(--theme-text-muted)]">Payment terms, overdue thresholds, and aging report configuration</p>
             </div>
-            {pendingChanges.size > 0 && (
-              <div className="settings-section__actions">
-                <button className="btn-secondary" onClick={handleCancel} disabled={isSaving}><RotateCcw size={16} /> Cancel</button>
-                <button className="btn-primary" onClick={handleSaveAll} disabled={isSaving}><Save size={16} /> {isSaving ? 'Saving...' : `Save (${pendingChanges.size})`}</button>
-              </div>
-            )}
           </div>
+          {pendingChanges.size > 0 && (
+            <div className="flex items-center gap-2">
+              <button className="inline-flex items-center gap-1.5 px-3 py-2 bg-transparent border border-white/10 text-white hover:border-white/20 rounded-xl text-sm transition-colors" onClick={handleCancel} disabled={isSaving}>
+                <RotateCcw size={14} /> Cancel
+              </button>
+              <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-[var(--color-gold)] text-black font-bold rounded-xl text-sm transition-colors hover:opacity-90 disabled:opacity-50" onClick={handleSaveAll} disabled={isSaving}>
+                <Save size={14} /> {isSaving ? 'Saving...' : `Save (${pendingChanges.size})`}
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="settings-section__body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        {/* Body */}
+        <div className="px-6 py-5 space-y-6">
           {/* Default Payment Terms */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base"><Clock size={18} className="text-rose-400" /> Default Payment Terms</CardTitle>
-              <CardDescription>Default terms applied to new B2B orders</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <select className="form-input form-select" value={form.defaultPaymentTermsDays} onChange={(e) => { setForm((prev) => ({ ...prev, defaultPaymentTermsDays: parseInt(e.target.value, 10) })); markDirty('defaultPaymentTermsDays'); }}>
+          <div className="bg-black/20 border border-white/5 rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-white/5">
+              <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
+                <Clock size={16} className="text-[var(--color-gold)]" /> Default Payment Terms
+              </h3>
+              <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">Default terms applied to new B2B orders</p>
+            </div>
+            <div className="px-5 py-4">
+              <select className="w-full px-3 py-2.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20" value={form.defaultPaymentTermsDays} onChange={(e) => { setForm((prev) => ({ ...prev, defaultPaymentTermsDays: parseInt(e.target.value, 10) })); markDirty('defaultPaymentTermsDays'); }}>
                 {TERM_OPTIONS.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
               </select>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Available Payment Terms */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base"><List size={18} className="text-rose-400" /> Available Payment Terms</CardTitle>
-              <CardDescription>Terms selectable when creating B2B orders</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
+          <div className="bg-black/20 border border-white/5 rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-white/5">
+              <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
+                <List size={16} className="text-[var(--color-gold)]" /> Available Payment Terms
+              </h3>
+              <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">Terms selectable when creating B2B orders</p>
+            </div>
+            <div className="px-5 py-4 space-y-3">
+              <div className="flex flex-wrap gap-2">
                 {form.paymentTermOptions.map((term) => (
-                  <span key={term} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', padding: '0.25rem 0.75rem', background: 'var(--color-blanc-creme)', borderRadius: 'var(--radius-md)', fontSize: '0.875rem', fontWeight: 500 }}>
+                  <span key={term} className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-sm text-white">
                     {term}
-                    <button className="btn-ghost btn-ghost--danger btn-ghost--small" onClick={() => removeTerm(term)} title="Remove"><Trash2 size={12} /></button>
+                    <button className="p-0.5 text-[var(--theme-text-muted)] hover:text-red-400 transition-colors" onClick={() => removeTerm(term)} title="Remove">
+                      <Trash2 size={12} />
+                    </button>
                   </span>
                 ))}
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <input type="text" className="form-input" style={{ flex: 1 }} placeholder="e.g. net45" value={newTerm} onChange={(e) => setNewTerm(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addTerm()} />
-                <button className="btn-secondary" onClick={addTerm}><Plus size={16} /> Add</button>
+              <div className="flex gap-2">
+                <input type="text" className="flex-1 px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white placeholder:text-[var(--theme-text-muted)] text-sm outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20" placeholder="e.g. net45" value={newTerm} onChange={(e) => setNewTerm(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addTerm()} />
+                <button className="inline-flex items-center gap-1.5 px-3 py-2 bg-transparent border border-white/10 text-white hover:border-white/20 rounded-xl text-sm transition-colors" onClick={addTerm}>
+                  <Plus size={14} /> Add
+                </button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Critical Overdue Threshold */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base"><AlertTriangle size={18} className="text-rose-400" /> Critical Overdue Threshold</CardTitle>
-              <CardDescription>Days past due before an invoice is flagged as critical</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="form-group--inline">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <label className="form-label" style={{ marginBottom: 0 }}>Threshold</label>
+          <div className="bg-black/20 border border-white/5 rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-white/5">
+              <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
+                <AlertTriangle size={16} className="text-[var(--color-gold)]" /> Critical Overdue Threshold
+              </h3>
+              <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">Days past due before an invoice is flagged as critical</p>
+            </div>
+            <div className="px-5 py-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm text-white/80">Threshold</span>
                   <Tooltip>
-                    <TooltipTrigger asChild><span style={{ cursor: 'help' }}><Info size={14} className="text-gray-400" /></span></TooltipTrigger>
+                    <TooltipTrigger asChild><span className="cursor-help"><Info size={12} className="text-[var(--theme-text-muted)]" /></span></TooltipTrigger>
                     <TooltipContent><p>Invoices overdue by this many days are marked critical</p></TooltipContent>
                   </Tooltip>
                 </div>
-                <div className="form-input-group">
-                  <input type="number" className="form-input form-input--narrow" min={1} value={form.criticalOverdueThresholdDays} onChange={(e) => { setForm((prev) => ({ ...prev, criticalOverdueThresholdDays: parseInt(e.target.value, 10) || 0 })); markDirty('criticalOverdueThresholdDays'); }} />
-                  <span className="form-input-suffix">days</span>
+                <div className="flex items-center gap-2">
+                  <input type="number" className="w-24 px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 text-right" min={1} value={form.criticalOverdueThresholdDays} onChange={(e) => { setForm((prev) => ({ ...prev, criticalOverdueThresholdDays: parseInt(e.target.value, 10) || 0 })); markDirty('criticalOverdueThresholdDays'); }} />
+                  <span className="text-xs text-[var(--theme-text-muted)]">days</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Aging Report Buckets */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base"><List size={18} className="text-rose-400" /> Aging Report Buckets</CardTitle>
-              <CardDescription>Date ranges for the accounts receivable aging report</CardDescription>
-            </CardHeader>
-            <CardContent>
+          <div className="bg-black/20 border border-white/5 rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-white/5">
+              <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
+                <List size={16} className="text-[var(--color-gold)]" /> Aging Report Buckets
+              </h3>
+              <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">Date ranges for the accounts receivable aging report</p>
+            </div>
+            <div className="px-5 py-4 space-y-3">
               {bucketWarning && (
-                <div className="settings-section__readonly-notice" style={{ marginBottom: '1rem' }}>
-                  <AlertTriangle size={16} /><span>{bucketWarning}</span>
+                <div className="flex items-center gap-2 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-lg text-amber-400 text-xs">
+                  <AlertTriangle size={14} />
+                  <span>{bucketWarning}</span>
                 </div>
               )}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div className="space-y-2">
                 {form.agingBuckets.map((bucket, idx) => (
-                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: 'var(--color-blanc-creme)', borderRadius: 'var(--radius-md)' }}>
-                    <input type="text" className="form-input" style={{ flex: 1, maxWidth: 160 }} placeholder="Label" value={bucket.label} onChange={(e) => updateBucket(idx, 'label', e.target.value)} />
-                    <input type="number" className="form-input form-input--narrow" placeholder="Min" min={0} value={bucket.min} onChange={(e) => updateBucket(idx, 'min', e.target.value)} />
-                    <span className="form-input-suffix">-</span>
-                    <input type="number" className="form-input form-input--narrow" placeholder="Max (empty=no limit)" value={bucket.max ?? ''} onChange={(e) => updateBucket(idx, 'max', e.target.value)} />
-                    <span className="form-input-suffix">days</span>
-                    <button className="btn-icon btn-icon--danger" onClick={() => removeBucket(idx)} disabled={form.agingBuckets.length <= 1} title="Remove bucket"><Trash2 size={14} /></button>
+                  <div key={idx} className="flex items-center gap-2 p-2.5 bg-white/[0.02] border border-white/5 rounded-lg">
+                    <input type="text" className="flex-1 max-w-[160px] px-2 py-1.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20" placeholder="Label" value={bucket.label} onChange={(e) => updateBucket(idx, 'label', e.target.value)} />
+                    <input type="number" className="w-20 px-2 py-1.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 text-center" placeholder="Min" min={0} value={bucket.min} onChange={(e) => updateBucket(idx, 'min', e.target.value)} />
+                    <span className="text-xs text-[var(--theme-text-muted)]">-</span>
+                    <input type="number" className="w-20 px-2 py-1.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 text-center" placeholder="Max" value={bucket.max ?? ''} onChange={(e) => updateBucket(idx, 'max', e.target.value)} />
+                    <span className="text-xs text-[var(--theme-text-muted)]">days</span>
+                    <button className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-30" onClick={() => removeBucket(idx)} disabled={form.agingBuckets.length <= 1} title="Remove bucket">
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 ))}
               </div>
-              <button className="btn-ghost" style={{ marginTop: '0.75rem' }} onClick={addBucket}><Plus size={16} /> Add Bucket</button>
-            </CardContent>
-          </Card>
+              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-[var(--theme-text-muted)] hover:text-white transition-colors" onClick={addBucket}>
+                <Plus size={14} /> Add Bucket
+              </button>
+            </div>
+          </div>
         </div>
 
+        {/* Unsaved notice */}
         {pendingChanges.size > 0 && (
-          <div className="settings-section__footer">
-            <div className="settings-unsaved-notice"><AlertCircle size={16} /><span>{pendingChanges.size} unsaved change{pendingChanges.size > 1 ? 's' : ''}</span></div>
+          <div className="px-6 py-3 border-t border-white/5 bg-[var(--color-gold)]/5">
+            <div className="flex items-center gap-2 text-[var(--color-gold)] text-sm">
+              <AlertCircle size={16} />
+              <span>{pendingChanges.size} unsaved change{pendingChanges.size > 1 ? 's' : ''}</span>
+            </div>
           </div>
         )}
       </div>

@@ -20,7 +20,6 @@ interface DeletedProduct {
   reason: string | null;
 }
 
-// Types for Supabase query results
 interface AuditLogDeleteQueryResult {
   id: string;
   old_values: Record<string, unknown> | null;
@@ -36,12 +35,7 @@ interface UserProfileQueryResult {
 async function getDeletedProducts(from: Date, to: Date): Promise<DeletedProduct[]> {
   const { data, error } = await supabase
     .from('audit_logs')
-    .select(`
-      id,
-      old_values,
-      user_id,
-      created_at
-    `)
+    .select(`id, old_values, user_id, created_at`)
     .eq('entity_type', 'product')
     .eq('action', 'delete')
     .gte('created_at', from.toISOString())
@@ -51,8 +45,6 @@ async function getDeletedProducts(from: Date, to: Date): Promise<DeletedProduct[
   if (error) throw error;
 
   const auditLogs = (data || []) as AuditLogDeleteQueryResult[];
-
-  // Fetch user names
   const userIds = [...new Set(auditLogs.map((d) => d.user_id).filter(Boolean))] as string[];
   const { data: users } = userIds.length > 0
     ? await supabase.from('user_profiles').select('id, name').in('id', userIds)
@@ -85,19 +77,14 @@ export function DeletedProductsTab() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Summary stats
   const summary = useMemo(() => {
-    if (!data || data.length === 0) {
-      return { totalDeleted: 0, totalValue: 0 };
-    }
-
+    if (!data || data.length === 0) return { totalDeleted: 0, totalValue: 0 };
     return {
       totalDeleted: data.length,
       totalValue: data.reduce((sum, d) => sum + d.retail_price, 0),
     };
   }, [data]);
 
-  // Export config
   const exportConfig: ExportConfig<DeletedProduct> = useMemo(() => ({
     data: data || [],
     columns: [
@@ -122,11 +109,7 @@ export function DeletedProductsTab() {
   };
 
   if (error) {
-    return (
-      <div className="p-8 text-center text-red-600">
-        Error loading data
-      </div>
-    );
+    return <div className="p-8 text-center text-red-400">Error loading data</div>;
   }
 
   if (isLoading) {
@@ -143,99 +126,92 @@ export function DeletedProductsTab() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-red-50 rounded-lg">
-              <Trash2 className="w-5 h-5 text-red-600" />
+        <div className="bg-[var(--onyx-surface)] rounded-xl p-6 border border-white/5">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-red-500/10 rounded-lg">
+              <Trash2 className="w-5 h-5 text-red-400" />
             </div>
-            <span className="text-sm text-gray-600">Deleted Products</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Deleted Products</span>
           </div>
-          <p className="text-2xl font-bold text-red-600">
-            {summary.totalDeleted}
-          </p>
+          <p className="text-2xl font-bold text-red-400">{summary.totalDeleted}</p>
         </div>
 
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-purple-50 rounded-lg">
-              <DollarSign className="w-5 h-5 text-purple-600" />
+        <div className="bg-[var(--onyx-surface)] rounded-xl p-6 border border-white/5">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-purple-500/10 rounded-lg">
+              <DollarSign className="w-5 h-5 text-purple-400" />
             </div>
-            <span className="text-sm text-gray-600">Cumulative Value</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Cumulative Value</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">
-            {formatCurrency(summary.totalValue)}
-          </p>
+          <p className="text-2xl font-bold text-white">{formatCurrency(summary.totalValue)}</p>
         </div>
       </div>
 
       {/* Data Table */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Deleted Products List</h3>
+      <div className="bg-[var(--onyx-surface)] rounded-xl border border-white/5 overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/5">
+          <h3 className="text-sm font-semibold text-white">Deleted Products List</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Retail Price</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deleted By</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
+            <thead>
+              <tr className="border-b border-white/5">
+                <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Product</th>
+                <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Category</th>
+                <th className="px-6 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Retail Price</th>
+                <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Deleted By</th>
+                <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Date</th>
+                <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Reason</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody>
               {data && data.length > 0 ? (
                 data.map((row) => (
-                  <tr key={row.id} className="hover:bg-gray-50">
+                  <tr key={row.id} className="border-b border-white/5 hover:bg-white/[0.02]">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-red-50 rounded-lg">
-                          <Package className="w-4 h-4 text-red-600" />
+                        <div className="p-2 bg-red-500/10 rounded-lg">
+                          <Package className="w-4 h-4 text-red-400" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{row.product_name}</p>
-                          {row.sku && <p className="text-xs text-gray-500">{row.sku}</p>}
+                          <p className="text-sm font-medium text-white">{row.product_name}</p>
+                          {row.sku && <p className="text-xs text-white/30">{row.sku}</p>}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.category_name || '-'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900 text-right font-medium">
+                    <td className="px-6 py-4 text-sm text-white/50">{row.category_name || '-'}</td>
+                    <td className="px-6 py-4 text-sm text-white text-right font-medium">
                       {formatCurrency(row.retail_price)}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-2 text-sm text-white/50">
                         <User className="w-3 h-3" />
                         {row.deleted_by}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-white/50">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-3 h-3" />
                         {new Date(row.deleted_at).toLocaleDateString('en-US', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
+                          day: '2-digit', month: '2-digit', year: 'numeric',
+                          hour: '2-digit', minute: '2-digit',
                         })}
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       {row.reason ? (
-                        <span className="inline-flex px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">
+                        <span className="inline-flex px-2 py-1 text-xs font-medium bg-white/5 text-white/60 border border-white/10 rounded-full">
                           {row.reason}
                         </span>
                       ) : (
-                        <span className="text-sm text-gray-400">-</span>
+                        <span className="text-sm text-white/20">-</span>
                       )}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-[var(--muted-smoke)]">
                     No products deleted in this period
                   </td>
                 </tr>

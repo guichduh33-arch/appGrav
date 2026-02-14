@@ -16,52 +16,52 @@ export const PricesTab: React.FC<PricesTabProps> = ({ product, priceHistory }) =
     }
 
     return (
-        <div className="card p-6 mb-6">
-            <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 flex justify-between items-center">Price History</h3>
-                <div className="bg-green-50 px-4 py-2 rounded-lg border border-green-100">
-                    <span className="text-green-700 text-sm">Estimated current price: </span>
-                    <span className="font-bold text-lg text-green-900 ml-2">{formattedPrice(product.cost_price || 0)}</span>
+        <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden shadow-2xl">
+            <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-white">Price History</h3>
+                <div className="bg-[var(--color-gold)]/10 px-4 py-2 rounded border border-[var(--color-gold)]/20">
+                    <span className="text-[10px] text-[var(--theme-text-muted)] uppercase tracking-wider font-bold">Estimated current: </span>
+                    <span className="font-bold text-lg text-[var(--color-gold)] ml-2">{formattedPrice(product.cost_price || 0)}</span>
                 </div>
             </div>
-            <div className="overflow-hidden rounded-lg border border-gray-200">
-                <table className="w-full border-collapse text-[0.95rem] [&_th]:text-left [&_th]:px-4 [&_th]:py-3 [&_th]:bg-gray-50 [&_th]:text-gray-600 [&_th]:font-semibold [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-wide [&_th]:border-b-2 [&_th]:border-gray-100 [&_td]:px-4 [&_td]:py-3 [&_td]:border-b [&_td]:border-gray-100 [&_td]:text-gray-700 [&_tbody_tr:hover_td]:bg-gray-50">
+            <div className="overflow-x-auto">
+                <table className="w-full text-left">
                     <thead>
-                        <tr>
-                            <th>Order Date</th>
-                            <th>Supplier</th>
-                            <th className="text-right">Quantity</th>
-                            <th className="text-right">Unit Price</th>
-                            <th className="text-right">Line Total</th>
+                        <tr className="bg-white/[0.02] text-[10px] uppercase tracking-wider text-[var(--muted-smoke)]">
+                            <th className="px-6 py-4 font-medium">Order Date</th>
+                            <th className="px-6 py-4 font-medium">Supplier</th>
+                            <th className="px-6 py-4 font-medium text-right">Quantity</th>
+                            <th className="px-6 py-4 font-medium text-right">Unit Price</th>
+                            <th className="px-6 py-4 font-medium text-right">Line Total</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-white/5">
                         {priceHistory.map((item, index) => {
                             const prevItem = priceHistory[index + 1]
                             const priceDiff = prevItem ? item.unit_price - prevItem.unit_price : 0
 
                             return (
-                                <tr key={item.id}>
-                                    <td className="text-gray-600">
+                                <tr key={item.id} className="hover:bg-white/[0.02] transition-colors">
+                                    <td className="px-6 py-4 text-sm text-[var(--theme-text-muted)]">
                                         {new Date(item.purchase_order?.order_date || item.created_at).toLocaleDateString()}
                                     </td>
-                                    <td className="font-medium text-gray-800">
+                                    <td className="px-6 py-4 text-sm font-medium text-white">
                                         {item.purchase_order?.supplier?.name || 'Unknown Supplier'}
                                     </td>
-                                    <td className="text-right font-mono">
+                                    <td className="px-6 py-4 text-sm text-right font-mono text-[var(--stone-text)]">
                                         {item.quantity_ordered} {product.unit}
                                     </td>
-                                    <td className="text-right font-medium">
+                                    <td className="px-6 py-4 text-sm text-right">
                                         <div className="flex items-center justify-end gap-2">
-                                            {formattedPrice(item.unit_price)}
+                                            <span className="font-medium text-[var(--color-gold)]">{formattedPrice(item.unit_price)}</span>
                                             {priceDiff !== 0 && (
-                                                <span className={`text-xs ${priceDiff > 0 ? 'text-red-500' : 'text-green-500'}`}>
-                                                    {priceDiff > 0 ? '▲' : '▼'}
+                                                <span className={`text-xs ${priceDiff > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                                                    {priceDiff > 0 ? '\u25B2' : '\u25BC'}
                                                 </span>
                                             )}
                                         </div>
                                     </td>
-                                    <td className="text-right text-gray-500">
+                                    <td className="px-6 py-4 text-sm text-right text-[var(--theme-text-muted)]">
                                         {formattedPrice(item.total)}
                                     </td>
                                 </tr>
@@ -69,7 +69,7 @@ export const PricesTab: React.FC<PricesTabProps> = ({ product, priceHistory }) =
                         })}
                         {priceHistory.length === 0 && (
                             <tr>
-                                <td colSpan={5} className="p-8 text-center text-gray-400">
+                                <td colSpan={5} className="p-8 text-center text-[var(--theme-text-muted)] italic text-sm">
                                     No purchase history found.
                                 </td>
                             </tr>

@@ -35,10 +35,10 @@ export default function CustomerDetailView({
 }: CustomerDetailViewProps) {
     return (
         <div className="flex flex-col h-full p-4 overflow-y-auto">
-            <div className="flex justify-between items-center mb-4 pb-3 border-b border-[var(--color-gray-700)]">
+            <div className="flex justify-between items-center mb-4 pb-3 border-b border-white/5">
                 <button
                     type="button"
-                    className="flex items-center gap-1 px-3 py-2 bg-[var(--color-gray-700)] border-none rounded-lg text-[var(--color-gray-300)] text-[0.85rem] cursor-pointer transition-all duration-200 hover:bg-[var(--color-gray-600)] hover:text-white"
+                    className="flex items-center gap-1 px-3 py-2 bg-[var(--theme-bg-tertiary)] border-none rounded-lg text-[var(--theme-text-secondary)] text-[0.85rem] cursor-pointer transition-all duration-200 hover:bg-[var(--theme-bg-secondary)] hover:text-white"
                     onClick={onBack}
                 >
                     <ChevronLeft size={20} />
@@ -55,7 +55,7 @@ export default function CustomerDetailView({
                 </button>
             </div>
 
-            <div className="flex flex-wrap gap-4 items-center p-4 bg-[var(--color-gray-900)] rounded-xl mb-4 max-[600px]:flex-col max-[600px]:items-start">
+            <div className="flex flex-wrap gap-4 items-center p-4 bg-[var(--theme-bg-secondary)] rounded-xl mb-4 max-[600px]:flex-col max-[600px]:items-start">
                 <div
                     className="w-[60px] h-[60px] rounded-xl flex items-center justify-center text-white font-bold text-2xl shrink-0"
                     style={{
@@ -66,8 +66,8 @@ export default function CustomerDetailView({
                 </div>
                 <div className="flex-1 min-w-[150px]">
                     <h3 className="m-0 mb-1 text-lg text-white">{customer.company_name || customer.name}</h3>
-                    {customer.phone && <p className="flex items-center gap-1.5 my-1 text-[0.85rem] text-[var(--color-gray-400)]"><Phone size={14} /> {customer.phone}</p>}
-                    {customer.email && <p className="flex items-center gap-1.5 my-1 text-[0.85rem] text-[var(--color-gray-400)]"><Mail size={14} /> {customer.email}</p>}
+                    {customer.phone && <p className="flex items-center gap-1.5 my-1 text-[0.85rem] text-[var(--theme-text-secondary)]"><Phone size={14} /> {customer.phone}</p>}
+                    {customer.email && <p className="flex items-center gap-1.5 my-1 text-[0.85rem] text-[var(--theme-text-secondary)]"><Mail size={14} /> {customer.email}</p>}
                 </div>
                 <div className="flex flex-col items-end gap-1.5 max-[600px]:w-full max-[600px]:flex-row max-[600px]:flex-wrap max-[600px]:items-center max-[600px]:justify-start">
                     <span
@@ -89,8 +89,8 @@ export default function CustomerDetailView({
             </div>
 
             {loadingHistory ? (
-                <div className="flex flex-col items-center justify-center p-12 text-[var(--color-gray-400)] gap-4">
-                    <div className="w-8 h-8 border-[3px] border-[var(--color-gray-600)] border-t-gold rounded-full animate-spin"></div>
+                <div className="flex flex-col items-center justify-center p-12 text-[var(--theme-text-secondary)] gap-4">
+                    <div className="w-8 h-8 border-[3px] border-white/10 border-t-gold rounded-full animate-spin"></div>
                     <span>Loading history...</span>
                 </div>
             ) : (
@@ -98,7 +98,7 @@ export default function CustomerDetailView({
                     {/* Frequent products (Story 7.5) */}
                     {frequentProducts.length > 0 && (
                         <div className="mb-5">
-                            <h4 className="flex items-center gap-2 m-0 mb-3 text-[0.9rem] text-[var(--color-gray-300)] font-semibold [&>svg]:text-gold"><Package size={16} /> Favorite Products</h4>
+                            <h4 className="flex items-center gap-2 m-0 mb-3 text-[0.9rem] text-[var(--theme-text-secondary)] font-semibold [&>svg]:text-gold"><Package size={16} /> Favorite Products</h4>
                             <div className="flex flex-wrap gap-2">
                                 {frequentProducts.map(product => (
                                     <div key={product.product_id} className="flex items-center gap-2 px-3 py-2 bg-gold/10 rounded-lg">
@@ -112,26 +112,26 @@ export default function CustomerDetailView({
 
                     {/* Order history (Story 7.4) */}
                     <div className="mb-5">
-                        <h4 className="flex items-center gap-2 m-0 mb-3 text-[0.9rem] text-[var(--color-gray-300)] font-semibold [&>svg]:text-gold"><ShoppingBag size={16} /> Order History</h4>
+                        <h4 className="flex items-center gap-2 m-0 mb-3 text-[0.9rem] text-[var(--theme-text-secondary)] font-semibold [&>svg]:text-gold"><ShoppingBag size={16} /> Order History</h4>
                         {orderHistory.length === 0 ? (
-                            <p className="text-center text-[var(--color-gray-500)] text-[0.85rem] py-6">No previous orders</p>
+                            <p className="text-center text-[var(--theme-text-muted)] text-[0.85rem] py-6">No previous orders</p>
                         ) : (
                             <div className="flex flex-col gap-3">
                                 {orderHistory.map(order => (
-                                    <div key={order.id} className="p-3 bg-[var(--color-gray-900)] rounded-lg border border-[var(--color-gray-700)]">
+                                    <div key={order.id} className="p-3 bg-[var(--theme-bg-secondary)] rounded-lg border border-white/5">
                                         <div className="flex items-center gap-3 mb-2">
                                             <span className="font-semibold text-white text-[0.85rem]">{order.order_number}</span>
-                                            <span className="flex-1 text-xs text-[var(--color-gray-500)]">{formatDate(order.created_at)}</span>
+                                            <span className="flex-1 text-xs text-[var(--theme-text-muted)]">{formatDate(order.created_at)}</span>
                                             <span className="font-semibold text-green-400 text-[0.85rem]">{formatPrice(order.total)}</span>
                                         </div>
                                         <div className="flex flex-wrap gap-1.5 mb-2">
                                             {order.items.slice(0, 3).map(item => (
-                                                <span key={item.id} className="text-xs text-[var(--color-gray-400)] bg-[var(--color-gray-700)] px-2 py-0.5 rounded">
+                                                <span key={item.id} className="text-xs text-[var(--theme-text-secondary)] bg-[var(--theme-bg-tertiary)] px-2 py-0.5 rounded">
                                                     {item.quantity}x {item.product_name}
                                                 </span>
                                             ))}
                                             {order.items.length > 3 && (
-                                                <span className="text-xs text-[var(--color-gray-500)] italic">
+                                                <span className="text-xs text-[var(--theme-text-muted)] italic">
                                                     +{order.items.length - 3} more
                                                 </span>
                                             )}

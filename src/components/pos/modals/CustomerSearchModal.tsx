@@ -133,14 +133,14 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
 
     return (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[1000] p-4" onClick={onClose}>
-            <div className="bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-2xl w-full max-w-[500px] max-h-[80vh] flex flex-col shadow-[0_20px_60px_rgba(0,0,0,0.5)] text-white max-[600px]:max-w-full max-[600px]:max-h-full max-[600px]:rounded-none" onClick={e => e.stopPropagation()}>
+            <div className="bg-[var(--theme-bg-primary)] border border-white/5 rounded-2xl w-full max-w-[500px] max-h-[80vh] flex flex-col shadow-[0_20px_60px_rgba(0,0,0,0.5)] text-white max-[600px]:max-w-full max-[600px]:max-h-full max-[600px]:rounded-none" onClick={e => e.stopPropagation()}>
                 {selectedDetailCustomer ? (
                     <CustomerDetailView customer={selectedDetailCustomer} orderHistory={orderHistory}
                         frequentProducts={frequentProducts} loadingHistory={loadingHistory}
                         onBack={() => setSelectedDetailCustomer(null)} onSelectCustomer={selectAndClose} onReorder={handleReorder} />
                 ) : (
                     <>
-                        <div className="flex justify-between items-center px-5 py-4 border-b border-[var(--color-gray-700)]">
+                        <div className="flex justify-between items-center px-5 py-4 border-b border-white/5">
                             <h2 className="flex items-center gap-2 m-0 text-lg text-white [&>svg]:text-gold">
                                 <ModeIcon size={22} />
                                 {MODE_TITLES[mode]}
@@ -160,18 +160,18 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
                                 )}
                             </h2>
                             <button
-                                className="w-9 h-9 rounded-lg border-none bg-[var(--color-gray-700)] text-[var(--color-gray-400)] cursor-pointer flex items-center justify-center transition-all duration-200 hover:bg-[var(--color-gray-600)] hover:text-white"
+                                className="w-9 h-9 rounded-lg border-none bg-[var(--theme-bg-tertiary)] text-[var(--theme-text-secondary)] cursor-pointer flex items-center justify-center transition-all duration-200 hover:bg-[var(--theme-bg-secondary)] hover:text-white"
                                 onClick={onClose}
                             >
                                 <X size={20} />
                             </button>
                         </div>
 
-                        <div className="flex gap-2 px-4 py-3 bg-[var(--color-gray-900)] border-b border-[var(--color-gray-700)]">
+                        <div className="flex gap-2 px-4 py-3 bg-[var(--theme-bg-secondary)] border-b border-white/5">
                             <button
                                 className={cn(
-                                    'flex-1 flex items-center justify-center gap-2 px-2.5 py-2.5 border-none bg-transparent rounded-lg text-[0.85rem] font-medium text-[var(--color-gray-400)] cursor-pointer transition-all duration-200',
-                                    'hover:bg-[var(--color-gray-700)] hover:text-white',
+                                    'flex-1 flex items-center justify-center gap-2 px-2.5 py-2.5 border-none bg-transparent rounded-lg text-[0.85rem] font-medium text-[var(--theme-text-secondary)] cursor-pointer transition-all duration-200',
+                                    'hover:bg-[var(--theme-bg-tertiary)] hover:text-white',
                                     mode === 'search' && 'bg-gold text-white'
                                 )}
                                 onClick={() => setMode('search')}
@@ -180,8 +180,8 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
                             </button>
                             <button
                                 className={cn(
-                                    'flex-1 flex items-center justify-center gap-2 px-2.5 py-2.5 border-none bg-transparent rounded-lg text-[0.85rem] font-medium text-[var(--color-gray-400)] cursor-pointer transition-all duration-200 relative',
-                                    'hover:bg-[var(--color-gray-700)] hover:text-white',
+                                    'flex-1 flex items-center justify-center gap-2 px-2.5 py-2.5 border-none bg-transparent rounded-lg text-[0.85rem] font-medium text-[var(--theme-text-secondary)] cursor-pointer transition-all duration-200 relative',
+                                    'hover:bg-[var(--theme-bg-tertiary)] hover:text-white',
                                     mode === 'favorites' && 'bg-gold text-white'
                                 )}
                                 onClick={() => setMode('favorites')}
@@ -198,8 +198,8 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
                             </button>
                             <button
                                 className={cn(
-                                    'flex-1 flex items-center justify-center gap-2 px-2.5 py-2.5 border-none bg-transparent rounded-lg text-[0.85rem] font-medium text-[var(--color-gray-400)] cursor-pointer transition-all duration-200',
-                                    'hover:bg-[var(--color-gray-700)] hover:text-white',
+                                    'flex-1 flex items-center justify-center gap-2 px-2.5 py-2.5 border-none bg-transparent rounded-lg text-[0.85rem] font-medium text-[var(--theme-text-secondary)] cursor-pointer transition-all duration-200',
+                                    'hover:bg-[var(--theme-bg-tertiary)] hover:text-white',
                                     mode === 'scan' && 'bg-gold text-white',
                                     !isOnline && 'opacity-50 cursor-not-allowed'
                                 )}
@@ -231,21 +231,21 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
                             ) : mode === 'favorites' ? (
                                 <div className="flex-1 overflow-y-auto flex flex-col gap-2">
                                     {loading ? (
-                                        <div className="flex flex-col items-center justify-center py-12 px-4 text-[var(--color-gray-400)] gap-3">
-                                            <div className="w-8 h-8 border-[3px] border-[var(--color-gray-600)] border-t-gold rounded-full animate-spin"></div>
+                                        <div className="flex flex-col items-center justify-center py-12 px-4 text-[var(--theme-text-secondary)] gap-3">
+                                            <div className="w-8 h-8 border-[3px] border-white/10 border-t-gold rounded-full animate-spin"></div>
                                             <span>Loading...</span>
                                         </div>
                                     ) : favoriteCustomers.length === 0 ? (
-                                        <div className="flex flex-col items-center justify-center py-12 px-4 text-[var(--color-gray-500)] gap-3">
+                                        <div className="flex flex-col items-center justify-center py-12 px-4 text-[var(--theme-text-muted)] gap-3">
                                             <Heart size={40} />
                                             <p className="m-0 text-[0.9rem]">No favorite customers</p>
-                                            <span className="text-[0.8rem] text-[var(--color-gray-500)] mt-2">Click the heart to add favorites</span>
+                                            <span className="text-[0.8rem] text-[var(--theme-text-muted)] mt-2">Click the heart to add favorites</span>
                                         </div>
                                     ) : renderCustomerList(favoriteCustomers)}
                                 </div>
                             ) : (
                                 <>
-                                    <div className="flex items-center gap-3 px-4 bg-[var(--color-gray-900)] rounded-[10px] mb-3 [&>svg]:text-[var(--color-gray-400)] [&>svg]:shrink-0">
+                                    <div className="flex items-center gap-3 px-4 bg-[var(--theme-bg-secondary)] rounded-[10px] mb-3 [&>svg]:text-[var(--theme-text-secondary)] [&>svg]:shrink-0">
                                         <Search size={20} />
                                         <input
                                             type="text"
@@ -253,7 +253,7 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
                                             onChange={e => setSearchTerm(e.target.value)}
                                             placeholder="Search by name, phone, email..."
                                             autoFocus
-                                            className="flex-1 border-none bg-transparent py-3.5 text-[0.95rem] text-white outline-none placeholder:text-[var(--color-gray-500)]"
+                                            className="flex-1 border-none bg-transparent py-3.5 text-[0.95rem] text-white outline-none placeholder:text-[var(--theme-text-muted)]"
                                         />
                                     </div>
                                     {selectedCustomerId && (
@@ -266,12 +266,12 @@ export default function CustomerSearchModal({ onClose, onSelectCustomer, selecte
                                     )}
                                     <div className="flex-1 overflow-y-auto flex flex-col gap-2">
                                         {loading ? (
-                                            <div className="flex flex-col items-center justify-center py-12 px-4 text-[var(--color-gray-400)] gap-3">
-                                                <div className="w-8 h-8 border-[3px] border-[var(--color-gray-600)] border-t-gold rounded-full animate-spin"></div>
+                                            <div className="flex flex-col items-center justify-center py-12 px-4 text-[var(--theme-text-secondary)] gap-3">
+                                                <div className="w-8 h-8 border-[3px] border-white/10 border-t-gold rounded-full animate-spin"></div>
                                                 <span>Loading...</span>
                                             </div>
                                         ) : customers.length === 0 ? (
-                                            <div className="flex flex-col items-center justify-center py-12 px-4 text-[var(--color-gray-500)] gap-3">
+                                            <div className="flex flex-col items-center justify-center py-12 px-4 text-[var(--theme-text-muted)] gap-3">
                                                 <User size={40} />
                                                 <p className="m-0 text-[0.9rem]">{searchTerm ? 'No customer found' : 'No recent customers'}</p>
                                             </div>

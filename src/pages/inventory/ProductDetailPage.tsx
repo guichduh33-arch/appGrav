@@ -1,14 +1,14 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import {
-    ArrowLeft, Save, DollarSign,
-    Layers, Settings, Scale, AlertTriangle
-} from 'lucide-react'
+import { AlertTriangle, ArrowLeft } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import type { Product, Recipe, ProductUOM, Category, Section } from '../../types/database'
 import { MOCK_PRODUCTS, MOCK_CATEGORIES } from '../../hooks/products'
-import { cn } from '@/lib/utils'
+
+// Sub-components
+import { ProductDetailHeader } from './components/ProductDetailHeader'
+import { ProductDetailTabs, type Tab } from './components/ProductDetailTabs'
 
 // Tabs
 import { GeneralTab } from './tabs/GeneralTab'
@@ -18,8 +18,6 @@ import { CostingTab } from './tabs/CostingTab'
 import { PricesTab } from './tabs/PricesTab'
 import { VariantsTab } from './tabs/VariantsTab'
 import { logError } from '@/utils/logger'
-
-type Tab = 'general' | 'units' | 'recipe' | 'costing' | 'prices' | 'variants'
 
 export default function ProductDetailPage() {
     const { id } = useParams<{ id: string }>()
@@ -32,13 +30,12 @@ export default function ProductDetailPage() {
     const [product, setProduct] = useState<Product | null>(null)
     const [categories, setCategories] = useState<Category[]>([])
     const [sections, setSections] = useState<Section[]>([])
-    const [productSections, setProductSections] = useState<string[]>([]) // Selected section IDs
+    const [productSections, setProductSections] = useState<string[]>([])
     const [primarySectionId, setPrimarySectionId] = useState<string | null>(null)
     const [recipeItems, setRecipeItems] = useState<(Recipe & { material: Product })[]>([])
     const [priceHistory, setPriceHistory] = useState<any[]>([])
     const [uoms, setUoms] = useState<ProductUOM[]>([])
 
-    // Derived state for ingredient search
     const [allIngredients, setAllIngredients] = useState<Product[]>([])
     const [showIngredientSearch, setShowIngredientSearch] = useState(false)
 
@@ -50,14 +47,12 @@ export default function ProductDetailPage() {
         if (!id) return
         setLoading(true)
         try {
-            // 1. Fetch Product
             const { data: prod, error: pError } = await supabase
                 .from('products')
                 .select('*')
                 .eq('id', id)
                 .single()
 
-            // Handle Mock Data Fallback
             if (pError || !prod) {
                 const mockRaw = MOCK_PRODUCTS.find(p => p.id === id)
                 if (mockRaw) {
@@ -109,11 +104,9 @@ export default function ProductDetailPage() {
 
             setProduct(prod)
 
-            // 2. Fetch Categories
             const { data: cats } = await supabase.from('categories').select('*').order('name')
             if (cats) setCategories(cats)
 
-            // 3. Fetch Sections (only active ones)
             const { data: sects } = await supabase
                 .from('sections')
                 .select('*')
@@ -121,7 +114,6 @@ export default function ProductDetailPage() {
                 .order('sort_order')
             if (sects) setSections(sects)
 
-            // 3b. Fetch Product Sections (many-to-many)
             const { data: prodSects } = await supabase
                 .from('product_sections')
                 .select('*')
@@ -133,7 +125,6 @@ export default function ProductDetailPage() {
                 setPrimarySectionId(primary?.section_id || (typedSects[0]?.section_id || null))
             }
 
-            // 4. Fetch Recipe
             const { data: recipes, error: rError } = await supabase
                 .from('recipes')
                 .select('*, material:products!material_id(*)')
@@ -141,14 +132,12 @@ export default function ProductDetailPage() {
             if (rError) throw rError
             setRecipeItems(recipes || [])
 
-            // 5. Fetch UOMs
             const { data: uomData } = await supabase
                 .from('product_uoms')
                 .select('*')
                 .eq('product_id', id)
             if (uomData) setUoms(uomData as ProductUOM[])
 
-            // 7. Fetch Potential Ingredients
             const { data: ingredients } = await supabase
                 .from('products')
                 .select('*')
@@ -157,7 +146,6 @@ export default function ProductDetailPage() {
                 .order('name')
             if (ingredients) setAllIngredients(ingredients)
 
-            // 8. Fetch Price History (PO Items)
             const { data: prices } = await supabase
                 .from('purchase_order_items')
                 .select('*, purchase_order:purchase_orders(order_date, supplier:suppliers(name))')
@@ -176,7 +164,6 @@ export default function ProductDetailPage() {
         if (!product) return
         setSaving(true)
         try {
-            // 1. Update product
             const { error } = await supabase
                 .from('products')
                 .update({
@@ -196,7 +183,6 @@ export default function ProductDetailPage() {
 
             if (error) throw error
 
-            // 2. Save product sections (delete existing, insert new)
             await supabase
                 .from('product_sections')
                 .delete()
@@ -226,7 +212,7 @@ export default function ProductDetailPage() {
 
     async function addUOM() {
         if (!product) return
-        const unitName = prompt("Nom de l'unité (ex: Carton):")
+        const unitName = prompt("Nom de l'unite (ex: Carton):")
         if (!unitName) return
         const factorStr = prompt(`Combien de ${product.unit} dans 1 ${unitName}?`)
         if (!factorStr) return
@@ -316,77 +302,42 @@ export default function ProductDetailPage() {
         }
     }
 
-    if (loading) return <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-gray-500 h-screen">Loading...</div>
-
-    if (!product) return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-8">
-            <div className="card max-w-md w-full flex flex-col items-center p-8">
-                <AlertTriangle size={64} className="mb-6 text-orange-500 opacity-80" />
-                <h2 className="text-2xl font-bold mb-2 text-gray-800 text-center">Product not found</h2>
-                <p className="mb-8 text-center text-gray-500 font-mono text-sm bg-gray-50 px-4 py-2 rounded">
-                    ID: {id}
-                </p>
-                <button
-                    onClick={() => navigate('/inventory')}
-                    className="btn-secondary flex items-center gap-2"
-                >
-                    <ArrowLeft size={18} />
-                    Back to list
-                </button>
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[var(--theme-bg-primary)] flex flex-col items-center justify-center">
+                <div className="text-[var(--theme-text-muted)] text-sm uppercase tracking-widest">Loading...</div>
             </div>
-        </div>
-    )
+        )
+    }
+
+    if (!product) {
+        return (
+            <div className="min-h-screen bg-[var(--theme-bg-primary)] flex flex-col items-center justify-center p-8">
+                <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl max-w-md w-full flex flex-col items-center p-8">
+                    <AlertTriangle size={64} className="mb-6 text-[var(--color-gold)] opacity-80" />
+                    <h2 className="text-2xl font-bold mb-2 text-white text-center">Product not found</h2>
+                    <p className="mb-8 text-center text-[var(--theme-text-muted)] font-mono text-sm bg-black/40 px-4 py-2 rounded">
+                        ID: {id}
+                    </p>
+                    <button
+                        onClick={() => navigate('/inventory')}
+                        className="bg-transparent border border-white/10 text-white hover:border-white/20 px-6 py-3 rounded-sm flex items-center gap-2 transition-colors text-sm font-medium"
+                    >
+                        <ArrowLeft size={18} />
+                        Back to list
+                    </button>
+                </div>
+            </div>
+        )
+    }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-            {/* Header */}
-            <header className="bg-white px-8 py-5 border-b border-gray-200 flex justify-between items-center sticky top-0 z-20 shadow-sm">
-                <div className="flex items-center gap-4">
-                    <button onClick={() => navigate('/inventory')} className="btn-icon" title="Back">
-                        <ArrowLeft />
-                    </button>
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900 m-0">{product.name}</h1>
-                        <span className="inline-block bg-gray-100 text-gray-600 px-2 py-0.5 rounded-sm font-mono text-sm mt-1">SKU: {product.sku}</span>
-                    </div>
-                </div>
-                <button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="btn-primary"
-                    title="Save changes"
-                >
-                    <Save size={18} />
-                    {saving ? 'Saving...' : 'Save'}
-                </button>
-            </header>
-
-            {/* Tabs */}
-            <div className="flex gap-2 pt-4 px-8 bg-white border-b border-gray-200 overflow-x-auto">
-                {([
-                    { key: 'general' as Tab, icon: <Settings size={16} />, label: 'General' },
-                    { key: 'units' as Tab, icon: <Scale size={16} />, label: 'Units' },
-                    { key: 'recipe' as Tab, icon: <Layers size={16} />, label: 'Recipe' },
-                    { key: 'variants' as Tab, icon: <Layers size={16} />, label: 'Variants' },
-                    { key: 'costing' as Tab, icon: <DollarSign size={16} />, label: 'Costing' },
-                    { key: 'prices' as Tab, icon: <DollarSign size={16} />, label: 'Prices' },
-                ]).map(tab => (
-                    <button
-                        key={tab.key}
-                        className={cn(
-                            'flex items-center gap-2 px-4 py-3 text-[0.95rem] font-medium text-gray-500 bg-transparent border-none border-b-2 border-transparent cursor-pointer transition-all duration-200 whitespace-nowrap',
-                            'hover:text-primary hover:bg-primary/5 hover:rounded-t-md',
-                            activeTab === tab.key && 'text-primary border-b-primary bg-transparent'
-                        )}
-                        onClick={() => setActiveTab(tab.key)}
-                    >
-                        {tab.icon} {tab.label}
-                    </button>
-                ))}
-            </div>
+        <div className="min-h-screen bg-[var(--theme-bg-primary)] flex flex-col">
+            <ProductDetailHeader product={product} saving={saving} onSave={handleSave} />
+            <ProductDetailTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
             {/* Content */}
-            <div className="flex-1 p-8 max-w-[1400px] mx-auto w-full max-md:p-4">
+            <div className="flex-1 p-10 max-w-6xl mx-auto w-full pb-24">
                 {activeTab === 'general' && (
                     <GeneralTab
                         product={product}

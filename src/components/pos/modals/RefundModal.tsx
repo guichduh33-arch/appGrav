@@ -149,45 +149,45 @@ export default function RefundModal({
   return (
     <>
       <div
-        className="modal-backdrop is-active"
+        className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/80 backdrop-blur-sm"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
-        <div className="modal modal-md is-active max-w-[520px]">
-          <div className="modal__header bg-gradient-to-br from-blue-600 to-blue-700 !border-b-0">
+        <div className="bg-[var(--theme-bg-primary)] rounded-xl text-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] w-full max-w-[520px]">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
             <div className="flex items-center gap-2">
-              <DollarSign size={24} className="text-blue-200" />
-              <h3 className="modal__title !text-white">Process Refund</h3>
+              <DollarSign size={24} className="text-[var(--color-gold)]" />
+              <h3 className="text-lg font-bold text-white m-0">Process Refund</h3>
             </div>
             <button
               type="button"
-              className="modal__close"
+              className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-transparent text-[var(--theme-text-muted)] hover:text-white hover:border-white/20 cursor-pointer"
               onClick={onClose}
               aria-label="Close"
               disabled={isProcessing}
             >
-              <X size={24} />
+              <X size={20} />
             </button>
           </div>
 
-          <div className="modal__body flex flex-col gap-4 p-6">
+          <div className="flex flex-col gap-4 p-6">
             {/* Order Summary */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="mb-2 pb-2 border-b border-blue-200">
-                <span className="text-lg font-bold text-blue-800">Order {orderNumber}</span>
+            <div className="bg-[var(--theme-bg-secondary)] border border-white/5 rounded-lg p-4">
+              <div className="mb-2 pb-2 border-b border-white/5">
+                <span className="text-lg font-bold text-[var(--color-gold)]">Order {orderNumber}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <div className="flex justify-between items-center">
-                  <span className="text-blue-500 text-sm">Original Total</span>
-                  <span className="font-semibold text-blue-800">{formatPrice(orderTotal)}</span>
+                  <span className="text-[var(--theme-text-secondary)] text-sm">Original Total</span>
+                  <span className="font-semibold text-white">{formatPrice(orderTotal)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-blue-500 text-sm">Payment Method</span>
-                  <span className="font-semibold text-blue-800">{paymentMethodName}</span>
+                  <span className="text-[var(--theme-text-secondary)] text-sm">Payment Method</span>
+                  <span className="font-semibold text-white">{paymentMethodName}</span>
                 </div>
                 {paidAt && (
                   <div className="flex justify-between items-center">
-                    <span className="text-blue-500 text-sm">Paid At</span>
-                    <span className="font-semibold text-blue-800">{paidAt}</span>
+                    <span className="text-[var(--theme-text-secondary)] text-sm">Paid At</span>
+                    <span className="font-semibold text-white">{paidAt}</span>
                   </div>
                 )}
               </div>
@@ -195,13 +195,15 @@ export default function RefundModal({
 
             {/* Refund Type Toggle */}
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-semibold text-foreground">Refund Type</label>
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Refund Type</label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   className={cn(
-                    'flex flex-col items-center p-4 bg-background border-2 border-border rounded-lg cursor-pointer transition-all duration-200 font-semibold hover:border-blue-600 disabled:opacity-50',
-                    refundType === 'full' && 'border-blue-600 bg-blue-50 text-blue-800'
+                    'flex flex-col items-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 font-semibold disabled:opacity-50',
+                    refundType === 'full'
+                      ? 'border-[var(--color-gold)] bg-[var(--color-gold)]/10 text-white'
+                      : 'bg-[var(--theme-bg-secondary)] border-white/10 text-[var(--theme-text-secondary)] hover:border-[var(--color-gold)]/50'
                   )}
                   onClick={() => setRefundType('full')}
                   disabled={isProcessing}
@@ -212,8 +214,10 @@ export default function RefundModal({
                 <button
                   type="button"
                   className={cn(
-                    'flex flex-col items-center p-4 bg-background border-2 border-border rounded-lg cursor-pointer transition-all duration-200 font-semibold hover:border-blue-600 disabled:opacity-50',
-                    refundType === 'partial' && 'border-blue-600 bg-blue-50 text-blue-800'
+                    'flex flex-col items-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 font-semibold disabled:opacity-50',
+                    refundType === 'partial'
+                      ? 'border-[var(--color-gold)] bg-[var(--color-gold)]/10 text-white'
+                      : 'bg-[var(--theme-bg-secondary)] border-white/10 text-[var(--theme-text-secondary)] hover:border-[var(--color-gold)]/50'
                   )}
                   onClick={() => setRefundType('partial')}
                   disabled={isProcessing}
@@ -227,14 +231,14 @@ export default function RefundModal({
             {/* Partial Amount Input */}
             {refundType === 'partial' && (
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-semibold text-foreground">
-                  Refund Amount <span className="text-red-600">*</span>
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">
+                  Refund Amount <span className="text-red-400">*</span>
                 </label>
-                <div className="flex items-center bg-background border-2 border-primary rounded-lg py-2 px-4">
-                  <span className="text-lg font-semibold text-muted-foreground mr-2">Rp</span>
+                <div className="flex items-center bg-black/40 border border-[var(--color-gold)] rounded-xl py-2 px-4">
+                  <span className="text-lg font-semibold text-[var(--theme-text-muted)] mr-2">Rp</span>
                   <input
                     type="text"
-                    className="border-none bg-transparent text-xl font-bold text-foreground w-full outline-none"
+                    className="border-none bg-transparent text-xl font-bold text-white w-full outline-none"
                     value={amount.toLocaleString('id-ID')}
                     onChange={(e) => {
                       const value = parseInt(e.target.value.replace(/\D/g, ''), 10) || 0;
@@ -243,21 +247,23 @@ export default function RefundModal({
                     disabled={isProcessing}
                   />
                 </div>
-                <span className="text-xs text-muted-foreground">Maximum: {formatPrice(orderTotal)}</span>
+                <span className="text-xs text-[var(--theme-text-muted)]">Maximum: {formatPrice(orderTotal)}</span>
               </div>
             )}
 
             {/* Refund Method */}
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-semibold text-foreground">Refund Method</label>
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Refund Method</label>
               <div className="grid grid-cols-2 gap-2">
                 {REFUND_METHODS.map((method) => (
                   <button
                     key={method.id}
                     type="button"
                     className={cn(
-                      'py-2 px-4 bg-background border border-border rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 hover:border-blue-600 disabled:opacity-50',
-                      refundMethod === method.id && 'border-blue-600 bg-blue-50 text-blue-800'
+                      'py-2 px-4 border rounded-lg text-sm font-medium cursor-pointer transition-all duration-200 disabled:opacity-50',
+                      refundMethod === method.id
+                        ? 'border-[var(--color-gold)] bg-[var(--color-gold)]/10 text-white'
+                        : 'bg-[var(--theme-bg-secondary)] border-white/10 text-[var(--theme-text-secondary)] hover:border-[var(--color-gold)]/50'
                     )}
                     onClick={() => setRefundMethod(method.id)}
                     disabled={isProcessing}
@@ -270,11 +276,11 @@ export default function RefundModal({
 
             {/* Reason Selection */}
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-semibold text-foreground">
-                Reason for refund <span className="text-red-600">*</span>
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">
+                Reason for refund <span className="text-red-400">*</span>
               </label>
               <select
-                className="form-select"
+                className="bg-black/40 border border-white/10 rounded-xl text-white px-4 py-3 focus:border-[var(--color-gold)] focus:outline-none"
                 value={reasonCode}
                 onChange={(e) => setReasonCode(e.target.value as TRefundReasonCode)}
                 disabled={isProcessing}
@@ -290,9 +296,9 @@ export default function RefundModal({
 
             {/* Additional Notes */}
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-semibold text-foreground">Additional notes</label>
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Additional notes</label>
               <textarea
-                className="form-textarea"
+                className="bg-black/40 border border-white/10 rounded-xl text-white px-4 py-3 focus:border-[var(--color-gold)] focus:outline-none resize-none"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Optional notes..."
@@ -302,10 +308,10 @@ export default function RefundModal({
             </div>
           </div>
 
-          <div className="modal__footer flex justify-end gap-4 px-6 py-4 border-t border-border">
+          <div className="px-6 py-4 border-t border-white/5 flex justify-end gap-3">
             <button
               type="button"
-              className="btn btn-secondary"
+              className="px-6 py-3 border border-white/10 rounded-xl bg-transparent text-sm font-semibold text-[var(--theme-text-secondary)] hover:text-white cursor-pointer"
               onClick={onClose}
               disabled={isProcessing}
             >
@@ -313,7 +319,7 @@ export default function RefundModal({
             </button>
             <button
               type="button"
-              className="flex items-center gap-1 py-2 px-6 bg-blue-600 text-white border-none rounded-lg font-semibold cursor-pointer transition-all duration-200 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-3 bg-[var(--color-gold)] rounded-xl text-black text-sm font-bold cursor-pointer hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleRefundClick}
               disabled={!canSubmit || isProcessing}
             >

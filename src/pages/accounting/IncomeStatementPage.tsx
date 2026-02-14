@@ -17,11 +17,11 @@ export default function IncomeStatementPage() {
     return (
       <div className="space-y-4">
         {[1, 2].map(i => (
-          <div key={i} className="border rounded-lg p-4 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-32 mb-3" />
+          <div key={i} className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-4 animate-pulse">
+            <div className="h-4 bg-white/10 rounded w-32 mb-3" />
             <div className="space-y-2">
-              <div className="h-3 bg-gray-100 rounded w-full" />
-              <div className="h-3 bg-gray-100 rounded w-3/4" />
+              <div className="h-3 bg-white/5 rounded w-full" />
+              <div className="h-3 bg-white/5 rounded w-3/4" />
             </div>
           </div>
         ))}
@@ -32,19 +32,19 @@ export default function IncomeStatementPage() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-4">
-        <label className="text-sm text-gray-500">From:</label>
+        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">From:</label>
         <input
           type="date"
           value={startDate}
           onChange={e => setStartDate(e.target.value)}
-          className="border rounded-lg px-3 py-2 text-sm"
+          className="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 outline-none"
         />
-        <label className="text-sm text-gray-500">To:</label>
+        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">To:</label>
         <input
           type="date"
           value={endDate}
           onChange={e => setEndDate(e.target.value)}
-          className="border rounded-lg px-3 py-2 text-sm"
+          className="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 outline-none"
         />
       </div>
 
@@ -67,14 +67,14 @@ export default function IncomeStatementPage() {
             ]}
           />
 
-          <div className={`mt-4 border-2 rounded-lg px-4 py-3 flex items-center justify-between ${
+          <div className={`mt-4 border-2 rounded-xl px-4 py-3 flex items-center justify-between ${
             data.netIncome >= 0
-              ? 'border-green-300 bg-green-50'
-              : 'border-red-300 bg-red-50'
+              ? 'border-emerald-400/30 bg-emerald-400/10'
+              : 'border-red-400/30 bg-red-400/10'
           }`}>
-            <span className="font-bold text-lg">Net Income</span>
+            <span className="font-bold text-lg text-white">Net Income</span>
             <span className={`font-bold font-mono text-xl ${
-              data.netIncome >= 0 ? 'text-green-700' : 'text-red-700'
+              data.netIncome >= 0 ? 'text-emerald-400' : 'text-red-400'
             }`}>
               {formatIDR(data.netIncome)}
             </span>

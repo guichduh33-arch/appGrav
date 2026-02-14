@@ -1,22 +1,15 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts';
-import { Percent, XCircle, RotateCcw, TrendingDown, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { supabase } from '@/lib/supabase';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
 import { useDateRange } from '@/hooks/reports/useDateRange';
 import { formatCurrency as formatCurrencyPdf } from '@/services/reports/pdfExport';
+import { DiscountsVoidsKpis } from './discounts-voids/DiscountsVoidsKpis';
+import { DiscountsVoidsChart } from './discounts-voids/DiscountsVoidsChart';
+import { DiscountsVoidsTable } from './discounts-voids/DiscountsVoidsTable';
 
 interface DiscountVoidEntry {
   id: string;
@@ -39,7 +32,6 @@ async function getDiscountsVoids(from: Date, to: Date): Promise<DiscountVoidEntr
   const fromStr = from.toISOString().split('T')[0];
   const toStr = to.toISOString().split('T')[0];
 
-  // Query orders with discounts, cancelled, or refunds
   const { data, error } = await supabase
     .from('orders')
     .select(`
@@ -59,7 +51,6 @@ async function getDiscountsVoids(from: Date, to: Date): Promise<DiscountVoidEntr
 
   if (error) throw error;
 
-  // Transform to entries
   const entries: DiscountVoidEntry[] = [];
 
   for (const order of data || []) {
@@ -67,7 +58,6 @@ async function getDiscountsVoids(from: Date, to: Date): Promise<DiscountVoidEntr
       ? order.user_profiles[0]?.full_name
       : (order.user_profiles as { full_name: string } | null)?.full_name;
 
-    // Add discount entry if discount > 0
     if (order.discount_amount && order.discount_amount > 0) {
       entries.push({
         id: `${order.id}-discount`,
@@ -80,7 +70,6 @@ async function getDiscountsVoids(from: Date, to: Date): Promise<DiscountVoidEntr
       });
     }
 
-    // Add void entry if cancelled
     if (order.status === 'cancelled') {
       entries.push({
         id: `${order.id}-void`,
@@ -93,7 +82,6 @@ async function getDiscountsVoids(from: Date, to: Date): Promise<DiscountVoidEntr
       });
     }
 
-    // Add refund entry if refund > 0
     if (order.refund_amount && order.refund_amount > 0) {
       entries.push({
         id: `${order.id}-refund`,
@@ -120,7 +108,6 @@ export function DiscountsVoidsTab() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Filter by search
   const filteredData = useMemo(() => {
     if (!searchTerm.trim()) return entries;
     const term = searchTerm.toLowerCase();
@@ -132,20 +119,16 @@ export function DiscountsVoidsTab() {
     );
   }, [entries, searchTerm]);
 
-  // KPIs
   const kpis = useMemo(() => {
     const totalDiscounts = filteredData
       .filter((e) => e.type === 'discount')
       .reduce((sum, e) => sum + e.amount, 0);
-
     const totalVoids = filteredData
       .filter((e) => e.type === 'void')
       .reduce((sum, e) => sum + e.amount, 0);
-
     const totalRefunds = filteredData
       .filter((e) => e.type === 'refund')
       .reduce((sum, e) => sum + e.amount, 0);
-
     const totalLoss = totalDiscounts + totalVoids + totalRefunds;
 
     return {
@@ -159,29 +142,20 @@ export function DiscountsVoidsTab() {
     };
   }, [filteredData]);
 
-  // Chart data - group by day
   const chartData = useMemo(() => {
     const dayMap: Record<string, DailyData> = {};
-
     for (const entry of entries) {
       const date = new Date(entry.created_at).toLocaleDateString('en-US', {
         day: '2-digit',
         month: 'short',
       });
-
       if (!dayMap[date]) {
         dayMap[date] = { date, discounts: 0, voids: 0, refunds: 0 };
       }
-
-      if (entry.type === 'discount') {
-        dayMap[date].discounts += entry.amount;
-      } else if (entry.type === 'void') {
-        dayMap[date].voids += entry.amount;
-      } else if (entry.type === 'refund') {
-        dayMap[date].refunds += entry.amount;
-      }
+      if (entry.type === 'discount') dayMap[date].discounts += entry.amount;
+      else if (entry.type === 'void') dayMap[date].voids += entry.amount;
+      else if (entry.type === 'refund') dayMap[date].refunds += entry.amount;
     }
-
     return Object.values(dayMap).sort((a, b) => {
       const dateA = new Date(a.date.split(' ').reverse().join(' '));
       const dateB = new Date(b.date.split(' ').reverse().join(' '));
@@ -189,7 +163,6 @@ export function DiscountsVoidsTab() {
     });
   }, [entries]);
 
-  // Export config
   const exportConfig: ExportConfig<DiscountVoidEntry> = useMemo(() => ({
     data: filteredData,
     columns: [
@@ -214,22 +187,9 @@ export function DiscountsVoidsTab() {
     return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
   };
 
-  const getTypeBadge = (type: string) => {
-    switch (type) {
-      case 'discount':
-        return <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Discount</span>;
-      case 'void':
-        return <span className="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Void</span>;
-      case 'refund':
-        return <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">Refund</span>;
-      default:
-        return <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">{type}</span>;
-    }
-  };
-
   if (error) {
     return (
-      <div className="p-8 text-center text-red-600">
+      <div className="p-8 text-center text-red-400">
         Error loading data
       </div>
     );
@@ -241,155 +201,30 @@ export function DiscountsVoidsTab() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <DateRangePicker defaultPreset="last30days" />
         <ExportButtons config={exportConfig} />
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-yellow-50 rounded-lg">
-              <Percent className="w-5 h-5 text-yellow-600" />
-            </div>
-            <span className="text-sm text-gray-600">Total Discounts</span>
-          </div>
-          <p className="text-2xl font-bold text-yellow-600">
-            {formatCurrency(kpis.totalDiscounts)}
-          </p>
-          <p className="text-xs text-gray-500 mt-1">{kpis.discountCount} discounts</p>
-        </div>
+      <DiscountsVoidsKpis {...kpis} formatCurrency={formatCurrency} />
 
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-red-50 rounded-lg">
-              <XCircle className="w-5 h-5 text-red-600" />
-            </div>
-            <span className="text-sm text-gray-600">Total Voids</span>
-          </div>
-          <p className="text-2xl font-bold text-red-600">
-            {formatCurrency(kpis.totalVoids)}
-          </p>
-          <p className="text-xs text-gray-500 mt-1">{kpis.voidCount} voids</p>
-        </div>
-
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-purple-50 rounded-lg">
-              <RotateCcw className="w-5 h-5 text-purple-600" />
-            </div>
-            <span className="text-sm text-gray-600">Total Refunds</span>
-          </div>
-          <p className="text-2xl font-bold text-purple-600">
-            {formatCurrency(kpis.totalRefunds)}
-          </p>
-          <p className="text-xs text-gray-500 mt-1">{kpis.refundCount} refunds</p>
-        </div>
-
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <TrendingDown className="w-5 h-5 text-gray-600" />
-            </div>
-            <span className="text-sm text-gray-600">Total Loss</span>
-          </div>
-          <p className="text-2xl font-bold text-gray-900">
-            {formatCurrency(kpis.totalLoss)}
-          </p>
-        </div>
-      </div>
-
-      {/* Chart */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Losses by Day</h3>
-        {chartData.length === 0 ? (
-          <div className="h-80 flex items-center justify-center text-gray-500">
-            No data for this period
-          </div>
-        ) : (
-          <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-              <YAxis tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 12 }} />
-              <Tooltip
-                formatter={(value, name) => [
-                  formatCurrency(value as number),
-                  name === 'discounts' ? 'Discounts' : name === 'voids' ? 'Voids' : 'Refunds'
-                ]}
-              />
-              <Legend />
-              <Bar dataKey="discounts" name="Discounts" stackId="a" fill="#EAB308" />
-              <Bar dataKey="voids" name="Voids" stackId="a" fill="#EF4444" />
-              <Bar dataKey="refunds" name="Refunds" stackId="a" fill="#A855F7" />
-            </BarChart>
-          </ResponsiveContainer>
-        )}
-      </div>
+      <DiscountsVoidsChart chartData={chartData} formatCurrency={formatCurrency} />
 
       {/* Search */}
       <div className="flex gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--theme-text-muted)]" />
           <input
             type="text"
             placeholder="Search order, staff..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 bg-black/40 border border-white/10 rounded-xl text-white text-sm placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
           />
         </div>
       </div>
 
-      {/* Data Table */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Loss Details</h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Staff</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredData.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    No data
-                  </td>
-                </tr>
-              ) : (
-                filteredData.map((row) => (
-                  <tr key={row.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {new Date(row.created_at).toLocaleDateString('en-US')}
-                      <div className="text-xs text-gray-400">
-                        {new Date(row.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{row.order_number}</td>
-                    <td className="px-6 py-4">{getTypeBadge(row.type)}</td>
-                    <td className="px-6 py-4 text-sm text-right font-bold text-red-600">
-                      -{formatCurrency(row.amount)}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.reason || '-'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.staff_name || '-'}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <DiscountsVoidsTable data={filteredData} formatCurrency={formatCurrency} />
     </div>
   );
 }

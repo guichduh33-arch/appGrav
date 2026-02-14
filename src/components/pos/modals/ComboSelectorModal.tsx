@@ -232,11 +232,11 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
 
     if (loading) {
         return (
-            <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4">
-                <div className="flex w-full max-w-[800px] flex-col rounded-2xl bg-white shadow-[0_10px_25px_rgba(0,0,0,0.2)] max-md:max-h-[95vh] max-md:rounded-t-2xl max-md:rounded-b-none">
+            <div className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                <div className="flex w-full max-w-[800px] flex-col rounded-xl bg-[var(--theme-bg-primary)] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] text-white">
                     <div className="flex flex-col items-center justify-center gap-4 px-8 py-16">
-                        <div className="h-10 w-10 animate-spin rounded-full border-3 border-slate-200 border-t-indigo-500" />
-                        <span className="text-[0.95rem] text-slate-500">Loading combo...</span>
+                        <div className="h-10 w-10 animate-spin rounded-full border-3 border-white/10 border-t-[var(--color-gold)]" />
+                        <span className="text-[0.95rem] text-[var(--theme-text-secondary)]">Loading combo...</span>
                     </div>
                 </div>
             </div>
@@ -245,11 +245,11 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
 
     if (!combo) {
         return (
-            <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4">
-                <div className="flex w-full max-w-[800px] flex-col rounded-2xl bg-white shadow-[0_10px_25px_rgba(0,0,0,0.2)] max-md:max-h-[95vh] max-md:rounded-t-2xl max-md:rounded-b-none">
+            <div className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                <div className="flex w-full max-w-[800px] flex-col rounded-xl bg-[var(--theme-bg-primary)] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] text-white">
                     <div className="flex flex-col items-center justify-center gap-4 px-8 py-16">
-                        <p className="m-0 text-base text-slate-500">Combo not found</p>
-                        <button type="button" className="btn btn-secondary" onClick={onClose}>
+                        <p className="m-0 text-base text-[var(--theme-text-secondary)]">Combo not found</p>
+                        <button type="button" className="px-6 py-3 border border-white/10 rounded-xl bg-transparent text-sm font-semibold text-[var(--theme-text-secondary)] hover:text-white cursor-pointer" onClick={onClose}>
                             Close
                         </button>
                     </div>
@@ -261,32 +261,32 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
     const totalPrice = calculateTotalPrice()
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
+        <div className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={onClose}>
             <div
-                className="flex w-full max-w-[800px] max-h-[90vh] flex-col rounded-2xl bg-white shadow-[0_10px_25px_rgba(0,0,0,0.2)] max-md:max-h-[95vh] max-md:rounded-t-2xl max-md:rounded-b-none"
+                className="flex w-full max-w-[800px] max-h-[90vh] flex-col rounded-xl bg-[var(--theme-bg-primary)] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] text-white max-md:max-h-[95vh]"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="flex items-start justify-between gap-4 border-b-2 border-slate-200 p-6 max-md:p-4">
+                <div className="flex items-start justify-between gap-4 border-b border-white/5 px-6 py-5 max-md:p-4">
                     <div>
-                        <h2 className="m-0 text-2xl font-bold text-slate-800 max-md:text-xl">{combo.name}</h2>
+                        <h2 className="m-0 text-xl font-bold text-white max-md:text-lg">{combo.name}</h2>
                         {combo.description && (
-                            <p className="mt-2 text-[0.9rem] text-slate-500">{combo.description}</p>
+                            <p className="mt-2 text-sm text-[var(--theme-text-secondary)]">{combo.description}</p>
                         )}
                     </div>
                     <button
                         type="button"
-                        className="shrink-0 cursor-pointer rounded-lg border-none bg-transparent p-2 text-slate-500 transition-all duration-200 hover:bg-slate-100 hover:text-slate-800"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-transparent text-[var(--theme-text-muted)] hover:text-white hover:border-white/20 cursor-pointer shrink-0"
                         onClick={onClose}
                         aria-label="Close"
                     >
-                        <X size={24} />
+                        <X size={20} />
                     </button>
                 </div>
 
                 {/* Error message */}
                 {error && (
-                    <div className="border-l-4 border-red-500 bg-red-50 px-6 py-4 text-[0.9rem] font-medium text-red-800">
+                    <div className="border-l-4 border-red-500 bg-red-500/10 px-6 py-4 text-[0.9rem] font-medium text-red-400">
                         {error}
                     </div>
                 )}
@@ -297,13 +297,13 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                         return (
                             <div key={group.id} className="flex flex-col gap-4">
                                 <div className="flex items-center justify-between gap-4">
-                                    <h3 className="m-0 flex items-center gap-2 text-lg font-semibold text-slate-800">
+                                    <h3 className="m-0 flex items-center gap-2 text-lg font-semibold text-white">
                                         {group.name}
-                                        {group.is_required && <span className="text-xl font-bold text-red-500">*</span>}
-                                        {!group.is_required && <span className="rounded bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800">Optional</span>}
+                                        {group.is_required && <span className="text-xl font-bold text-red-400">*</span>}
+                                        {!group.is_required && <span className="rounded bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-400">Optional</span>}
                                     </h3>
                                     {(group.max_selections ?? 1) > 1 && (
-                                        <span className="text-[0.85rem] font-medium text-slate-500">
+                                        <span className="text-[0.85rem] font-medium text-[var(--theme-text-secondary)]">
                                             {group.min_selections === group.max_selections
                                                 ? `Choose ${group.min_selections}`
                                                 : `Choose ${group.min_selections ?? 0}-${group.max_selections}`}
@@ -322,20 +322,23 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                                                 key={item.id}
                                                 type="button"
                                                 className={cn(
-                                                    'flex items-center rounded-xl border-2 border-slate-200 bg-white p-4 text-left transition-all duration-200 cursor-pointer hover:border-indigo-500 hover:bg-slate-50 hover:-translate-y-0.5 hover:shadow-[0_4px_6px_rgba(99,102,241,0.1)]',
-                                                    isSelected && 'border-indigo-500 bg-gradient-to-br from-indigo-50 to-indigo-100 shadow-[0_0_0_3px_rgba(99,102,241,0.1)]'
+                                                    'flex items-center rounded-xl border-2 p-4 text-left transition-all duration-200 cursor-pointer',
+                                                    'hover:border-[var(--color-gold)]/50 hover:-translate-y-0.5',
+                                                    isSelected
+                                                        ? 'border-[var(--color-gold)] bg-[var(--color-gold)]/10 shadow-[0_0_0_3px_rgba(202,176,109,0.1)]'
+                                                        : 'border-white/10 bg-[var(--theme-bg-secondary)] hover:bg-[var(--theme-bg-tertiary)]'
                                                 )}
                                                 onClick={() => handleItemSelect(group, item.id)}
                                             >
                                                 <div className="flex flex-1 items-center justify-between gap-4">
                                                     <div className="flex flex-1 flex-col gap-1">
-                                                        <span className="text-base font-medium text-slate-800">
+                                                        <span className="text-base font-medium text-white">
                                                             {item.product.name}
                                                         </span>
                                                         {(item.price_adjustment ?? 0) !== 0 && (
                                                             <span className={cn(
                                                                 'text-sm font-semibold',
-                                                                (item.price_adjustment ?? 0) > 0 ? 'text-emerald-600' : 'text-red-600'
+                                                                (item.price_adjustment ?? 0) > 0 ? 'text-emerald-400' : 'text-red-400'
                                                             )}>
                                                                 {(item.price_adjustment ?? 0) > 0 ? '+' : ''}
                                                                 {formatCurrency(item.price_adjustment ?? 0)}
@@ -343,7 +346,7 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                                                         )}
                                                     </div>
                                                     {isSelected && (
-                                                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-white">
+                                                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-gold)] text-black">
                                                             <Check size={20} />
                                                         </div>
                                                     )}
@@ -358,22 +361,22 @@ export default function ComboSelectorModal({ comboId, onClose, onConfirm }: Comb
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between gap-4 border-t-2 border-slate-200 bg-slate-50 p-6 max-md:flex-col max-md:items-stretch max-md:p-4">
+                <div className="flex items-center justify-between gap-4 border-t border-white/5 px-6 py-4 max-md:flex-col max-md:items-stretch max-md:p-4">
                     <div className="flex flex-col gap-1 max-md:text-center">
-                        <span className="text-sm font-medium text-slate-500">Total:</span>
-                        <span className="text-[1.75rem] font-bold text-emerald-500">{formatCurrency(totalPrice)}</span>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Total:</span>
+                        <span className="text-[1.75rem] font-bold text-[var(--color-gold)]">{formatCurrency(totalPrice)}</span>
                     </div>
                     <div className="flex gap-3 max-md:w-full max-md:flex-col">
                         <button
                             type="button"
-                            className="btn btn-secondary max-md:w-full max-md:justify-center"
+                            className="px-6 py-3 border border-white/10 rounded-xl bg-transparent text-sm font-semibold text-[var(--theme-text-secondary)] hover:text-white cursor-pointer max-md:w-full max-md:justify-center"
                             onClick={onClose}
                         >
                             Cancel
                         </button>
                         <button
                             type="button"
-                            className="btn btn-primary max-md:w-full max-md:justify-center"
+                            className="px-6 py-3 bg-[var(--color-gold)] rounded-xl text-black text-sm font-bold cursor-pointer hover:brightness-110 max-md:w-full max-md:justify-center"
                             onClick={handleConfirm}
                         >
                             Add to Cart

@@ -24,10 +24,10 @@ interface ToggleProps {
 
 function Toggle({ label, description, checked, onChange, disabled }: ToggleProps) {
     return (
-        <div className="toggle-group">
-            <div className="toggle-group__info">
-                <span className="toggle-group__label">{label}</span>
-                {description && <span className="toggle-group__description">{description}</span>}
+        <div className="flex items-center justify-between py-3">
+            <div className="flex-1">
+                <span className="text-sm font-medium text-white">{label}</span>
+                {description && <span className="block text-xs text-[var(--theme-text-muted)] mt-0.5">{description}</span>}
             </div>
             <div
                 className={`toggle-switch ${checked ? 'is-on' : ''} ${disabled ? 'is-disabled' : ''}`}
@@ -48,11 +48,11 @@ interface InputProps {
 
 function Input({ label, type = 'text', value, placeholder, onChange, disabled }: InputProps) {
     return (
-        <div className="form-group">
-            <label className="form-label">{label}</label>
+        <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">{label}</label>
             <input
                 type={type}
-                className="form-input"
+                className="bg-black/40 border border-white/10 rounded-xl text-white placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 px-3 py-2 text-sm"
                 value={value}
                 placeholder={placeholder}
                 onChange={(e) => onChange(e.target.value)}
@@ -85,12 +85,10 @@ export default function NotificationSettingsSection() {
 
     if (isLoading || !settings) {
         return (
-            <div className="settings-section">
-                <div className="settings-section__header">
-                    <h2 className="settings-section__title">Notification Settings</h2>
-                </div>
-                <div className="settings-section__body--centered">
-                    <RefreshCw size={24} className="spinning" />
+            <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-6">
+                <h2 className="text-lg font-semibold text-white mb-4">Notification Settings</h2>
+                <div className="flex items-center justify-center gap-2 py-8 text-[var(--theme-text-muted)]">
+                    <RefreshCw size={24} className="animate-spin" />
                     <p>Loading...</p>
                 </div>
             </div>
@@ -98,21 +96,22 @@ export default function NotificationSettingsSection() {
     }
 
     return (
-        <div className="settings-section">
-            <div className="settings-section__header">
-                <h2 className="settings-section__title">Notification Settings</h2>
-                <p className="settings-section__description">
+        <div className="space-y-6">
+            {/* Header */}
+            <div>
+                <h2 className="text-lg font-semibold text-white">Notification Settings</h2>
+                <p className="text-sm text-[var(--theme-text-muted)] mt-1">
                     Configure how the system sends alerts and reports.
                 </p>
             </div>
 
-            <div className="settings-section__body">
-                {/* Email Settings */}
-                <div className="settings-group">
-                    <h3 className="settings-group__title">
-                        <Mail size={18} />
-                        Email Configuration (SMTP)
-                    </h3>
+            {/* Email Settings */}
+            <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+                <div className="px-6 py-4 border-b border-white/5 flex items-center gap-2">
+                    <Mail size={18} className="text-[var(--color-gold)]" />
+                    <h3 className="text-base font-semibold text-white">Email Configuration (SMTP)</h3>
+                </div>
+                <div className="p-6 space-y-3">
                     <Toggle
                         label="Email enabled"
                         description="Enable email sending by the system"
@@ -120,7 +119,7 @@ export default function NotificationSettingsSection() {
                         onChange={(v) => handleUpdate('email_enabled', v)}
                     />
 
-                    <div className="form-row">
+                    <div className="grid grid-cols-2 gap-4">
                         <Input
                             label="SMTP Server"
                             value={settings.smtp_host}
@@ -138,7 +137,7 @@ export default function NotificationSettingsSection() {
                         />
                     </div>
 
-                    <div className="form-row">
+                    <div className="grid grid-cols-2 gap-4">
                         <Input
                             label="SMTP User"
                             value={settings.smtp_user}
@@ -150,7 +149,7 @@ export default function NotificationSettingsSection() {
                             label="SMTP Password"
                             type="password"
                             value={settings.smtp_password}
-                            placeholder="••••••••"
+                            placeholder="--------"
                             onChange={(v) => handleUpdate('smtp_password', v)}
                             disabled={!settings.email_enabled}
                         />
@@ -165,34 +164,38 @@ export default function NotificationSettingsSection() {
                     />
 
                     {/* Test Email */}
-                    <div className="notification-test-box">
-                        <h4 className="notification-test-header">Test Configuration</h4>
-                        <div className="form-row">
-                            <Input
-                                label="Destination Email"
-                                value={testEmail}
-                                placeholder="dest@example.com"
-                                onChange={setTestEmail}
-                                disabled={!settings.email_enabled}
-                            />
+                    <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 mt-4">
+                        <h4 className="text-sm font-semibold text-white mb-3">Test Configuration</h4>
+                        <div className="flex items-end gap-3">
+                            <div className="flex-1">
+                                <Input
+                                    label="Destination Email"
+                                    value={testEmail}
+                                    placeholder="dest@example.com"
+                                    onChange={setTestEmail}
+                                    disabled={!settings.email_enabled}
+                                />
+                            </div>
                             <button
-                                className="btn-secondary btn-test-send"
+                                className="flex items-center gap-1.5 px-4 py-2 bg-transparent border border-white/10 text-white rounded-xl hover:border-white/20 transition-colors text-sm disabled:opacity-50 whitespace-nowrap"
                                 onClick={handleSendTestEmail}
                                 disabled={!settings.email_enabled || sendTestEmail.isPending}
                             >
-                                {sendTestEmail.isPending ? <RefreshCw size={16} className="spinning" /> : <Send size={16} />}
+                                {sendTestEmail.isPending ? <RefreshCw size={16} className="animate-spin" /> : <Send size={16} />}
                                 Send Test
                             </button>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                {/* Alerts Settings */}
-                <div className="settings-group">
-                    <h3 className="settings-group__title">
-                        <Bell size={18} />
-                        Alerts and Reports
-                    </h3>
+            {/* Alerts Settings */}
+            <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+                <div className="px-6 py-4 border-b border-white/5 flex items-center gap-2">
+                    <Bell size={18} className="text-[var(--color-gold)]" />
+                    <h3 className="text-base font-semibold text-white">Alerts and Reports</h3>
+                </div>
+                <div className="p-6 space-y-3">
                     <Toggle
                         label="Low stock alerts"
                         description="Receive a notification when a product reaches critical threshold"
@@ -207,28 +210,30 @@ export default function NotificationSettingsSection() {
                     />
 
                     {settings.daily_report && (
-                        <div className="form-group daily-report-time-input">
-                            <label className="form-label" htmlFor="daily-report-time">
-                                <Clock size={14} />
+                        <div className="ml-6 flex items-center gap-2">
+                            <Clock size={14} className="text-[var(--theme-text-muted)]" />
+                            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]" htmlFor="daily-report-time">
                                 Send Time
                             </label>
                             <input
                                 id="daily-report-time"
                                 type="time"
-                                className="form-input"
+                                className="bg-black/40 border border-white/10 rounded-xl text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 px-3 py-1.5 text-sm"
                                 value={settings.daily_report_time}
                                 onChange={(e) => handleUpdate('daily_report_time', e.target.value)}
                             />
                         </div>
                     )}
                 </div>
+            </div>
 
-                {/* Other integrations */}
-                <div className="settings-group">
-                    <h3 className="settings-group__title">
-                        <MessageSquare size={18} />
-                        Additional Channels
-                    </h3>
+            {/* Other integrations */}
+            <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+                <div className="px-6 py-4 border-b border-white/5 flex items-center gap-2">
+                    <MessageSquare size={18} className="text-[var(--color-gold)]" />
+                    <h3 className="text-base font-semibold text-white">Additional Channels</h3>
+                </div>
+                <div className="p-6">
                     <Toggle
                         label="WhatsApp (Beta)"
                         description="Coming soon: notifications via WhatsApp Business API"

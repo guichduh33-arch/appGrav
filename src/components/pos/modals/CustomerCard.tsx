@@ -30,8 +30,8 @@ export default function CustomerCard({
     return (
         <div
             className={cn(
-                'flex items-center gap-3 p-3 bg-[var(--color-gray-900)] border-2 border-transparent rounded-[10px] cursor-pointer transition-all duration-200',
-                'hover:bg-[var(--color-gray-700)] hover:border-[var(--color-gray-600)]',
+                'flex items-center gap-3 p-3 bg-[var(--theme-bg-secondary)] border-2 border-transparent rounded-[10px] cursor-pointer transition-all duration-200',
+                'hover:bg-[var(--theme-bg-tertiary)] hover:border-white/10',
                 'max-[600px]:flex-wrap',
                 isSelected && 'bg-gold/10 border-gold'
             )}
@@ -54,12 +54,12 @@ export default function CustomerCard({
                     )}
                 </div>
                 {customer.company_name && (
-                    <span className="block text-xs text-[var(--color-gray-400)] mt-0.5">{customer.name}</span>
+                    <span className="block text-xs text-[var(--theme-text-secondary)] mt-0.5">{customer.name}</span>
                 )}
                 <div className="flex flex-wrap gap-2 mt-1">
-                    {customer.phone && <span className="text-[0.7rem] text-[var(--color-gray-500)]">{customer.phone}</span>}
+                    {customer.phone && <span className="text-[0.7rem] text-[var(--theme-text-muted)]">{customer.phone}</span>}
                     {customer.membership_number && (
-                        <span className="flex items-center gap-1 px-1.5 py-0.5 bg-[var(--color-gray-700)] rounded text-[0.7rem] text-[var(--color-gray-400)] font-mono">
+                        <span className="flex items-center gap-1 px-1.5 py-0.5 bg-[var(--theme-bg-tertiary)] rounded text-[0.7rem] text-[var(--theme-text-secondary)] font-mono">
                             <QrCode size={10} />
                             {customer.membership_number}
                         </span>
@@ -88,7 +88,7 @@ export default function CustomerCard({
                         <Star size={10} />
                         {customer.loyalty_tier}
                     </span>
-                    <span className="text-[0.7rem] text-[var(--color-gray-400)] font-medium">
+                    <span className="text-[0.7rem] text-[var(--theme-text-secondary)] font-medium">
                         {customer.loyalty_points.toLocaleString()} pts
                     </span>
                 </div>
@@ -107,7 +107,7 @@ export default function CustomerCard({
                     <button
                         type="button"
                         className={cn(
-                            'w-8 h-8 border-none bg-[var(--color-gray-700)] rounded-md text-[var(--color-gray-400)] cursor-pointer flex items-center justify-center transition-all duration-200',
+                            'w-8 h-8 border-none bg-[var(--theme-bg-tertiary)] rounded-md text-[var(--theme-text-secondary)] cursor-pointer flex items-center justify-center transition-all duration-200',
                             'hover:bg-red-900/30 hover:text-red-400',
                             isFavorite && 'bg-red-900/30 text-red-400'
                         )}
@@ -123,7 +123,7 @@ export default function CustomerCard({
                 {isOnline && (
                     <button
                         type="button"
-                        className="w-8 h-8 border-none bg-[var(--color-gray-700)] rounded-md text-[var(--color-gray-400)] cursor-pointer flex items-center justify-center transition-all duration-200 hover:bg-gold/10 hover:text-gold"
+                        className="w-8 h-8 border-none bg-[var(--theme-bg-tertiary)] rounded-md text-[var(--theme-text-secondary)] cursor-pointer flex items-center justify-center transition-all duration-200 hover:bg-gold/10 hover:text-gold"
                         onClick={(e) => {
                             e.stopPropagation()
                             onShowDetail(customer)

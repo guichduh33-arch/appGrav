@@ -73,37 +73,67 @@ const FinancialSettingsPage = () => {
     toast.success('Changes discarded');
   };
 
-  if (isLoading) return <div className="settings-section"><div className="settings-section__body settings-section__loading"><div className="spinner" /><span>Loading settings...</span></div></div>;
-  if (error || !settings) return <div className="settings-section"><div className="settings-section__body settings-section__error"><AlertCircle size={24} /><span>Error loading settings</span></div></div>;
-
-  return (
-    <div className="settings-section">
-      <div className="settings-section__header">
-        <div className="settings-section__header-content">
-          <div>
-            <h2 className="settings-section__title"><DollarSign size={20} /> Financial Settings</h2>
-            <p className="settings-section__description">Payment limits, currency rounding, and reference requirements.</p>
-          </div>
-          {pending.size > 0 && (
-            <div className="settings-section__actions">
-              <button className="btn-secondary" onClick={handleCancel} disabled={isSaving}><RotateCcw size={16} /> Cancel</button>
-              <button className="btn-primary" onClick={handleSave} disabled={isSaving || hasErrors}><Save size={16} /> {isSaving ? 'Saving...' : `Save (${pending.size})`}</button>
-            </div>
-          )}
+  if (isLoading) {
+    return (
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+        <div className="flex flex-col items-center justify-center py-16 text-[var(--theme-text-muted)] gap-3">
+          <div className="w-6 h-6 border-2 border-white/10 border-t-[var(--color-gold)] rounded-full animate-spin" />
+          <span className="text-sm">Loading settings...</span>
         </div>
       </div>
+    );
+  }
 
-      <div className="settings-section__body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xl)' }}>
+  if (error || !settings) {
+    return (
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+        <div className="flex items-center justify-center gap-2 py-16 text-red-400">
+          <AlertCircle size={24} />
+          <span>Error loading settings</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
+        <div className="flex items-center gap-2">
+          <DollarSign size={20} className="text-[var(--color-gold)]" />
+          <div>
+            <h2 className="text-lg font-bold text-white">Financial Settings</h2>
+            <p className="text-sm text-[var(--theme-text-muted)]">Payment limits, currency rounding, and reference requirements.</p>
+          </div>
+        </div>
+        {pending.size > 0 && (
+          <div className="flex items-center gap-2">
+            <button className="inline-flex items-center gap-1.5 px-3 py-2 bg-transparent border border-white/10 text-white hover:border-white/20 rounded-xl text-sm transition-colors" onClick={handleCancel} disabled={isSaving}>
+              <RotateCcw size={14} /> Cancel
+            </button>
+            <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-[var(--color-gold)] text-black font-bold rounded-xl text-sm transition-colors hover:opacity-90 disabled:opacity-50" onClick={handleSave} disabled={isSaving || hasErrors}>
+              <Save size={14} /> {isSaving ? 'Saving...' : `Save (${pending.size})`}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Body */}
+      <div className="px-6 py-5 space-y-6">
         {/* Max Payment Amount */}
-        <div className="settings-group">
-          <h3 className="settings-group__title">Max Payment Amount</h3>
-          <div className="form-group--inline">
-            <label className="form-label">Maximum single payment</label>
-            <div className="form-input-group">
-              <span className="form-input-suffix">IDR</span>
+        <div className="space-y-2">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Max Payment Amount</h3>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-[var(--theme-text-muted)]">Maximum single payment</span>
+            <div className="flex items-center gap-2 ml-auto">
+              <span className="text-xs text-[var(--theme-text-muted)]">IDR</span>
               <input
                 type="number"
-                className={`form-input form-input--narrow ${validationErrors['financial.max_payment_amount'] ? 'form-input--error' : ''}`}
+                className={`w-40 px-3 py-2 bg-black/40 border rounded-xl text-white text-sm outline-none transition-colors ${
+                  validationErrors['financial.max_payment_amount']
+                    ? 'border-red-500 focus:border-red-500'
+                    : 'border-white/10 focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20'
+                }`}
                 min={1}
                 value={getVal('financial.max_payment_amount', FINANCIAL_DEFAULTS.maxPaymentAmount)}
                 onChange={(e) => update('financial.max_payment_amount', Number(e.target.value))}
@@ -111,17 +141,23 @@ const FinancialSettingsPage = () => {
             </div>
           </div>
           {validationErrors['financial.max_payment_amount'] && (
-            <span className="form-error">{validationErrors['financial.max_payment_amount']}</span>
+            <span className="text-xs text-red-400">{validationErrors['financial.max_payment_amount']}</span>
           )}
         </div>
 
+        <div className="border-t border-white/5" />
+
         {/* Currency Rounding Unit */}
-        <div className="settings-group">
-          <h3 className="settings-group__title">Currency Rounding Unit</h3>
-          <div className="form-group--inline">
-            <label className="form-label">Round amounts to nearest</label>
+        <div className="space-y-2">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Currency Rounding Unit</h3>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-[var(--theme-text-muted)]">Round amounts to nearest</span>
             <select
-              className={`form-input form-select form-input--narrow ${validationErrors['financial.currency_rounding_unit'] ? 'form-input--error' : ''}`}
+              className={`ml-auto w-40 px-3 py-2 bg-black/40 border rounded-xl text-white text-sm outline-none transition-colors ${
+                validationErrors['financial.currency_rounding_unit']
+                  ? 'border-red-500 focus:border-red-500'
+                  : 'border-white/10 focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20'
+              }`}
               value={getVal('financial.currency_rounding_unit', FINANCIAL_DEFAULTS.currencyRoundingUnit)}
               onChange={(e) => update('financial.currency_rounding_unit', Number(e.target.value))}
             >
@@ -131,49 +167,56 @@ const FinancialSettingsPage = () => {
             </select>
           </div>
           {validationErrors['financial.currency_rounding_unit'] && (
-            <span className="form-error">{validationErrors['financial.currency_rounding_unit']}</span>
+            <span className="text-xs text-red-400">{validationErrors['financial.currency_rounding_unit']}</span>
           )}
         </div>
 
+        <div className="border-t border-white/5" />
+
         {/* Rounding Tolerance */}
-        <div className="settings-group">
-          <h3 className="settings-group__title">Rounding Tolerance</h3>
-          <div className="form-group--inline">
-            <label className="form-label">Max accepted rounding difference</label>
-            <div className="form-input-group">
-              <input
-                type="number"
-                className="form-input form-input--narrow"
-                min={0}
-                value={getVal('financial.rounding_tolerance', FINANCIAL_DEFAULTS.roundingTolerance)}
-                onChange={(e) => update('financial.rounding_tolerance', Number(e.target.value))}
-              />
-            </div>
+        <div className="space-y-2">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Rounding Tolerance</h3>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-[var(--theme-text-muted)]">Max accepted rounding difference</span>
+            <input
+              type="number"
+              className="ml-auto w-40 px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-white text-sm outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20"
+              min={0}
+              value={getVal('financial.rounding_tolerance', FINANCIAL_DEFAULTS.roundingTolerance)}
+              onChange={(e) => update('financial.rounding_tolerance', Number(e.target.value))}
+            />
           </div>
         </div>
 
+        <div className="border-t border-white/5" />
+
         {/* Reference Required Methods */}
-        <div className="settings-group">
-          <h3 className="settings-group__title">Reference Required Methods</h3>
-          <p className="form-hint" style={{ marginBottom: 'var(--space-sm)' }}>Payment methods that require a reference number.</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-sm)' }}>
+        <div className="space-y-2">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Reference Required Methods</h3>
+          <p className="text-xs text-[var(--theme-text-muted)]">Payment methods that require a reference number.</p>
+          <div className="flex flex-wrap gap-2 mt-2">
             {PAYMENT_METHOD_OPTIONS.map((m) => (
-              <label key={m} className="form-checkbox u-capitalize">
+              <label key={m} className="inline-flex items-center gap-2 px-3 py-1.5 bg-black/30 border border-white/5 rounded-lg cursor-pointer hover:border-white/10 transition-colors">
                 <input
                   type="checkbox"
                   checked={getVal<string[]>('financial.reference_required_methods', FINANCIAL_DEFAULTS.referenceRequiredMethods).includes(m)}
                   onChange={() => toggleMethod(m)}
+                  className="accent-[var(--color-gold)]"
                 />
-                {m}
+                <span className="text-sm text-white capitalize">{m}</span>
               </label>
             ))}
           </div>
         </div>
       </div>
 
+      {/* Unsaved notice */}
       {pending.size > 0 && (
-        <div className="settings-section__footer">
-          <div className="settings-unsaved-notice"><AlertCircle size={16} /><span>{pending.size} unsaved change{pending.size > 1 ? 's' : ''}</span></div>
+        <div className="px-6 py-3 border-t border-white/5 bg-[var(--color-gold)]/5">
+          <div className="flex items-center gap-2 text-[var(--color-gold)] text-sm">
+            <AlertCircle size={16} />
+            <span>{pending.size} unsaved change{pending.size > 1 ? 's' : ''}</span>
+          </div>
         </div>
       )}
     </div>

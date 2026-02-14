@@ -71,7 +71,6 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
 
             if (error) throw error
 
-            // Group by group_name
             const groups: Record<string, VariantGroup> = {}
 
             data?.forEach(mod => {
@@ -85,7 +84,6 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                     }
                 }
 
-                // Parse materials from JSONB
                 const materials: VariantMaterial[] = mod.materials && Array.isArray(mod.materials)
                     ? mod.materials.map((m: any) => ({
                         material_id: m.material_id,
@@ -224,7 +222,6 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
     }
 
     async function handleUpdateOption(optionId: string, field: string, value: any) {
-        // Update local state immediately for responsive UI
         setVariantGroups(prevGroups => {
             return prevGroups.map(group => ({
                 ...group,
@@ -234,7 +231,6 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
             }))
         })
 
-        // Then update database
         try {
             const { error } = await supabase
                 .from('product_modifiers')
@@ -245,7 +241,6 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
         } catch (error) {
             logError('Error updating option:', error)
             toast.error('Error updating option')
-            // Reload to get correct state on error
             loadVariants()
         }
     }
@@ -272,7 +267,6 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
 
         setVariantGroups(newGroups)
 
-        // Update in database
         const option = newGroups[groupIndex].options[optionIndex]
         handleUpdateOption(option.id!, 'materials', option.materials)
     }
@@ -291,68 +285,45 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
 
         setVariantGroups(newGroups)
 
-        // Update in database
         const option = newGroups[groupIndex].options[optionIndex]
         handleUpdateOption(option.id!, 'materials', option.materials)
     }
 
     if (loading) {
-        return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>
+        return (
+            <div className="py-8 text-center text-[var(--theme-text-muted)] text-sm uppercase tracking-widest">
+                Loading...
+            </div>
+        )
     }
 
     return (
-        <div style={{ padding: '1.5rem' }}>
-            <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="flex justify-between items-center">
                 <div>
-                    <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600 }}>Product Variants</h2>
-                    <p style={{ margin: '0.5rem 0 0', color: '#6B7280', fontSize: '0.875rem' }}>
+                    <h2 className="text-xl font-semibold text-white m-0">Product Variants</h2>
+                    <p className="text-xs text-[var(--theme-text-muted)] mt-1">
                         Create variant categories with multiple ingredients per option
                     </p>
                 </div>
                 <button
                     onClick={() => setShowAddGroup(true)}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        padding: '0.75rem 1.25rem',
-                        background: '#3B82F6',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        fontWeight: 500
-                    }}
+                    className="bg-[var(--color-gold)] text-black font-bold px-5 py-2.5 rounded-sm flex items-center gap-2 text-xs uppercase tracking-wider hover:bg-[var(--color-gold)]/90 transition-colors cursor-pointer"
                 >
-                    <Plus size={18} />
+                    <Plus size={16} />
                     New Category
                 </button>
             </div>
 
             {/* Add Group Modal */}
             {showAddGroup && (
-                <div style={{
-                    position: 'fixed',
-                    inset: 0,
-                    background: 'rgba(0,0,0,0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 1000
-                }}>
-                    <div style={{
-                        background: 'white',
-                        borderRadius: '12px',
-                        padding: '2rem',
-                        width: '90%',
-                        maxWidth: '500px'
-                    }}>
-                        <h3 style={{ margin: '0 0 1.5rem', fontSize: '1.125rem', fontWeight: 600 }}>
-                            New Variant Category
-                        </h3>
+                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[1000]">
+                    <div className="bg-[var(--onyx-surface)] border border-white/10 rounded-xl p-6 w-[90%] max-w-[500px] shadow-2xl">
+                        <h3 className="text-lg font-semibold text-white mb-6">New Variant Category</h3>
 
-                        <div style={{ marginBottom: '1rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
+                        <div className="mb-4">
+                            <label className="block text-[10px] font-bold text-[var(--theme-text-muted)] uppercase tracking-[0.15em] mb-2">
                                 Category Name *
                             </label>
                             <input
@@ -360,48 +331,37 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                 value={newGroupName}
                                 onChange={(e) => setNewGroupName(e.target.value)}
                                 placeholder="e.g. Milk, Size, Topping..."
-                                style={{
-                                    width: '100%',
-                                    padding: '0.75rem',
-                                    border: '1px solid #D1D5DB',
-                                    borderRadius: '6px',
-                                    fontSize: '0.875rem'
-                                }}
+                                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-0 focus:outline-none transition-all"
                             />
                         </div>
 
-                        <div style={{ marginBottom: '1rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
+                        <div className="mb-4">
+                            <label className="block text-[10px] font-bold text-[var(--theme-text-muted)] uppercase tracking-[0.15em] mb-2">
                                 Selection Type
                             </label>
                             <select
                                 value={newGroupType}
                                 onChange={(e) => setNewGroupType(e.target.value as 'single' | 'multiple')}
-                                style={{
-                                    width: '100%',
-                                    padding: '0.75rem',
-                                    border: '1px solid #D1D5DB',
-                                    borderRadius: '6px',
-                                    fontSize: '0.875rem'
-                                }}
+                                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-sm text-white focus:border-[var(--color-gold)] focus:ring-0 focus:outline-none transition-all"
                             >
                                 <option value="single">Single Choice</option>
                                 <option value="multiple">Multiple Choice</option>
                             </select>
                         </div>
 
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                        <div className="mb-6">
+                            <label className="flex items-center gap-2 cursor-pointer text-sm text-[var(--stone-text)]">
                                 <input
                                     type="checkbox"
                                     checked={newGroupRequired}
                                     onChange={(e) => setNewGroupRequired(e.target.checked)}
+                                    className="rounded border-white/20 bg-black/40 text-[var(--color-gold)] focus:ring-[var(--color-gold)]/20"
                                 />
-                                <span style={{ fontSize: '0.875rem' }}>Required</span>
+                                Required
                             </label>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+                        <div className="flex gap-3 justify-end">
                             <button
                                 onClick={() => {
                                     setShowAddGroup(false)
@@ -409,30 +369,13 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                     setNewGroupType('single')
                                     setNewGroupRequired(false)
                                 }}
-                                style={{
-                                    padding: '0.75rem 1.25rem',
-                                    background: '#F3F4F6',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.875rem',
-                                    fontWeight: 500
-                                }}
+                                className="px-5 py-2.5 bg-transparent border border-white/10 text-white rounded-lg text-sm font-medium hover:border-white/20 transition-colors cursor-pointer"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleAddGroup}
-                                style={{
-                                    padding: '0.75rem 1.25rem',
-                                    background: '#3B82F6',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.875rem',
-                                    fontWeight: 500
-                                }}
+                                className="px-5 py-2.5 bg-[var(--color-gold)] text-black rounded-lg text-sm font-bold hover:bg-[var(--color-gold)]/90 transition-colors cursor-pointer"
                             >
                                 Create
                             </button>
@@ -443,65 +386,33 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
 
             {/* Variant Groups List */}
             {variantGroups.length === 0 ? (
-                <div style={{
-                    padding: '3rem',
-                    textAlign: 'center',
-                    background: '#F9FAFB',
-                    borderRadius: '8px',
-                    border: '1px dashed #D1D5DB'
-                }}>
-                    <p style={{ color: '#6B7280', marginBottom: '1rem' }}>
+                <div className="py-12 text-center bg-[var(--onyx-surface)] rounded-xl border border-dashed border-white/10">
+                    <p className="text-[var(--theme-text-muted)] mb-2 text-sm">
                         No variant categories defined
                     </p>
-                    <p style={{ color: '#9CA3AF', fontSize: '0.875rem' }}>
+                    <p className="text-[var(--theme-text-muted)] text-xs opacity-60">
                         Click "New Category" to get started
                     </p>
                 </div>
             ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div className="space-y-6">
                     {variantGroups.map((group) => (
                         <div
                             key={group.group_name}
-                            style={{
-                                background: 'white',
-                                border: '1px solid #E5E7EB',
-                                borderRadius: '8px',
-                                padding: '1.5rem'
-                            }}
+                            className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden"
                         >
                             {/* Group Header */}
-                            <div style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'flex-start',
-                                marginBottom: '1rem',
-                                paddingBottom: '1rem',
-                                borderBottom: '1px solid #E5E7EB'
-                            }}>
+                            <div className="p-6 border-b border-white/5 flex justify-between items-start">
                                 <div>
-                                    <h3 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 600 }}>
+                                    <h3 className="text-lg font-semibold text-white m-0">
                                         {group.group_name}
                                     </h3>
-                                    <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
-                                        <span style={{
-                                            padding: '0.25rem 0.75rem',
-                                            background: '#EFF6FF',
-                                            color: '#1E40AF',
-                                            fontSize: '0.75rem',
-                                            borderRadius: '12px',
-                                            fontWeight: 500
-                                        }}>
+                                    <div className="flex gap-2 mt-2">
+                                        <span className="px-2.5 py-0.5 bg-[var(--color-gold)]/10 text-[var(--color-gold)] text-[10px] rounded-full font-bold uppercase tracking-wider border border-[var(--color-gold)]/20">
                                             {group.group_type === 'single' ? 'Single Choice' : 'Multiple Choice'}
                                         </span>
                                         {group.group_required && (
-                                            <span style={{
-                                                padding: '0.25rem 0.75rem',
-                                                background: '#FEF3C7',
-                                                color: '#92400E',
-                                                fontSize: '0.75rem',
-                                                borderRadius: '12px',
-                                                fontWeight: 500
-                                            }}>
+                                            <span className="px-2.5 py-0.5 bg-amber-400/10 text-amber-400 text-[10px] rounded-full font-bold uppercase tracking-wider border border-amber-400/20">
                                                 Required
                                             </span>
                                         )}
@@ -509,14 +420,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                 </div>
                                 <button
                                     onClick={() => handleDeleteGroup(group.group_name)}
-                                    style={{
-                                        padding: '0.5rem',
-                                        background: 'transparent',
-                                        border: 'none',
-                                        color: '#EF4444',
-                                        cursor: 'pointer',
-                                        borderRadius: '4px'
-                                    }}
+                                    className="p-2 bg-transparent border-none text-[var(--theme-text-muted)] hover:text-red-400 cursor-pointer rounded transition-colors"
                                     title="Delete category"
                                 >
                                     <Trash2 size={18} />
@@ -524,131 +428,72 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                             </div>
 
                             {/* Options List */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div className="p-6 space-y-4">
                                 {group.options.map((option, optIndex) => (
                                     <div
                                         key={option.id || optIndex}
-                                        style={{
-                                            background: '#F9FAFB',
-                                            padding: '1rem',
-                                            borderRadius: '6px',
-                                            border: '1px solid #E5E7EB'
-                                        }}
+                                        className="bg-black/20 p-4 rounded-lg border border-white/5"
                                     >
                                         {/* Option Header */}
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                                        <div className="flex items-center gap-3 mb-3">
                                             <input
                                                 type="text"
                                                 value={option.option_label}
                                                 onChange={(e) => handleUpdateOption(option.id!, 'option_label', e.target.value)}
-                                                style={{
-                                                    flex: 1,
-                                                    padding: '0.5rem',
-                                                    border: '1px solid #D1D5DB',
-                                                    borderRadius: '4px',
-                                                    fontSize: '0.875rem',
-                                                    background: 'white'
-                                                }}
+                                                className="flex-1 bg-black/40 border border-white/10 rounded-md px-3 py-2 text-sm text-white focus:border-[var(--color-gold)] focus:ring-0 focus:outline-none transition-all"
                                             />
                                             <input
                                                 type="number"
                                                 value={option.price_adjustment}
                                                 onChange={(e) => handleUpdateOption(option.id!, 'price_adjustment', parseFloat(e.target.value) || 0)}
-                                                placeholder="Prix"
-                                                style={{
-                                                    width: '100px',
-                                                    padding: '0.5rem',
-                                                    border: '1px solid #D1D5DB',
-                                                    borderRadius: '4px',
-                                                    fontSize: '0.875rem',
-                                                    background: 'white'
-                                                }}
+                                                placeholder="Price"
+                                                className="w-24 bg-black/40 border border-white/10 rounded-md px-3 py-2 text-sm text-white focus:border-[var(--color-gold)] focus:ring-0 focus:outline-none transition-all"
                                             />
-                                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem' }}>
+                                            <label className="flex items-center gap-1.5 text-[10px] text-[var(--theme-text-muted)] uppercase tracking-wider cursor-pointer">
                                                 <input
                                                     type="checkbox"
                                                     checked={option.is_default}
                                                     onChange={(e) => handleUpdateOption(option.id!, 'is_default', e.target.checked)}
+                                                    className="rounded border-white/20 bg-black/40 text-[var(--color-gold)] focus:ring-[var(--color-gold)]/20"
                                                 />
                                                 Default
                                             </label>
                                             <button
                                                 onClick={() => handleDeleteOption(option.id!)}
-                                                style={{
-                                                    padding: '0.5rem',
-                                                    background: 'transparent',
-                                                    border: 'none',
-                                                    color: '#EF4444',
-                                                    cursor: 'pointer'
-                                                }}
+                                                className="p-1.5 bg-transparent border-none text-[var(--theme-text-muted)] hover:text-red-400 cursor-pointer transition-colors"
                                                 title="Delete option"
                                             >
-                                                <Trash2 size={16} />
+                                                <Trash2 size={14} />
                                             </button>
                                         </div>
 
                                         {/* Materials Section */}
-                                        <div style={{
-                                            marginTop: '0.75rem',
-                                            paddingTop: '0.75rem',
-                                            borderTop: '1px solid #E5E7EB'
-                                        }}>
-                                            <div style={{
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                marginBottom: '0.5rem'
-                                            }}>
-                                                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#6B7280' }}>
+                                        <div className="pt-3 border-t border-white/5">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="text-[10px] font-bold text-[var(--theme-text-muted)] uppercase tracking-wider">
                                                     Ingredients to Deduct
                                                 </span>
                                                 <button
                                                     onClick={() => handleAddMaterial(group.group_name, option.id!)}
-                                                    style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '0.25rem',
-                                                        padding: '0.25rem 0.5rem',
-                                                        background: '#3B82F6',
-                                                        color: 'white',
-                                                        border: 'none',
-                                                        borderRadius: '4px',
-                                                        cursor: 'pointer',
-                                                        fontSize: '0.75rem',
-                                                        fontWeight: 500
-                                                    }}
+                                                    className="flex items-center gap-1 px-2 py-1 bg-[var(--color-gold)]/10 text-[var(--color-gold)] border border-[var(--color-gold)]/20 rounded text-[10px] font-bold uppercase tracking-wider cursor-pointer hover:bg-[var(--color-gold)]/20 transition-colors"
                                                 >
-                                                    <Plus size={14} />
+                                                    <Plus size={12} />
                                                     Add
                                                 </button>
                                             </div>
 
-                                            {/* Materials List */}
                                             {option.materials.length === 0 ? (
-                                                <p style={{
-                                                    fontSize: '0.75rem',
-                                                    color: '#9CA3AF',
-                                                    fontStyle: 'italic',
-                                                    margin: '0.5rem 0'
-                                                }}>
+                                                <p className="text-[10px] text-[var(--theme-text-muted)] italic m-1 opacity-60">
                                                     No ingredients configured
                                                 </p>
                                             ) : (
-                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                                <div className="space-y-2">
                                                     {option.materials.map((material, matIndex) => {
                                                         const selectedProduct = availableProducts.find(p => p.id === material.material_id)
                                                         return (
                                                             <div
                                                                 key={matIndex}
-                                                                style={{
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '0.5rem',
-                                                                    background: 'white',
-                                                                    padding: '0.5rem',
-                                                                    borderRadius: '4px',
-                                                                    border: '1px solid #E5E7EB'
-                                                                }}
+                                                                className="flex items-center gap-2 bg-black/30 p-2 rounded border border-white/5"
                                                             >
                                                                 <select
                                                                     value={material.material_id}
@@ -659,13 +504,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                                                         'material_id',
                                                                         e.target.value
                                                                     )}
-                                                                    style={{
-                                                                        flex: 1,
-                                                                        padding: '0.375rem',
-                                                                        border: '1px solid #D1D5DB',
-                                                                        borderRadius: '4px',
-                                                                        fontSize: '0.75rem'
-                                                                    }}
+                                                                    className="flex-1 bg-black/40 border border-white/10 rounded px-2 py-1.5 text-xs text-white focus:border-[var(--color-gold)] focus:ring-0 focus:outline-none"
                                                                 >
                                                                     <option value="">Select a product...</option>
                                                                     {availableProducts.map(prod => (
@@ -685,37 +524,20 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                                                         'quantity',
                                                                         parseFloat(e.target.value) || 0
                                                                     )}
-                                                                    placeholder="Qté"
+                                                                    placeholder="Qty"
                                                                     disabled={!material.material_id}
-                                                                    style={{
-                                                                        width: '80px',
-                                                                        padding: '0.375rem',
-                                                                        border: '1px solid #D1D5DB',
-                                                                        borderRadius: '4px',
-                                                                        fontSize: '0.75rem',
-                                                                        background: material.material_id ? 'white' : '#F3F4F6'
-                                                                    }}
+                                                                    className="w-20 bg-black/40 border border-white/10 rounded px-2 py-1.5 text-xs text-white focus:border-[var(--color-gold)] focus:ring-0 focus:outline-none disabled:opacity-40"
                                                                 />
 
                                                                 {selectedProduct && (
-                                                                    <span style={{
-                                                                        fontSize: '0.75rem',
-                                                                        color: '#6B7280',
-                                                                        minWidth: '40px'
-                                                                    }}>
+                                                                    <span className="text-[10px] text-[var(--theme-text-muted)] min-w-[40px]">
                                                                         {selectedProduct.unit}
                                                                     </span>
                                                                 )}
 
                                                                 <button
                                                                     onClick={() => handleRemoveMaterial(group.group_name, option.id!, matIndex)}
-                                                                    style={{
-                                                                        padding: '0.25rem',
-                                                                        background: 'transparent',
-                                                                        border: 'none',
-                                                                        color: '#EF4444',
-                                                                        cursor: 'pointer'
-                                                                    }}
+                                                                    className="p-1 bg-transparent border-none text-[var(--theme-text-muted)] hover:text-red-400 cursor-pointer transition-colors"
                                                                     title="Remove ingredient"
                                                                 >
                                                                     <X size={14} />
@@ -732,20 +554,7 @@ export const VariantsTab: React.FC<VariantsTabProps> = ({ productId }) => {
                                 {/* Add Option Button */}
                                 <button
                                     onClick={() => handleAddOption(group.group_name)}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '0.5rem',
-                                        padding: '0.75rem',
-                                        background: 'white',
-                                        border: '1px dashed #D1D5DB',
-                                        borderRadius: '6px',
-                                        cursor: 'pointer',
-                                        color: '#6B7280',
-                                        fontSize: '0.875rem',
-                                        fontWeight: 500
-                                    }}
+                                    className="w-full flex items-center justify-center gap-2 py-3 bg-transparent border border-dashed border-white/10 rounded-lg cursor-pointer text-[var(--theme-text-muted)] text-sm font-medium hover:border-[var(--color-gold)]/40 hover:text-[var(--color-gold)] transition-colors"
                                 >
                                     <Plus size={16} />
                                     Add an option

@@ -23,6 +23,31 @@ interface OrdersTableProps {
     onPageChange: (page: number) => void;
 }
 
+const statusBadge = (status: string) => {
+    const base = 'inline-flex py-1 px-2.5 rounded-full text-[11px] font-semibold uppercase tracking-wider border';
+    switch (status) {
+        case 'pending': return cn(base, 'bg-blue-500/10 text-blue-400 border-blue-500/20');
+        case 'preparing': return cn(base, 'bg-amber-500/10 text-amber-400 border-amber-500/20');
+        case 'ready': return cn(base, 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20');
+        case 'completed': return cn(base, 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20');
+        case 'cancelled': return cn(base, 'bg-red-500/10 text-red-400 border-red-500/20');
+        default: return cn(base, 'bg-white/5 text-[var(--theme-text-muted)] border-white/10');
+    }
+};
+
+const typeBadge = (type: string) => {
+    const base = 'inline-flex items-center gap-1 py-1 px-2 rounded-lg text-xs font-medium';
+    switch (type) {
+        case 'dine_in': return cn(base, 'bg-blue-500/10 text-blue-400');
+        case 'takeaway': return cn(base, 'bg-amber-500/10 text-amber-400');
+        case 'delivery': return cn(base, 'bg-purple-500/10 text-purple-400');
+        case 'b2b': return cn(base, 'bg-emerald-500/10 text-emerald-400');
+        default: return cn(base, 'bg-white/5 text-[var(--theme-text-muted)]');
+    }
+};
+
+const thClass = 'p-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)] bg-black/20';
+
 const OrdersTable = ({
     paginatedOrders,
     filteredTotal,
@@ -34,10 +59,10 @@ const OrdersTable = ({
 }: OrdersTableProps) => {
     if (isLoading) {
         return (
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                <div className="flex flex-col items-center justify-center p-2xl gap-md" style={{ color: 'var(--color-gris-chaud)' }}>
-                    <RefreshCw size={32} className="animate-spin" />
-                    <p className="m-0">Loading orders...</p>
+            <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+                <div className="flex flex-col items-center justify-center p-12 gap-3 text-[var(--theme-text-muted)]">
+                    <RefreshCw size={32} className="animate-spin text-[var(--color-gold)]" />
+                    <p className="m-0 text-sm">Loading orders...</p>
                 </div>
             </div>
         );
@@ -45,10 +70,9 @@ const OrdersTable = ({
 
     if (paginatedOrders.length === 0) {
         return (
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                <div className="flex flex-col items-center justify-center p-2xl text-center" style={{ color: 'var(--color-gris-chaud)' }}>
-                    <div className="text-[4rem] mb-md opacity-40">{'\uD83D\uDCCB'}</div>
-                    <div className="text-lg mb-xs">No orders found</div>
+            <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+                <div className="flex flex-col items-center justify-center p-12 text-center text-[var(--theme-text-muted)]">
+                    <div className="text-5xl mb-3 opacity-30">No orders</div>
                     <div className="text-sm">Adjust your filters to see more results</div>
                 </div>
             </div>
@@ -56,80 +80,64 @@ const OrdersTable = ({
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <table className="ot-table w-full border-collapse max-md:block max-md:overflow-x-auto">
+        <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+            <table className="w-full border-collapse max-md:block max-md:overflow-x-auto">
                 <thead>
                     <tr>
-                        <th className="p-md text-left text-xs font-semibold uppercase tracking-[0.5px] border-b border-border" style={{ color: 'var(--color-gris-chaud)', background: 'var(--color-blanc-creme)' }}>Order #</th>
-                        <th className="p-md text-left text-xs font-semibold uppercase tracking-[0.5px] border-b border-border" style={{ color: 'var(--color-gris-chaud)', background: 'var(--color-blanc-creme)' }}>Time</th>
-                        <th className="p-md text-left text-xs font-semibold uppercase tracking-[0.5px] border-b border-border" style={{ color: 'var(--color-gris-chaud)', background: 'var(--color-blanc-creme)' }}>Type</th>
-                        <th className="p-md text-left text-xs font-semibold uppercase tracking-[0.5px] border-b border-border" style={{ color: 'var(--color-gris-chaud)', background: 'var(--color-blanc-creme)' }}>Customer</th>
-                        <th className="p-md text-left text-xs font-semibold uppercase tracking-[0.5px] border-b border-border" style={{ color: 'var(--color-gris-chaud)', background: 'var(--color-blanc-creme)' }}>Items</th>
-                        <th className="p-md text-left text-xs font-semibold uppercase tracking-[0.5px] border-b border-border" style={{ color: 'var(--color-gris-chaud)', background: 'var(--color-blanc-creme)' }}>Amount</th>
-                        <th className="p-md text-left text-xs font-semibold uppercase tracking-[0.5px] border-b border-border" style={{ color: 'var(--color-gris-chaud)', background: 'var(--color-blanc-creme)' }}>Status</th>
-                        <th className="p-md text-left text-xs font-semibold uppercase tracking-[0.5px] border-b border-border" style={{ color: 'var(--color-gris-chaud)', background: 'var(--color-blanc-creme)' }}>Payment</th>
-                        <th className="p-md text-left text-xs font-semibold uppercase tracking-[0.5px] border-b border-border" style={{ color: 'var(--color-gris-chaud)', background: 'var(--color-blanc-creme)' }}></th>
+                        <th className={thClass}>Order #</th>
+                        <th className={thClass}>Time</th>
+                        <th className={thClass}>Type</th>
+                        <th className={thClass}>Customer</th>
+                        <th className={thClass}>Items</th>
+                        <th className={thClass}>Amount</th>
+                        <th className={thClass}>Status</th>
+                        <th className={thClass}>Payment</th>
+                        <th className={thClass}></th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-white/5">
                     {paginatedOrders.map(order => (
                         <tr
                             key={order.id}
-                            className={cn(
-                                'ot-row cursor-pointer transition-[background] duration-150',
-                                order.payment_status !== 'paid' && 'ot-row--unpaid'
-                            )}
+                            className="cursor-pointer transition-colors hover:bg-white/[0.02]"
                             onClick={() => onSelectOrder(order)}
                         >
-                            <td className="p-md text-sm border-b border-border" style={{ color: 'var(--color-brun-chocolat)' }}>
-                                <span className="font-mono font-semibold" style={{ color: 'var(--color-rose-poudre)' }}>
+                            <td className="p-3 text-sm">
+                                <span className="font-mono font-semibold text-[var(--color-gold)]">
                                     #{order.order_number}
                                 </span>
                             </td>
-                            <td className="p-md text-sm border-b border-border" style={{ color: 'var(--color-brun-chocolat)' }}>
-                                <div>{formatTime(order.created_at)}</div>
-                                <div className="text-[12px]" style={{ color: 'var(--color-gris-chaud)' }}>
+                            <td className="p-3 text-sm">
+                                <div className="text-white">{formatTime(order.created_at)}</div>
+                                <div className="text-[11px] text-[var(--theme-text-muted)]">
                                     {formatDate(order.created_at)}
                                 </div>
                             </td>
-                            <td className="p-md text-sm border-b border-border" style={{ color: 'var(--color-brun-chocolat)' }}>
-                                <span className={cn(
-                                    'ot-type-badge inline-flex items-center gap-xs py-xs px-sm rounded-sm text-xs font-medium',
-                                    order.order_type === 'dine_in' && 'ot-type--dine_in',
-                                    order.order_type === 'takeaway' && 'ot-type--takeaway',
-                                    order.order_type === 'delivery' && 'ot-type--delivery',
-                                    order.order_type === 'b2b' && 'ot-type--b2b'
-                                )}>
+                            <td className="p-3 text-sm">
+                                <span className={typeBadge(order.order_type)}>
                                     {getOrderTypeIcon(order.order_type)} {getOrderTypeLabel(order.order_type)}
                                     {order.table_number && ` - T${order.table_number}`}
                                 </span>
                             </td>
-                            <td className="p-md text-sm border-b border-border" style={{ color: 'var(--color-gris-chaud)' }}>
+                            <td className="p-3 text-sm text-[var(--theme-text-muted)]">
                                 {order.customer_name || '-'}
                             </td>
-                            <td className="p-md text-sm border-b border-border" style={{ color: 'var(--color-gris-chaud)' }}>
+                            <td className="p-3 text-sm text-[var(--theme-text-muted)]">
                                 {order.items.reduce((sum, item) => sum + item.quantity, 0)} items
                             </td>
-                            <td className="p-md text-sm border-b border-border" style={{ color: 'var(--color-brun-chocolat)' }}>
-                                <span className="font-semibold font-mono">{formatCurrency(order.total)}</span>
+                            <td className="p-3 text-sm">
+                                <span className="font-semibold font-mono text-white">{formatCurrency(order.total)}</span>
                             </td>
-                            <td className="p-md text-sm border-b border-border" style={{ color: 'var(--color-brun-chocolat)' }}>
-                                <span className={cn(
-                                    'ot-status inline-flex py-xs px-sm rounded-xl text-[11px] font-semibold uppercase tracking-[0.5px]',
-                                    order.status === 'pending' && 'bg-info-bg text-info',
-                                    order.status === 'preparing' && 'bg-warning-bg text-warning',
-                                    order.status === 'ready' && 'bg-success-bg text-success',
-                                    order.status === 'completed' && 'ot-status--completed',
-                                    order.status === 'cancelled' && 'ot-status--cancelled'
-                                )}>
+                            <td className="p-3 text-sm">
+                                <span className={statusBadge(order.status)}>
                                     {getStatusLabel(order.status)}
                                 </span>
                             </td>
-                            <td className="p-md text-sm border-b border-border" style={{ color: 'var(--color-brun-chocolat)' }}>
+                            <td className="p-3 text-sm">
                                 <div className="flex flex-col gap-1">
                                     <span className={cn(
-                                        'inline-flex items-center gap-xs text-sm font-medium',
-                                        order.payment_status === 'paid' ? 'text-success' : 'text-[var(--color-urgent)]'
+                                        'inline-flex items-center gap-1 text-sm font-medium',
+                                        order.payment_status === 'paid' ? 'text-emerald-400' : 'text-red-400'
                                     )}>
                                         {order.payment_status === 'paid' ? (
                                             <><Check size={14} /> Paid</>
@@ -138,17 +146,16 @@ const OrdersTable = ({
                                         )}
                                     </span>
                                     {order.payment_status === 'paid' && order.payment_method && (
-                                        <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--color-gris-chaud)' }}>
+                                        <span className="flex items-center gap-1 text-xs text-[var(--theme-text-muted)]">
                                             {getPaymentIcon(order.payment_method)}
                                             {getPaymentMethodLabel(order.payment_method)}
                                         </span>
                                     )}
                                 </div>
                             </td>
-                            <td className="p-md text-sm border-b border-border" style={{ color: 'var(--color-brun-chocolat)' }}>
+                            <td className="p-3 text-sm">
                                 <button
-                                    className="ot-view-btn flex items-center gap-1 py-xs px-sm bg-transparent border border-border rounded-sm text-xs font-medium cursor-pointer transition-all duration-fast ease-standard"
-                                    style={{ color: 'var(--color-gris-chaud)' }}
+                                    className="flex items-center gap-1 py-1 px-2.5 bg-transparent border border-white/10 rounded-lg text-xs font-medium text-[var(--theme-text-muted)] cursor-pointer transition-all hover:border-[var(--color-gold)]/40 hover:text-[var(--color-gold)]"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         onSelectOrder(order);
@@ -163,14 +170,13 @@ const OrdersTable = ({
             </table>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between p-md border-t border-border" style={{ background: 'var(--color-blanc-creme)' }}>
-                <div className="text-sm" style={{ color: 'var(--color-gris-chaud)' }}>
+            <div className="flex items-center justify-between p-3 border-t border-white/5 bg-black/20">
+                <div className="text-sm text-[var(--theme-text-muted)]">
                     Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredTotal)} of {filteredTotal} orders
                 </div>
-                <div className="flex gap-xs">
+                <div className="flex gap-1.5">
                     <button
-                        className="ot-page-btn w-9 h-9 flex items-center justify-center bg-white border border-border rounded-sm cursor-pointer transition-all duration-fast ease-standard disabled:opacity-40 disabled:cursor-not-allowed"
-                        style={{ color: 'var(--color-brun-chocolat)' }}
+                        className="w-9 h-9 flex items-center justify-center bg-transparent border border-white/10 rounded-lg cursor-pointer transition-all text-[var(--theme-text-muted)] hover:border-[var(--color-gold)]/40 hover:text-[var(--color-gold)] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-white/10 disabled:hover:text-[var(--theme-text-muted)]"
                         disabled={currentPage === 1}
                         onClick={() => onPageChange(currentPage - 1)}
                         aria-label="Previous Page"
@@ -192,15 +198,11 @@ const OrdersTable = ({
                             <button
                                 key={pageNum}
                                 className={cn(
-                                    'ot-page-btn w-9 h-9 flex items-center justify-center border rounded-sm cursor-pointer transition-all duration-fast ease-standard',
+                                    'w-9 h-9 flex items-center justify-center border rounded-lg cursor-pointer transition-all text-sm font-medium',
                                     currentPage === pageNum
-                                        ? 'text-white'
-                                        : 'bg-white border-border'
+                                        ? 'bg-[var(--color-gold)] text-black border-[var(--color-gold)] font-bold'
+                                        : 'bg-transparent border-white/10 text-[var(--theme-text-muted)] hover:border-[var(--color-gold)]/40 hover:text-white'
                                 )}
-                                style={currentPage === pageNum
-                                    ? { background: 'var(--color-rose-poudre)', borderColor: 'var(--color-rose-poudre)' }
-                                    : { color: 'var(--color-brun-chocolat)' }
-                                }
                                 onClick={() => onPageChange(pageNum)}
                             >
                                 {pageNum}
@@ -208,8 +210,7 @@ const OrdersTable = ({
                         );
                     })}
                     <button
-                        className="ot-page-btn w-9 h-9 flex items-center justify-center bg-white border border-border rounded-sm cursor-pointer transition-all duration-fast ease-standard disabled:opacity-40 disabled:cursor-not-allowed"
-                        style={{ color: 'var(--color-brun-chocolat)' }}
+                        className="w-9 h-9 flex items-center justify-center bg-transparent border border-white/10 rounded-lg cursor-pointer transition-all text-[var(--theme-text-muted)] hover:border-[var(--color-gold)]/40 hover:text-[var(--color-gold)] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-white/10 disabled:hover:text-[var(--theme-text-muted)]"
                         disabled={currentPage === totalPages}
                         onClick={() => onPageChange(currentPage + 1)}
                         aria-label="Next Page"
@@ -218,29 +219,6 @@ const OrdersTable = ({
                     </button>
                 </div>
             </div>
-
-            {/* Scoped styles for hover effects and variants */}
-            <style>{`
-                .ot-row:hover td { background: rgba(186,144,162,0.05); }
-                .ot-row--unpaid { background: rgba(239,68,68,0.03); }
-                .ot-row--unpaid:hover td { background: rgba(239,68,68,0.08); }
-                .ot-type-badge { background: var(--color-blanc-creme); }
-                .ot-type--dine_in { background: rgba(123,163,181,0.1); color: #7BA3B5; }
-                .ot-type--takeaway { background: rgba(234,192,134,0.1); color: #D4A574; }
-                .ot-type--delivery { background: rgba(186,144,162,0.1); color: #BA90A2; }
-                .ot-type--b2b { background: rgba(107,142,107,0.1); color: #5A7D5A; }
-                .ot-status--completed { background: rgba(107,142,107,0.2); color: #5A7D5A; }
-                .ot-status--cancelled { background: var(--color-urgent-bg); color: var(--color-urgent); }
-                .ot-view-btn:hover {
-                    border-color: var(--color-rose-poudre);
-                    color: var(--color-rose-poudre);
-                    background: rgba(186,144,162,0.05);
-                }
-                .ot-page-btn:hover:not(:disabled) {
-                    border-color: var(--color-rose-poudre);
-                    color: var(--color-rose-poudre);
-                }
-            `}</style>
         </div>
     );
 };

@@ -3,10 +3,10 @@ import {
   Save, RotateCcw, AlertCircle, AlertTriangle, RefreshCw,
   Repeat, Database, Wifi, Zap, Shield, BatteryLow,
 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { useSettingsByCategory, useUpdateSetting } from '@/hooks/settings';
 import { SYNC_ADVANCED_DEFAULTS } from '@/hooks/settings/useModuleConfigSettings';
 import { toast } from 'sonner';
+import { SyncSettingsCard, NumericField } from './sync-advanced/SyncSettingsCard';
 
 const K = {
   startupDelay: 'sync_advanced.startup_delay_ms',
@@ -136,19 +136,17 @@ const SyncAdvancedSettingsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="settings-section">
-        <div className="settings-section__body settings-section__loading">
-          <div className="spinner" /><span>Loading settings...</span>
-        </div>
+      <div className="p-6 max-w-5xl mx-auto flex items-center justify-center gap-2 py-20 text-[var(--theme-text-muted)]">
+        <RefreshCw size={24} className="animate-spin" />
+        <span>Loading settings...</span>
       </div>
     );
   }
   if (error || !settings) {
     return (
-      <div className="settings-section">
-        <div className="settings-section__body settings-section__error">
-          <AlertCircle size={24} /><span>Error loading sync settings</span>
-        </div>
+      <div className="p-6 max-w-5xl mx-auto flex items-center justify-center gap-2 py-20 text-red-400">
+        <AlertCircle size={24} />
+        <span>Error loading sync settings</span>
       </div>
     );
   }
@@ -159,153 +157,125 @@ const SyncAdvancedSettingsPage = () => {
     ? (formValues[K.retryBackoff] as number[]) : SYNC_ADVANCED_DEFAULTS.retryBackoffDelaysMs;
 
   return (
-    <div className="settings-section">
-      <div className="settings-section__header">
-        <div className="settings-section__header-content">
-          <div>
-            <h2 className="settings-section__title">
-              <RefreshCw size={20} /> Sync Advanced Settings
-            </h2>
-            <p className="settings-section__description">
-              Fine-tune synchronization, caching, and LAN parameters
-            </p>
-          </div>
-          {pendingChanges.size > 0 && (
-            <div className="settings-section__actions">
-              <button className="btn-secondary" onClick={handleResetAll} disabled={isSaving}>
-                <RotateCcw size={16} /> Cancel
-              </button>
-              <button className="btn-primary" onClick={handleSaveAll} disabled={isSaving}>
-                <Save size={16} /> {isSaving ? 'Saving...' : `Save (${pendingChanges.size})`}
-              </button>
-            </div>
-          )}
+    <div className="p-6 max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            <RefreshCw className="w-7 h-7 text-[var(--color-gold)]" />
+            Sync Advanced Settings
+          </h1>
+          <p className="text-[var(--theme-text-muted)] mt-1">
+            Fine-tune synchronization, caching, and LAN parameters
+          </p>
         </div>
+        {pendingChanges.size > 0 && (
+          <div className="flex items-center gap-2">
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-transparent border border-white/10 text-white rounded-xl hover:border-white/20 transition-colors"
+              onClick={handleResetAll}
+              disabled={isSaving}
+            >
+              <RotateCcw size={16} /> Cancel
+            </button>
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--color-gold)] text-black font-bold rounded-xl hover:opacity-90 transition-colors disabled:opacity-50"
+              onClick={handleSaveAll}
+              disabled={isSaving}
+            >
+              <Save size={16} /> {isSaving ? 'Saving...' : `Save (${pendingChanges.size})`}
+            </button>
+          </div>
+        )}
       </div>
 
-      <div className="settings-section__body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        <div className="settings-section__readonly-notice">
-          <AlertTriangle size={16} />
-          <span>
+      <div className="space-y-6">
+        {/* Warning */}
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex items-center gap-3">
+          <AlertTriangle size={16} className="text-amber-400 shrink-0" />
+          <span className="text-sm text-amber-300">
             These settings are for technical administrators. Incorrect values may affect
             performance and sync reliability.
           </span>
         </div>
 
+        {/* Presets */}
         <div className="flex gap-2 flex-wrap">
           {PRESETS.map((p) => (
-            <button key={p.label} className="btn-secondary" onClick={() => applyPreset(p)}>
+            <button
+              key={p.label}
+              className="flex items-center gap-1.5 px-4 py-2 bg-transparent border border-white/10 text-white rounded-xl hover:border-white/20 transition-colors text-sm"
+              onClick={() => applyPreset(p)}
+            >
               {p.icon} {p.label}
             </button>
           ))}
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <RefreshCw size={18} className="text-rose-400" /> Synchronization
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <NF label="Startup delay" hint={msToS(formValues[K.startupDelay])} suffix="ms"
-              value={n(formValues[K.startupDelay])} onChange={(v) => handleChange(K.startupDelay, v)} />
-            <NF label="Background interval" hint={msToS(formValues[K.bgInterval])} suffix="ms"
-              value={n(formValues[K.bgInterval])} onChange={(v) => handleChange(K.bgInterval, v)} />
-            <NF label="Item process delay" suffix="ms"
-              value={n(formValues[K.itemDelay])} onChange={(v) => handleChange(K.itemDelay, v)} />
-          </CardContent>
-        </Card>
+        {/* Synchronization */}
+        <SyncSettingsCard icon={<RefreshCw size={18} className="text-[var(--color-gold)]" />} title="Synchronization">
+          <NumericField label="Startup delay" hint={msToS(formValues[K.startupDelay])} suffix="ms"
+            value={n(formValues[K.startupDelay])} onChange={(v) => handleChange(K.startupDelay, v)} />
+          <NumericField label="Background interval" hint={msToS(formValues[K.bgInterval])} suffix="ms"
+            value={n(formValues[K.bgInterval])} onChange={(v) => handleChange(K.bgInterval, v)} />
+          <NumericField label="Item process delay" suffix="ms"
+            value={n(formValues[K.itemDelay])} onChange={(v) => handleChange(K.itemDelay, v)} />
+        </SyncSettingsCard>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Repeat size={18} className="text-rose-400" /> Retry Strategy
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="form-group--inline">
-              <label className="form-label">Backoff delays (ms, comma-separated)</label>
-              <input type="text" className="form-input" style={{ maxWidth: 320 }}
-                value={backoff.join(', ')}
-                onChange={(e) => {
-                  const arr = e.target.value.split(',').map((s) => Number(s.trim())).filter((n) => !isNaN(n) && n > 0);
-                  handleChange(K.retryBackoff, arr);
-                }}
-              />
-            </div>
-            <NF label="Max retries" value={n(formValues[K.maxRetries])}
-              onChange={(v) => handleChange(K.maxRetries, v)} />
-            <NF label="Max queue size" value={n(formValues[K.maxQueue])}
-              onChange={(v) => handleChange(K.maxQueue, v)} />
-          </CardContent>
-        </Card>
+        {/* Retry Strategy */}
+        <SyncSettingsCard icon={<Repeat size={18} className="text-[var(--color-gold)]" />} title="Retry Strategy">
+          <div className="flex items-center justify-between gap-4">
+            <label className="text-sm text-[var(--theme-text-secondary)]">Backoff delays (ms, comma-separated)</label>
+            <input
+              type="text"
+              className="bg-black/40 border border-white/10 rounded-xl text-white placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 px-3 py-1.5 text-sm w-72"
+              value={backoff.join(', ')}
+              onChange={(e) => {
+                const arr = e.target.value.split(',').map((s) => Number(s.trim())).filter((n) => !isNaN(n) && n > 0);
+                handleChange(K.retryBackoff, arr);
+              }}
+            />
+          </div>
+          <NumericField label="Max retries" value={n(formValues[K.maxRetries])}
+            onChange={(v) => handleChange(K.maxRetries, v)} />
+          <NumericField label="Max queue size" value={n(formValues[K.maxQueue])}
+            onChange={(v) => handleChange(K.maxQueue, v)} />
+        </SyncSettingsCard>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Database size={18} className="text-rose-400" /> Cache TTL
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <NF label="Default cache TTL" suffix="hours"
-              value={n(formValues[K.cacheTtlDefault])} onChange={(v) => handleChange(K.cacheTtlDefault, v)} />
-            <NF label="Orders cache TTL" suffix="hours"
-              value={n(formValues[K.cacheTtlOrders])} onChange={(v) => handleChange(K.cacheTtlOrders, v)} />
-            <NF label="Cache refresh interval" suffix="hours"
-              value={n(formValues[K.cacheRefresh])} onChange={(v) => handleChange(K.cacheRefresh, v)} />
-          </CardContent>
-        </Card>
+        {/* Cache TTL */}
+        <SyncSettingsCard icon={<Database size={18} className="text-[var(--color-gold)]" />} title="Cache TTL">
+          <NumericField label="Default cache TTL" suffix="hours"
+            value={n(formValues[K.cacheTtlDefault])} onChange={(v) => handleChange(K.cacheTtlDefault, v)} />
+          <NumericField label="Orders cache TTL" suffix="hours"
+            value={n(formValues[K.cacheTtlOrders])} onChange={(v) => handleChange(K.cacheTtlOrders, v)} />
+          <NumericField label="Cache refresh interval" suffix="hours"
+            value={n(formValues[K.cacheRefresh])} onChange={(v) => handleChange(K.cacheRefresh, v)} />
+        </SyncSettingsCard>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Zap size={18} className="text-rose-400" /> LAN Network
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <NF label="Heartbeat interval" hint={msToS(formValues[K.lanHeartbeat])} suffix="ms"
-              value={n(formValues[K.lanHeartbeat])} onChange={(v) => handleChange(K.lanHeartbeat, v)} />
-            <NF label="Stale timeout" hint={msToS(formValues[K.lanStale])} suffix="ms"
-              value={n(formValues[K.lanStale])} onChange={(v) => handleChange(K.lanStale, v)} />
-            <NF label="Max reconnect attempts"
-              value={n(formValues[K.lanMaxReconnect])} onChange={(v) => handleChange(K.lanMaxReconnect, v)} />
-            <NF label="Reconnect backoff base" suffix="ms"
-              value={n(formValues[K.lanReconnectBase])} onChange={(v) => handleChange(K.lanReconnectBase, v)} />
-            <NF label="Reconnect backoff max" suffix="ms"
-              value={n(formValues[K.lanReconnectMax])} onChange={(v) => handleChange(K.lanReconnectMax, v)} />
-          </CardContent>
-        </Card>
+        {/* LAN Network */}
+        <SyncSettingsCard icon={<Zap size={18} className="text-[var(--color-gold)]" />} title="LAN Network">
+          <NumericField label="Heartbeat interval" hint={msToS(formValues[K.lanHeartbeat])} suffix="ms"
+            value={n(formValues[K.lanHeartbeat])} onChange={(v) => handleChange(K.lanHeartbeat, v)} />
+          <NumericField label="Stale timeout" hint={msToS(formValues[K.lanStale])} suffix="ms"
+            value={n(formValues[K.lanStale])} onChange={(v) => handleChange(K.lanStale, v)} />
+          <NumericField label="Max reconnect attempts"
+            value={n(formValues[K.lanMaxReconnect])} onChange={(v) => handleChange(K.lanMaxReconnect, v)} />
+          <NumericField label="Reconnect backoff base" suffix="ms"
+            value={n(formValues[K.lanReconnectBase])} onChange={(v) => handleChange(K.lanReconnectBase, v)} />
+          <NumericField label="Reconnect backoff max" suffix="ms"
+            value={n(formValues[K.lanReconnectMax])} onChange={(v) => handleChange(K.lanReconnectMax, v)} />
+        </SyncSettingsCard>
       </div>
 
+      {/* Unsaved notice */}
       {pendingChanges.size > 0 && (
-        <div className="settings-section__footer">
-          <div className="settings-unsaved-notice">
-            <AlertCircle size={16} />
-            <span>{pendingChanges.size} unsaved change{pendingChanges.size > 1 ? 's' : ''}</span>
-          </div>
+        <div className="mt-6 bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex items-center gap-3">
+          <AlertCircle size={16} className="text-amber-400" />
+          <span className="text-sm text-amber-300">{pendingChanges.size} unsaved change{pendingChanges.size > 1 ? 's' : ''}</span>
         </div>
       )}
     </div>
   );
 };
-
-function NF({ label, hint, suffix, value, onChange }: {
-  label: string; hint?: string; suffix?: string; value: number;
-  onChange: (v: number) => void;
-}) {
-  return (
-    <div className="form-group--inline">
-      <div>
-        <label className="form-label">{label}</label>
-        {hint && <span className="text-xs text-gray-400 ml-2">= {hint}</span>}
-      </div>
-      <div className="form-input-group">
-        <input type="number" className="form-input form-input--narrow" value={value}
-          onChange={(e) => onChange(Number(e.target.value) || 0)} min={0} />
-        {suffix && <span className="form-input-suffix">{suffix}</span>}
-      </div>
-    </div>
-  );
-}
 
 export default SyncAdvancedSettingsPage;

@@ -13,57 +13,8 @@ import {
   useUpdatePOSAdvancedSetting,
 } from '../../hooks/settings';
 import type { POSAdvancedSettings, RoundingMethod, SoundType } from '../../types/settings';
-
-interface ToggleProps {
-  label: string;
-  description?: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-  disabled?: boolean;
-}
-
-function Toggle({ label, description, checked, onChange, disabled }: ToggleProps) {
-  return (
-    <div className="toggle-group">
-      <div className="toggle-group__info">
-        <span className="toggle-group__label">{label}</span>
-        {description && <span className="toggle-group__description">{description}</span>}
-      </div>
-      <div
-        className={`toggle-switch ${checked ? 'is-on' : ''} ${disabled ? 'is-disabled' : ''}`}
-        onClick={() => !disabled && onChange(!checked)}
-      />
-    </div>
-  );
-}
-
-interface SelectProps {
-  label: string;
-  value: string | number;
-  options: { value: string | number; label: string }[];
-  onChange: (value: string | number) => void;
-  disabled?: boolean;
-}
-
-function Select({ label, value, options, onChange, disabled }: SelectProps) {
-  return (
-    <div className="form-group">
-      <label className="form-label">{label}</label>
-      <select
-        className="form-input form-select"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        disabled={disabled}
-      >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
+import { SettingsToggle } from './pos-advanced/SettingsToggle';
+import { SettingsSelect } from './pos-advanced/SettingsSelect';
 
 export default function POSAdvancedSettingsSection() {
   const { data: settings, isLoading } = usePOSAdvancedSettings();
@@ -79,58 +30,59 @@ export default function POSAdvancedSettingsSection() {
 
   if (isLoading || !settings) {
     return (
-      <div className="settings-section">
-        <div className="settings-section__header">
-          <h2 className="settings-section__title">
-            Advanced POS Settings
-          </h2>
-        </div>
-        <div className="settings-section__body" style={{ textAlign: 'center', padding: '2rem' }}>
-          <RefreshCw size={24} className="spinning" />
-          <p>Loading...</p>
+      <div className="space-y-6">
+        <h2 className="text-lg font-display font-bold text-white">
+          Advanced POS Settings
+        </h2>
+        <div className="flex items-center justify-center py-12 text-[var(--theme-text-muted)]">
+          <RefreshCw size={24} className="animate-spin mr-3" />
+          <span>Loading...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="settings-section">
-      <div className="settings-section__header">
-        <h2 className="settings-section__title">
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-lg font-display font-bold text-white">
           Advanced POS Settings
         </h2>
-        <p className="settings-section__description">
+        <p className="text-sm text-[var(--theme-text-muted)] mt-1">
           Advanced point of sale configuration
         </p>
       </div>
-      <div className="settings-section__body">
-        {/* Cart Settings */}
-        <div className="settings-group">
-          <h3 className="settings-group__title">
-            <ShoppingCart size={18} />
-            Cart
-          </h3>
-          <Toggle
+
+      {/* Cart Settings */}
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
+          <ShoppingCart size={16} className="text-[var(--color-gold)]" />
+          Cart
+        </h3>
+        <div className="space-y-1 divide-y divide-white/5">
+          <SettingsToggle
             label="Lock after kitchen send"
             description="Items sent to kitchen cannot be modified without PIN"
             checked={settings.cart.lock_on_kitchen_send}
             onChange={(v) => handleUpdate('cart', 'lock_on_kitchen_send', v)}
           />
-          <Toggle
+          <SettingsToggle
             label="PIN required for removal"
             description="Require PIN to remove a locked item"
             checked={settings.cart.require_pin_locked_remove}
             onChange={(v) => handleUpdate('cart', 'require_pin_locked_remove', v)}
           />
         </div>
+      </div>
 
-        {/* Rounding Settings */}
-        <div className="settings-group">
-          <h3 className="settings-group__title">
-            <DollarSign size={18} />
-            IDR Rounding
-          </h3>
-          <Select
+      {/* Rounding Settings */}
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
+          <DollarSign size={16} className="text-[var(--color-gold)]" />
+          IDR Rounding
+        </h3>
+        <div className="space-y-1">
+          <SettingsSelect
             label="Round to"
             value={settings.rounding.amount}
             options={[
@@ -140,7 +92,7 @@ export default function POSAdvancedSettingsSection() {
             ]}
             onChange={(v) => handleUpdate('rounding', 'amount', Number(v))}
           />
-          <Select
+          <SettingsSelect
             label="Method"
             value={settings.rounding.method}
             options={[
@@ -151,21 +103,23 @@ export default function POSAdvancedSettingsSection() {
             onChange={(v) => handleUpdate('rounding', 'method', v)}
           />
         </div>
+      </div>
 
-        {/* Payment Settings */}
-        <div className="settings-group">
-          <h3 className="settings-group__title">
-            <CreditCard size={18} />
-            Payment
-          </h3>
-          <Toggle
+      {/* Payment Settings */}
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
+          <CreditCard size={16} className="text-[var(--color-gold)]" />
+          Payment
+        </h3>
+        <div className="space-y-1">
+          <SettingsToggle
             label="Split payment"
             description="Allow dividing payment into multiple parts"
             checked={settings.payment.allow_split}
             onChange={(v) => handleUpdate('payment', 'allow_split', v)}
           />
           {settings.payment.allow_split && (
-            <Select
+            <SettingsSelect
               label="Max split count"
               value={settings.payment.max_split_count}
               options={[
@@ -178,14 +132,16 @@ export default function POSAdvancedSettingsSection() {
             />
           )}
         </div>
+      </div>
 
-        {/* Sound Settings */}
-        <div className="settings-group">
-          <h3 className="settings-group__title">
-            <Volume2 size={18} />
-            Sounds
-          </h3>
-          <Toggle
+      {/* Sound Settings */}
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
+          <Volume2 size={16} className="text-[var(--color-gold)]" />
+          Sounds
+        </h3>
+        <div className="space-y-1">
+          <SettingsToggle
             label="Sounds enabled"
             description="Enable sound notifications"
             checked={settings.sound.enabled}
@@ -193,7 +149,7 @@ export default function POSAdvancedSettingsSection() {
           />
           {settings.sound.enabled && (
             <>
-              <Select
+              <SettingsSelect
                 label="New order"
                 value={settings.sound.new_order}
                 options={[
@@ -204,7 +160,7 @@ export default function POSAdvancedSettingsSection() {
                 ]}
                 onChange={(v) => handleUpdate('sound', 'new_order', v)}
               />
-              <Select
+              <SettingsSelect
                 label="Payment success"
                 value={settings.sound.payment_success}
                 options={[
@@ -218,14 +174,16 @@ export default function POSAdvancedSettingsSection() {
             </>
           )}
         </div>
+      </div>
 
-        {/* Screensaver Settings */}
-        <div className="settings-group">
-          <h3 className="settings-group__title">
-            <Lock size={18} />
-            Screensaver
-          </h3>
-          <Toggle
+      {/* Screensaver Settings */}
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
+          <Lock size={16} className="text-[var(--color-gold)]" />
+          Screensaver
+        </h3>
+        <div className="space-y-1">
+          <SettingsToggle
             label="Enable screensaver"
             description="Show screensaver after inactivity"
             checked={settings.screensaver.enabled}
@@ -233,7 +191,7 @@ export default function POSAdvancedSettingsSection() {
           />
           {settings.screensaver.enabled && (
             <>
-              <Select
+              <SettingsSelect
                 label="Timeout (seconds)"
                 value={settings.screensaver.timeout}
                 options={[
@@ -244,7 +202,7 @@ export default function POSAdvancedSettingsSection() {
                 ]}
                 onChange={(v) => handleUpdate('screensaver', 'timeout', Number(v))}
               />
-              <Toggle
+              <SettingsToggle
                 label="Show clock"
                 checked={settings.screensaver.show_clock}
                 onChange={(v) => handleUpdate('screensaver', 'show_clock', v)}
@@ -252,14 +210,16 @@ export default function POSAdvancedSettingsSection() {
             </>
           )}
         </div>
+      </div>
 
-        {/* Offline Mode Settings */}
-        <div className="settings-group">
-          <h3 className="settings-group__title">
-            <WifiOff size={18} />
-            Offline Mode
-          </h3>
-          <Toggle
+      {/* Offline Mode Settings */}
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
+          <WifiOff size={16} className="text-[var(--color-gold)]" />
+          Offline Mode
+        </h3>
+        <div className="space-y-1">
+          <SettingsToggle
             label="Offline mode enabled"
             description="Allow sales without internet connection"
             checked={settings.offline.enabled}
@@ -267,13 +227,13 @@ export default function POSAdvancedSettingsSection() {
           />
           {settings.offline.enabled && (
             <>
-              <Toggle
+              <SettingsToggle
                 label="Auto switch"
                 description="Automatically switch to offline mode when connection is lost"
                 checked={settings.offline.auto_switch}
                 onChange={(v) => handleUpdate('offline', 'auto_switch', v)}
               />
-              <Select
+              <SettingsSelect
                 label="Sync interval (sec)"
                 value={settings.offline.sync_interval}
                 options={[
@@ -284,7 +244,7 @@ export default function POSAdvancedSettingsSection() {
                 ]}
                 onChange={(v) => handleUpdate('offline', 'sync_interval', Number(v))}
               />
-              <Select
+              <SettingsSelect
                 label="Max offline orders"
                 value={settings.offline.max_offline_orders}
                 options={[
@@ -298,14 +258,16 @@ export default function POSAdvancedSettingsSection() {
             </>
           )}
         </div>
+      </div>
 
-        {/* Customer Display Settings */}
-        <div className="settings-group">
-          <h3 className="settings-group__title">
-            <Monitor size={18} />
-            Customer Display
-          </h3>
-          <Toggle
+      {/* Customer Display Settings */}
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
+          <Monitor size={16} className="text-[var(--color-gold)]" />
+          Customer Display
+        </h3>
+        <div className="space-y-1">
+          <SettingsToggle
             label="Enable customer display"
             description="Show information on a second screen"
             checked={settings.customer_display.enabled}
@@ -313,17 +275,17 @@ export default function POSAdvancedSettingsSection() {
           />
           {settings.customer_display.enabled && (
             <>
-              <Toggle
+              <SettingsToggle
                 label="Show items"
                 checked={settings.customer_display.show_items}
                 onChange={(v) => handleUpdate('customer_display', 'show_items', v)}
               />
-              <Toggle
+              <SettingsToggle
                 label="Show promotions"
                 checked={settings.customer_display.show_promotions}
                 onChange={(v) => handleUpdate('customer_display', 'show_promotions', v)}
               />
-              <Toggle
+              <SettingsToggle
                 label="Show logo"
                 checked={settings.customer_display.show_logo}
                 onChange={(v) => handleUpdate('customer_display', 'show_logo', v)}

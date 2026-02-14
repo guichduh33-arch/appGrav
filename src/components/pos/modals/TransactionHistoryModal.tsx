@@ -172,50 +172,50 @@ export default function TransactionHistoryModal({
     }), { count: 0, total: 0, cash: 0, qris: 0, card: 0 })
 
     return (
-        <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-black/70 p-4" onClick={onClose}>
+        <div className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={onClose}>
             <div
-                className="flex w-full max-w-[600px] max-h-[90vh] flex-col rounded-2xl bg-[var(--color-gray-800)] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] max-[480px]:max-h-screen max-[480px]:rounded-none"
+                className="flex w-full max-w-[600px] max-h-[90vh] flex-col rounded-xl bg-[var(--theme-bg-primary)] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] max-[480px]:max-h-screen max-[480px]:rounded-none"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="flex items-start gap-4 border-b border-[var(--color-gray-700)] p-6">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
-                        <Receipt size={24} />
-                    </div>
-                    <div>
-                        <h2 className="m-0 text-xl font-bold text-white">
-                            Transaction History
-                        </h2>
-                        <p className="mt-1 text-sm text-[var(--color-gray-400)]">
-                            {orders.length} transaction{orders.length > 1 ? 's' : ''} this shift
-                        </p>
+                <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
+                    <div className="flex items-center gap-3">
+                        <Receipt size={24} className="text-[var(--color-gold)]" />
+                        <div>
+                            <h2 className="m-0 text-lg font-bold text-white">
+                                Transaction History
+                            </h2>
+                            <p className="mt-1 text-sm text-[var(--theme-text-secondary)]">
+                                {orders.length} transaction{orders.length > 1 ? 's' : ''} this shift
+                            </p>
+                        </div>
                     </div>
                     <button
-                        className="ml-auto cursor-pointer rounded-lg border-none bg-transparent p-2 text-[var(--color-gray-400)] transition-all duration-150 hover:bg-[var(--color-gray-700)] hover:text-white"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-transparent text-[var(--theme-text-muted)] hover:text-white hover:border-white/20 cursor-pointer"
                         onClick={onClose}
                     >
-                        <X size={24} />
+                        <X size={20} />
                     </button>
                 </div>
 
                 {/* Summary Stats */}
-                <div className="flex gap-4 border-b border-[var(--color-gray-700)] bg-[var(--color-gray-900)] px-6 py-4 max-[480px]:flex-wrap">
-                    <div className="flex flex-1 flex-col items-start gap-1 rounded-lg bg-[var(--color-gray-800)] px-4 py-2">
-                        <span className="text-xs text-[var(--color-gray-400)]">Total</span>
+                <div className="flex gap-4 border-b border-white/5 bg-[var(--theme-bg-secondary)] px-6 py-4 max-[480px]:flex-wrap">
+                    <div className="flex flex-1 flex-col items-start gap-1 rounded-lg bg-[var(--theme-bg-tertiary)] px-4 py-2">
+                        <span className="text-xs text-[var(--theme-text-muted)]">Total</span>
                         <span className="font-bold text-white">{formatPrice(totals.total)}</span>
                     </div>
-                    <div className="flex items-center gap-2 rounded-lg bg-[var(--color-gray-800)] px-4 py-2">
+                    <div className="flex items-center gap-2 rounded-lg bg-[var(--theme-bg-tertiary)] px-4 py-2">
                         <Banknote size={14} />
                         <span className="font-bold text-emerald-500">
                             {formatPrice(totals.cash)}
                         </span>
                     </div>
-                    <div className="flex items-center gap-2 rounded-lg bg-[var(--color-gray-800)] px-4 py-2">
+                    <div className="flex items-center gap-2 rounded-lg bg-[var(--theme-bg-tertiary)] px-4 py-2">
                         <QrCode size={14} />
                         <span className="font-bold text-blue-500">
                             {formatPrice(totals.qris)}
                         </span>
                     </div>
-                    <div className="flex items-center gap-2 rounded-lg bg-[var(--color-gray-800)] px-4 py-2">
+                    <div className="flex items-center gap-2 rounded-lg bg-[var(--theme-bg-tertiary)] px-4 py-2">
                         <CreditCard size={14} />
                         <span className="font-bold text-violet-500">
                             {formatPrice(totals.card)}
@@ -225,11 +225,11 @@ export default function TransactionHistoryModal({
 
                 <div className="flex-1 overflow-y-auto p-4">
                     {isLoading ? (
-                        <div className="flex flex-col items-center justify-center gap-4 p-12 text-[var(--color-gray-500)]">
+                        <div className="flex flex-col items-center justify-center gap-4 p-12 text-[var(--theme-text-muted)]">
                             Loading...
                         </div>
                     ) : orders.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center gap-4 p-12 text-[var(--color-gray-500)]">
+                        <div className="flex flex-col items-center justify-center gap-4 p-12 text-[var(--theme-text-muted)]">
                             <Receipt size={48} />
                             <p className="m-0">No transactions for this shift</p>
                         </div>
@@ -239,8 +239,8 @@ export default function TransactionHistoryModal({
                                 <div
                                     key={order.id}
                                     className={cn(
-                                        'overflow-hidden rounded-xl bg-[var(--color-gray-700)] transition-all duration-200',
-                                        expandedOrder === order.id && 'bg-[var(--color-gray-750,var(--color-gray-700))]'
+                                        'overflow-hidden rounded-xl bg-[var(--theme-bg-secondary)] transition-all duration-200',
+                                        expandedOrder === order.id && 'bg-[var(--theme-bg-tertiary)]'
                                     )}
                                 >
                                     <div
@@ -252,30 +252,30 @@ export default function TransactionHistoryModal({
                                                 <Hash size={14} />
                                                 {order.order_number}
                                             </div>
-                                            <div className="flex items-center gap-3 text-xs text-[var(--color-gray-400)]">
+                                            <div className="flex items-center gap-3 text-xs text-[var(--theme-text-secondary)]">
                                                 <span className="flex items-center gap-1">
                                                     <Clock size={12} />
                                                     {formatTime(order.created_at)}
                                                 </span>
-                                                <span className="rounded bg-[var(--color-gray-600)] px-2 py-0.5">
+                                                <span className="rounded bg-white/10 px-2 py-0.5">
                                                     {getOrderTypeLabel(order.order_type)}
                                                 </span>
                                                 {order.table_number && (
-                                                    <span className="text-[var(--color-primary-light)]">
+                                                    <span className="text-[var(--color-gold)]">
                                                         Table {order.table_number}
                                                     </span>
                                                 )}
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-4 max-[480px]:flex-col max-[480px]:items-end max-[480px]:gap-2">
-                                            <div className="flex items-center gap-1.5 text-xs text-[var(--color-gray-300)]">
+                                            <div className="flex items-center gap-1.5 text-xs text-[var(--theme-text-secondary)]">
                                                 {getPaymentIcon(order.payment_method)}
                                                 <span>{getPaymentLabel(order.payment_method)}</span>
                                             </div>
                                             <div className="min-w-[100px] text-right text-base font-bold text-white">
                                                 {formatPrice(order.total_amount)}
                                             </div>
-                                            <button className="cursor-pointer border-none bg-transparent p-1 text-[var(--color-gray-400)] transition-colors duration-150 hover:text-white">
+                                            <button className="cursor-pointer border-none bg-transparent p-1 text-[var(--theme-text-secondary)] transition-colors duration-150 hover:text-white">
                                                 {expandedOrder === order.id ? (
                                                     <ChevronUp size={20} />
                                                 ) : (
@@ -286,57 +286,57 @@ export default function TransactionHistoryModal({
                                     </div>
 
                                     {expandedOrder === order.id && (
-                                        <div className="flex flex-col gap-4 border-t border-[var(--color-gray-600)] p-4">
+                                        <div className="flex flex-col gap-4 border-t border-white/5 p-4">
                                             {/* Order Info */}
                                             <div className="grid grid-cols-2 gap-2 max-[480px]:grid-cols-1">
-                                                <div className="flex justify-between rounded-md bg-[var(--color-gray-800)] px-2 py-1.5 text-xs">
-                                                    <span className="flex items-center gap-1 text-[var(--color-gray-400)]">Transaction ID</span>
-                                                    <span className="font-medium font-mono text-[var(--color-gray-200)]">{order.id.slice(0, 8)}...</span>
+                                                <div className="flex justify-between rounded-md bg-[var(--theme-bg-tertiary)] px-2 py-1.5 text-xs">
+                                                    <span className="flex items-center gap-1 text-[var(--theme-text-secondary)]">Transaction ID</span>
+                                                    <span className="font-medium font-mono text-[var(--theme-text-primary)]">{order.id.slice(0, 8)}...</span>
                                                 </div>
-                                                <div className="flex justify-between rounded-md bg-[var(--color-gray-800)] px-2 py-1.5 text-xs">
-                                                    <span className="flex items-center gap-1 text-[var(--color-gray-400)]">Date</span>
-                                                    <span className="font-medium text-[var(--color-gray-200)]">{formatDate(order.created_at)}</span>
+                                                <div className="flex justify-between rounded-md bg-[var(--theme-bg-tertiary)] px-2 py-1.5 text-xs">
+                                                    <span className="flex items-center gap-1 text-[var(--theme-text-secondary)]">Date</span>
+                                                    <span className="font-medium text-[var(--theme-text-primary)]">{formatDate(order.created_at)}</span>
                                                 </div>
-                                                <div className="flex justify-between rounded-md bg-[var(--color-gray-800)] px-2 py-1.5 text-xs">
-                                                    <span className="flex items-center gap-1 text-[var(--color-gray-400)]">Order Time</span>
-                                                    <span className="font-medium text-[var(--color-gray-200)]">{formatTime(order.created_at)}</span>
+                                                <div className="flex justify-between rounded-md bg-[var(--theme-bg-tertiary)] px-2 py-1.5 text-xs">
+                                                    <span className="flex items-center gap-1 text-[var(--theme-text-secondary)]">Order Time</span>
+                                                    <span className="font-medium text-[var(--theme-text-primary)]">{formatTime(order.created_at)}</span>
                                                 </div>
                                                 {order.completed_at && (
-                                                    <div className="flex justify-between rounded-md bg-[var(--color-gray-800)] px-2 py-1.5 text-xs">
-                                                        <span className="flex items-center gap-1 text-[var(--color-gray-400)]">Payment Time</span>
-                                                        <span className="font-medium text-[var(--color-gray-200)]">{formatTime(order.completed_at)}</span>
+                                                    <div className="flex justify-between rounded-md bg-[var(--theme-bg-tertiary)] px-2 py-1.5 text-xs">
+                                                        <span className="flex items-center gap-1 text-[var(--theme-text-secondary)]">Payment Time</span>
+                                                        <span className="font-medium text-[var(--theme-text-primary)]">{formatTime(order.completed_at)}</span>
                                                     </div>
                                                 )}
                                                 {order.customer_name && (
-                                                    <div className="flex justify-between rounded-md bg-[var(--color-gray-800)] px-2 py-1.5 text-xs">
-                                                        <span className="flex items-center gap-1 text-[var(--color-gray-400)]"><User size={12} /> Customer</span>
-                                                        <span className="font-medium text-[var(--color-gray-200)]">{order.customer_name}</span>
+                                                    <div className="flex justify-between rounded-md bg-[var(--theme-bg-tertiary)] px-2 py-1.5 text-xs">
+                                                        <span className="flex items-center gap-1 text-[var(--theme-text-secondary)]"><User size={12} /> Customer</span>
+                                                        <span className="font-medium text-[var(--theme-text-primary)]">{order.customer_name}</span>
                                                     </div>
                                                 )}
                                             </div>
 
                                             {/* Order Items */}
-                                            <div className="rounded-lg bg-[var(--color-gray-800)] p-3">
-                                                <div className="mb-2 flex items-center gap-2 border-b border-[var(--color-gray-700)] pb-2 text-xs font-semibold text-[var(--color-gray-400)]">
+                                            <div className="rounded-lg bg-[var(--theme-bg-tertiary)] p-3">
+                                                <div className="mb-2 flex items-center gap-2 border-b border-white/5 pb-2 text-xs font-semibold text-[var(--theme-text-secondary)]">
                                                     <ShoppingBag size={14} />
                                                     <span>Items ({order.items.length})</span>
                                                 </div>
                                                 {order.items.map(item => (
                                                     <div key={item.id} className="flex items-center justify-between py-1.5 text-sm">
                                                         <div className="flex items-center gap-2">
-                                                            <span className="min-w-[28px] font-semibold text-[var(--color-gray-400)]">
+                                                            <span className="min-w-[28px] font-semibold text-[var(--theme-text-secondary)]">
                                                                 {item.quantity}x
                                                             </span>
                                                             <span className="text-white">
                                                                 {item.product_name}
                                                             </span>
                                                             {item.modifiers && Object.keys(item.modifiers).length > 0 && (
-                                                                <span className="text-[0.7rem] text-[var(--color-primary-light)]">
+                                                                <span className="text-[0.7rem] text-[var(--color-gold)]">
                                                                     + options
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <span className="font-semibold text-[var(--color-gray-300)]">
+                                                        <span className="font-semibold text-[var(--theme-text-secondary)]">
                                                             {formatPrice(item.total_price + item.modifiers_total)}
                                                         </span>
                                                     </div>
@@ -344,8 +344,8 @@ export default function TransactionHistoryModal({
                                             </div>
 
                                             {/* Order Totals */}
-                                            <div className="rounded-lg bg-[var(--color-gray-800)] p-3">
-                                                <div className="flex justify-between py-1.5 text-sm text-[var(--color-gray-300)]">
+                                            <div className="rounded-lg bg-[var(--theme-bg-tertiary)] p-3">
+                                                <div className="flex justify-between py-1.5 text-sm text-[var(--theme-text-secondary)]">
                                                     <span>Subtotal</span>
                                                     <span>{formatPrice(order.subtotal)}</span>
                                                 </div>
@@ -355,21 +355,21 @@ export default function TransactionHistoryModal({
                                                         <span>-{formatPrice(order.discount_amount)}</span>
                                                     </div>
                                                 )}
-                                                <div className="flex justify-between py-1.5 text-sm text-[var(--color-gray-300)]">
+                                                <div className="flex justify-between py-1.5 text-sm text-[var(--theme-text-secondary)]">
                                                     <span>Tax (10%)</span>
                                                     <span>{formatPrice(order.tax_amount)}</span>
                                                 </div>
-                                                <div className="mt-1.5 flex justify-between border-t border-[var(--color-gray-700)] pt-3 text-base font-bold text-white">
+                                                <div className="mt-1.5 flex justify-between border-t border-white/5 pt-3 text-base font-bold text-white">
                                                     <span>Total</span>
                                                     <span>{formatPrice(order.total_amount)}</span>
                                                 </div>
                                                 {order.payment_method === 'cash' && order.cash_received && (
                                                     <>
-                                                        <div className="flex justify-between py-1.5 text-sm text-[var(--color-gray-300)]">
+                                                        <div className="flex justify-between py-1.5 text-sm text-[var(--theme-text-secondary)]">
                                                             <span>Cash Received</span>
                                                             <span>{formatPrice(order.cash_received)}</span>
                                                         </div>
-                                                        <div className="flex justify-between py-1.5 text-sm text-[var(--color-gray-300)]">
+                                                        <div className="flex justify-between py-1.5 text-sm text-[var(--theme-text-secondary)]">
                                                             <span>Change</span>
                                                             <span>{formatPrice(order.change_given || 0)}</span>
                                                         </div>

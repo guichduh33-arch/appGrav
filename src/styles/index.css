@@ -55,6 +55,11 @@
     --muted-smoke: #8E8E93;
     --stone-text: #E5E7EB;
 
+    /* Shimmer / Skeleton Loading Tokens */
+    --shimmer-base: #161618;
+    --shimmer-highlight: #1A1A1C;
+    --shimmer-gold: rgba(200, 164, 91, 0.05);
+
     /* Semantic Colors (Muted Professionalism) */
     --color-success: #4A5D4E;
     /* Olive Muted */
@@ -1167,6 +1172,42 @@ tbody tr:hover {
 
 .animate-pulse {
     animation: pulse 2s infinite;
+}
+
+/* ============================================
+   SKELETON SHIMMER LOADING STATES
+   (From Stitch Luxe Loading States design)
+   ============================================ */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+    background: linear-gradient(
+        90deg,
+        var(--shimmer-base) 25%,
+        var(--shimmer-gold) 50%,
+        var(--shimmer-base) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite linear;
+}
+
+.skeleton-shimmer-subtle {
+    background: linear-gradient(
+        90deg,
+        #121214 25%,
+        var(--shimmer-highlight) 50%,
+        #121214 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 4s infinite linear;
+}
+
+.chart-grid {
+    background-image: linear-gradient(to bottom, rgba(200, 164, 91, 0.03) 1px, transparent 1px);
+    background-size: 100% 40px;
 }
 
 /* ============================================

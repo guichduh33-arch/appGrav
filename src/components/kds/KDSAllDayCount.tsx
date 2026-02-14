@@ -50,28 +50,28 @@ export function KDSAllDayCount({ orders, onClose }: IKDSAllDayCountProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white">All-Day Count</h2>
-          <p className="text-sm text-[#888] mt-1">
+          <h2 className="text-2xl font-bold text-[var(--stone-text)]">All-Day Count</h2>
+          <p className="text-xs tracking-widest uppercase text-[var(--muted-smoke)] mt-1">
             {totalPrepared}/{totalItems} items prepared ({productCounts.length} products)
           </p>
         </div>
         <button
-          className="bg-[#333] border-none text-white w-10 h-10 rounded-[10px] flex items-center justify-center cursor-pointer hover:bg-[#444]"
+          className="bg-[var(--kds-surface-elevated)] border-none text-[var(--stone-text)] w-10 h-10 rounded-lg flex items-center justify-center cursor-pointer hover:bg-[var(--kds-surface-hover)]"
           onClick={onClose}
         >
-          <X size={20} />
+          <X size={18} />
         </button>
       </div>
 
       {/* Summary bar */}
-      <div className="mb-6 bg-[#2a2a2a] rounded-xl p-4">
-        <div className="flex justify-between text-sm text-[#aaa] mb-2">
-          <span>Overall Progress</span>
+      <div className="mb-6 bg-[var(--kds-surface)] border border-white/5 rounded-xl p-4">
+        <div className="flex justify-between text-xs text-[var(--muted-smoke)] mb-2">
+          <span className="tracking-widest uppercase">Overall Progress</span>
           <span>{totalItems > 0 ? Math.round((totalPrepared / totalItems) * 100) : 0}%</span>
         </div>
-        <div className="w-full h-3 bg-[#333] rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-[#10B981] to-[#059669] rounded-full transition-all duration-500"
+            className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full transition-all duration-500"
             style={{ width: `${totalItems > 0 ? (totalPrepared / totalItems) * 100 : 0}%` }}
           />
         </div>
@@ -86,31 +86,31 @@ export function KDSAllDayCount({ orders, onClose }: IKDSAllDayCountProps) {
           return (
             <div
               key={product.product_name}
-              className={`bg-[#2a2a2a] rounded-xl p-4 border-2 transition-all ${
-                isDone ? 'border-[#10B981]/30 opacity-60' : 'border-transparent'
+              className={`bg-[var(--kds-surface)] rounded-xl p-4 border transition-all ${
+                isDone ? 'border-emerald-500/20 opacity-60' : 'border-white/5'
               }`}
             >
               <div className="flex items-start justify-between mb-3">
-                <h3 className="text-base font-semibold text-white leading-tight flex-1 mr-2">
+                <h3 className="text-sm font-semibold text-[var(--stone-text)] leading-tight flex-1 mr-2">
                   {product.product_name}
                 </h3>
-                {isDone && <CheckCircle size={18} className="text-[#10B981] shrink-0 mt-0.5" />}
+                {isDone && <CheckCircle size={16} className="text-emerald-500 shrink-0 mt-0.5" />}
               </div>
 
               <div className="flex items-end justify-between mb-2">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-bold text-[#F59E0B]">{product.remaining}</span>
-                  <span className="text-sm text-[#888]">remaining</span>
+                  <span className="text-2xl font-bold text-[var(--kds-accent)]">{product.remaining}</span>
+                  <span className="text-xs text-[var(--muted-smoke)]">remaining</span>
                 </div>
-                <span className="text-sm text-[#aaa]">
+                <span className="text-xs text-[var(--muted-smoke)]">
                   {product.prepared}/{product.total}
                 </span>
               </div>
 
-              <div className="w-full h-2 bg-[#333] rounded-full overflow-hidden">
+              <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
-                    isDone ? 'bg-[#10B981]' : 'bg-[#3B82F6]'
+                    isDone ? 'bg-emerald-500' : 'bg-[var(--kds-accent)]'
                   }`}
                   style={{ width: `${progress}%` }}
                 />
@@ -121,8 +121,8 @@ export function KDSAllDayCount({ orders, onClose }: IKDSAllDayCountProps) {
       </div>
 
       {productCounts.length === 0 && (
-        <div className="text-center py-12 text-[#888]">
-          <p className="text-lg">No items to display</p>
+        <div className="text-center py-12 text-[var(--muted-smoke)]">
+          <p className="text-sm tracking-widest uppercase">No items to display</p>
         </div>
       )}
     </div>

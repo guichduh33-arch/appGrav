@@ -16,7 +16,7 @@ interface CategoryNavProps {
 
 const itemBase = 'w-full flex flex-col items-center gap-1 py-4 px-1 border-none cursor-pointer text-left transition-all duration-300 relative border-r-2 border-r-transparent bg-transparent hover:text-[var(--color-gold)]'
 const itemActive = 'border-r-[var(--color-gold)] bg-[var(--color-gold)]/10 text-[var(--color-gold)]'
-const itemInactive = 'text-[#8E8E93] hover:bg-[var(--theme-bg-tertiary)]/30'
+const itemInactive = 'text-[var(--muted-smoke)] hover:bg-[var(--theme-bg-tertiary)]/30'
 
 const getCategoryIcon = (name: string) => {
     const s = name.toLowerCase()
@@ -38,7 +38,7 @@ export default memo(function CategoryNav({
         return (
             <aside className="w-24 bg-[var(--theme-bg-primary)] border-r border-white/5 flex flex-col items-center py-8">
                 {[...Array(6)].map((_, i) => (
-                    <div key={i} className="h-16 w-12 bg-[#161618] rounded-lg mb-4 animate-pulse" />
+                    <div key={i} className="h-16 w-12 bg-[var(--onyx-surface)] rounded-lg mb-4 animate-pulse" />
                 ))}
             </aside>
         )
@@ -84,14 +84,14 @@ export default memo(function CategoryNav({
 
                 <div className="flex flex-col items-center gap-1 py-4 border-t border-white/5 w-full">
                     <button
-                        className="w-10 h-10 flex items-center justify-center rounded-lg text-[#8E8E93] hover:text-[var(--color-gold)] hover:bg-[var(--theme-bg-tertiary)] transition-colors border-none bg-transparent cursor-pointer"
+                        className="w-10 h-10 flex items-center justify-center rounded-lg text-[var(--muted-smoke)] hover:text-[var(--color-gold)] hover:bg-[var(--theme-bg-tertiary)] transition-colors border-none bg-transparent cursor-pointer"
                         title="Settings"
                         onClick={onOpenMenu}
                     >
                         <Settings size={20} strokeWidth={1.5} />
                     </button>
                     <button
-                        className="w-10 h-10 flex items-center justify-center rounded-lg text-[#8E8E93] hover:text-[var(--color-gold)] hover:bg-[var(--theme-bg-tertiary)] transition-colors border-none bg-transparent cursor-pointer"
+                        className="w-10 h-10 flex items-center justify-center rounded-lg text-[var(--muted-smoke)] hover:text-[var(--color-gold)] hover:bg-[var(--theme-bg-tertiary)] transition-colors border-none bg-transparent cursor-pointer"
                         title="Account"
                     >
                         <User size={20} strokeWidth={1.5} />

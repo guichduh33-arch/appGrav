@@ -25,11 +25,11 @@ export function AccountTree({ onEdit, showInactive = false }: AccountTreeProps) 
       {Array.from(grouped.entries())
         .sort(([a], [b]) => a - b)
         .map(([classNum, classAccounts]) => (
-          <div key={classNum} className="border rounded-lg overflow-hidden">
-            <div className="bg-gray-50 px-4 py-2 font-medium text-sm text-gray-700 border-b">
+          <div key={classNum} className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+            <div className="px-4 py-2 font-medium text-sm text-[var(--color-gold)] border-b border-white/5">
               Class {classNum}: {ACCOUNT_CLASS_LABELS[classNum] || 'Other'}
             </div>
-            <div className="divide-y">
+            <div>
               {buildAccountTree(classAccounts).map(node => (
                 <AccountNode
                   key={node.id}
@@ -60,15 +60,20 @@ function AccountNode({ node, depth, onEdit, onToggleActive }: AccountNodeProps) 
   return (
     <>
       <div
-        className={`flex items-center gap-2 px-4 py-2 hover:bg-gray-50 ${
+        className={`flex items-center gap-2 px-4 py-2 border-b border-white/5 hover:bg-white/[0.02] transition-colors ${
           !node.is_active ? 'opacity-50' : ''
         }`}
         style={{ paddingLeft: `${16 + depth * 24}px` }}
       >
+        {/* Gold connector line for hierarchy */}
+        {depth > 0 && (
+          <span className="w-0.5 h-full bg-[var(--color-gold)]/20 absolute" style={{ left: `${4 + depth * 24}px` }} />
+        )}
+
         {hasChildren ? (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="p-0.5 hover:bg-gray-200 rounded"
+            className="p-0.5 hover:bg-white/5 rounded text-[var(--color-gold)]"
           >
             {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           </button>
@@ -76,19 +81,19 @@ function AccountNode({ node, depth, onEdit, onToggleActive }: AccountNodeProps) 
           <span className="w-5" />
         )}
 
-        <span className="font-mono text-sm text-gray-500 w-16">{node.code}</span>
-        <span className="flex-1 text-sm">{node.name}</span>
+        <span className="font-mono text-sm text-[var(--theme-text-muted)] w-16">{node.code}</span>
+        <span className="flex-1 text-sm text-white/80">{node.name}</span>
 
         <span className={`text-xs px-2 py-0.5 rounded-full ${
           node.balance_type === 'debit'
-            ? 'bg-blue-50 text-blue-700'
-            : 'bg-green-50 text-green-700'
+            ? 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20'
+            : 'bg-red-400/10 text-red-400 border border-red-400/20'
         }`}>
           {node.balance_type}
         </span>
 
         {node.is_system && (
-          <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-white/40 border border-white/10">
             System
           </span>
         )}
@@ -96,7 +101,7 @@ function AccountNode({ node, depth, onEdit, onToggleActive }: AccountNodeProps) 
         <div className="flex items-center gap-1">
           <button
             onClick={() => onEdit(node)}
-            className="p-1 hover:bg-gray-200 rounded text-gray-500"
+            className="p-1 hover:bg-white/5 rounded text-white/40 hover:text-white transition-colors"
             title="Edit"
           >
             <Edit2 size={14} />
@@ -104,10 +109,10 @@ function AccountNode({ node, depth, onEdit, onToggleActive }: AccountNodeProps) 
           {!node.is_system && (
             <button
               onClick={() => onToggleActive(node.id, !node.is_active)}
-              className="p-1 hover:bg-gray-200 rounded text-gray-500"
+              className="p-1 hover:bg-white/5 rounded text-white/40 hover:text-white transition-colors"
               title={node.is_active ? 'Deactivate' : 'Activate'}
             >
-              {node.is_active ? <ToggleRight size={14} className="text-green-600" /> : <ToggleLeft size={14} />}
+              {node.is_active ? <ToggleRight size={14} className="text-emerald-400" /> : <ToggleLeft size={14} />}
             </button>
           )}
         </div>

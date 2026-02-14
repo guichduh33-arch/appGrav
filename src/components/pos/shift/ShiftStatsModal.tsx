@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react'
 import {
-    X, PieChart, Banknote, CreditCard, Smartphone,
+    X, Banknote, CreditCard, Smartphone,
     TrendingUp, ShoppingBag, Timer, Wallet
 } from 'lucide-react'
 import { PosSession, ShiftTransaction } from '../../../hooks/useShift'
@@ -73,48 +73,49 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
     const maxHourly = Math.max(...Array.from(hourlyData.values()), 1)
 
     return (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-sh-fade-in">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-sh-fade-in">
             <div
-                className="w-full max-w-[560px] max-h-[90vh] bg-[#1a1714] rounded-3xl border border-white/[0.08] overflow-hidden flex flex-col shadow-[0_0_0_1px_rgba(255,255,255,0.05)_inset,0_25px_50px_-12px_rgba(0,0,0,0.5),0_0_100px_rgba(212,165,116,0.15)] animate-sh-slide-up max-[480px]:max-h-screen max-[480px]:rounded-none"
+                className="w-full max-w-[560px] max-h-[90vh] bg-[var(--theme-bg-primary)] rounded-xl border border-white/5 overflow-hidden flex flex-col shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] animate-sh-slide-up max-[480px]:max-h-screen max-[480px]:rounded-none text-white"
                 ref={modalRef}
             >
                 {/* Header */}
-                <header className="flex items-center justify-between py-5 px-6 border-b border-white/[0.08] bg-[#252220]">
+                <header className="flex items-center justify-between py-5 px-6 border-b border-white/5">
                     <div className="flex items-center gap-4">
-                        <PieChart className="w-11 h-11 p-2.5 bg-gradient-to-br from-[#d4a574] to-[#b8864c] rounded-xl text-[#1a1714] shadow-[0_4px_12px_rgba(212,165,116,0.15)]" />
+                        <span className="text-2xl font-display italic font-bold text-[var(--color-gold)]">B</span>
                         <div>
-                            <h2 className="font-fraunces text-[1.35rem] font-semibold text-[#faf8f5] m-0">
+                            <span className="text-sm font-bold uppercase tracking-[0.2em] block">
                                 Shift Statistics
-                            </h2>
-                            <p className="text-[0.8rem] text-[#a8a29e] mt-0.5 mb-0">
+                            </span>
+                            <p className="text-xs text-[var(--theme-text-muted)] mt-0.5 mb-0">
                                 #{session.session_number} - Started {formatTime(session.opened_at)}
                             </p>
                         </div>
                     </div>
                     <button
-                        className="w-11 h-11 flex items-center justify-center bg-[#2d2a27] border border-white/[0.08] rounded-xl text-[#a8a29e] cursor-pointer transition-all duration-200 hover:bg-[#1a1714] hover:text-[#faf8f5] hover:scale-105"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-transparent text-[var(--theme-text-muted)] hover:text-white hover:border-white/20 cursor-pointer transition-colors"
                         onClick={onClose}
+                        aria-label="Close"
                     >
-                        <X size={24} />
+                        <X size={18} />
                     </button>
                 </header>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-[#2d2a27] scrollbar-track-transparent">
+                <div className="flex-1 overflow-y-auto p-6">
                     {/* Hero Stats */}
                     <div className="mb-6">
                         {/* Primary hero card */}
-                        <div className="flex items-center gap-4 p-6 bg-gradient-to-br from-[#252220] to-[#2d2a27] rounded-2xl border border-white/[0.08] mb-3 relative overflow-hidden">
+                        <div className="flex items-center gap-4 p-6 bg-[var(--theme-bg-secondary)] rounded-lg border border-white/5 mb-3 relative overflow-hidden">
                             {/* Accent glow */}
-                            <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-[radial-gradient(circle,rgba(212,165,116,0.15)_0%,transparent_70%)] pointer-events-none" />
-                            <div className="w-14 h-14 flex items-center justify-center bg-[rgba(212,165,116,0.15)] rounded-[14px] text-[#d4a574]">
+                            <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-[radial-gradient(circle,rgba(202,176,109,0.12)_0%,transparent_70%)] pointer-events-none" />
+                            <div className="w-14 h-14 flex items-center justify-center bg-[var(--color-gold)]/10 rounded-xl text-[var(--color-gold)]">
                                 <Banknote size={24} />
                             </div>
                             <div className="flex-1">
-                                <span className="block text-[0.85rem] text-[#a8a29e] uppercase tracking-[0.08em] mb-1">
+                                <span className="block text-[10px] font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase mb-1">
                                     Total Sales
                                 </span>
-                                <span className="font-fraunces text-[2.5rem] font-bold text-[#faf8f5] tracking-tight max-[480px]:text-[2rem]">
+                                <span className="text-[2.5rem] font-bold text-[var(--color-gold)] tracking-tight max-[480px]:text-[2rem]">
                                     {formatCurrency(stats.totalSales)}
                                 </span>
                             </div>
@@ -122,43 +123,43 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
 
                         {/* Stats grid */}
                         <div className="grid grid-cols-2 gap-3 max-[480px]:grid-cols-2">
-                            <div className="flex items-center gap-3 p-4 px-5 bg-[#252220] rounded-2xl border border-white/[0.08]">
-                                <ShoppingBag size={20} className="text-[#d4a574] shrink-0" />
+                            <div className="flex items-center gap-3 p-4 px-5 bg-[var(--theme-bg-secondary)] rounded-lg border border-white/5">
+                                <ShoppingBag size={20} className="text-[var(--color-gold)] shrink-0" />
                                 <div className="flex flex-col gap-px">
-                                    <span className="font-fraunces text-xl font-semibold text-[#faf8f5] leading-none max-[480px]:text-[1.1rem]">
+                                    <span className="text-xl font-semibold text-white leading-none max-[480px]:text-[1.1rem]">
                                         {stats.transactionCount}
                                     </span>
-                                    <span className="text-[0.7rem] text-[#a8a29e]">Transactions</span>
+                                    <span className="text-[0.7rem] text-[var(--theme-text-muted)]">Transactions</span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 p-4 px-5 bg-[#252220] rounded-2xl border border-white/[0.08]">
-                                <TrendingUp size={20} className="text-[#d4a574] shrink-0" />
+                            <div className="flex items-center gap-3 p-4 px-5 bg-[var(--theme-bg-secondary)] rounded-lg border border-white/5">
+                                <TrendingUp size={20} className="text-[var(--color-gold)] shrink-0" />
                                 <div className="flex flex-col gap-px">
-                                    <span className="font-fraunces text-xl font-semibold text-[#faf8f5] leading-none max-[480px]:text-[1.1rem]">
+                                    <span className="text-xl font-semibold text-white leading-none max-[480px]:text-[1.1rem]">
                                         {formatCurrency(avgTransaction)}
                                     </span>
-                                    <span className="text-[0.7rem] text-[#a8a29e]">Average Ticket</span>
+                                    <span className="text-[0.7rem] text-[var(--theme-text-muted)]">Average Ticket</span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 p-4 px-5 bg-[#252220] rounded-2xl border border-white/[0.08]">
-                                <Timer size={20} className="text-[#d4a574] shrink-0" />
+                            <div className="flex items-center gap-3 p-4 px-5 bg-[var(--theme-bg-secondary)] rounded-lg border border-white/5">
+                                <Timer size={20} className="text-[var(--color-gold)] shrink-0" />
                                 <div className="flex flex-col gap-px">
-                                    <span className="font-fraunces text-xl font-semibold text-[#faf8f5] leading-none max-[480px]:text-[1.1rem]">
+                                    <span className="text-xl font-semibold text-white leading-none max-[480px]:text-[1.1rem]">
                                         {formatDuration(stats.duration)}
                                     </span>
-                                    <span className="text-[0.7rem] text-[#a8a29e]">Duration</span>
+                                    <span className="text-[0.7rem] text-[var(--theme-text-muted)]">Duration</span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 p-4 px-5 bg-[#252220] rounded-2xl border border-white/[0.08]">
-                                <Wallet size={20} className="text-[#d4a574] shrink-0" />
+                            <div className="flex items-center gap-3 p-4 px-5 bg-[var(--theme-bg-secondary)] rounded-lg border border-white/5">
+                                <Wallet size={20} className="text-[var(--color-gold)] shrink-0" />
                                 <div className="flex flex-col gap-px">
-                                    <span className="font-fraunces text-xl font-semibold text-[#faf8f5] leading-none max-[480px]:text-[1.1rem]">
+                                    <span className="text-xl font-semibold text-white leading-none max-[480px]:text-[1.1rem]">
                                         {formatCurrency(session.opening_cash)}
                                     </span>
-                                    <span className="text-[0.7rem] text-[#a8a29e]">Opening cash</span>
+                                    <span className="text-[0.7rem] text-[var(--theme-text-muted)]">Opening cash</span>
                                 </div>
                             </div>
                         </div>
@@ -166,23 +167,23 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
 
                     {/* Payment Methods */}
                     <section className="mb-6">
-                        <h3 className="text-[0.8rem] font-medium text-[#a8a29e] uppercase tracking-[0.08em] mb-4">
+                        <h3 className="text-xs font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase mb-4">
                             Payment Breakdown
                         </h3>
 
                         <div className="flex flex-col gap-3">
                             {/* Cash */}
-                            <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4 p-4 px-5 bg-[#252220] rounded-[14px] border border-white/[0.08] relative overflow-hidden">
+                            <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4 p-4 px-5 bg-[var(--theme-bg-secondary)] rounded-lg border border-white/5 relative overflow-hidden">
                                 <div className="w-11 h-11 flex items-center justify-center rounded-xl bg-emerald-500 text-white">
                                     <Banknote size={20} />
                                 </div>
                                 <div className="flex flex-col gap-px">
-                                    <span className="font-medium text-[#faf8f5]">Cash</span>
-                                    <span className="font-fraunces text-[1.1rem] font-semibold text-[#e8c49a]">
+                                    <span className="font-medium text-white">Cash</span>
+                                    <span className="text-[1.1rem] font-semibold text-[var(--color-gold)]">
                                         {formatCurrency(stats.cashTotal)}
                                     </span>
                                 </div>
-                                <span className="text-[0.9rem] font-medium text-[#a8a29e] min-w-[40px] text-right">
+                                <span className="text-[0.9rem] font-medium text-[var(--theme-text-secondary)] min-w-[40px] text-right">
                                     {cashPercent.toFixed(0)}%
                                 </span>
                                 <div
@@ -192,17 +193,17 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                             </div>
 
                             {/* QRIS */}
-                            <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4 p-4 px-5 bg-[#252220] rounded-[14px] border border-white/[0.08] relative overflow-hidden">
+                            <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4 p-4 px-5 bg-[var(--theme-bg-secondary)] rounded-lg border border-white/5 relative overflow-hidden">
                                 <div className="w-11 h-11 flex items-center justify-center rounded-xl bg-amber-500 text-white">
                                     <Smartphone size={20} />
                                 </div>
                                 <div className="flex flex-col gap-px">
-                                    <span className="font-medium text-[#faf8f5]">QRIS</span>
-                                    <span className="font-fraunces text-[1.1rem] font-semibold text-[#e8c49a]">
+                                    <span className="font-medium text-white">QRIS</span>
+                                    <span className="text-[1.1rem] font-semibold text-[var(--color-gold)]">
                                         {formatCurrency(stats.qrisTotal)}
                                     </span>
                                 </div>
-                                <span className="text-[0.9rem] font-medium text-[#a8a29e] min-w-[40px] text-right">
+                                <span className="text-[0.9rem] font-medium text-[var(--theme-text-secondary)] min-w-[40px] text-right">
                                     {qrisPercent.toFixed(0)}%
                                 </span>
                                 <div
@@ -212,17 +213,17 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                             </div>
 
                             {/* EDC */}
-                            <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4 p-4 px-5 bg-[#252220] rounded-[14px] border border-white/[0.08] relative overflow-hidden">
+                            <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4 p-4 px-5 bg-[var(--theme-bg-secondary)] rounded-lg border border-white/5 relative overflow-hidden">
                                 <div className="w-11 h-11 flex items-center justify-center rounded-xl bg-indigo-500 text-white">
                                     <CreditCard size={20} />
                                 </div>
                                 <div className="flex flex-col gap-px">
-                                    <span className="font-medium text-[#faf8f5]">EDC/Carte</span>
-                                    <span className="font-fraunces text-[1.1rem] font-semibold text-[#e8c49a]">
+                                    <span className="font-medium text-white">EDC/Card</span>
+                                    <span className="text-[1.1rem] font-semibold text-[var(--color-gold)]">
                                         {formatCurrency(stats.edcTotal)}
                                     </span>
                                 </div>
-                                <span className="text-[0.9rem] font-medium text-[#a8a29e] min-w-[40px] text-right">
+                                <span className="text-[0.9rem] font-medium text-[var(--theme-text-secondary)] min-w-[40px] text-right">
                                     {edcPercent.toFixed(0)}%
                                 </span>
                                 <div
@@ -236,19 +237,19 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                     {/* Hourly Distribution */}
                     {hourlyData.size > 0 && (
                         <section className="mb-6">
-                            <h3 className="text-[0.8rem] font-medium text-[#a8a29e] uppercase tracking-[0.08em] mb-4">
+                            <h3 className="text-xs font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase mb-4">
                                 Hourly Sales
                             </h3>
-                            <div className="flex items-end gap-2 h-[120px] p-4 bg-[#252220] rounded-[14px] border border-white/[0.08]">
+                            <div className="flex items-end gap-2 h-[120px] p-4 bg-[var(--theme-bg-secondary)] rounded-lg border border-white/5">
                                 {Array.from(hourlyData.entries())
                                     .sort((a, b) => a[0] - b[0])
                                     .map(([hour, amount]) => (
                                         <div key={hour} className="flex-1 flex flex-col items-center h-full relative">
                                             <div
-                                                className="w-full max-w-6 bg-gradient-to-b from-[#d4a574] to-[#b8864c] rounded-t mt-auto min-h-1 transition-[height] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                                                className="w-full max-w-6 bg-gradient-to-b from-[var(--color-gold)] to-[var(--color-gold)]/60 rounded-t mt-auto min-h-1 transition-[height] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
                                                 style={{ height: `${(amount / maxHourly) * 100}%` }}
                                             />
-                                            <span className="absolute -bottom-5 text-[0.65rem] text-[#78716c]">
+                                            <span className="absolute -bottom-5 text-[0.65rem] text-[var(--theme-text-muted)]">
                                                 {hour}h
                                             </span>
                                         </div>
@@ -260,25 +261,25 @@ export default function ShiftStatsModal({ session, transactions, stats, onClose 
                     {/* Recent Transactions */}
                     {recentTransactions.length > 0 && (
                         <section className="mb-6">
-                            <h3 className="text-[0.8rem] font-medium text-[#a8a29e] uppercase tracking-[0.08em] mb-4">
+                            <h3 className="text-xs font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase mb-4">
                                 Recent Transactions
                             </h3>
                             <div className="flex flex-col gap-2">
                                 {recentTransactions.map((tx) => (
-                                    <div key={tx.id} className="flex justify-between items-center p-3.5 px-4 bg-[#252220] rounded-xl border border-white/[0.08]">
+                                    <div key={tx.id} className="flex justify-between items-center p-3.5 px-4 bg-[var(--theme-bg-secondary)] rounded-lg border border-white/5">
                                         <div className="flex flex-col gap-px">
-                                            <span className="font-medium text-[#faf8f5] text-[0.9rem]">
+                                            <span className="font-medium text-white text-[0.9rem]">
                                                 {tx.order_number}
                                             </span>
-                                            <span className="text-[0.75rem] text-[#78716c]">
+                                            <span className="text-[0.75rem] text-[var(--theme-text-muted)]">
                                                 {formatTime(tx.created_at)}
                                             </span>
                                         </div>
                                         <div className="flex flex-col items-end gap-px">
-                                            <span className="text-[0.75rem] text-[#a8a29e] capitalize">
+                                            <span className="text-[0.75rem] text-[var(--theme-text-secondary)] capitalize">
                                                 {tx.payment_method}
                                             </span>
-                                            <span className="font-fraunces font-semibold text-[#e8c49a]">
+                                            <span className="font-semibold text-[var(--color-gold)]">
                                                 {formatCurrency(tx.total)}
                                             </span>
                                         </div>

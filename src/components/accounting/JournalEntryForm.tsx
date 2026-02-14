@@ -59,11 +59,11 @@ export function JournalEntryForm({ onClose }: JournalEntryFormProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">New Journal Entry</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+      <div className="bg-[var(--theme-bg-secondary)] border border-white/10 rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b border-white/5">
+          <h2 className="text-lg font-semibold text-white">New Journal Entry</h2>
+          <button onClick={onClose} className="p-1 hover:bg-white/5 rounded text-white/60 hover:text-white transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -71,21 +71,21 @@ export function JournalEntryForm({ onClose }: JournalEntryFormProps) {
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Date</label>
+              <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-1">Date</label>
               <input
                 type="date"
                 value={entryDate}
                 onChange={e => setEntryDate(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Description</label>
+              <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-1">Description</label>
               <input
                 type="text"
                 value={description}
                 onChange={e => setDescription(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
                 placeholder="Entry description"
               />
             </div>
@@ -101,24 +101,24 @@ export function JournalEntryForm({ onClose }: JournalEntryFormProps) {
             <button
               type="button"
               onClick={addLine}
-              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+              className="flex items-center gap-1 text-sm text-[var(--color-gold)] hover:brightness-125 transition-all"
             >
               <Plus size={16} /> Add Line
             </button>
 
             <div className="flex items-center gap-4 text-sm">
-              <span>Debit: <strong>{totalDebit.toLocaleString()}</strong></span>
-              <span>Credit: <strong>{totalCredit.toLocaleString()}</strong></span>
-              <span className={Math.abs(difference) < 0.01 ? 'text-green-600' : 'text-red-600'}>
+              <span className="text-white/70">Debit: <strong className="text-emerald-400">{totalDebit.toLocaleString()}</strong></span>
+              <span className="text-white/70">Credit: <strong className="text-red-400">{totalCredit.toLocaleString()}</strong></span>
+              <span className={Math.abs(difference) < 0.01 ? 'text-emerald-400' : 'text-red-400'}>
                 Diff: {difference.toLocaleString()}
               </span>
             </div>
           </div>
 
           {errors.length > 0 && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3 space-y-1">
+            <div className="bg-red-400/10 border border-red-400/20 rounded-xl p-3 space-y-1">
               {errors.map((err, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm text-red-700">
+                <div key={i} className="flex items-center gap-2 text-sm text-red-400">
                   <AlertCircle size={14} />
                   <span>{err.message}</span>
                 </div>
@@ -126,18 +126,18 @@ export function JournalEntryForm({ onClose }: JournalEntryFormProps) {
             </div>
           )}
 
-          <div className="flex justify-end gap-2 pt-2 border-t">
+          <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-sm bg-transparent border border-white/10 text-white rounded-xl hover:border-white/20 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={createEntry.isPending}
-              className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 text-sm bg-[var(--color-gold)] text-black font-bold rounded-xl hover:brightness-110 disabled:opacity-50 transition-all"
             >
               {createEntry.isPending ? 'Creating...' : 'Create Entry'}
             </button>

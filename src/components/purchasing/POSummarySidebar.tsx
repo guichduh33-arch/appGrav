@@ -6,46 +6,63 @@ const paymentStatusLabels: Record<string, string> = {
   pending: 'Pending',
   partial: 'Partial',
   paid: 'Paid',
+  unpaid: 'Unpaid',
+  partially_paid: 'Partially Paid',
+}
+
+const paymentBadgeClass: Record<string, string> = {
+  paid: 'border-emerald-400/40 text-emerald-400',
+  partially_paid: 'border-orange-400/40 text-orange-400',
+  unpaid: 'border-red-400/40 text-red-400',
+  pending: 'border-amber-400/40 text-amber-400',
+  partial: 'border-orange-400/40 text-orange-400',
 }
 
 export function POSummarySidebar({ purchaseOrder, isOnline, onMarkAsPaid }: IPOSummarySidebarProps) {
   const getPaymentStatusLabel = (status: string) => paymentStatusLabels[status] || status
+  const getBadgeClass = (status: string) => paymentBadgeClass[status] || paymentBadgeClass.pending
 
   return (
-    <div className="po-detail-page__sidebar">
-      {/* Summary */}
-      <div className="po-detail-card">
-        <h3>Financial summary</h3>
-        <div className="po-summary-line">
+    <div className="sticky top-6 flex flex-col gap-6 max-lg:static">
+      {/* Financial Summary */}
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-6">
+        <h3 className="text-sm font-semibold uppercase tracking-widest text-[var(--color-gold)] mb-5">
+          Financial Summary
+        </h3>
+        <div className="flex justify-between items-center py-2.5 text-sm text-[var(--muted-smoke)]">
           <span>Subtotal</span>
-          <span>{formatCurrency(parseFloat(purchaseOrder.subtotal.toString()))}</span>
+          <span className="font-medium text-[var(--stone-text)]">{formatCurrency(parseFloat(purchaseOrder.subtotal.toString()))}</span>
         </div>
         {parseFloat(purchaseOrder.discount_amount.toString()) > 0 && (
-          <div className="po-summary-line po-summary-line--discount">
+          <div className="flex justify-between items-center py-2.5 text-sm text-emerald-400">
             <span>Discount</span>
             <span>-{formatCurrency(parseFloat(purchaseOrder.discount_amount.toString()))}</span>
           </div>
         )}
-        <div className="po-summary-line">
+        <div className="flex justify-between items-center py-2.5 text-sm text-[var(--muted-smoke)]">
           <span>Tax</span>
-          <span>{formatCurrency(parseFloat(purchaseOrder.tax_amount.toString()))}</span>
+          <span className="font-medium text-[var(--stone-text)]">{formatCurrency(parseFloat(purchaseOrder.tax_amount.toString()))}</span>
         </div>
-        <div className="po-summary-divider"></div>
-        <div className="po-summary-total">
-          <span>Total</span>
-          <span>{formatCurrency(parseFloat(purchaseOrder.total_amount.toString()))}</span>
+        <div className="h-px bg-white/10 my-3"></div>
+        <div className="flex justify-between items-center py-3">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--muted-smoke)]">Total</span>
+          <span className="text-xl font-bold text-[var(--color-gold)]">
+            {formatCurrency(parseFloat(purchaseOrder.total_amount.toString()))}
+          </span>
         </div>
       </div>
 
       {/* Payment Status */}
-      <div className="po-detail-card">
-        <h3>Payment status</h3>
-        <div className="po-payment-status">
-          <span className={`status-badge status-badge--${purchaseOrder.payment_status}`}>
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-6">
+        <h3 className="text-sm font-semibold uppercase tracking-widest text-[var(--color-gold)] mb-5">
+          Payment Status
+        </h3>
+        <div className="flex flex-col gap-3">
+          <span className={`inline-flex self-start px-3 py-1 text-[10px] font-semibold uppercase tracking-widest rounded-full border ${getBadgeClass(purchaseOrder.payment_status)}`}>
             {getPaymentStatusLabel(purchaseOrder.payment_status)}
           </span>
           {purchaseOrder.payment_date && (
-            <div className="po-payment-date">
+            <div className="text-xs text-[var(--muted-smoke)]">
               Paid on{' '}
               {new Date(purchaseOrder.payment_date).toLocaleDateString('fr-FR')}
             </div>
@@ -53,13 +70,12 @@ export function POSummarySidebar({ purchaseOrder, isOnline, onMarkAsPaid }: IPOS
         </div>
         {purchaseOrder.payment_status !== 'paid' && (
           <button
-            className="btn btn-success btn-block"
+            className="w-full flex items-center justify-center gap-2 mt-5 py-3 bg-emerald-500 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all hover:bg-emerald-500/90 disabled:opacity-40"
             onClick={onMarkAsPaid}
             disabled={!isOnline}
-            style={{ marginTop: 'var(--space-md)' }}
           >
-            <DollarSign size={18} />
-            Mark as paid
+            <DollarSign size={16} />
+            Mark as Paid
           </button>
         )}
       </div>

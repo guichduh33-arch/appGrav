@@ -136,12 +136,12 @@ export function ExportButtons<T extends object>({
         disabled={isDisabled || isExportingCsv}
         className={`
           inline-flex items-center gap-2 px-3 py-2
-          text-sm font-medium rounded-lg
+          text-sm font-medium rounded-xl
           transition-colors
           ${
             isDisabled
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+              ? 'bg-white/5 text-white/20 cursor-not-allowed'
+              : 'bg-transparent border border-white/10 text-white hover:border-white/20'
           }
         `}
         title="Export to CSV"
@@ -161,12 +161,12 @@ export function ExportButtons<T extends object>({
         disabled={isDisabled || isExportingPdf}
         className={`
           inline-flex items-center gap-2 px-3 py-2
-          text-sm font-medium rounded-lg
+          text-sm font-medium rounded-xl
           transition-colors
           ${
             isDisabled
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+              ? 'bg-white/5 text-white/20 cursor-not-allowed'
+              : 'bg-transparent border border-white/10 text-white hover:border-white/20'
           }
         `}
         title="Export to PDF"
@@ -259,12 +259,12 @@ export function ExportDropdown<T extends object>({
         disabled={isDisabled}
         className={`
           inline-flex items-center gap-2 px-3 py-2
-          text-sm font-medium rounded-lg
+          text-sm font-medium rounded-xl
           transition-colors
           ${
             isDisabled
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700'
+              ? 'bg-white/5 text-white/20 cursor-not-allowed'
+              : 'bg-[var(--color-gold)] text-black font-bold hover:bg-[var(--color-gold)]/90'
           }
         `}
       >
@@ -277,11 +277,11 @@ export function ExportDropdown<T extends object>({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+        <div className="absolute right-0 mt-1 w-40 bg-[var(--onyx-surface)] border border-white/10 rounded-xl shadow-lg z-10">
           <button
             type="button"
             onClick={() => handleExport('csv')}
-            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-white hover:bg-white/[0.02] rounded-t-xl"
           >
             <FileSpreadsheet className="w-4 h-4" />
             CSV (Excel)
@@ -289,7 +289,7 @@ export function ExportDropdown<T extends object>({
           <button
             type="button"
             onClick={() => handleExport('pdf')}
-            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-white hover:bg-white/[0.02] rounded-b-xl"
           >
             <FileText className="w-4 h-4" />
             PDF

@@ -46,12 +46,12 @@ export function ComparisonToggle({
         disabled={disabled}
         className={`
           inline-flex items-center gap-2 px-3 py-2
-          text-sm font-medium rounded-lg border
+          text-sm font-medium rounded-xl border
           transition-colors
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           ${isEnabled
-            ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'
-            : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+            ? 'bg-[var(--color-gold)]/10 border-[var(--color-gold)]/30 text-[var(--color-gold)] hover:bg-[var(--color-gold)]/20'
+            : 'bg-transparent border-white/10 text-white hover:border-white/20'
           }
         `}
       >
@@ -61,7 +61,7 @@ export function ComparisonToggle({
             <>
               Compare: {activeOption.label}
               {comparisonRange && (
-                <span className="text-xs text-blue-500 ml-1">
+                <span className="text-xs text-[var(--color-gold)]/70 ml-1">
                   ({formatComparisonRange()})
                 </span>
               )}
@@ -85,7 +85,7 @@ export function ComparisonToggle({
           />
 
           {/* Menu */}
-          <div className="absolute z-50 mt-1 right-0 w-72 bg-white border border-gray-200 rounded-lg shadow-lg">
+          <div className="absolute z-50 mt-1 right-0 w-72 bg-[var(--onyx-surface)] border border-white/10 rounded-xl shadow-lg">
             <div className="p-2">
               {COMPARISON_OPTIONS.map((option) => (
                 <button
@@ -96,25 +96,25 @@ export function ComparisonToggle({
                     setIsOpen(false);
                   }}
                   className={`
-                    w-full text-left px-3 py-2 rounded-md
+                    w-full text-left px-3 py-2 rounded-lg
                     flex items-start gap-3
                     transition-colors
                     ${comparisonType === option.value
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'hover:bg-gray-50 text-gray-700'
+                      ? 'bg-[var(--color-gold)]/10 text-[var(--color-gold)]'
+                      : 'hover:bg-white/[0.02] text-white'
                     }
                   `}
                 >
                   <div className="flex-shrink-0 mt-0.5">
                     {comparisonType === option.value ? (
-                      <Check className="w-4 h-4 text-blue-600" />
+                      <Check className="w-4 h-4 text-[var(--color-gold)]" />
                     ) : (
                       <div className="w-4 h-4" />
                     )}
                   </div>
                   <div>
                     <div className="text-sm font-medium">{option.label}</div>
-                    <div className="text-xs text-gray-500">{option.description}</div>
+                    <div className="text-xs text-[var(--theme-text-muted)]">{option.description}</div>
                   </div>
                 </button>
               ))}
@@ -122,9 +122,9 @@ export function ComparisonToggle({
 
             {/* Comparison range preview */}
             {comparisonRange && (
-              <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 rounded-b-lg">
-                <div className="text-xs text-gray-500 mb-1">Comparison period:</div>
-                <div className="text-sm font-medium text-gray-900">
+              <div className="px-4 py-3 bg-white/[0.02] border-t border-white/5 rounded-b-xl">
+                <div className="text-xs text-[var(--theme-text-muted)] mb-1">Comparison period:</div>
+                <div className="text-sm font-medium text-white">
                   {formatComparisonRange()}
                 </div>
               </div>
@@ -159,14 +159,14 @@ export function ComparisonBadge({
       className={`
         inline-flex items-center gap-1.5 px-2 py-1
         text-xs font-medium rounded-full
-        bg-blue-100 text-blue-700
+        bg-[var(--color-gold)]/10 text-[var(--color-gold)]
         ${className}
       `}
     >
       <GitCompare className="w-3 h-3" />
       {label}
       {comparisonRange && (
-        <span className="text-blue-500">
+        <span className="text-[var(--color-gold)]/70">
           ({format(comparisonRange.from, 'dd/MM', { locale: enUS })} - {format(comparisonRange.to, 'dd/MM', { locale: enUS })})
         </span>
       )}
@@ -174,9 +174,9 @@ export function ComparisonBadge({
         <button
           type="button"
           onClick={onClear}
-          className="hover:text-blue-900 ml-1"
+          className="hover:text-white ml-1"
         >
-          ×
+          x
         </button>
       )}
     </span>

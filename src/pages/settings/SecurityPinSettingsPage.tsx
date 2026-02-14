@@ -72,109 +72,155 @@ const SecurityPinSettingsPage = () => {
     toast.success('Changes discarded');
   };
 
-  if (isLoading) return <div className="settings-section"><div className="settings-section__body settings-section__loading"><div className="spinner" /><span>Loading settings...</span></div></div>;
-  if (error || !settings) return <div className="settings-section"><div className="settings-section__body settings-section__error"><AlertCircle size={24} /><span>Error loading settings</span></div></div>;
-
-  return (
-    <div className="settings-section">
-      <div className="settings-section__header">
-        <div className="settings-section__header-content">
-          <div>
-            <h2 className="settings-section__title"><Lock size={20} /> Security PIN Settings</h2>
-            <p className="settings-section__description">Configure PIN requirements for offline authentication and sensitive operations.</p>
-          </div>
-          {pending.size > 0 && (
-            <div className="settings-section__actions">
-              <button className="btn-secondary" onClick={handleCancel} disabled={isSaving}><RotateCcw size={16} /> Cancel</button>
-              <button className="btn-primary" onClick={handleSave} disabled={isSaving || hasErrors}><Save size={16} /> {isSaving ? 'Saving...' : `Save (${pending.size})`}</button>
-            </div>
-          )}
+  if (isLoading) {
+    return (
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+        <div className="flex flex-col items-center justify-center py-16 text-[var(--theme-text-muted)] gap-3">
+          <div className="w-6 h-6 border-2 border-white/10 border-t-[var(--color-gold)] rounded-full animate-spin" />
+          <span className="text-sm">Loading settings...</span>
         </div>
       </div>
+    );
+  }
 
-      <div className="settings-section__body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xl)' }}>
+  if (error || !settings) {
+    return (
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+        <div className="flex items-center justify-center gap-2 py-16 text-red-400">
+          <AlertCircle size={24} />
+          <span>Error loading settings</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
+        <div className="flex items-center gap-2">
+          <Lock size={20} className="text-[var(--color-gold)]" />
+          <div>
+            <h2 className="text-lg font-bold text-white">Security PIN Settings</h2>
+            <p className="text-sm text-[var(--theme-text-muted)]">Configure PIN requirements for offline authentication and sensitive operations.</p>
+          </div>
+        </div>
+        {pending.size > 0 && (
+          <div className="flex items-center gap-2">
+            <button className="inline-flex items-center gap-1.5 px-3 py-2 bg-transparent border border-white/10 text-white hover:border-white/20 rounded-xl text-sm transition-colors" onClick={handleCancel} disabled={isSaving}>
+              <RotateCcw size={14} /> Cancel
+            </button>
+            <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-[var(--color-gold)] text-black font-bold rounded-xl text-sm transition-colors hover:opacity-90 disabled:opacity-50" onClick={handleSave} disabled={isSaving || hasErrors}>
+              <Save size={14} /> {isSaving ? 'Saving...' : `Save (${pending.size})`}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Body */}
+      <div className="px-6 py-5 space-y-6">
         {/* PIN Length */}
-        <div className="settings-group">
-          <h3 className="settings-group__title">PIN Length</h3>
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Minimum Length</label>
+        <div className="space-y-3">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">PIN Length</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs text-[var(--theme-text-muted)]">Minimum Length</label>
               <input
                 type="number"
-                className={`form-input ${validationErrors['security.pin_min_length'] ? 'form-input--error' : ''}`}
-                min={2}
-                max={8}
+                className={`w-full px-3 py-2.5 bg-black/40 border rounded-xl text-white text-sm outline-none transition-colors ${
+                  validationErrors['security.pin_min_length']
+                    ? 'border-red-500 focus:border-red-500'
+                    : 'border-white/10 focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20'
+                }`}
+                min={2} max={8}
                 value={pinMin}
                 onChange={(e) => update('security.pin_min_length', Number(e.target.value))}
               />
               {validationErrors['security.pin_min_length'] && (
-                <span className="form-error">{validationErrors['security.pin_min_length']}</span>
+                <span className="text-xs text-red-400">{validationErrors['security.pin_min_length']}</span>
               )}
-              <span className="form-hint">Between 2 and 8 digits</span>
+              <span className="text-[11px] text-[var(--theme-text-muted)]">Between 2 and 8 digits</span>
             </div>
-            <div className="form-group">
-              <label className="form-label">Maximum Length</label>
+            <div className="space-y-1.5">
+              <label className="text-xs text-[var(--theme-text-muted)]">Maximum Length</label>
               <input
                 type="number"
-                className={`form-input ${validationErrors['security.pin_max_length'] ? 'form-input--error' : ''}`}
-                min={4}
-                max={12}
+                className={`w-full px-3 py-2.5 bg-black/40 border rounded-xl text-white text-sm outline-none transition-colors ${
+                  validationErrors['security.pin_max_length']
+                    ? 'border-red-500 focus:border-red-500'
+                    : 'border-white/10 focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20'
+                }`}
+                min={4} max={12}
                 value={pinMax}
                 onChange={(e) => update('security.pin_max_length', Number(e.target.value))}
               />
               {validationErrors['security.pin_max_length'] && (
-                <span className="form-error">{validationErrors['security.pin_max_length']}</span>
+                <span className="text-xs text-red-400">{validationErrors['security.pin_max_length']}</span>
               )}
-              <span className="form-hint">Between 4 and 12 digits</span>
+              <span className="text-[11px] text-[var(--theme-text-muted)]">Between 4 and 12 digits</span>
             </div>
           </div>
         </div>
 
+        <div className="border-t border-white/5" />
+
         {/* Max Attempts */}
-        <div className="settings-group">
-          <h3 className="settings-group__title">Max Attempts</h3>
-          <div className="form-group--inline">
-            <label className="form-label">Failed attempts before lockout</label>
+        <div className="space-y-2">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Max Attempts</h3>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-sm text-[var(--theme-text-muted)]">Failed attempts before lockout</span>
             <input
               type="number"
-              className={`form-input form-input--narrow ${validationErrors['security.pin_max_attempts'] ? 'form-input--error' : ''}`}
-              min={1}
-              max={10}
+              className={`w-24 px-3 py-1.5 bg-black/40 border rounded-xl text-white text-sm outline-none transition-colors text-right ${
+                validationErrors['security.pin_max_attempts']
+                  ? 'border-red-500 focus:border-red-500'
+                  : 'border-white/10 focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20'
+              }`}
+              min={1} max={10}
               value={getVal('security.pin_max_attempts', SECURITY_PIN_DEFAULTS.pinMaxAttempts)}
               onChange={(e) => update('security.pin_max_attempts', Number(e.target.value))}
             />
           </div>
           {validationErrors['security.pin_max_attempts'] && (
-            <span className="form-error">{validationErrors['security.pin_max_attempts']}</span>
+            <span className="text-xs text-red-400">{validationErrors['security.pin_max_attempts']}</span>
           )}
         </div>
 
+        <div className="border-t border-white/5" />
+
         {/* Cooldown Duration */}
-        <div className="settings-group">
-          <h3 className="settings-group__title">Cooldown Duration</h3>
-          <div className="form-group--inline">
-            <label className="form-label">Lockout duration after max attempts</label>
-            <div className="form-input-group">
+        <div className="space-y-2">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Cooldown Duration</h3>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-sm text-[var(--theme-text-muted)]">Lockout duration after max attempts</span>
+            <div className="flex items-center gap-2">
               <input
                 type="number"
-                className={`form-input form-input--narrow ${validationErrors['security.pin_cooldown_minutes'] ? 'form-input--error' : ''}`}
-                min={1}
-                max={60}
+                className={`w-24 px-3 py-1.5 bg-black/40 border rounded-xl text-white text-sm outline-none transition-colors text-right ${
+                  validationErrors['security.pin_cooldown_minutes']
+                    ? 'border-red-500 focus:border-red-500'
+                    : 'border-white/10 focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20'
+                }`}
+                min={1} max={60}
                 value={getVal('security.pin_cooldown_minutes', SECURITY_PIN_DEFAULTS.pinCooldownMinutes)}
                 onChange={(e) => update('security.pin_cooldown_minutes', Number(e.target.value))}
               />
-              <span className="form-input-suffix">minutes</span>
+              <span className="text-xs text-[var(--theme-text-muted)]">minutes</span>
             </div>
           </div>
           {validationErrors['security.pin_cooldown_minutes'] && (
-            <span className="form-error">{validationErrors['security.pin_cooldown_minutes']}</span>
+            <span className="text-xs text-red-400">{validationErrors['security.pin_cooldown_minutes']}</span>
           )}
         </div>
       </div>
 
+      {/* Unsaved notice */}
       {pending.size > 0 && (
-        <div className="settings-section__footer">
-          <div className="settings-unsaved-notice"><AlertCircle size={16} /><span>{pending.size} unsaved change{pending.size > 1 ? 's' : ''}</span></div>
+        <div className="px-6 py-3 border-t border-white/5 bg-[var(--color-gold)]/5">
+          <div className="flex items-center gap-2 text-[var(--color-gold)] text-sm">
+            <AlertCircle size={16} />
+            <span>{pending.size} unsaved change{pending.size > 1 ? 's' : ''}</span>
+          </div>
         </div>
       )}
     </div>

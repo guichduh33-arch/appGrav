@@ -113,46 +113,46 @@ export default function VoidModal({
   return (
     <>
       <div
-        className="modal-backdrop is-active"
+        className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/80 backdrop-blur-sm"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
-        <div className="modal modal-md is-active max-w-[500px]">
-          {/* Red gradient header */}
-          <div className="modal__header bg-gradient-to-br from-red-600 to-red-700 !border-b-0">
+        <div className="bg-[var(--theme-bg-primary)] rounded-xl text-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] w-full max-w-[500px]">
+          {/* Red-accented header for destructive action */}
+          <div className="flex items-center justify-between px-6 py-5 border-b border-red-500/20">
             <div className="flex items-center gap-2">
-              <AlertTriangle size={24} className="text-red-50" />
-              <h3 className="modal__title !text-white">Void Order</h3>
+              <AlertTriangle size={24} className="text-red-400" />
+              <h3 className="text-lg font-bold text-red-400 m-0">Void Order</h3>
             </div>
             <button
               type="button"
-              className="modal__close"
+              className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-transparent text-[var(--theme-text-muted)] hover:text-white hover:border-white/20 cursor-pointer"
               onClick={onClose}
               aria-label="Close"
               disabled={isProcessing}
             >
-              <X size={24} />
+              <X size={20} />
             </button>
           </div>
 
-          <div className="modal__body flex flex-col gap-6 p-6">
+          <div className="flex flex-col gap-6 p-6">
             {/* Order Summary */}
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="mb-2 pb-2 border-b border-red-200">
-                <span className="text-lg font-bold text-red-900">Order {orderNumber}</span>
+            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
+              <div className="mb-2 pb-2 border-b border-red-500/20">
+                <span className="text-lg font-bold text-red-400">Order {orderNumber}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <div className="flex justify-between items-center">
-                  <span className="text-red-950 text-sm">Total</span>
-                  <span className="font-semibold text-red-900">{formatPrice(orderTotal)}</span>
+                  <span className="text-[var(--theme-text-secondary)] text-sm">Total</span>
+                  <span className="font-semibold text-white">{formatPrice(orderTotal)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-red-950 text-sm">Payment</span>
-                  <span className="font-semibold text-red-900">{paymentMethodName}</span>
+                  <span className="text-[var(--theme-text-secondary)] text-sm">Payment</span>
+                  <span className="font-semibold text-white">{paymentMethodName}</span>
                 </div>
                 {orderTime && (
                   <div className="flex justify-between items-center">
-                    <span className="text-red-950 text-sm">Time</span>
-                    <span className="font-semibold text-red-900">{orderTime}</span>
+                    <span className="text-[var(--theme-text-secondary)] text-sm">Time</span>
+                    <span className="font-semibold text-white">{orderTime}</span>
                   </div>
                 )}
               </div>
@@ -160,11 +160,11 @@ export default function VoidModal({
 
             {/* Reason Selection */}
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-semibold text-foreground">
-                Reason for void <span className="text-red-600">*</span>
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">
+                Reason for void <span className="text-red-400">*</span>
               </label>
               <select
-                className="form-select"
+                className="bg-black/40 border border-white/10 rounded-xl text-white px-4 py-3 focus:border-red-400 focus:outline-none"
                 value={reasonCode}
                 onChange={(e) => setReasonCode(e.target.value as TVoidReasonCode)}
                 disabled={isProcessing}
@@ -180,9 +180,9 @@ export default function VoidModal({
 
             {/* Additional Notes */}
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-semibold text-foreground">Additional notes</label>
+              <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Additional notes</label>
               <textarea
-                className="form-textarea"
+                className="bg-black/40 border border-white/10 rounded-xl text-white px-4 py-3 focus:border-red-400 focus:outline-none resize-none"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Optional notes..."
@@ -192,7 +192,7 @@ export default function VoidModal({
             </div>
 
             {/* Warning */}
-            <div className="flex items-start gap-2 p-4 bg-amber-50 border border-yellow-300 rounded text-sm text-amber-800 [&>svg]:shrink-0 [&>svg]:mt-0.5">
+            <div className="flex items-start gap-2 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg text-sm text-amber-400 [&>svg]:shrink-0 [&>svg]:mt-0.5">
               <AlertTriangle size={16} />
               <span>
                 This action cannot be undone.
@@ -201,10 +201,10 @@ export default function VoidModal({
             </div>
           </div>
 
-          <div className="modal__footer flex justify-end gap-4 px-6 py-4 border-t border-border">
+          <div className="px-6 py-4 border-t border-white/5 flex justify-end gap-3">
             <button
               type="button"
-              className="btn btn-secondary"
+              className="px-6 py-3 border border-white/10 rounded-xl bg-transparent text-sm font-semibold text-[var(--theme-text-secondary)] hover:text-white cursor-pointer"
               onClick={onClose}
               disabled={isProcessing}
             >
@@ -212,7 +212,7 @@ export default function VoidModal({
             </button>
             <button
               type="button"
-              className="btn btn-danger"
+              className="flex items-center gap-2 px-6 py-3 bg-red-600 rounded-xl text-white text-sm font-bold cursor-pointer hover:bg-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleVoidClick}
               disabled={!canSubmit || isProcessing}
             >

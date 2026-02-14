@@ -97,7 +97,7 @@ export function ReportFilters({
     <div className={className}>
       {/* Filter Dropdowns */}
       <div className="flex flex-wrap items-end gap-3">
-        <div className="flex items-center gap-2 text-gray-500 pb-2">
+        <div className="flex items-center gap-2 text-[var(--theme-text-muted)] pb-2">
           <Filter className="w-4 h-4" />
           <span className="text-sm font-medium">Filters</span>
         </div>
@@ -124,9 +124,9 @@ export function ReportFilters({
             onClick={clearAllFilters}
             className="
               flex items-center gap-1 px-3 py-2 mb-0.5
-              text-sm text-gray-600 hover:text-gray-800
-              bg-gray-100 hover:bg-gray-200
-              rounded-lg transition-colors
+              text-sm text-[var(--theme-text-muted)] hover:text-white
+              bg-white/5 hover:bg-white/10
+              rounded-xl transition-colors
             "
           >
             <X className="w-4 h-4" />
@@ -145,16 +145,16 @@ export function ReportFilters({
                 key={`${filter.type}-${filter.value}`}
                 className="
                   inline-flex items-center gap-1.5 px-2.5 py-1
-                  bg-blue-50 text-blue-700 text-sm rounded-full
+                  bg-[var(--color-gold)]/10 text-[var(--color-gold)] text-sm rounded-full
                 "
               >
-                <span className="text-blue-500">{config.icon}</span>
+                <span className="text-[var(--color-gold)]/70">{config.icon}</span>
                 <span className="font-medium">{config.label}:</span>
                 <span>{filter.label}</span>
                 <button
                   type="button"
                   onClick={() => clearFilter(filter.type)}
-                  className="ml-0.5 p-0.5 hover:bg-blue-100 rounded-full"
+                  className="ml-0.5 p-0.5 hover:bg-[var(--color-gold)]/20 rounded-full"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>

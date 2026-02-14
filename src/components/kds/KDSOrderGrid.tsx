@@ -56,9 +56,9 @@ export function KDSOrderGrid({
     <>
       {/* Urgent Orders Section */}
       {urgentOrders.length > 0 && (
-        <div className="mb-6 p-4 rounded-xl bg-red-500/10 border-2 border-red-500/30">
-          <h2 className="flex items-center gap-2 text-[1.1rem] font-bold mb-4 py-2 px-4 rounded-lg bg-[#EF4444] text-white animate-pulse-urgent">
-            <AlertTriangle size={20} />
+        <div className="mb-6 p-4 rounded-xl bg-red-500/5 border border-red-500/20">
+          <h2 className="flex items-center gap-2 text-xs font-bold tracking-widest uppercase mb-4 py-2 px-4 rounded-lg bg-red-600/90 text-white animate-pulse-urgent">
+            <AlertTriangle size={16} />
             URGENT ({urgentOrders.length})
           </h2>
           <div className={GRID_CLASSES}>
@@ -72,7 +72,7 @@ export function KDSOrderGrid({
       {/* Normal Orders Section */}
       <div className="mb-6">
         {urgentOrders.length > 0 && (
-          <h2 className="flex items-center gap-2 text-[1.1rem] font-bold mb-4 py-2 px-4 rounded-lg bg-[#2a2a2a] text-[#888]">
+          <h2 className="flex items-center gap-2 text-xs font-bold tracking-widest uppercase mb-4 py-2 px-4 rounded-lg bg-[var(--kds-surface)] text-[var(--muted-smoke)]">
             Waiting ({normalOrders.length})
           </h2>
         )}

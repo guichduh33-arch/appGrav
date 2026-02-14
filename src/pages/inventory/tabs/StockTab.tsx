@@ -13,7 +13,6 @@ interface StockTabProps {
 
 type MovementFilterType = 'all' | TMovementType
 
-// Icon mapping for movement types - typed to sync with MOVEMENT_STYLES
 const MOVEMENT_ICONS: Record<TMovementType, React.ReactNode> = {
     production_in: <Factory size={16} />,
     production_out: <Package size={16} />,
@@ -43,18 +42,14 @@ interface MovementWithBalance extends StockMovement {
 export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => {
     const [filterType, setFilterType] = useState<MovementFilterType>('all')
 
-    // Calculate running balance for each movement (oldest to newest, then reverse for display)
     const movementsWithBalance = useMemo(() => {
-        // Sort by date ascending (oldest first) to calculate running balance
         const sorted = [...stockHistory].sort((a, b) =>
             new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime()
         )
 
-        // Start from current stock and work backwards to find initial stock
         const totalMovement = sorted.reduce((sum, m) => sum + m.quantity, 0)
         let runningStock = (product.current_stock || 0) - totalMovement
 
-        // Calculate stock before and after for each movement
         const withBalance: MovementWithBalance[] = sorted.map(movement => {
             const stockBefore = runningStock
             runningStock += movement.quantity
@@ -65,16 +60,13 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
             }
         })
 
-        // Reverse to show newest first
         return withBalance.reverse()
     }, [stockHistory, product.current_stock])
 
-    // Filter movements
     const filteredHistory = filterType === 'all'
         ? movementsWithBalance
         : movementsWithBalance.filter(m => m.movement_type === filterType)
 
-    // Calculate stats - cast movement_type to string for flexible comparison
     const costPrice = product.cost_price || 0
     const getMovementType = (m: StockMovement): string => m.movement_type as string
     const stats = {
@@ -86,7 +78,6 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
         sales: stockHistory.filter(m => getMovementType(m) === 'sale_pos' || getMovementType(m) === 'sale_b2b').reduce((sum, m) => sum + Math.abs(m.quantity), 0),
         waste: stockHistory.filter(m => getMovementType(m) === 'waste').reduce((sum, m) => sum + Math.abs(m.quantity), 0),
         opname: stockHistory.filter(m => getMovementType(m) === 'opname').reduce((sum, m) => sum + m.quantity, 0),
-        // Values in IDR
         totalInValue: stockHistory.filter(m => m.quantity > 0).reduce((sum, m) => sum + (m.quantity * costPrice), 0),
         totalOutValue: stockHistory.filter(m => m.quantity < 0).reduce((sum, m) => sum + (Math.abs(m.quantity) * costPrice), 0),
         currentStockValue: (product.current_stock || 0) * costPrice
@@ -110,7 +101,6 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
         }).format(Math.abs(amount))
     }
 
-    // Calculate movement value based on cost price
     const getMovementValue = (quantity: number): number => {
         const costPrice = product.cost_price || 0
         return quantity * costPrice
@@ -121,66 +111,66 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
             {/* Stats Cards */}
             <div className="grid grid-cols-5 gap-4">
                 {/* Current Stock */}
-                <div className="rounded-2xl p-5 text-white bg-gradient-to-br from-blue-500 to-blue-700">
-                    <div className="text-xs opacity-90 mb-1">Current Stock</div>
-                    <div className="text-2xl font-bold">{product.current_stock} {product.unit}</div>
-                    <div className="text-xs opacity-90 mt-1">{formatIDR(stats.currentStockValue)}</div>
+                <div className="rounded-xl p-5 bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20">
+                    <div className="text-[10px] text-[var(--color-gold)] font-bold uppercase tracking-wider mb-1">Current Stock</div>
+                    <div className="text-2xl font-bold text-white">{product.current_stock} {product.unit}</div>
+                    <div className="text-xs text-[var(--color-gold)]/70 mt-1">{formatIDR(stats.currentStockValue)}</div>
                 </div>
 
                 {/* Total In */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-200">
+                <div className="bg-[var(--onyx-surface)] rounded-xl p-5 border border-white/5">
                     <div className="flex items-center gap-2 mb-2">
-                        <TrendingUp size={18} className="text-emerald-500" />
-                        <span className="text-xs text-gray-500">Total In</span>
+                        <TrendingUp size={18} className="text-emerald-400" />
+                        <span className="text-[10px] text-[var(--theme-text-muted)] font-bold uppercase tracking-wider">Total In</span>
                     </div>
-                    <div className="text-2xl font-bold text-emerald-500">+{stats.totalIn}</div>
-                    <div className="text-xs text-emerald-600 font-medium">+{formatIDR(stats.totalInValue)}</div>
+                    <div className="text-2xl font-bold text-emerald-400">+{stats.totalIn}</div>
+                    <div className="text-xs text-emerald-400/70 font-medium">+{formatIDR(stats.totalInValue)}</div>
                 </div>
 
                 {/* Total Out */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-200">
+                <div className="bg-[var(--onyx-surface)] rounded-xl p-5 border border-white/5">
                     <div className="flex items-center gap-2 mb-2">
-                        <TrendingDown size={18} className="text-red-500" />
-                        <span className="text-xs text-gray-500">Total Out</span>
+                        <TrendingDown size={18} className="text-red-400" />
+                        <span className="text-[10px] text-[var(--theme-text-muted)] font-bold uppercase tracking-wider">Total Out</span>
                     </div>
-                    <div className="text-2xl font-bold text-red-500">-{stats.totalOut}</div>
-                    <div className="text-xs text-red-600 font-medium">-{formatIDR(stats.totalOutValue)}</div>
+                    <div className="text-2xl font-bold text-red-400">-{stats.totalOut}</div>
+                    <div className="text-xs text-red-400/70 font-medium">-{formatIDR(stats.totalOutValue)}</div>
                 </div>
 
                 {/* Production In */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-200">
+                <div className="bg-[var(--onyx-surface)] rounded-xl p-5 border border-white/5">
                     <div className="flex items-center gap-2 mb-2">
-                        <Factory size={18} className="text-amber-500" />
-                        <span className="text-xs text-gray-500">Production In</span>
+                        <Factory size={18} className="text-[var(--color-gold)]" />
+                        <span className="text-[10px] text-[var(--theme-text-muted)] font-bold uppercase tracking-wider">Prod. In</span>
                     </div>
-                    <div className="text-2xl font-bold text-amber-700">+{stats.productionIn}</div>
-                    <div className="text-xs text-amber-800 font-medium">+{formatIDR(stats.productionIn * costPrice)}</div>
+                    <div className="text-2xl font-bold text-[var(--color-gold)]">+{stats.productionIn}</div>
+                    <div className="text-xs text-[var(--color-gold)]/70 font-medium">+{formatIDR(stats.productionIn * costPrice)}</div>
                 </div>
 
                 {/* Production Out */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-200">
+                <div className="bg-[var(--onyx-surface)] rounded-xl p-5 border border-white/5">
                     <div className="flex items-center gap-2 mb-2">
-                        <Package size={18} className="text-pink-600" />
-                        <span className="text-xs text-gray-500">Production Out</span>
+                        <Package size={18} className="text-rose-400" />
+                        <span className="text-[10px] text-[var(--theme-text-muted)] font-bold uppercase tracking-wider">Prod. Out</span>
                     </div>
-                    <div className="text-2xl font-bold text-pink-600">-{stats.productionOut}</div>
-                    <div className="text-xs text-pink-800 font-medium">-{formatIDR(stats.productionOut * costPrice)}</div>
+                    <div className="text-2xl font-bold text-rose-400">-{stats.productionOut}</div>
+                    <div className="text-xs text-rose-400/70 font-medium">-{formatIDR(stats.productionOut * costPrice)}</div>
                 </div>
             </div>
 
             {/* Filters */}
-            <div className="bg-white rounded-2xl p-4 border border-gray-200">
+            <div className="bg-[var(--onyx-surface)] rounded-xl p-4 border border-white/5">
                 <div className="flex items-center gap-3 flex-wrap">
-                    <div className="flex items-center gap-2 text-gray-500">
-                        <Filter size={18} />
-                        <span className="font-medium text-sm">Filter:</span>
+                    <div className="flex items-center gap-2 text-[var(--theme-text-muted)]">
+                        <Filter size={16} />
+                        <span className="font-bold text-[10px] uppercase tracking-wider">Filter:</span>
                     </div>
 
                     <button
                         onClick={() => setFilterType('all')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filterType === 'all'
-                                ? 'bg-blue-100 text-blue-700 border-2 border-blue-500 font-semibold'
-                                : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+                        className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${filterType === 'all'
+                                ? 'bg-[var(--color-gold)]/10 text-[var(--color-gold)] border border-[var(--color-gold)]/30'
+                                : 'bg-white/5 text-[var(--theme-text-muted)] border border-white/5 hover:border-white/10'
                             }`}
                     >
                         All ({stockHistory.length})
@@ -194,13 +184,10 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                             <button
                                 key={type}
                                 onClick={() => setFilterType(type as MovementFilterType)}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-colors ${isActive ? 'border-2 font-semibold' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
-                                    }`}
-                                style={isActive ? {
-                                    backgroundColor: style.bgColor,
-                                    color: style.textColor,
-                                    borderColor: style.borderColor
-                                } : {}}
+                                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer ${isActive
+                                    ? 'bg-[var(--color-gold)]/10 text-[var(--color-gold)] border border-[var(--color-gold)]/30'
+                                    : 'bg-white/5 text-[var(--theme-text-muted)] border border-white/5 hover:border-white/10'
+                                }`}
                             >
                                 {getMovementIcon(type)}
                                 {style.label} ({count})
@@ -211,9 +198,9 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
             </div>
 
             {/* Movements List */}
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-                <div className="px-5 py-4 border-b border-gray-200 bg-gray-50">
-                    <h3 className="m-0 text-base font-semibold text-gray-800">
+            <div className="bg-[var(--onyx-surface)] rounded-xl border border-white/5 overflow-hidden">
+                <div className="px-6 py-4 border-b border-white/5">
+                    <h3 className="m-0 text-base font-semibold text-white">
                         Movement History ({filteredHistory.length})
                     </h3>
                 </div>
@@ -228,7 +215,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                             return (
                                 <div
                                     key={movement.id}
-                                    className={`px-5 py-4 flex items-center gap-4 transition-colors hover:bg-gray-50 ${index < filteredHistory.length - 1 ? 'border-b border-gray-100' : ''
+                                    className={`px-6 py-4 flex items-center gap-4 transition-colors hover:bg-white/[0.02] ${index < filteredHistory.length - 1 ? 'border-b border-white/5' : ''
                                         }`}
                                 >
                                     {/* Type Icon */}
@@ -247,7 +234,7 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
                                             <span
-                                                className="px-2 py-1 rounded-md text-xs font-semibold uppercase"
+                                                className="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider"
                                                 style={{
                                                     backgroundColor: style.bgColor,
                                                     color: style.textColor
@@ -255,13 +242,13 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                                             >
                                                 {style.label}
                                             </span>
-                                            <span className="text-xs text-gray-400">
+                                            <span className="text-[10px] text-[var(--theme-text-muted)]">
                                                 {style.description}
                                             </span>
                                         </div>
                                         {movement.reason && (
                                             <div
-                                                className="text-sm text-gray-500 truncate"
+                                                className="text-xs text-[var(--theme-text-muted)] truncate"
                                                 title={movement.reason}
                                             >
                                                 {movement.reason}
@@ -269,16 +256,16 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                                         )}
                                     </div>
 
-                                    {/* Stock Before → After */}
-                                    <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg shrink-0">
+                                    {/* Stock Before/After */}
+                                    <div className="flex items-center gap-2 px-3 py-2 bg-black/30 rounded-lg shrink-0 border border-white/5">
                                         <div className="text-center">
-                                            <div className="text-xs text-gray-400 uppercase">Before</div>
-                                            <div className="text-base font-semibold text-gray-600">{movement.stockBefore}</div>
+                                            <div className="text-[9px] text-[var(--theme-text-muted)] uppercase font-bold tracking-wider">Before</div>
+                                            <div className="text-sm font-semibold text-[var(--theme-text-muted)]">{movement.stockBefore}</div>
                                         </div>
-                                        <ArrowRight size={16} className="text-gray-400" />
+                                        <ArrowRight size={14} className="text-white/20" />
                                         <div className="text-center">
-                                            <div className="text-xs text-gray-400 uppercase">After</div>
-                                            <div className={`text-base font-bold ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
+                                            <div className="text-[9px] text-[var(--theme-text-muted)] uppercase font-bold tracking-wider">After</div>
+                                            <div className={`text-sm font-bold ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
                                                 {movement.stockAfter}
                                             </div>
                                         </div>
@@ -286,21 +273,21 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
 
                                     {/* Quantity & Value */}
                                     <div className="text-center shrink-0 min-w-[100px]">
-                                        <div className={`text-xl font-bold ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
+                                        <div className={`text-xl font-bold ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
                                             {isPositive ? '+' : ''}{movement.quantity} {product.unit}
                                         </div>
-                                        <div className={`text-xs font-semibold mt-0.5 ${isPositive ? 'text-emerald-600' : 'text-red-600'}`}>
+                                        <div className={`text-xs font-semibold mt-0.5 ${isPositive ? 'text-emerald-400/70' : 'text-red-400/70'}`}>
                                             {isPositive ? '+' : '-'}{formatIDR(getMovementValue(movement.quantity))}
                                         </div>
                                     </div>
 
                                     {/* Date */}
                                     <div className="text-right shrink-0 min-w-[90px]">
-                                        <div className="text-sm font-medium text-gray-600">
+                                        <div className="text-xs font-medium text-[var(--stone-text)]">
                                             {date}
                                         </div>
-                                        <div className="text-xs text-gray-400 flex items-center justify-end gap-1">
-                                            <Clock size={12} />
+                                        <div className="text-[10px] text-[var(--theme-text-muted)] flex items-center justify-end gap-1">
+                                            <Clock size={10} />
                                             {time}
                                         </div>
                                     </div>
@@ -309,10 +296,10 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
                         })}
                     </div>
                 ) : (
-                    <div className="py-16 px-8 text-center text-gray-400">
-                        <Package size={48} className="mx-auto mb-4 opacity-50" />
-                        <p className="m-0 font-medium">No stock movements</p>
-                        <p className="mt-2 text-sm">
+                    <div className="py-16 px-8 text-center">
+                        <Package size={48} className="mx-auto mb-4 text-white/10" />
+                        <p className="m-0 font-medium text-[var(--theme-text-muted)]">No stock movements</p>
+                        <p className="mt-2 text-xs text-[var(--theme-text-muted)] opacity-60">
                             {filterType !== 'all'
                                 ? 'No movements of this type found'
                                 : 'Stock movements will appear here'}
@@ -323,11 +310,11 @@ export const StockTab: React.FC<StockTabProps> = ({ product, stockHistory }) => 
 
             {/* Low Stock Warning */}
             {(product.current_stock ?? 0) <= (product.min_stock_level || 0) && (
-                <div className="bg-amber-100 rounded-2xl p-5 border border-amber-300 flex items-center gap-3">
-                    <AlertTriangle size={20} className="text-amber-600" />
+                <div className="bg-amber-400/10 rounded-xl p-5 border border-amber-400/20 flex items-center gap-3">
+                    <AlertTriangle size={20} className="text-amber-400" />
                     <div>
-                        <div className="font-semibold text-amber-800">Low Stock</div>
-                        <div className="text-sm text-amber-700">
+                        <div className="font-semibold text-amber-400 text-sm">Low Stock</div>
+                        <div className="text-xs text-amber-400/70">
                             {`Current stock (${product.current_stock} ${product.unit}) is below minimum threshold (${product.min_stock_level} ${product.unit})`}
                         </div>
                     </div>

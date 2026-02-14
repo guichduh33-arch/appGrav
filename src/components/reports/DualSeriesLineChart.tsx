@@ -83,39 +83,39 @@ function CustomTooltip({
   const previousValue = typeof previousData?.value === 'number' ? previousData.value : undefined;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3 text-sm">
-      <p className="font-medium text-gray-900 mb-2">{dataPoint?.label}</p>
+    <div className="bg-black border border-white/10 rounded-xl shadow-lg p-3 text-sm">
+      <p className="font-medium text-white mb-2">{dataPoint?.label}</p>
 
       {currentValue !== undefined && (
         <div className="flex items-center gap-2 mb-1">
-          <div className="w-3 h-0.5 bg-blue-600" />
-          <span className="text-gray-600">{currentLabel}:</span>
-          <span className="font-medium text-gray-900">{formatValue(currentValue)}</span>
+          <div className="w-3 h-0.5 bg-[var(--color-gold)]" />
+          <span className="text-[var(--theme-text-muted)]">{currentLabel}:</span>
+          <span className="font-medium text-white">{formatValue(currentValue)}</span>
           {dataPoint?.currentDate && (
-            <span className="text-gray-400 text-xs">({dataPoint.currentDate})</span>
+            <span className="text-white/40 text-xs">({dataPoint.currentDate})</span>
           )}
         </div>
       )}
 
       {previousValue !== undefined && (
         <div className="flex items-center gap-2">
-          <div className="w-3 h-0.5 bg-gray-400" style={{ borderStyle: 'dashed' }} />
-          <span className="text-gray-600">{previousLabel}:</span>
-          <span className="font-medium text-gray-900">{formatValue(previousValue)}</span>
+          <div className="w-3 h-0.5 bg-white/40" style={{ borderStyle: 'dashed' }} />
+          <span className="text-[var(--theme-text-muted)]">{previousLabel}:</span>
+          <span className="font-medium text-white">{formatValue(previousValue)}</span>
           {dataPoint?.previousDate && (
-            <span className="text-gray-400 text-xs">({dataPoint.previousDate})</span>
+            <span className="text-white/40 text-xs">({dataPoint.previousDate})</span>
           )}
         </div>
       )}
 
       {/* Variation */}
       {currentValue !== undefined && previousValue !== undefined && previousValue !== 0 && (
-        <div className="mt-2 pt-2 border-t border-gray-100">
+        <div className="mt-2 pt-2 border-t border-white/10">
           {(() => {
             const variation = ((currentValue - previousValue) / Math.abs(previousValue)) * 100;
             const isPositive = variation > 0;
             return (
-              <span className={`text-xs font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+              <span className={`text-xs font-medium ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
                 {isPositive ? '+' : ''}{variation.toFixed(1)}% vs previous
               </span>
             );
@@ -137,8 +137,8 @@ export function DualSeriesLineChart({
   format = 'currency',
   height = 300,
   showGrid = true,
-  currentColor = '#2563eb',
-  previousColor = '#9ca3af',
+  currentColor = 'var(--color-gold)',
+  previousColor = 'rgba(255,255,255,0.3)',
   className = '',
 }: DualSeriesLineChartProps) {
   const hasPreviousData = data.some((d) => d.previous !== null && d.previous !== undefined);
@@ -160,22 +160,22 @@ export function DualSeriesLineChart({
   };
 
   return (
-    <div className={`bg-white rounded-xl border border-gray-200 p-6 ${className}`}>
+    <div className={`bg-[var(--onyx-surface)] rounded-xl border border-white/5 p-6 ${className}`}>
       <ResponsiveContainer width="100%" height={height}>
         <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-          {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />}
+          {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />}
 
           <XAxis
             dataKey="label"
-            tick={{ fontSize: 12, fill: '#6b7280' }}
-            axisLine={{ stroke: '#e5e7eb' }}
-            tickLine={{ stroke: '#e5e7eb' }}
+            tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.4)' }}
+            axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+            tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
           />
 
           <YAxis
-            tick={{ fontSize: 12, fill: '#6b7280' }}
-            axisLine={{ stroke: '#e5e7eb' }}
-            tickLine={{ stroke: '#e5e7eb' }}
+            tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.4)' }}
+            axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+            tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
             tickFormatter={formatYAxis}
           />
 
@@ -192,7 +192,7 @@ export function DualSeriesLineChart({
           <Legend
             wrapperStyle={{ paddingTop: '20px' }}
             formatter={(value) => (
-              <span className="text-sm text-gray-600">{value}</span>
+              <span className="text-sm text-[var(--theme-text-muted)]">{value}</span>
             )}
           />
 

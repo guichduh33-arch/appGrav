@@ -15,8 +15,6 @@ import { playNewOrderSound, playUrgentSound } from '../../utils/audio'
 import { logError } from '@/utils/logger'
 import type { IKdsNewOrderPayload, TKitchenStation } from '../../types/offline'
 
-const KDS_ACCENT = '#ec5b13'
-
 const STATION_CONFIG: Record<string, { name: string; icon: React.ReactNode; color: string; dbStation: string }> = {
     hot_kitchen: {
         name: 'Hot Kitchen',
@@ -241,7 +239,7 @@ export default function KDSMainPage() {
     )
 
     return (
-        <div data-kds className="flex flex-col h-screen overflow-hidden bg-[var(--kds-bg)] text-white" style={{ '--station-color': stationConfig.color, '--kds-accent': KDS_ACCENT } as React.CSSProperties}>
+        <div data-kds className="flex flex-col h-screen overflow-hidden bg-[#0D0D0F] text-white" style={{ '--station-color': stationConfig.color } as React.CSSProperties}>
             <KDSHeader
                 stationConfig={stationConfig}
                 urgentCount={urgentCount}
@@ -261,15 +259,15 @@ export default function KDSMainPage() {
 
             <main className="flex-1 overflow-y-auto p-5">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center h-full gap-4 text-[#888]">
+                    <div className="flex flex-col items-center justify-center h-full gap-4 text-[var(--muted-smoke)]">
                         <RefreshCw className="animate-spin" size={48} />
-                        <p>Loading orders...</p>
+                        <p className="text-sm tracking-widest uppercase">Loading orders...</p>
                     </div>
                 ) : orders.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-center">
-                        <div className="w-[120px] h-[120px] rounded-[30px] bg-[var(--kds-surface)] flex items-center justify-center mb-6 text-[var(--station-color)] [&_svg]:w-[60px] [&_svg]:h-[60px]">{stationConfig.icon}</div>
-                        <h2 className="text-[2rem] m-0 mb-2 text-white">No Orders</h2>
-                        <p className="text-[1.1rem] text-[#888] m-0">Waiting for new orders...</p>
+                        <div className="w-[120px] h-[120px] rounded-2xl bg-[var(--kds-surface)] border border-white/5 flex items-center justify-center mb-6 text-[var(--station-color)] [&_svg]:w-[60px] [&_svg]:h-[60px]">{stationConfig.icon}</div>
+                        <h2 className="text-2xl font-bold m-0 mb-2 text-[var(--stone-text)]">No Orders</h2>
+                        <p className="text-sm text-[var(--muted-smoke)] m-0">Waiting for new orders...</p>
                     </div>
                 ) : showAllDayCount ? (
                     <KDSAllDayCount

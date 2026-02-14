@@ -41,7 +41,6 @@ function RolesPageContent() {
   const isLoading = isLoadingRoles || isLoadingPerms
   const isSaving = createRole.isPending || updateRole.isPending
 
-  // Open modal for creating a new role
   const handleCreate = useCallback(() => {
     if (!isOnline) {
       toast.error('Cannot create roles while offline')
@@ -51,7 +50,6 @@ function RolesPageContent() {
     setShowModal(true)
   }, [isOnline])
 
-  // Open modal for editing a role
   const handleEdit = useCallback(
     (role: RoleWithDetails) => {
       if (!isOnline) {
@@ -64,27 +62,21 @@ function RolesPageContent() {
     [isOnline]
   )
 
-  // Delete a role with confirmation
   const handleDelete = useCallback(
     async (role: RoleWithDetails) => {
       if (!isOnline) {
         toast.error('Cannot delete roles while offline')
         return
       }
-
       if (role.is_system) {
         toast.error('Cannot delete a system role')
         return
       }
-
       if ((role.user_count || 0) > 0) {
         toast.error('Cannot delete a role that is assigned to users')
         return
       }
-
-      if (!confirm(`Delete role "${getRoleName(role)}"?`)) {
-        return
-      }
+      if (!confirm(`Delete role "${getRoleName(role)}"?`)) return
 
       try {
         await deleteRole.mutateAsync(role.id)
@@ -97,7 +89,6 @@ function RolesPageContent() {
     [isOnline, deleteRole]
   )
 
-  // Save role (create or update)
   const handleSave = useCallback(
     async (input: RoleFormInput) => {
       try {
@@ -113,13 +104,12 @@ function RolesPageContent() {
       } catch (error) {
         logError('Error saving role:', error)
         toast.error(error instanceof Error ? error.message : 'Failed to save role')
-        throw error // Re-throw to prevent modal from closing
+        throw error
       }
     },
     [selectedRole, createRole, updateRole]
   )
 
-  // Close modal
   const handleCloseModal = useCallback(() => {
     setShowModal(false)
     setSelectedRole(null)
@@ -128,11 +118,11 @@ function RolesPageContent() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="p-lg h-full overflow-y-auto bg-cream">
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="flex flex-col items-center justify-center p-2xl text-center text-smoke gap-md">
-            <div className="w-6 h-6 border-3 border-border border-t-[var(--color-rose-poudre)] rounded-full animate-spin" />
-            <span>Loading roles...</span>
+      <div className="p-6 h-full overflow-y-auto">
+        <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+          <div className="flex flex-col items-center justify-center py-16 text-[var(--theme-text-muted)] gap-3">
+            <div className="w-6 h-6 border-2 border-white/10 border-t-[var(--color-gold)] rounded-full animate-spin" />
+            <span className="text-sm">Loading roles...</span>
           </div>
         </div>
       </div>
@@ -142,12 +132,10 @@ function RolesPageContent() {
   // Error state
   if (rolesError) {
     return (
-      <div className="p-lg h-full overflow-y-auto bg-cream">
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="p-lg">
-            <div className="text-red-600 text-center py-8">
-              Failed to load roles. Please try again.
-            </div>
+      <div className="p-6 h-full overflow-y-auto">
+        <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+          <div className="flex items-center justify-center py-16 text-red-400">
+            Failed to load roles. Please try again.
           </div>
         </div>
       </div>
@@ -155,28 +143,28 @@ function RolesPageContent() {
   }
 
   return (
-    <div className="p-lg h-full overflow-y-auto bg-cream">
+    <div className="p-6 h-full overflow-y-auto">
       {/* Offline Warning */}
       {!isOnline && (
-        <div className="flex items-center gap-3 p-4 mb-6 bg-amber-500/10 rounded-lg text-amber-600 text-sm">
+        <div className="flex items-center gap-3 p-4 mb-6 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400 text-sm">
           <WifiOff size={18} />
           <span>You are offline. Role management is read-only until you reconnect.</span>
         </div>
       )}
 
       {/* Header */}
-      <header className="flex items-center justify-between mb-lg">
+      <header className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <Link
             to="/settings/security"
-            className="w-9 h-9 flex items-center justify-center bg-white border border-border rounded-sm text-smoke cursor-pointer transition-all duration-fast ease-standard hover:border-[var(--color-rose-poudre)] hover:text-[var(--color-rose-poudre)]"
+            className="w-9 h-9 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl text-[var(--theme-text-muted)] cursor-pointer transition-all hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
             title="Back to settings"
           >
             <ArrowLeft size={18} />
           </Link>
           <div>
-            <h1 className="font-display text-4xl font-bold text-espresso">Role Management</h1>
-            <p className="text-smoke text-sm mt-1">
+            <h1 className="text-2xl font-bold text-white">Role Management</h1>
+            <p className="text-[var(--theme-text-muted)] text-sm mt-0.5">
               Configure roles and their access permissions
             </p>
           </div>
@@ -184,7 +172,7 @@ function RolesPageContent() {
         <PermissionGuard permission="users.roles">
           <button
             type="button"
-            className="inline-flex items-center gap-xs py-sm px-lg bg-[var(--color-rose-poudre)] text-white border-none rounded-md text-sm font-semibold cursor-pointer transition-all duration-fast ease-standard hover:opacity-90"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-gold)] text-black font-bold rounded-xl text-sm transition-colors hover:opacity-90 disabled:opacity-50"
             onClick={handleCreate}
             disabled={!isOnline}
           >
@@ -195,20 +183,16 @@ function RolesPageContent() {
       </header>
 
       {/* Roles Grid */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="p-lg border-b border-border">
-          <div className="flex items-start justify-between gap-md">
-            <div>
-              <h2 className="flex items-center gap-sm text-lg font-semibold text-espresso mb-xs">System Roles</h2>
-              <p className="text-sm text-smoke">
-                {roles.length} role{roles.length !== 1 ? 's' : ''} configured
-              </p>
-            </div>
-          </div>
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/5">
+          <h2 className="text-sm font-semibold text-white">System Roles</h2>
+          <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">
+            {roles.length} role{roles.length !== 1 ? 's' : ''} configured
+          </p>
         </div>
 
-        <div className="p-lg">
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-6">
+        <div className="p-6">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-5">
             {roles.map((role) => (
               <RoleCard
                 key={role.id}
@@ -222,7 +206,7 @@ function RolesPageContent() {
           </div>
 
           {roles.length === 0 && (
-            <div className="text-center py-12 text-smoke">
+            <div className="text-center py-12 text-[var(--theme-text-muted)]">
               No roles configured yet. Create your first role to get started.
             </div>
           )}

@@ -20,7 +20,7 @@ const navItems = [
 
 export default function AccountingLayout() {
   return (
-    <div className="p-6">
+    <div className="min-h-screen bg-[var(--theme-bg-primary)] text-white p-6">
       <h1 className="text-2xl font-bold mb-6">Accounting</h1>
 
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
@@ -29,10 +29,10 @@ export default function AccountingLayout() {
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+              `flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
                 isActive
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-[var(--color-gold)]/15 text-[var(--color-gold)] border border-[var(--color-gold)]/30'
+                  : 'bg-transparent border border-white/10 text-white/70 hover:border-white/20 hover:text-white'
               }`
             }
           >

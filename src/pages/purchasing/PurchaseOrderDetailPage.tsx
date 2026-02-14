@@ -28,7 +28,7 @@ import {
 } from '@/components/purchasing'
 import PinVerificationModal from '@/components/pos/modals/PinVerificationModal'
 import { toast } from 'sonner'
-import './PurchaseOrderDetailPage.css'
+import { logError } from '@/utils/logger'
 
 export default function PurchaseOrderDetailPage() {
   const navigate = useNavigate()
@@ -253,15 +253,23 @@ export default function PurchaseOrderDetailPage() {
 
   // Loading / Error states
   if (isLoading) {
-    return <div className="po-detail-loading">Loading...</div>
+    return (
+      <div className="min-h-screen bg-[var(--theme-bg-primary)] flex items-center justify-center text-lg text-[var(--muted-smoke)]">
+        Loading...
+      </div>
+    )
   }
 
   if (error || !purchaseOrder) {
-    return <div className="po-detail-error">Purchase order not found</div>
+    return (
+      <div className="min-h-screen bg-[var(--theme-bg-primary)] flex items-center justify-center text-lg text-[var(--muted-smoke)]">
+        Purchase order not found
+      </div>
+    )
   }
 
   return (
-    <div className="po-detail-page">
+    <div className="min-h-screen bg-[var(--theme-bg-primary)] p-8 overflow-y-auto">
       <PODetailHeader
         purchaseOrder={purchaseOrder}
         validActions={validActions}
@@ -275,8 +283,8 @@ export default function PurchaseOrderDetailPage() {
         isConfirming={confirmOrderMutation.isPending}
       />
 
-      <div className="po-detail-page__content">
-        <div className="po-detail-page__main">
+      <div className="grid grid-cols-[1fr_360px] gap-6 items-start max-lg:grid-cols-1">
+        <div className="flex flex-col gap-6">
           <POInfoCard purchaseOrder={purchaseOrder} />
 
           <POItemsTable
@@ -330,5 +338,3 @@ export default function PurchaseOrderDetailPage() {
     </div>
   )
 }
-
-import { logError } from '@/utils/logger'

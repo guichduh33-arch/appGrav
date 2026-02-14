@@ -55,45 +55,42 @@ const ArrayAmountEditor: React.FC<ArrayAmountEditorProps> = ({
         {values.map((v, i) => (
           <div
             key={i}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium"
-            style={{ background: 'var(--color-blanc-creme)' }}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-white/5 border border-white/10"
           >
-            <span style={{ color: 'var(--color-brun-chocolat)' }}>
+            <span className="text-white">
               {formatDisplay(v)}
             </span>
             <button
               type="button"
-              className="btn-ghost--small"
+              className="p-0.5 bg-transparent border-none cursor-pointer text-[var(--theme-text-muted)] hover:text-white transition-colors disabled:opacity-30"
               onClick={() => handleMove(i, -1)}
               disabled={i === 0}
-              style={{ padding: 2, background: 'none', border: 'none', cursor: 'pointer', opacity: i === 0 ? 0.3 : 1 }}
             >
               <ArrowUp size={12} />
             </button>
             <button
               type="button"
-              className="btn-ghost--small"
+              className="p-0.5 bg-transparent border-none cursor-pointer text-[var(--theme-text-muted)] hover:text-white transition-colors disabled:opacity-30"
               onClick={() => handleMove(i, 1)}
               disabled={i === values.length - 1}
-              style={{ padding: 2, background: 'none', border: 'none', cursor: 'pointer', opacity: i === values.length - 1 ? 0.3 : 1 }}
             >
               <ArrowDown size={12} />
             </button>
             <button
               type="button"
               onClick={() => handleRemove(i)}
-              style={{ padding: 2, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-urgent)' }}
+              className="p-0.5 bg-transparent border-none cursor-pointer text-red-400 hover:text-red-300 transition-colors"
             >
               <Trash2 size={12} />
             </button>
           </div>
         ))}
       </div>
-      <div className="form-input-group">
-        <span className="form-input-suffix">{suffix}</span>
+      <div className="flex items-center gap-2">
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">{suffix}</span>
         <input
           type="number"
-          className="form-input form-input--narrow"
+          className="w-28 h-9 px-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
           value={newValue}
           onChange={(e) => setNewValue(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAdd())}
@@ -103,10 +100,9 @@ const ArrayAmountEditor: React.FC<ArrayAmountEditorProps> = ({
         />
         <button
           type="button"
-          className="btn-secondary"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-transparent border border-white/10 text-white hover:border-white/20 rounded-xl text-sm font-medium transition-colors disabled:opacity-40"
           onClick={handleAdd}
           disabled={!newValue.trim()}
-          style={{ padding: '6px 12px' }}
         >
           <Plus size={14} />
           Add

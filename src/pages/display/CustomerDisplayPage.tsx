@@ -17,12 +17,6 @@ import { BreakeryLogo } from '@/components/ui/BreakeryLogo';
 import { cn } from '@/lib/utils';
 import { logError } from '@/utils/logger'
 
-const CD_BG = '#111113';
-const CD_GOLD = '#C9A55C';
-const CD_TEXT = '#F5F4F1';
-const CD_TEXT_SECONDARY = '#A8A29E';
-const CD_TEXT_MUTED = '#78716C';
-
 function formatPrice(amount: number): string {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency', currency: 'IDR',
@@ -128,13 +122,13 @@ export default function CustomerDisplayPage() {
   // --- Connecting State ---
   if (isConnecting) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center text-white overflow-hidden" style={{ background: CD_BG }}>
+      <div className="h-screen flex flex-col items-center justify-center text-white overflow-hidden bg-[var(--theme-bg-primary)]">
         <div className="flex justify-center mb-6 animate-[cd-float_3s_ease-in-out_infinite]">
           <BreakeryLogo size="xl" variant="light" showText={false} />
         </div>
-        <h1 className="font-display text-[3.5rem] font-bold" style={{ color: CD_TEXT }}>The Breakery</h1>
-        <p className="text-lg mt-2 font-display" style={{ color: CD_TEXT_SECONDARY }}>Artisan French Bakery</p>
-        <p className="text-base mt-8 animate-[cd-blink_1.5s_ease-in-out_infinite]" style={{ color: CD_TEXT_MUTED }}>Connecting...</p>
+        <h1 className="font-display text-[3.5rem] font-bold text-[var(--theme-text-primary)]">The Breakery</h1>
+        <p className="text-lg mt-2 font-display text-[var(--theme-text-secondary)]">Artisan French Bakery</p>
+        <p className="text-base mt-8 animate-[cd-blink_1.5s_ease-in-out_infinite] text-[var(--theme-text-muted)]">Connecting...</p>
         <style>{cdStyles}</style>
       </div>
     );
@@ -143,15 +137,15 @@ export default function CustomerDisplayPage() {
   // --- Active Cart State ---
   if (!isIdle && cart.items.length > 0) {
     return (
-      <div className="h-screen flex flex-col text-white overflow-hidden relative" style={{ background: CD_BG }}>
+      <div className="h-screen flex flex-col text-white overflow-hidden relative bg-[var(--theme-bg-primary)]">
         <audio ref={audioRef} src="/sounds/order-ready.mp3" preload="auto" />
 
         {/* Header */}
         <div className="flex items-center gap-4 px-10 py-5 border-b border-white/10">
           <BreakeryLogo size="sm" variant="light" showText={false} />
-          <h2 className="text-xl font-semibold flex-1" style={{ color: CD_TEXT }}>Your Order</h2>
-          {cart.customerName && <span className="text-base px-4 py-1 rounded-full bg-white/10" style={{ color: CD_TEXT_SECONDARY }}>{cart.customerName}</span>}
-          {cart.tableNumber && <span className="text-base px-4 py-1 rounded-full bg-white/10" style={{ color: CD_TEXT_SECONDARY }}>Table {cart.tableNumber}</span>}
+          <h2 className="text-xl font-semibold flex-1 text-[var(--theme-text-primary)]">Your Order</h2>
+          {cart.customerName && <span className="text-base px-4 py-1 rounded-full bg-white/10 text-[var(--theme-text-secondary)]">{cart.customerName}</span>}
+          {cart.tableNumber && <span className="text-base px-4 py-1 rounded-full bg-white/10 text-[var(--theme-text-secondary)]">Table {cart.tableNumber}</span>}
         </div>
 
         {/* Items */}
@@ -159,13 +153,13 @@ export default function CustomerDisplayPage() {
           {cart.items.map((item) => (
             <div key={item.id} className="flex justify-between items-start py-4 border-b border-white/5 animate-[cd-slideIn_0.3s_ease-out]">
               <div className="flex flex-wrap items-baseline gap-2">
-                <span className="text-base font-semibold min-w-[2rem]" style={{ color: CD_GOLD }}>{item.quantity}x</span>
-                <span className="text-lg font-medium" style={{ color: CD_TEXT }}>{item.name}</span>
+                <span className="text-base font-semibold min-w-[2rem] text-[var(--color-gold)]">{item.quantity}x</span>
+                <span className="text-lg font-medium text-[var(--theme-text-primary)]">{item.name}</span>
                 {item.modifiers.length > 0 && (
-                  <span className="text-sm italic w-full ml-10" style={{ color: CD_TEXT_MUTED }}>+ {item.modifiers.join(', ')}</span>
+                  <span className="text-sm italic w-full ml-10 text-[var(--theme-text-muted)]">+ {item.modifiers.join(', ')}</span>
                 )}
               </div>
-              <span className="text-lg font-medium tabular-nums whitespace-nowrap" style={{ color: CD_TEXT_SECONDARY }}>{formatPrice(item.totalPrice)}</span>
+              <span className="text-lg font-medium tabular-nums whitespace-nowrap text-[var(--theme-text-secondary)]">{formatPrice(item.totalPrice)}</span>
             </div>
           ))}
         </div>
@@ -173,17 +167,17 @@ export default function CustomerDisplayPage() {
         {/* Total */}
         <div className="px-10 py-6 border-t border-white/10 text-center">
           {cart.discountAmount > 0 && (
-            <div className="flex justify-between text-base mb-2" style={{ color: CD_TEXT_SECONDARY }}>
+            <div className="flex justify-between text-base mb-2 text-[var(--theme-text-secondary)]">
               <span>Subtotal</span><span className="tabular-nums">{formatPrice(cart.subtotal)}</span>
             </div>
           )}
           {cart.discountAmount > 0 && (
-            <div className="flex justify-between text-base mb-4" style={{ color: '#22C55E' }}>
+            <div className="flex justify-between text-base mb-4 text-[#22C55E]">
               <span>Discount</span><span className="tabular-nums">-{formatPrice(cart.discountAmount)}</span>
             </div>
           )}
-          <div className="text-[48px] font-bold tabular-nums animate-[cd-totalBounce_0.3s_ease-out]" style={{ color: CD_GOLD }}>{formatPrice(cart.total)}</div>
-          <div className="text-sm uppercase tracking-[0.1em] mt-1" style={{ color: CD_TEXT_MUTED }}>TOTAL</div>
+          <div className="text-[48px] font-bold tabular-nums animate-[cd-totalBounce_0.3s_ease-out] text-[var(--color-gold)]">{formatPrice(cart.total)}</div>
+          <div className="text-sm uppercase tracking-[0.1em] mt-1 text-[var(--theme-text-muted)]">TOTAL</div>
         </div>
 
         {/* Watermark */}
@@ -194,7 +188,7 @@ export default function CustomerDisplayPage() {
         {/* Side ready orders */}
         {readyOrders.length > 0 && (
           <div className="absolute right-0 top-[72px] bottom-0 w-[240px] p-5 bg-white/5 border-l border-white/10">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.05em] mb-4" style={{ color: CD_TEXT_MUTED }}>Ready</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-[0.05em] mb-4 text-[var(--theme-text-muted)]">Ready</h3>
             <div className="flex flex-col gap-2">
               {readyOrders.map((order) => (
                 <div key={order.orderId} className={cn(
@@ -212,7 +206,7 @@ export default function CustomerDisplayPage() {
 
   // --- Idle State ---
   return (
-    <div className={cn('h-screen flex flex-col justify-center text-white overflow-hidden relative transition-opacity duration-1000', isDimmed && 'opacity-70')} style={{ background: CD_BG }}>
+    <div className={cn('h-screen flex flex-col justify-center text-white overflow-hidden relative transition-opacity duration-1000 bg-[var(--theme-bg-primary)]', isDimmed && 'opacity-70')}>
       <audio ref={audioRef} src="/sounds/order-ready.mp3" preload="auto" />
 
       <div className="flex-1 flex flex-col items-center justify-center text-center p-12">
@@ -224,7 +218,7 @@ export default function CustomerDisplayPage() {
                 className="max-w-[60%] max-h-[50vh] object-contain rounded-2xl mb-8 shadow-[0_10px_40px_rgba(0,0,0,0.4)]" />
             )}
             <h2 className="text-[3.5rem] font-bold">{currentPromo.title}</h2>
-            {currentPromo.subtitle && <p className="text-2xl mt-3" style={{ color: CD_TEXT_SECONDARY }}>{currentPromo.subtitle}</p>}
+            {currentPromo.subtitle && <p className="text-2xl mt-3 text-[var(--theme-text-secondary)]">{currentPromo.subtitle}</p>}
           </div>
         ) : (
           <>
@@ -232,17 +226,17 @@ export default function CustomerDisplayPage() {
               <div className="flex justify-center mb-4 animate-[cd-float_3s_ease-in-out_infinite]">
                 <BreakeryLogo size="xl" variant="light" showText={false} />
               </div>
-              <h1 className="font-display text-[3.5rem] font-bold" style={{ color: CD_TEXT }}>The Breakery</h1>
-              <p className="text-lg mt-2 font-display" style={{ color: CD_TEXT_SECONDARY }}>Artisan French Bakery</p>
+              <h1 className="font-display text-[3.5rem] font-bold text-[var(--theme-text-primary)]">The Breakery</h1>
+              <p className="text-lg mt-2 font-display text-[var(--theme-text-secondary)]">Artisan French Bakery</p>
             </div>
             <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-center gap-2 text-lg" style={{ color: CD_TEXT_SECONDARY }}>
+              <div className="flex items-center justify-center gap-2 text-lg text-[var(--theme-text-secondary)]">
                 <MapPin size={20} /><span>Senggigi, Lombok</span>
               </div>
-              <div className="flex items-center justify-center gap-2 text-lg" style={{ color: CD_TEXT_SECONDARY }}>
+              <div className="flex items-center justify-center gap-2 text-lg text-[var(--theme-text-secondary)]">
                 <Wifi size={20} /><span>WiFi: TheBreakery</span>
               </div>
-              <div className="flex items-center justify-center gap-2 text-lg" style={{ color: CD_TEXT_SECONDARY }}>
+              <div className="flex items-center justify-center gap-2 text-lg text-[var(--theme-text-secondary)]">
                 <Clock size={20} /><span>Open 7/7 &bull; 7am - 6pm</span>
               </div>
             </div>
@@ -255,7 +249,7 @@ export default function CustomerDisplayPage() {
         <div className="flex gap-10 py-5 px-10 bg-black/30 backdrop-blur-md border-t border-white/5">
           {orderQueue.length > 0 && (
             <div className="flex-1">
-              <h3 className="text-sm font-semibold uppercase tracking-[0.05em] mb-3" style={{ color: CD_TEXT_MUTED }}>Preparing</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-[0.05em] mb-3 text-[var(--theme-text-muted)]">Preparing</h3>
               <div className="flex flex-wrap gap-2">
                 {orderQueue.map((order) => (
                   <div key={order.orderId} className="py-2 px-5 rounded-lg text-xl font-semibold border border-amber-500/30 text-amber-300">
@@ -267,7 +261,7 @@ export default function CustomerDisplayPage() {
           )}
           {readyOrders.length > 0 && (
             <div className="flex-1">
-              <h3 className="text-sm font-semibold uppercase tracking-[0.05em] mb-3" style={{ color: '#22C55E' }}>Ready for Pickup</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-[0.05em] mb-3 text-[#22C55E]">Ready for Pickup</h3>
               <div className="flex flex-wrap gap-2">
                 {readyOrders.map((order) => (
                   <div key={order.orderId} className={cn(

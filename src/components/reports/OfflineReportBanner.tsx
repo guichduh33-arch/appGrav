@@ -36,8 +36,8 @@ export function OfflineReportBanner({
       <div
         className={`
           flex items-center gap-2 px-4 py-2
-          bg-blue-50 border border-blue-200 rounded-lg
-          text-sm text-blue-700
+          bg-blue-500/10 border border-blue-500/20 rounded-xl
+          text-sm text-blue-400
           ${className}
         `}
       >
@@ -53,8 +53,8 @@ export function OfflineReportBanner({
       <div
         className={`
           flex items-center gap-2 px-4 py-3
-          bg-yellow-50 border border-yellow-200 rounded-lg
-          text-sm text-yellow-800
+          bg-yellow-500/10 border border-yellow-500/20 rounded-xl
+          text-sm text-yellow-400
           ${className}
         `}
       >
@@ -72,19 +72,19 @@ export function OfflineReportBanner({
       <div
         className={`
           flex items-center justify-between gap-4 px-4 py-3
-          bg-yellow-50 border border-yellow-200 rounded-lg
+          bg-yellow-500/10 border border-yellow-500/20 rounded-xl
           ${className}
         `}
       >
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-yellow-100 rounded-full">
-            <WifiOff className="w-4 h-4 text-yellow-700" />
+          <div className="p-2 bg-yellow-500/20 rounded-full">
+            <WifiOff className="w-4 h-4 text-yellow-400" />
           </div>
           <div>
-            <p className="text-sm font-medium text-yellow-800">
+            <p className="text-sm font-medium text-yellow-300">
               Offline Mode
             </p>
-            <p className="text-xs text-yellow-600">
+            <p className="text-xs text-yellow-500">
               {lastSyncDate ? (
                 <>
                   Data as of {format(lastSyncDate, 'dd MMM yyyy HH:mm', { locale: enUS })}
@@ -97,7 +97,7 @@ export function OfflineReportBanner({
         </div>
 
         {isDateRangeExceedsCache && (
-          <div className="text-xs text-yellow-700 bg-yellow-100 px-2 py-1 rounded">
+          <div className="text-xs text-yellow-400 bg-yellow-500/20 px-2 py-1 rounded">
             7 days max
           </div>
         )}
@@ -127,7 +127,7 @@ export function OfflineIndicatorBadge({
       className={`
         inline-flex items-center gap-1.5 px-2 py-1
         text-xs font-medium rounded-full
-        bg-yellow-100 text-yellow-700
+        bg-yellow-500/20 text-yellow-400
         ${className}
       `}
       title={lastSyncDate ? `Last sync: ${format(lastSyncDate, 'dd/MM/yyyy HH:mm')}` : 'No cached data'}

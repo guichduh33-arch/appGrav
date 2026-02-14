@@ -32,17 +32,17 @@ export default function TrialBalancePage() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-4">
-        <label className="text-sm text-gray-500">As of:</label>
+        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">As of:</label>
         <input
           type="date"
           value={endDate}
           onChange={e => setEndDate(e.target.value)}
-          className="border rounded-lg px-3 py-2 text-sm"
+          className="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
         />
         {data?.rows.length ? (
           <button
             onClick={exportCSV}
-            className="flex items-center gap-1 px-3 py-2 text-sm border rounded-lg hover:bg-gray-50 ml-auto"
+            className="flex items-center gap-1 px-3 py-2 text-sm border border-white/10 rounded-xl text-white hover:border-white/20 ml-auto transition-colors"
           >
             <Download size={14} /> Export CSV
           </button>
@@ -51,10 +51,10 @@ export default function TrialBalancePage() {
 
       {/* Balance check */}
       {data && (
-        <div className={`flex items-center gap-2 mb-4 px-4 py-2 rounded-lg text-sm font-medium ${
+        <div className={`flex items-center gap-2 mb-4 px-4 py-2 rounded-xl text-sm font-medium ${
           data.isBalanced
-            ? 'bg-green-50 text-green-700 border border-green-200'
-            : 'bg-red-50 text-red-700 border border-red-200'
+            ? 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20'
+            : 'bg-red-400/10 text-red-400 border border-red-400/20'
         }`}>
           {data.isBalanced ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
           {data.isBalanced
@@ -63,44 +63,44 @@ export default function TrialBalancePage() {
         </div>
       )}
 
-      <div className="border rounded-lg overflow-hidden">
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 border-b">
-              <th className="text-left px-4 py-2 font-medium">Code</th>
-              <th className="text-left px-4 py-2 font-medium">Account</th>
-              <th className="text-left px-4 py-2 font-medium">Type</th>
-              <th className="text-right px-4 py-2 font-medium">Debit</th>
-              <th className="text-right px-4 py-2 font-medium">Credit</th>
+            <tr className="border-b border-white/5">
+              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Code</th>
+              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Account</th>
+              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Type</th>
+              <th className="text-right px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Debit</th>
+              <th className="text-right px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Credit</th>
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody>
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="animate-pulse">
-                  <td className="px-4 py-3"><div className="h-3 bg-gray-200 rounded w-12" /></td>
-                  <td className="px-4 py-3"><div className="h-3 bg-gray-200 rounded w-40" /></td>
-                  <td className="px-4 py-3"><div className="h-3 bg-gray-200 rounded w-16" /></td>
-                  <td className="px-4 py-3"><div className="h-3 bg-gray-200 rounded w-24" /></td>
-                  <td className="px-4 py-3"><div className="h-3 bg-gray-200 rounded w-24" /></td>
+                <tr key={i} className="animate-pulse border-b border-white/5">
+                  <td className="px-4 py-3"><div className="h-3 bg-white/10 rounded w-12" /></td>
+                  <td className="px-4 py-3"><div className="h-3 bg-white/10 rounded w-40" /></td>
+                  <td className="px-4 py-3"><div className="h-3 bg-white/10 rounded w-16" /></td>
+                  <td className="px-4 py-3"><div className="h-3 bg-white/10 rounded w-24" /></td>
+                  <td className="px-4 py-3"><div className="h-3 bg-white/10 rounded w-24" /></td>
                 </tr>
               ))
             ) : data?.rows.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={5} className="px-4 py-8 text-center text-[var(--theme-text-muted)]">
                   No data for this period
                 </td>
               </tr>
             ) : (
               data?.rows.map(row => (
-                <tr key={row.account_id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 font-mono text-gray-500">{row.account_code}</td>
-                  <td className="px-4 py-2">{row.account_name}</td>
-                  <td className="px-4 py-2 capitalize text-gray-500">{row.account_type}</td>
-                  <td className="px-4 py-2 text-right font-mono">
+                <tr key={row.account_id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                  <td className="px-4 py-2 font-mono text-[var(--theme-text-muted)]">{row.account_code}</td>
+                  <td className="px-4 py-2 text-white/80">{row.account_name}</td>
+                  <td className="px-4 py-2 capitalize text-[var(--theme-text-muted)]">{row.account_type}</td>
+                  <td className="px-4 py-2 text-right font-mono text-emerald-400">
                     {row.debit_total > 0 ? formatIDR(row.debit_total) : ''}
                   </td>
-                  <td className="px-4 py-2 text-right font-mono">
+                  <td className="px-4 py-2 text-right font-mono text-red-400">
                     {row.credit_total > 0 ? formatIDR(row.credit_total) : ''}
                   </td>
                 </tr>
@@ -109,10 +109,10 @@ export default function TrialBalancePage() {
           </tbody>
           {data && (
             <tfoot>
-              <tr className="bg-gray-50 font-semibold border-t">
-                <td colSpan={3} className="px-4 py-2">Total</td>
-                <td className="px-4 py-2 text-right font-mono">{formatIDR(data.totalDebit)}</td>
-                <td className="px-4 py-2 text-right font-mono">{formatIDR(data.totalCredit)}</td>
+              <tr className="border-t border-white/10 font-semibold">
+                <td colSpan={3} className="px-4 py-2 text-[var(--color-gold)]">Total</td>
+                <td className="px-4 py-2 text-right font-mono text-emerald-400">{formatIDR(data.totalDebit)}</td>
+                <td className="px-4 py-2 text-right font-mono text-red-400">{formatIDR(data.totalCredit)}</td>
               </tr>
             </tfoot>
           )}

@@ -34,35 +34,25 @@ export default function TerminalSettingsSection() {
     setIsEditing(false);
   };
 
-  // If not registered, show registration prompt
+  // Unregistered state
   if (!isRegistered) {
     return (
-      <div className="settings-section">
-        <div className="settings-section__header">
-          <h3 className="settings-section__title">
-            <Monitor size={20} />
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+        <div className="px-6 py-4 border-b border-white/5">
+          <h3 className="text-base font-semibold text-white flex items-center gap-2">
+            <Monitor size={20} className="text-[var(--color-gold)]" />
             POS Terminal
           </h3>
         </div>
-        <div className="settings-section__content">
-          <div
-            style={{
-              padding: '2rem',
-              textAlign: 'center',
-              backgroundColor: '#f9fafb',
-              borderRadius: '0.5rem',
-              border: '2px dashed #d1d5db',
-            }}
-          >
-            <Monitor size={48} style={{ color: '#9ca3af', marginBottom: '1rem' }} />
-            <h4 style={{ marginBottom: '0.5rem' }}>
-              Terminal not registered
-            </h4>
-            <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
+        <div className="p-6">
+          <div className="flex flex-col items-center gap-4 py-8 text-center border-2 border-dashed border-white/10 rounded-xl bg-white/[0.01]">
+            <Monitor size={48} className="text-[var(--theme-text-muted)]" />
+            <h4 className="text-base font-semibold text-white">Terminal not registered</h4>
+            <p className="text-sm text-[var(--theme-text-muted)] max-w-[280px]">
               Register this device to enable LAN communication and offline sync
             </p>
             <button
-              className="btn btn-primary"
+              className="flex items-center gap-2 px-4 py-2 bg-[var(--color-gold)] text-black font-bold rounded-xl hover:opacity-90 transition-colors"
               onClick={() => setShowRegistrationModal(true)}
             >
               <Monitor size={18} />
@@ -81,150 +71,133 @@ export default function TerminalSettingsSection() {
     );
   }
 
-  // Registered terminal view
+  // Registered state
   return (
-    <div className="settings-section">
-      <div className="settings-section__header">
-        <h3 className="settings-section__title">
-          <Monitor size={20} />
+    <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+      <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+        <h3 className="text-base font-semibold text-white flex items-center gap-2">
+          <Monitor size={20} className="text-[var(--color-gold)]" />
           POS Terminal
         </h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          {/* Sync Status Badge */}
+        <div className="flex items-center gap-2">
           <span
-            style={{
-              padding: '0.25rem 0.75rem',
-              borderRadius: '9999px',
-              fontSize: '0.75rem',
-              fontWeight: 500,
-              backgroundColor: serverSynced ? '#dcfce7' : '#fef3c7',
-              color: serverSynced ? '#166534' : '#92400e',
-            }}
+            className={`px-3 py-1 rounded-full text-xs font-medium ${
+              serverSynced
+                ? 'bg-emerald-500/20 text-emerald-400'
+                : 'bg-amber-500/20 text-amber-400'
+            }`}
           >
             {serverSynced ? 'Synced' : 'Pending Sync'}
           </span>
           {!serverSynced && (
             <button
-              className="btn btn-sm btn-secondary"
+              className="p-1.5 hover:bg-white/[0.04] rounded-xl transition-colors"
               onClick={syncPendingChanges}
               disabled={isLoading}
               title="Sync Now"
             >
-              <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
+              <RefreshCw size={14} className={`text-[var(--theme-text-secondary)] ${isLoading ? 'animate-spin' : ''}`} />
             </button>
           )}
         </div>
       </div>
 
-      <div className="settings-section__content">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {/* Device ID */}
-          <div className="settings-item">
-            <div className="settings-item__label">
-              <Wifi size={16} />
-              Device ID
-            </div>
-            <div className="settings-item__value" style={{ fontFamily: 'monospace', fontSize: '0.875rem' }}>
-              {deviceId}
-            </div>
-          </div>
+      <div className="p-6 space-y-4">
+        {/* Device ID */}
+        <SettingsRow icon={<Wifi size={16} />} label="Device ID">
+          <span className="font-mono text-sm text-[var(--theme-text-secondary)]">{deviceId}</span>
+        </SettingsRow>
 
-          {/* Terminal Name */}
-          <div className="settings-item">
-            <div className="settings-item__label">
-              <Monitor size={16} />
-              Terminal Name
+        {/* Terminal Name */}
+        <SettingsRow icon={<Monitor size={16} />} label="Terminal Name">
+          {isEditing ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                className="bg-black/40 border border-white/10 rounded-xl text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 px-3 py-1.5 text-sm w-48"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                autoFocus
+              />
+              <button
+                className="p-1.5 bg-[var(--color-gold)] text-black rounded-lg hover:opacity-90 transition-colors"
+                onClick={handleSaveName}
+              >
+                <Check size={14} />
+              </button>
+              <button
+                className="p-1.5 border border-white/10 text-white rounded-lg hover:border-white/20 transition-colors"
+                onClick={handleCancelEdit}
+              >
+                <X size={14} />
+              </button>
             </div>
-            <div className="settings-item__value" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              {isEditing ? (
-                <>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    style={{ width: '200px' }}
-                    autoFocus
-                  />
-                  <button className="btn btn-sm btn-primary" onClick={handleSaveName}>
-                    <Check size={14} />
-                  </button>
-                  <button className="btn btn-sm btn-secondary" onClick={handleCancelEdit}>
-                    <X size={14} />
-                  </button>
-                </>
-              ) : (
-                <>
-                  <span>{terminalName}</span>
-                  <button
-                    className="btn btn-sm btn-ghost"
-                    onClick={() => {
-                      setEditName(terminalName || '');
-                      setIsEditing(true);
-                    }}
-                  >
-                    <Edit2 size={14} />
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Location */}
-          {location && (
-            <div className="settings-item">
-              <div className="settings-item__label">
-                <MapPin size={16} />
-                Location
-              </div>
-              <div className="settings-item__value">{location}</div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-white">{terminalName}</span>
+              <button
+                className="p-1 hover:bg-white/[0.04] rounded-lg transition-colors"
+                onClick={() => { setEditName(terminalName || ''); setIsEditing(true); }}
+              >
+                <Edit2 size={14} className="text-[var(--theme-text-muted)]" />
+              </button>
             </div>
           )}
+        </SettingsRow>
 
-          {/* Hub Status */}
-          <div className="settings-item">
-            <div className="settings-item__label">
-              <Server size={16} />
-              Hub Status
-            </div>
-            <div className="settings-item__value">
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  checked={isHub}
-                  onChange={(e) => updateIsHub(e.target.checked)}
-                  style={{ width: '1rem', height: '1rem' }}
-                />
-                <span>
-                  {isHub ? 'This is the main hub' : 'Not a hub'}
-                </span>
-              </label>
-            </div>
-          </div>
+        {/* Location */}
+        {location && (
+          <SettingsRow icon={<MapPin size={16} />} label="Location">
+            <span className="text-sm text-white">{location}</span>
+          </SettingsRow>
+        )}
 
-          {/* Status */}
-          <div className="settings-item">
-            <div className="settings-item__label">
-              Status
-            </div>
-            <div className="settings-item__value">
-              <span
-                style={{
-                  padding: '0.25rem 0.75rem',
-                  borderRadius: '9999px',
-                  fontSize: '0.75rem',
-                  fontWeight: 500,
-                  backgroundColor: status === 'active' ? '#dcfce7' : '#fef3c7',
-                  color: status === 'active' ? '#166534' : '#92400e',
-                  textTransform: 'capitalize',
-                }}
-              >
-                {status}
-              </span>
-            </div>
-          </div>
-        </div>
+        {/* Hub Status */}
+        <SettingsRow icon={<Server size={16} />} label="Hub Status">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={isHub}
+              onChange={(e) => updateIsHub(e.target.checked)}
+              className="w-4 h-4 rounded border-white/10 text-[var(--color-gold)] focus:ring-[var(--color-gold)]/20"
+            />
+            <span className="text-sm text-white">
+              {isHub ? 'This is the main hub' : 'Not a hub'}
+            </span>
+          </label>
+        </SettingsRow>
+
+        {/* Status */}
+        <SettingsRow icon={null} label="Status">
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${
+              status === 'active'
+                ? 'bg-emerald-500/20 text-emerald-400'
+                : 'bg-amber-500/20 text-amber-400'
+            }`}
+          >
+            {status}
+          </span>
+        </SettingsRow>
       </div>
+    </div>
+  );
+}
+
+function SettingsRow({
+  icon, label, children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-between py-2 border-b border-white/5 last:border-b-0">
+      <div className="flex items-center gap-2 text-[var(--theme-text-muted)]">
+        {icon}
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">{label}</span>
+      </div>
+      <div>{children}</div>
     </div>
   );
 }

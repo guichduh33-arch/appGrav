@@ -2,7 +2,7 @@ import { Skeleton as SkeletonBox } from '@/components/ui/Skeleton';
 
 export function KPICardSkeleton() {
   return (
-    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+    <div className="bg-[var(--onyx-surface)] p-6 rounded-xl border border-white/5">
       <div className="flex justify-between items-start mb-4">
         <SkeletonBox className="h-4 w-24" />
         <SkeletonBox className="h-8 w-8 rounded-lg" />
@@ -43,9 +43,9 @@ export function TableSkeleton({
   columns?: number;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="bg-[var(--onyx-surface)] rounded-xl border border-white/5 overflow-hidden">
       {/* Header */}
-      <div className="border-b border-gray-100 bg-gray-50/50">
+      <div className="border-b border-white/5 bg-white/[0.02]">
         <div className="flex px-4 py-3 gap-4">
           {Array.from({ length: columns }).map((_, i) => (
             <SkeletonBox key={i} className="h-4 w-24" />
@@ -54,7 +54,7 @@ export function TableSkeleton({
       </div>
       {/* Rows */}
       <table className="w-full">
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-white/5">
           {Array.from({ length: rows }).map((_, i) => (
             <TableRowSkeleton key={i} columns={columns} />
           ))}
@@ -72,7 +72,7 @@ export function ChartSkeleton({
   showLegend?: boolean;
 }) {
   return (
-    <div className="bg-white p-6 rounded-xl border border-gray-200">
+    <div className="bg-[var(--onyx-surface)] p-6 rounded-xl border border-white/5">
       {/* Title */}
       <div className="flex justify-between items-center mb-6">
         <div>

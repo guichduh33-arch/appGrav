@@ -82,28 +82,28 @@ export default function InternalTransfersPage() {
   }, [error])
 
   return (
-    <div className="p-xl max-w-[1600px] mx-auto">
+    <div className="p-6 lg:p-8 max-w-[1600px] mx-auto">
       {/* Offline indicator */}
       {!isOnline && (
-        <div className="flex items-center gap-2 p-3 px-4 mb-4 rounded-lg border border-warning bg-warning/10 text-[#b45309]">
+        <div className="flex items-center gap-2 p-3 px-4 mb-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-400">
           <WifiOff size={18} />
-          <span>Transfers are not available offline</span>
+          <span className="text-sm font-medium">Transfers are not available offline</span>
         </div>
       )}
 
       {/* Header */}
-      <header className="flex justify-between items-start mb-xl">
+      <header className="flex justify-between items-start mb-8">
         <div>
-          <h1 className="flex items-center gap-md text-3xl font-bold text-white m-0 mb-sm">
-            <ArrowRightLeft size={28} />
+          <h1 className="flex items-center gap-3 text-2xl font-bold text-white m-0 mb-1">
+            <ArrowRightLeft size={24} className="text-[var(--color-gold)]" />
             Internal Transfers
           </h1>
-          <p className="text-base text-[var(--color-gray-400)] m-0">
+          <p className="text-sm text-[var(--theme-text-muted)] m-0">
             Manage transfers between warehouse and sections
           </p>
         </div>
         <button
-          className="btn btn-primary"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[var(--color-gold)] text-black font-bold text-sm rounded-xl hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
           onClick={handleNewTransfer}
           disabled={!isOnline}
           title={!isOnline ? 'Transfers are not available offline' : undefined}
@@ -114,51 +114,34 @@ export default function InternalTransfersPage() {
       </header>
 
       {/* Stats */}
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-lg mb-xl">
-        <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
-          <div className="flex items-center justify-center w-14 h-14 rounded-lg" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6' }}>
-            <ArrowRightLeft size={24} />
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4 mb-8">
+        {[
+          { value: stats.total, label: 'TOTAL', icon: ArrowRightLeft, accent: 'var(--color-gold)' },
+          { value: stats.pending, label: 'PENDING', icon: Clock, accent: '#f59e0b' },
+          { value: stats.received, label: 'COMPLETED', icon: CheckCircle, accent: '#10b981' },
+          { value: `Rp${stats.totalValue.toLocaleString('id-ID')}`, label: 'TOTAL VALUE', icon: Filter, accent: '#8b5cf6' },
+        ].map(({ value, label, icon: Icon, accent }) => (
+          <div key={label} className="flex items-center gap-4 p-4 bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+            <div
+              className="flex items-center justify-center w-12 h-12 rounded-xl"
+              style={{ background: `${accent}15`, color: accent }}
+            >
+              <Icon size={22} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-2xl font-bold text-white leading-none mb-1 truncate">{value}</div>
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">{label}</div>
+            </div>
           </div>
-          <div className="flex-1">
-            <div className="text-3xl font-bold text-white leading-none mb-1">{stats.total}</div>
-            <div className="text-sm text-[var(--color-gray-400)]">Total</div>
-          </div>
-        </div>
-        <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
-          <div className="flex items-center justify-center w-14 h-14 rounded-lg" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}>
-            <Clock size={24} />
-          </div>
-          <div className="flex-1">
-            <div className="text-3xl font-bold text-white leading-none mb-1">{stats.pending}</div>
-            <div className="text-sm text-[var(--color-gray-400)]">Pending</div>
-          </div>
-        </div>
-        <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
-          <div className="flex items-center justify-center w-14 h-14 rounded-lg" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
-            <CheckCircle size={24} />
-          </div>
-          <div className="flex-1">
-            <div className="text-3xl font-bold text-white leading-none mb-1">{stats.received}</div>
-            <div className="text-sm text-[var(--color-gray-400)]">Completed</div>
-          </div>
-        </div>
-        <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
-          <div className="flex items-center justify-center w-14 h-14 rounded-lg" style={{ background: 'rgba(139, 92, 246, 0.15)', color: '#8b5cf6' }}>
-            <Filter size={24} />
-          </div>
-          <div className="flex-1">
-            <div className="text-3xl font-bold text-white leading-none mb-1">Rp{stats.totalValue.toLocaleString('id-ID')}</div>
-            <div className="text-sm text-[var(--color-gray-400)]">Total Value</div>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Filters */}
-      <div className="mb-lg">
+      <div className="mb-6">
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as TTransferStatus | 'all')}
-          className="py-3 px-4 bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg text-white text-sm cursor-pointer"
+          className="py-2.5 px-4 bg-black/40 border border-white/10 rounded-xl text-white text-sm cursor-pointer focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
         >
           <option value="all">All statuses</option>
           <option value="draft">Draft</option>
@@ -171,14 +154,14 @@ export default function InternalTransfersPage() {
 
       {/* Transfers List */}
       {isLoading ? (
-        <div className="flex items-center justify-center p-3xl text-lg text-[var(--color-gray-400)]">Loading...</div>
+        <div className="flex items-center justify-center p-16 text-sm text-[var(--theme-text-muted)]">Loading...</div>
       ) : transfers.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-3xl bg-[var(--color-gray-800)] border-2 border-dashed border-[var(--color-gray-700)] rounded-xl text-center [&>svg]:text-[var(--color-gray-600)] [&>svg]:mb-md">
-          <ArrowRightLeft size={64} />
-          <h3 className="text-xl font-bold text-white m-0 mb-sm">No transfers yet</h3>
-          <p className="text-base text-[var(--color-gray-400)] m-0 mb-lg">Create your first internal transfer to move stock between locations</p>
+        <div className="flex flex-col items-center justify-center p-16 bg-[var(--onyx-surface)] border-2 border-dashed border-white/10 rounded-xl text-center">
+          <ArrowRightLeft size={56} className="text-white/10 mb-4" />
+          <h3 className="text-lg font-bold text-white m-0 mb-2">No transfers yet</h3>
+          <p className="text-sm text-[var(--theme-text-muted)] m-0 mb-6">Create your first internal transfer to move stock between locations</p>
           <button
-            className="btn btn-primary"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[var(--color-gold)] text-black font-bold text-sm rounded-xl hover:opacity-90 transition-opacity disabled:opacity-40"
             onClick={handleNewTransfer}
             disabled={!isOnline}
           >
@@ -187,71 +170,62 @@ export default function InternalTransfersPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] max-md:grid-cols-1 gap-lg">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(380px,1fr))] max-md:grid-cols-1 gap-4">
           {transfers.map(transfer => {
             const statusConfig = getStatusConfig(transfer.status ?? 'draft')
             const StatusIcon = statusConfig.icon
 
             return (
-              <div key={transfer.id} className="bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg p-lg transition-all duration-200 hover:border-primary hover:shadow-md">
-                <div className="flex justify-between items-center mb-md pb-md border-b border-[var(--color-gray-700)]">
-                  <div className="flex items-center gap-2 text-lg font-bold text-white">
-                    <ArrowRightLeft size={18} />
+              <div key={transfer.id} className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5 transition-all duration-200 hover:border-white/20 hover:bg-white/[0.02]">
+                <div className="flex justify-between items-center mb-3 pb-3 border-b border-white/5">
+                  <div className="flex items-center gap-2 text-base font-bold text-white">
+                    <ArrowRightLeft size={16} className="text-[var(--color-gold)]" />
                     {transfer.transfer_number}
                   </div>
                   <span
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
                     style={{
-                      background: `${statusConfig.color}20`,
+                      background: `${statusConfig.color}15`,
                       color: statusConfig.color
                     }}
                   >
-                    <StatusIcon size={14} />
+                    <StatusIcon size={12} />
                     {statusConfig.label}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-md mb-lg p-md bg-[var(--color-gray-800)]/80 rounded-md">
-                  <div className="flex-1 text-center text-sm font-semibold text-primary">
+                <div className="flex items-center gap-3 mb-4 p-3 bg-black/20 rounded-lg">
+                  <div className="flex-1 text-center text-sm font-semibold text-[var(--color-gold)]">
                     {transfer.from_section?.icon} {transfer.from_section?.name ?? transfer.from_location?.name ?? 'Unknown'}
                   </div>
-                  <ArrowRightLeft size={20} className="text-[var(--color-gray-500)] shrink-0" />
-                  <div className="flex-1 text-center text-sm font-semibold text-success">
+                  <ArrowRightLeft size={16} className="text-white/20 shrink-0" />
+                  <div className="flex-1 text-center text-sm font-semibold text-emerald-400">
                     {transfer.to_section?.icon} {transfer.to_section?.name ?? transfer.to_location?.name ?? 'Unknown'}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-sm mb-lg">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-[var(--color-gray-500)] uppercase tracking-wider">Date:</span>
-                    <span className="text-sm text-white font-medium">
-                      {transfer.transfer_date ? new Date(transfer.transfer_date).toLocaleDateString('en-US') : '-'}
-                    </span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-[var(--color-gray-500)] uppercase tracking-wider">Responsible:</span>
-                    <span className="text-sm text-white font-medium">{transfer.responsible_person}</span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-[var(--color-gray-500)] uppercase tracking-wider">Total Items:</span>
-                    <span className="text-sm text-white font-medium">{transfer.total_items ?? 0}</span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-xs text-[var(--color-gray-500)] uppercase tracking-wider">Total Value:</span>
-                    <span className="text-sm text-white font-medium">Rp{(transfer.total_value ?? 0).toLocaleString('id-ID')}</span>
-                  </div>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {[
+                    { label: 'DATE', value: transfer.transfer_date ? new Date(transfer.transfer_date).toLocaleDateString('en-US') : '-' },
+                    { label: 'RESPONSIBLE', value: transfer.responsible_person },
+                    { label: 'TOTAL ITEMS', value: transfer.total_items ?? 0 },
+                    { label: 'TOTAL VALUE', value: `Rp${(transfer.total_value ?? 0).toLocaleString('id-ID')}` },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="flex flex-col gap-1">
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">{label}</span>
+                      <span className="text-sm text-white font-medium">{value}</span>
+                    </div>
+                  ))}
                 </div>
 
-                <div className="flex gap-sm">
-                  <button
-                    type="button"
-                    className="btn btn-secondary py-2 px-4 text-sm"
-                    onClick={() => navigate(`/inventory/transfers/${transfer.id}`)}
-                  >
-                    <Eye size={16} />
-                    View Details
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  className="flex items-center gap-2 w-full justify-center py-2 px-4 text-sm font-medium bg-transparent border border-white/10 text-white rounded-lg hover:border-white/20 hover:bg-white/[0.02] transition-all"
+                  onClick={() => navigate(`/inventory/transfers/${transfer.id}`)}
+                >
+                  <Eye size={14} />
+                  View Details
+                </button>
               </div>
             )
           })}

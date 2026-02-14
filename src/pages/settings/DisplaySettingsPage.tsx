@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Save, RotateCcw, AlertCircle, MonitorPlay, Printer, Wifi, WifiOff } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { useSettingsByCategory, useUpdateSetting } from '@/hooks/settings';
 import {
   DISPLAY_DEFAULTS,
@@ -30,6 +29,29 @@ const ALL_DEFAULTS: Record<string, unknown> = {
   [PRINTING_KEYS.requestTimeout]: PRINTING_SERVER_DEFAULTS.requestTimeoutMs,
   [PRINTING_KEYS.healthCheckTimeout]: PRINTING_SERVER_DEFAULTS.healthCheckTimeoutMs,
 };
+
+function num(v: unknown): number {
+  return typeof v === 'number' ? v : Number(v) || 0;
+}
+
+function NumberRow({ label, description, suffix, value, onChange }: {
+  label: string; description?: string; suffix?: string; value: number;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4 py-2">
+      <div>
+        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">{label}</label>
+        {description && <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">{description}</p>}
+      </div>
+      <div className="flex items-center gap-2">
+        <input type="number" className="w-24 h-9 px-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white text-right focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none" value={value}
+          onChange={(e) => onChange(Number(e.target.value) || 0)} min={0} />
+        {suffix && <span className="text-xs text-[var(--theme-text-muted)]">{suffix}</span>}
+      </div>
+    </div>
+  );
+}
 
 const DisplaySettingsPage = () => {
   const { data: displaySettings, isLoading: loadingDisplay, error: errorDisplay } =
@@ -112,145 +134,99 @@ const DisplaySettingsPage = () => {
 
   if (isLoading) {
     return (
-      <div className="settings-section">
-        <div className="settings-section__body settings-section__loading">
-          <div className="spinner" /><span>Loading settings...</span>
-        </div>
+      <div className="flex items-center justify-center py-12 text-[var(--theme-text-muted)]">
+        <div className="animate-spin w-5 h-5 border-2 border-[var(--color-gold)] border-t-transparent rounded-full mr-3" />
+        <span>Loading settings...</span>
       </div>
     );
   }
   if (hasError) {
     return (
-      <div className="settings-section">
-        <div className="settings-section__body settings-section__error">
-          <AlertCircle size={24} /><span>Error loading display settings</span>
-        </div>
+      <div className="flex items-center justify-center gap-3 py-12 text-red-400">
+        <AlertCircle size={24} /><span>Error loading display settings</span>
       </div>
     );
   }
 
   return (
-    <div className="settings-section">
-      <div className="settings-section__header">
-        <div className="settings-section__header-content">
-          <div>
-            <h2 className="settings-section__title">
-              <MonitorPlay size={20} /> Display & Print Server
-            </h2>
-            <p className="settings-section__description">
-              Customer display timing and print server connection
-            </p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-display font-bold text-white flex items-center gap-2">
+            <MonitorPlay size={20} /> Display & Print Server
+          </h2>
+          <p className="text-sm text-[var(--theme-text-muted)] mt-1">
+            Customer display timing and print server connection
+          </p>
+        </div>
+        {pendingChanges.size > 0 && (
+          <div className="flex items-center gap-2">
+            <button className="inline-flex items-center gap-1.5 px-3 py-2 bg-transparent border border-white/10 text-white hover:border-white/20 rounded-xl text-sm font-medium transition-colors" onClick={handleResetAll} disabled={isSaving}>
+              <RotateCcw size={16} /> Cancel
+            </button>
+            <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-[var(--color-gold)] text-black font-bold rounded-xl text-sm transition-opacity disabled:opacity-50" onClick={handleSaveAll} disabled={isSaving}>
+              <Save size={16} /> {isSaving ? 'Saving...' : `Save (${pendingChanges.size})`}
+            </button>
           </div>
-          {pendingChanges.size > 0 && (
-            <div className="settings-section__actions">
-              <button className="btn-secondary" onClick={handleResetAll} disabled={isSaving}>
-                <RotateCcw size={16} /> Cancel
-              </button>
-              <button className="btn-primary" onClick={handleSaveAll} disabled={isSaving}>
-                <Save size={16} /> {isSaving ? 'Saving...' : `Save (${pendingChanges.size})`}
-              </button>
-            </div>
-          )}
+        )}
+      </div>
+
+      {/* Customer Display */}
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
+          <MonitorPlay size={16} className="text-[var(--color-gold)]" /> Customer Display
+        </h3>
+        <div className="space-y-1">
+          <NumberRow label="Idle timeout" description="Time before switching to promo mode" suffix="seconds" value={num(formValues[DISPLAY_KEYS.idleTimeout])} onChange={(v) => handleChange(DISPLAY_KEYS.idleTimeout, v)} />
+          <NumberRow label="Promo rotation interval" description="Time between promo slides" suffix="seconds" value={num(formValues[DISPLAY_KEYS.promoRotation])} onChange={(v) => handleChange(DISPLAY_KEYS.promoRotation, v)} />
+          <NumberRow label="Ready order visible duration" description="How long completed orders stay visible" suffix="minutes" value={num(formValues[DISPLAY_KEYS.readyOrderDuration])} onChange={(v) => handleChange(DISPLAY_KEYS.readyOrderDuration, v)} />
+          <NumberRow label="Broadcast debounce" description="Advanced: cart update debounce" suffix="ms" value={num(formValues[DISPLAY_KEYS.broadcastDebounce])} onChange={(v) => handleChange(DISPLAY_KEYS.broadcastDebounce, v)} />
         </div>
       </div>
 
-      <div className="settings-section__body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <MonitorPlay size={18} className="text-rose-400" /> Customer Display
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <NumberRow label="Idle timeout" description="Time before switching to promo mode"
-              suffix="seconds" value={num(formValues[DISPLAY_KEYS.idleTimeout])}
-              onChange={(v) => handleChange(DISPLAY_KEYS.idleTimeout, v)} />
-            <NumberRow label="Promo rotation interval" description="Time between promo slides"
-              suffix="seconds" value={num(formValues[DISPLAY_KEYS.promoRotation])}
-              onChange={(v) => handleChange(DISPLAY_KEYS.promoRotation, v)} />
-            <NumberRow label="Ready order visible duration" description="How long completed orders stay visible"
-              suffix="minutes" value={num(formValues[DISPLAY_KEYS.readyOrderDuration])}
-              onChange={(v) => handleChange(DISPLAY_KEYS.readyOrderDuration, v)} />
-            <NumberRow label="Broadcast debounce" description="Advanced: cart update debounce"
-              suffix="ms" value={num(formValues[DISPLAY_KEYS.broadcastDebounce])}
-              onChange={(v) => handleChange(DISPLAY_KEYS.broadcastDebounce, v)} />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Printer size={18} className="text-rose-400" /> Print Server
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="form-group--inline">
-              <label className="form-label">Server URL</label>
-              <input
-                type="text"
-                className="form-input"
-                style={{ maxWidth: 280 }}
-                value={String(formValues[PRINTING_KEYS.serverUrl] ?? '')}
-                onChange={(e) => handleChange(PRINTING_KEYS.serverUrl, e.target.value)}
-                placeholder="http://localhost:3001"
-              />
-            </div>
-            <NumberRow label="Request timeout" suffix="ms"
-              value={num(formValues[PRINTING_KEYS.requestTimeout])}
-              onChange={(v) => handleChange(PRINTING_KEYS.requestTimeout, v)} />
-            <NumberRow label="Health check timeout" suffix="ms"
-              value={num(formValues[PRINTING_KEYS.healthCheckTimeout])}
-              onChange={(v) => handleChange(PRINTING_KEYS.healthCheckTimeout, v)} />
-            <div className="mt-3">
-              <button
-                className="btn-secondary"
-                onClick={handleTestConnection}
-                disabled={isTesting}
-              >
-                {isTesting ? (
-                  <><div className="spinner" style={{ width: 14, height: 14 }} /> Testing...</>
-                ) : (
-                  <>{navigator.onLine ? <Wifi size={16} /> : <WifiOff size={16} />} Test Connection</>
-                )}
-              </button>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Print Server */}
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5">
+        <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
+          <Printer size={16} className="text-[var(--color-gold)]" /> Print Server
+        </h3>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-4 py-2">
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Server URL</label>
+            <input
+              type="text"
+              className="w-64 h-9 px-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
+              value={String(formValues[PRINTING_KEYS.serverUrl] ?? '')}
+              onChange={(e) => handleChange(PRINTING_KEYS.serverUrl, e.target.value)}
+              placeholder="http://localhost:3001"
+            />
+          </div>
+          <NumberRow label="Request timeout" suffix="ms" value={num(formValues[PRINTING_KEYS.requestTimeout])} onChange={(v) => handleChange(PRINTING_KEYS.requestTimeout, v)} />
+          <NumberRow label="Health check timeout" suffix="ms" value={num(formValues[PRINTING_KEYS.healthCheckTimeout])} onChange={(v) => handleChange(PRINTING_KEYS.healthCheckTimeout, v)} />
+          <div className="pt-2">
+            <button
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-transparent border border-white/10 text-white hover:border-white/20 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+              onClick={handleTestConnection}
+              disabled={isTesting}
+            >
+              {isTesting ? (
+                <><div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" /> Testing...</>
+              ) : (
+                <>{navigator.onLine ? <Wifi size={16} /> : <WifiOff size={16} />} Test Connection</>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
 
       {pendingChanges.size > 0 && (
-        <div className="settings-section__footer">
-          <div className="settings-unsaved-notice">
-            <AlertCircle size={16} />
-            <span>{pendingChanges.size} unsaved change{pendingChanges.size > 1 ? 's' : ''}</span>
-          </div>
+        <div className="flex items-center gap-2 text-sm text-amber-400">
+          <AlertCircle size={16} />
+          <span>{pendingChanges.size} unsaved change{pendingChanges.size > 1 ? 's' : ''}</span>
         </div>
       )}
     </div>
   );
 };
-
-function num(v: unknown): number {
-  return typeof v === 'number' ? v : Number(v) || 0;
-}
-
-function NumberRow({ label, description, suffix, value, onChange }: {
-  label: string; description?: string; suffix?: string; value: number;
-  onChange: (v: number) => void;
-}) {
-  return (
-    <div className="form-group--inline">
-      <div>
-        <label className="form-label">{label}</label>
-        {description && <p className="form-hint" style={{ marginTop: 0 }}>{description}</p>}
-      </div>
-      <div className="form-input-group">
-        <input type="number" className="form-input form-input--narrow" value={value}
-          onChange={(e) => onChange(Number(e.target.value) || 0)} min={0} />
-        {suffix && <span className="form-input-suffix">{suffix}</span>}
-      </div>
-    </div>
-  );
-}
 
 export default DisplaySettingsPage;

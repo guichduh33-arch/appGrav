@@ -110,34 +110,35 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
     }
 
     return (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-sh-fade-in">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-sh-fade-in">
             <div
-                className="w-full max-w-[600px] max-h-[85vh] bg-[#1a1714] rounded-[20px] border border-white/[0.08] overflow-hidden flex flex-col shadow-[0_0_0_1px_rgba(255,255,255,0.05)_inset,0_25px_50px_-12px_rgba(0,0,0,0.5)] animate-sh-slide-up max-[480px]:max-h-screen max-[480px]:rounded-none"
+                className="w-full max-w-[600px] max-h-[85vh] bg-[var(--theme-bg-primary)] rounded-xl border border-white/5 overflow-hidden flex flex-col shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] animate-sh-slide-up max-[480px]:max-h-screen max-[480px]:rounded-none text-white"
                 ref={modalRef}
             >
                 {/* Header */}
-                <header className="flex items-center justify-between py-5 px-6 border-b border-white/[0.08] bg-[#252220]">
-                    <div className="flex items-center gap-3">
-                        <Calendar className="w-10 h-10 p-2 bg-[rgba(212,165,116,0.15)] rounded-[10px] text-[#d4a574]" />
-                        <h2 className="font-display text-xl font-semibold text-[#faf8f5] m-0">Shift History</h2>
+                <header className="flex items-center justify-between py-5 px-6 border-b border-white/5">
+                    <div className="flex items-center gap-4">
+                        <span className="text-2xl font-display italic font-bold text-[var(--color-gold)]">B</span>
+                        <span className="text-sm font-bold uppercase tracking-[0.2em]">Shift History</span>
                     </div>
                     <button
-                        className="w-10 h-10 flex items-center justify-center bg-[#2d2a27] border border-white/[0.08] rounded-[10px] text-[#a8a29e] cursor-pointer transition-all duration-200 hover:bg-[#1a1714] hover:text-[#faf8f5]"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-transparent text-[var(--theme-text-muted)] hover:text-white hover:border-white/20 cursor-pointer transition-colors"
                         onClick={onClose}
+                        aria-label="Close"
                     >
-                        <X size={24} />
+                        <X size={18} />
                     </button>
                 </header>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-[#2d2a27] scrollbar-track-transparent">
+                <div className="flex-1 overflow-y-auto p-4">
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center gap-4 py-12 text-[#a8a29e]">
-                            <div className="w-9 h-9 border-3 border-[#252220] border-t-[#d4a574] rounded-full animate-sh-spin" />
+                        <div className="flex flex-col items-center justify-center gap-4 py-12 text-[var(--theme-text-muted)]">
+                            <div className="w-9 h-9 border-3 border-[var(--theme-bg-tertiary)] border-t-[var(--color-gold)] rounded-full animate-sh-spin" />
                             <span>Loading...</span>
                         </div>
                     ) : sessions.length === 0 ? (
-                        <div className="flex flex-col items-center gap-4 py-12 text-[#a8a29e] text-center">
+                        <div className="flex flex-col items-center gap-4 py-12 text-[var(--theme-text-muted)] text-center">
                             <Calendar size={48} className="opacity-40" />
                             <p>No shift history</p>
                         </div>
@@ -152,8 +153,8 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
                                     <div
                                         key={session.id}
                                         className={cn(
-                                            'bg-[#252220] border border-white/[0.08] rounded-[14px] p-4 cursor-pointer transition-all duration-200 animate-sh-card-in hover:border-[#d4a574] hover:bg-[#2d2a27]',
-                                            isExpanded && 'border-[#d4a574]'
+                                            'bg-[var(--theme-bg-secondary)] border border-white/5 rounded-lg p-4 cursor-pointer transition-all duration-200 animate-sh-card-in hover:border-[var(--color-gold)]/30 hover:bg-[var(--theme-bg-tertiary)]',
+                                            isExpanded && 'border-[var(--color-gold)]/40'
                                         )}
                                         style={{ animationDelay: `${Math.min(index, 4) * 50}ms` }}
                                         onClick={() => setSelectedSession(isExpanded ? null : session)}
@@ -161,15 +162,15 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
                                         {/* Card Header */}
                                         <div className="flex justify-between items-start mb-3">
                                             <div className="flex flex-col gap-0.5">
-                                                <span className="font-display text-[1.1rem] font-semibold text-[#faf8f5]">
+                                                <span className="text-[1.1rem] font-semibold text-white">
                                                     #{session.session_number}
                                                 </span>
-                                                <span className="text-[0.85rem] text-[#a8a29e]">
+                                                <span className="text-[0.85rem] text-[var(--theme-text-secondary)]">
                                                     {session.user_name}
                                                 </span>
                                             </div>
                                             <div className="flex flex-col items-end gap-1">
-                                                <span className="text-[0.8rem] text-[#78716c]">
+                                                <span className="text-[0.8rem] text-[var(--theme-text-muted)]">
                                                     {formatDateTime(session.closed_at || session.opened_at)}
                                                 </span>
                                                 <span className={cn(
@@ -187,16 +188,16 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
                                         </div>
 
                                         {/* Card Summary */}
-                                        <div className="flex gap-5 pt-3 border-t border-white/[0.08] max-[480px]:flex-wrap max-[480px]:gap-3">
-                                            <div className="flex items-center gap-1.5 text-[0.85rem] text-[#a8a29e] [&_svg]:text-[#d4a574] [&_svg]:opacity-70">
+                                        <div className="flex gap-5 pt-3 border-t border-white/5 max-[480px]:flex-wrap max-[480px]:gap-3">
+                                            <div className="flex items-center gap-1.5 text-[0.85rem] text-[var(--theme-text-secondary)] [&_svg]:text-[var(--color-gold)] [&_svg]:opacity-70">
                                                 <Banknote size={16} />
                                                 <span>{formatCurrency(session.total_sales)}</span>
                                             </div>
-                                            <div className="flex items-center gap-1.5 text-[0.85rem] text-[#a8a29e] [&_svg]:text-[#d4a574] [&_svg]:opacity-70">
+                                            <div className="flex items-center gap-1.5 text-[0.85rem] text-[var(--theme-text-secondary)] [&_svg]:text-[var(--color-gold)] [&_svg]:opacity-70">
                                                 <TrendingUp size={16} />
                                                 <span>{session.transaction_count} trans.</span>
                                             </div>
-                                            <div className="flex items-center gap-1.5 text-[0.85rem] text-[#a8a29e] [&_svg]:text-[#d4a574] [&_svg]:opacity-70">
+                                            <div className="flex items-center gap-1.5 text-[0.85rem] text-[var(--theme-text-secondary)] [&_svg]:text-[var(--color-gold)] [&_svg]:opacity-70">
                                                 <Clock size={16} />
                                                 <span>{getDuration(session.opened_at, session.closed_at)}</span>
                                             </div>
@@ -204,26 +205,26 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
 
                                         {/* Expanded Details */}
                                         {isExpanded && (
-                                            <div className="mt-4 pt-4 border-t border-white/[0.08] animate-sh-expand-in">
+                                            <div className="mt-4 pt-4 border-t border-white/5 animate-sh-expand-in">
                                                 <div className="grid grid-cols-2 gap-3 max-[480px]:grid-cols-1">
-                                                    <div className="flex flex-col gap-0.5 p-3 bg-[#1a1714] rounded-[10px]">
-                                                        <span className="text-xs text-[#78716c] uppercase tracking-wider">
+                                                    <div className="flex flex-col gap-0.5 p-3 bg-[var(--theme-bg-primary)] rounded-lg border border-white/5">
+                                                        <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase">
                                                             Opening cash
                                                         </span>
-                                                        <span className="font-display text-base font-medium text-[#faf8f5] flex items-baseline gap-2 flex-wrap">
+                                                        <span className="text-base font-medium text-white flex items-baseline gap-2 flex-wrap">
                                                             {formatCurrency(session.opening_cash)}
                                                         </span>
                                                     </div>
 
-                                                    <div className="flex flex-col gap-0.5 p-3 bg-[#1a1714] rounded-[10px]">
-                                                        <span className="text-xs text-[#78716c] uppercase tracking-wider">
+                                                    <div className="flex flex-col gap-0.5 p-3 bg-[var(--theme-bg-primary)] rounded-lg border border-white/5">
+                                                        <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase">
                                                             Cash collected
                                                         </span>
-                                                        <span className="font-display text-base font-medium text-[#faf8f5] flex items-baseline gap-2 flex-wrap">
+                                                        <span className="text-base font-medium text-white flex items-baseline gap-2 flex-wrap">
                                                             {formatCurrency(session.actual_cash || 0)}
                                                             {session.cash_difference !== 0 && session.cash_difference !== null && (
                                                                 <span className={cn(
-                                                                    'text-[0.8rem] font-sans',
+                                                                    'text-[0.8rem]',
                                                                     session.cash_difference > 0 ? 'text-emerald-400' : 'text-red-400'
                                                                 )}>
                                                                     ({session.cash_difference > 0 ? '+' : ''}{formatCurrency(session.cash_difference)})
@@ -232,13 +233,13 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
                                                         </span>
                                                     </div>
 
-                                                    <div className="flex flex-col gap-0.5 p-3 bg-[#1a1714] rounded-[10px]">
-                                                        <span className="text-xs text-[#78716c] uppercase tracking-wider">QRIS</span>
-                                                        <span className="font-display text-base font-medium text-[#faf8f5] flex items-baseline gap-2 flex-wrap">
+                                                    <div className="flex flex-col gap-0.5 p-3 bg-[var(--theme-bg-primary)] rounded-lg border border-white/5">
+                                                        <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase">QRIS</span>
+                                                        <span className="text-base font-medium text-white flex items-baseline gap-2 flex-wrap">
                                                             {formatCurrency(session.actual_qris || 0)}
                                                             {session.qris_difference !== 0 && session.qris_difference !== null && (
                                                                 <span className={cn(
-                                                                    'text-[0.8rem] font-sans',
+                                                                    'text-[0.8rem]',
                                                                     session.qris_difference > 0 ? 'text-emerald-400' : 'text-red-400'
                                                                 )}>
                                                                     ({session.qris_difference > 0 ? '+' : ''}{formatCurrency(session.qris_difference)})
@@ -247,13 +248,13 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
                                                         </span>
                                                     </div>
 
-                                                    <div className="flex flex-col gap-0.5 p-3 bg-[#1a1714] rounded-[10px]">
-                                                        <span className="text-xs text-[#78716c] uppercase tracking-wider">EDC/Carte</span>
-                                                        <span className="font-display text-base font-medium text-[#faf8f5] flex items-baseline gap-2 flex-wrap">
+                                                    <div className="flex flex-col gap-0.5 p-3 bg-[var(--theme-bg-primary)] rounded-lg border border-white/5">
+                                                        <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase">EDC/Card</span>
+                                                        <span className="text-base font-medium text-white flex items-baseline gap-2 flex-wrap">
                                                             {formatCurrency(session.actual_edc || 0)}
                                                             {session.edc_difference !== 0 && session.edc_difference !== null && (
                                                                 <span className={cn(
-                                                                    'text-[0.8rem] font-sans',
+                                                                    'text-[0.8rem]',
                                                                     session.edc_difference > 0 ? 'text-emerald-400' : 'text-red-400'
                                                                 )}>
                                                                     ({session.edc_difference > 0 ? '+' : ''}{formatCurrency(session.edc_difference)})
@@ -264,8 +265,8 @@ export default function ShiftHistoryModal({ onClose }: ShiftHistoryModalProps) {
                                                 </div>
 
                                                 {session.notes && (
-                                                    <div className="mt-3 p-3 bg-[#1a1714] rounded-[10px] text-[0.85rem] text-[#a8a29e]">
-                                                        <strong className="text-[#faf8f5]">Notes:</strong> {session.notes}
+                                                    <div className="mt-3 p-3 bg-[var(--theme-bg-primary)] rounded-lg border border-white/5 text-[0.85rem] text-[var(--theme-text-secondary)]">
+                                                        <strong className="text-white">Notes:</strong> {session.notes}
                                                     </div>
                                                 )}
                                             </div>

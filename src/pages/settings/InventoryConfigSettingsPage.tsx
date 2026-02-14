@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Save, RotateCcw, AlertCircle, Package, Info, BarChart3, Truck, Gauge, Database } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { useSettingsByCategory, useUpdateSetting } from '@/hooks/settings';
 import { INVENTORY_CONFIG_DEFAULTS } from '@/hooks/settings/useModuleConfigSettings';
@@ -97,71 +96,104 @@ const InventoryConfigSettingsPage = () => {
     toast.success('Changes discarded');
   };
 
-  if (isLoading) return <div className="settings-section"><div className="settings-section__body settings-section__loading"><div className="spinner" /><span>Loading settings...</span></div></div>;
-  if (error || !settings) return <div className="settings-section"><div className="settings-section__body settings-section__error"><AlertCircle size={24} /><span>Error loading settings</span></div></div>;
+  if (isLoading) {
+    return (
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+        <div className="flex flex-col items-center justify-center py-16 text-[var(--theme-text-muted)] gap-3">
+          <div className="w-6 h-6 border-2 border-white/10 border-t-[var(--color-gold)] rounded-full animate-spin" />
+          <span className="text-sm">Loading settings...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !settings) {
+    return (
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+        <div className="flex items-center justify-center gap-2 py-16 text-red-400">
+          <AlertCircle size={24} />
+          <span>Error loading settings</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <TooltipProvider>
-      <div className="settings-section">
-        <div className="settings-section__header">
-          <div className="settings-section__header-content">
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
+          <div className="flex items-center gap-2">
+            <Package size={20} className="text-[var(--color-gold)]" />
             <div>
-              <h2 className="settings-section__title"><Package size={20} /> Inventory Configuration</h2>
-              <p className="settings-section__description">Manage stock thresholds, analysis periods, and query limits</p>
+              <h2 className="text-lg font-bold text-white">Inventory Configuration</h2>
+              <p className="text-sm text-[var(--theme-text-muted)]">Manage stock thresholds, analysis periods, and query limits</p>
             </div>
-            {pendingChanges.size > 0 && (
-              <div className="settings-section__actions">
-                <button className="btn-secondary" onClick={handleCancel} disabled={isSaving}><RotateCcw size={16} /> Cancel</button>
-                <button className="btn-primary" onClick={handleSaveAll} disabled={isSaving}><Save size={16} /> {isSaving ? 'Saving...' : `Save (${pendingChanges.size})`}</button>
-              </div>
-            )}
           </div>
+          {pendingChanges.size > 0 && (
+            <div className="flex items-center gap-2">
+              <button className="inline-flex items-center gap-1.5 px-3 py-2 bg-transparent border border-white/10 text-white hover:border-white/20 rounded-xl text-sm transition-colors" onClick={handleCancel} disabled={isSaving}>
+                <RotateCcw size={14} /> Cancel
+              </button>
+              <button className="inline-flex items-center gap-1.5 px-4 py-2 bg-[var(--color-gold)] text-black font-bold rounded-xl text-sm transition-colors hover:opacity-90 disabled:opacity-50" onClick={handleSaveAll} disabled={isSaving}>
+                <Save size={14} /> {isSaving ? 'Saving...' : `Save (${pendingChanges.size})`}
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="settings-section__body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        {/* Body */}
+        <div className="px-6 py-5 space-y-6">
           {SECTIONS.map((section) => {
             const Icon = section.icon;
             const sectionFields = FIELDS.filter((f) => f.section === section.id);
             return (
-              <Card key={section.id}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base"><Icon size={18} className="text-rose-400" />{section.title}</CardTitle>
-                  <CardDescription>{section.desc}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    {sectionFields.map((field) => (
-                      <div key={field.key} className="form-group--inline">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <label className="form-label" style={{ marginBottom: 0 }}>{field.label}</label>
-                          <Tooltip>
-                            <TooltipTrigger asChild><span style={{ cursor: 'help' }}><Info size={14} className="text-gray-400" /></span></TooltipTrigger>
-                            <TooltipContent><p>{field.desc}</p></TooltipContent>
-                          </Tooltip>
-                        </div>
-                        <div className="form-input-group">
-                          <input
-                            type="number"
-                            className="form-input form-input--narrow"
-                            value={formValues[field.key] ?? ''}
-                            onChange={(e) => handleChange(field.key, e.target.value)}
-                            min={0}
-                            step={field.key.includes('max_stock_multiplier') ? 0.1 : 1}
-                          />
-                          <span className="form-input-suffix">{field.suffix}</span>
-                        </div>
+              <div key={section.id} className="bg-black/20 border border-white/5 rounded-xl overflow-hidden">
+                <div className="px-5 py-3.5 border-b border-white/5">
+                  <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
+                    <Icon size={16} className="text-[var(--color-gold)]" />
+                    {section.title}
+                  </h3>
+                  <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">{section.desc}</p>
+                </div>
+                <div className="px-5 py-3 space-y-3">
+                  {sectionFields.map((field) => (
+                    <div key={field.key} className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm text-white/80">{field.label}</span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="cursor-help"><Info size={12} className="text-[var(--theme-text-muted)]" /></span>
+                          </TooltipTrigger>
+                          <TooltipContent><p>{field.desc}</p></TooltipContent>
+                        </Tooltip>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          className="w-24 px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 text-right"
+                          value={formValues[field.key] ?? ''}
+                          onChange={(e) => handleChange(field.key, e.target.value)}
+                          min={0}
+                          step={field.key.includes('max_stock_multiplier') ? 0.1 : 1}
+                        />
+                        <span className="text-xs text-[var(--theme-text-muted)] w-10">{field.suffix}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             );
           })}
         </div>
 
+        {/* Unsaved notice */}
         {pendingChanges.size > 0 && (
-          <div className="settings-section__footer">
-            <div className="settings-unsaved-notice"><AlertCircle size={16} /><span>{pendingChanges.size} unsaved change{pendingChanges.size > 1 ? 's' : ''}</span></div>
+          <div className="px-6 py-3 border-t border-white/5 bg-[var(--color-gold)]/5">
+            <div className="flex items-center gap-2 text-[var(--color-gold)] text-sm">
+              <AlertCircle size={16} />
+              <span>{pendingChanges.size} unsaved change{pendingChanges.size > 1 ? 's' : ''}</span>
+            </div>
           </div>
         )}
       </div>

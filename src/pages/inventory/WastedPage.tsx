@@ -2,16 +2,13 @@ import { useState } from 'react'
 import {
     Trash2,
     Plus,
-    Calendar,
     Search,
     Package,
     AlertTriangle,
-    X,
-    Save
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/authStore'
 import { logError } from '@/utils/logger'
-import { formatCurrency, formatDateTime } from '../../utils/helpers'
+import { formatCurrency } from '../../utils/helpers'
 import { toast } from 'sonner'
 import {
     useWasteRecords,
@@ -20,6 +17,8 @@ import {
     type IWasteProduct as Product,
     type TWasteDateFilter,
 } from '@/hooks/inventory/useWasteRecords'
+import WastageForm from './components/WastageForm'
+import WastageTable from './components/WastageTable'
 import './WastedPage.css'
 
 const WASTE_REASONS = [
@@ -128,257 +127,129 @@ export default function WastedPage() {
         return found ? found.label : reasonValue
     }
 
-    // Extract reason type from full reason string (e.g., "Expired: some notes" -> "expired")
-    const getReasonType = (reason: string | null): string => {
-        if (!reason) return 'other'
-        const lowerReason = reason.toLowerCase()
-        const found = WASTE_REASONS.find(r => lowerReason.startsWith(r.label.toLowerCase()))
-        return found ? found.value : 'other'
-    }
+    const dateFilterOptions: { value: TWasteDateFilter; label: string }[] = [
+        { value: 'today', label: 'Today' },
+        { value: 'week', label: '7 Days' },
+        { value: 'month', label: '30 Days' },
+        { value: 'all', label: 'All' },
+    ]
 
     return (
-        <div className="wasted-page">
-            {/* Stats */}
-            <div className="wasted-stats">
-                <div className="wasted-stat">
-                    <div className="wasted-stat__icon total">
-                        <Trash2 size={20} />
+        <div className="flex flex-col gap-6">
+            {/* KPI Stats Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-[var(--onyx-surface)] border border-white/5 p-6 rounded-xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Trash2 size={64} className="text-[var(--color-gold)]" />
                     </div>
-                    <div className="wasted-stat__info">
-                        <span className="wasted-stat__value">{stats.totalRecords}</span>
-                        <span className="wasted-stat__label">Total Records</span>
-                    </div>
-                </div>
-                <div className="wasted-stat">
-                    <div className="wasted-stat__icon quantity">
-                        <Package size={20} />
-                    </div>
-                    <div className="wasted-stat__info">
-                        <span className="wasted-stat__value">{stats.totalQuantity.toFixed(0)}</span>
-                        <span className="wasted-stat__label">Total Units Lost</span>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--stone-text)]/50 mb-2">
+                        Total Records
+                    </p>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold text-[var(--color-gold)] tabular-nums">
+                            {stats.totalRecords}
+                        </span>
+                        <span className="text-xs text-[var(--stone-text)]/40">Entries</span>
                     </div>
                 </div>
-                <div className="wasted-stat">
-                    <div className="wasted-stat__icon cost">
-                        <AlertTriangle size={20} />
+                <div className="bg-[var(--onyx-surface)] border border-white/5 p-6 rounded-xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Package size={64} className="text-[var(--color-gold)]" />
                     </div>
-                    <div className="wasted-stat__info">
-                        <span className="wasted-stat__value">{formatCurrency(stats.totalCost)}</span>
-                        <span className="wasted-stat__label">Total Cost Lost</span>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--stone-text)]/50 mb-2">
+                        Total Units Lost
+                    </p>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold text-[var(--color-gold)] tabular-nums">
+                            {stats.totalQuantity.toFixed(0)}
+                        </span>
+                        <span className="text-xs text-[var(--stone-text)]/40">Units</span>
+                    </div>
+                </div>
+                <div className="bg-[var(--onyx-surface)] border border-white/5 p-6 rounded-xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <AlertTriangle size={64} className="text-[var(--color-gold)]" />
+                    </div>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--stone-text)]/50 mb-2">
+                        Est. Financial Loss
+                    </p>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold text-[var(--color-gold)] tabular-nums">
+                            {formatCurrency(stats.totalCost)}
+                        </span>
                     </div>
                 </div>
             </div>
 
             {/* Toolbar */}
-            <div className="wasted-toolbar">
-                <div className="wasted-search">
-                    <Search size={18} />
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+                {/* Search */}
+                <div className="relative w-64">
+                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--stone-text)]/40" />
                     <input
                         type="text"
-                        placeholder="Search by product, reason..."
+                        placeholder="Search entries..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full bg-[var(--onyx-surface)] border border-white/10 rounded-lg py-2 pl-10 pr-4 text-xs text-white focus:outline-none focus:border-[var(--color-gold)] transition-all placeholder:text-[var(--stone-text)]/40"
                     />
                 </div>
-                <div className="wasted-filters">
-                    <button
-                        className={`filter-btn ${dateFilter === 'today' ? 'active' : ''}`}
-                        onClick={() => setDateFilter('today')}
-                    >
-                        Today
-                    </button>
-                    <button
-                        className={`filter-btn ${dateFilter === 'week' ? 'active' : ''}`}
-                        onClick={() => setDateFilter('week')}
-                    >
-                        7 Days
-                    </button>
-                    <button
-                        className={`filter-btn ${dateFilter === 'month' ? 'active' : ''}`}
-                        onClick={() => setDateFilter('month')}
-                    >
-                        30 Days
-                    </button>
-                    <button
-                        className={`filter-btn ${dateFilter === 'all' ? 'active' : ''}`}
-                        onClick={() => setDateFilter('all')}
-                    >
-                        All
-                    </button>
+
+                {/* Date Filters */}
+                <div className="flex gap-2">
+                    {dateFilterOptions.map(opt => (
+                        <button
+                            key={opt.value}
+                            className={`px-4 py-2 text-xs font-medium rounded-lg border transition-all ${
+                                dateFilter === opt.value
+                                    ? 'bg-[var(--color-gold)] border-[var(--color-gold)] text-black font-bold'
+                                    : 'bg-transparent border-white/10 text-[var(--stone-text)]/70 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]'
+                            }`}
+                            onClick={() => setDateFilter(opt.value)}
+                        >
+                            {opt.label}
+                        </button>
+                    ))}
                 </div>
-                <button className="btn-primary" onClick={() => setShowModal(true)}>
-                    <Plus size={18} />
-                    Record Waste
+
+                {/* Report Waste Button */}
+                <button
+                    className="bg-[var(--color-gold)] hover:bg-[var(--color-gold)]/90 text-black font-bold text-[11px] px-6 py-2.5 rounded-lg shadow-lg shadow-[var(--color-gold)]/10 transition-all uppercase tracking-[0.15em] flex items-center gap-2"
+                    onClick={() => setShowModal(true)}
+                >
+                    <Plus size={16} />
+                    Report Waste
                 </button>
             </div>
 
             {/* Table */}
-            <div className="wasted-table-wrapper">
-                {isLoading ? (
-                    <div className="wasted-loading">
-                        <div className="spinner" />
-                        <span>Loading...</span>
-                    </div>
-                ) : filteredRecords.length === 0 ? (
-                    <div className="wasted-empty">
-                        <Trash2 size={48} />
-                        <h3>No waste records found</h3>
-                        <p>Click "Record Waste" to add a new entry</p>
-                    </div>
-                ) : (
-                    <table className="wasted-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Product</th>
-                                <th>Quantity</th>
-                                <th>Reason</th>
-                                <th>Cost</th>
-                                <th>Recorded By</th>
-                                <th>Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredRecords.map(record => (
-                                <tr key={record.id}>
-                                    <td className="cell-date">
-                                        <Calendar size={14} />
-                                        {formatDateTime(record.created_at)}
-                                    </td>
-                                    <td className="cell-product">
-                                        <div className="product-info">
-                                            <span className="product-name">{record.product?.name}</span>
-                                            <span className="product-sku">{record.product?.sku}</span>
-                                        </div>
-                                    </td>
-                                    <td className="cell-quantity">
-                                        <span className="quantity-value">
-                                            {Math.abs(record.quantity)} {record.product?.unit}
-                                        </span>
-                                    </td>
-                                    <td className="cell-reason">
-                                        <span className={`reason-badge reason-${getReasonType(record.reason)}`}>
-                                            {record.reason?.split(':')[0] || 'Other'}
-                                        </span>
-                                    </td>
-                                    <td className="cell-cost">
-                                        {formatCurrency(Math.abs(record.quantity) * (record.unit_cost || 0))}
-                                    </td>
-                                    <td className="cell-user">
-                                        {record.staff_name || '-'}
-                                    </td>
-                                    <td className="cell-notes">
-                                        {record.reason || '-'}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
-            </div>
+            <WastageTable
+                records={filteredRecords}
+                isLoading={isLoading}
+            />
 
             {/* Add Waste Modal */}
             {showModal && (
-                <div className="wasted-modal-overlay">
-                    <div className="wasted-modal">
-                        <div className="wasted-modal__header">
-                            <h3>Record Waste</h3>
-                            <button className="btn-close" onClick={() => { setShowModal(false); resetForm(); }} title="Close" aria-label="Close">
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <div className="wasted-modal__body">
-                            {/* Product Selection */}
-                            <div className="form-group">
-                                <label>Product *</label>
-                                <div className="product-selector">
-                                    <input
-                                        type="text"
-                                        placeholder="Search product..."
-                                        value={productSearch}
-                                        onChange={(e) => setProductSearch(e.target.value)}
-                                    />
-                                    {productSearch && !selectedProduct && (
-                                        <div className="product-dropdown">
-                                            {filteredProducts.slice(0, 10).map(product => (
-                                                <div
-                                                    key={product.id}
-                                                    className="product-option"
-                                                    onClick={() => {
-                                                        setSelectedProduct(product)
-                                                        setProductSearch(product.name)
-                                                    }}
-                                                >
-                                                    <span className="product-option__name">{product.name}</span>
-                                                    <span className="product-option__stock">
-                                                        Stock: {product.current_stock} {product.unit}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                                {selectedProduct && (
-                                    <div className="selected-product">
-                                        <span>{selectedProduct.name}</span>
-                                        <span className="stock-info">
-                                            Current stock: {selectedProduct.current_stock} {selectedProduct.unit}
-                                        </span>
-                                        <button onClick={() => { setSelectedProduct(null); setProductSearch(''); }} title="Clear" aria-label="Clear">
-                                            <X size={16} />
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Quantity */}
-                            <div className="form-group">
-                                <label>Quantity *</label>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    step="0.01"
-                                    max={selectedProduct?.current_stock || 0}
-                                    value={quantity}
-                                    onChange={(e) => setQuantity(e.target.value)}
-                                    placeholder="0"
-                                />
-                            </div>
-
-                            {/* Reason */}
-                            <div className="form-group">
-                                <label>Reason *</label>
-                                <select value={reason} onChange={(e) => setReason(e.target.value)} aria-label="Select reason">
-                                    {WASTE_REASONS.map(r => (
-                                        <option key={r.value} value={r.value}>
-                                            {r.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Notes */}
-                            <div className="form-group">
-                                <label>Notes</label>
-                                <textarea
-                                    value={notes}
-                                    onChange={(e) => setNotes(e.target.value)}
-                                    placeholder="Additional details..."
-                                    rows={3}
-                                />
-                            </div>
-                        </div>
-                        <div className="wasted-modal__footer">
-                            <button className="btn-secondary" onClick={() => { setShowModal(false); resetForm(); }}>
-                                Cancel
-                            </button>
-                            <button className="btn-primary" onClick={handleSave} disabled={isSaving}>
-                                <Save size={18} />
-                                {isSaving ? 'Saving...' : 'Save'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <WastageForm
+                    selectedProduct={selectedProduct}
+                    quantity={quantity}
+                    reason={reason}
+                    notes={notes}
+                    productSearch={productSearch}
+                    filteredProducts={filteredProducts}
+                    isSaving={isSaving}
+                    onProductSearchChange={setProductSearch}
+                    onSelectProduct={(product) => {
+                        setSelectedProduct(product)
+                        setProductSearch(product.name)
+                    }}
+                    onClearProduct={() => { setSelectedProduct(null); setProductSearch('') }}
+                    onQuantityChange={setQuantity}
+                    onReasonChange={setReason}
+                    onNotesChange={setNotes}
+                    onSave={handleSave}
+                    onClose={() => { setShowModal(false); resetForm() }}
+                />
             )}
         </div>
     )

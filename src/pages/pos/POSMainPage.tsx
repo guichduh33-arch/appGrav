@@ -179,7 +179,7 @@ export default function POSMainPage() {
 
     return (
         <div className="pos-app">
-            <main className="pos-main bg-[#0D0D0F]">
+            <main className="pos-main bg-[var(--theme-bg-primary)]">
                 {/* Category Navigation */}
                 <CategoryNav
                     categories={categories}
@@ -190,11 +190,17 @@ export default function POSMainPage() {
                 />
 
                 <div className="flex-1 flex flex-col overflow-hidden relative">
-                    <div className="px-10 pt-10 pb-4 flex flex-col gap-6">
+                    <div className="px-10 pt-10 pb-4 flex flex-col gap-6 border-b border-[var(--color-gold)]/5">
                         <div className="flex items-center justify-between">
-                            <h1 className="text-3xl font-display font-bold text-white tracking-tight">
-                                Artisan <span className="text-[var(--color-gold)] font-medium italic">Catalogue</span>
-                            </h1>
+                            <div className="flex items-center gap-2 text-sm">
+                                <span className="text-[var(--muted-smoke)]">Catalogue</span>
+                                {selectedCategory && (
+                                    <>
+                                        <span className="text-[var(--muted-smoke)]/40">/</span>
+                                        <span className="text-white font-medium">{categories.find(c => c.id === selectedCategory)?.name ?? ''}</span>
+                                    </>
+                                )}
+                            </div>
                             <div className="flex items-center gap-4">
                                 {heldOrdersCount > 0 && (
                                     <button
@@ -207,11 +213,11 @@ export default function POSMainPage() {
                                     </button>
                                 )}
                                 <div className="pos-products__search w-80 relative">
-                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8E8E93]" size={16} />
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted-smoke)]" size={16} />
                                     <input
                                         type="text"
                                         placeholder="Search excellence..."
-                                        className="w-full bg-white/5 border border-white/5 rounded-full py-3 pl-12 pr-6 text-sm text-white focus:outline-none focus:border-[var(--color-gold)]/50 transition-all placeholder:text-[#8E8E93]/50"
+                                        className="w-full bg-[var(--onyx-surface)] border-none rounded-lg py-3 pl-12 pr-6 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-gold)]/50 transition-all placeholder:text-[var(--muted-smoke)]/50"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                     />

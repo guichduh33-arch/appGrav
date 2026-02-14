@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Plus, Save, Trash2, Send, WifiOff } from 'lucide-react'
+import { ArrowLeft, Save, Send, WifiOff } from 'lucide-react'
 import { toast } from 'sonner'
 import { useSectionsByType, useCreateTransfer, useTransfer } from '@/hooks/inventory'
 import { useProducts } from '@/hooks/products'
 import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'
 import { logError } from '@/utils/logger'
+import { TransferFormItems } from './transfer-form/TransferFormItems'
 
 interface TransferItemForm {
   id?: string
@@ -57,7 +58,6 @@ export default function TransferFormPage() {
   // Load existing transfer data
   useEffect(() => {
     if (existingTransfer && isEditing) {
-      // Support both old location-based and new section-based transfers
       setFromSectionId(existingTransfer.from_section_id || '')
       setToSectionId(existingTransfer.to_section_id || '')
       setResponsiblePerson(existingTransfer.responsible_person || '')
@@ -119,13 +119,11 @@ export default function TransferFormPage() {
   }
 
   const handleSubmit = async (sendDirectly: boolean = false) => {
-    // Check online status
     if (!isOnline) {
       toast.error('Transfers are not available offline')
       return
     }
 
-    // Validation
     if (!fromSectionId || !toSectionId) {
       toast.error('Please select source and destination locations')
       return
@@ -176,227 +174,110 @@ export default function TransferFormPage() {
   const isSubmitting = createTransferMutation.isPending
   const canSave = isOnline && !isSubmitting
 
+  const inputClass = 'w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 text-sm text-white placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed'
+  const labelClass = 'block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-2'
+
   return (
-    <div className="mx-auto max-w-[1400px] p-6">
+    <div className="mx-auto max-w-[1400px] p-6 lg:p-8">
       {/* Offline warning banner */}
       {!isOnline && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg border border-destructive bg-destructive/10 px-4 py-3 text-red-800">
+        <div className="mb-4 flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-400 text-sm font-medium">
           <WifiOff size={18} />
           <span>Connection lost. Please reconnect to save changes.</span>
         </div>
       )}
 
-      <header className="mb-6 flex items-start gap-4">
-        <button className="btn btn-ghost" onClick={() => navigate('/inventory/transfers')}>
-          <ArrowLeft size={20} />
+      <header className="mb-6 flex items-center gap-4">
+        <button
+          className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--theme-text-secondary)] bg-transparent border border-white/10 rounded-lg hover:border-white/20 hover:text-white transition-all"
+          onClick={() => navigate('/inventory/transfers')}
+        >
+          <ArrowLeft size={18} />
         </button>
         <div>
-          <h1 className="mb-1 text-2xl font-bold text-foreground">
+          <h1 className="mb-0.5 text-2xl font-bold text-white">
             {isEditing ? 'Edit Transfer' : 'New Transfer'}
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-[var(--theme-text-muted)]">
             Manage transfers between warehouse and sections
           </p>
         </div>
       </header>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
         {/* General Info */}
-        <div className="rounded-lg border border-border bg-card p-5">
-          <h2 className="mb-4 text-lg font-bold text-foreground">Settings</h2>
+        <div className="rounded-xl border border-white/5 bg-[var(--onyx-surface)] p-5">
+          <h2 className="mb-4 text-base font-bold text-white">Settings</h2>
           <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
-            <div className="form-group">
-              <label>From *</label>
-              <select
-                value={fromSectionId}
-                onChange={(e) => setFromSectionId(e.target.value)}
-                disabled={!isOnline}
-              >
+            <div>
+              <label className={labelClass}>From *</label>
+              <select className={inputClass} value={fromSectionId} onChange={(e) => setFromSectionId(e.target.value)} disabled={!isOnline}>
                 <option value="">Select location</option>
                 {warehouses.map(section => (
-                  <option key={section.id} value={section.id}>
-                    {section.icon} {section.name}
-                  </option>
+                  <option key={section.id} value={section.id}>{section.icon} {section.name}</option>
                 ))}
               </select>
             </div>
-            <div className="form-group">
-              <label>To *</label>
-              <select
-                value={toSectionId}
-                onChange={(e) => setToSectionId(e.target.value)}
-                disabled={!isOnline}
-              >
+            <div>
+              <label className={labelClass}>To *</label>
+              <select className={inputClass} value={toSectionId} onChange={(e) => setToSectionId(e.target.value)} disabled={!isOnline}>
                 <option value="">Select location</option>
                 {destinationSections.map(section => (
-                  <option key={section.id} value={section.id}>
-                    {section.icon} {section.name}
-                  </option>
+                  <option key={section.id} value={section.id}>{section.icon} {section.name}</option>
                 ))}
               </select>
             </div>
-            <div className="form-group">
-              <label>Responsible *</label>
-              <input
-                type="text"
-                value={responsiblePerson}
-                onChange={(e) => setResponsiblePerson(e.target.value)}
-                placeholder="Responsible person"
-                disabled={!isOnline}
-              />
+            <div>
+              <label className={labelClass}>Responsible *</label>
+              <input type="text" className={inputClass} value={responsiblePerson} onChange={(e) => setResponsiblePerson(e.target.value)} placeholder="Responsible person" disabled={!isOnline} />
             </div>
-            <div className="form-group">
-              <label>Date *</label>
-              <input
-                type="date"
-                value={transferDate}
-                onChange={(e) => setTransferDate(e.target.value)}
-                disabled={!isOnline}
-              />
+            <div>
+              <label className={labelClass}>Date *</label>
+              <input type="date" className={inputClass} value={transferDate} onChange={(e) => setTransferDate(e.target.value)} disabled={!isOnline} />
             </div>
           </div>
-          <div className="form-group">
-            <label>Notes</label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={3}
-              placeholder="Additional notes..."
-              disabled={!isOnline}
-            />
+          <div className="mt-4">
+            <label className={labelClass}>Notes</label>
+            <textarea className={inputClass + ' resize-y'} value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Additional notes..." disabled={!isOnline} />
           </div>
         </div>
 
         {/* Items */}
-        <div className="rounded-lg border border-border bg-card p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-foreground">Items</h2>
-            <button
-              className="btn btn-secondary btn-sm"
-              onClick={addItem}
-              disabled={!isOnline}
-            >
-              <Plus size={16} />
-              Add Item
-            </button>
-          </div>
-
-          {items.length === 0 ? (
-            <div className="py-6 text-center text-muted-foreground">
-              <p>No items added yet</p>
-            </div>
-          ) : (
-            <div className="max-md:overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr>
-                    <th className="border-b border-border bg-muted/50 p-3 text-left text-xs font-semibold uppercase text-muted-foreground">Product</th>
-                    <th className="border-b border-border bg-muted/50 p-3 text-left text-xs font-semibold uppercase text-muted-foreground" style={{ width: '120px' }}>Quantity</th>
-                    <th className="border-b border-border bg-muted/50 p-3 text-left text-xs font-semibold uppercase text-muted-foreground" style={{ width: '80px' }}>Unit</th>
-                    <th className="border-b border-border bg-muted/50 p-3 text-left text-xs font-semibold uppercase text-muted-foreground" style={{ width: '120px' }}>Unit Cost</th>
-                    <th className="border-b border-border bg-muted/50 p-3 text-left text-xs font-semibold uppercase text-muted-foreground" style={{ width: '120px' }}>Line Total</th>
-                    <th className="border-b border-border bg-muted/50 p-3 text-left text-xs font-semibold uppercase text-muted-foreground" style={{ width: '60px' }}></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((item, index) => (
-                    <tr key={index}>
-                      <td className="border-b border-border p-3">
-                        <select
-                          className="w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground"
-                          value={item.product_id}
-                          onChange={(e) => updateItem(index, 'product_id', e.target.value)}
-                          disabled={!isOnline}
-                        >
-                          <option value="">Select product</option>
-                          {products.map(p => (
-                            <option key={p.id} value={p.id}>
-                              {p.name} {p.sku && `(${p.sku})`}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="border-b border-border p-3">
-                        <input
-                          className="w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground"
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={item.quantity_requested}
-                          onChange={(e) => updateItem(index, 'quantity_requested', Number(e.target.value))}
-                          disabled={!isOnline}
-                        />
-                      </td>
-                      <td className="border-b border-border p-3">
-                        <span className="text-sm font-medium text-muted-foreground">{item.unit || '-'}</span>
-                      </td>
-                      <td className="border-b border-border p-3">
-                        <input
-                          className="w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground"
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={item.unit_cost}
-                          onChange={(e) => updateItem(index, 'unit_cost', Number(e.target.value))}
-                          disabled={!isOnline}
-                        />
-                      </td>
-                      <td className="border-b border-border p-3 font-semibold text-foreground">Rp{item.line_total.toLocaleString('id-ID')}</td>
-                      <td className="border-b border-border p-3">
-                        <button
-                          className="btn-icon btn-icon--danger"
-                          onClick={() => removeItem(index)}
-                          disabled={!isOnline}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {items.length > 0 && (
-            <div className="mt-4 rounded-md bg-muted/50 p-4">
-              <div className="flex justify-between py-2">
-                <span className="text-sm text-muted-foreground">Total Items:</span>
-                <span className="text-base font-semibold text-foreground">{items.length}</span>
-              </div>
-              <div className="mt-2 flex justify-between border-t-2 border-border pt-4">
-                <span className="text-sm text-muted-foreground">Total Value:</span>
-                <span className="text-lg font-semibold text-primary">Rp{getTotalValue().toLocaleString('id-ID')}</span>
-              </div>
-            </div>
-          )}
-        </div>
+        <TransferFormItems
+          items={items}
+          products={products}
+          isOnline={isOnline}
+          onAddItem={addItem}
+          onUpdateItem={updateItem}
+          onRemoveItem={removeItem}
+          totalValue={getTotalValue()}
+        />
 
         {/* Actions */}
-        <div className="flex justify-between border-t border-border pt-5 max-md:flex-col max-md:gap-3">
+        <div className="flex justify-between border-t border-white/5 pt-5 max-md:flex-col max-md:gap-3">
           <button
-            className="btn btn-secondary"
+            className="px-5 py-2.5 bg-transparent border border-white/10 text-white text-sm font-medium rounded-xl hover:border-white/20 transition-all"
             onClick={() => navigate('/inventory/transfers')}
           >
             Cancel
           </button>
           <div className="flex gap-3 max-md:flex-col">
             <button
-              className="btn btn-outline"
+              className="flex items-center gap-2 px-5 py-2.5 bg-transparent border border-white/10 text-white text-sm font-medium rounded-xl hover:border-white/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               onClick={() => handleSubmit(false)}
               disabled={!canSave}
               title={!isOnline ? 'Connection lost. Please reconnect to save changes.' : undefined}
             >
-              <Save size={18} />
+              <Save size={16} />
               Save as Draft
             </button>
             <button
-              className="btn btn-primary"
+              className="flex items-center gap-2 px-5 py-2.5 bg-[var(--color-gold)] text-black font-bold text-sm rounded-xl hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
               onClick={() => handleSubmit(true)}
               disabled={!canSave}
               title={!isOnline ? 'Connection lost. Please reconnect to save changes.' : undefined}
             >
-              <Send size={18} />
+              <Send size={16} />
               {isSubmitting ? 'Saving...' : 'Save & Send'}
             </button>
           </div>

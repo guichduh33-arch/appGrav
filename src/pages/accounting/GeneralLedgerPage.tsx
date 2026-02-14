@@ -48,18 +48,18 @@ export default function GeneralLedgerPage() {
           type="date"
           value={startDate}
           onChange={e => setStartDate(e.target.value)}
-          className="border rounded-lg px-3 py-2 text-sm"
+          className="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
         />
         <input
           type="date"
           value={endDate}
           onChange={e => setEndDate(e.target.value)}
-          className="border rounded-lg px-3 py-2 text-sm"
+          className="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
         />
         {data?.entries.length ? (
           <button
             onClick={exportCSV}
-            className="flex items-center gap-1 px-3 py-2 text-sm border rounded-lg hover:bg-gray-50 ml-auto"
+            className="flex items-center gap-1 px-3 py-2 text-sm border border-white/10 rounded-xl text-white hover:border-white/20 ml-auto transition-colors"
           >
             <Download size={14} /> Export CSV
           </button>
@@ -67,51 +67,51 @@ export default function GeneralLedgerPage() {
       </div>
 
       {!accountId ? (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-[var(--theme-text-muted)]">
           Select an account to view its ledger
         </div>
       ) : isLoading ? (
-        <div className="border rounded-lg p-8 text-center text-gray-400">Loading...</div>
+        <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-8 text-center text-[var(--theme-text-muted)]">Loading...</div>
       ) : (
         <>
           {/* Opening balance */}
-          <div className="flex justify-between items-center mb-2 px-4 py-2 bg-gray-50 rounded-lg text-sm">
-            <span className="font-medium">Opening Balance</span>
-            <span className="font-mono">{formatIDR(data?.openingBalance ?? 0)}</span>
+          <div className="flex justify-between items-center mb-2 px-4 py-2 bg-[var(--onyx-surface)] border border-white/5 rounded-xl text-sm">
+            <span className="font-medium text-white/80">Opening Balance</span>
+            <span className="font-mono text-white">{formatIDR(data?.openingBalance ?? 0)}</span>
           </div>
 
-          <div className="border rounded-lg overflow-hidden">
+          <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-50 border-b">
-                  <th className="text-left px-4 py-2 font-medium">Date</th>
-                  <th className="text-left px-4 py-2 font-medium">Entry #</th>
-                  <th className="text-left px-4 py-2 font-medium">Description</th>
-                  <th className="text-right px-4 py-2 font-medium">Debit</th>
-                  <th className="text-right px-4 py-2 font-medium">Credit</th>
-                  <th className="text-right px-4 py-2 font-medium">Balance</th>
+                <tr className="border-b border-white/5">
+                  <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Date</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Entry #</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Description</th>
+                  <th className="text-right px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Debit</th>
+                  <th className="text-right px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Credit</th>
+                  <th className="text-right px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Balance</th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody>
                 {data?.entries.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-gray-400">
+                    <td colSpan={6} className="px-4 py-8 text-center text-[var(--theme-text-muted)]">
                       No movements in this period
                     </td>
                   </tr>
                 ) : (
                   data?.entries.map((entry, i) => (
-                    <tr key={i} className="hover:bg-gray-50">
-                      <td className="px-4 py-2">{entry.date}</td>
-                      <td className="px-4 py-2 font-mono text-xs">{entry.entry_number}</td>
-                      <td className="px-4 py-2 max-w-xs truncate">{entry.description}</td>
-                      <td className="px-4 py-2 text-right font-mono">
+                    <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                      <td className="px-4 py-2 text-white/80">{entry.date}</td>
+                      <td className="px-4 py-2 font-mono text-xs text-[var(--color-gold)]">{entry.entry_number}</td>
+                      <td className="px-4 py-2 max-w-xs truncate text-white/80">{entry.description}</td>
+                      <td className="px-4 py-2 text-right font-mono text-emerald-400">
                         {entry.debit > 0 ? formatIDR(entry.debit) : ''}
                       </td>
-                      <td className="px-4 py-2 text-right font-mono">
+                      <td className="px-4 py-2 text-right font-mono text-red-400">
                         {entry.credit > 0 ? formatIDR(entry.credit) : ''}
                       </td>
-                      <td className="px-4 py-2 text-right font-mono font-medium">
+                      <td className="px-4 py-2 text-right font-mono font-medium text-[var(--color-gold)]">
                         {formatIDR(entry.balance)}
                       </td>
                     </tr>
@@ -122,9 +122,9 @@ export default function GeneralLedgerPage() {
           </div>
 
           {/* Closing balance */}
-          <div className="flex justify-between items-center mt-2 px-4 py-2 bg-blue-50 rounded-lg text-sm font-medium">
-            <span>Closing Balance</span>
-            <span className="font-mono text-blue-700">{formatIDR(data?.closingBalance ?? 0)}</span>
+          <div className="flex justify-between items-center mt-2 px-4 py-2 bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 rounded-xl text-sm font-medium">
+            <span className="text-white">Closing Balance</span>
+            <span className="font-mono text-[var(--color-gold)]">{formatIDR(data?.closingBalance ?? 0)}</span>
           </div>
         </>
       )}

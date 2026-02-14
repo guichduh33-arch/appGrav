@@ -69,24 +69,24 @@ export default function DiscountModal({
 
     return (
         <>
-            <div className="modal-backdrop is-active" onClick={onClose}>
-                <div className="modal modal-md is-active" onClick={e => e.stopPropagation()}>
-                    <div className="modal__header">
+            <div className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={onClose}>
+                <div className="bg-[var(--theme-bg-primary)] rounded-xl text-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] w-full max-w-md" onClick={e => e.stopPropagation()}>
+                    <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
                         <div>
-                            <h2 className="modal__title">
-                                <Tag size={24} />
+                            <h2 className="text-lg font-bold text-white flex items-center gap-2 m-0">
+                                <Tag size={24} className="text-[var(--color-gold)]" />
                                 {isItemDiscount ? 'Item Discount' : 'Order Discount'}
                             </h2>
-                            <p className="modal__subtitle">
+                            <p className="text-sm text-[var(--theme-text-secondary)] mt-1">
                                 {isItemDiscount ? itemName : 'Apply discount to total'}
                             </p>
                         </div>
-                        <button className="modal__close" onClick={onClose}>
-                            <X size={24} />
+                        <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-transparent text-[var(--theme-text-muted)] hover:text-white hover:border-white/20 cursor-pointer" onClick={onClose}>
+                            <X size={20} />
                         </button>
                     </div>
 
-                    <div className="modal__body p-6">
+                    <div className="p-6">
                         {/* Discount Type Selector */}
                         <div className="grid grid-cols-2 gap-3 mb-6">
                             {(['percentage', 'fixed'] as const).map(type => (
@@ -95,8 +95,8 @@ export default function DiscountModal({
                                     className={cn(
                                         'p-4 rounded-lg text-sm font-semibold cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 border-2',
                                         discountType === type
-                                            ? 'bg-gold/15 border-gold text-gold'
-                                            : 'bg-[var(--color-gray-800)] border-transparent text-[var(--color-gray-300)] hover:bg-[var(--color-gray-700)] hover:text-white'
+                                            ? 'bg-[var(--color-gold)]/15 border-[var(--color-gold)] text-[var(--color-gold)]'
+                                            : 'bg-[var(--theme-bg-secondary)] border-transparent text-[var(--theme-text-secondary)] hover:bg-[var(--theme-bg-tertiary)] hover:text-white'
                                     )}
                                     onClick={() => setDiscountType(type)}
                                 >
@@ -111,7 +111,7 @@ export default function DiscountModal({
                                 {posConfig.quickDiscountPercentages.map(pct => (
                                     <button
                                         key={pct}
-                                        className="p-3 bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded text-sm font-semibold text-[var(--color-gray-300)] cursor-pointer transition-all duration-200 hover:bg-[var(--color-gray-700)] hover:border-gold hover:text-white"
+                                        className="p-3 bg-[var(--theme-bg-secondary)] border border-white/10 rounded text-sm font-semibold text-[var(--theme-text-secondary)] cursor-pointer transition-all duration-200 hover:bg-[var(--theme-bg-tertiary)] hover:border-[var(--color-gold)] hover:text-white"
                                         onClick={() => handleQuickPercentage(pct)}
                                     >
                                         {pct}%
@@ -122,12 +122,12 @@ export default function DiscountModal({
 
                         {/* Discount Input */}
                         <div className="mb-8">
-                            <label className="block text-sm font-semibold text-gray-400 mb-2 uppercase tracking-wide">
+                            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] block mb-2">
                                 {discountType === 'percentage' ? 'Percentage (%)' : 'Amount (IDR)'}
                             </label>
                             <input
                                 type="number"
-                                className="w-full h-16 px-6 text-center text-3xl font-bold text-white bg-[var(--color-gray-900)] border-2 border-[var(--color-gray-700)] rounded-lg transition-all duration-200 focus:outline-none focus:border-gold focus:shadow-[0_0_0_4px_rgba(201,165,92,0.1)]"
+                                className="w-full h-16 px-6 text-center text-3xl font-bold text-white bg-black/40 border border-white/10 rounded-xl transition-all duration-200 focus:outline-none focus:border-[var(--color-gold)]"
                                 value={discountValue}
                                 onChange={(e) => setDiscountValue(e.target.value)}
                                 placeholder="0"
@@ -138,9 +138,9 @@ export default function DiscountModal({
                         </div>
 
                         {/* Price Summary */}
-                        <div className="bg-gray-800 rounded-lg p-6 mb-6">
+                        <div className="bg-[var(--theme-bg-secondary)] border border-white/5 rounded-lg p-6 mb-6">
                             <div className="flex justify-between items-center mb-3 text-sm">
-                                <span className="text-gray-400 font-medium">
+                                <span className="text-[var(--theme-text-secondary)] font-medium">
                                     {isItemDiscount ? 'Item Price' : 'Order Total'}
                                 </span>
                                 <span className="font-semibold text-white">{formatPrice(totalPrice)}</span>
@@ -148,16 +148,16 @@ export default function DiscountModal({
                             {discountAmount > 0 && (
                                 <>
                                     <div className="flex justify-between items-center mb-3 text-sm">
-                                        <span className="text-destructive font-medium">
+                                        <span className="text-[var(--color-danger-text)] font-medium">
                                             Discount ({discountType === 'percentage' ? `${discountValue}%` : 'fixed'})
                                         </span>
-                                        <span className="text-destructive font-bold">
+                                        <span className="text-[var(--color-danger-text)] font-bold">
                                             -{formatPrice(discountAmount)}
                                         </span>
                                     </div>
-                                    <div className="flex justify-between items-center mt-4 pt-4 border-t-2 border-dashed border-gray-700">
+                                    <div className="flex justify-between items-center mt-4 pt-4 border-t-2 border-dashed border-white/10">
                                         <span className="text-lg font-bold text-white">Final Price</span>
-                                        <span className="text-2xl font-extrabold text-success">
+                                        <span className="text-2xl font-extrabold text-[var(--color-success-text)]">
                                             {formatPrice(finalPrice)}
                                         </span>
                                     </div>
@@ -165,18 +165,18 @@ export default function DiscountModal({
                             )}
                         </div>
 
-                        <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/30 rounded text-xs text-warning font-medium">
+                        <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/30 rounded text-xs text-amber-400 font-medium">
                             <Tag size={16} />
                             PIN verification required to apply discount
                         </div>
                     </div>
 
-                    <div className="modal__footer">
-                        <button className="btn btn-secondary" onClick={onClose}>
+                    <div className="px-6 py-4 border-t border-white/5 flex justify-end gap-3">
+                        <button className="px-6 py-3 border border-white/10 rounded-xl bg-transparent text-sm font-semibold text-[var(--theme-text-secondary)] hover:text-white cursor-pointer" onClick={onClose}>
                             Cancel
                         </button>
                         <button
-                            className="btn btn-primary-lg"
+                            className="px-6 py-3 bg-[var(--color-gold)] rounded-xl text-black text-sm font-bold cursor-pointer hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                             onClick={handleApply}
                             disabled={discountAmount === 0}
                         >

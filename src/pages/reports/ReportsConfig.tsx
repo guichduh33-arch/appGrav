@@ -307,5 +307,3 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
         ]
     }
 ];
-
-

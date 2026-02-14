@@ -18,13 +18,11 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
         }).format(amount)
     }
 
-    // Cost per 1 kg (base calculation)
     const costPerKg = recipeItems.reduce((total, item) => {
         const cost = item.material.cost_price || 0
         return total + (cost * item.quantity)
     }, 0)
 
-    // Cost for target quantity
     const calculatedCost = costPerKg * targetQuantity
 
     const margin = product?.retail_price
@@ -34,283 +32,263 @@ export const CostingTab: React.FC<CostingTabProps> = ({ product, recipeItems }) 
     const isSemiFinished = product.product_type === 'semi_finished'
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Banner for semi-finished products */}
-            {isSemiFinished && (
-                <div className="lg:col-span-2" style={{
-                    background: 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
-                    borderRadius: '0.75rem',
-                    padding: '1.25rem 1.5rem',
-                    border: '1px solid #FCD34D',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem'
-                }}>
-                    <div style={{
-                        width: '48px',
-                        height: '48px',
-                        borderRadius: '12px',
-                        background: 'white',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                    }}>
-                        <Scale size={24} style={{ color: '#D97706' }} />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#92400E' }}>
-                            Cost per kilogram
-                        </h3>
-                        <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: '#B45309' }}>
-                            The costs below are calculated for <strong>1 kg</strong> of this semi-finished product.
-                            Use the calculator to estimate the cost of a different quantity.
-                        </p>
-                    </div>
-                    <div style={{
-                        textAlign: 'right',
-                        background: 'white',
-                        padding: '0.75rem 1.25rem',
-                        borderRadius: '0.75rem',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                    }}>
-                        <div style={{ fontSize: '0.75rem', color: '#92400E', fontWeight: 500 }}>COST / KG</div>
-                        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#D97706' }}>
-                            {formattedPrice(costPerKg)}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Column: Cost Breakdown Table */}
+            <div className="lg:col-span-8 space-y-6">
+                {/* Semi-finished banner */}
+                {isSemiFinished && (
+                    <div className="flex items-center gap-4 p-5 bg-[var(--color-gold)]/5 border border-[var(--color-gold)]/20 rounded-xl">
+                        <div className="w-12 h-12 rounded-xl bg-[var(--color-gold)]/10 flex items-center justify-center shrink-0">
+                            <Scale size={24} className="text-[var(--color-gold)]" />
                         </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Quantity Calculator for semi-finished */}
-            {isSemiFinished && (
-                <div className="lg:col-span-2 card p-6 mb-6" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                        <Calculator size={20} style={{ color: '#16A34A' }} />
-                        <span style={{ fontWeight: 600, color: '#166534' }}>Cost calculator:</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <span style={{ color: '#166534' }}>For</span>
-                            <input
-                                type="number"
-                                value={targetQuantity}
-                                onChange={(e) => setTargetQuantity(Math.max(0.1, parseFloat(e.target.value) || 1))}
-                                step="0.1"
-                                min="0.1"
-                                style={{
-                                    width: '80px',
-                                    padding: '0.5rem',
-                                    border: '2px solid #86EFAC',
-                                    borderRadius: '0.5rem',
-                                    textAlign: 'center',
-                                    fontWeight: 600,
-                                    fontSize: '1rem'
-                                }}
-                            />
-                            <span style={{ color: '#166534' }}>kg</span>
-                        </div>
-                        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <TrendingUp size={18} style={{ color: '#16A34A' }} />
-                            <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#166534' }}>
-                                {formattedPrice(calculatedCost)}
-                            </span>
-                        </div>
-                    </div>
-                    {/* Quick quantity buttons */}
-                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap' }}>
-                        {[0.5, 1, 2, 2.5, 5, 10].map(qty => (
-                            <button
-                                key={qty}
-                                onClick={() => setTargetQuantity(qty)}
-                                style={{
-                                    padding: '0.375rem 0.75rem',
-                                    borderRadius: '0.375rem',
-                                    border: targetQuantity === qty ? '2px solid #16A34A' : '1px solid #D1D5DB',
-                                    background: targetQuantity === qty ? '#DCFCE7' : 'white',
-                                    color: targetQuantity === qty ? '#166534' : '#6B7280',
-                                    fontWeight: 500,
-                                    fontSize: '0.875rem',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                {qty} kg
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            <div className="card p-6 mb-6 lg:col-span-2">
-                <h3 className="text-lg font-semibold text-gray-900 mb-5 flex justify-between items-center">
-                    Cost Breakdown
-                    {isSemiFinished && <span style={{ fontWeight: 400, color: '#8B7355', marginLeft: '0.5rem' }}>(for 1 kg)</span>}
-                </h3>
-                <div className="overflow-x-auto mt-4 rounded-lg border border-gray-200">
-                    <table className="w-full border-collapse text-[0.95rem] [&_th]:text-left [&_th]:px-4 [&_th]:py-3 [&_th]:bg-gray-50 [&_th]:text-gray-600 [&_th]:font-semibold [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-wide [&_th]:border-b-2 [&_th]:border-gray-100 [&_td]:px-4 [&_td]:py-3 [&_td]:border-b [&_td]:border-gray-100 [&_td]:text-gray-700 [&_tbody_tr:hover_td]:bg-gray-50">
-                        <thead>
-                            <tr>
-                                <th>Ingredient</th>
-                                <th className="text-right">Qty Used</th>
-                                <th>Unit</th>
-                                <th className="text-right">Unit Cost</th>
-                                <th className="text-right">Subtotal</th>
-                                <th className="text-right">% of Cost</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {recipeItems.map(item => {
-                                const unitCost = item.material.cost_price || 0
-                                const lineCost = unitCost * item.quantity
-                                const percentage = costPerKg > 0 ? (lineCost / costPerKg) * 100 : 0
-                                return (
-                                    <tr key={item.id}>
-                                        <td>
-                                            <div className="font-medium">{item.material.name}</div>
-                                            <div className="text-xs text-gray-400">{item.material.sku}</div>
-                                        </td>
-                                        <td className="text-right font-mono">{item.quantity}</td>
-                                        <td className="text-gray-600">{item.unit || item.material.unit}</td>
-                                        <td className="text-right text-gray-600">{formattedPrice(unitCost)}</td>
-                                        <td className="text-right font-semibold">{formattedPrice(lineCost)}</td>
-                                        <td className="text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                                    <div
-                                                        className="h-full bg-blue-500 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
-                                                        style={{ '--progress-width': `${Math.min(percentage, 100)}%` } as React.CSSProperties}
-                                                    />
-                                                </div>
-                                                <span className="text-xs text-gray-500 w-12 text-right">{percentage.toFixed(1)}%</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )
-                            })}
-                            {recipeItems.length === 0 && (
-                                <tr>
-                                    <td colSpan={6} className="p-8 text-center text-gray-400 italic">
-                                        No ingredients defined. Add ingredients to the recipe to see cost breakdown.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                        {recipeItems.length > 0 && (
-                            <tfoot className="bg-gray-50 font-semibold">
-                                <tr>
-                                    <td colSpan={4} className="text-right py-3 pr-4">
-                                        Total Material Cost
-                                        {isSemiFinished && <span style={{ fontWeight: 400, color: '#8B7355' }}> (1 kg)</span>}
-                                    </td>
-                                    <td className="text-right py-3 pr-4 text-lg">{formattedPrice(costPerKg)}</td>
-                                    <td className="text-right py-3 pr-4 text-gray-500">100%</td>
-                                </tr>
-                            </tfoot>
-                        )}
-                    </table>
-                </div>
-            </div>
-
-            <div className="card p-6 mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-5 flex justify-between items-center">Financial Summary</h3>
-                <div className="my-4 space-y-3">
-                    <div className="flex justify-between py-2 border-b border-dashed border-gray-200">
-                        <span className="text-gray-600">
-                            Material Cost
-                            {isSemiFinished && <span style={{ fontSize: '0.75rem', color: '#9CA3AF' }}> / kg</span>}
-                        </span>
-                        <span className="font-bold">{formattedPrice(costPerKg)}</span>
-                    </div>
-                    {!isSemiFinished && (
-                        <>
-                            <div className="flex justify-between py-2 border-b border-dashed border-gray-200">
-                                <span className="text-gray-600">Selling Price</span>
-                                <span className="font-bold">{formattedPrice(product.retail_price || 0)}</span>
-                            </div>
-                            <div className="flex justify-between py-2 border-b border-dashed border-gray-200">
-                                <span className="text-gray-600">Gross Profit</span>
-                                <span className={`font-bold ${(product.retail_price || 0) - costPerKg < 0 ? 'text-red-500' : 'text-green-600'}`}>
-                                    {formattedPrice((product.retail_price || 0) - costPerKg)}
-                                </span>
-                            </div>
-                            <div className="flex justify-between py-4 bg-gray-50 px-4 rounded-lg mt-4">
-                                <span className="font-medium">Gross Margin</span>
-                                <span className={`font-bold text-lg ${margin < 30 ? 'text-red-500' : 'text-green-600'}`}>
-                                    {margin.toFixed(2)} %
-                                </span>
-                            </div>
-                        </>
-                    )}
-                    {isSemiFinished && (
-                        <div style={{
-                            marginTop: '1rem',
-                            padding: '1rem',
-                            background: '#EFF6FF',
-                            borderRadius: '0.5rem',
-                            border: '1px solid #BFDBFE'
-                        }}>
-                            <p style={{ margin: 0, fontSize: '0.8125rem', color: '#1E40AF' }}>
-                                <strong>Note:</strong> Semi-finished products are generally not sold directly.
-                                The cost is used to calculate the cost of finished products that use it.
+                        <div className="flex-1">
+                            <h3 className="text-sm font-bold text-[var(--color-gold)] m-0">Cost per kilogram</h3>
+                            <p className="text-xs text-[var(--color-gold)]/70 mt-0.5 m-0">
+                                Costs below are calculated for <strong>1 kg</strong> of this semi-finished product.
                             </p>
                         </div>
+                        <div className="text-right bg-black/40 px-4 py-2 rounded-lg border border-white/5">
+                            <div className="text-[10px] text-[var(--theme-text-muted)] uppercase tracking-wider font-bold">Cost / KG</div>
+                            <div className="text-xl font-bold text-[var(--color-gold)]">{formattedPrice(costPerKg)}</div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Quantity Calculator */}
+                {isSemiFinished && (
+                    <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-6">
+                        <div className="flex items-center gap-4 flex-wrap">
+                            <Calculator size={18} className="text-[var(--color-gold)]" />
+                            <span className="font-semibold text-white text-sm">Cost calculator:</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-[var(--theme-text-secondary)] text-sm">For</span>
+                                <input
+                                    type="number"
+                                    value={targetQuantity}
+                                    onChange={(e) => setTargetQuantity(Math.max(0.1, parseFloat(e.target.value) || 1))}
+                                    step="0.1"
+                                    min="0.1"
+                                    className="w-20 bg-black/40 border border-[var(--color-gold)]/30 rounded-lg text-center font-semibold text-white text-sm py-2 focus:border-[var(--color-gold)] focus:ring-0 focus:outline-none"
+                                />
+                                <span className="text-[var(--theme-text-secondary)] text-sm">kg</span>
+                            </div>
+                            <div className="ml-auto flex items-center gap-2">
+                                <TrendingUp size={16} className="text-[var(--color-gold)]" />
+                                <span className="text-lg font-bold text-[var(--color-gold)]">
+                                    {formattedPrice(calculatedCost)}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="flex gap-2 mt-3 flex-wrap">
+                            {[0.5, 1, 2, 2.5, 5, 10].map(qty => (
+                                <button
+                                    key={qty}
+                                    onClick={() => setTargetQuantity(qty)}
+                                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer ${
+                                        targetQuantity === qty
+                                            ? 'bg-[var(--color-gold)]/10 text-[var(--color-gold)] border border-[var(--color-gold)]/30'
+                                            : 'bg-white/5 text-[var(--theme-text-muted)] border border-white/10 hover:border-white/20'
+                                    }`}
+                                >
+                                    {qty} kg
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Cost Breakdown Table */}
+                <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden shadow-2xl">
+                    <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                        <h2 className="text-lg font-semibold text-white">
+                            Cost Breakdown
+                            {isSemiFinished && <span className="text-[var(--theme-text-muted)] font-normal ml-2 text-sm">(for 1 kg)</span>}
+                        </h2>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="bg-white/[0.02] text-[10px] uppercase tracking-wider text-[var(--muted-smoke)]">
+                                    <th className="px-6 py-4 font-medium">Ingredient</th>
+                                    <th className="px-6 py-4 font-medium text-right">Qty Used</th>
+                                    <th className="px-6 py-4 font-medium text-center">Unit</th>
+                                    <th className="px-6 py-4 font-medium text-right">Unit Cost</th>
+                                    <th className="px-6 py-4 font-medium text-right">Subtotal</th>
+                                    <th className="px-6 py-4 font-medium text-right">% of Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                                {recipeItems.map(item => {
+                                    const unitCost = item.material.cost_price || 0
+                                    const lineCost = unitCost * item.quantity
+                                    const percentage = costPerKg > 0 ? (lineCost / costPerKg) * 100 : 0
+                                    return (
+                                        <tr key={item.id} className="hover:bg-white/[0.02] transition-colors">
+                                            <td className="px-6 py-4">
+                                                <div className="font-medium text-white">{item.material.name}</div>
+                                                <div className="text-[10px] text-[var(--color-gold)]/50 uppercase tracking-tighter">{item.material.sku}</div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right font-mono text-[var(--stone-text)]">{item.quantity}</td>
+                                            <td className="px-6 py-4 text-center text-[var(--theme-text-muted)] font-light">{item.unit || item.material.unit}</td>
+                                            <td className="px-6 py-4 text-right text-[var(--theme-text-muted)] font-light">{formattedPrice(unitCost)}</td>
+                                            <td className="px-6 py-4 text-right font-medium text-[var(--color-gold)]">{formattedPrice(lineCost)}</td>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                                        <div
+                                                            className="h-full bg-[var(--color-gold)] transition-all duration-500"
+                                                            style={{ width: `${Math.min(percentage, 100)}%` }}
+                                                        />
+                                                    </div>
+                                                    <span className="text-xs text-[var(--theme-text-muted)] w-12 text-right">{percentage.toFixed(1)}%</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
+                                {recipeItems.length === 0 && (
+                                    <tr>
+                                        <td colSpan={6} className="p-8 text-center text-[var(--theme-text-muted)] italic text-sm">
+                                            No ingredients defined. Add ingredients to the recipe to see cost breakdown.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                    {recipeItems.length > 0 && (
+                        <div className="p-6 bg-white/[0.02] border-t border-white/5 flex items-center justify-between">
+                            <span className="text-sm text-[var(--stone-text)]">
+                                Base Material Cost
+                                {isSemiFinished && <span className="text-[var(--theme-text-muted)]"> (1 kg)</span>}
+                            </span>
+                            <span className="text-2xl font-semibold text-[var(--stone-text)]">{formattedPrice(costPerKg)}</span>
+                        </div>
                     )}
                 </div>
-                {!isSemiFinished && margin < 0 && (
-                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm flex gap-2">
-                        <AlertTriangle size={16} /> <strong>Warning: This product is sold at a loss!</strong>
-                    </div>
-                )}
-                {!isSemiFinished && margin >= 0 && margin < 30 && (
-                    <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 text-sm flex gap-2">
-                        <AlertTriangle size={16} /> <strong>Warning: Low margin! Consider adjusting the selling price.</strong>
-                    </div>
-                )}
             </div>
 
-            <div className="card p-6 mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-5 flex justify-between items-center">{isSemiFinished ? 'Cost Analysis' : 'Margin Analysis'}</h3>
-                {!isSemiFinished && (
-                    <div className="mt-4">
-                        <div className="h-8 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                                className={`h-full transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${margin < 0 ? 'bg-red-500' : margin < 30 ? 'bg-yellow-500' : 'bg-green-500'}`}
-                                style={{ '--progress-width': `${Math.max(0, Math.min(margin, 100))}%` } as React.CSSProperties}
-                            />
+            {/* Right Column: Financial Analysis */}
+            <aside className="lg:col-span-4 sticky top-24 space-y-6">
+                {/* Financial Summary Card */}
+                <div className="bg-[var(--onyx-surface)] border border-[var(--color-gold)]/20 rounded-xl overflow-hidden shadow-2xl relative">
+                    <div className="p-8">
+                        <h2 className="text-xl font-medium text-white mb-8">Financial Analysis</h2>
+                        <div className="space-y-6">
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-[var(--theme-text-muted)]">
+                                        Material Cost
+                                        {isSemiFinished && <span className="text-xs"> / kg</span>}
+                                    </span>
+                                    <span className="text-[var(--stone-text)] font-medium">{formattedPrice(costPerKg)}</span>
+                                </div>
+                                {!isSemiFinished && (
+                                    <>
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-[var(--theme-text-muted)]">Selling Price</span>
+                                            <span className="text-[var(--stone-text)] font-medium">{formattedPrice(product.retail_price || 0)}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-[var(--theme-text-muted)]">Gross Profit</span>
+                                            <span className={`font-medium ${(product.retail_price || 0) - costPerKg < 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                                                {formattedPrice((product.retail_price || 0) - costPerKg)}
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
+                                <div className="pt-3 border-t border-white/10 flex justify-between items-center">
+                                    <span className="text-[var(--stone-text)] font-semibold">
+                                        {isSemiFinished ? 'Total Cost / kg' : 'Gross Margin'}
+                                    </span>
+                                    <span className="text-xl font-bold text-[var(--color-gold)]">
+                                        {isSemiFinished ? formattedPrice(costPerKg) : `${margin.toFixed(1)}%`}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Divider */}
+                            <div className="h-px bg-gradient-to-r from-transparent via-[var(--color-gold)]/20 to-transparent" />
+
+                            {/* Margin bar for finished products */}
+                            {!isSemiFinished && (
+                                <div>
+                                    <div className="flex justify-between mb-2 text-[10px] uppercase text-[var(--theme-text-muted)] font-bold tracking-wider">
+                                        <span>0%</span>
+                                        <span className="text-[var(--color-gold)]">30% threshold</span>
+                                        <span>100%</span>
+                                    </div>
+                                    <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full transition-all duration-500 ${margin < 0 ? 'bg-red-400' : margin < 30 ? 'bg-amber-400' : 'bg-emerald-400'}`}
+                                            style={{ width: `${Math.max(0, Math.min(margin, 100))}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Pricing Card */}
+                            {!isSemiFinished && (
+                                <div className="bg-black/40 rounded-lg p-4 space-y-3">
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className="text-[var(--theme-text-muted)]">Current Retail Price</span>
+                                        <span className="text-[var(--stone-text)] font-medium">{formattedPrice(product.retail_price || 0)}</span>
+                                    </div>
+                                    {margin < 0 && (
+                                        <div className="flex items-center gap-2 text-[11px] text-red-400 bg-red-400/10 p-2 rounded-lg">
+                                            <AlertTriangle size={14} />
+                                            This product is sold at a loss!
+                                        </div>
+                                    )}
+                                    {margin >= 0 && margin < 30 && (
+                                        <div className="flex items-center gap-2 text-[11px] text-amber-400 bg-amber-400/10 p-2 rounded-lg">
+                                            <AlertTriangle size={14} />
+                                            Low margin! Consider adjusting the selling price.
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Semi-finished info */}
+                            {isSemiFinished && (
+                                <div className="p-3 bg-[var(--color-gold)]/5 rounded border border-[var(--color-gold)]/20 text-[11px] text-[var(--color-gold)]/80 italic">
+                                    Semi-finished products are generally not sold directly.
+                                    The cost is used to calculate the cost of finished products that use it.
+                                </div>
+                            )}
                         </div>
-                        <div className="flex justify-between text-xs text-gray-500 mt-2">
-                            <span>0%</span>
-                            <span className="text-yellow-600 font-medium">30% (threshold)</span>
-                            <span>100%</span>
-                        </div>
-                        <div className="text-center mt-2 font-bold text-lg">
-                            {margin.toFixed(1)}%
-                        </div>
-                    </div>
-                )}
-                <div className={`${isSemiFinished ? 'mt-4' : 'mt-6'} grid grid-cols-2 gap-4 text-center`}>
-                    <div className="p-4 bg-blue-50 rounded-lg">
-                        <div className="text-2xl font-bold text-blue-600">{recipeItems.length}</div>
-                        <div className="text-xs text-blue-500 font-medium">Ingredients</div>
-                    </div>
-                    <div className="p-4 bg-purple-50 rounded-lg">
-                        <div className="text-xl font-bold text-purple-600">
-                            {recipeItems.length > 0 ? formattedPrice(costPerKg / recipeItems.length) : '-'}
-                        </div>
-                        <div className="text-xs text-purple-500 font-medium">Avg. Cost per Ingredient</div>
                     </div>
                 </div>
-                {isSemiFinished && (
-                    <div className="mt-4 grid grid-cols-2 gap-4 text-center">
-                        <div className="p-4 bg-amber-50 rounded-lg">
-                            <div className="text-xl font-bold text-amber-600">{formattedPrice(costPerKg / 10)}</div>
-                            <div className="text-xs text-amber-500 font-medium">Cost / 100g</div>
+
+                {/* Stats Cards */}
+                <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-6">
+                    <h3 className="text-sm font-medium text-white mb-4">Quick Stats</h3>
+                    <div className="grid grid-cols-2 gap-4 text-center">
+                        <div className="p-4 bg-[var(--color-gold)]/5 rounded-lg border border-[var(--color-gold)]/10">
+                            <div className="text-2xl font-bold text-[var(--color-gold)]">{recipeItems.length}</div>
+                            <div className="text-[10px] text-[var(--theme-text-muted)] font-bold uppercase tracking-wider">Ingredients</div>
                         </div>
-                        <div className="p-4 bg-green-50 rounded-lg">
-                            <div className="text-xl font-bold text-green-600">{formattedPrice(costPerKg * targetQuantity)}</div>
-                            <div className="text-xs text-green-500 font-medium">Cost for {targetQuantity} kg</div>
+                        <div className="p-4 bg-white/5 rounded-lg border border-white/5">
+                            <div className="text-xl font-bold text-[var(--stone-text)]">
+                                {recipeItems.length > 0 ? formattedPrice(costPerKg / recipeItems.length) : '-'}
+                            </div>
+                            <div className="text-[10px] text-[var(--theme-text-muted)] font-bold uppercase tracking-wider">Avg. Cost</div>
                         </div>
                     </div>
-                )}
-            </div>
+                    {isSemiFinished && (
+                        <div className="grid grid-cols-2 gap-4 text-center mt-4">
+                            <div className="p-4 bg-white/5 rounded-lg border border-white/5">
+                                <div className="text-lg font-bold text-[var(--stone-text)]">{formattedPrice(costPerKg / 10)}</div>
+                                <div className="text-[10px] text-[var(--theme-text-muted)] font-bold uppercase tracking-wider">Cost / 100g</div>
+                            </div>
+                            <div className="p-4 bg-[var(--color-gold)]/5 rounded-lg border border-[var(--color-gold)]/10">
+                                <div className="text-lg font-bold text-[var(--color-gold)]">{formattedPrice(costPerKg * targetQuantity)}</div>
+                                <div className="text-[10px] text-[var(--theme-text-muted)] font-bold uppercase tracking-wider">Cost for {targetQuantity} kg</div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </aside>
         </div>
     )
 }

@@ -23,13 +23,11 @@ export function PermissionPicker({
     () => initialExpandAll ? new Set(permissions.map((p) => p.module)) : new Set()
   )
 
-  // Group permissions by module
   const permissionGroups = useMemo(
     () => groupPermissionsByModule(permissions),
     [permissions]
   )
 
-  // Toggle module expansion
   const toggleModule = useCallback((module: string) => {
     setExpandedModules((prev) => {
       const newSet = new Set(prev)
@@ -42,7 +40,6 @@ export function PermissionPicker({
     })
   }, [])
 
-  // Toggle single permission
   const togglePermission = useCallback(
     (permId: string) => {
       if (disabled) return
@@ -54,7 +51,6 @@ export function PermissionPicker({
     [selectedPermissions, onChange, disabled]
   )
 
-  // Toggle all permissions in a module
   const toggleModulePermissions = useCallback(
     (module: string) => {
       if (disabled) return
@@ -74,12 +70,10 @@ export function PermissionPicker({
     [permissions, selectedPermissions, onChange, disabled]
   )
 
-  // Expand all modules
   const expandAll = useCallback(() => {
     setExpandedModules(new Set(permissionGroups.map((g) => g.module)))
   }, [permissionGroups])
 
-  // Collapse all modules
   const collapseAll = useCallback(() => {
     setExpandedModules(new Set())
   }, [])
@@ -88,23 +82,23 @@ export function PermissionPicker({
     <div>
       {/* Header with expand/collapse controls */}
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-semibold text-[var(--color-brun-chocolat)]">
+        <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">
           Permissions ({selectedPermissions.length})
         </h3>
         <div className="flex gap-2 text-xs">
           <button
             type="button"
             onClick={expandAll}
-            className="text-[var(--color-rose-poudre)] hover:underline"
+            className="text-[var(--color-gold)] hover:underline"
             disabled={disabled}
           >
             Expand all
           </button>
-          <span className="text-[var(--color-gris-chaud)]">|</span>
+          <span className="text-[var(--theme-text-muted)]">|</span>
           <button
             type="button"
             onClick={collapseAll}
-            className="text-[var(--color-rose-poudre)] hover:underline"
+            className="text-[var(--color-gold)] hover:underline"
             disabled={disabled}
           >
             Collapse all
@@ -113,7 +107,7 @@ export function PermissionPicker({
       </div>
 
       {/* Permission groups */}
-      <div className="border border-[var(--color-border)] rounded-lg max-h-[350px] overflow-y-auto">
+      <div className="border border-white/10 rounded-xl max-h-[350px] overflow-y-auto">
         {permissionGroups.map((group) => (
           <PermissionGroupSection
             key={group.module}
@@ -156,26 +150,26 @@ function PermissionGroupSection({
   const allSelected = selectedCount === group.permissions.length
 
   return (
-    <div className="border-b border-[var(--color-border)] last:border-0">
+    <div className="border-b border-white/5 last:border-0">
       {/* Module header */}
       <button
         type="button"
         onClick={onToggleModule}
-        className="w-full flex items-center justify-between px-4 py-2 bg-transparent border-0 cursor-pointer text-left hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-2.5 bg-transparent border-0 cursor-pointer text-left hover:bg-white/[0.02] transition-colors"
         disabled={disabled}
       >
         <div className="flex items-center gap-2">
           {isExpanded ? (
-            <ChevronDown size={16} color="var(--color-gris-chaud)" />
+            <ChevronDown size={14} className="text-[var(--theme-text-muted)]" />
           ) : (
-            <ChevronRight size={16} color="var(--color-gris-chaud)" />
+            <ChevronRight size={14} className="text-[var(--theme-text-muted)]" />
           )}
-          <span className="font-medium text-[var(--color-brun-chocolat)]">
+          <span className="font-medium text-white text-sm">
             {getModuleName(group.module)}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-[var(--color-gris-chaud)]">
+          <span className="text-[11px] text-[var(--theme-text-muted)]">
             {selectedCount}/{group.permissions.length}
           </span>
           <button
@@ -184,8 +178,10 @@ function PermissionGroupSection({
               e.stopPropagation()
               onToggleModulePermissions()
             }}
-            className={`section-badge cursor-pointer border-0 ${
-              allSelected ? 'section-badge--sales' : ''
+            className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full border-0 cursor-pointer transition-colors ${
+              allSelected
+                ? 'bg-[var(--color-gold)]/10 text-[var(--color-gold)]'
+                : 'bg-white/5 text-[var(--theme-text-muted)] hover:text-white'
             }`}
             disabled={disabled}
           >
@@ -196,29 +192,29 @@ function PermissionGroupSection({
 
       {/* Permission checkboxes */}
       {isExpanded && (
-        <div className="bg-[var(--color-blanc-creme)] px-4 py-2 space-y-1">
+        <div className="bg-black/20 px-4 py-2 space-y-0.5">
           {group.permissions.map((perm) => (
             <label
               key={perm.id}
-              className={`flex items-center gap-2 px-2 py-1 rounded transition-colors ${
+              className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg transition-colors ${
                 disabled
                   ? 'cursor-not-allowed opacity-60'
-                  : 'cursor-pointer hover:bg-black/5'
+                  : 'cursor-pointer hover:bg-white/[0.03]'
               }`}
             >
               <input
                 type="checkbox"
                 checked={selectedPermissions.includes(perm.id)}
                 onChange={() => onTogglePermission(perm.id)}
-                className="accent-[var(--color-rose-poudre)]"
+                className="accent-[var(--color-gold)]"
                 disabled={disabled}
               />
               <div className="flex-1">
-                <span className="text-sm text-[var(--color-brun-chocolat)]">
+                <span className="text-sm text-white/80">
                   {getPermissionName(perm)}
                 </span>
                 {perm.is_sensitive && (
-                  <span className="ml-2 text-[10px] px-1.5 py-0.5 bg-red-500/10 text-red-600 rounded">
+                  <span className="ml-2 text-[10px] px-1.5 py-0.5 bg-red-500/10 text-red-400 rounded">
                     Sensitive
                   </span>
                 )}

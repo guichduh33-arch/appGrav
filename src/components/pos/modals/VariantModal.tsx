@@ -258,17 +258,17 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                 {/* Body */}
                 <div className="flex-1 overflow-y-auto p-[var(--space-lg)]">
                     {variantGroups.length === 0 ? (
-                        <div className="text-center p-4 text-[var(--color-gray-400)]">
+                        <div className="text-center p-4 text-[var(--theme-text-secondary)]">
                             No options available for this product
                         </div>
                     ) : (
                         variantGroups.map(group => (
                             <div key={group.group_name} className="mb-6 last:mb-0">
-                                <h4 className="text-sm font-semibold text-[var(--color-gray-400)] mb-3 uppercase tracking-[0.05em] flex items-center gap-2">
+                                <h4 className="text-sm font-semibold text-[var(--theme-text-secondary)] mb-3 uppercase tracking-[0.05em] flex items-center gap-2">
                                     {group.group_name}
                                     {group.group_required && <span className="text-destructive ml-1">*</span>}
                                     {group.group_type === 'multiple' && (
-                                        <span className="text-xs font-normal ml-2 text-[var(--color-gray-500)]">
+                                        <span className="text-xs font-normal ml-2 text-[var(--theme-text-muted)]">
                                             (Multiple choice)
                                         </span>
                                     )}
@@ -291,7 +291,7 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                                                 {option.price_adjustment !== 0 && (
                                                     <span className={cn(
                                                         'text-xs font-medium',
-                                                        isSelected ? 'text-gold' : 'text-[var(--color-gray-400)]'
+                                                        isSelected ? 'text-gold' : 'text-[var(--theme-text-secondary)]'
                                                     )}>
                                                         {option.price_adjustment > 0 ? '+' : ''}{formatPrice(option.price_adjustment)}
                                                     </span>
@@ -305,8 +305,8 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                     )}
 
                     {/* Total Price */}
-                    <div className="flex justify-between items-center p-4 bg-[var(--color-gray-900)] border border-[var(--color-gray-700)] rounded-xl mt-4">
-                        <span className="text-[var(--color-gray-300)] text-lg">Total price:</span>
+                    <div className="flex justify-between items-center p-4 bg-[var(--theme-bg-primary)] border border-white/10 rounded-xl mt-4">
+                        <span className="text-[var(--theme-text-secondary)] text-lg">Total price:</span>
                         <strong className="text-xl font-bold text-gold">{formatPrice(totalPrice)}</strong>
                     </div>
                 </div>

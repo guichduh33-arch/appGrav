@@ -37,7 +37,6 @@ export const PurchaseDetailsTab = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Filter by search
   const filteredData = useMemo(() => {
     if (!searchTerm.trim()) return data;
     const term = searchTerm.toLowerCase();
@@ -50,7 +49,6 @@ export const PurchaseDetailsTab = () => {
     );
   }, [data, searchTerm]);
 
-  // KPIs
   const kpis = useMemo(() => {
     const totalCost = filteredData.reduce((acc, curr) => {
       const cost = curr.product?.cost_price || 0;
@@ -63,7 +61,6 @@ export const PurchaseDetailsTab = () => {
     return { totalCost, totalQuantity, itemCount: filteredData.length, uniqueProducts };
   }, [filteredData]);
 
-  // Export config
   const exportConfig: ExportConfig<PurchaseDetail> = useMemo(() => ({
     data: filteredData,
     columns: [
@@ -91,7 +88,7 @@ export const PurchaseDetailsTab = () => {
 
   if (error) {
     return (
-      <div className="p-8 text-center text-red-600">
+      <div className="p-8 text-center text-red-400">
         Error loading data
       </div>
     );
@@ -111,93 +108,85 @@ export const PurchaseDetailsTab = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <div className="bg-[var(--onyx-surface)] rounded-xl p-6 border border-white/5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-50 rounded-lg">
-              <DollarSign className="w-5 h-5 text-blue-600" />
+            <div className="p-2 bg-blue-500/10 rounded-lg">
+              <DollarSign className="w-5 h-5 text-blue-400" />
             </div>
-            <span className="text-sm text-gray-600">Total Value (Est.)</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Total Value (Est.)</span>
           </div>
-          <p className="text-2xl font-bold text-blue-600">
-            {formatCurrency(kpis.totalCost)}
-          </p>
+          <p className="text-2xl font-bold text-blue-400">{formatCurrency(kpis.totalCost)}</p>
         </div>
 
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <div className="bg-[var(--onyx-surface)] rounded-xl p-6 border border-white/5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-green-50 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-green-600" />
+            <div className="p-2 bg-green-500/10 rounded-lg">
+              <TrendingUp className="w-5 h-5 text-green-400" />
             </div>
-            <span className="text-sm text-gray-600">Total Quantity</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Total Quantity</span>
           </div>
-          <p className="text-2xl font-bold text-green-600">
-            {kpis.totalQuantity.toLocaleString()}
-          </p>
+          <p className="text-2xl font-bold text-green-400">{kpis.totalQuantity.toLocaleString()}</p>
         </div>
 
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <div className="bg-[var(--onyx-surface)] rounded-xl p-6 border border-white/5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-purple-50 rounded-lg">
-              <Package className="w-5 h-5 text-purple-600" />
+            <div className="p-2 bg-purple-500/10 rounded-lg">
+              <Package className="w-5 h-5 text-purple-400" />
             </div>
-            <span className="text-sm text-gray-600">Items</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Items</span>
           </div>
-          <p className="text-2xl font-bold text-purple-600">
-            {kpis.itemCount}
-          </p>
+          <p className="text-2xl font-bold text-purple-400">{kpis.itemCount}</p>
         </div>
 
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <div className="bg-[var(--onyx-surface)] rounded-xl p-6 border border-white/5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-orange-50 rounded-lg">
-              <Package className="w-5 h-5 text-orange-600" />
+            <div className="p-2 bg-amber-500/10 rounded-lg">
+              <Package className="w-5 h-5 text-amber-400" />
             </div>
-            <span className="text-sm text-gray-600">Unique Products</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Unique Products</span>
           </div>
-          <p className="text-2xl font-bold text-orange-600">
-            {kpis.uniqueProducts}
-          </p>
+          <p className="text-2xl font-bold text-amber-400">{kpis.uniqueProducts}</p>
         </div>
       </div>
 
       {/* Search */}
       <div className="flex gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--theme-text-muted)]" />
           <input
             type="text"
             placeholder="Search product, SKU, supplier, or reference..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
           />
         </div>
       </div>
 
       {/* Data Table */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Incoming Purchase History</h3>
-          <p className="text-sm text-gray-500">Stock movements marked as purchase</p>
+      <div className="bg-[var(--onyx-surface)] rounded-xl border border-white/5 overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/5">
+          <h3 className="text-lg font-semibold text-white">Incoming Purchase History</h3>
+          <p className="text-sm text-[var(--theme-text-muted)]">Stock movements marked as purchase</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supplier</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reference (PO#)</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Unit Cost (Est.)</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Value</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Staff</th>
+            <thead>
+              <tr className="border-b border-white/5">
+                <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Date</th>
+                <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Product</th>
+                <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Supplier</th>
+                <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Reference (PO#)</th>
+                <th className="px-6 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Quantity</th>
+                <th className="px-6 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Unit Cost (Est.)</th>
+                <th className="px-6 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Total Value</th>
+                <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Staff</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody>
               {filteredData.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={8} className="px-6 py-8 text-center text-[var(--theme-text-muted)]">
                     No data
                   </td>
                 </tr>
@@ -206,33 +195,33 @@ export const PurchaseDetailsTab = () => {
                   const unitCost = row.product?.cost_price || 0;
                   const totalValue = unitCost * row.quantity;
                   return (
-                    <tr key={row.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                    <tr key={row.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                      <td className="px-6 py-4 text-sm text-[var(--theme-text-muted)]">
                         {new Date(row.created_at).toLocaleDateString('en-US')}
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-[var(--theme-text-muted)]">
                           {new Date(row.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                      <td className="px-6 py-4 text-sm font-medium text-white">
                         {row.product?.name || 'Unknown Product'}
-                        <div className="text-xs text-gray-400 font-mono">{row.product?.sku}</div>
+                        <div className="text-xs text-[var(--theme-text-muted)] font-mono">{row.product?.sku}</div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{row.supplier?.name || '-'}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
+                      <td className="px-6 py-4 text-sm text-[var(--theme-text-muted)]">{row.supplier?.name || '-'}</td>
+                      <td className="px-6 py-4 text-sm text-[var(--theme-text-muted)]">
                         {row.reference_id ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
                             {row.reference_id}
                           </span>
                         ) : (
-                          <span className="text-gray-300">-</span>
+                          <span className="text-white/20">-</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-right font-medium text-gray-900">
+                      <td className="px-6 py-4 text-sm text-right font-medium text-white">
                         {row.quantity} {row.product?.unit}
                       </td>
-                      <td className="px-6 py-4 text-sm text-right text-gray-600">{formatCurrency(unitCost)}</td>
-                      <td className="px-6 py-4 text-sm text-right font-bold text-gray-900">{formatCurrency(totalValue)}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{row.staff?.name || '-'}</td>
+                      <td className="px-6 py-4 text-sm text-right text-[var(--theme-text-muted)]">{formatCurrency(unitCost)}</td>
+                      <td className="px-6 py-4 text-sm text-right font-bold text-white">{formatCurrency(totalValue)}</td>
+                      <td className="px-6 py-4 text-sm text-[var(--theme-text-muted)]">{row.staff?.name || '-'}</td>
                     </tr>
                   );
                 })

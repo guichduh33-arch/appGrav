@@ -12,40 +12,37 @@ export default function B2BOrderItemsTab({ items }: B2BOrderItemsTabProps) {
             <table className="w-full border-collapse">
                 <thead>
                     <tr>
-                        <th className="p-md text-left text-xs font-semibold text-[var(--color-gris-chaud)] uppercase tracking-wide bg-[var(--color-blanc-creme)] border-b border-border">Product</th>
-                        <th className="p-md text-left text-xs font-semibold text-[var(--color-gris-chaud)] uppercase tracking-wide bg-[var(--color-blanc-creme)] border-b border-border">Qty</th>
-                        <th className="p-md text-left text-xs font-semibold text-[var(--color-gris-chaud)] uppercase tracking-wide bg-[var(--color-blanc-creme)] border-b border-border">Unit Price</th>
-                        <th className="p-md text-left text-xs font-semibold text-[var(--color-gris-chaud)] uppercase tracking-wide bg-[var(--color-blanc-creme)] border-b border-border">Discount</th>
-                        <th className="p-md text-left text-xs font-semibold text-[var(--color-gris-chaud)] uppercase tracking-wide bg-[var(--color-blanc-creme)] border-b border-border">Total</th>
-                        <th className="p-md text-left text-xs font-semibold text-[var(--color-gris-chaud)] uppercase tracking-wide bg-[var(--color-blanc-creme)] border-b border-border">Delivered</th>
+                        {['Product', 'Qty', 'Unit Price', 'Discount', 'Total', 'Delivered'].map(th => (
+                            <th key={th} className="p-4 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)] border-b border-white/5">{th}</th>
+                        ))}
                     </tr>
                 </thead>
                 <tbody>
                     {items.map(item => (
-                        <tr key={item.id} className="[&:last-child>td]:border-b-0">
-                            <td className="p-md text-sm border-b border-border">
+                        <tr key={item.id} className="border-b border-white/5 [&:last-child]:border-b-0">
+                            <td className="p-4 text-sm">
                                 <div className="flex flex-col gap-0.5">
-                                    <span className="font-medium">{item.product_name}</span>
+                                    <span className="font-medium text-white">{item.product_name}</span>
                                     {item.product_sku && (
-                                        <span className="text-xs text-[var(--color-gris-chaud)]">{item.product_sku}</span>
+                                        <span className="text-xs text-[var(--theme-text-muted)]">{item.product_sku}</span>
                                     )}
                                 </div>
                             </td>
-                            <td className="p-md text-sm border-b border-border">{item.quantity} {item.unit}</td>
-                            <td className="p-md text-sm border-b border-border">{formatCurrency(item.unit_price)}</td>
-                            <td className="p-md text-sm border-b border-border">
+                            <td className="p-4 text-sm text-white">{item.quantity} {item.unit}</td>
+                            <td className="p-4 text-sm text-[var(--theme-text-muted)]">{formatCurrency(item.unit_price)}</td>
+                            <td className="p-4 text-sm text-[var(--theme-text-muted)]">
                                 {item.discount_percentage > 0
                                     ? `${item.discount_percentage}%`
                                     : '-'
                                 }
                             </td>
-                            <td className="p-md text-sm border-b border-border"><strong>{formatCurrency(item.line_total)}</strong></td>
-                            <td className="p-md text-sm border-b border-border">
+                            <td className="p-4 text-sm"><strong className="text-[var(--color-gold)]">{formatCurrency(item.line_total)}</strong></td>
+                            <td className="p-4 text-sm">
                                 <span className={cn(
-                                    'inline-flex px-2 py-1 rounded-sm text-xs font-semibold',
+                                    'inline-flex px-2 py-1 rounded-full text-xs font-semibold border',
                                     item.quantity_delivered >= item.quantity
-                                        ? 'bg-[rgba(107,142,107,0.1)] text-success'
-                                        : 'bg-[rgba(255,153,0,0.1)] text-[#cc7a00]'
+                                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                        : 'bg-orange-500/10 text-orange-400 border-orange-500/20'
                                 )}>
                                     {item.quantity_delivered}/{item.quantity}
                                 </span>

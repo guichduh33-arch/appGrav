@@ -19,9 +19,9 @@ export function VATSummaryCard({ summary, year, month, isLoading }: VATSummaryCa
     return (
       <div className="grid grid-cols-3 gap-4">
         {[1, 2, 3].map(i => (
-          <div key={i} className="border rounded-lg p-4 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-24 mb-2" />
-            <div className="h-8 bg-gray-200 rounded w-32" />
+          <div key={i} className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-4 animate-pulse">
+            <div className="h-4 bg-white/10 rounded w-24 mb-2" />
+            <div className="h-8 bg-white/10 rounded w-32" />
           </div>
         ))}
       </div>
@@ -30,35 +30,35 @@ export function VATSummaryCard({ summary, year, month, isLoading }: VATSummaryCa
 
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-medium text-gray-500">
+      <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">
         VAT Summary - {monthName} {year}
       </h3>
 
       <div className="grid grid-cols-3 gap-4">
-        <div className="border rounded-lg p-4">
-          <p className="text-sm text-gray-500 mb-1">PPN Keluaran (Output VAT)</p>
-          <p className="text-xl font-bold text-blue-700">{formatIDR(summary.collected)}</p>
-          <p className="text-xs text-gray-400 mt-1">Collected from sales</p>
+        <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-1">PPN Keluaran (Output VAT)</p>
+          <p className="text-xl font-bold text-[var(--color-gold)]">{formatIDR(summary.collected)}</p>
+          <p className="text-xs text-[var(--theme-text-muted)] mt-1">Collected from sales</p>
         </div>
 
-        <div className="border rounded-lg p-4">
-          <p className="text-sm text-gray-500 mb-1">PPN Masukan (Input VAT)</p>
-          <p className="text-xl font-bold text-green-700">{formatIDR(summary.deductible)}</p>
-          <p className="text-xs text-gray-400 mt-1">Deductible from purchases</p>
+        <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-1">PPN Masukan (Input VAT)</p>
+          <p className="text-xl font-bold text-emerald-400">{formatIDR(summary.deductible)}</p>
+          <p className="text-xs text-[var(--theme-text-muted)] mt-1">Deductible from purchases</p>
         </div>
 
-        <div className={`border-2 rounded-lg p-4 ${
+        <div className={`border-2 rounded-xl p-4 ${
           summary.payable > 0
-            ? 'border-orange-300 bg-orange-50'
-            : 'border-green-300 bg-green-50'
+            ? 'border-[var(--color-gold)]/30 bg-[var(--color-gold)]/5'
+            : 'border-emerald-400/30 bg-emerald-400/5'
         }`}>
-          <p className="text-sm text-gray-500 mb-1">PPN Terutang (VAT Payable)</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-1">PPN Terutang (VAT Payable)</p>
           <p className={`text-xl font-bold ${
-            summary.payable > 0 ? 'text-orange-700' : 'text-green-700'
+            summary.payable > 0 ? 'text-[var(--color-gold)]' : 'text-emerald-400'
           }`}>
             {formatIDR(summary.payable)}
           </p>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-[var(--theme-text-muted)] mt-1">
             {summary.payable > 0 ? 'Amount due to DJP' : 'Credit balance'}
           </p>
         </div>

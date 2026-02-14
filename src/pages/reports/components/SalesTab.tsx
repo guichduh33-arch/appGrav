@@ -8,7 +8,7 @@ import { useDateRange } from '@/hooks/reports/useDateRange';
 import { formatCurrency } from '@/utils/helpers';
 import type { PaymentMethodStat } from '@/types/reporting';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const COLORS = ['#D4A843', '#10B981', '#3B82F6', '#F59E0B', '#8B5CF6'];
 
 export const SalesTab = () => {
   const { dateRange } = useDateRange({ defaultPreset: 'last7days' });
@@ -56,7 +56,7 @@ export const SalesTab = () => {
   }), [paymentStats, dateRange]);
 
   if (error) {
-    return <div className="p-8 text-center text-red-600">Error loading sales data. Please try again.</div>;
+    return <div className="p-8 text-center text-red-400">Error loading sales data. Please try again.</div>;
   }
 
   return (
@@ -68,10 +68,10 @@ export const SalesTab = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Payment Methods PieChart */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold mb-6">Payment Methods</h3>
+        <div className="bg-[var(--onyx-surface)] p-6 rounded-xl border border-white/5">
+          <h3 className="text-lg font-semibold text-white mb-6">Payment Methods</h3>
           {isLoading ? (
-            <div className="h-64 animate-pulse bg-gray-100 rounded-lg" />
+            <div className="h-64 animate-pulse bg-white/5 rounded-xl" />
           ) : (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -81,8 +81,8 @@ export const SalesTab = () => {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(val: number | undefined) => formatCurrency(val || 0)} />
-                  <Legend />
+                  <Tooltip formatter={(val: number | undefined) => formatCurrency(val || 0)} contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }} />
+                  <Legend wrapperStyle={{ color: 'rgba(255,255,255,0.6)' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -90,19 +90,19 @@ export const SalesTab = () => {
         </div>
 
         {/* Period Comparison BarChart */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold mb-6">Period Comparison</h3>
+        <div className="bg-[var(--onyx-surface)] p-6 rounded-xl border border-white/5">
+          <h3 className="text-lg font-semibold text-white mb-6">Period Comparison</h3>
           {isLoading ? (
-            <div className="h-64 animate-pulse bg-gray-100 rounded-lg" />
+            <div className="h-64 animate-pulse bg-white/5 rounded-xl" />
           ) : (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={comparison}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="period_label" tickFormatter={(val) => (val === 'current' ? 'This Period' : 'Previous')} />
-                  <YAxis tickFormatter={(val) => val / 1000 + 'k'} />
-                  <Tooltip formatter={(val: number | undefined) => formatCurrency(val || 0)} />
-                  <Bar dataKey="total_revenue" fill="#3b82f6" name="Revenue" radius={[4, 4, 0, 0]} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                  <XAxis dataKey="period_label" tickFormatter={(val) => (val === 'current' ? 'This Period' : 'Previous')} tick={{ fill: 'rgba(255,255,255,0.4)' }} />
+                  <YAxis tickFormatter={(val) => val / 1000 + 'k'} tick={{ fill: 'rgba(255,255,255,0.4)' }} />
+                  <Tooltip formatter={(val: number | undefined) => formatCurrency(val || 0)} contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }} />
+                  <Bar dataKey="total_revenue" fill="var(--color-gold)" name="Revenue" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="net_revenue" fill="#10b981" name="Net" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -112,37 +112,37 @@ export const SalesTab = () => {
       </div>
 
       {/* Detailed Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 box-border">
-          <h3 className="font-semibold text-gray-800">Payment Method Detail</h3>
+      <div className="bg-[var(--onyx-surface)] rounded-xl border border-white/5 overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/5 box-border">
+          <h3 className="font-semibold text-white">Payment Method Detail</h3>
         </div>
         <table className="w-full text-sm text-left">
-          <thead className="bg-gray-50 text-gray-500 border-b border-gray-100">
+          <thead className="bg-white/[0.02] border-b border-white/5">
             <tr>
-              <th className="px-6 py-3 font-medium">Method</th>
-              <th className="px-6 py-3 font-medium text-right">Transactions</th>
-              <th className="px-6 py-3 font-medium text-right">Total</th>
+              <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Method</th>
+              <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)] text-right">Transactions</th>
+              <th className="px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)] text-right">Total</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-white/5">
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i}>
-                  <td className="px-6 py-3"><div className="h-4 w-24 bg-gray-200 rounded animate-pulse" /></td>
-                  <td className="px-6 py-3 text-right"><div className="h-4 w-16 bg-gray-200 rounded animate-pulse ml-auto" /></td>
-                  <td className="px-6 py-3 text-right"><div className="h-4 w-20 bg-gray-200 rounded animate-pulse ml-auto" /></td>
+                  <td className="px-6 py-3"><div className="h-4 w-24 bg-white/5 rounded animate-pulse" /></td>
+                  <td className="px-6 py-3 text-right"><div className="h-4 w-16 bg-white/5 rounded animate-pulse ml-auto" /></td>
+                  <td className="px-6 py-3 text-right"><div className="h-4 w-20 bg-white/5 rounded animate-pulse ml-auto" /></td>
                 </tr>
               ))
             ) : paymentStats.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-6 py-12 text-center text-gray-400">No data available.</td>
+                <td colSpan={3} className="px-6 py-12 text-center text-[var(--theme-text-muted)]">No data available.</td>
               </tr>
             ) : (
               paymentStats.map((stat, i) => (
-                <tr key={i} className="hover:bg-gray-50">
-                  <td className="px-6 py-3 font-medium text-gray-900 capitalize">{stat.payment_method}</td>
-                  <td className="px-6 py-3 text-right text-gray-600">{stat.transaction_count}</td>
-                  <td className="px-6 py-3 text-right font-semibold text-gray-900">{formatCurrency(stat.total_revenue)}</td>
+                <tr key={i} className="hover:bg-white/[0.02]">
+                  <td className="px-6 py-3 font-medium text-white capitalize">{stat.payment_method}</td>
+                  <td className="px-6 py-3 text-right text-[var(--theme-text-muted)]">{stat.transaction_count}</td>
+                  <td className="px-6 py-3 text-right font-semibold text-[var(--color-gold)]">{formatCurrency(stat.total_revenue)}</td>
                 </tr>
               ))
             )}

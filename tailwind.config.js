@@ -215,8 +215,8 @@ export default {
           '50%': { opacity: '0.85', transform: 'scale(1.02)' }
         },
         'pulse-new': {
-          '0%, 100%': { boxShadow: '0 0 6px rgba(59, 130, 246, 0.2)' },
-          '50%': { boxShadow: '0 0 10px rgba(59, 130, 246, 0.35)' }
+          '0%, 100%': { boxShadow: '0 0 6px rgba(236, 91, 19, 0.2)' },
+          '50%': { boxShadow: '0 0 10px rgba(236, 91, 19, 0.35)' }
         },
         'pulse-critical': {
           '0%, 100%': { boxShadow: '0 0 8px rgba(239, 68, 68, 0.3)' },

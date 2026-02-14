@@ -16,13 +16,11 @@ export function UnsoldProductsTab() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Filter by minimum days
   const filteredData = useMemo(() => {
     if (!data) return [];
     return data.filter((item) => item.days_since_sale >= minDays);
   }, [data, minDays]);
 
-  // Summary stats
   const summary = useMemo(() => {
     const items = filteredData;
     return {
@@ -34,7 +32,6 @@ export function UnsoldProductsTab() {
     };
   }, [filteredData]);
 
-  // Export config
   const exportConfig: ExportConfig<IUnsoldProductsReport> = useMemo(() => ({
     data: filteredData,
     columns: [
@@ -63,38 +60,34 @@ export function UnsoldProductsTab() {
   const getDaysBadge = (days: number) => {
     if (days >= 90) {
       return (
-        <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-full">
-          {days}j
+        <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-red-500/10 text-red-400 rounded-full">
+          {days}d
         </span>
       );
     }
     if (days >= 60) {
       return (
-        <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-orange-100 text-orange-700 rounded-full">
-          {days}j
+        <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-amber-500/10 text-amber-400 rounded-full">
+          {days}d
         </span>
       );
     }
     if (days >= 30) {
       return (
-        <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-700 rounded-full">
-          {days}j
+        <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-yellow-500/10 text-yellow-400 rounded-full">
+          {days}d
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">
-        {days}j
+      <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-white/5 text-[var(--theme-text-muted)] rounded-full">
+        {days}d
       </span>
     );
   };
 
   if (error) {
-    return (
-      <div className="p-8 text-center text-red-600">
-        Error loading data
-      </div>
-    );
+    return <div className="p-8 text-center text-red-400">Error loading data</div>;
   }
 
   if (isLoading) {
@@ -106,13 +99,11 @@ export function UnsoldProductsTab() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <h2 className="text-lg font-semibold text-gray-900">Unsold Products</h2>
-
-          {/* Days Filter */}
+          <h2 className="text-lg font-semibold text-white">Unsold Products</h2>
           <select
             value={minDays}
             onChange={(e) => setMinDays(Number(e.target.value))}
-            className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 text-sm bg-black/40 border border-white/10 rounded-xl text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
           >
             <option value={7}>More than 7 days</option>
             <option value={14}>More than 14 days</option>
@@ -126,100 +117,94 @@ export function UnsoldProductsTab() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <div className="bg-[var(--onyx-surface)] rounded-xl p-6 border border-white/5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-red-50 rounded-lg">
-              <PackageX className="w-5 h-5 text-red-600" />
+            <div className="p-2 bg-red-500/10 rounded-lg">
+              <PackageX className="w-5 h-5 text-red-400" />
             </div>
-            <span className="text-sm text-gray-600">Unsold Products</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Unsold Products</span>
           </div>
-          <p className="text-2xl font-bold text-red-600">
-            {summary.totalProducts}
-          </p>
+          <p className="text-2xl font-bold text-red-400">{summary.totalProducts}</p>
         </div>
 
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <div className="bg-[var(--onyx-surface)] rounded-xl p-6 border border-white/5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-purple-50 rounded-lg">
-              <DollarSign className="w-5 h-5 text-purple-600" />
+            <div className="p-2 bg-purple-500/10 rounded-lg">
+              <DollarSign className="w-5 h-5 text-purple-400" />
             </div>
-            <span className="text-sm text-gray-600">Locked Stock Value</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Locked Stock Value</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900">
-            {formatCurrency(summary.totalStockValue)}
-          </p>
+          <p className="text-2xl font-bold text-white">{formatCurrency(summary.totalStockValue)}</p>
         </div>
 
-        <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+        <div className="bg-[var(--onyx-surface)] rounded-xl p-6 border border-white/5">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-orange-50 rounded-lg">
-              <Calendar className="w-5 h-5 text-orange-600" />
+            <div className="p-2 bg-amber-500/10 rounded-lg">
+              <Calendar className="w-5 h-5 text-amber-400" />
             </div>
-            <span className="text-sm text-gray-600">Avg Days Without Sale</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Avg Days Without Sale</span>
           </div>
-          <p className="text-2xl font-bold text-orange-600">
-            {`${summary.avgDaysSinceLastSale}d`}
-          </p>
+          <p className="text-2xl font-bold text-amber-400">{`${summary.avgDaysSinceLastSale}d`}</p>
         </div>
       </div>
 
       {/* Data Table */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Products unsold for {minDays}+ days</h3>
+      <div className="bg-[var(--onyx-surface)] rounded-xl border border-white/5 overflow-hidden">
+        <div className="px-6 py-4 border-b border-white/5">
+          <h3 className="text-lg font-semibold text-white">Products unsold for {minDays}+ days</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Stock</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Last Sale</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Days</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Sold</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Stock Value</th>
+            <thead>
+              <tr className="border-b border-white/5">
+                <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Product</th>
+                <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Category</th>
+                <th className="px-6 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Stock</th>
+                <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Last Sale</th>
+                <th className="px-6 py-3 text-center text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Days</th>
+                <th className="px-6 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Total Sold</th>
+                <th className="px-6 py-3 text-right text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Stock Value</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody>
               {filteredData.length > 0 ? (
                 filteredData.map((row) => (
-                  <tr key={row.product_id} className="hover:bg-gray-50">
+                  <tr key={row.product_id} className="border-b border-white/5 hover:bg-white/[0.02]">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gray-100 rounded-lg">
-                          <Package className="w-4 h-4 text-gray-600" />
+                        <div className="p-2 bg-white/5 rounded-lg">
+                          <Package className="w-4 h-4 text-[var(--theme-text-muted)]" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{row.product_name}</p>
-                          {row.sku && <p className="text-xs text-gray-500">{row.sku}</p>}
+                          <p className="text-sm font-medium text-white">{row.product_name}</p>
+                          {row.sku && <p className="text-xs text-[var(--theme-text-muted)]">{row.sku}</p>}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{row.category_name || '-'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900 text-right font-medium">
+                    <td className="px-6 py-4 text-sm text-[var(--theme-text-muted)]">{row.category_name || '-'}</td>
+                    <td className="px-6 py-4 text-sm text-white text-right font-medium">
                       {row.current_stock} {row.unit}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-[var(--theme-text-muted)]">
                       {row.last_sale_at
                         ? new Date(row.last_sale_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })
-                        : <span className="text-gray-400 italic">Never sold</span>
+                        : <span className="text-[var(--theme-text-muted)]/60 italic">Never sold</span>
                       }
                     </td>
                     <td className="px-6 py-4 text-center">
                       {getDaysBadge(row.days_since_sale)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 text-right">
+                    <td className="px-6 py-4 text-sm text-[var(--theme-text-muted)] text-right">
                       {row.total_units_sold}
                     </td>
-                    <td className="px-6 py-4 text-sm text-purple-600 text-right font-medium">
+                    <td className="px-6 py-4 text-sm text-purple-400 text-right font-medium">
                       {formatCurrency(row.stock_value)}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={7} className="px-6 py-8 text-center text-[var(--theme-text-muted)]">
                     No unsold products for {minDays}+ days
                   </td>
                 </tr>

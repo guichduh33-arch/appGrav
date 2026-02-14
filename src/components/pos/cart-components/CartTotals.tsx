@@ -18,15 +18,15 @@ export const CartTotals = memo(function CartTotals({ subtotal, discountAmount, t
     const taxAmount = Math.round(total * 10 / 110)
 
     return (
-        <div className="px-8 py-6 bg-[var(--theme-bg-secondary)] border-t border-white/5">
+        <div className="px-8 py-6 bg-black/20 border-t border-[var(--color-gold)]/20">
             {/* Subtotal row */}
-            <div className="flex justify-between mb-2 text-xs text-[#8E8E93] uppercase tracking-wider font-medium">
+            <div className="flex justify-between mb-2 text-xs text-[var(--muted-smoke)] uppercase tracking-wider font-medium">
                 <span>Subtotal</span>
                 <span className="font-bold text-white tracking-normal">{formatPrice(subtotal)}</span>
             </div>
             {/* Promotion discounts */}
             {promotionTotalDiscount > 0 && (
-                <div className="flex justify-between mb-2 text-xs text-[#8E8E93] uppercase tracking-wider font-medium">
+                <div className="flex justify-between mb-2 text-xs text-[var(--muted-smoke)] uppercase tracking-wider font-medium">
                     <span className="flex items-center gap-1.5 text-success">
                         <Percent size={12} strokeWidth={2.5} />
                         Promo Sav.
@@ -37,10 +37,10 @@ export const CartTotals = memo(function CartTotals({ subtotal, discountAmount, t
                 </div>
             )}
             {/* Discount row */}
-            <div className="flex justify-between mb-2 text-xs text-[#8E8E93] uppercase tracking-wider font-medium">
+            <div className="flex justify-between mb-2 text-xs text-[var(--muted-smoke)] uppercase tracking-wider font-medium">
                 <button
                     type="button"
-                    className="bg-transparent border-none p-0 text-[#8E8E93] text-[10px] uppercase tracking-widest font-bold cursor-pointer transition-all duration-200 flex items-center gap-1.5 hover:text-[var(--color-gold)]"
+                    className="bg-transparent border-none p-0 text-[var(--muted-smoke)] text-[10px] uppercase tracking-widest font-bold cursor-pointer transition-all duration-200 flex items-center gap-1.5 hover:text-[var(--color-gold)]"
                     onClick={onDiscountClick}
                 >
                     <Tag size={12} />
@@ -51,14 +51,14 @@ export const CartTotals = memo(function CartTotals({ subtotal, discountAmount, t
                 </span>
             </div>
             {/* Tax row */}
-            <div className="flex justify-between mb-4 text-[10px] text-[#8E8E93] uppercase tracking-widest font-medium opacity-50">
+            <div className="flex justify-between mb-4 text-[10px] text-[var(--muted-smoke)] uppercase tracking-widest font-medium opacity-50">
                 <span>Tax Included (10%)</span>
                 <span>{formatPrice(taxAmount)}</span>
             </div>
             {/* Grand total row */}
             <div className="flex justify-between mt-4 pt-4 border-t border-white/10 mb-0">
                 <span className="text-sm font-bold text-white tracking-[0.2em] font-display uppercase">Total Amount</span>
-                <span className="text-2xl font-bold text-[var(--color-gold)] font-display tracking-tight">{formatPrice(total)}</span>
+                <span className="text-xl font-semibold text-[var(--color-gold)] font-display tracking-tight">{formatPrice(total)}</span>
             </div>
         </div>
     )

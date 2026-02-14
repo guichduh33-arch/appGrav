@@ -42,8 +42,8 @@ const ProductCard = memo(function ProductCard({
     return (
         <button
             className={cn(
-                'group relative flex flex-col bg-[#161618] border border-white/5 rounded-xl p-0 cursor-pointer transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden h-full text-left',
-                'hover:-translate-y-1 hover:shadow-2xl hover:shadow-[var(--color-gold)]/15 hover:border-[var(--color-gold)]/40',
+                'group relative flex flex-col bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-0 cursor-pointer transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden h-full text-left',
+                'hover:-translate-y-1 hover:shadow-2xl hover:shadow-[var(--color-gold)]/5 hover:border-[var(--color-gold)]/40',
                 'active:scale-[0.98]',
                 isOutOfStock && 'opacity-60 hover:opacity-80',
                 bouncing && 'pos-bounce'
@@ -100,7 +100,7 @@ const ProductCard = memo(function ProductCard({
                 {product.name}
             </div>
 
-            <div className="px-5 pt-0.5 pb-5 text-sm font-bold text-[var(--color-gold)] tracking-widest uppercase">
+            <div className="px-5 pt-0.5 pb-5 text-sm font-semibold text-[var(--color-gold)] tracking-wider uppercase">
                 {formatPrice(product.retail_price || 0)}
             </div>
         </button>
@@ -132,7 +132,7 @@ function ProductGrid({ products, onProductClick, isLoading }: ProductGridProps) 
         return (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6 w-full pb-xl">
                 {[...Array(8)].map((_, i) => (
-                    <div key={i} className="h-[260px] bg-[#161618] rounded-xl animate-pulse" />
+                    <div key={i} className="h-[260px] bg-[var(--onyx-surface)] rounded-xl animate-pulse" />
                 ))}
             </div>
         )

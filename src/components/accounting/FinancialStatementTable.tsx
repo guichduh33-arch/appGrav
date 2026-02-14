@@ -19,31 +19,34 @@ export function FinancialStatementSection({
   totalLabel,
 }: FinancialStatementSectionProps) {
   return (
-    <div className="border rounded-lg overflow-hidden">
-      <div className="bg-gray-50 px-4 py-2 font-semibold text-sm border-b">
-        {title}
+    <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-white/5 flex items-center gap-2">
+        <div className="w-1 h-4 rounded-full bg-[var(--color-gold)]" />
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">
+          {title}
+        </span>
       </div>
       <table className="w-full text-sm">
-        <tbody className="divide-y">
+        <tbody>
           {accounts.map(acc => (
-            <tr key={acc.account_code} className="hover:bg-gray-50">
-              <td className="px-4 py-2 font-mono text-gray-500 w-20">{acc.account_code}</td>
-              <td className="px-4 py-2">{acc.account_name}</td>
-              <td className="px-4 py-2 text-right font-mono">{formatIDR(acc.amount)}</td>
+            <tr key={acc.account_code} className="border-b border-white/5 hover:bg-white/[0.02]">
+              <td className="px-4 py-2 font-mono text-[var(--theme-text-muted)] w-20">{acc.account_code}</td>
+              <td className="px-4 py-2 text-white">{acc.account_name}</td>
+              <td className="px-4 py-2 text-right font-mono text-white">{formatIDR(acc.amount)}</td>
             </tr>
           ))}
           {accounts.length === 0 && (
             <tr>
-              <td colSpan={3} className="px-4 py-3 text-center text-gray-400">
+              <td colSpan={3} className="px-4 py-3 text-center text-[var(--theme-text-muted)]">
                 No data
               </td>
             </tr>
           )}
         </tbody>
         <tfoot>
-          <tr className="bg-gray-50 font-semibold border-t">
-            <td colSpan={2} className="px-4 py-2">{totalLabel || `Total ${title}`}</td>
-            <td className="px-4 py-2 text-right font-mono">{formatIDR(total)}</td>
+          <tr className="bg-black/20 border-t-2 border-[var(--color-gold)]">
+            <td colSpan={2} className="px-4 py-2 font-bold text-white">{totalLabel || `Total ${title}`}</td>
+            <td className="px-4 py-2 text-right font-mono font-bold text-[var(--color-gold)]">{formatIDR(total)}</td>
           </tr>
         </tfoot>
       </table>
@@ -69,17 +72,17 @@ export function FinancialStatementTable({
       ))}
 
       {grandTotal && (
-        <div className="border-2 border-gray-300 rounded-lg px-4 py-3 flex items-center justify-between bg-gray-50">
-          <span className="font-bold">{grandTotal.label}</span>
-          <span className="font-bold font-mono text-lg">{formatIDR(grandTotal.amount)}</span>
+        <div className="bg-black/20 border-2 border-[var(--color-gold)] rounded-xl px-4 py-3 flex items-center justify-between">
+          <span className="font-bold text-white">{grandTotal.label}</span>
+          <span className="font-bold font-mono text-lg text-[var(--color-gold)]">{formatIDR(grandTotal.amount)}</span>
         </div>
       )}
 
       {balanceCheck && (
-        <div className={`rounded-lg px-4 py-2 text-sm font-medium ${
+        <div className={`rounded-xl px-4 py-2 text-sm font-medium ${
           balanceCheck.isBalanced
-            ? 'bg-green-50 text-green-700 border border-green-200'
-            : 'bg-red-50 text-red-700 border border-red-200'
+            ? 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20'
+            : 'bg-red-400/10 text-red-400 border border-red-400/20'
         }`}>
           {balanceCheck.isBalanced
             ? `${balanceCheck.label}: Balanced`

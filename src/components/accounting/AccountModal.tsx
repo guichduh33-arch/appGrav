@@ -84,13 +84,13 @@ export function AccountModal({ account, onClose }: AccountModalProps) {
   )
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div className="bg-[var(--theme-bg-secondary)] border border-white/10 rounded-xl shadow-xl w-full max-w-md mx-4">
+        <div className="flex items-center justify-between p-4 border-b border-white/5">
+          <h2 className="text-lg font-semibold text-white">
             {isEdit ? 'Edit Account' : 'New Account'}
           </h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded">
+          <button onClick={onClose} className="p-1 hover:bg-white/5 rounded text-white/60 hover:text-white transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -98,11 +98,11 @@ export function AccountModal({ account, onClose }: AccountModalProps) {
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           {!isEdit && (
             <div>
-              <label className="block text-sm font-medium mb-1">Account Type</label>
+              <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-1">Account Type</label>
               <select
                 value={accountType}
                 onChange={e => setAccountType(e.target.value as TAccountType)}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
               >
                 {ACCOUNT_TYPE_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -113,19 +113,19 @@ export function AccountModal({ account, onClose }: AccountModalProps) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium mb-1">Code</label>
+              <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-1">Code</label>
               <input
                 type="text"
                 value={code}
                 onChange={e => setCode(e.target.value)}
                 disabled={isEdit}
-                className="w-full border rounded-lg px-3 py-2 disabled:bg-gray-100"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none disabled:opacity-40"
                 placeholder="e.g. 1100"
               />
-              {errors.code && <p className="text-red-500 text-xs mt-1">{errors.code}</p>}
+              {errors.code && <p className="text-red-400 text-xs mt-1">{errors.code}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Class</label>
+              <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-1">Class</label>
               <input
                 type="number"
                 value={accountClass}
@@ -133,30 +133,30 @@ export function AccountModal({ account, onClose }: AccountModalProps) {
                 disabled={isEdit}
                 min={1}
                 max={7}
-                className="w-full border rounded-lg px-3 py-2 disabled:bg-gray-100"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none disabled:opacity-40"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Name</label>
+            <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-1">Name</label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2"
+              className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
               placeholder="Account name"
             />
-            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+            {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
           </div>
 
           {parentOptions.length > 0 && (
             <div>
-              <label className="block text-sm font-medium mb-1">Parent Account (optional)</label>
+              <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-1">Parent Account (optional)</label>
               <select
                 value={parentId}
                 onChange={e => setParentId(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
               >
                 <option value="">None</option>
                 {parentOptions.map(a => (
@@ -170,14 +170,14 @@ export function AccountModal({ account, onClose }: AccountModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-sm bg-transparent border border-white/10 text-white rounded-xl hover:border-white/20 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={createAccount.isPending || updateAccount.isPending}
-              className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 text-sm bg-[var(--color-gold)] text-black font-bold rounded-xl hover:brightness-110 disabled:opacity-50 transition-all"
             >
               {isEdit ? 'Update' : 'Create'}
             </button>

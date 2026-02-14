@@ -23,9 +23,9 @@ export default function ShiftReconciliationModal({
     }
 
     const diffColorClass = (diff: number) => {
-        if (diff > 0) return 'text-emerald-700'
-        if (diff < 0) return 'text-red-600'
-        return 'text-slate-500'
+        if (diff > 0) return 'text-[var(--color-success-text)]'
+        if (diff < 0) return 'text-[var(--color-danger-text)]'
+        return 'text-[var(--theme-text-muted)]'
     }
 
     const totalExpected = reconciliation.cash.expected + reconciliation.qris.expected + reconciliation.edc.expected
@@ -34,51 +34,64 @@ export default function ShiftReconciliationModal({
 
     const hasDiscrepancy = totalDifference !== 0
 
+    const now = new Date()
+    const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase()
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
+
     return (
-        <div className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/60 p-4">
-            <div className="flex w-full max-w-[560px] max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] max-[480px]:max-h-screen max-[480px]:rounded-none">
-                <div className="flex items-start gap-4 border-b border-slate-200 p-6">
-                    <div className={cn(
-                        'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl',
-                        hasDiscrepancy ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-700'
-                    )}>
-                        {hasDiscrepancy ? <AlertTriangle size={24} /> : <CheckCircle size={24} />}
+        <div className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+            <div className="flex w-full max-w-[560px] max-h-[90vh] flex-col overflow-hidden rounded-xl bg-[var(--theme-bg-primary)] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] text-white max-[480px]:max-h-screen max-[480px]:rounded-none">
+                {/* Header */}
+                <div className="flex items-center justify-between px-8 py-5 border-b border-white/5">
+                    <div className="flex items-center gap-4">
+                        <span className="text-2xl font-display italic font-bold text-[var(--color-gold)]">B</span>
+                        <span className="text-sm font-bold uppercase tracking-[0.2em]">Reconciliation</span>
                     </div>
-                    <div>
-                        <h2 className="m-0 text-xl font-bold text-slate-900">
-                            Shift Reconciliation
-                        </h2>
-                        <p className="mt-1 text-sm text-slate-500">
-                            {hasDiscrepancy
-                                ? 'Discrepancies have been detected'
-                                : 'All amounts match'
-                            }
-                        </p>
+                    <div className="flex items-center gap-6 text-xs text-[var(--theme-text-muted)]">
+                        <div className="text-right">
+                            <div className="font-bold text-white">{dateStr}</div>
+                            <div>{timeStr}</div>
+                        </div>
                     </div>
                     <button
-                        className="ml-auto cursor-pointer rounded-lg border-none bg-transparent p-2 text-slate-400 transition-all duration-150 hover:bg-slate-100 hover:text-slate-500"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-transparent text-[var(--theme-text-muted)] hover:text-white hover:border-white/20 cursor-pointer transition-colors"
                         onClick={onClose}
+                        aria-label="Close"
                     >
-                        <X size={24} />
+                        <X size={18} />
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6">
+                <div className="flex-1 overflow-y-auto p-8">
+                    {/* Status Banner */}
+                    <div className={cn(
+                        'flex items-center gap-3 mb-6 p-4 rounded-lg border',
+                        hasDiscrepancy
+                            ? 'bg-[var(--color-warning-bg)] border-[var(--color-warning-border)] text-[var(--color-warning-text)]'
+                            : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                    )}>
+                        {hasDiscrepancy ? <AlertTriangle size={20} /> : <CheckCircle size={20} />}
+                        <span className="text-sm font-semibold">
+                            {hasDiscrepancy ? 'Discrepancies have been detected' : 'All amounts match'}
+                        </span>
+                    </div>
+
                     {/* Summary Stats */}
-                    <div className="mb-5 flex gap-4">
-                        <div className="flex-1 rounded-xl bg-slate-50 p-4 text-center">
-                            <span className="mb-1 block text-xs text-slate-500">Total sales</span>
-                            <span className="text-xl font-bold text-slate-900">{formatPrice(totalSales)}</span>
+                    <div className="mb-6 grid grid-cols-2 gap-3">
+                        <div className="bg-[var(--theme-bg-secondary)] p-6 rounded-lg border border-white/5 text-center">
+                            <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase block mb-1">Total Sales</span>
+                            <span className="text-xl font-bold">{formatPrice(totalSales)}</span>
                         </div>
-                        <div className="flex-1 rounded-xl bg-slate-50 p-4 text-center">
-                            <span className="mb-1 block text-xs text-slate-500">Transactions</span>
-                            <span className="text-xl font-bold text-slate-900">{transactionCount}</span>
+                        <div className="bg-[var(--theme-bg-secondary)] p-6 rounded-lg border border-white/5 text-center">
+                            <span className="text-[10px] font-bold tracking-[0.2em] text-[var(--theme-text-muted)] uppercase block mb-1">Transactions</span>
+                            <span className="text-xl font-bold">{transactionCount}</span>
                         </div>
                     </div>
 
                     {/* Reconciliation Table */}
-                    <div className="mb-4 overflow-hidden rounded-xl bg-slate-50">
-                        <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] gap-2 bg-slate-200 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 max-[480px]:grid-cols-[1fr_1fr] max-[480px]:gap-y-1">
+                    <div className="mb-6 overflow-hidden rounded-lg border border-white/5">
+                        {/* Table Header */}
+                        <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] gap-2 bg-[var(--theme-bg-tertiary)] px-4 py-3 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] max-[480px]:grid-cols-[1fr_1fr] max-[480px]:gap-y-1">
                             <span>Type</span>
                             <span>Expected</span>
                             <span>Actual</span>
@@ -86,13 +99,13 @@ export default function ShiftReconciliationModal({
                         </div>
 
                         {/* Cash Row */}
-                        <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] items-center gap-2 border-b border-slate-200 px-4 py-3 max-[480px]:grid-cols-[1fr_1fr] max-[480px]:gap-y-1">
-                            <div className="flex items-center gap-2 font-semibold text-slate-700 max-[480px]:col-span-2">
-                                <Banknote size={18} className="rounded-md bg-emerald-100 p-0.5 text-emerald-700" />
+                        <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] items-center gap-2 border-b border-white/5 bg-[var(--theme-bg-secondary)] px-4 py-3 max-[480px]:grid-cols-[1fr_1fr] max-[480px]:gap-y-1">
+                            <div className="flex items-center gap-2 font-semibold text-white max-[480px]:col-span-2">
+                                <Banknote size={18} className="text-[var(--color-gold)]" />
                                 <span>Cash</span>
                             </div>
-                            <span className="text-right text-sm text-slate-700">{formatPrice(reconciliation.cash.expected)}</span>
-                            <span className="text-right text-sm text-slate-700">{formatPrice(reconciliation.cash.actual)}</span>
+                            <span className="text-right text-sm text-[var(--theme-text-secondary)]">{formatPrice(reconciliation.cash.expected)}</span>
+                            <span className="text-right text-sm text-[var(--theme-text-secondary)]">{formatPrice(reconciliation.cash.actual)}</span>
                             <span className={cn('flex items-center justify-end gap-1 text-sm font-semibold', diffColorClass(reconciliation.cash.difference))}>
                                 {getDifferenceIcon(reconciliation.cash.difference)}
                                 {formatPrice(Math.abs(reconciliation.cash.difference))}
@@ -100,13 +113,13 @@ export default function ShiftReconciliationModal({
                         </div>
 
                         {/* QRIS Row */}
-                        <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] items-center gap-2 border-b border-slate-200 px-4 py-3 max-[480px]:grid-cols-[1fr_1fr] max-[480px]:gap-y-1">
-                            <div className="flex items-center gap-2 font-semibold text-slate-700 max-[480px]:col-span-2">
-                                <QrCode size={18} className="rounded-md bg-blue-100 p-0.5 text-blue-600" />
+                        <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] items-center gap-2 border-b border-white/5 bg-[var(--theme-bg-secondary)] px-4 py-3 max-[480px]:grid-cols-[1fr_1fr] max-[480px]:gap-y-1">
+                            <div className="flex items-center gap-2 font-semibold text-white max-[480px]:col-span-2">
+                                <QrCode size={18} className="text-[var(--color-gold)]" />
                                 <span>QRIS</span>
                             </div>
-                            <span className="text-right text-sm text-slate-700">{formatPrice(reconciliation.qris.expected)}</span>
-                            <span className="text-right text-sm text-slate-700">{formatPrice(reconciliation.qris.actual)}</span>
+                            <span className="text-right text-sm text-[var(--theme-text-secondary)]">{formatPrice(reconciliation.qris.expected)}</span>
+                            <span className="text-right text-sm text-[var(--theme-text-secondary)]">{formatPrice(reconciliation.qris.actual)}</span>
                             <span className={cn('flex items-center justify-end gap-1 text-sm font-semibold', diffColorClass(reconciliation.qris.difference))}>
                                 {getDifferenceIcon(reconciliation.qris.difference)}
                                 {formatPrice(Math.abs(reconciliation.qris.difference))}
@@ -114,13 +127,13 @@ export default function ShiftReconciliationModal({
                         </div>
 
                         {/* EDC Row */}
-                        <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] items-center gap-2 border-b border-slate-200 px-4 py-3 max-[480px]:grid-cols-[1fr_1fr] max-[480px]:gap-y-1">
-                            <div className="flex items-center gap-2 font-semibold text-slate-700 max-[480px]:col-span-2">
-                                <CreditCard size={18} className="rounded-md bg-purple-100 p-0.5 text-violet-600" />
-                                <span>EDC/Carte</span>
+                        <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] items-center gap-2 border-b border-white/5 bg-[var(--theme-bg-secondary)] px-4 py-3 max-[480px]:grid-cols-[1fr_1fr] max-[480px]:gap-y-1">
+                            <div className="flex items-center gap-2 font-semibold text-white max-[480px]:col-span-2">
+                                <CreditCard size={18} className="text-[var(--color-gold)]" />
+                                <span>EDC/Card</span>
                             </div>
-                            <span className="text-right text-sm text-slate-700">{formatPrice(reconciliation.edc.expected)}</span>
-                            <span className="text-right text-sm text-slate-700">{formatPrice(reconciliation.edc.actual)}</span>
+                            <span className="text-right text-sm text-[var(--theme-text-secondary)]">{formatPrice(reconciliation.edc.expected)}</span>
+                            <span className="text-right text-sm text-[var(--theme-text-secondary)]">{formatPrice(reconciliation.edc.actual)}</span>
                             <span className={cn('flex items-center justify-end gap-1 text-sm font-semibold', diffColorClass(reconciliation.edc.difference))}>
                                 {getDifferenceIcon(reconciliation.edc.difference)}
                                 {formatPrice(Math.abs(reconciliation.edc.difference))}
@@ -128,13 +141,13 @@ export default function ShiftReconciliationModal({
                         </div>
 
                         {/* Total Row */}
-                        <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] items-center gap-2 bg-slate-200 px-4 py-3 font-bold max-[480px]:grid-cols-[1fr_1fr] max-[480px]:gap-y-1">
+                        <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] items-center gap-2 bg-[var(--theme-bg-tertiary)] px-4 py-3 font-bold max-[480px]:grid-cols-[1fr_1fr] max-[480px]:gap-y-1">
                             <div className="flex items-center gap-2 max-[480px]:col-span-2">
-                                <span className="font-bold text-slate-900">TOTAL</span>
+                                <span className="font-bold text-white">TOTAL</span>
                             </div>
-                            <span className="text-right text-sm font-bold text-slate-900">{formatPrice(totalExpected)}</span>
-                            <span className="text-right text-sm font-bold text-slate-900">{formatPrice(totalActual)}</span>
-                            <span className={cn('flex items-center justify-end gap-1 text-base font-semibold', diffColorClass(totalDifference))}>
+                            <span className="text-right text-sm font-bold">{formatPrice(totalExpected)}</span>
+                            <span className="text-right text-sm font-bold">{formatPrice(totalActual)}</span>
+                            <span className={cn('flex items-center justify-end gap-1 text-base font-bold', diffColorClass(totalDifference))}>
                                 {getDifferenceIcon(totalDifference)}
                                 {formatPrice(Math.abs(totalDifference))}
                             </span>
@@ -144,8 +157,10 @@ export default function ShiftReconciliationModal({
                     {/* Warning if discrepancy */}
                     {hasDiscrepancy && (
                         <div className={cn(
-                            'mb-4 flex gap-3 rounded-xl p-4',
-                            totalDifference > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-800'
+                            'mb-6 flex gap-3 rounded-lg p-4 border',
+                            totalDifference > 0
+                                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                                : 'bg-red-500/10 border-red-500/20 text-red-400'
                         )}>
                             <AlertTriangle size={20} className="mt-0.5 shrink-0" />
                             <div>
@@ -155,7 +170,7 @@ export default function ShiftReconciliationModal({
                                         : 'Shortage detected'
                                     }
                                 </strong>
-                                <p className="m-0 text-sm opacity-90">
+                                <p className="m-0 text-sm opacity-80">
                                     {totalDifference > 0
                                         ? 'The actual amount is higher than expected.'
                                         : 'The actual amount is lower than expected.'
@@ -165,13 +180,14 @@ export default function ShiftReconciliationModal({
                         </div>
                     )}
 
-                    <div className="mt-2 flex gap-3 border-t border-slate-200 pt-4">
+                    {/* Action Button */}
+                    <div className="flex flex-col gap-3 border-t border-white/5 pt-6">
                         <button
                             type="button"
-                            className="flex w-full flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border-none bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-all duration-150 hover:bg-blue-700"
+                            className="w-full bg-[var(--color-gold)] rounded-xl text-black py-6 text-[13px] font-bold tracking-[0.25em] uppercase shadow-xl shadow-[var(--color-gold)]/10 cursor-pointer transition-all hover:brightness-110 flex items-center justify-center gap-2"
                             onClick={onClose}
                         >
-                            <CheckCircle size={18} />
+                            <CheckCircle size={16} />
                             Understood
                         </button>
                     </div>

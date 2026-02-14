@@ -53,25 +53,25 @@ function getBarBg(severity: string): string {
  */
 export function InventoryMonitor({ items, isLoading }: InventoryMonitorProps) {
     return (
-        <div className="bg-[var(--theme-bg-secondary)] rounded-2xl p-6 border border-[var(--theme-border)] shadow-sm">
+        <div className="bg-[var(--onyx-surface)] rounded-2xl p-6 border border-white/5">
             {/* Header */}
             <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                    <Package size={16} className="text-[var(--theme-text-secondary)]" />
-                    <h3 className="text-sm font-semibold text-[var(--theme-text-secondary)] uppercase tracking-wider">
+                <div className="flex items-center gap-2.5">
+                    <Package size={15} className="text-[var(--color-gold)]" />
+                    <h3 className="text-[10px] font-semibold text-[var(--muted-smoke)] uppercase tracking-wider">
                         Inventory Monitor
                     </h3>
                     {items.length > 0 && (
-                        <span className="bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] text-xs font-medium px-2 py-0.5 rounded-full border border-[var(--theme-border)]">
+                        <span className="bg-[var(--color-danger-bg)] text-[var(--color-danger-text)] text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/5">
                             {items.length}
                         </span>
                     )}
                 </div>
                 <Link
                     to="/inventory"
-                    className="text-sm text-[var(--color-gold)] hover:text-[var(--color-gold-light)] flex items-center gap-1 transition-colors"
+                    className="text-xs text-[var(--color-gold)] hover:text-[var(--color-gold-light)] flex items-center gap-1 transition-colors"
                 >
-                    View all <ArrowRight size={14} />
+                    View all <ArrowRight size={13} />
                 </Link>
             </div>
             <p className="text-xs text-[var(--theme-text-muted)] mb-5">
@@ -80,15 +80,15 @@ export function InventoryMonitor({ items, isLoading }: InventoryMonitorProps) {
 
             {/* Content */}
             {isLoading ? (
-                <div className="space-y-4">
-                    {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-16" />)}
+                <div className="space-y-3">
+                    {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-16 rounded-xl bg-[var(--theme-bg-tertiary)]" />)}
                 </div>
             ) : items.length === 0 ? (
                 <p className="text-sm text-[var(--theme-text-muted)] text-center py-8">
                     All stock levels are healthy
                 </p>
             ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                     {items.map(item => {
                         const percent = getStockPercent(item.current_stock, item.min_stock_level);
                         const barColor = getBarColor(item.severity);
@@ -97,26 +97,26 @@ export function InventoryMonitor({ items, isLoading }: InventoryMonitorProps) {
                         return (
                             <div
                                 key={item.id}
-                                className="group p-4 rounded-xl bg-[var(--theme-bg-tertiary)]/40 border border-[var(--theme-border)]/50 hover:border-[var(--theme-border)] transition-colors"
+                                className="group p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors"
                             >
-                                <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center justify-between mb-2.5">
                                     <div className="min-w-0">
-                                        <span className="text-sm font-medium text-[var(--theme-text-primary)] block truncate">
+                                        <span className="text-sm font-medium text-white block truncate">
                                             {item.name}
                                         </span>
                                         {item.supplier_name && (
-                                            <span className="text-[11px] text-[var(--theme-text-muted)]">
+                                            <span className="text-[11px] text-[var(--muted-smoke)]">
                                                 Supplier: {item.supplier_name}
                                             </span>
                                         )}
                                     </div>
-                                    <div className="flex items-center gap-2 shrink-0 ml-3">
-                                        <span className="text-xs font-mono text-[var(--theme-text-secondary)]">
+                                    <div className="flex items-center gap-2.5 shrink-0 ml-3">
+                                        <span className="text-xs font-mono text-[var(--muted-smoke)]">
                                             {item.current_stock} {item.unit_name}
                                         </span>
                                         <span
                                             className={cn(
-                                                'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider',
+                                                'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-white/5',
                                                 item.severity === 'critical'
                                                     ? 'bg-[var(--color-danger-bg)] text-[var(--color-danger-text)]'
                                                     : item.severity === 'warning'
@@ -131,11 +131,11 @@ export function InventoryMonitor({ items, isLoading }: InventoryMonitorProps) {
 
                                 {/* Progress bar */}
                                 <div
-                                    className="h-2 rounded-full overflow-hidden"
+                                    className="h-1.5 rounded-full overflow-hidden"
                                     style={{ backgroundColor: barBg }}
                                 >
                                     <div
-                                        className="h-2 rounded-full transition-all duration-700 ease-out"
+                                        className="h-1.5 rounded-full transition-all duration-700 ease-out"
                                         style={{
                                             width: `${percent}%`,
                                             backgroundColor: barColor,

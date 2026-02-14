@@ -219,51 +219,56 @@ export default function StockOpnameForm() {
         i.product.sku.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
-    if (!session) return <div className="flex h-screen flex-col bg-gray-50"><div className="p-8 text-center text-gray-500">Loading...</div></div>
+    if (!session) return (
+        <div className="flex h-screen flex-col bg-[var(--theme-bg-primary)]">
+            <div className="p-8 text-center text-[var(--theme-text-muted)]">Loading...</div>
+        </div>
+    )
 
     const isLocked = session.status !== 'draft'
 
     return (
-        <div className="flex h-screen flex-col bg-gray-50">
-            <header className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4 shadow-sm">
+        <div className="flex h-screen flex-col bg-[var(--theme-bg-primary)]">
+            {/* Header */}
+            <header className="sticky top-0 z-10 flex items-center justify-between border-b border-white/5 bg-[var(--theme-bg-primary)] px-8 py-4">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => navigate('/inventory/stock-opname')}
-                        className="flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-[var(--theme-text-muted)] transition-colors hover:bg-white/5 hover:text-white hover:border-white/20"
                         aria-label="Back"
                     >
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <div className="flex items-center gap-2">
-                            <h1 className="text-xl font-bold">{session.count_number ?? ''}</h1>
+                        <div className="flex items-center gap-3">
+                            <h1 className="font-display text-xl text-white">{session.count_number ?? ''}</h1>
                             <StatusBadge status={session.status ?? 'draft'} />
                             {session.section && (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                <span className="inline-flex items-center px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-[var(--color-gold)]/10 text-[var(--color-gold)] border border-[var(--color-gold)]/20">
                                     {session.section.name}
                                 </span>
                             )}
                         </div>
-                        <p className="flex items-center gap-2 text-sm text-gray-500">
+                        <p className="text-sm text-[var(--theme-text-muted)] mt-0.5">
                             {session.created_at ? new Date(session.created_at).toLocaleDateString() : ''}
                         </p>
                     </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                     {!isLocked && (
                         <>
                             <button
                                 onClick={saveDraft}
                                 disabled={status === 'saving'}
-                                className="btn btn-secondary"
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-transparent border border-white/10 rounded-lg hover:border-white/20 transition-colors disabled:opacity-40"
                             >
                                 <Save size={16} /> Save
                             </button>
                             <button
                                 onClick={finalizeCount}
                                 disabled={status === 'saving'}
-                                className="btn btn-primary"
+                                className="flex items-center gap-2 px-5 py-2 text-sm font-bold text-black bg-[var(--color-gold)] rounded-lg hover:brightness-110 transition-all disabled:opacity-40"
                             >
                                 <CheckCheck size={16} /> Finalize
                             </button>
@@ -275,11 +280,11 @@ export default function StockOpnameForm() {
             <div className="flex-1 overflow-auto px-8 py-6">
 
                 {/* Controls */}
-                <div className="mb-6 flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                <div className="mb-6 flex items-center justify-between rounded-xl border border-white/5 bg-[var(--onyx-surface)] p-4">
                     <div className="relative w-80">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--theme-text-muted)]" size={18} />
                         <input
-                            className="w-full rounded-md border border-gray-300 py-2.5 pl-10 pr-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                            className="w-full rounded-xl bg-black/40 border border-white/10 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-[var(--theme-text-muted)] outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 transition-colors"
                             placeholder="Search for a product..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
@@ -290,7 +295,12 @@ export default function StockOpnameForm() {
                         <label className="flex items-center gap-2 cursor-pointer select-none">
                             <button
                                 onClick={() => setBlindMode(!blindMode)}
-                                className={`btn btn-sm ${blindMode ? 'btn-primary' : 'btn-secondary'}`}
+                                className={cn(
+                                    'flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-all',
+                                    blindMode
+                                        ? 'bg-[var(--color-gold)] text-black border-[var(--color-gold)] font-bold'
+                                        : 'bg-transparent text-white border-white/10 hover:border-white/20'
+                                )}
                             >
                                 {blindMode ? <EyeOff size={16} /> : <Eye size={16} />}
                                 {blindMode ? 'Blind Mode (ON)' : 'Blind Mode (OFF)'}
@@ -300,55 +310,55 @@ export default function StockOpnameForm() {
                 </div>
 
                 {/* Table */}
-                <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+                <div className="overflow-hidden rounded-xl border border-white/5 bg-[var(--onyx-surface)] shadow-lg">
                     <table className="w-full border-collapse">
                         <thead>
-                            <tr>
-                                <th className="border-b border-gray-200 bg-gray-50 p-4 text-left text-sm font-semibold text-gray-600">Product</th>
-                                <th className="border-b border-gray-200 bg-gray-50 p-4 text-right text-sm font-semibold text-gray-600">System Stock</th>
-                                <th className="w-[180px] border-b border-gray-200 bg-blue-50/50 p-4 text-right text-sm font-semibold text-gray-600">Actual (Physical)</th>
-                                <th className="border-b border-gray-200 bg-gray-50 p-4 text-right text-sm font-semibold text-gray-600">Variance</th>
+                            <tr className="bg-white/[0.02] border-b border-white/5">
+                                <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">Product</th>
+                                <th className="px-6 py-4 text-right text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">System Stock</th>
+                                <th className="w-[180px] px-6 py-4 text-right text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-gold)]/70 bg-[var(--color-gold)]/5">Actual (Physical)</th>
+                                <th className="px-6 py-4 text-right text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">Variance</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-white/5">
                             {filteredItems.map(item => (
-                                <tr key={item.id} className="hover:bg-gray-50">
-                                    <td className="border-b border-gray-100 p-4 text-gray-700">
-                                        <div className="font-medium text-gray-900">{item.product.name}</div>
-                                        <div className="text-xs text-gray-500">{item.product.sku}</div>
+                                <tr key={item.id} className="transition-colors hover:bg-white/[0.02]">
+                                    <td className="px-6 py-4">
+                                        <div className="font-medium text-white">{item.product.name}</div>
+                                        <div className="text-xs text-[var(--theme-text-muted)] mt-0.5">{item.product.sku}</div>
                                     </td>
-                                    <td className="border-b border-gray-100 p-4 text-right text-gray-700">
+                                    <td className="px-6 py-4 text-right">
                                         {blindMode && !isLocked ? (
-                                            <span className="text-muted italic">Hidden</span>
+                                            <span className="text-[var(--theme-text-muted)] italic">Hidden</span>
                                         ) : (
-                                            <span className="font-medium">{item.system_quantity} {item.unit}</span>
+                                            <span className="font-medium text-[var(--theme-text-secondary)]">{item.system_quantity} {item.unit}</span>
                                         )}
                                     </td>
-                                    <td className="w-[180px] border-b border-gray-100 bg-blue-50/50 p-4 text-right">
+                                    <td className="w-[180px] px-6 py-4 text-right bg-[var(--color-gold)]/5">
                                         {isLocked ? (
-                                            <span className="font-bold">{item.counted_quantity}</span>
+                                            <span className="font-bold text-white">{item.counted_quantity}</span>
                                         ) : (
                                             <input
                                                 type="number"
-                                                className="w-full rounded-md border border-gray-300 p-2 text-right font-mono font-semibold transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                                className="w-full rounded-xl bg-black/40 border border-white/10 p-2 text-right font-mono font-semibold text-white transition-all outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 placeholder:text-[var(--theme-text-muted)]"
                                                 value={item.counted_quantity ?? ''}
                                                 placeholder="-"
                                                 onChange={e => handleUpdateCount(item.id, e.target.value ? parseFloat(e.target.value) : null)}
                                             />
                                         )}
                                     </td>
-                                    <td className="border-b border-gray-100 p-4 text-right">
+                                    <td className="px-6 py-4 text-right">
                                         {item.difference !== null && !blindMode ? (
                                             <span className={cn(
                                                 'font-semibold',
-                                                item.difference === 0 && 'text-gray-400',
+                                                item.difference === 0 && 'text-[var(--theme-text-muted)]',
                                                 item.difference > 0 && 'text-success',
                                                 item.difference < 0 && 'text-destructive'
                                             )}>
                                                 {item.difference > 0 ? '+' : ''}{item.difference} {item.unit}
                                             </span>
                                         ) : (
-                                            <span className="text-gray-300">-</span>
+                                            <span className="text-white/10">-</span>
                                         )}
                                     </td>
                                 </tr>
@@ -365,12 +375,12 @@ export default function StockOpnameForm() {
 function StatusBadge({ status }: { status: string }) {
     switch (status) {
         case 'draft':
-            return <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-primary">Draft</span>
+            return <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-white/5 text-[var(--theme-text-secondary)] border border-white/10">Draft</span>
         case 'completed':
-            return <span className="inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-success">Validated</span>
+            return <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border border-success/30 bg-success/10 text-success">Validated</span>
         case 'cancelled':
-            return <span className="inline-flex items-center gap-1.5 rounded-full border border-destructive/30 bg-destructive/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-destructive">Cancelled</span>
+            return <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border border-destructive/30 bg-destructive/10 text-destructive">Cancelled</span>
         default:
-            return <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wider">{status}</span>
+            return <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--theme-text-muted)]">{status}</span>
     }
 }

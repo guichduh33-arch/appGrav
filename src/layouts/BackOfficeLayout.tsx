@@ -14,7 +14,6 @@ import { PostOfflineSyncReport } from '../components/sync/PostOfflineSyncReport'
 import { StockAlertsBadge } from '../components/inventory/StockAlertsBadge';
 import { useNetworkAlerts } from '../hooks/useNetworkAlerts';
 import { useSyncReport } from '../hooks/useSyncReport';
-import { BreakeryLogo } from '@/components/ui/BreakeryLogo';
 import { cn } from '@/lib/utils';
 
 const BackOfficeLayout: React.FC = () => {
@@ -38,182 +37,179 @@ const BackOfficeLayout: React.FC = () => {
     };
 
     return (
-        <div className="flex h-screen w-screen bg-cream overflow-hidden">
+        <div className="flex h-screen w-screen bg-[var(--theme-bg-primary)] overflow-hidden">
             {/* Sidebar */}
             <aside
                 className={cn(
-                    'bo-sidebar flex flex-col h-full shrink-0 z-50 relative border-r border-parchment',
+                    'bo-sidebar flex flex-col h-full shrink-0 z-50 relative',
+                    'bg-[var(--theme-bg-primary)] border-r border-white/5',
                     'transition-[width] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
-                    'shadow-[2px_0_12px_rgba(45,42,36,0.06)]',
-                    isCollapsed ? 'w-[88px]' : 'w-[280px]',
+                    isCollapsed ? 'w-[88px]' : 'w-64',
                     'max-md:fixed max-md:left-0 max-md:top-0 max-md:z-[100]'
                 )}
-                style={{
-                    background: 'linear-gradient(180deg, var(--color-flour) 0%, var(--color-kraft) 100%)',
-                }}
             >
-                {/* Header */}
+                {/* Header / Logo */}
                 <div
                     className={cn(
-                        'h-[88px] flex items-center border-b border-parchment bg-flour',
-                        isCollapsed ? 'justify-center p-0' : 'px-xl'
+                        'h-[88px] flex items-center border-b border-white/5',
+                        isCollapsed ? 'justify-center p-0' : 'px-8'
                     )}
                 >
-                    <div className="flex items-center gap-md overflow-hidden whitespace-nowrap">
-                        <BreakeryLogo
-                            size={isCollapsed ? 'sm' : 'lg'}
-                            variant="gold"
-                            showText={false}
-                        />
-                        {!isCollapsed && (
-                            <div className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">
-                                <h1 className="text-lg font-bold tracking-tight text-gray-900">The Breakery</h1>
-                                <span className="badge badge-neutral text-xs px-2 py-0.5 mt-1">Back Office</span>
-                            </div>
-                        )}
-                    </div>
-                    {/* Network Status Indicator - Always visible per NFR-U4 */}
-                    <NetworkIndicator compact={isCollapsed} className="mt-2" />
-                    {/* Sync Status Indicator - Story 2.6 */}
-                    <SyncIndicator compact={isCollapsed} className="mt-1" />
-                    {/* Pending Sync Counter - Story 3.8 */}
-                    <PendingSyncCounter className="mt-1" />
+                    {!isCollapsed ? (
+                        <div className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">
+                            <h1 className="font-display text-2xl italic font-semibold text-[var(--color-gold)]">
+                                The Breakery
+                            </h1>
+                            <p className="text-[10px] uppercase tracking-widest text-[var(--muted-smoke)] mt-1 opacity-70">
+                                Artisanal Bakery System
+                            </p>
+                        </div>
+                    ) : (
+                        <span className="font-display text-xl italic font-semibold text-[var(--color-gold)]">
+                            B
+                        </span>
+                    )}
+                </div>
+
+                {/* Status indicators */}
+                <div className={cn('px-4 py-2 flex flex-col gap-1 border-b border-white/5', isCollapsed && 'items-center')}>
+                    <NetworkIndicator compact={isCollapsed} className="" />
+                    <SyncIndicator compact={isCollapsed} className="" />
+                    <PendingSyncCounter className="" />
                 </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 px-lg py-xl overflow-y-auto overflow-x-hidden flex flex-col gap-2xl custom-scrollbar">
-                    <div className="flex flex-col gap-xs">
+                <nav className="flex-1 px-4 py-6 overflow-y-auto overflow-x-hidden flex flex-col gap-6 custom-scrollbar">
+                    <div className="flex flex-col gap-1">
                         {!isCollapsed && (
-                            <h3 className="font-body text-[0.65rem] uppercase text-stone tracking-[0.12em] font-bold mb-sm pl-md h-5 animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">
+                            <p className="px-4 text-[10px] font-semibold text-[var(--muted-smoke)] uppercase tracking-wider mb-2 animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">
                                 Operations
-                            </h3>
+                            </p>
                         )}
                         <NavLink to="/" end className="bo-nav-item" title={isCollapsed ? "Dashboard" : ""} data-collapsed={isCollapsed || undefined}>
-                            <LayoutDashboard size={22} strokeWidth={2} />
+                            <LayoutDashboard size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Dashboard</span>}
                         </NavLink>
                         <NavLink to="/pos" className="bo-nav-item" title={isCollapsed ? "POS Terminal" : ""} data-collapsed={isCollapsed || undefined}>
-                            <Store size={22} strokeWidth={2} />
+                            <Store size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">POS Terminal</span>}
                         </NavLink>
                         <NavLink to="/kds" className="bo-nav-item" title={isCollapsed ? "Kitchen Display" : ""} data-collapsed={isCollapsed || undefined}>
-                            <Utensils size={22} strokeWidth={2} />
+                            <Utensils size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Kitchen Display</span>}
                         </NavLink>
                     </div>
 
-                    <div className="flex flex-col gap-xs">
+                    <div className="flex flex-col gap-1">
                         {!isCollapsed && (
-                            <h3 className="font-body text-[0.65rem] uppercase text-stone tracking-[0.12em] font-bold mb-sm pl-md h-5 animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">
+                            <p className="px-4 text-[10px] font-semibold text-[var(--muted-smoke)] uppercase tracking-wider mb-2 animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">
                                 Management
-                            </h3>
+                            </p>
                         )}
                         <NavLink to="/products" className="bo-nav-item" title={isCollapsed ? "Products" : ""} data-collapsed={isCollapsed || undefined}>
-                            <Coffee size={22} strokeWidth={2} />
+                            <Coffee size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Products</span>}
                         </NavLink>
                         <NavLink to="/inventory" className="bo-nav-item" title={isCollapsed ? "Stock & Inventory" : ""} data-collapsed={isCollapsed || undefined}>
-                            <Boxes size={22} strokeWidth={2} />
+                            <Boxes size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Stock & Inventory</span>}
                             <StockAlertsBadge className={isCollapsed ? '' : 'ml-auto'} />
                         </NavLink>
                         <NavLink to="/orders" className="bo-nav-item" title={isCollapsed ? "Order History" : ""} data-collapsed={isCollapsed || undefined}>
-                            <FileText size={22} strokeWidth={2} />
+                            <FileText size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Order History</span>}
                         </NavLink>
                         <NavLink to="/b2b" className="bo-nav-item" title={isCollapsed ? "B2B Wholesale" : ""} data-collapsed={isCollapsed || undefined}>
-                            <Building2 size={22} strokeWidth={2} />
+                            <Building2 size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">B2B Wholesale</span>}
                         </NavLink>
                         <NavLink to="/purchasing/purchase-orders" className="bo-nav-item" title={isCollapsed ? "Purchases" : ""} data-collapsed={isCollapsed || undefined}>
-                            <ShoppingCart size={22} strokeWidth={2} />
+                            <ShoppingCart size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Purchases</span>}
                         </NavLink>
                         <NavLink to="/purchasing/suppliers" className="bo-nav-item" title={isCollapsed ? "Suppliers" : ""} data-collapsed={isCollapsed || undefined}>
-                            <Truck size={22} strokeWidth={2} />
+                            <Truck size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Suppliers</span>}
                         </NavLink>
                         <NavLink to="/customers" className="bo-nav-item" title={isCollapsed ? "Customers" : ""} data-collapsed={isCollapsed || undefined}>
-                            <UserCircle size={22} strokeWidth={2} />
+                            <UserCircle size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Customers</span>}
                         </NavLink>
                     </div>
 
-                    <div className="flex flex-col gap-xs">
+                    <div className="flex flex-col gap-1">
                         {!isCollapsed && (
-                            <h3 className="font-body text-[0.65rem] uppercase text-stone tracking-[0.12em] font-bold mb-sm pl-md h-5 animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">
+                            <p className="px-4 text-[10px] font-semibold text-[var(--muted-smoke)] uppercase tracking-wider mb-2 animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">
                                 Admin
-                            </h3>
+                            </p>
                         )}
                         <NavLink to="/reports" className="bo-nav-item" title={isCollapsed ? "Reports" : ""} data-collapsed={isCollapsed || undefined}>
-                            <BarChart3 size={22} strokeWidth={2} />
+                            <BarChart3 size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Reports</span>}
                         </NavLink>
                         <NavLink to="/accounting" className="bo-nav-item" title={isCollapsed ? "Accounting" : ""} data-collapsed={isCollapsed || undefined}>
-                            <Calculator size={22} strokeWidth={2} />
+                            <Calculator size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Accounting</span>}
                         </NavLink>
                         <NavLink to="/users" className="bo-nav-item" title={isCollapsed ? "Users" : ""} data-collapsed={isCollapsed || undefined}>
-                            <Users size={22} strokeWidth={2} />
+                            <Users size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Users</span>}
                         </NavLink>
                         <NavLink to="/settings" className="bo-nav-item" title={isCollapsed ? "Settings" : ""} data-collapsed={isCollapsed || undefined}>
-                            <Settings size={22} strokeWidth={2} />
+                            <Settings size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Settings</span>}
                         </NavLink>
                         <NavLink to="/settings/roles" className="bo-nav-item" title={isCollapsed ? "Roles" : ""} data-collapsed={isCollapsed || undefined}>
-                            <Shield size={22} strokeWidth={2} />
+                            <Shield size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Roles</span>}
                         </NavLink>
                         <NavLink to="/settings/audit" className="bo-nav-item" title={isCollapsed ? "Audit" : ""} data-collapsed={isCollapsed || undefined}>
-                            <ScrollText size={22} strokeWidth={2} />
+                            <ScrollText size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Audit</span>}
                         </NavLink>
                         <NavLink to="/settings/sync" className="bo-nav-item" title={isCollapsed ? "Sync" : ""} data-collapsed={isCollapsed || undefined}>
-                            <CloudCog size={22} strokeWidth={2} />
+                            <CloudCog size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Sync</span>}
                         </NavLink>
                     </div>
                 </nav>
 
-                {/* Footer / Toggle */}
-                <div className="p-lg border-t border-parchment bg-flour flex flex-col gap-md">
+                {/* Footer / Toggle + User */}
+                <div className="p-4 border-t border-white/5 flex flex-col gap-3">
                     <button
                         onClick={toggleSidebar}
                         className={cn(
-                            'w-8 h-8 flex items-center justify-center border border-parchment bg-flour rounded-md text-stone cursor-pointer',
-                            'transition-all duration-200 hover:border-gold hover:text-gold hover:bg-[var(--color-primary-50)]',
+                            'w-8 h-8 flex items-center justify-center rounded-md cursor-pointer',
+                            'border border-white/10 text-[var(--muted-smoke)]',
+                            'transition-all duration-200 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]',
                             isCollapsed ? 'self-center' : 'self-end'
                         )}
                         title={isCollapsed ? "Expand menu" : "Collapse menu"}
                     >
-                        {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+                        {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                     </button>
 
                     <div className="flex items-center justify-center min-h-[50px]">
                         {!isCollapsed ? (
-                            <div className="flex items-center gap-md w-full p-[0.625rem] bg-kraft rounded-lg border border-parchment animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">
+                            <div className="flex items-center gap-3 w-full p-3 bg-[var(--onyx-surface)] rounded-xl border border-white/5 animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">
                                 <NavLink
                                     to="/profile"
-                                    className="w-9 h-9 rounded-full flex items-center justify-center font-display font-semibold text-sm text-white shrink-0 shadow-[0_2px_6px_rgba(201,165,92,0.3)]"
-                                    style={{
-                                        background: 'linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-dark) 100%)',
-                                    }}
+                                    className="w-10 h-10 rounded-full bg-[var(--color-gold)] flex items-center justify-center text-[var(--theme-bg-primary)] font-bold text-sm shrink-0"
                                     title="My Profile"
                                 >
                                     {user?.name?.charAt(0) || 'U'}
                                 </NavLink>
                                 <NavLink to="/profile" className="flex flex-col flex-1 overflow-hidden" title="My Profile">
-                                    <span className="font-body font-semibold text-[0.8125rem] text-charcoal whitespace-nowrap overflow-hidden text-ellipsis">
+                                    <span className="text-xs font-semibold text-[var(--theme-text-primary)] whitespace-nowrap overflow-hidden text-ellipsis">
                                         {user?.display_name || user?.name}
                                     </span>
-                                    <span className="font-body text-[0.6875rem] text-stone capitalize">
+                                    <span className="text-[10px] text-[var(--muted-smoke)] uppercase">
                                         {user?.role}
                                     </span>
                                 </NavLink>
                                 <button
                                     onClick={handleLogout}
-                                    className="bg-none border-none text-stone cursor-pointer p-[0.375rem] rounded-sm transition-all duration-200 hover:text-[var(--color-danger)] hover:bg-[var(--color-danger-bg)]"
+                                    className="text-[var(--muted-smoke)] hover:text-[var(--color-gold)] transition-colors bg-transparent border-none cursor-pointer p-1.5 rounded"
                                     title="Logout"
                                 >
                                     <LogOut size={16} />
@@ -222,10 +218,10 @@ const BackOfficeLayout: React.FC = () => {
                         ) : (
                             <button
                                 onClick={handleLogout}
-                                className="w-10 h-10 flex items-center justify-center border-none bg-transparent text-stone cursor-pointer rounded-md transition-all duration-200 hover:text-[var(--color-danger)] hover:bg-[var(--color-danger-bg)]"
+                                className="w-10 h-10 flex items-center justify-center border-none bg-transparent text-[var(--muted-smoke)] cursor-pointer rounded-md transition-all duration-200 hover:text-[var(--color-danger)]"
                                 title="Logout"
                             >
-                                <LogOut size={20} />
+                                <LogOut size={18} />
                             </button>
                         )}
                     </div>
@@ -233,7 +229,7 @@ const BackOfficeLayout: React.FC = () => {
             </aside>
 
             {/* Main Content */}
-            <main className="bo-content flex-1 overflow-y-auto bg-cream relative">
+            <main className="bo-content flex-1 overflow-y-auto bg-[var(--theme-bg-primary)] relative">
                 <Outlet />
             </main>
 
@@ -246,50 +242,20 @@ const BackOfficeLayout: React.FC = () => {
                 />
             )}
 
-            {/* Scoped styles for pseudo-elements, tooltips, and complex selectors */}
+            {/* Scoped styles for nav items and tooltips */}
             <style>{`
                 @keyframes sidebarFadeIn {
                     from { opacity: 0; transform: translateX(-5px); }
                     to { opacity: 1; transform: translateX(0); }
                 }
 
-                /* Sidebar gold accent line */
-                .bo-sidebar::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    width: 3px;
-                    height: 100%;
-                    background: linear-gradient(180deg, var(--color-gold) 0%, var(--color-gold-dark) 50%, var(--color-gold) 100%);
-                    opacity: 0.6;
-                }
-                .bo-sidebar.w-\\[88px\\]::before {
-                    display: none;
-                }
-
-                /* Content grain texture */
-                .bo-content::before {
-                    content: '';
-                    position: fixed;
-                    inset: 0;
-                    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-                    opacity: 0.02;
-                    pointer-events: none;
-                    z-index: 0;
-                }
-                .bo-content > * {
-                    position: relative;
-                    z-index: 1;
-                }
-
-                /* Nav items */
+                /* Nav items — Stitch Luxe Dark pattern */
                 .bo-nav-item {
                     display: flex;
                     align-items: center;
-                    gap: var(--space-md);
-                    padding: 0.75rem 1rem;
-                    color: var(--color-smoke);
+                    gap: 0.75rem;
+                    padding: 0.625rem 1rem;
+                    color: var(--theme-text-secondary);
                     text-decoration: none;
                     border-radius: var(--radius-md);
                     transition: all 0.2s ease;
@@ -298,38 +264,28 @@ const BackOfficeLayout: React.FC = () => {
                     font-size: var(--text-sm);
                     white-space: nowrap;
                     position: relative;
-                    height: 48px;
-                    border: 1px solid transparent;
+                    height: 44px;
+                    border-right: 2px solid transparent;
                 }
                 .bo-nav-item[data-collapsed] {
                     justify-content: center;
                     padding: 0;
                     width: 48px;
                     margin: 0 auto;
+                    border-right: none;
                 }
                 .bo-nav-item:hover {
-                    background: var(--color-kraft);
-                    color: var(--color-charcoal);
-                    border-color: var(--color-parchment);
+                    color: var(--color-gold);
+                    background: rgba(201, 165, 92, 0.03);
                 }
                 .bo-nav-item.active {
-                    background: linear-gradient(135deg, rgba(201,165,92,0.12) 0%, rgba(201,165,92,0.06) 100%);
-                    color: var(--color-gold-dark);
-                    border-color: var(--color-gold);
+                    color: var(--color-gold);
+                    background: rgba(201, 165, 92, 0.05);
+                    border-right-color: var(--color-gold);
                 }
-                .bo-nav-item.active::before {
-                    content: '';
-                    position: absolute;
-                    left: 0;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    width: 3px;
-                    height: 24px;
-                    background: var(--color-gold);
-                    border-radius: 0 2px 2px 0;
-                }
-                .bo-nav-item[data-collapsed].active::before {
-                    display: none;
+                .bo-nav-item[data-collapsed].active {
+                    border-right: none;
+                    background: rgba(201, 165, 92, 0.08);
                 }
                 .bo-nav-item svg {
                     flex-shrink: 0;
@@ -347,8 +303,8 @@ const BackOfficeLayout: React.FC = () => {
                     left: calc(100% + 8px);
                     top: 50%;
                     transform: translateY(-50%);
-                    background: var(--color-charcoal);
-                    color: white;
+                    background: var(--onyx-surface);
+                    color: var(--theme-text-primary);
                     padding: 0.5rem 0.75rem;
                     border-radius: var(--radius-md);
                     font-size: var(--text-xs);
@@ -358,7 +314,8 @@ const BackOfficeLayout: React.FC = () => {
                     visibility: hidden;
                     transition: all 0.2s ease;
                     z-index: 100;
-                    box-shadow: var(--shadow-md);
+                    border: 1px solid rgba(255,255,255,0.05);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
                 }
                 .bo-nav-item[data-collapsed]:hover::after {
                     opacity: 1;

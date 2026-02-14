@@ -60,7 +60,6 @@ export default function PurchaseOrdersPage() {
             toast.success('Purchase order deleted successfully')
         } catch (error) {
             logError('Error deleting purchase order:', error)
-            // Handle specific validation error for non-draft PO deletion
             if (error instanceof Error && error.message === 'DELETE_NOT_DRAFT') {
                 toast.error('Only draft purchase orders can be deleted')
             } else {
@@ -112,23 +111,23 @@ export default function PurchaseOrdersPage() {
 
     const getStatusBadgeClass = (status: TPOStatus) => {
         switch (status) {
-            case 'draft': return 'bg-gray-500/15 text-[var(--color-gray-400)]'
-            case 'sent': return 'bg-blue-500/15 text-primary'
-            case 'confirmed': return 'bg-amber-500/15 text-amber-500'
-            case 'partially_received': return 'bg-orange-400/15 text-orange-400'
-            case 'received': return 'bg-emerald-500/15 text-success'
-            case 'cancelled': return 'bg-red-500/15 text-danger'
-            case 'modified': return 'bg-violet-500/15 text-violet-500'
-            default: return 'bg-gray-500/15 text-[var(--color-gray-400)]'
+            case 'draft': return 'border-[var(--muted-smoke)] text-[var(--muted-smoke)]'
+            case 'sent': return 'border-blue-400/40 text-blue-400'
+            case 'confirmed': return 'border-[var(--color-gold)]/40 text-[var(--color-gold)]'
+            case 'partially_received': return 'border-orange-400/40 text-orange-400'
+            case 'received': return 'border-emerald-400/40 text-emerald-400'
+            case 'cancelled': return 'border-red-400/40 text-red-400'
+            case 'modified': return 'border-violet-400/40 text-violet-400'
+            default: return 'border-[var(--muted-smoke)] text-[var(--muted-smoke)]'
         }
     }
 
     const getPaymentBadgeClass = (status: TPaymentStatus) => {
         switch (status) {
-            case 'paid': return 'bg-emerald-500/15 text-success'
-            case 'partially_paid': return 'bg-orange-400/15 text-orange-400'
-            case 'unpaid': return 'bg-red-500/15 text-danger'
-            default: return 'bg-gray-500/15 text-[var(--color-gray-400)]'
+            case 'paid': return 'border-emerald-400/40 text-emerald-400'
+            case 'partially_paid': return 'border-orange-400/40 text-orange-400'
+            case 'unpaid': return 'border-red-400/40 text-red-400'
+            default: return 'border-[var(--muted-smoke)] text-[var(--muted-smoke)]'
         }
     }
 
@@ -155,227 +154,213 @@ export default function PurchaseOrdersPage() {
     }
 
     return (
-        <div className="p-xl max-w-[1600px] mx-auto">
+        <div className="min-h-screen bg-[var(--theme-bg-primary)] p-10 max-w-7xl mx-auto">
             {/* Offline Warning Banner */}
             {!isOnline && (
-                <div className="flex items-center gap-sm px-lg py-md mb-lg bg-warning/10 border border-warning rounded-md text-warning font-medium">
-                    <WifiOff size={20} />
+                <div className="flex items-center gap-3 px-5 py-3.5 mb-6 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-400 text-sm font-medium">
+                    <WifiOff size={18} />
                     <span>This feature requires an internet connection</span>
                 </div>
             )}
 
             {/* Header */}
-            <div className="flex justify-between items-start mb-xl">
+            <div className="flex justify-between items-start mb-10">
                 <div>
-                    <h1 className="flex items-center gap-md text-3xl font-bold text-white m-0 mb-sm">
-                        <FileText size={32} />
-                        Purchase Orders
+                    <h1 className="text-3xl font-light text-white mb-2">
+                        Pending Supplier{' '}
+                        <span className="font-bold">Orders</span>
                     </h1>
-                    <p className="text-base text-muted-foreground m-0">
-                        Manage your supplier orders
+                    <p className="text-sm text-[var(--muted-smoke)]">
+                        Manage your supplier orders and track deliveries
                     </p>
                 </div>
                 <button
-                    className="btn btn-primary"
+                    className="bg-[var(--color-gold)] px-5 py-2.5 rounded-xl text-black text-[10px] font-bold uppercase tracking-widest hover:bg-[var(--color-gold)]/90 transition-all flex items-center gap-2 disabled:opacity-40"
                     onClick={() => navigate('/purchasing/purchase-orders/new')}
                     disabled={!isOnline}
                 >
-                    <Plus size={20} />
-                    New Purchase Order
+                    <Plus size={16} />
+                    New Order
                 </button>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-lg mb-xl">
-                <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
-                    <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-blue-500/15 text-primary">
-                        <FileText size={24} />
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mb-10">
+                {[
+                    { icon: FileText, label: 'Total Orders', value: stats.total, color: 'text-[var(--color-gold)]', bg: 'bg-[var(--color-gold)]/10' },
+                    { icon: Clock, label: 'Pending', value: stats.pending, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+                    { icon: Check, label: 'Completed', value: stats.completed, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+                    { icon: DollarSign, label: 'Total Value', value: formatCurrency(stats.totalValue), color: 'text-violet-400', bg: 'bg-violet-500/10' },
+                ].map((stat) => (
+                    <div key={stat.label} className="flex items-center gap-4 p-5 bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
+                        <div className={`flex items-center justify-center w-12 h-12 rounded-xl ${stat.bg} ${stat.color}`}>
+                            <stat.icon size={22} />
+                        </div>
+                        <div className="flex-1">
+                            <div className="text-xl font-bold text-white leading-none mb-1">{stat.value}</div>
+                            <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--muted-smoke)]">{stat.label}</div>
+                        </div>
                     </div>
-                    <div className="flex-1">
-                        <div className="text-2xl font-bold text-white leading-none mb-1">{stats.total}</div>
-                        <div className="text-sm text-muted-foreground">Total Orders</div>
-                    </div>
-                </div>
-                <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
-                    <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-amber-500/15 text-amber-500">
-                        <Clock size={24} />
-                    </div>
-                    <div className="flex-1">
-                        <div className="text-2xl font-bold text-white leading-none mb-1">{stats.pending}</div>
-                        <div className="text-sm text-muted-foreground">Pending</div>
-                    </div>
-                </div>
-                <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
-                    <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-emerald-500/15 text-success">
-                        <Check size={24} />
-                    </div>
-                    <div className="flex-1">
-                        <div className="text-2xl font-bold text-white leading-none mb-1">{stats.completed}</div>
-                        <div className="text-sm text-muted-foreground">Completed</div>
-                    </div>
-                </div>
-                <div className="flex items-center gap-md p-lg bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg">
-                    <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-violet-500/15 text-violet-500">
-                        <DollarSign size={24} />
-                    </div>
-                    <div className="flex-1">
-                        <div className="text-2xl font-bold text-white leading-none mb-1">{formatCurrency(stats.totalValue)}</div>
-                        <div className="text-sm text-muted-foreground">Total Value</div>
-                    </div>
-                </div>
+                ))}
             </div>
 
             {/* Filters */}
-            <div className="flex gap-md mb-lg">
+            <div className="flex gap-3 mb-6 items-center">
                 <div className="relative flex-1">
-                    <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted-smoke)]" />
                     <input
                         type="text"
                         placeholder="Search purchase orders..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full py-3 px-4 pl-12 bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg text-white text-base focus:outline-none focus:border-primary"
+                        className="w-full py-2.5 px-4 pl-11 bg-[var(--onyx-surface)] border border-white/10 rounded-xl text-white text-sm placeholder:text-[var(--theme-text-muted)] focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 transition-all"
                     />
                 </div>
-                <select
-                    className="py-3 px-4 bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg text-white text-base min-w-[200px] focus:outline-none focus:border-primary"
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    aria-label="Filter by status"
-                >
-                    <option value="all">All Statuses</option>
-                    <option value="draft">Draft</option>
-                    <option value="sent">Sent</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="partially_received">Partially Received</option>
-                    <option value="received">Received</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-                <select
-                    className="py-3 px-4 bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg text-white text-base min-w-[200px] focus:outline-none focus:border-primary"
-                    value={paymentFilter}
-                    onChange={(e) => setPaymentFilter(e.target.value)}
-                    aria-label="Filter by payment"
-                >
-                    <option value="all">All Payments</option>
-                    <option value="unpaid">Unpaid</option>
-                    <option value="partially_paid">Partially Paid</option>
-                    <option value="paid">Paid</option>
-                </select>
+                <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase tracking-widest text-[var(--muted-smoke)]">Status:</span>
+                    <select
+                        className="py-2.5 px-3 bg-[var(--onyx-surface)] border border-white/10 rounded-xl text-[10px] uppercase tracking-widest text-white focus:outline-none focus:border-[var(--color-gold)] focus:ring-0"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        aria-label="Filter by status"
+                    >
+                        <option value="all">All Status</option>
+                        <option value="draft">Draft</option>
+                        <option value="sent">Sent</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="partially_received">Partial</option>
+                        <option value="received">Received</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase tracking-widest text-[var(--muted-smoke)]">Payment:</span>
+                    <select
+                        className="py-2.5 px-3 bg-[var(--onyx-surface)] border border-white/10 rounded-xl text-[10px] uppercase tracking-widest text-white focus:outline-none focus:border-[var(--color-gold)] focus:ring-0"
+                        value={paymentFilter}
+                        onChange={(e) => setPaymentFilter(e.target.value)}
+                        aria-label="Filter by payment"
+                    >
+                        <option value="all">All Payments</option>
+                        <option value="unpaid">Unpaid</option>
+                        <option value="partially_paid">Partial</option>
+                        <option value="paid">Paid</option>
+                    </select>
+                </div>
             </div>
 
             {/* Orders List */}
             {isLoading ? (
-                <div className="flex items-center justify-center p-3xl text-lg text-muted-foreground">Loading...</div>
+                <div className="flex items-center justify-center py-20 text-lg text-[var(--muted-smoke)]">Loading...</div>
             ) : filteredOrders.length === 0 ? (
-                <div className="flex flex-col items-center justify-center p-3xl bg-[var(--color-gray-800)] border-2 border-dashed border-[var(--color-gray-700)] rounded-xl text-center">
-                    <FileText size={48} className="text-[var(--color-gray-600)] mb-md" />
-                    <h3 className="text-xl font-bold text-white m-0 mb-sm">No purchase orders</h3>
-                    <p className="text-base text-muted-foreground m-0 mb-lg">Create your first purchase order to get started</p>
+                <div className="flex flex-col items-center justify-center py-20 bg-[var(--onyx-surface)] border-2 border-dashed border-white/10 rounded-xl text-center">
+                    <FileText size={48} className="text-white/10 mb-4" />
+                    <h3 className="text-lg font-bold text-white mb-1">No purchase orders</h3>
+                    <p className="text-sm text-[var(--muted-smoke)] mb-6">Create your first purchase order to get started</p>
                     <button
-                        className="btn btn-primary"
+                        className="bg-[var(--color-gold)] px-5 py-2.5 rounded-xl text-black text-[10px] font-bold uppercase tracking-widest hover:bg-[var(--color-gold)]/90 transition-all flex items-center gap-2 disabled:opacity-40"
                         onClick={() => navigate('/purchasing/purchase-orders/new')}
                         disabled={!isOnline}
                     >
-                        <Plus size={20} />
-                        New Purchase Order
+                        <Plus size={16} />
+                        New Order
                     </button>
                 </div>
             ) : (
-                <div className="bg-[var(--color-gray-800)] border border-[var(--color-gray-700)] rounded-lg overflow-hidden">
-                    <table className="w-full border-collapse">
-                        <thead className="bg-[var(--color-gray-750)] border-b border-[var(--color-gray-700)]">
-                            <tr>
-                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">PO Number</th>
-                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">Supplier</th>
-                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">Date</th>
-                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">Expected Delivery</th>
-                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">Status</th>
-                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">Payment</th>
-                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">Total</th>
-                                <th className="p-md text-left text-sm font-bold text-muted-foreground uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredOrders.map(po => (
-                                <tr key={po.id} className="hover:bg-[var(--color-gray-750)] [&:last-child>td]:border-b-0">
-                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">
-                                        <strong>{po.po_number}</strong>
-                                    </td>
-                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">{po.supplier?.name || '-'}</td>
-                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">{new Date(po.order_date).toLocaleDateString('fr-FR')}</td>
-                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">
-                                        {po.expected_delivery_date
-                                            ? new Date(po.expected_delivery_date).toLocaleDateString('fr-FR')
-                                            : '-'
-                                        }
-                                    </td>
-                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">
-                                        <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-wider ${getStatusBadgeClass(po.status)}`}>
-                                            {getStatusLabel(po.status)}
-                                        </span>
-                                    </td>
-                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">
-                                        <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-wider ${getPaymentBadgeClass(po.payment_status)}`}>
-                                            {getPaymentLabel(po.payment_status)}
-                                        </span>
-                                    </td>
-                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">
-                                        <strong>{formatCurrency(parseFloat(po.total_amount?.toString() ?? '0') || 0)}</strong>
-                                    </td>
-                                    <td className="p-md border-b border-[var(--color-gray-700)] text-sm text-[var(--color-gray-300)]">
-                                        <div className="flex gap-1">
+                <div className="space-y-3">
+                    {filteredOrders.map(po => (
+                        <div
+                            key={po.id}
+                            className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden transition-all hover:border-[var(--color-gold)]/30 group"
+                        >
+                            <div className="p-5 flex items-center justify-between">
+                                <div className="grid grid-cols-5 flex-1 items-center gap-8">
+                                    <div>
+                                        <p className="text-[10px] text-[var(--muted-smoke)] uppercase tracking-widest mb-1">PO Number</p>
+                                        <p className="text-sm font-medium text-[var(--color-gold)]">{po.po_number}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] text-[var(--muted-smoke)] uppercase tracking-widest mb-1">Supplier</p>
+                                        <p className="text-sm text-[var(--stone-text)]">{po.supplier?.name || '-'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] text-[var(--muted-smoke)] uppercase tracking-widest mb-1">Order Date</p>
+                                        <p className="text-sm text-[var(--stone-text)]">{new Date(po.order_date).toLocaleDateString('fr-FR')}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] text-[var(--muted-smoke)] uppercase tracking-widest mb-1">Expected</p>
+                                        <p className="text-sm text-[var(--stone-text)]">
+                                            {po.expected_delivery_date
+                                                ? new Date(po.expected_delivery_date).toLocaleDateString('fr-FR')
+                                                : '-'
+                                            }
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] text-[var(--muted-smoke)] uppercase tracking-widest mb-1">Value</p>
+                                        <p className="text-sm font-bold text-[var(--stone-text)]">
+                                            {formatCurrency(parseFloat(po.total_amount?.toString() ?? '0') || 0)}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4 ml-8">
+                                    <span className={`px-3 py-1 text-[10px] font-semibold uppercase tracking-widest rounded-full border ${getStatusBadgeClass(po.status)}`}>
+                                        {getStatusLabel(po.status)}
+                                    </span>
+                                    <span className={`px-3 py-1 text-[10px] font-semibold uppercase tracking-widest rounded-full border ${getPaymentBadgeClass(po.payment_status)}`}>
+                                        {getPaymentLabel(po.payment_status)}
+                                    </span>
+                                    <div className="flex gap-1 ml-2">
+                                        <button
+                                            className="flex items-center justify-center w-8 h-8 rounded-lg text-[var(--muted-smoke)] transition-all hover:bg-white/5 hover:text-[var(--color-gold)]"
+                                            onClick={() => navigate(`/purchasing/purchase-orders/${po.id}`)}
+                                            title="View"
+                                        >
+                                            <Eye size={16} />
+                                        </button>
+                                        <button
+                                            className="flex items-center justify-center w-8 h-8 rounded-lg text-[var(--muted-smoke)] transition-all hover:bg-white/5 hover:text-[var(--color-gold)] disabled:opacity-30"
+                                            onClick={() => navigate(`/purchasing/purchase-orders/${po.id}/edit`)}
+                                            title="Edit"
+                                            disabled={!isOnline}
+                                        >
+                                            <Edit2 size={16} />
+                                        </button>
+                                        {po.status === 'sent' && (
                                             <button
-                                                className="flex items-center justify-center w-8 h-8 bg-transparent border-none rounded-md text-muted-foreground cursor-pointer transition-all duration-200 hover:bg-[var(--color-gray-700)] hover:text-primary-light"
-                                                onClick={() => navigate(`/purchasing/purchase-orders/${po.id}`)}
-                                                title="View"
-                                            >
-                                                <Eye size={18} />
-                                            </button>
-                                            <button
-                                                className="flex items-center justify-center w-8 h-8 bg-transparent border-none rounded-md text-muted-foreground cursor-pointer transition-all duration-200 hover:bg-[var(--color-gray-700)] hover:text-primary-light"
-                                                onClick={() => navigate(`/purchasing/purchase-orders/${po.id}/edit`)}
-                                                title="Edit"
+                                                className="flex items-center justify-center w-8 h-8 rounded-lg text-[var(--muted-smoke)] transition-all hover:bg-white/5 hover:text-emerald-400 disabled:opacity-30"
+                                                onClick={() => handleUpdateStatus(po.id, 'confirmed')}
+                                                title="Confirm"
                                                 disabled={!isOnline}
                                             >
-                                                <Edit2 size={18} />
+                                                <Check size={16} />
                                             </button>
-                                            {po.status === 'sent' && (
-                                                <button
-                                                    className="flex items-center justify-center w-8 h-8 bg-transparent border-none rounded-md text-muted-foreground cursor-pointer transition-all duration-200 hover:bg-[var(--color-gray-700)] hover:text-primary-light"
-                                                    onClick={() => handleUpdateStatus(po.id, 'confirmed')}
-                                                    title="Confirm"
-                                                    disabled={!isOnline}
-                                                >
-                                                    <Check size={18} />
-                                                </button>
-                                            )}
-                                            {po.status === 'confirmed' && (
-                                                <button
-                                                    className="flex items-center justify-center w-8 h-8 bg-transparent border-none rounded-md text-muted-foreground cursor-pointer transition-all duration-200 hover:bg-[var(--color-gray-700)] hover:text-primary-light"
-                                                    onClick={() => handleUpdateStatus(po.id, 'received')}
-                                                    title="Mark Received"
-                                                    disabled={!isOnline}
-                                                >
-                                                    <Package size={18} />
-                                                </button>
-                                            )}
-                                            {po.status === 'draft' && (
-                                                <button
-                                                    className="flex items-center justify-center w-8 h-8 bg-transparent border-none rounded-md text-muted-foreground cursor-pointer transition-all duration-200 hover:bg-red-500/15 hover:text-danger"
-                                                    onClick={() => handleDelete(po.id)}
-                                                    title="Delete"
-                                                    disabled={!isOnline}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                        )}
+                                        {po.status === 'confirmed' && (
+                                            <button
+                                                className="flex items-center justify-center w-8 h-8 rounded-lg text-[var(--muted-smoke)] transition-all hover:bg-white/5 hover:text-emerald-400 disabled:opacity-30"
+                                                onClick={() => handleUpdateStatus(po.id, 'received')}
+                                                title="Mark Received"
+                                                disabled={!isOnline}
+                                            >
+                                                <Package size={16} />
+                                            </button>
+                                        )}
+                                        {po.status === 'draft' && (
+                                            <button
+                                                className="flex items-center justify-center w-8 h-8 rounded-lg text-[var(--muted-smoke)] transition-all hover:bg-red-500/10 hover:text-red-400 disabled:opacity-30"
+                                                onClick={() => handleDelete(po.id)}
+                                                title="Delete"
+                                                disabled={!isOnline}
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
         </div>

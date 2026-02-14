@@ -25,10 +25,8 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
     const [newUOM, setNewUOM] = useState({ uom_name: '', uom_code: '', conversion_factor: 1 })
     const [saving, setSaving] = useState(false)
 
-    // Cast uoms to extended type for UI fields that may not exist yet in DB
     const extendedUoms = uoms as ExtendedUOM[]
 
-    // Get currently selected unit for each context
     const getContextUnit = (context: UOMContext): ExtendedUOM | null => {
         return extendedUoms.find(u => {
             if (context === 'stock_opname') return u.is_stock_opname_unit
@@ -38,22 +36,18 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
         }) || null
     }
 
-    // Set preferred unit for a context
     const setContextUnit = async (context: UOMContext, uomId: string | null) => {
         setSaving(true)
         try {
-            // First, unset all units for this context
             const field = context === 'stock_opname' ? 'is_stock_opname_unit'
                 : context === 'recipe' ? 'is_consumption_unit'
                     : 'is_purchase_uom'
 
-            // Unset all
             await supabase
                 .from('product_uoms')
                 .update({ [field]: false })
                 .eq('product_id', product.id)
 
-            // Set the selected one
             if (uomId) {
                 await supabase
                     .from('product_uoms')
@@ -61,7 +55,6 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                     .eq('id', uomId)
             }
 
-            // Refresh - this would need to be passed from parent
             window.location.reload()
         } catch (error) {
             logError('Error setting context unit:', error)
@@ -99,7 +92,7 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
         { id: 'base', uom_name: product.unit, conversion_factor: 1, isBase: true },
         ...uoms.map(u => ({ ...u, isBase: false }))
     ]
-    void _allUnits // Prevent unused variable warning
+    void _allUnits
 
     const contexts = [
         {
@@ -107,186 +100,124 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
             label: 'Stock Opname',
             description: 'Unit used for inventory counting',
             icon: ClipboardList,
-            color: '#3B82F6',
-            bgColor: '#EFF6FF'
+            color: 'var(--color-gold)',
         },
         {
             id: 'recipe' as UOMContext,
             label: 'Recipes',
             description: 'Unit used in production recipes',
             icon: Scale,
-            color: '#F59E0B',
-            bgColor: '#FFFBEB'
+            color: 'var(--color-gold)',
         },
         {
             id: 'purchase' as UOMContext,
             label: 'Purchases (PO)',
             description: 'Unit used for supplier orders',
             icon: ShoppingCart,
-            color: '#10B981',
-            bgColor: '#ECFDF5'
+            color: 'var(--color-gold)',
         }
     ]
 
     return (
         <div className="space-y-6">
             {/* Base Unit Card */}
-            <div className="card p-6 mb-6">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{
-                        width: '48px',
-                        height: '48px',
-                        borderRadius: '12px',
-                        background: 'linear-gradient(135deg, #BA90A2 0%, #D4A5B5 100%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}>
-                        <Package size={24} color="white" />
+            <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-6">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 flex items-center justify-center">
+                        <Package size={24} className="text-[var(--color-gold)]" />
                     </div>
-                    <div style={{ flex: 1 }}>
-                        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: '#4A3728' }}>
-                            Base Unit (Stock)
-                        </h3>
-                        <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8125rem', color: '#8B7355' }}>
+                    <div className="flex-1">
+                        <h3 className="text-base font-semibold text-white m-0">Base Unit (Stock)</h3>
+                        <p className="text-xs text-[var(--theme-text-muted)] mt-0.5 m-0">
                             All conversions are done relative to this unit
                         </p>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <input
-                            value={product.unit ?? ''}
-                            onChange={e => onProductChange({ ...product, unit: e.target.value })}
-                            style={{
-                                width: '100px',
-                                padding: '0.75rem',
-                                border: '2px solid #BA90A2',
-                                borderRadius: '0.5rem',
-                                textAlign: 'center',
-                                fontWeight: 700,
-                                fontSize: '1rem'
-                            }}
-                            title="Base unit"
-                        />
-                    </div>
+                    <input
+                        value={product.unit ?? ''}
+                        onChange={e => onProductChange({ ...product, unit: e.target.value })}
+                        className="w-24 bg-black/40 border-2 border-[var(--color-gold)]/40 rounded-lg text-center font-bold text-white text-sm py-2.5 focus:border-[var(--color-gold)] focus:ring-0 focus:outline-none transition-all"
+                        title="Base unit"
+                    />
                 </div>
             </div>
 
             {/* UOM List Card */}
-            <div className="card p-6 mb-6">
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+                <div className="p-6 border-b border-white/5 flex items-center justify-between">
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1 flex justify-between items-center">Alternative Units</h3>
-                        <p style={{ margin: 0, fontSize: '0.8125rem', color: '#8B7355' }}>
+                        <h3 className="text-lg font-semibold text-white">Alternative Units</h3>
+                        <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">
                             Define purchase or consumption units
                         </p>
                     </div>
                     <button
                         onClick={() => setShowAddModal(true)}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            padding: '0.625rem 1rem',
-                            background: 'linear-gradient(135deg, #BA90A2 0%, #D4A5B5 100%)',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '0.5rem',
-                            fontWeight: 600,
-                            cursor: 'pointer'
-                        }}
+                        className="bg-[var(--color-gold)] text-black font-bold px-4 py-2 rounded-sm flex items-center gap-2 text-xs uppercase tracking-wider hover:bg-[var(--color-gold)]/90 transition-colors cursor-pointer"
                     >
-                        <Plus size={18} /> New Unit
+                        <Plus size={16} /> New Unit
                     </button>
                 </div>
 
-                {uoms.length === 0 ? (
-                    <div style={{
-                        textAlign: 'center',
-                        padding: '2rem',
-                        background: '#F9FAFB',
-                        borderRadius: '0.75rem',
-                        border: '2px dashed #E5E7EB'
-                    }}>
-                        <Package size={40} style={{ color: '#D1D5DB', margin: '0 auto 0.75rem' }} />
-                        <p style={{ margin: 0, color: '#6B7280' }}>No alternative unit</p>
-                        <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8125rem', color: '#9CA3AF' }}>
-                            Add units like "Bag 5kg", "Box", etc.
-                        </p>
-                    </div>
-                ) : (
-                    <div style={{ display: 'grid', gap: '0.75rem' }}>
-                        {extendedUoms.map(uom => (
-                            <div
-                                key={uom.id}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '1rem',
-                                    padding: '1rem',
-                                    background: '#F9FAFB',
-                                    borderRadius: '0.75rem',
-                                    border: '1px solid #E5E7EB'
-                                }}
-                            >
-                                <div style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '8px',
-                                    background: '#E5E7EB',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontWeight: 700,
-                                    color: '#4B5563',
-                                    fontSize: '0.75rem'
-                                }}>
-                                    {uom.uom_name.substring(0, 3).toUpperCase()}
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ fontWeight: 600, color: '#1F2937' }}>{uom.uom_name}</div>
-                                    <div style={{ fontSize: '0.8125rem', color: '#6B7280' }}>
-                                        1 {uom.uom_name} = <strong>{uom.conversion_factor}</strong> {product.unit}
-                                    </div>
-                                </div>
-                                <div style={{ display: 'flex', gap: '0.375rem' }}>
-                                    {uom.is_stock_opname_unit && (
-                                        <span style={{ padding: '0.25rem 0.5rem', background: '#DBEAFE', color: '#1D4ED8', borderRadius: '0.25rem', fontSize: '0.625rem', fontWeight: 600 }}>STOCK</span>
-                                    )}
-                                    {uom.is_consumption_unit && (
-                                        <span style={{ padding: '0.25rem 0.5rem', background: '#FEF3C7', color: '#B45309', borderRadius: '0.25rem', fontSize: '0.625rem', fontWeight: 600 }}>RECIPE</span>
-                                    )}
-                                    {uom.is_purchase_uom && (
-                                        <span style={{ padding: '0.25rem 0.5rem', background: '#D1FAE5', color: '#047857', borderRadius: '0.25rem', fontSize: '0.625rem', fontWeight: 600 }}>PURCHASE</span>
-                                    )}
-                                </div>
-                                <button
-                                    onClick={() => onDeleteUOM(uom.id)}
-                                    style={{
-                                        padding: '0.5rem',
-                                        background: 'transparent',
-                                        border: 'none',
-                                        color: '#EF4444',
-                                        cursor: 'pointer',
-                                        borderRadius: '0.375rem'
-                                    }}
-                                    title="Delete"
+                <div className="p-6">
+                    {uoms.length === 0 ? (
+                        <div className="text-center py-8 border-2 border-dashed border-white/10 rounded-xl">
+                            <Package size={40} className="mx-auto mb-3 text-white/10" />
+                            <p className="text-[var(--theme-text-muted)] text-sm m-0">No alternative unit</p>
+                            <p className="text-[var(--theme-text-muted)] text-xs mt-1 opacity-60">
+                                Add units like "Bag 5kg", "Box", etc.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {extendedUoms.map(uom => (
+                                <div
+                                    key={uom.id}
+                                    className="flex items-center gap-4 p-4 bg-black/20 rounded-lg border border-white/5"
                                 >
-                                    <Trash2 size={18} />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                                    <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center font-bold text-[var(--theme-text-muted)] text-[10px] uppercase tracking-wider">
+                                        {uom.uom_name.substring(0, 3).toUpperCase()}
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="font-semibold text-white text-sm">{uom.uom_name}</div>
+                                        <div className="text-xs text-[var(--theme-text-muted)]">
+                                            1 {uom.uom_name} = <strong className="text-white">{uom.conversion_factor}</strong> {product.unit}
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-1.5">
+                                        {uom.is_stock_opname_unit && (
+                                            <span className="px-2 py-0.5 bg-[var(--color-gold)]/10 text-[var(--color-gold)] rounded text-[9px] font-bold uppercase tracking-wider border border-[var(--color-gold)]/20">Stock</span>
+                                        )}
+                                        {uom.is_consumption_unit && (
+                                            <span className="px-2 py-0.5 bg-[var(--color-gold)]/10 text-[var(--color-gold)] rounded text-[9px] font-bold uppercase tracking-wider border border-[var(--color-gold)]/20">Recipe</span>
+                                        )}
+                                        {uom.is_purchase_uom && (
+                                            <span className="px-2 py-0.5 bg-[var(--color-gold)]/10 text-[var(--color-gold)] rounded text-[9px] font-bold uppercase tracking-wider border border-[var(--color-gold)]/20">Purchase</span>
+                                        )}
+                                    </div>
+                                    <button
+                                        onClick={() => onDeleteUOM(uom.id)}
+                                        className="p-2 bg-transparent border-none text-[var(--theme-text-muted)] hover:text-red-400 cursor-pointer rounded transition-colors"
+                                        title="Delete"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Context Preferences Card */}
-            <div className="card p-6 mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 flex justify-between items-center">Unités par Contexte</h3>
-                <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.8125rem', color: '#8B7355' }}>
-                    Choisissez l'unité à utiliser dans chaque contexte de l'application
-                </p>
+            <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+                <div className="p-6 border-b border-white/5">
+                    <h3 className="text-lg font-semibold text-white">Units by Context</h3>
+                    <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">
+                        Choose the unit to use in each application context
+                    </p>
+                </div>
 
-                <div style={{ display: 'grid', gap: '1rem' }}>
+                <div className="p-6 space-y-4">
                     {contexts.map(ctx => {
                         const Icon = ctx.icon
                         const currentUnit = getContextUnit(ctx.id)
@@ -294,47 +225,24 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                         return (
                             <div
                                 key={ctx.id}
-                                style={{
-                                    padding: '1.25rem',
-                                    background: ctx.bgColor,
-                                    borderRadius: '0.75rem',
-                                    border: `1px solid ${ctx.color}20`
-                                }}
+                                className="p-5 bg-black/20 rounded-xl border border-white/5"
                             >
-                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
-                                    <div style={{
-                                        width: '40px',
-                                        height: '40px',
-                                        borderRadius: '10px',
-                                        background: 'white',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                                    }}>
-                                        <Icon size={20} style={{ color: ctx.color }} />
+                                <div className="flex items-start gap-4">
+                                    <div className="w-10 h-10 rounded-lg bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 flex items-center justify-center shrink-0">
+                                        <Icon size={20} className="text-[var(--color-gold)]" />
                                     </div>
-                                    <div style={{ flex: 1 }}>
-                                        <h4 style={{ margin: 0, fontSize: '0.9375rem', fontWeight: 600, color: '#1F2937' }}>
+                                    <div className="flex-1">
+                                        <h4 className="text-sm font-semibold text-white m-0">
                                             {ctx.label}
                                         </h4>
-                                        <p style={{ margin: '0.25rem 0 0.75rem 0', fontSize: '0.75rem', color: '#6B7280' }}>
+                                        <p className="text-[10px] text-[var(--theme-text-muted)] mt-0.5 mb-3">
                                             {ctx.description}
                                         </p>
                                         <select
                                             value={currentUnit?.id || 'base'}
                                             onChange={(e) => setContextUnit(ctx.id, e.target.value === 'base' ? null : e.target.value)}
                                             disabled={saving}
-                                            style={{
-                                                width: '100%',
-                                                padding: '0.625rem 1rem',
-                                                border: '2px solid #E5E7EB',
-                                                borderRadius: '0.5rem',
-                                                background: 'white',
-                                                fontWeight: 500,
-                                                fontSize: '0.875rem',
-                                                cursor: 'pointer'
-                                            }}
+                                            className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white font-medium cursor-pointer focus:border-[var(--color-gold)] focus:ring-0 focus:outline-none transition-all"
                                         >
                                             <option value="base">{product.unit} (Base unit)</option>
                                             {uoms.map(uom => (
@@ -353,28 +261,18 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
 
             {/* Add UOM Modal */}
             {showAddModal && (
-                <div style={{
-                    position: 'fixed',
-                    inset: 0,
-                    background: 'rgba(0,0,0,0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 9999
-                }} onClick={() => setShowAddModal(false)}>
-                    <div style={{
-                        background: 'white',
-                        borderRadius: '1rem',
-                        padding: '1.5rem',
-                        width: '400px',
-                        maxWidth: '90vw'
-                    }} onClick={e => e.stopPropagation()}>
-                        <h3 style={{ margin: '0 0 1.5rem 0', fontSize: '1.125rem', fontWeight: 600 }}>
-                            New Unit
-                        </h3>
+                <div
+                    className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[9999]"
+                    onClick={() => setShowAddModal(false)}
+                >
+                    <div
+                        className="bg-[var(--onyx-surface)] border border-white/10 rounded-xl p-6 w-[400px] max-w-[90vw] shadow-2xl"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <h3 className="text-lg font-semibold text-white mb-6">New Unit</h3>
 
-                        <div style={{ marginBottom: '1rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, fontSize: '0.875rem' }}>
+                        <div className="mb-4">
+                            <label className="block text-[10px] font-bold text-[var(--theme-text-muted)] uppercase tracking-[0.15em] mb-2">
                                 Unit name
                             </label>
                             <input
@@ -382,73 +280,42 @@ export const UnitsTab: React.FC<UnitsTabProps> = ({ product, uoms, onProductChan
                                 value={newUOM.uom_name}
                                 onChange={e => setNewUOM({ ...newUOM, uom_name: e.target.value })}
                                 placeholder="Ex: Bag 5kg, Box, Pack"
-                                style={{
-                                    width: '100%',
-                                    padding: '0.75rem',
-                                    border: '2px solid #E5E7EB',
-                                    borderRadius: '0.5rem',
-                                    fontSize: '1rem'
-                                }}
+                                className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-0 focus:outline-none transition-all"
                             />
                         </div>
 
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, fontSize: '0.875rem' }}>
+                        <div className="mb-6">
+                            <label className="block text-[10px] font-bold text-[var(--theme-text-muted)] uppercase tracking-[0.15em] mb-2">
                                 Conversion factor
                             </label>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <span style={{ color: '#6B7280' }}>1 {newUOM.uom_name || 'unit'} =</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-[var(--theme-text-muted)]">1 {newUOM.uom_name || 'unit'} =</span>
                                 <input
                                     type="number"
                                     value={newUOM.conversion_factor}
                                     onChange={e => setNewUOM({ ...newUOM, conversion_factor: parseFloat(e.target.value) || 0 })}
                                     step="0.01"
                                     min="0.01"
-                                    style={{
-                                        width: '100px',
-                                        padding: '0.75rem',
-                                        border: '2px solid #E5E7EB',
-                                        borderRadius: '0.5rem',
-                                        fontSize: '1rem',
-                                        textAlign: 'center'
-                                    }}
+                                    className="w-24 bg-black/40 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white text-center font-semibold focus:border-[var(--color-gold)] focus:ring-0 focus:outline-none transition-all"
                                 />
-                                <span style={{ fontWeight: 600 }}>{product.unit}</span>
+                                <span className="text-sm font-semibold text-white">{product.unit}</span>
                             </div>
-                            <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.75rem', color: '#9CA3AF' }}>
+                            <p className="text-[10px] text-[var(--theme-text-muted)] mt-2 opacity-60">
                                 Ex: If 1 Bag = 5000g, enter 5000
                             </p>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '0.75rem' }}>
+                        <div className="flex gap-3">
                             <button
                                 onClick={() => setShowAddModal(false)}
-                                style={{
-                                    flex: 1,
-                                    padding: '0.75rem',
-                                    border: '1px solid #E5E7EB',
-                                    borderRadius: '0.5rem',
-                                    background: 'white',
-                                    fontWeight: 500,
-                                    cursor: 'pointer'
-                                }}
+                                className="flex-1 px-4 py-3 bg-transparent border border-white/10 text-white rounded-lg font-medium text-sm hover:border-white/20 transition-colors cursor-pointer"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleAddUOM}
                                 disabled={saving || !newUOM.uom_name}
-                                style={{
-                                    flex: 1,
-                                    padding: '0.75rem',
-                                    border: 'none',
-                                    borderRadius: '0.5rem',
-                                    background: 'linear-gradient(135deg, #BA90A2 0%, #D4A5B5 100%)',
-                                    color: 'white',
-                                    fontWeight: 600,
-                                    cursor: 'pointer',
-                                    opacity: saving || !newUOM.uom_name ? 0.5 : 1
-                                }}
+                                className="flex-1 px-4 py-3 bg-[var(--color-gold)] text-black rounded-lg font-bold text-sm hover:bg-[var(--color-gold)]/90 transition-colors cursor-pointer disabled:opacity-50"
                             >
                                 {saving ? 'Saving...' : 'Add'}
                             </button>

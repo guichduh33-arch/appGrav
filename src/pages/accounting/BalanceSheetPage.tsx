@@ -14,11 +14,11 @@ export default function BalanceSheetPage() {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map(i => (
-          <div key={i} className="border rounded-lg p-4 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-32 mb-3" />
+          <div key={i} className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-4 animate-pulse">
+            <div className="h-4 bg-white/10 rounded w-32 mb-3" />
             <div className="space-y-2">
-              <div className="h-3 bg-gray-100 rounded w-full" />
-              <div className="h-3 bg-gray-100 rounded w-3/4" />
+              <div className="h-3 bg-white/5 rounded w-full" />
+              <div className="h-3 bg-white/5 rounded w-3/4" />
             </div>
           </div>
         ))}
@@ -29,12 +29,12 @@ export default function BalanceSheetPage() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-4">
-        <label className="text-sm text-gray-500">As of:</label>
+        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">As of:</label>
         <input
           type="date"
           value={endDate}
           onChange={e => setEndDate(e.target.value)}
-          className="border rounded-lg px-3 py-2 text-sm"
+          className="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 outline-none"
         />
       </div>
 

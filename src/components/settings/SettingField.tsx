@@ -12,6 +12,11 @@ interface SettingFieldProps {
   showReset?: boolean;
 }
 
+const inputBase =
+  'w-full h-10 px-3 bg-black/40 border border-white/10 rounded-xl text-sm text-white placeholder:text-[var(--theme-text-muted)] transition-all focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 disabled:opacity-50 disabled:cursor-not-allowed';
+
+const selectBase = `${inputBase} cursor-pointer appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2716%27%20height=%2716%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%239ca3af%27%20stroke-width=%272%27%3E%3Cpath%20d=%27M6%209l6%206%206-6%27/%3E%3C/svg%3E')] bg-no-repeat bg-[right_12px_center] pr-10`;
+
 const SettingField: React.FC<SettingFieldProps> = ({
   setting,
   value,
@@ -23,11 +28,9 @@ const SettingField: React.FC<SettingFieldProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [localValue, setLocalValue] = useState(value);
 
-  // Use English
   const name = setting.name_en;
   const description = setting.description_en;
 
-  // Parse value from JSONB
   const parseValue = (val: unknown): unknown => {
     if (typeof val === 'string') {
       try {
@@ -41,22 +44,18 @@ const SettingField: React.FC<SettingFieldProps> = ({
 
   const parsedValue = parseValue(localValue);
 
-  // Sync local value with prop
   useEffect(() => {
     setLocalValue(value);
   }, [value]);
 
-  // Handle value change with validation
   const handleChange = (newValue: unknown) => {
     setLocalValue(newValue);
     onChange(newValue);
   };
 
-  // Check if value has changed from default
   const hasChanged = setting.default_value !== undefined &&
     JSON.stringify(parsedValue) !== JSON.stringify(parseValue(setting.default_value));
 
-  // Render based on value type
   const renderField = () => {
     const validation = setting.validation_rules as ValidationRules | undefined;
 
@@ -65,10 +64,9 @@ const SettingField: React.FC<SettingFieldProps> = ({
         return (
           <div
             className={cn(
-              'w-12 h-7 rounded-[14px] bg-smoke cursor-pointer transition-all duration-fast ease-standard relative shrink-0',
-              'after:content-[""] after:absolute after:top-[3px] after:left-[3px] after:w-[22px] after:h-[22px] after:rounded-full after:bg-white after:shadow-[0_2px_4px_rgba(0,0,0,0.15)] after:transition-all after:duration-fast after:ease-standard',
-              'focus-visible:outline-2 focus-visible:outline-[var(--color-rose-poudre)] focus-visible:outline-offset-2',
-              !!parsedValue && 'bg-success after:left-[23px]',
+              'w-12 h-7 rounded-full bg-white/10 cursor-pointer transition-all relative shrink-0',
+              'after:content-[""] after:absolute after:top-[3px] after:left-[3px] after:w-[22px] after:h-[22px] after:rounded-full after:bg-white after:shadow-[0_2px_4px_rgba(0,0,0,0.3)] after:transition-all',
+              !!parsedValue && 'bg-[var(--color-gold)] after:left-[23px]',
               disabled && 'opacity-50 cursor-not-allowed'
             )}
             onClick={() => !disabled && handleChange(!parsedValue)}
@@ -83,7 +81,7 @@ const SettingField: React.FC<SettingFieldProps> = ({
         return (
           <input
             type="number"
-            className="w-full h-10 px-md bg-cream border border-border rounded-sm text-sm text-espresso transition-all duration-fast ease-standard focus:outline-none focus:border-[var(--color-rose-poudre)] focus:shadow-[0_0_0_3px_rgba(var(--color-rose-poudre-rgb),0.2)] disabled:opacity-60 disabled:cursor-not-allowed max-w-[150px]"
+            className={cn(inputBase, 'max-w-[150px]')}
             value={parsedValue as number ?? ''}
             onChange={(e) => handleChange(e.target.value === '' ? null : Number(e.target.value))}
             min={validation?.min}
@@ -93,11 +91,10 @@ const SettingField: React.FC<SettingFieldProps> = ({
         );
 
       case 'string':
-        // Check if it's a select from options
         if (validation?.options && validation.options.length > 0) {
           return (
             <select
-              className="w-full h-10 px-md bg-cream border border-border rounded-sm text-sm text-espresso transition-all duration-fast ease-standard focus:outline-none focus:border-[var(--color-rose-poudre)] focus:shadow-[0_0_0_3px_rgba(var(--color-rose-poudre-rgb),0.2)] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2716%27%20height=%2716%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%236B7280%27%20stroke-width=%272%27%3E%3Cpath%20d=%27M6%209l6%206%206-6%27/%3E%3C/svg%3E')] bg-no-repeat bg-[right_12px_center] pr-10"
+              className={selectBase}
               value={parsedValue as string ?? ''}
               onChange={(e) => handleChange(e.target.value)}
               disabled={disabled}
@@ -111,13 +108,12 @@ const SettingField: React.FC<SettingFieldProps> = ({
           );
         }
 
-        // Sensitive field (password)
         if (setting.is_sensitive) {
           return (
             <div className="relative flex items-center">
               <input
                 type={showPassword ? 'text' : 'password'}
-                className="flex-1 w-full h-10 px-md pr-11 bg-cream border border-border rounded-sm text-sm text-espresso transition-all duration-fast ease-standard focus:outline-none focus:border-[var(--color-rose-poudre)] focus:shadow-[0_0_0_3px_rgba(var(--color-rose-poudre-rgb),0.2)] disabled:opacity-60 disabled:cursor-not-allowed"
+                className={cn(inputBase, 'pr-11')}
                 value={parsedValue as string ?? ''}
                 onChange={(e) => handleChange(e.target.value)}
                 disabled={disabled}
@@ -125,7 +121,7 @@ const SettingField: React.FC<SettingFieldProps> = ({
               />
               <button
                 type="button"
-                className="absolute right-2 flex items-center justify-center w-7 h-7 border-none bg-transparent text-smoke cursor-pointer rounded-sm hover:text-espresso"
+                className="absolute right-2 flex items-center justify-center w-7 h-7 border-none bg-transparent text-[var(--theme-text-muted)] cursor-pointer rounded-lg hover:text-white transition-colors"
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
               >
@@ -135,11 +131,10 @@ const SettingField: React.FC<SettingFieldProps> = ({
           );
         }
 
-        // Regular string input
         return (
           <input
             type="text"
-            className="w-full h-10 px-md bg-cream border border-border rounded-sm text-sm text-espresso transition-all duration-fast ease-standard focus:outline-none focus:border-[var(--color-rose-poudre)] focus:shadow-[0_0_0_3px_rgba(var(--color-rose-poudre-rgb),0.2)] disabled:opacity-60 disabled:cursor-not-allowed"
+            className={inputBase}
             value={parsedValue as string ?? ''}
             onChange={(e) => handleChange(e.target.value)}
             disabled={disabled}
@@ -147,12 +142,11 @@ const SettingField: React.FC<SettingFieldProps> = ({
         );
 
       case 'array': {
-        // Render as comma-separated input for simple arrays
         const arrayValue = Array.isArray(parsedValue) ? parsedValue : [];
         return (
           <input
             type="text"
-            className="w-full h-10 px-md bg-cream border border-border rounded-sm text-sm text-espresso transition-all duration-fast ease-standard focus:outline-none focus:border-[var(--color-rose-poudre)] focus:shadow-[0_0_0_3px_rgba(var(--color-rose-poudre-rgb),0.2)] disabled:opacity-60 disabled:cursor-not-allowed"
+            className={inputBase}
             value={arrayValue.join(', ')}
             onChange={(e) => {
               const items = e.target.value.split(',').map((s) => {
@@ -162,20 +156,19 @@ const SettingField: React.FC<SettingFieldProps> = ({
               });
               handleChange(items);
             }}
-            placeholder="valeur1, valeur2, valeur3"
+            placeholder="value1, value2, value3"
             disabled={disabled}
           />
         );
       }
 
       case 'json': {
-        // For JSON, render a textarea with formatted JSON
         const jsonString = typeof parsedValue === 'object'
           ? JSON.stringify(parsedValue, null, 2)
           : String(parsedValue);
         return (
           <textarea
-            className="w-full h-auto min-h-[100px] p-md bg-cream border border-border rounded-sm text-xs text-espresso font-mono resize-y transition-all duration-fast ease-standard focus:outline-none focus:border-[var(--color-rose-poudre)] focus:shadow-[0_0_0_3px_rgba(var(--color-rose-poudre-rgb),0.2)] disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full min-h-[100px] p-3 bg-black/40 border border-white/10 rounded-xl text-xs text-white font-mono resize-y transition-all focus:outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 disabled:opacity-50 disabled:cursor-not-allowed"
             value={jsonString}
             onChange={(e) => {
               try {
@@ -193,14 +186,13 @@ const SettingField: React.FC<SettingFieldProps> = ({
 
       case 'file':
         return (
-          <div className="flex items-center gap-md">
+          <div className="flex items-center gap-3">
             <input
               type="file"
-              className="flex-1"
+              className="flex-1 text-sm text-white file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border file:border-white/10 file:bg-transparent file:text-white file:font-medium file:cursor-pointer hover:file:border-white/20"
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  // Handle file upload - for now just store the name
                   handleChange(file.name);
                 }
               }}
@@ -208,7 +200,9 @@ const SettingField: React.FC<SettingFieldProps> = ({
               accept="image/*"
             />
             {parsedValue != null && (
-              <span className="text-sm text-smoke max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">{String(parsedValue)}</span>
+              <span className="text-sm text-[var(--theme-text-muted)] max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap">
+                {String(parsedValue)}
+              </span>
             )}
           </div>
         );
@@ -217,7 +211,7 @@ const SettingField: React.FC<SettingFieldProps> = ({
         return (
           <input
             type="text"
-            className="w-full h-10 px-md bg-cream border border-border rounded-sm text-sm text-espresso transition-all duration-fast ease-standard focus:outline-none focus:border-[var(--color-rose-poudre)] focus:shadow-[0_0_0_3px_rgba(var(--color-rose-poudre-rgb),0.2)] disabled:opacity-60 disabled:cursor-not-allowed"
+            className={inputBase}
             value={String(parsedValue ?? '')}
             onChange={(e) => handleChange(e.target.value)}
             disabled={disabled}
@@ -226,57 +220,50 @@ const SettingField: React.FC<SettingFieldProps> = ({
     }
   };
 
+  const resetButton = (
+    <button
+      type="button"
+      className="flex items-center justify-center w-6 h-6 border-none bg-transparent text-[var(--theme-text-muted)] cursor-pointer rounded-lg transition-colors hover:bg-white/5 hover:text-[var(--color-gold)]"
+      onClick={onReset}
+      title="Reset"
+    >
+      <RotateCcw size={14} />
+    </button>
+  );
+
   return (
     <div className={cn(
-      'py-md border-b border-border last:border-b-0',
-      setting.value_type === 'boolean' && 'flex items-center justify-between gap-lg'
+      'py-3 border-b border-white/5 last:border-b-0',
+      setting.value_type === 'boolean' && 'flex items-center justify-between gap-4'
     )}>
       <div className={cn(
-        'flex justify-between items-start mb-sm',
+        'flex justify-between items-start mb-2',
         setting.value_type === 'boolean' && 'flex-1 mb-0'
       )}>
         <div className="flex-1">
-          <label className="flex items-center gap-sm text-sm font-medium text-espresso">
+          <label className="flex items-center gap-2 text-sm font-medium text-white">
             {name}
             {setting.requires_restart && (
-              <span className="text-[10px] font-semibold uppercase px-1.5 py-0.5 bg-warning text-white rounded-sm">
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded-md">
                 Restart
               </span>
             )}
           </label>
           {description && (
-            <p className="text-xs text-smoke mt-0.5">{description}</p>
+            <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">{description}</p>
           )}
         </div>
         {setting.value_type !== 'boolean' && (
-          <div className="flex items-center gap-xs">
-            {showReset && hasChanged && onReset && (
-              <button
-                type="button"
-                className="flex items-center justify-center w-6 h-6 border-none bg-transparent text-smoke cursor-pointer rounded-sm transition-all duration-fast ease-standard hover:bg-cream hover:text-warning"
-                onClick={onReset}
-                title="Reset"
-              >
-                <RotateCcw size={14} />
-              </button>
-            )}
+          <div className="flex items-center gap-1">
+            {showReset && hasChanged && onReset && resetButton}
           </div>
         )}
       </div>
       <div className={cn(
-        setting.value_type === 'boolean' && 'flex items-center gap-sm'
+        setting.value_type === 'boolean' && 'flex items-center gap-2'
       )}>
         {renderField()}
-        {setting.value_type === 'boolean' && showReset && hasChanged && onReset && (
-          <button
-            type="button"
-            className="flex items-center justify-center w-6 h-6 border-none bg-transparent text-smoke cursor-pointer rounded-sm transition-all duration-fast ease-standard hover:bg-cream hover:text-warning ml-sm"
-            onClick={onReset}
-            title="Reset"
-          >
-            <RotateCcw size={14} />
-          </button>
-        )}
+        {setting.value_type === 'boolean' && showReset && hasChanged && onReset && resetButton}
       </div>
     </div>
   );

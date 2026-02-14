@@ -19,15 +19,15 @@ export function ReportPlaceholder({
 }: ReportPlaceholderProps) {
   return (
     <div className="flex flex-col items-center justify-center h-96 text-center px-4">
-      <div className="p-4 bg-amber-50 rounded-full mb-4">
-        <Construction size={48} className="text-amber-500" />
+      <div className="p-4 bg-[var(--color-gold)]/10 rounded-full mb-4">
+        <Construction size={48} className="text-[var(--color-gold)]" />
       </div>
 
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      <h3 className="text-lg font-semibold text-white mb-2">
         {title}
       </h3>
 
-      <p className="text-gray-500 max-w-md mb-6">
+      <p className="text-[var(--theme-text-muted)] max-w-md mb-6">
         {description}
       </p>
 

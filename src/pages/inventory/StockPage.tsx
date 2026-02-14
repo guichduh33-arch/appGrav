@@ -105,16 +105,18 @@ export default function StockPage() {
             {/* Filter Tabs */}
             <div className="flex gap-2 flex-wrap max-md:overflow-x-auto max-md:flex-nowrap max-md:pb-2">
                 {([
-                    { key: 'all', label: 'All', icon: <LayoutDashboard size={18} /> },
+                    { key: 'all', label: 'All Items', icon: <LayoutDashboard size={18} /> },
                     { key: 'raw_material', label: 'Raw Materials', icon: <Package size={18} /> },
-                    { key: 'finished', label: 'Finished Products', icon: <Coffee size={18} /> },
+                    { key: 'finished', label: 'Finished', icon: <Coffee size={18} /> },
                     { key: 'low_stock', label: 'Low Stock', icon: <AlertCircle size={18} /> },
                 ] as const).map(f => (
                     <button
                         key={f.key}
                         className={cn(
-                            'flex items-center gap-2 py-2.5 px-4 text-sm font-medium text-[var(--theme-text-secondary)] bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-lg cursor-pointer transition-all duration-200 max-md:shrink-0 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]',
-                            activeFilter === f.key && 'bg-[var(--color-gold)] border-[var(--color-gold)] text-[var(--theme-bg-primary)] hover:text-[var(--theme-bg-primary)]'
+                            'flex items-center gap-2 py-2 px-5 text-[10px] font-bold uppercase tracking-[0.15em] rounded-full border cursor-pointer transition-all duration-200 max-md:shrink-0',
+                            activeFilter === f.key
+                                ? 'bg-[var(--color-gold)]/10 border-[var(--color-gold)]/30 text-[var(--color-gold)]'
+                                : 'border-white/10 text-[var(--muted-smoke)] hover:border-white/20 hover:text-white'
                         )}
                         onClick={() => setActiveFilter(f.key)}
                     >
@@ -122,8 +124,10 @@ export default function StockPage() {
                         {f.label}
                         {f.key === 'low_stock' && stats.lowStockItems > 0 && (
                             <span className={cn(
-                                'inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-semibold rounded-full',
-                                activeFilter === 'low_stock' ? 'bg-[var(--theme-bg-primary)] text-[var(--color-gold)]' : 'bg-[var(--color-danger)] text-white'
+                                'inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-[10px] font-bold rounded-full',
+                                activeFilter === 'low_stock'
+                                    ? 'bg-[var(--color-gold)]/20 text-[var(--color-gold)]'
+                                    : 'bg-red-900/30 text-red-400'
                             )}>
                                 {stats.lowStockItems}
                             </span>
@@ -136,18 +140,18 @@ export default function StockPage() {
             <div className="grid grid-cols-4 max-xl:grid-cols-2 max-md:grid-cols-1 gap-4">
                 {([
                     { icon: <Boxes size={24} />, iconClass: 'bg-[var(--color-gold)]/10 text-[var(--color-gold)]', label: 'Total Products', value: stats.totalItems, trend: 'In stock', trendIcon: <TrendingUp size={12} />, trendUp: true },
-                    { icon: <Package size={24} />, iconClass: 'bg-[var(--color-warning)]/10 text-[var(--color-warning)]', label: 'Raw Materials', value: stats.rawMaterials, trend: 'Ingredients', trendUp: true },
-                    { icon: <Coffee size={24} />, iconClass: 'bg-[var(--color-success)]/10 text-[var(--color-success)]', label: 'Finished Products', value: stats.finishedProducts, trend: 'Ready to sell', trendUp: true },
-                    { icon: <AlertTriangle size={24} />, iconClass: 'bg-[var(--color-danger)]/10 text-[var(--color-danger)]', label: 'Low Stock Alerts', value: stats.lowStockItems, trend: stats.lowStockItems > 0 ? 'Needs attention' : 'All OK', trendUp: stats.lowStockItems === 0 },
+                    { icon: <Package size={24} />, iconClass: 'bg-amber-500/10 text-amber-400', label: 'Raw Materials', value: stats.rawMaterials, trend: 'Ingredients', trendUp: true },
+                    { icon: <Coffee size={24} />, iconClass: 'bg-emerald-500/10 text-emerald-400', label: 'Finished Products', value: stats.finishedProducts, trend: 'Ready to sell', trendUp: true },
+                    { icon: <AlertTriangle size={24} />, iconClass: 'bg-red-500/10 text-red-400', label: 'Critical Alerts', value: stats.lowStockItems, trend: stats.lowStockItems > 0 ? 'Needs attention' : 'All OK', trendUp: stats.lowStockItems === 0 },
                 ]).map((stat, i) => (
-                    <div key={i} className="flex items-start gap-4 p-5 bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl shadow-sm">
+                    <div key={i} className="flex items-start gap-4 p-6 bg-[var(--onyx-surface)] border border-white/5 rounded-xl">
                         <div className={cn('flex items-center justify-center w-12 h-12 rounded-xl', stat.iconClass)}>
                             {stat.icon}
                         </div>
                         <div className="flex-1">
-                            <div className="text-[0.8125rem] font-medium text-[var(--theme-text-muted)] uppercase tracking-wide">{stat.label}</div>
-                            <div className="text-[1.75rem] font-bold text-[var(--theme-text-primary)] leading-tight">{stat.value}</div>
-                            <div className={cn('flex items-center gap-1 text-[0.8125rem] font-medium mt-1', stat.trendUp ? 'text-[var(--color-success)]' : 'text-[var(--color-danger)]')}>
+                            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)] mb-1">{stat.label}</div>
+                            <div className="text-2xl font-light text-white leading-tight">{stat.value}</div>
+                            <div className={cn('flex items-center gap-1 text-[10px] font-medium mt-2', stat.trendUp ? 'text-emerald-400' : 'text-red-400')}>
                                 {stat.trendIcon}
                                 {stat.trend}
                             </div>
@@ -163,7 +167,7 @@ export default function StockPage() {
             )}
 
             {/* Inventory Table */}
-            <div className="bg-[var(--theme-bg-secondary)] border border-[var(--theme-border)] rounded-xl overflow-hidden shadow-sm">
+            <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
                 <InventoryTable
                     items={filteredItems as unknown as InventoryItemWithCategory[]}
                     isLoading={isLoading}

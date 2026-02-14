@@ -10,18 +10,18 @@ import { formatIDR } from '@/services/accounting/accountingService'
 import type { TJournalReferenceType } from '@/types/accounting'
 
 const REF_TYPE_COLORS: Record<string, string> = {
-  sale: 'bg-green-100 text-green-700',
-  purchase: 'bg-blue-100 text-blue-700',
-  manual: 'bg-gray-100 text-gray-700',
-  void: 'bg-red-100 text-red-700',
-  refund: 'bg-orange-100 text-orange-700',
-  adjustment: 'bg-purple-100 text-purple-700',
+  sale: 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20',
+  purchase: 'bg-sky-400/10 text-sky-400 border border-sky-400/20',
+  manual: 'bg-white/5 text-white/60 border border-white/10',
+  void: 'bg-red-400/10 text-red-400 border border-red-400/20',
+  refund: 'bg-amber-400/10 text-amber-400 border border-amber-400/20',
+  adjustment: 'bg-purple-400/10 text-purple-400 border border-purple-400/20',
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  draft: 'bg-yellow-100 text-yellow-700',
-  posted: 'bg-green-100 text-green-700',
-  locked: 'bg-gray-100 text-gray-700',
+  draft: 'bg-amber-400/10 text-amber-400 border border-amber-400/20',
+  posted: 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20',
+  locked: 'bg-white/5 text-white/60 border border-white/10',
 }
 
 export default function JournalEntriesPage() {
@@ -43,10 +43,10 @@ export default function JournalEntriesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-gray-500">{totalCount} entries</p>
+        <p className="text-sm text-[var(--theme-text-muted)]">{totalCount} entries</p>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-1 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="flex items-center gap-1 px-4 py-2 text-sm bg-[var(--color-gold)] text-black font-bold rounded-xl hover:brightness-110 transition-all"
         >
           <Plus size={16} /> New Entry
         </button>
@@ -57,7 +57,7 @@ export default function JournalEntriesPage() {
         <select
           value={filterType}
           onChange={e => setFilterType(e.target.value as TJournalReferenceType | '')}
-          className="border rounded-lg px-3 py-1.5 text-sm"
+          className="bg-black/40 border border-white/10 rounded-xl px-3 py-1.5 text-sm text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
         >
           <option value="">All Types</option>
           <option value="sale">Sales</option>
@@ -71,57 +71,57 @@ export default function JournalEntriesPage() {
           type="date"
           value={startDate}
           onChange={e => setStartDate(e.target.value)}
-          className="border rounded-lg px-3 py-1.5 text-sm"
+          className="bg-black/40 border border-white/10 rounded-xl px-3 py-1.5 text-sm text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
           placeholder="Start date"
         />
         <input
           type="date"
           value={endDate}
           onChange={e => setEndDate(e.target.value)}
-          className="border rounded-lg px-3 py-1.5 text-sm"
+          className="bg-black/40 border border-white/10 rounded-xl px-3 py-1.5 text-sm text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
           placeholder="End date"
         />
       </div>
 
       {/* Table */}
-      <div className="border rounded-lg overflow-hidden">
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 border-b">
-              <th className="text-left px-4 py-2 font-medium">Entry #</th>
-              <th className="text-left px-4 py-2 font-medium">Date</th>
-              <th className="text-left px-4 py-2 font-medium">Description</th>
-              <th className="text-left px-4 py-2 font-medium">Type</th>
-              <th className="text-left px-4 py-2 font-medium">Status</th>
-              <th className="text-right px-4 py-2 font-medium">Amount</th>
+            <tr className="border-b border-white/5">
+              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Entry #</th>
+              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Date</th>
+              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Description</th>
+              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Type</th>
+              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Status</th>
+              <th className="text-right px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Amount</th>
               <th className="w-20"></th>
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody>
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="animate-pulse">
-                  <td className="px-4 py-3"><div className="h-3 bg-gray-200 rounded w-24" /></td>
-                  <td className="px-4 py-3"><div className="h-3 bg-gray-200 rounded w-20" /></td>
-                  <td className="px-4 py-3"><div className="h-3 bg-gray-200 rounded w-48" /></td>
-                  <td className="px-4 py-3"><div className="h-3 bg-gray-200 rounded w-16" /></td>
-                  <td className="px-4 py-3"><div className="h-3 bg-gray-200 rounded w-16" /></td>
-                  <td className="px-4 py-3"><div className="h-3 bg-gray-200 rounded w-24" /></td>
+                <tr key={i} className="animate-pulse border-b border-white/5">
+                  <td className="px-4 py-3"><div className="h-3 bg-white/10 rounded w-24" /></td>
+                  <td className="px-4 py-3"><div className="h-3 bg-white/10 rounded w-20" /></td>
+                  <td className="px-4 py-3"><div className="h-3 bg-white/10 rounded w-48" /></td>
+                  <td className="px-4 py-3"><div className="h-3 bg-white/10 rounded w-16" /></td>
+                  <td className="px-4 py-3"><div className="h-3 bg-white/10 rounded w-16" /></td>
+                  <td className="px-4 py-3"><div className="h-3 bg-white/10 rounded w-24" /></td>
                   <td />
                 </tr>
               ))
             ) : entries.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
+                <td colSpan={7} className="px-4 py-8 text-center text-[var(--theme-text-muted)]">
                   No journal entries found
                 </td>
               </tr>
             ) : (
               entries.map(entry => (
-                <tr key={entry.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => setSelectedId(entry.id)}>
-                  <td className="px-4 py-2 font-mono text-xs">{entry.entry_number}</td>
-                  <td className="px-4 py-2">{entry.entry_date}</td>
-                  <td className="px-4 py-2 max-w-xs truncate">{entry.description}</td>
+                <tr key={entry.id} className="border-b border-white/5 hover:bg-white/[0.02] cursor-pointer transition-colors" onClick={() => setSelectedId(entry.id)}>
+                  <td className="px-4 py-2 font-mono text-xs text-[var(--color-gold)]">{entry.entry_number}</td>
+                  <td className="px-4 py-2 text-white/80">{entry.entry_date}</td>
+                  <td className="px-4 py-2 max-w-xs truncate text-white/80">{entry.description}</td>
                   <td className="px-4 py-2">
                     <span className={`px-2 py-0.5 rounded-full text-xs ${REF_TYPE_COLORS[entry.reference_type] || ''}`}>
                       {entry.reference_type}
@@ -132,16 +132,16 @@ export default function JournalEntriesPage() {
                       {entry.status}
                     </span>
                   </td>
-                  <td className="px-4 py-2 text-right font-mono">{formatIDR(entry.total_debit)}</td>
+                  <td className="px-4 py-2 text-right font-mono text-white">{formatIDR(entry.total_debit)}</td>
                   <td className="px-4 py-2">
                     <div className="flex items-center gap-1">
-                      <button className="p-1 hover:bg-gray-200 rounded" title="View">
+                      <button className="p-1 hover:bg-white/5 rounded text-white/40 hover:text-white transition-colors" title="View">
                         <Eye size={14} />
                       </button>
                       {entry.status === 'draft' && (
                         <button
                           onClick={e => { e.stopPropagation(); postEntry.mutate(entry.id) }}
-                          className="p-1 hover:bg-green-100 rounded text-green-600"
+                          className="p-1 hover:bg-emerald-400/10 rounded text-emerald-400"
                           title="Post"
                         >
                           <CheckCircle size={14} />
@@ -162,17 +162,17 @@ export default function JournalEntriesPage() {
           <button
             onClick={() => setPage(Math.max(0, page - 1))}
             disabled={page === 0}
-            className="p-1 border rounded disabled:opacity-30"
+            className="p-1 border border-white/10 rounded-xl text-white/60 hover:border-white/20 disabled:opacity-30 transition-colors"
           >
             <ChevronLeft size={16} />
           </button>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-[var(--theme-text-muted)]">
             Page {page + 1} of {totalPages}
           </span>
           <button
             onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
             disabled={page >= totalPages - 1}
-            className="p-1 border rounded disabled:opacity-30"
+            className="p-1 border border-white/10 rounded-xl text-white/60 hover:border-white/20 disabled:opacity-30 transition-colors"
           >
             <ChevronRight size={16} />
           </button>
@@ -181,61 +181,61 @@ export default function JournalEntriesPage() {
 
       {/* Detail drawer */}
       {selectedId && detail && (
-        <div className="fixed inset-y-0 right-0 w-[500px] bg-white shadow-xl border-l z-40 overflow-y-auto">
-          <div className="flex items-center justify-between p-4 border-b">
-            <h3 className="font-semibold">{detail.entry_number}</h3>
-            <button onClick={() => setSelectedId(undefined)} className="p-1 hover:bg-gray-100 rounded">
+        <div className="fixed inset-y-0 right-0 w-[500px] bg-[var(--theme-bg-secondary)] border-l border-white/10 z-40 overflow-y-auto shadow-2xl">
+          <div className="flex items-center justify-between p-4 border-b border-white/5">
+            <h3 className="font-semibold text-[var(--color-gold)]">{detail.entry_number}</h3>
+            <button onClick={() => setSelectedId(undefined)} className="p-1 hover:bg-white/5 rounded text-white/60 hover:text-white transition-colors">
               &times;
             </button>
           </div>
           <div className="p-4 space-y-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-500">Date</span>
-              <span>{detail.entry_date}</span>
+              <span className="text-[var(--theme-text-muted)]">Date</span>
+              <span className="text-white">{detail.entry_date}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Type</span>
+              <span className="text-[var(--theme-text-muted)]">Type</span>
               <span className={`px-2 py-0.5 rounded-full text-xs ${REF_TYPE_COLORS[detail.reference_type]}`}>
                 {detail.reference_type}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Status</span>
+              <span className="text-[var(--theme-text-muted)]">Status</span>
               <span className={`px-2 py-0.5 rounded-full text-xs ${STATUS_COLORS[detail.status]}`}>
                 {detail.status}
               </span>
             </div>
-            <p className="text-gray-700">{detail.description}</p>
+            <p className="text-white/70">{detail.description}</p>
 
-            <table className="w-full text-sm border rounded-lg overflow-hidden mt-4">
+            <table className="w-full text-sm bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden mt-4">
               <thead>
-                <tr className="bg-gray-50">
-                  <th className="text-left px-3 py-2 font-medium">Account</th>
-                  <th className="text-right px-3 py-2 font-medium">Debit</th>
-                  <th className="text-right px-3 py-2 font-medium">Credit</th>
+                <tr className="border-b border-white/5">
+                  <th className="text-left px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Account</th>
+                  <th className="text-right px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Debit</th>
+                  <th className="text-right px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Credit</th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody>
                 {detail.lines.map(line => (
-                  <tr key={line.id}>
+                  <tr key={line.id} className="border-b border-white/5">
                     <td className="px-3 py-2">
-                      <span className="font-mono text-xs text-gray-500">{line.account?.code}</span>{' '}
-                      {line.account?.name}
+                      <span className="font-mono text-xs text-[var(--theme-text-muted)]">{line.account?.code}</span>{' '}
+                      <span className="text-white/80">{line.account?.name}</span>
                     </td>
-                    <td className="px-3 py-2 text-right font-mono">
+                    <td className="px-3 py-2 text-right font-mono text-emerald-400">
                       {line.debit > 0 ? formatIDR(line.debit) : ''}
                     </td>
-                    <td className="px-3 py-2 text-right font-mono">
+                    <td className="px-3 py-2 text-right font-mono text-red-400">
                       {line.credit > 0 ? formatIDR(line.credit) : ''}
                     </td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
-                <tr className="bg-gray-50 font-semibold">
-                  <td className="px-3 py-2">Total</td>
-                  <td className="px-3 py-2 text-right font-mono">{formatIDR(detail.total_debit)}</td>
-                  <td className="px-3 py-2 text-right font-mono">{formatIDR(detail.total_credit)}</td>
+                <tr className="border-t border-white/10 font-semibold">
+                  <td className="px-3 py-2 text-white">Total</td>
+                  <td className="px-3 py-2 text-right font-mono text-emerald-400">{formatIDR(detail.total_debit)}</td>
+                  <td className="px-3 py-2 text-right font-mono text-red-400">{formatIDR(detail.total_credit)}</td>
                 </tr>
               </tfoot>
             </table>

@@ -197,25 +197,25 @@ export default function PinVerificationModal({
     const numpadKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'clear', '0', 'back']
 
     return (
-        <div className="modal-backdrop is-active" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className={cn('modal modal-sm is-active max-w-[360px]', isShaking && 'animate-pin-shake')}>
-                <div className="modal__header flex items-center">
+        <div className="fixed inset-0 z-[1050] flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={(e) => e.target === e.currentTarget && onClose()}>
+            <div className={cn('bg-[var(--theme-bg-primary)] rounded-xl text-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)] w-full max-w-[360px]', isShaking && 'animate-pin-shake')}>
+                <div className="flex items-center px-6 py-5 border-b border-white/5">
                     <div className="w-12 h-12 flex items-center justify-center rounded-xl mr-4 text-white"
                         style={{ background: 'linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-dark) 100%)' }}>
                         <Lock size={24} />
                     </div>
                     <div>
-                        <h3 className="modal__title">{title}</h3>
-                        <p className="modal__subtitle">{message}</p>
+                        <h3 className="text-lg font-bold text-white m-0">{title}</h3>
+                        <p className="text-sm text-[var(--theme-text-secondary)] mt-1">{message}</p>
                     </div>
-                    <button className="modal__close ml-auto" onClick={onClose} title="Close">
-                        <X size={24} />
+                    <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-white/10 bg-transparent text-[var(--theme-text-muted)] hover:text-white hover:border-white/20 cursor-pointer ml-auto" onClick={onClose} title="Close">
+                        <X size={20} />
                     </button>
                 </div>
 
-                <div className="modal__body">
+                <div className="p-6">
                     {isLoadingUsers ? (
-                        <div className="flex flex-col items-center justify-center py-8 gap-4 text-[var(--color-gray-400)]">
+                        <div className="flex flex-col items-center justify-center py-8 gap-4 text-[var(--theme-text-secondary)]">
                             <Loader2 size={32} className="animate-spin" />
                             <p>Loading...</p>
                         </div>
@@ -227,15 +227,15 @@ export default function PinVerificationModal({
                                     {[...Array(6)].map((_, i) => (
                                         <span key={i} className={cn(
                                             'w-4 h-4 text-xl transition-all duration-150',
-                                            i < pin.length ? 'text-gold' : 'text-[var(--color-gray-500)]'
+                                            i < pin.length ? 'text-[var(--color-gold)]' : 'text-[var(--theme-text-muted)]'
                                         )}>
-                                            {i < pin.length ? '●' : '○'}
+                                            {i < pin.length ? '\u25CF' : '\u25CB'}
                                         </span>
                                     ))}
                                 </div>
 
                                 {error && (
-                                    <div className="flex items-center justify-center gap-1 text-destructive text-sm animate-in fade-in">
+                                    <div className="flex items-center justify-center gap-1 text-[var(--color-danger-text)] text-sm animate-in fade-in">
                                         <AlertCircle size={16} />
                                         {error}
                                     </div>
@@ -248,13 +248,13 @@ export default function PinVerificationModal({
                                     <button
                                         key={key}
                                         className={cn(
-                                            'h-14 flex items-center justify-center text-2xl font-bold bg-[var(--color-gray-700)] text-white border-2 border-[var(--color-gray-600)] rounded-lg cursor-pointer shadow-sm transition-all duration-150 hover:bg-[var(--color-gray-600)] hover:border-[var(--color-gray-500)] active:scale-95 active:bg-[var(--color-gray-500)] disabled:opacity-50 disabled:cursor-not-allowed',
+                                            'h-14 flex items-center justify-center text-2xl font-bold bg-[var(--theme-bg-tertiary)] text-white border border-white/10 rounded-lg cursor-pointer shadow-sm transition-all duration-150 hover:bg-[var(--theme-bg-secondary)] hover:border-white/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed',
                                             (key === 'clear' || key === 'back') && 'bg-red-900/30 text-red-400 border-red-800 text-xl hover:bg-red-900/50 hover:border-red-600'
                                         )}
                                         onClick={() => handleKeyPress(key)}
                                         disabled={isVerifying}
                                     >
-                                        {key === 'clear' ? 'C' : key === 'back' ? '←' : key}
+                                        {key === 'clear' ? 'C' : key === 'back' ? '\u2190' : key}
                                     </button>
                                 ))}
                             </div>
@@ -262,12 +262,12 @@ export default function PinVerificationModal({
                     )}
                 </div>
 
-                <div className="modal__footer">
-                    <button className="btn btn-secondary" onClick={onClose} disabled={isVerifying}>
+                <div className="px-6 py-4 border-t border-white/5 flex justify-end gap-3">
+                    <button className="px-6 py-3 border border-white/10 rounded-xl bg-transparent text-sm font-semibold text-[var(--theme-text-secondary)] hover:text-white cursor-pointer" onClick={onClose} disabled={isVerifying}>
                         Cancel
                     </button>
                     <button
-                        className="btn btn-primary"
+                        className="px-6 py-3 bg-[var(--color-gold)] rounded-xl text-black text-sm font-bold cursor-pointer hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                         onClick={handleVerify}
                         disabled={pin.length < 4 || isVerifying || isLoadingUsers}
                     >
