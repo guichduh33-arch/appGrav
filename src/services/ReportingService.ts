@@ -103,6 +103,21 @@ export const ReportingService = {
     },
 
     /**
+     * Get Unique Customer Count for a period
+     */
+    async getUniqueCustomerCount(startDate: Date, endDate: Date): Promise<number> {
+        const { data, error } = await supabase
+            .from('orders')
+            .select('customer_id')
+            .gte('created_at', startDate.toISOString())
+            .lte('created_at', endDate.toISOString())
+            .not('customer_id', 'is', null)
+
+        if (error) throw error
+        return new Set((data || []).map(d => d.customer_id)).size
+    },
+
+    /**
      * Get Product Performance
      */
     async getProductPerformance(

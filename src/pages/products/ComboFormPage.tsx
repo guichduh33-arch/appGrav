@@ -45,6 +45,8 @@ export default function ComboFormPage() {
     const [availableAtPos, setAvailableAtPos] = useState(true)
     const [imageUrl, setImageUrl] = useState('')
     const [sortOrder, setSortOrder] = useState(0)
+    const [availableFrom, setAvailableFrom] = useState('')
+    const [availableTo, setAvailableTo] = useState('')
     const [groups, setGroups] = useState<ComboGroup[]>([])
     const [products, setProducts] = useState<Product[]>([])
     const [showProductSearch, setShowProductSearch] = useState<number | null>(null)
@@ -74,6 +76,7 @@ export default function ComboFormPage() {
                 setComboPrice(comboData.combo_price ?? 0); setIsActive(comboData.is_active ?? true)
                 setAvailableAtPos(comboData.available_at_pos ?? true); setImageUrl(comboData.image_url || '')
                 setSortOrder(comboData.sort_order ?? 0)
+                setAvailableFrom(comboData.available_from || ''); setAvailableTo(comboData.available_to || '')
 
                 const { data: groupsData, error: groupsError } = await supabase
                     .from('product_combo_groups').select('*').eq('combo_id', id).order('sort_order')
@@ -161,7 +164,7 @@ export default function ComboFormPage() {
         try {
             if (isEditing) {
                 const { error: comboError } = await supabase.from('product_combos')
-                    .update({ name, description: description || null, combo_price: comboPrice, is_active: isActive, available_at_pos: availableAtPos, image_url: imageUrl || null, sort_order: sortOrder } as never).eq('id', id!)
+                    .update({ name, description: description || null, combo_price: comboPrice, is_active: isActive, available_at_pos: availableAtPos, image_url: imageUrl || null, sort_order: sortOrder, available_from: availableFrom || null, available_to: availableTo || null } as never).eq('id', id!)
                 if (comboError) throw comboError
                 const { error: deleteError } = await supabase.from('product_combo_groups').delete().eq('combo_id', id!)
                 if (deleteError) throw deleteError
@@ -169,7 +172,7 @@ export default function ComboFormPage() {
                 toast.success('Combo updated')
             } else {
                 const { data: comboData, error: comboError } = await supabase.from('product_combos')
-                    .insert({ name, description: description || null, combo_price: comboPrice, is_active: isActive, available_at_pos: availableAtPos, image_url: imageUrl || null, sort_order: sortOrder } as never).select().single()
+                    .insert({ name, description: description || null, combo_price: comboPrice, is_active: isActive, available_at_pos: availableAtPos, image_url: imageUrl || null, sort_order: sortOrder, available_from: availableFrom || null, available_to: availableTo || null } as never).select().single()
                 if (comboError) throw comboError
                 await insertGroupsAndItems(comboData.id)
                 toast.success('Combo created')
@@ -232,10 +235,13 @@ export default function ComboFormPage() {
                         <ComboFormGeneral
                             name={name} description={description} comboPrice={comboPrice}
                             sortOrder={sortOrder} imageUrl={imageUrl} isActive={isActive}
-                            availableAtPos={availableAtPos} onNameChange={setName}
+                            availableAtPos={availableAtPos}
+                            availableFrom={availableFrom} availableTo={availableTo}
+                            onNameChange={setName}
                             onDescriptionChange={setDescription} onComboPriceChange={setComboPrice}
                             onSortOrderChange={setSortOrder} onImageUrlChange={setImageUrl}
                             onIsActiveChange={setIsActive} onAvailableAtPosChange={setAvailableAtPos}
+                            onAvailableFromChange={setAvailableFrom} onAvailableToChange={setAvailableTo}
                         />
                         {groups.length > 0 && (
                             <ComboFormPricePreview minPrice={calculateMinPrice()} maxPrice={calculateMaxPrice()} />

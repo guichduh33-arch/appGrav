@@ -3,10 +3,25 @@ import { Save, RotateCcw, AlertCircle, ShoppingCart, Shield } from 'lucide-react
 import { useSettingsByCategory, useUpdateSetting } from '@/hooks/settings';
 import { POS_CONFIG_DEFAULTS } from '@/hooks/settings/useModuleConfigSettings';
 import ArrayAmountEditor from '@/components/settings/ArrayAmountEditor';
+import DiscountPresetEditor from '@/components/settings/DiscountPresetEditor';
+import type { IDiscountPreset } from '@/types/settingsModuleConfig';
 import { toast } from 'sonner';
 
 const REFUND_METHOD_OPTIONS = ['same', 'cash', 'card', 'transfer', 'qris', 'edc'];
 const ROLE_OPTIONS = ['cashier', 'manager', 'admin', 'barista'];
+
+/** Normalize legacy number[] to IDiscountPreset[] for backward compatibility in settings form */
+function normalizePresets(raw: unknown): IDiscountPreset[] {
+  if (!Array.isArray(raw)) return POS_CONFIG_DEFAULTS.quickDiscountPercentages;
+  return raw.map((item) => {
+    if (typeof item === 'number') return { name: `${item}%`, pct: item };
+    if (typeof item === 'object' && item !== null && 'pct' in item) {
+      const obj = item as { name?: string; pct: number };
+      return { name: obj.name || `${obj.pct}%`, pct: obj.pct };
+    }
+    return null;
+  }).filter((p): p is IDiscountPreset => p !== null);
+}
 
 type FormValues = Record<string, unknown>;
 
@@ -109,10 +124,15 @@ const POSConfigSettingsPage = () => {
         <ArrayAmountEditor values={getVal('pos_config.shift_opening_cash_presets', POS_CONFIG_DEFAULTS.shiftOpeningCashPresets)} onChange={(v) => update('pos_config.shift_opening_cash_presets', v)} formatAs="idr" placeholder="e.g. 100000" min={0} />
       </div>
 
-      {/* Quick Discount Percentages */}
+      {/* Quick Discount Presets */}
       <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5">
-        <h3 className="text-sm font-bold text-white mb-3">Quick Discount Percentages</h3>
-        <ArrayAmountEditor values={getVal('pos_config.quick_discount_percentages', POS_CONFIG_DEFAULTS.quickDiscountPercentages)} onChange={(v) => update('pos_config.quick_discount_percentages', v)} formatAs="percent" placeholder="e.g. 10" min={0} max={100} />
+        <h3 className="text-sm font-bold text-white mb-1">Quick Discount Presets</h3>
+        <p className="text-[11px] text-[var(--theme-text-muted)] mb-3">Named discount buttons shown in the POS discount modal.</p>
+        <DiscountPresetEditor
+          values={normalizePresets(getVal<IDiscountPreset[] | number[]>('pos_config.quick_discount_percentages', POS_CONFIG_DEFAULTS.quickDiscountPercentages))}
+          onChange={(v) => update('pos_config.quick_discount_percentages', v)}
+          maxPct={getVal('pos_config.max_discount_percentage', POS_CONFIG_DEFAULTS.maxDiscountPercentage)}
+        />
       </div>
 
       {/* Max Discount */}

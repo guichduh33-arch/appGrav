@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Save, CheckCheck, Search, Eye, EyeOff } from 'lucide-react'
+import { ArrowLeft, Save, CheckCheck, Search, Eye, EyeOff, MapPin } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import type { InventoryCount, Product, ISection } from '../../types/database'
+import type { InventoryCount, Product, ISection, StockLocation } from '../../types/database'
 import { cn } from '@/lib/utils'
 import { logError } from '@/utils/logger'
 
@@ -33,6 +33,7 @@ const VARIANCE_REASONS = [
 
 interface InventoryCountWithSection extends InventoryCount {
     section?: ISection | null
+    location?: StockLocation | null
 }
 
 export default function StockOpnameForm() {
@@ -58,10 +59,10 @@ export default function StockOpnameForm() {
         if (!id) return
         setStatus('loading')
         try {
-            // 1. Get Session Info with section
+            // 1. Get Session Info with section and location
             const { data: sess, error: sErr } = await supabase
                 .from('inventory_counts')
-                .select('*, section:sections(*)')
+                .select('*, section:sections(*), location:stock_locations(*)')
                 .eq('id', id)
                 .single()
             if (sErr) throw sErr
@@ -263,6 +264,11 @@ export default function StockOpnameForm() {
                             {session.section && (
                                 <span className="inline-flex items-center px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-[var(--color-gold)]/10 text-[var(--color-gold)] border border-[var(--color-gold)]/20">
                                     {session.section.name}
+                                </span>
+                            )}
+                            {session.location && (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-white/5 text-[var(--theme-text-secondary)] border border-white/10">
+                                    <MapPin size={10} /> {session.location.name}
                                 </span>
                             )}
                         </div>

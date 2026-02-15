@@ -1,10 +1,10 @@
 # Database Schema Reference
 
-Last updated: 2026-02-10
+Last updated: 2026-02-15
 
 ## Overview
 
-PostgreSQL database hosted on Supabase. 58 SQL migrations. All tables use UUID primary keys, RLS enabled, and `created_at`/`updated_at` timestamps.
+PostgreSQL database hosted on Supabase. 74 SQL migrations (local) + 13 Phase 1 migrations (applied via Supabase API). All tables use UUID primary keys, RLS enabled, and `created_at`/`updated_at` timestamps.
 
 ## Core Tables
 
@@ -27,6 +27,7 @@ PostgreSQL database hosted on Supabase. 58 SQL migrations. All tables use UUID p
 ### suppliers
 - `id` UUID PK
 - `name`, `contact_person`, `phone`, `email`, `address`
+- `category` VARCHAR (e.g., bakery, dairy, packaging) (Phase 1 - I1)
 
 ## Sales Tables
 
@@ -36,6 +37,8 @@ PostgreSQL database hosted on Supabase. 58 SQL migrations. All tables use UUID p
 - `status`: pending, preparing, ready, completed, cancelled, **voided**
 - `order_type`: dine_in, takeaway, delivery, b2b
 - `subtotal`, `tax_amount`, `discount_amount`, `total` DECIMAL
+- `service_charge` DECIMAL (Phase 1 - C3)
+- `guest_count` INTEGER (Phase 1 - B3)
 - `payment_method`, `payment_status`
 - `customer_id` FK -> customers
 - `staff_id` FK -> user_profiles
@@ -120,6 +123,66 @@ PostgreSQL database hosted on Supabase. 58 SQL migrations. All tables use UUID p
 ## Purchasing
 
 ### purchase_orders / po_items
+
+### po_activity_log (Phase 1 - I4)
+- `id` UUID PK
+- `po_id` FK -> purchase_orders
+- `action` VARCHAR (created, updated, approved, received, cancelled)
+- `user_id` FK -> user_profiles
+- `details` JSONB
+- `created_at` TIMESTAMPTZ
+
+## Accounting Tables (Phase 1 additions)
+
+### product_price_history (D3/O1)
+- `id` UUID PK
+- `product_id` FK -> products
+- `old_price`, `new_price` DECIMAL
+- `old_cost_price`, `new_cost_price` DECIMAL
+- `changed_by` FK -> user_profiles
+- `reason` TEXT
+
+### vat_filings (H7)
+- `id` UUID PK
+- `year` INTEGER, `month` INTEGER
+- `collected`, `deductible`, `payable` DECIMAL
+- `status` VARCHAR (draft, filed, paid)
+- `filed_at` TIMESTAMPTZ, `filed_by` FK -> user_profiles
+- `notes` TEXT
+
+### journal_entries (updated)
+- `attachment_url` TEXT (Phase 1 - H3, file upload via Supabase Storage)
+
+## Notification Tables (Phase 1 - L1)
+
+### notification_events
+- `id` UUID PK
+- `code` VARCHAR UNIQUE
+- `name`, `description` TEXT
+- `category` VARCHAR
+- `default_enabled` BOOLEAN
+
+### notification_preferences
+- `id` UUID PK
+- `user_id` FK -> user_profiles
+- `event_id` FK -> notification_events
+- `enabled` BOOLEAN
+- UNIQUE(user_id, event_id)
+
+## Business Hours (Phase 1 - K7)
+
+### business_holidays
+- `id` UUID PK
+- `name` VARCHAR
+- `date` DATE UNIQUE
+- `is_recurring` BOOLEAN
+
+## User Profiles (updated)
+
+### user_profiles (Phase 1 additions)
+- `title` VARCHAR (job title - M2)
+- `default_module` VARCHAR (landing page after login - M2)
+- `mfa_enabled` BOOLEAN (MFA flag - M3)
 
 ## System Tables
 

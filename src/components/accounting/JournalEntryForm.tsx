@@ -28,6 +28,7 @@ export function JournalEntryForm({ onClose }: JournalEntryFormProps) {
   const { periods } = useFiscalPeriods()
   const [entryDate, setEntryDate] = useState(new Date().toISOString().split('T')[0])
   const [description, setDescription] = useState('')
+  const [memo, setMemo] = useState('')
   const [lines, setLines] = useState<IJournalLineInput[]>([emptyLine(), emptyLine()])
   const [errors, setErrors] = useState<{ field: string; message: string }[]>([])
   const [attachmentFile, setAttachmentFile] = useState<File | null>(null)
@@ -70,7 +71,7 @@ export function JournalEntryForm({ onClose }: JournalEntryFormProps) {
     }
 
     createEntry.mutate(
-      { entry_date: entryDate, description, lines, attachment_url },
+      { entry_date: entryDate, description, lines, attachment_url, memo: memo || null },
       { onSuccess: () => onClose() }
     )
   }
@@ -106,6 +107,18 @@ export function JournalEntryForm({ onClose }: JournalEntryFormProps) {
                 placeholder="Entry description"
               />
             </div>
+          </div>
+
+          {/* Memo */}
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-1">Memo</label>
+            <textarea
+              value={memo}
+              onChange={e => setMemo(e.target.value)}
+              rows={2}
+              className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none resize-none"
+              placeholder="Internal memo or notes for this entry"
+            />
           </div>
 
           {/* Attachment */}

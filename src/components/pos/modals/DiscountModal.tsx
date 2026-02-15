@@ -42,9 +42,9 @@ export default function DiscountModal({
     const discountAmount = calculateDiscountAmount()
     const finalPrice = totalPrice - discountAmount
 
-    const handleQuickPercentage = (percentage: number) => {
+    const handleQuickPercentage = (pct: number) => {
         setDiscountType('percentage')
-        setDiscountValue(percentage.toString())
+        setDiscountValue(pct.toString())
     }
 
     const handleApply = () => {
@@ -108,13 +108,16 @@ export default function DiscountModal({
                         {/* Quick Percentage Buttons */}
                         {discountType === 'percentage' && (
                             <div className="grid grid-cols-3 gap-2 mb-6">
-                                {posConfig.quickDiscountPercentages.map(pct => (
+                                {posConfig.quickDiscountPercentages.map((preset, idx) => (
                                     <button
-                                        key={pct}
-                                        className="p-3 bg-[var(--theme-bg-secondary)] border border-white/10 rounded text-sm font-semibold text-[var(--theme-text-secondary)] cursor-pointer transition-all duration-200 hover:bg-[var(--theme-bg-tertiary)] hover:border-[var(--color-gold)] hover:text-white"
-                                        onClick={() => handleQuickPercentage(pct)}
+                                        key={`${preset.pct}-${idx}`}
+                                        className="p-3 bg-[var(--theme-bg-secondary)] border border-white/10 rounded text-sm font-semibold text-[var(--theme-text-secondary)] cursor-pointer transition-all duration-200 hover:bg-[var(--theme-bg-tertiary)] hover:border-[var(--color-gold)] hover:text-white flex flex-col items-center gap-0.5"
+                                        onClick={() => handleQuickPercentage(preset.pct)}
                                     >
-                                        {pct}%
+                                        <span className="text-base font-bold">{preset.pct}%</span>
+                                        {preset.name !== `${preset.pct}%` && (
+                                            <span className="text-[10px] text-[var(--theme-text-muted)] truncate max-w-full">{preset.name}</span>
+                                        )}
                                     </button>
                                 ))}
                             </div>

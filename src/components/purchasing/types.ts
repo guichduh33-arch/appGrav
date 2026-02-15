@@ -12,6 +12,7 @@ export interface IPODetailItem {
   line_total: number
   quantity_received: number
   quantity_returned: number
+  qc_passed: boolean | null
 }
 
 // History metadata for different action types
@@ -88,6 +89,7 @@ export interface IPOItemsTableProps {
   isReceiving: boolean
   onReceiveItem: (itemId: string, quantity: number) => void
   onOpenReturnModal: (item: IPODetailItem) => void
+  onToggleQC?: (itemId: string, qcPassed: boolean | null) => void
 }
 
 export interface IPOReturnsSectionProps {

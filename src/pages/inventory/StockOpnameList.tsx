@@ -1,8 +1,9 @@
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, CheckCircle, Clock, XCircle, ArrowRight, X } from 'lucide-react'
+import { Plus, CheckCircle, Clock, XCircle, ArrowRight, X, MapPin } from 'lucide-react'
 import { useSections } from '@/hooks/inventory/useSections'
+import { useLocations } from '@/hooks/inventory/useLocations'
 import { useInventoryCounts, useCreateInventoryCount } from '@/hooks/inventory/useStockOpname'
 import { toast } from 'sonner'
 
@@ -10,14 +11,17 @@ export default function StockOpnameList() {
     const navigate = useNavigate()
     const [showSectionDialog, setShowSectionDialog] = useState(false)
     const [selectedSection, setSelectedSection] = useState<string | null>(null)
+    const [selectedLocation, setSelectedLocation] = useState<string | null>(null)
 
     const { data: counts = [], isLoading: loading } = useInventoryCounts()
     const { data: sections = [], isLoading: sectionsLoading } = useSections({ isActive: true })
+    const { data: locations = [], isLoading: locationsLoading } = useLocations()
     const createCountMutation = useCreateInventoryCount()
     const creating = createCountMutation.isPending
 
     function openSectionDialog() {
         setSelectedSection(null)
+        setSelectedLocation(null)
         setShowSectionDialog(true)
     }
 
@@ -28,7 +32,10 @@ export default function StockOpnameList() {
         }
 
         try {
-            const data = await createCountMutation.mutateAsync(selectedSection)
+            const data = await createCountMutation.mutateAsync({
+                sectionId: selectedSection,
+                locationId: selectedLocation,
+            })
             if (data) {
                 setShowSectionDialog(false)
                 navigate(`/inventory/stock-opname/${data.id}`)
@@ -68,6 +75,7 @@ export default function StockOpnameList() {
                             <tr className="bg-white/[0.02] border-b border-white/5">
                                 <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">Number</th>
                                 <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">Section</th>
+                                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">Location</th>
                                 <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">Date</th>
                                 <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">Status</th>
                                 <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">Notes</th>
@@ -85,6 +93,15 @@ export default function StockOpnameList() {
                                         {session.section ? (
                                             <span className="inline-flex items-center px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-[var(--color-gold)]/10 text-[var(--color-gold)] border border-[var(--color-gold)]/20">
                                                 {session.section.name}
+                                            </span>
+                                        ) : (
+                                            <span className="text-[var(--theme-text-muted)]">--</span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-5">
+                                        {session.location ? (
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-white/5 text-[var(--theme-text-secondary)] border border-white/10">
+                                                <MapPin size={10} /> {session.location.name}
                                             </span>
                                         ) : (
                                             <span className="text-[var(--theme-text-muted)]">--</span>
@@ -112,7 +129,7 @@ export default function StockOpnameList() {
                             ))}
                             {counts.length === 0 && (
                                 <tr>
-                                    <td colSpan={6} className="p-8 text-center text-[var(--theme-text-muted)]">
+                                    <td colSpan={7} className="p-8 text-center text-[var(--theme-text-muted)]">
                                         No inventory found. Start by creating one.
                                     </td>
                                 </tr>
@@ -138,51 +155,77 @@ export default function StockOpnameList() {
                         </div>
 
                         {/* Dialog Body */}
-                        <div className="px-6 py-5">
-                            <p className="text-sm text-[var(--theme-text-secondary)] mb-4">
-                                Choose the section for which you want to perform the inventory count.
-                            </p>
-                            {sectionsLoading ? (
-                                <div className="py-4 text-center text-[var(--theme-text-muted)]">Loading sections...</div>
-                            ) : (
-                                <div className="space-y-2 max-h-64 overflow-y-auto">
-                                    {sections.map(section => (
-                                        <label
-                                            key={section.id}
-                                            className="flex items-center p-3 rounded-xl cursor-pointer transition-all"
-                                            style={{
-                                                border: selectedSection === section.id
-                                                    ? '2px solid var(--color-gold)'
-                                                    : '1px solid rgba(255,255,255,0.05)',
-                                                background: selectedSection === section.id
-                                                    ? 'rgba(201, 165, 92, 0.08)'
-                                                    : 'rgba(255,255,255,0.02)',
-                                            }}
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="section"
-                                                value={section.id}
-                                                checked={selectedSection === section.id}
-                                                onChange={() => setSelectedSection(section.id)}
-                                                className="mr-3"
-                                                style={{ accentColor: 'var(--color-gold)' }}
-                                            />
-                                            <div>
-                                                <div className="font-medium text-white">{section.name}</div>
-                                                {section.description && (
-                                                    <div className="text-sm text-[var(--theme-text-muted)]">{section.description}</div>
-                                                )}
-                                            </div>
-                                        </label>
-                                    ))}
-                                    {sections.length === 0 && (
-                                        <p className="py-4 text-center text-[var(--theme-text-muted)]">
-                                            No sections available. Please create sections first.
-                                        </p>
-                                    )}
-                                </div>
-                            )}
+                        <div className="px-6 py-5 space-y-5">
+                            {/* Section selector */}
+                            <div>
+                                <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-2">
+                                    Section *
+                                </label>
+                                {sectionsLoading ? (
+                                    <div className="py-4 text-center text-[var(--theme-text-muted)]">Loading sections...</div>
+                                ) : (
+                                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                                        {sections.map(section => (
+                                            <label
+                                                key={section.id}
+                                                className="flex items-center p-3 rounded-xl cursor-pointer transition-all"
+                                                style={{
+                                                    border: selectedSection === section.id
+                                                        ? '2px solid var(--color-gold)'
+                                                        : '1px solid rgba(255,255,255,0.05)',
+                                                    background: selectedSection === section.id
+                                                        ? 'rgba(201, 165, 92, 0.08)'
+                                                        : 'rgba(255,255,255,0.02)',
+                                                }}
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="section"
+                                                    value={section.id}
+                                                    checked={selectedSection === section.id}
+                                                    onChange={() => setSelectedSection(section.id)}
+                                                    className="mr-3"
+                                                    style={{ accentColor: 'var(--color-gold)' }}
+                                                />
+                                                <div>
+                                                    <div className="font-medium text-white">{section.name}</div>
+                                                    {section.description && (
+                                                        <div className="text-sm text-[var(--theme-text-muted)]">{section.description}</div>
+                                                    )}
+                                                </div>
+                                            </label>
+                                        ))}
+                                        {sections.length === 0 && (
+                                            <p className="py-4 text-center text-[var(--theme-text-muted)]">
+                                                No sections available. Please create sections first.
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Location selector */}
+                            <div>
+                                <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-2">
+                                    Location (optional)
+                                </label>
+                                {locationsLoading ? (
+                                    <div className="py-2 text-center text-[var(--theme-text-muted)] text-sm">Loading locations...</div>
+                                ) : (
+                                    <select
+                                        value={selectedLocation ?? ''}
+                                        onChange={(e) => setSelectedLocation(e.target.value || null)}
+                                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 transition-colors"
+                                    >
+                                        <option value="">-- No location --</option>
+                                        {locations.map(loc => (
+                                            <option key={loc.id} value={loc.id}>
+                                                {loc.name} {loc.code ? `(${loc.code})` : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                )}
+                            </div>
                         </div>
 
                         {/* Dialog Footer */}

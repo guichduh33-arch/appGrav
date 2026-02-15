@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp, TrendingDown, DollarSign, ShoppingBag,
-  BarChart3, Receipt, Star, AlertTriangle, Landmark, Package,
+  BarChart3, Receipt, Star, AlertTriangle, Landmark, Package, Printer, Users,
 } from 'lucide-react';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
@@ -12,6 +12,7 @@ import { formatCurrency } from '@/utils/helpers';
 import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ComparisonToggle } from '@/components/reports/ComparisonToggle';
 import { ComparisonKpiCard, ComparisonKpiGrid } from '@/components/reports/ComparisonKpiCard';
+import { exportReportToPdf } from '@/services/export/pdfExportService';
 
 interface KpiRow { label: string; value: string; trend: string }
 
@@ -80,6 +81,12 @@ export function OverviewTab() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { data: uniqueCustomers } = useQuery({
+    queryKey: ['overview-unique-customers', dateRange.from, dateRange.to],
+    queryFn: () => ReportingService.getUniqueCustomerCount(dateRange.from, dateRange.to),
+    staleTime: 5 * 60 * 1000,
+  });
+
   const isLoading = comparisonLoading || summaryLoading;
   const error = comparisonError || summaryError;
 
@@ -109,6 +116,7 @@ export function OverviewTab() {
       { label: 'ATV', value: String(current?.avg_basket ?? 0), trend: `${atvTrend.toFixed(1)}%` },
       { label: 'Net Revenue', value: String(current?.net_revenue ?? 0), trend: `${netRevenueTrend.toFixed(1)}%` },
       { label: 'Total Tax', value: String(Math.round(totalTax)), trend: `${taxTrend.toFixed(1)}%` },
+      { label: 'Unique Customers', value: String(uniqueCustomers ?? 0), trend: '' },
       { label: 'Top Product', value: summaryData?.top_product ? `${summaryData.top_product.name} (${summaryData.top_product.qty})` : 'N/A', trend: '' },
       { label: 'Low Stock Alerts', value: String(summaryData?.low_stock_alerts ?? 0), trend: '' },
     ],
@@ -120,7 +128,15 @@ export function OverviewTab() {
     filename: 'overview-report',
     title: 'Overview Report',
     dateRange: { from: dateRange.from, to: dateRange.to },
-  }), [current, summaryData, dateRange, revenueTrend, ordersTrend, itemsSoldTrend, atvTrend, netRevenueTrend]);
+  }), [current, summaryData, uniqueCustomers, dateRange, revenueTrend, ordersTrend, itemsSoldTrend, atvTrend, netRevenueTrend]);
+
+  const handlePrintPdf = useCallback(() => {
+    if (!exportConfig.data.length) return
+    const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+    const rows = exportConfig.data.map(r => [r.label, r.value, r.trend])
+    exportReportToPdf('Overview Report', ['KPI', 'Value', 'Trend vs Previous'], rows,
+      { 'Period': `${fmt(dateRange.from)} - ${fmt(dateRange.to)}` })
+  }, [exportConfig, dateRange])
 
   if (error) {
     return (
@@ -146,6 +162,16 @@ export function OverviewTab() {
             onComparisonTypeChange={setComparisonType}
           />
           <ExportButtons config={exportConfig} />
+          <button
+            type="button"
+            onClick={handlePrintPdf}
+            disabled={!exportConfig.data.length}
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl transition-colors bg-transparent border border-white/10 text-white hover:border-white/20 disabled:bg-white/5 disabled:text-white/20 disabled:cursor-not-allowed"
+            title="Print / Save as PDF"
+          >
+            <Printer className="w-4 h-4" />
+            <span>Print</span>
+          </button>
         </div>
       </div>
 
@@ -197,84 +223,34 @@ export function OverviewTab() {
         </ComparisonKpiGrid>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <KpiCard
-            icon={<DollarSign className="w-5 h-5 text-blue-400" />}
-            iconBg="bg-blue-500/10" label="Revenue"
-            trend={revenueTrend}
-          >
-            <p className="text-2xl font-bold text-white">
-              {formatCurrency(current?.total_revenue ?? 0)}
-            </p>
+          <KpiCard icon={<DollarSign className="w-5 h-5 text-blue-400" />} iconBg="bg-blue-500/10" label="Revenue" trend={revenueTrend}>
+            <p className="text-2xl font-bold text-white">{formatCurrency(current?.total_revenue ?? 0)}</p>
           </KpiCard>
-
-          <KpiCard
-            icon={<ShoppingBag className="w-5 h-5 text-indigo-400" />}
-            iconBg="bg-indigo-500/10" label="Orders"
-            trend={ordersTrend}
-          >
-            <p className="text-2xl font-bold text-white">
-              {(current?.transaction_count ?? 0).toLocaleString()}
-            </p>
+          <KpiCard icon={<ShoppingBag className="w-5 h-5 text-indigo-400" />} iconBg="bg-indigo-500/10" label="Orders" trend={ordersTrend}>
+            <p className="text-2xl font-bold text-white">{(current?.transaction_count ?? 0).toLocaleString()}</p>
           </KpiCard>
-
-          <KpiCard
-            icon={<Package className="w-5 h-5 text-cyan-400" />}
-            iconBg="bg-cyan-500/10" label="Items Sold"
-            trend={itemsSoldTrend}
-          >
-            <p className="text-2xl font-bold text-white">
-              {(current?.items_sold ?? 0).toLocaleString()}
-            </p>
+          <KpiCard icon={<Package className="w-5 h-5 text-cyan-400" />} iconBg="bg-cyan-500/10" label="Items Sold" trend={itemsSoldTrend}>
+            <p className="text-2xl font-bold text-white">{(current?.items_sold ?? 0).toLocaleString()}</p>
           </KpiCard>
-
-          <KpiCard
-            icon={<BarChart3 className="w-5 h-5 text-purple-400" />}
-            iconBg="bg-purple-500/10" label="Avg Transaction Value"
-            trend={atvTrend}
-          >
-            <p className="text-2xl font-bold text-white">
-              {formatCurrency(current?.avg_basket ?? 0)}
-            </p>
+          <KpiCard icon={<BarChart3 className="w-5 h-5 text-purple-400" />} iconBg="bg-purple-500/10" label="Avg Transaction Value" trend={atvTrend}>
+            <p className="text-2xl font-bold text-white">{formatCurrency(current?.avg_basket ?? 0)}</p>
           </KpiCard>
-
-          <KpiCard
-            icon={<Receipt className="w-5 h-5 text-emerald-400" />}
-            iconBg="bg-emerald-500/10" label="Net Revenue (excl. Tax)"
-            trend={netRevenueTrend}
-          >
-            <p className="text-2xl font-bold text-emerald-400">
-              {formatCurrency(current?.net_revenue ?? 0)}
-            </p>
+          <KpiCard icon={<Receipt className="w-5 h-5 text-emerald-400" />} iconBg="bg-emerald-500/10" label="Net Revenue (excl. Tax)" trend={netRevenueTrend}>
+            <p className="text-2xl font-bold text-emerald-400">{formatCurrency(current?.net_revenue ?? 0)}</p>
           </KpiCard>
-
-          <KpiCard
-            icon={<Landmark className="w-5 h-5 text-amber-400" />}
-            iconBg="bg-amber-500/10" label="Total Tax (10%)"
-            trend={taxTrend}
-          >
-            <p className="text-2xl font-bold text-amber-400">
-              {formatCurrency(totalTax)}
-            </p>
+          <KpiCard icon={<Landmark className="w-5 h-5 text-amber-400" />} iconBg="bg-amber-500/10" label="Total Tax (10%)" trend={taxTrend}>
+            <p className="text-2xl font-bold text-amber-400">{formatCurrency(totalTax)}</p>
           </KpiCard>
-
-          <KpiCard
-            icon={<Star className="w-5 h-5 text-[var(--color-gold)]" />}
-            iconBg="bg-[var(--color-gold)]/10" label="Top Product"
-          >
-            {summaryData?.top_product ? (
-              <>
-                <p className="text-lg font-bold text-white truncate">{summaryData.top_product.name}</p>
-                <p className="text-sm text-[var(--theme-text-muted)]">{summaryData.top_product.qty} units sold</p>
-              </>
-            ) : (
-              <p className="text-lg text-[var(--theme-text-muted)]">No data</p>
-            )}
+          <KpiCard icon={<Users className="w-5 h-5 text-teal-400" />} iconBg="bg-teal-500/10" label="Unique Customers">
+            <p className="text-2xl font-bold text-white">{(uniqueCustomers ?? 0).toLocaleString()}</p>
           </KpiCard>
-
-          <KpiCard
-            icon={<AlertTriangle className="w-5 h-5 text-red-400" />}
-            iconBg="bg-red-500/10" label="Low Stock Alerts"
-          >
+          <KpiCard icon={<Star className="w-5 h-5 text-[var(--color-gold)]" />} iconBg="bg-[var(--color-gold)]/10" label="Top Product">
+            {summaryData?.top_product ? (<>
+              <p className="text-lg font-bold text-white truncate">{summaryData.top_product.name}</p>
+              <p className="text-sm text-[var(--theme-text-muted)]">{summaryData.top_product.qty} units sold</p>
+            </>) : (<p className="text-lg text-[var(--theme-text-muted)]">No data</p>)}
+          </KpiCard>
+          <KpiCard icon={<AlertTriangle className="w-5 h-5 text-red-400" />} iconBg="bg-red-500/10" label="Low Stock Alerts">
             <p className={`text-2xl font-bold ${(summaryData?.low_stock_alerts ?? 0) > 0 ? 'text-red-400' : 'text-white'}`}>
               {summaryData?.low_stock_alerts ?? 0}
             </p>

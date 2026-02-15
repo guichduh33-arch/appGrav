@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
+import { useToggleQCPassed } from '@/hooks/inventory/useIncomingStock'
 import { formatCurrency } from '@/utils/helpers'
 import { useNetworkStatus } from '@/hooks/offline/useNetworkStatus'
 import {
@@ -60,6 +61,7 @@ export default function PurchaseOrderDetailPage() {
   const confirmOrderMutation = useConfirmOrder()
   const cancelOrderMutation = useCancelOrder()
   const receivePOItemMutation = useReceivePOItem()
+  const toggleQCMutation = useToggleQCPassed()
 
   // Workflow actions
   const handleSendToSupplier = async () => {
@@ -179,6 +181,14 @@ export default function PurchaseOrderDetailPage() {
     }
   }
 
+  // QC toggle
+  const handleToggleQC = (itemId: string, qcPassed: boolean | null) => {
+    toggleQCMutation.mutate(
+      { itemId, qcPassed },
+      { onSuccess: () => refetch() },
+    )
+  }
+
   // Return handling
   const handleOpenReturnModal = (item: IPODetailItem) => {
     setSelectedItem(item)
@@ -296,6 +306,7 @@ export default function PurchaseOrderDetailPage() {
             isReceiving={receivePOItemMutation.isPending}
             onReceiveItem={handleReceiveItem}
             onOpenReturnModal={handleOpenReturnModal}
+            onToggleQC={handleToggleQC}
           />
 
           <POReturnsSection returns={returns} />

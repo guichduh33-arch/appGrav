@@ -1,4 +1,4 @@
-import { Box, Save } from 'lucide-react'
+import { Box, Save, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface ComboFormGeneralProps {
@@ -9,6 +9,8 @@ interface ComboFormGeneralProps {
     imageUrl: string
     isActive: boolean
     availableAtPos: boolean
+    availableFrom: string
+    availableTo: string
     onNameChange: (v: string) => void
     onDescriptionChange: (v: string) => void
     onComboPriceChange: (v: number) => void
@@ -16,6 +18,8 @@ interface ComboFormGeneralProps {
     onImageUrlChange: (v: string) => void
     onIsActiveChange: (v: boolean) => void
     onAvailableAtPosChange: (v: boolean) => void
+    onAvailableFromChange: (v: string) => void
+    onAvailableToChange: (v: string) => void
 }
 
 const INPUT_CLASS = "w-full px-5 py-3.5 bg-black/40 border border-white/10 rounded-xl text-white outline-none transition-all focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 placeholder:text-[var(--theme-text-muted)]"
@@ -23,9 +27,10 @@ const LABEL_CLASS = "text-[10px] font-bold uppercase tracking-[0.2em] text-[var(
 
 export default function ComboFormGeneral({
     name, description, comboPrice, sortOrder, imageUrl,
-    isActive, availableAtPos,
+    isActive, availableAtPos, availableFrom, availableTo,
     onNameChange, onDescriptionChange, onComboPriceChange,
-    onSortOrderChange, onImageUrlChange, onIsActiveChange, onAvailableAtPosChange
+    onSortOrderChange, onImageUrlChange, onIsActiveChange, onAvailableAtPosChange,
+    onAvailableFromChange, onAvailableToChange
 }: ComboFormGeneralProps) {
     return (
         <div className="bg-[var(--onyx-surface)] rounded-xl p-8 border border-white/5 shadow-sm">
@@ -101,6 +106,42 @@ export default function ComboFormGeneral({
                         placeholder="https://example.com/combo-image.jpg"
                         className={INPUT_CLASS}
                     />
+                </div>
+
+                <div className="grid grid-cols-2 gap-6 max-md:grid-cols-1">
+                    <div className="space-y-2">
+                        <label htmlFor="availableFrom" className={LABEL_CLASS}>
+                            <span className="inline-flex items-center gap-1.5">
+                                <Clock size={12} className="text-[var(--color-gold)]" />
+                                Available From
+                            </span>
+                        </label>
+                        <input
+                            id="availableFrom"
+                            type="time"
+                            value={availableFrom}
+                            onChange={(e) => onAvailableFromChange(e.target.value)}
+                            className={cn(INPUT_CLASS, "[color-scheme:dark]")}
+                        />
+                        <p className="text-[0.7rem] text-[var(--theme-text-muted)] mt-1 opacity-70 italic">
+                            Leave empty for all-day availability
+                        </p>
+                    </div>
+                    <div className="space-y-2">
+                        <label htmlFor="availableTo" className={LABEL_CLASS}>
+                            <span className="inline-flex items-center gap-1.5">
+                                <Clock size={12} className="text-[var(--color-gold)]" />
+                                Available To
+                            </span>
+                        </label>
+                        <input
+                            id="availableTo"
+                            type="time"
+                            value={availableTo}
+                            onChange={(e) => onAvailableToChange(e.target.value)}
+                            className={cn(INPUT_CLASS, "[color-scheme:dark]")}
+                        />
+                    </div>
                 </div>
 
                 <div className="flex gap-10 pt-4 max-md:flex-col max-md:gap-4">

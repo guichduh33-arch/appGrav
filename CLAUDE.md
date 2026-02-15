@@ -55,9 +55,9 @@ src/
 │   ├── settings/    # Configuration UI
 │   ├── sync/        # Offline/sync indicators
 │   └── ui/          # Shared UI components (shadcn/ui)
-├── pages/           # Route-based pages (95+ pages)
+├── pages/           # Route-based pages (~240 pages)
 ├── stores/          # Zustand stores (see State Management)
-├── hooks/           # Custom hooks by module (~117 hooks)
+├── hooks/           # Custom hooks by module (~130 hooks)
 │   ├── accounting/  # useAccounts, useJournalEntries, useGeneralLedger, useTrialBalance, useBalanceSheet, useIncomeStatement, useVATManagement, useFiscalPeriods
 │   ├── customers/   # useCustomers, useCustomerCategories
 │   ├── inventory/   # useInventoryItems, useStockMovements, useStockAdjustment, useProductRecipe
@@ -74,7 +74,7 @@ src/
 │   ├── shift/       # Shift management hooks
 │   ├── sync/        # Sync status hooks
 │   └── ...          # useOrders, usePermissions, useSyncQueue, useTerminal, usePWAInstall
-├── services/        # Business logic & external APIs (~74 services)
+├── services/        # Business logic & external APIs (~78 services)
 │   ├── accounting/  # accountingService, journalEntryValidation, vatService
 │   ├── b2b/         # B2B credit system
 │   ├── display/     # Customer display broadcast
@@ -110,7 +110,7 @@ src/
 └── locales/         # [SUSPENDED] Translation files exist but i18n is disabled
 
 supabase/
-├── migrations/      # SQL migrations (62: 59 consolidated + 3 accounting)
+├── migrations/      # SQL migrations (74 local + 13 Phase 1 via API)
 └── functions/       # Edge Functions (Deno, 13 functions)
 ```
 
@@ -181,7 +181,7 @@ Offline Mode:
 
 **Core**: `products` (finished/semi_finished/raw_material types), `categories` (dispatch_station: barista/kitchen/display/none), `suppliers`
 
-**Sales**: `orders`, `order_items`, `pos_sessions`, `floor_plan_items`
+**Sales**: `orders` (+ `service_charge`, `guest_count`), `order_items`, `pos_sessions`, `floor_plan_items`
 
 **Customers**: `customers`, `customer_categories` (slug, price_modifier_type), `product_category_prices`, `loyalty_tiers`, `loyalty_transactions`
 
@@ -191,9 +191,13 @@ Offline Mode:
 
 **B2B**: `b2b_orders`, `b2b_order_items`, `b2b_payments`
 
-**Purchasing**: `purchase_orders`, `po_items`
+**Purchasing**: `purchase_orders`, `po_items`, `po_activity_log`
 
-**Accounting**: `accounts` (chart of accounts, 30 seed), `journal_entries`, `journal_entry_lines`, `fiscal_periods`
+**Accounting**: `accounts` (chart of accounts, 30 seed), `journal_entries` (+ `attachment_url`), `journal_entry_lines`, `fiscal_periods`, `vat_filings`, `product_price_history`
+
+**Notifications**: `notification_events`, `notification_preferences`
+
+**Business Hours**: `business_holidays`
 
 **System**: `user_profiles`, `roles`, `permissions`, `role_permissions`, `user_roles`, `user_permissions`, `audit_logs`, `settings`, `printer_configurations`
 
@@ -262,7 +266,7 @@ Used with `usePermissions` hook and `PermissionGuard` component:
 - **Accounting**: `accounting.view`, `accounting.manage`, `accounting.journal.create`, `accounting.journal.update`, `accounting.vat.manage`
 - **Admin**: `users.view`, `users.create`, `users.roles`, `settings.view`, `settings.update`
 
-## Key Routes (~111 pages)
+## Key Routes (~240 pages)
 
 | Module | Base Route | Description |
 |--------|-----------|-------------|
@@ -393,17 +397,22 @@ Key test files:
 - `docs/audit/` - Strategic audit and improvement roadmap
 - `_bmad-output/` - Planning artifacts (architecture, epics, PRD)
 
+### Phase 0: Stitch Gap Analysis
+- `docs/phase0/stitch-pages-inventory.md` - Full inventory of 67 Stitch pages with gap status
+- `docs/phase0/gap-analysis.md` - Gap analysis summary
+- `docs/phase0/backend-creation-plan.md` - Backend migration plan
+
 ### Archive
 - `docs/_archive/` - Obsolete docs preserved for reference (12 files)
 
 ## Project Statistics
 
-- **Components**: ~112 React components across 14 feature directories
-- **Pages**: 111 route-based pages
-- **Hooks**: ~117 custom hooks across 15 subdirectories
-- **Services**: ~74 business logic services across 16 subdirectories
+- **Components**: ~171 React components across 14 feature directories
+- **Pages**: ~240 route-based pages
+- **Hooks**: ~130 custom hooks across 15 subdirectories
+- **Services**: ~78 business logic services across 16 subdirectories
 - **Stores**: 11 Zustand stores
-- **Migrations**: 62 SQL migrations (59 consolidated + 3 accounting)
+- **Migrations**: 74 local SQL files + 13 Phase 1 migrations (applied via Supabase API)
 - **Edge Functions**: 13 Deno functions
-- **Test files**: 92 test files, ~1,630 tests
-- **Codebase**: ~118,000 lines of TypeScript/React
+- **Test files**: 98 test files, ~1,650 tests
+- **Codebase**: ~62,000 lines of TypeScript/React

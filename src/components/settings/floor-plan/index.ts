@@ -1,2 +1,6 @@
 export { FloorPlanToolbar } from './FloorPlanToolbar'
 export { FloorPlanDetailsPanel } from './FloorPlanDetailsPanel'
+export { FloorPlanCanvas } from './FloorPlanCanvas'
+export { FloorPlanAddForm } from './FloorPlanAddForm'
+export { FloorPlanItemIcon } from './FloorPlanItemIcon'
+export * from './floorPlanConstants'

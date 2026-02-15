@@ -3,7 +3,7 @@
  * Extracted from IncomingStockPage.tsx
  */
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 
 export interface IIncomingPurchaseOrder {
@@ -22,6 +22,7 @@ export interface IIncomingPurchaseOrder {
     quantity: number
     quantity_received: number
     unit_price: number
+    qc_passed: boolean | null
   }[]
 }
 
@@ -46,7 +47,8 @@ export function useIncomingStock() {
             product:products(id, name, sku),
             quantity,
             quantity_received,
-            unit_price
+            unit_price,
+            qc_passed
           )
         `)
         .order('order_date', { ascending: false })
@@ -56,5 +58,26 @@ export function useIncomingStock() {
       return data ?? []
     },
     staleTime: 15_000,
+  })
+}
+
+/**
+ * Mutation to toggle qc_passed on a purchase_order_item
+ */
+export function useToggleQCPassed() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ itemId, qcPassed }: { itemId: string; qcPassed: boolean | null }) => {
+      const { error } = await supabase
+        .from('purchase_order_items')
+        .update({ qc_passed: qcPassed })
+        .eq('id', itemId)
+
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['incoming-stock'] })
+    },
   })
 }

@@ -4,8 +4,9 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
-import { Wifi, HardDrive, Zap, RefreshCw } from 'lucide-react'
+import { Wifi, HardDrive, Zap, RefreshCw, UploadCloud } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { useSyncQueue } from '@/hooks/useSyncQueue'
 import { logError } from '@/utils/logger'
 
 interface IHealthMetrics {
@@ -23,6 +24,7 @@ export function SystemHealthCards() {
     lastChecked: null,
   })
   const [checking, setChecking] = useState(false)
+  const { counts: syncCounts } = useSyncQueue()
 
   const checkHealth = useCallback(async () => {
     setChecking(true)
@@ -88,7 +90,7 @@ export function SystemHealthCards() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Database Latency */}
         <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
@@ -143,6 +145,24 @@ export function SystemHealthCards() {
             {'serviceWorker' in navigator ? 'Active' : 'N/A'}
           </p>
           <p className="text-[10px] text-white/30 mt-1">Offline capability</p>
+        </div>
+
+        {/* Sync Queue */}
+        <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <UploadCloud size={14} className="text-[var(--theme-text-muted)]" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">
+              Sync Queue
+            </span>
+          </div>
+          <p className={`text-2xl font-bold ${
+            syncCounts.pending > 0 ? 'text-amber-400' : syncCounts.failed > 0 ? 'text-red-400' : 'text-emerald-400'
+          }`}>
+            {syncCounts.pending > 0 ? `${syncCounts.pending} pending` : syncCounts.failed > 0 ? `${syncCounts.failed} failed` : 'Clear'}
+          </p>
+          <p className="text-[10px] text-white/30 mt-1">
+            {syncCounts.synced} synced · {syncCounts.total} total
+          </p>
         </div>
       </div>
     </div>

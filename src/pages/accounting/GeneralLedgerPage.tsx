@@ -3,11 +3,12 @@
  */
 
 import { useState } from 'react'
-import { Download } from 'lucide-react'
+import { Download, Printer } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { AccountPicker } from '@/components/accounting/AccountPicker'
 import { useGeneralLedger } from '@/hooks/accounting'
 import { formatIDR } from '@/services/accounting/accountingService'
+import { exportReportToPdf } from '@/services/export/pdfExportService'
 
 export default function GeneralLedgerPage() {
   const [accountId, setAccountId] = useState('')
@@ -36,6 +37,26 @@ export default function GeneralLedgerPage() {
     URL.revokeObjectURL(url)
   }
 
+  const exportPDF = () => {
+    if (!data?.entries.length) return
+    const headers = ['Date', 'Entry #', 'Description', 'Source', 'Debit', 'Credit', 'Balance']
+    const rows = data.entries.map(e => [
+      e.date,
+      e.entry_number,
+      e.description,
+      e.reference_type ?? '',
+      e.debit > 0 ? formatIDR(e.debit) : '',
+      e.credit > 0 ? formatIDR(e.credit) : '',
+      formatIDR(e.balance),
+    ])
+    const summary: Record<string, string> = {
+      'Period': `${startDate} to ${endDate}`,
+      'Opening Balance': formatIDR(data.openingBalance),
+      'Closing Balance': formatIDR(data.closingBalance),
+    }
+    exportReportToPdf('General Ledger', headers, rows, summary)
+  }
+
   return (
     <div>
       <div className="flex items-center gap-3 mb-4 flex-wrap">
@@ -58,12 +79,20 @@ export default function GeneralLedgerPage() {
           className="bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
         />
         {data?.entries.length ? (
-          <button
-            onClick={exportCSV}
-            className="flex items-center gap-1 px-3 py-2 text-sm border border-white/10 rounded-xl text-white hover:border-white/20 ml-auto transition-colors"
-          >
-            <Download size={14} /> Export CSV
-          </button>
+          <div className="flex items-center gap-2 ml-auto">
+            <button
+              onClick={exportCSV}
+              className="flex items-center gap-1 px-3 py-2 text-sm border border-white/10 rounded-xl text-white hover:border-white/20 transition-colors"
+            >
+              <Download size={14} /> Export CSV
+            </button>
+            <button
+              onClick={exportPDF}
+              className="flex items-center gap-1 px-3 py-2 text-sm border border-white/10 rounded-xl text-white hover:border-white/20 transition-colors"
+            >
+              <Printer size={14} /> Export PDF
+            </button>
+          </div>
         ) : null}
       </div>
 

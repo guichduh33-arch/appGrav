@@ -1,4 +1,4 @@
-import { Warehouse, Image as ImageIcon, Upload, X, FileText } from 'lucide-react'
+import { Warehouse, Image as ImageIcon, Upload, X, FileText, PackageOpen } from 'lucide-react'
 
 const INPUT_CLASS = "py-3 px-4 rounded-xl bg-black/40 border border-white/10 text-white outline-none transition-all focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20"
 const LABEL_CLASS = "text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]"
@@ -10,10 +10,11 @@ interface StockImageOptionsSectionProps {
     posVisible: boolean
     isActive: boolean
     deductIngredients: boolean
+    trackInventory: boolean
     onStockChange: (updates: { stock_quantity?: number; min_stock_level?: number }) => void
     onImageChange: (url: string) => void
     onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
-    onOptionsChange: (updates: { pos_visible?: boolean; is_active?: boolean; deduct_ingredients?: boolean }) => void
+    onOptionsChange: (updates: { pos_visible?: boolean; is_active?: boolean; deduct_ingredients?: boolean; track_inventory?: boolean }) => void
 }
 
 export default function StockImageOptionsSection({
@@ -23,6 +24,7 @@ export default function StockImageOptionsSection({
     posVisible,
     isActive,
     deductIngredients,
+    trackInventory,
     onStockChange,
     onImageChange,
     onImageUpload,
@@ -32,10 +34,32 @@ export default function StockImageOptionsSection({
         <>
             {/* Stock Section */}
             <section className="bg-[var(--onyx-surface)] rounded-xl p-6 border border-white/5 shadow-sm">
-                <h2 className="flex items-center gap-2 font-display text-lg font-semibold m-0 mb-6 pb-4 border-b border-white/5 text-white">
-                    <Warehouse size={20} className="text-[var(--color-gold)]" /> Stock
-                </h2>
-                <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 max-md:grid-cols-1">
+                <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
+                    <h2 className="flex items-center gap-2 font-display text-lg font-semibold m-0 text-white">
+                        <Warehouse size={20} className="text-[var(--color-gold)]" /> Stock
+                    </h2>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                        <span className={LABEL_CLASS}>Track Inventory</span>
+                        <button
+                            type="button"
+                            role="switch"
+                            aria-checked={trackInventory}
+                            onClick={() => onOptionsChange({ track_inventory: !trackInventory })}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${trackInventory ? 'bg-[var(--color-gold)]' : 'bg-white/10'}`}
+                        >
+                            <span className={`inline-block h-4 w-4 rounded-full bg-white shadow-md transition-transform duration-200 ${trackInventory ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </button>
+                    </label>
+                </div>
+                {!trackInventory && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5 mb-5">
+                        <PackageOpen size={16} className="text-[var(--theme-text-muted)] shrink-0" />
+                        <span className="text-xs text-[var(--theme-text-muted)]">
+                            Inventory tracking is disabled for this product (e.g., services, digital goods).
+                        </span>
+                    </div>
+                )}
+                <div className={`grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 max-md:grid-cols-1 transition-opacity duration-200 ${!trackInventory ? 'opacity-40 pointer-events-none' : ''}`}>
                     <div className="flex flex-col gap-1.5">
                         <label className={LABEL_CLASS}>Current stock</label>
                         <input
@@ -43,6 +67,7 @@ export default function StockImageOptionsSection({
                             value={stockQuantity}
                             onChange={e => onStockChange({ stock_quantity: parseFloat(e.target.value) || 0 })}
                             step="0.01"
+                            disabled={!trackInventory}
                             className={INPUT_CLASS}
                         />
                     </div>
@@ -54,6 +79,7 @@ export default function StockImageOptionsSection({
                             onChange={e => onStockChange({ min_stock_level: parseFloat(e.target.value) || 0 })}
                             min="0"
                             step="1"
+                            disabled={!trackInventory}
                             className={INPUT_CLASS}
                         />
                     </div>

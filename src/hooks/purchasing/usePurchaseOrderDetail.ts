@@ -51,6 +51,7 @@ async function fetchPODetailData(purchaseOrderId: string): Promise<IPurchaseOrde
       line_total: i.line_total as number,
       quantity_received: (i.quantity_received as number) || 0,
       quantity_returned: (i.quantity_returned as number) || 0,
+      qc_passed: (i.qc_passed as boolean | null) ?? null,
     }
   })
 

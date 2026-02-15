@@ -73,6 +73,9 @@ export interface IOfflineProduct {
   /** Whether product is available for sale */
   available_for_sale: boolean;
 
+  /** Whether inventory is tracked for this product (false for services) */
+  track_inventory: boolean;
+
   /** ISO 8601 timestamp of last update */
   updated_at: string;
 }

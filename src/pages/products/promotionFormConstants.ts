@@ -64,9 +64,9 @@ export function mapPromotionToForm(
         max_uses_per_customer: (d.max_uses_per_customer as number | null) || null,
         start_date: data.start_date || '',
         end_date: data.end_date || '',
-        days_of_week: data.days_of_week || [],
-        time_start: (d.time_start as string) || '',
-        time_end: (d.time_end as string) || '',
+        days_of_week: data.days_of_week || (d.active_days as number[] | null) || [],
+        time_start: (d.time_start as string) || (d.start_time as string) || '',
+        time_end: (d.time_end as string) || (d.end_time as string) || '',
         priority: data.priority || 0,
         is_stackable: (d.is_stackable as boolean) ?? false,
         is_active: data.is_active ?? true

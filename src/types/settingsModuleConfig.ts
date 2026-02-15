@@ -1,10 +1,15 @@
 // Epic 10: Typed interfaces for module configuration settings
 // Each interface maps to a settings category in the DB
 
+export interface IDiscountPreset {
+  name: string
+  pct: number
+}
+
 export interface IPOSConfigSettings {
   quickPaymentAmounts: number[]
   shiftOpeningCashPresets: number[]
-  quickDiscountPercentages: number[]
+  quickDiscountPercentages: IDiscountPreset[]
   maxDiscountPercentage: number
   shiftReconciliationTolerance: number
   refundMethods: string[]

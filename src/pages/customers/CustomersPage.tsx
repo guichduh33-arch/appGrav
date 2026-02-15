@@ -1,14 +1,13 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Users, Plus } from 'lucide-react'
-import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCustomers, useCustomerCategories } from '@/hooks/customers'
 import { CustomersHeader } from '@/components/customers/CustomersHeader'
 import { CustomersStats } from '@/components/customers/CustomersStats'
 import { CustomersFilters } from '@/components/customers/CustomersFilters'
 import { CustomerCard } from '@/components/customers/CustomerCard'
-import { importCustomersFromCsv } from '@/services/customers/csvImportService'
+import { CustomerImportModal } from '@/components/customers/CustomerImportModal'
 
 export default function CustomersPage() {
     const navigate = useNavigate()
@@ -16,19 +15,7 @@ export default function CustomersPage() {
     const { data: customers = [], isLoading: loading } = useCustomers()
     const { data: categories = [] } = useCustomerCategories(true)
 
-    const handleImportCsv = useCallback(async (file: File) => {
-        try {
-            toast.info('Importing customers...')
-            const result = await importCustomersFromCsv(file)
-            queryClient.invalidateQueries({ queryKey: ['customers'] })
-            toast.success(`Imported ${result.imported} customers${result.skipped ? `, ${result.skipped} skipped` : ''}`)
-            if (result.errors.length > 0) {
-                toast.warning(result.errors[0])
-            }
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : 'Import failed')
-        }
-    }, [queryClient])
+    const [showImport, setShowImport] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
     const [categoryFilter, setCategoryFilter] = useState<string>('all')
     const [tierFilter, setTierFilter] = useState<string>('all')
@@ -70,7 +57,7 @@ export default function CustomersPage() {
             <CustomersHeader
                 onNavigateCategories={() => navigate('/customers/categories')}
                 onNavigateNew={() => navigate('/customers/new')}
-                onImportCsv={handleImportCsv}
+                onOpenImport={() => setShowImport(true)}
             />
 
             <CustomersStats {...stats} />
@@ -125,6 +112,13 @@ export default function CustomersPage() {
                         />
                     ))}
                 </div>
+            )}
+
+            {showImport && (
+                <CustomerImportModal
+                    onClose={() => setShowImport(false)}
+                    onSuccess={() => queryClient.invalidateQueries({ queryKey: ['customers'] })}
+                />
             )}
         </div>
     )

@@ -1,8 +1,8 @@
 /**
- * CSV Customer Import Service (F1 gap)
+ * CSV Customer Import Service
  *
- * Parses CSV files and upserts customers into Supabase.
- * Expected CSV columns: name, phone, email, company_name, category_slug, notes
+ * Parses CSV files, validates rows, and batch-inserts customers into Supabase.
+ * Expected columns: name, phone, email, address, company_name, customer_type
  */
 
 import { supabase } from '@/lib/supabase'
@@ -13,14 +13,21 @@ export interface ICsvImportResult {
   errors: string[]
 }
 
-interface ICsvRow {
+export interface IParsedCustomerRow {
+  row: number
   name: string
-  phone?: string
-  email?: string
-  company_name?: string
-  category_slug?: string
-  notes?: string
+  phone: string
+  email: string
+  address: string
+  company_name: string
+  customer_type: string
+  valid: boolean
+  error: string
 }
+
+const VALID_CUSTOMER_TYPES = ['retail', 'wholesale', 'b2b']
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function parseCsvLine(line: string): string[] {
   const fields: string[] = []
@@ -30,7 +37,12 @@ function parseCsvLine(line: string): string[] {
   for (let i = 0; i < line.length; i++) {
     const char = line[i]
     if (char === '"') {
-      inQuotes = !inQuotes
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"'
+        i++
+      } else {
+        inQuotes = !inQuotes
+      }
     } else if (char === ',' && !inQuotes) {
       fields.push(current.trim())
       current = ''
@@ -42,90 +54,125 @@ function parseCsvLine(line: string): string[] {
   return fields
 }
 
-function parseCsv(text: string): ICsvRow[] {
+function columnIndex(headers: string[], ...names: string[]): number {
+  for (const n of names) {
+    const idx = headers.indexOf(n)
+    if (idx !== -1) return idx
+  }
+  return -1
+}
+
+/** Parse a CSV string into validated rows ready for preview. */
+export function parseCustomerCsv(text: string): IParsedCustomerRow[] {
   const lines = text.split(/\r?\n/).filter(l => l.trim())
   if (lines.length < 2) return []
 
-  const headers = parseCsvLine(lines[0]).map(h => h.toLowerCase().replace(/\s+/g, '_'))
-  const nameIdx = headers.indexOf('name')
-  if (nameIdx === -1) throw new Error('CSV must have a "name" column')
+  const headers = parseCsvLine(lines[0]).map(h =>
+    h.toLowerCase().replace(/\s+/g, '_')
+  )
 
-  return lines.slice(1).map(line => {
-    const fields = parseCsvLine(line)
-    const row: ICsvRow = { name: fields[nameIdx] || '' }
+  const nameIdx = columnIndex(headers, 'name')
+  if (nameIdx === -1) throw new Error('CSV must contain a "name" column')
 
-    const phoneIdx = headers.indexOf('phone')
-    const emailIdx = headers.indexOf('email')
-    const companyIdx = headers.indexOf('company_name')
-    const categoryIdx = headers.indexOf('category_slug') !== -1
-      ? headers.indexOf('category_slug')
-      : headers.indexOf('category')
-    const notesIdx = headers.indexOf('notes')
+  const phoneIdx = columnIndex(headers, 'phone', 'phone_number')
+  const emailIdx = columnIndex(headers, 'email')
+  const addressIdx = columnIndex(headers, 'address')
+  const companyIdx = columnIndex(headers, 'company_name', 'company')
+  const typeIdx = columnIndex(headers, 'customer_type', 'type')
 
-    if (phoneIdx !== -1) row.phone = fields[phoneIdx] || undefined
-    if (emailIdx !== -1) row.email = fields[emailIdx] || undefined
-    if (companyIdx !== -1) row.company_name = fields[companyIdx] || undefined
-    if (categoryIdx !== -1) row.category_slug = fields[categoryIdx] || undefined
-    if (notesIdx !== -1) row.notes = fields[notesIdx] || undefined
+  return lines.slice(1).map((line, i) => {
+    const f = parseCsvLine(line)
+    const name = (f[nameIdx] ?? '').trim()
+    const phone = phoneIdx !== -1 ? (f[phoneIdx] ?? '').trim() : ''
+    const email = emailIdx !== -1 ? (f[emailIdx] ?? '').trim() : ''
+    const address = addressIdx !== -1 ? (f[addressIdx] ?? '').trim() : ''
+    const companyName = companyIdx !== -1 ? (f[companyIdx] ?? '').trim() : ''
+    const customerType = typeIdx !== -1
+      ? (f[typeIdx] ?? 'retail').trim().toLowerCase()
+      : 'retail'
 
-    return row
+    let valid = true
+    let error = ''
+
+    if (!name) {
+      valid = false
+      error = 'Name is required'
+    } else if (email && !EMAIL_RE.test(email)) {
+      valid = false
+      error = 'Invalid email format'
+    } else if (customerType && !VALID_CUSTOMER_TYPES.includes(customerType)) {
+      valid = false
+      error = `Invalid type "${customerType}" (use retail, wholesale, or b2b)`
+    }
+
+    return {
+      row: i + 2, // 1-indexed, skip header
+      name,
+      phone,
+      email,
+      address,
+      company_name: companyName,
+      customer_type: customerType || 'retail',
+      valid,
+      error,
+    }
   })
 }
 
-export async function importCustomersFromCsv(file: File): Promise<ICsvImportResult> {
-  const text = await file.text()
-  const rows = parseCsv(text)
-
-  if (rows.length === 0) {
-    return { imported: 0, skipped: 0, errors: ['No data rows found in CSV'] }
+/** Insert an array of validated rows into Supabase. */
+export async function importCustomerRows(
+  rows: IParsedCustomerRow[]
+): Promise<ICsvImportResult> {
+  const validRows = rows.filter(r => r.valid)
+  if (validRows.length === 0) {
+    return { imported: 0, skipped: rows.length, errors: ['No valid rows'] }
   }
 
-  // Fetch category mapping (slug -> id)
-  const { data: categories } = await supabase
-    .from('customer_categories')
-    .select('id, slug')
+  const result: ICsvImportResult = {
+    imported: 0,
+    skipped: rows.length - validRows.length,
+    errors: [],
+  }
 
-  const categoryMap = new Map(
-    (categories || []).map(c => [c.slug, c.id])
-  )
-
-  const result: ICsvImportResult = { imported: 0, skipped: 0, errors: [] }
-
-  // Process in batches of 50
   const batchSize = 50
-  for (let i = 0; i < rows.length; i += batchSize) {
-    const batch = rows.slice(i, i + batchSize)
-    const insertData = batch
-      .filter(row => {
-        if (!row.name.trim()) {
-          result.skipped++
-          return false
-        }
-        return true
-      })
-      .map(row => ({
-        name: row.name.trim(),
-        phone: row.phone || null,
-        email: row.email || null,
-        company_name: row.company_name || null,
-        category_id: row.category_slug ? (categoryMap.get(row.category_slug) ?? null) : null,
-        notes: row.notes || null,
-        is_active: true,
-        customer_type: 'retail' as const,
-      }))
+  for (let i = 0; i < validRows.length; i += batchSize) {
+    const batch = validRows.slice(i, i + batchSize).map(r => ({
+      name: r.name,
+      phone: r.phone || null,
+      email: r.email || null,
+      address: r.address || null,
+      company_name: r.company_name || null,
+      customer_type: r.customer_type || 'retail',
+      is_active: true,
+    }))
 
-    if (insertData.length === 0) continue
-
-    const { error } = await supabase
-      .from('customers')
-      .insert(insertData)
+    const { error } = await supabase.from('customers').insert(batch)
 
     if (error) {
-      result.errors.push(`Batch ${Math.floor(i / batchSize) + 1}: ${error.message}`)
+      result.errors.push(
+        `Batch ${Math.floor(i / batchSize) + 1}: ${error.message}`
+      )
     } else {
-      result.imported += insertData.length
+      result.imported += batch.length
     }
   }
 
   return result
+}
+
+/**
+ * Legacy one-shot import (kept for backward compat).
+ * Parses + imports in a single call.
+ */
+export async function importCustomersFromCsv(
+  file: File
+): Promise<ICsvImportResult> {
+  const text = await file.text()
+  const parsed = parseCustomerCsv(text)
+
+  if (parsed.length === 0) {
+    return { imported: 0, skipped: 0, errors: ['No data rows found in CSV'] }
+  }
+
+  return importCustomerRows(parsed)
 }

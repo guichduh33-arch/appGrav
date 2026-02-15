@@ -5,6 +5,7 @@ import {
     Search,
     Package,
     AlertTriangle,
+    TrendingDown,
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/authStore'
 import { logError } from '@/utils/logger'
@@ -24,7 +25,9 @@ import './WastedPage.css'
 const WASTE_REASONS = [
     { value: 'expired', label: 'Expired' },
     { value: 'damaged', label: 'Damaged' },
+    { value: 'spoiled', label: 'Spoiled' },
     { value: 'quality', label: 'Quality Issue' },
+    { value: 'overproduction', label: 'Overproduction' },
     { value: 'spillage', label: 'Spillage' },
     { value: 'theft', label: 'Theft' },
     { value: 'other', label: 'Other' }
@@ -140,7 +143,7 @@ export default function WastedPage() {
     return (
         <div className="flex flex-col gap-6">
             {/* KPI Stats Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-[var(--onyx-surface)] border border-white/5 p-6 rounded-xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
                         <Trash2 size={64} className="text-[var(--color-gold)]" />
@@ -180,6 +183,36 @@ export default function WastedPage() {
                         <span className="text-3xl font-bold text-[var(--color-gold)] tabular-nums">
                             {formatCurrency(stats.totalCost)}
                         </span>
+                    </div>
+                </div>
+                <div className="bg-[var(--onyx-surface)] border border-white/5 p-6 rounded-xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <TrendingDown size={64} className="text-[var(--color-gold)]" />
+                    </div>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--stone-text)]/50 mb-2">
+                        Top Waste Reason
+                    </p>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-xl font-bold text-[var(--color-gold)]">
+                            {(() => {
+                                const topReason = stats.byReason
+                                    .filter(r => r.count > 0)
+                                    .sort((a, b) => b.count - a.count)[0]
+                                return topReason
+                                    ? `${topReason.reason.charAt(0).toUpperCase() + topReason.reason.slice(1)}`
+                                    : 'None'
+                            })()}
+                        </span>
+                        {(() => {
+                            const topReason = stats.byReason
+                                .filter(r => r.count > 0)
+                                .sort((a, b) => b.count - a.count)[0]
+                            return topReason ? (
+                                <span className="text-xs text-[var(--stone-text)]/40">
+                                    {topReason.count} entries ({stats.totalRecords > 0 ? Math.round((topReason.count / stats.totalRecords) * 100) : 0}%)
+                                </span>
+                            ) : null
+                        })()}
                     </div>
                 </div>
             </div>

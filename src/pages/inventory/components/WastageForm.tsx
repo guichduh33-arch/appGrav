@@ -4,7 +4,9 @@ import type { IWasteProduct as Product } from '@/hooks/inventory/useWasteRecords
 const WASTE_REASONS = [
     { value: 'expired', label: 'Expired' },
     { value: 'damaged', label: 'Damaged' },
+    { value: 'spoiled', label: 'Spoiled' },
     { value: 'quality', label: 'Quality Issue' },
+    { value: 'overproduction', label: 'Overproduction' },
     { value: 'spillage', label: 'Spillage' },
     { value: 'theft', label: 'Theft' },
     { value: 'other', label: 'Other' }

@@ -1,6 +1,6 @@
 # Current State
 
-Last updated: 2026-02-12
+Last updated: 2026-02-15
 
 ## Sprint Status
 
@@ -341,6 +341,72 @@ INSERT/UPDATE/DELETE policies used `USING (true)` or `WITH CHECK (true)`, allowi
 - Supabase security advisors: **156 to 0** "RLS Policy Always True" warnings
 - Only remaining warning: `auth_leaked_password_protection` (Auth config, not RLS)
 - No test regressions: 93 files, 1,650 tests pass
+
+## Phase 0: Stitch Gap Analysis (2026-02-15)
+
+Comprehensive gap analysis of 67 Stitch HTML designs against the existing codebase. Identified RED/YELLOW/GREEN gaps across 15 modules.
+
+- **Tracking document**: `docs/phase0/stitch-pages-inventory.md`
+- **Gap analysis**: `docs/phase0/gap-analysis.md`
+- **Backend plan**: `docs/phase0/backend-creation-plan.md`
+
+## Phase 1: Backend Execution (2026-02-15)
+
+13 migrations applied to Supabase to fill database gaps identified in Phase 0.
+
+### New Tables
+| Table | Purpose |
+|-------|---------|
+| `product_price_history` | Price change audit trail (D3/O1) |
+| `vat_filings` | VAT filing records with status tracking (H7) |
+| `business_holidays` | Holiday calendar for business hours (K7) |
+| `notification_events` | Notification event definitions (L1) |
+| `notification_preferences` | Per-user notification preferences (L1) |
+| `po_activity_log` | Purchase order activity timeline (I4) |
+
+### Column Additions
+| Table | Column(s) | Purpose |
+|-------|-----------|---------|
+| `orders` | `service_charge`, `guest_count` | Service charge tracking (C3), guest count (B3) |
+| `journal_entries` | `attachment_url` | Journal entry file attachments (H3) |
+| `user_profiles` | `title`, `default_module`, `mfa_enabled` | User admin features (M2/M3) |
+| `suppliers` | `category` | Supplier classification (I1) |
+
+### Other Changes
+- Schema verification fixes (missing columns, constraints)
+- Permissions seed (new permission codes)
+- Enhanced views (`view_daily_kpis` with completion rate, `view_stock_alerts` with section stock)
+- 65+ settings rows across 10 categories (POS, KDS, inventory, security, sync, etc.)
+- Security definer views + search path fixes
+
+## Phase 2: Frontend-Driven Assembly (2026-02-15)
+
+Page-by-page assembly connecting Stitch HTML designs to functional React components. Resolved 41 out of 46 RED gaps.
+
+### Summary
+- **RED gaps resolved**: 41/46 (89%)
+- **Remaining**: 5 RED gaps deferred (require significant infrastructure: B2B delivery maps, staff hours tracking, vendor email notifications, concurrent sessions, local DB encryption)
+- **New files created**: ~20 (components, hooks, services, pages)
+- **Files modified**: ~40 (connecting existing components to new data/features)
+
+### Key Deliverables
+| Category | Items |
+|----------|-------|
+| **Auth** | Password reset page (`/login/reset`) |
+| **Orders** | Completion rate KPI, voided row styling |
+| **Products** | Price history tracking, product performance card (conversion rate) |
+| **Customers** | CSV import service + UI |
+| **Accounting** | Journal attachments (file upload), VAT PDF export |
+| **Purchasing** | Supplier category display, PO activity log |
+| **Settings** | Peak pricing UI, business holidays, notification preferences |
+| **B2B** | Batch PDF statements per customer |
+| **System** | System health cards (latency, storage, service worker) |
+| **Visual** | TrendBadge, StockStatusBadge, various UI enhancements |
+
+### Production Build
+- Build time: 15.16s
+- Precache entries: 171
+- Index bundle: 430kB
 
 ## Known Issues
 

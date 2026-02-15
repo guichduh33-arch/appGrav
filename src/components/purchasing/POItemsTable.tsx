@@ -1,4 +1,4 @@
-import { RotateCcw } from 'lucide-react'
+import { RotateCcw, CheckCircle } from 'lucide-react'
 import { formatCurrency } from '@/utils/helpers'
 import { canReceiveItems, type TPOStatus } from '@/hooks/purchasing'
 import type { IPOItemsTableProps } from './types'
@@ -10,6 +10,7 @@ export function POItemsTable({
   isReceiving,
   onReceiveItem,
   onOpenReturnModal,
+  onToggleQC,
 }: IPOItemsTableProps) {
   const canReceive = canReceiveItems(purchaseOrder.status as TPOStatus)
 
@@ -31,6 +32,7 @@ export function POItemsTable({
               <th className="py-4 px-5 text-[10px] font-bold text-[var(--muted-smoke)] uppercase tracking-widest border-b border-white/5">Tax</th>
               <th className="py-4 px-5 text-[10px] font-bold text-[var(--muted-smoke)] uppercase tracking-widest border-b border-white/5">Total</th>
               <th className="py-4 px-5 text-[10px] font-bold text-[var(--muted-smoke)] uppercase tracking-widest border-b border-white/5">Received</th>
+              <th className="py-4 px-5 text-[10px] font-bold text-[var(--muted-smoke)] uppercase tracking-widest border-b border-white/5 text-center">QC</th>
               <th className="py-4 px-5 text-[10px] font-bold text-[var(--muted-smoke)] uppercase tracking-widest border-b border-white/5">Returned</th>
               <th className="py-4 px-5 text-[10px] font-bold text-[var(--muted-smoke)] uppercase tracking-widest border-b border-white/5">Actions</th>
             </tr>
@@ -67,6 +69,31 @@ export function POItemsTable({
                     className="w-[70px] py-2 px-2.5 bg-black/40 border border-white/10 rounded-lg text-sm text-white text-center focus:outline-none focus:border-[var(--color-gold)] disabled:opacity-40 disabled:cursor-not-allowed"
                     disabled={!isOnline || !canReceive || isReceiving}
                   />
+                </td>
+                <td className="py-3.5 px-5 text-center">
+                  {onToggleQC ? (
+                    <label className="inline-flex items-center gap-1.5 cursor-pointer select-none group">
+                      <input
+                        type="checkbox"
+                        checked={item.qc_passed === true}
+                        onChange={() => {
+                          const next = item.qc_passed === true ? null : true
+                          onToggleQC(item.id, next)
+                        }}
+                        disabled={!isOnline || !canReceive}
+                        className="h-4 w-4 rounded border-white/20 bg-black/40 accent-[var(--color-gold)] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                      />
+                      <span className={`text-[10px] font-bold uppercase ${item.qc_passed === true ? 'text-emerald-400' : 'text-[var(--theme-text-muted)]'}`}>
+                        {item.qc_passed === true ? 'Pass' : 'QC'}
+                      </span>
+                    </label>
+                  ) : item.qc_passed === true ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <CheckCircle size={12} /> Pass
+                    </span>
+                  ) : (
+                    <span className="text-[var(--theme-text-muted)]">-</span>
+                  )}
                 </td>
                 <td className="py-3.5 px-5 text-sm text-[var(--stone-text)]">{parseFloat(item.quantity_returned.toString()).toFixed(2)}</td>
                 <td className="py-3.5 px-5">

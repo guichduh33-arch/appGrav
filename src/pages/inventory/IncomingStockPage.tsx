@@ -13,7 +13,7 @@ import {
     ChevronDown,
     ChevronRight
 } from 'lucide-react'
-import { useIncomingStock } from '@/hooks/inventory/useIncomingStock'
+import { useIncomingStock, useToggleQCPassed } from '@/hooks/inventory/useIncomingStock'
 import { formatCurrency, formatDate } from '../../utils/helpers'
 import './IncomingStockPage.css'
 
@@ -22,6 +22,7 @@ type FilterStatus = 'all' | 'pending' | 'partial' | 'received'
 export default function IncomingStockPage() {
     const navigate = useNavigate()
     const { data: orders = [], isLoading } = useIncomingStock()
+    const toggleQCMutation = useToggleQCPassed()
     const [filterStatus, setFilterStatus] = useState<FilterStatus>('all')
     const [searchTerm, setSearchTerm] = useState('')
     const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set())
@@ -311,17 +312,20 @@ export default function IncomingStockPage() {
                                                                                 {formatCurrency(item.quantity * item.unit_price)}
                                                                             </td>
                                                                             <td className="text-center">
-                                                                                {item.qc_passed === true ? (
-                                                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                                                                        <CheckCircle size={12} /> Pass
+                                                                                <label className="inline-flex items-center gap-1.5 cursor-pointer select-none group">
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        checked={item.qc_passed === true}
+                                                                                        onChange={() => {
+                                                                                            const next = item.qc_passed === true ? null : true
+                                                                                            toggleQCMutation.mutate({ itemId: item.id, qcPassed: next })
+                                                                                        }}
+                                                                                        className="h-4 w-4 rounded border-white/20 bg-black/40 accent-[var(--color-gold)] cursor-pointer"
+                                                                                    />
+                                                                                    <span className={`text-[10px] font-bold uppercase tracking-[0.1em] ${item.qc_passed === true ? 'text-emerald-400' : 'text-[var(--theme-text-muted)] group-hover:text-white/60'}`}>
+                                                                                        {item.qc_passed === true ? 'Pass' : 'QC'}
                                                                                     </span>
-                                                                                ) : item.qc_passed === false ? (
-                                                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-red-500/10 text-red-400 border border-red-500/20">
-                                                                                        <AlertCircle size={12} /> Fail
-                                                                                    </span>
-                                                                                ) : (
-                                                                                    <span className="text-[var(--theme-text-muted)]">-</span>
-                                                                                )}
+                                                                                </label>
                                                                             </td>
                                                                             <td>
                                                                                 <div className="reception-progress">

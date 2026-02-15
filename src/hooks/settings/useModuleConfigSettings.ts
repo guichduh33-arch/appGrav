@@ -5,6 +5,7 @@
 import { useCoreSettingsStore } from '../../stores/settings/coreSettingsStore'
 import type {
   IPOSConfigSettings,
+  IDiscountPreset,
   IFinancialSettings,
   IInventoryConfigSettings,
   ILoyaltySettings,
@@ -26,7 +27,14 @@ import type {
 export const POS_CONFIG_DEFAULTS: IPOSConfigSettings = {
   quickPaymentAmounts: [50000, 100000, 150000, 200000, 500000],
   shiftOpeningCashPresets: [100000, 200000, 300000, 500000, 1000000],
-  quickDiscountPercentages: [5, 10, 15, 20, 25, 50],
+  quickDiscountPercentages: [
+    { name: '5%', pct: 5 },
+    { name: '10%', pct: 10 },
+    { name: '15%', pct: 15 },
+    { name: '20%', pct: 20 },
+    { name: '25%', pct: 25 },
+    { name: 'Staff Meal', pct: 50 },
+  ],
   maxDiscountPercentage: 100,
   shiftReconciliationTolerance: 5000,
   refundMethods: ['same', 'cash', 'card', 'transfer'],
@@ -127,12 +135,26 @@ export const PRINTING_SERVER_DEFAULTS: IPrintingServerSettings = {
 // Hooks
 // =====================================================
 
+/** Normalize legacy number[] to IDiscountPreset[] for backward compatibility */
+function normalizeDiscountPresets(raw: unknown): IDiscountPreset[] {
+  if (!Array.isArray(raw)) return POS_CONFIG_DEFAULTS.quickDiscountPercentages
+  return raw.map((item) => {
+    if (typeof item === 'number') return { name: `${item}%`, pct: item }
+    if (typeof item === 'object' && item !== null && 'pct' in item) {
+      const obj = item as { name?: string; pct: number }
+      return { name: obj.name || `${obj.pct}%`, pct: obj.pct }
+    }
+    return null
+  }).filter((p): p is IDiscountPreset => p !== null)
+}
+
 export function usePOSConfigSettings(): IPOSConfigSettings {
   const getSetting = useCoreSettingsStore((state) => state.getSetting)
+  const rawDiscounts = getSetting<IDiscountPreset[] | number[]>('pos_config.quick_discount_percentages')
   return {
     quickPaymentAmounts: getSetting<number[]>('pos_config.quick_payment_amounts') ?? POS_CONFIG_DEFAULTS.quickPaymentAmounts,
     shiftOpeningCashPresets: getSetting<number[]>('pos_config.shift_opening_cash_presets') ?? POS_CONFIG_DEFAULTS.shiftOpeningCashPresets,
-    quickDiscountPercentages: getSetting<number[]>('pos_config.quick_discount_percentages') ?? POS_CONFIG_DEFAULTS.quickDiscountPercentages,
+    quickDiscountPercentages: rawDiscounts ? normalizeDiscountPresets(rawDiscounts) : POS_CONFIG_DEFAULTS.quickDiscountPercentages,
     maxDiscountPercentage: getSetting<number>('pos_config.max_discount_percentage') ?? POS_CONFIG_DEFAULTS.maxDiscountPercentage,
     shiftReconciliationTolerance: getSetting<number>('pos_config.shift_reconciliation_tolerance') ?? POS_CONFIG_DEFAULTS.shiftReconciliationTolerance,
     refundMethods: getSetting<string[]>('pos_config.refund_methods') ?? POS_CONFIG_DEFAULTS.refundMethods,

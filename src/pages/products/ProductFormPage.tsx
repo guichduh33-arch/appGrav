@@ -26,6 +26,7 @@ interface ProductForm {
     unit: string; cost_price: number; sale_price: number; retail_price: number
     wholesale_price: number; min_stock_level: number; stock_quantity: number
     pos_visible: boolean; is_active: boolean; deduct_ingredients: boolean; image_url: string
+    track_inventory: boolean
 }
 
 export default function ProductFormPage() {
@@ -40,7 +41,8 @@ export default function ProductFormPage() {
         product_type: 'finished', unit: 'piece', cost_price: 0,
         sale_price: 0, retail_price: 0, wholesale_price: 0,
         min_stock_level: 0, stock_quantity: 0, pos_visible: true,
-        is_active: true, deduct_ingredients: false, image_url: ''
+        is_active: true, deduct_ingredients: false, image_url: '',
+        track_inventory: true
     })
     const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -62,7 +64,7 @@ export default function ProductFormPage() {
                         wholesale_price: product.wholesale_price || 0, min_stock_level: product.min_stock_level || 0,
                         stock_quantity: product.current_stock || 0, pos_visible: product.pos_visible !== false,
                         is_active: product.is_active !== false, deduct_ingredients: product.deduct_ingredients === true,
-                        image_url: product.image_url || ''
+                        image_url: product.image_url || '', track_inventory: product.track_inventory !== false
                     })
                 }
             } else {
@@ -107,7 +109,7 @@ export default function ProductFormPage() {
                 retail_price: form.retail_price || form.sale_price, wholesale_price: form.wholesale_price || null,
                 current_stock: form.stock_quantity, min_stock_level: form.min_stock_level || null,
                 pos_visible: form.pos_visible, is_active: form.is_active, image_url: form.image_url || null,
-                updated_at: new Date().toISOString()
+                track_inventory: form.track_inventory, updated_at: new Date().toISOString()
             }
             const result = await saveProduct(productData as Partial<IOfflineProduct> & { id: string })
             if (!result.success) throw new Error(result.error)
@@ -182,6 +184,7 @@ export default function ProductFormPage() {
                     posVisible={form.pos_visible}
                     isActive={form.is_active}
                     deductIngredients={form.deduct_ingredients}
+                    trackInventory={form.track_inventory}
                     onStockChange={(updates) => setForm(prev => ({ ...prev, ...updates }))}
                     onImageChange={(url) => setForm(prev => ({ ...prev, image_url: url }))}
                     onImageUpload={handleImageUpload}

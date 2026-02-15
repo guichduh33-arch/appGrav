@@ -1,5 +1,5 @@
 import {
-    Search, Trash2, Save, Package
+    Search, Trash2, Save, Package, Clock
 } from 'lucide-react'
 import type { ProductionItem, ProductWithSection } from '../StockProductionPage'
 
@@ -13,6 +13,7 @@ interface ProductionFormProps {
     onUpdateQuantity: (productId: string, field: 'quantity' | 'wasted', value: number) => void
     onUpdateUnit: (productId: string, unitName: string) => void
     onUpdateReason: (productId: string, reason: string) => void
+    onUpdateEstimatedCompletion: (productId: string, value: string) => void
     onRemoveItem: (productId: string) => void
     onClear: () => void
     onSave: () => void
@@ -29,6 +30,7 @@ export default function ProductionForm({
     onUpdateQuantity,
     onUpdateUnit,
     onUpdateReason,
+    onUpdateEstimatedCompletion,
     onRemoveItem,
     onClear,
     onSave,
@@ -101,6 +103,9 @@ export default function ProductionForm({
                                     <th className="px-6 py-3 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">
                                         Waste
                                     </th>
+                                    <th className="px-6 py-3 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">
+                                        Est. Completion
+                                    </th>
                                     <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">
                                         Note
                                     </th>
@@ -162,6 +167,17 @@ export default function ProductionForm({
                                                 <span className={`text-xs font-medium min-w-[40px] ${item.wasted > 0 ? 'text-red-400' : 'text-[var(--muted-smoke)]'}`}>
                                                     {item.selectedUnit}
                                                 </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="relative">
+                                                <Clock size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--muted-smoke)] pointer-events-none" />
+                                                <input
+                                                    type="datetime-local"
+                                                    value={item.estimatedCompletion}
+                                                    onChange={(e) => onUpdateEstimatedCompletion(item.productId, e.target.value)}
+                                                    className="w-full pl-8 pr-2 py-2 bg-black/40 border border-white/10 rounded-lg text-sm text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none [color-scheme:dark]"
+                                                />
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">

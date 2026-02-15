@@ -4816,6 +4816,7 @@ export type Database = {
           retail_price: number | null
           section_id: string | null
           sku: string
+          track_inventory: boolean | null
           unit: string | null
           updated_at: string | null
           wholesale_price: number | null
@@ -4840,6 +4841,7 @@ export type Database = {
           retail_price?: number | null
           section_id?: string | null
           sku: string
+          track_inventory?: boolean | null
           unit?: string | null
           updated_at?: string | null
           wholesale_price?: number | null
@@ -4864,6 +4866,7 @@ export type Database = {
           retail_price?: number | null
           section_id?: string | null
           sku?: string
+          track_inventory?: boolean | null
           unit?: string | null
           updated_at?: string | null
           wholesale_price?: number | null

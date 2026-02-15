@@ -31,6 +31,7 @@ export interface ProductionItem {
     quantity: number
     wasted: number
     wasteReason: string
+    estimatedCompletion: string
 }
 
 export interface ProductUOM {
@@ -254,7 +255,8 @@ export default function StockProductionPage() {
             availableUnits,
             quantity: 1,
             wasted: 0,
-            wasteReason: ''
+            wasteReason: '',
+            estimatedCompletion: ''
         }])
         setSearchQuery('')
     }
@@ -288,6 +290,16 @@ export default function StockProductionPage() {
             items.map(item =>
                 item.productId === productId
                     ? { ...item, wasteReason: reason }
+                    : item
+            )
+        )
+    }
+
+    const updateEstimatedCompletion = (productId: string, value: string) => {
+        setProductionItems(items =>
+            items.map(item =>
+                item.productId === productId
+                    ? { ...item, estimatedCompletion: value }
                     : item
             )
         )
@@ -335,7 +347,9 @@ export default function StockProductionPage() {
                     quantity_waste: wastedInBaseUnit,
                     production_date: dateStr,
                     staff_id: user?.id,
-                    notes
+                    notes,
+                    status: 'pending',
+                    ...(item.estimatedCompletion ? { estimated_completion: new Date(item.estimatedCompletion).toISOString() } : {})
                 }
 
                 const { data: prodRecord, error: prodError } = await supabase
@@ -602,6 +616,7 @@ export default function StockProductionPage() {
                             onUpdateQuantity={updateQuantity}
                             onUpdateUnit={updateUnit}
                             onUpdateReason={updateReason}
+                            onUpdateEstimatedCompletion={updateEstimatedCompletion}
                             onRemoveItem={removeItem}
                             onClear={() => setProductionItems([])}
                             onSave={handleSave}
@@ -619,6 +634,7 @@ export default function StockProductionPage() {
                             todayHistory={todayHistory}
                             isAdmin={isAdmin}
                             onDeleteRecord={handleDeleteRecord}
+                            onStatusChange={fetchTodayHistory}
                         />
                     </div>
                 </div>

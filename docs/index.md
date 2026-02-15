@@ -1,6 +1,6 @@
 # AppGrav Documentation
 
-> Last updated: 2026-02-12
+> Last updated: 2026-02-15
 
 ## Root-Level Documentation
 
@@ -50,6 +50,16 @@
 - [user-guide.md](user-guide.md) - User guide
 - [wireframes/pos-revision-wireframes.md](wireframes/pos-revision-wireframes.md) - POS revision wireframes
 - [security/PHASE2_SECURITY_AUDIT.md](security/PHASE2_SECURITY_AUDIT.md) - Phase 2 security audit
+
+## Assembly Tracking
+
+- **[ASSEMBLY-TRACKING.md](ASSEMBLY-TRACKING.md)** - Suivi complet de l'assemblage frontend-driven (phases 0-5, gaps, chronologie, items restants)
+
+## Phase 0: Stitch Gap Analysis
+
+- [phase0/stitch-pages-inventory.md](phase0/stitch-pages-inventory.md) - Full inventory of 67 Stitch pages with RED/YELLOW/GREEN gap status
+- [phase0/gap-analysis.md](phase0/gap-analysis.md) - Gap analysis summary and prioritization
+- [phase0/backend-creation-plan.md](phase0/backend-creation-plan.md) - Backend migration plan for Phase 1
 
 ## Audit & Strategic Planning
 

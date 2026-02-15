@@ -94,6 +94,7 @@ export interface IJournalEntryInsert {
   description: string
   reference_type?: TJournalReferenceType
   attachment_url?: string | null
+  memo?: string | null
   lines: IJournalLineInput[]
 }
 

@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
-import { DollarSign, ShoppingCart, TrendingUp } from 'lucide-react';
+import { DollarSign, ShoppingCart, TrendingUp, TrendingDown } from 'lucide-react';
 import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
@@ -18,14 +18,22 @@ import { formatCurrency } from '@/utils/helpers';
 import type { DailySalesStat } from '@/types/reporting';
 import { DailySalesDrillDown } from './DailySalesDrillDown';
 
-function KpiCard({ icon, bg, label, value }: {
-  icon: React.ReactNode; bg: string; label: string; value: string | null;
+function KpiCard({ icon, bg, label, value, trend }: {
+  icon: React.ReactNode; bg: string; label: string; value: string | null; trend?: number;
 }) {
   return (
     <div className="bg-[var(--onyx-surface)] rounded-xl p-5 border border-white/5">
-      <div className="flex items-center gap-3 mb-2">
-        <div className={`p-2 ${bg} rounded-lg`}>{icon}</div>
-        <span className="text-sm text-[var(--theme-text-muted)]">{label}</span>
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-3">
+          <div className={`p-2 ${bg} rounded-lg`}>{icon}</div>
+          <span className="text-sm text-[var(--theme-text-muted)]">{label}</span>
+        </div>
+        {trend !== undefined && (
+          <div className={`flex items-center gap-1 text-sm font-medium ${trend >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+            {trend >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+            {Math.abs(trend).toFixed(1)}%
+          </div>
+        )}
       </div>
       {value === null ? (
         <div className="h-8 w-28 bg-white/5 rounded animate-pulse" />
@@ -77,6 +85,19 @@ export const DailySalesTab = () => {
     return { revenue, orders: orderCount, avgDaily: revenue / data.length, avgBasket: orderCount > 0 ? revenue / orderCount : 0 };
   }, [data]);
 
+  const comparisonTotals = useMemo(() => {
+    if (comparisonData.length === 0) return null;
+    const revenue = comparisonData.reduce((s, d) => s + (d.total_sales || 0), 0);
+    const orderCount = comparisonData.reduce((s, d) => s + (d.total_orders || 0), 0);
+    return { revenue, orders: orderCount, avgDaily: revenue / comparisonData.length, avgBasket: orderCount > 0 ? revenue / orderCount : 0 };
+  }, [comparisonData]);
+
+  const calcTrend = (curr: number, prev: number | undefined): number | undefined => {
+    if (prev === undefined || !isComparisonEnabled || !comparisonTotals) return undefined;
+    if (!prev) return curr > 0 ? 100 : 0;
+    return ((curr - prev) / prev) * 100;
+  };
+
   const exportConfig: ExportConfig<DailySalesStat> = useMemo(() => ({
     data,
     columns: [
@@ -119,10 +140,10 @@ export const DailySalesTab = () => {
       <ReportFilters filtersState={filtersState} enabledFilters={['category', 'order_type']} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard icon={<DollarSign className="w-5 h-5 text-blue-400" />} bg="bg-blue-500/10" label="Total Revenue" value={formatCurrency(totals.revenue)} />
-        <KpiCard icon={<ShoppingCart className="w-5 h-5 text-emerald-400" />} bg="bg-emerald-500/10" label="Total Orders" value={totals.orders.toLocaleString()} />
-        <KpiCard icon={<TrendingUp className="w-5 h-5 text-purple-400" />} bg="bg-purple-500/10" label="Avg Daily Revenue" value={formatCurrency(totals.avgDaily)} />
-        <KpiCard icon={<DollarSign className="w-5 h-5 text-amber-400" />} bg="bg-amber-500/10" label="Avg Basket" value={formatCurrency(totals.avgBasket)} />
+        <KpiCard icon={<DollarSign className="w-5 h-5 text-blue-400" />} bg="bg-blue-500/10" label="Total Revenue" value={formatCurrency(totals.revenue)} trend={calcTrend(totals.revenue, comparisonTotals?.revenue)} />
+        <KpiCard icon={<ShoppingCart className="w-5 h-5 text-emerald-400" />} bg="bg-emerald-500/10" label="Total Orders" value={totals.orders.toLocaleString()} trend={calcTrend(totals.orders, comparisonTotals?.orders)} />
+        <KpiCard icon={<TrendingUp className="w-5 h-5 text-purple-400" />} bg="bg-purple-500/10" label="Avg Daily Revenue" value={formatCurrency(totals.avgDaily)} trend={calcTrend(totals.avgDaily, comparisonTotals?.avgDaily)} />
+        <KpiCard icon={<DollarSign className="w-5 h-5 text-amber-400" />} bg="bg-amber-500/10" label="Avg Basket" value={formatCurrency(totals.avgBasket)} trend={calcTrend(totals.avgBasket, comparisonTotals?.avgBasket)} />
       </div>
 
       {isComparisonEnabled && dualSeriesData.length > 0 && (
