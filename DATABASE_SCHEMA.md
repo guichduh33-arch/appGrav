@@ -152,6 +152,7 @@ PostgreSQL database hosted on Supabase. 74 SQL migrations (local) + 13 Phase 1 m
 
 ### journal_entries (updated)
 - `attachment_url` TEXT (Phase 1 - H3, file upload via Supabase Storage)
+- `memo` TEXT (Phase 4 - H3, internal notes for journal entries)
 
 ## Notification Tables (Phase 1 - L1)
 
@@ -215,6 +216,8 @@ add_loyalty_points(p_customer_id UUID, p_points INTEGER, p_order_id UUID) -> VOI
 redeem_loyalty_points(p_customer_id UUID, p_points INTEGER) -> BOOLEAN
 open_shift(p_opening_cash DECIMAL, p_terminal_id VARCHAR, p_notes TEXT) -> JSONB
   -- Uses auth.uid() internally (no p_user_id parameter)
+get_vat_by_category(p_year INT, p_month INT) -> TABLE(category_name, total_sales, vat_collected, order_count, items_sold)
+  -- Phase 4 - H7: VAT breakdown by product category for a given month
 ```
 
 ## Key Triggers

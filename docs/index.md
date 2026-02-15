@@ -53,13 +53,13 @@
 
 ## Assembly Tracking
 
-- **[ASSEMBLY-TRACKING.md](ASSEMBLY-TRACKING.md)** - Suivi complet de l'assemblage frontend-driven (phases 0-5, gaps, chronologie, items restants)
+- **[../phase0/ASSEMBLY-TRACKING.md](../phase0/ASSEMBLY-TRACKING.md)** - Full assembly tracking (phases 0-5, gaps, timeline, remaining items)
 
 ## Phase 0: Stitch Gap Analysis
 
-- [phase0/stitch-pages-inventory.md](phase0/stitch-pages-inventory.md) - Full inventory of 67 Stitch pages with RED/YELLOW/GREEN gap status
-- [phase0/gap-analysis.md](phase0/gap-analysis.md) - Gap analysis summary and prioritization
-- [phase0/backend-creation-plan.md](phase0/backend-creation-plan.md) - Backend migration plan for Phase 1
+- [../phase0/stitch-pages-inventory.md](../phase0/stitch-pages-inventory.md) - Full inventory of 67 Stitch pages with RED/YELLOW/GREEN gap status
+- [../phase0/gap-analysis.md](../phase0/gap-analysis.md) - Gap analysis summary and prioritization
+- [../phase0/backend-creation-plan.md](../phase0/backend-creation-plan.md) - Backend migration plan for Phase 1
 
 ## Audit & Strategic Planning
 

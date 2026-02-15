@@ -54,7 +54,7 @@ src/
 │   ├── reports/     # Analytics & reports
 │   ├── settings/    # Configuration UI
 │   ├── sync/        # Offline/sync indicators
-│   └── ui/          # Shared UI components (shadcn/ui)
+│   └── ui/          # Shared UI components (shadcn/ui, NotificationBell)
 ├── pages/           # Route-based pages (~240 pages)
 ├── stores/          # Zustand stores (see State Management)
 ├── hooks/           # Custom hooks by module (~130 hooks)
@@ -193,7 +193,7 @@ Offline Mode:
 
 **Purchasing**: `purchase_orders`, `po_items`, `po_activity_log`
 
-**Accounting**: `accounts` (chart of accounts, 30 seed), `journal_entries` (+ `attachment_url`), `journal_entry_lines`, `fiscal_periods`, `vat_filings`, `product_price_history`
+**Accounting**: `accounts` (chart of accounts, 30 seed), `journal_entries` (+ `attachment_url`, `memo`), `journal_entry_lines`, `fiscal_periods`, `vat_filings`, `product_price_history`
 
 **Notifications**: `notification_events`, `notification_preferences`
 
@@ -212,6 +212,7 @@ add_loyalty_points(p_customer_id UUID, p_points INTEGER, p_order_id UUID) → VO
 redeem_loyalty_points(p_customer_id UUID, p_points INTEGER) → BOOLEAN
 get_account_balance(p_account_id UUID, p_end_date DATE) → DECIMAL
 calculate_vat_payable(p_year INT, p_month INT) → TABLE(collected, deductible, payable)
+get_vat_by_category(p_year INT, p_month INT) → TABLE(category_name, total_sales, vat_collected, order_count, items_sold)
 create_sale_journal_entry() → TRIGGER (auto on orders.completed/voided)
 create_purchase_journal_entry() → TRIGGER (auto on purchase_orders.received)
 ```
@@ -412,7 +413,7 @@ Key test files:
 - **Hooks**: ~130 custom hooks across 15 subdirectories
 - **Services**: ~78 business logic services across 16 subdirectories
 - **Stores**: 11 Zustand stores
-- **Migrations**: 74 local SQL files + 13 Phase 1 migrations (applied via Supabase API)
+- **Migrations**: 74 local SQL files + 15 Phase 1-4 migrations (applied via Supabase API)
 - **Edge Functions**: 13 Deno functions
 - **Test files**: 98 test files, ~1,650 tests
-- **Codebase**: ~62,000 lines of TypeScript/React
+- **Codebase**: ~65,000 lines of TypeScript/React

@@ -55,7 +55,7 @@ Last updated: 2026-02-15
 
 ## Test Coverage
 
-- **93 test files**, approximately **1,650 tests**
+- **98 test files**, approximately **1,650 tests**
 - Key additions in Sprint 4: `cartStore.test.ts`, `checkoutIntegration.test.ts`, `promotionEngine.test.ts`, `authService.test.ts`
 - Coverage configuration: V8 provider, thresholds at 60/50/60/60 (statements/branches/functions/lines)
 - Run with: `npm run test:coverage`
@@ -408,9 +408,57 @@ Page-by-page assembly connecting Stitch HTML designs to functional React compone
 - Precache entries: 171
 - Index bundle: 430kB
 
+## Phase 3: Luxe Dark Design System (2026-02-15)
+
+Applied the Luxe Dark design system across all modules (waves 7A-8D). Standardized visual language:
+- **Artisan Gold** (#C9A55C) for primary accents, CTAs, and active states
+- **Deep Onyx** (#0D0D0F) background with surface hierarchy via `var(--onyx-surface)`
+- Consistent spacing, rounded corners (xl), border-white/5 dividers
+- All modules updated: POS, KDS, inventory, B2B, customers, orders, purchasing, reports, settings, accounting
+
+## Phase 4: Yellow Gap Resolution (2026-02-15)
+
+Resolved all remaining YELLOW gaps from the Stitch gap analysis.
+
+### Batch 1: 18 BACKEND_ONLY Gaps (313eb8b)
+Connected backend features (already in DB) to frontend UI across products, inventory, purchasing, customers, and settings modules.
+
+### Batch 2: 19 TODO Gaps (90d9205)
+| Gap | Feature | Files Changed |
+|-----|---------|---------------|
+| H3 | Journal entry memo field | `accounting.ts`, `useJournalEntries.ts`, `JournalEntryForm.tsx` |
+| L3 | Sync queue throughput metric | `SystemHealthCards.tsx` |
+| N3 | Top waste reason KPI | `WastedPage.tsx` |
+| N1 | Daily sales trend badges | `DailySalesTab.tsx` |
+| N2 | Unique customers count | `OverviewTab.tsx`, `ReportingService.ts` |
+
+### Batch 3: 3 Complex Gaps (5da3c67)
+| Gap | Feature | Implementation |
+|-----|---------|---------------|
+| H7 | VAT category breakdown | New SQL function `get_vat_by_category` + table in `VATManagementPage.tsx` |
+| H5 | Waste cost in P&L | `ProfitLossTab.tsx` queries `stock_movements` for waste, shows % of revenue |
+| B1/B2 | Notification bell | New `NotificationBell.tsx` component (low stock + overdue B2B) in `BackOfficeLayout.tsx` |
+
+### Build Fixes (e3782dd)
+- Fixed `SecurityPinSettingsPage.tsx` premature `</div>` syntax error
+- Propagated `track_inventory` field to all `IOfflineProduct` usages (16 files)
+- Added missing `tierDescriptions` to `useLoyaltySettings` hook
+- Fixed unused variable in `pdfExportService.ts`
+
+### Database Migrations (Phase 4)
+| Migration | Purpose |
+|-----------|---------|
+| `add_journal_entry_memo` | `journal_entries.memo` TEXT column |
+| `add_vat_by_category_function` | `get_vat_by_category(year, month)` RPC |
+
+### Production Build
+- Build time: 15.46s
+- Precache entries: 174
+- Index bundle: 435kB
+- **0 TypeScript errors**, build passes cleanly
+
 ## Known Issues
 
 - `StockAlerts.test.tsx > StaleDataWarning > renders nothing when data is fresh` is flaky (timing issue in full suite, passes alone)
 - `useLanClient.test.ts > should handle localStorage not available` is flaky (pre-existing)
 - ExpensesTab disabled (feature flag false, `expenses` table does not exist)
-- Pre-existing TS errors in `authService.ts` (unused `requestingUserId` vars) and `authStore.ts` (type mismatch)
