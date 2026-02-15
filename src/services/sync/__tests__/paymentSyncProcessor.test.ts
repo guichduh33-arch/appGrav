@@ -139,6 +139,7 @@ describe('paymentSyncProcessor', () => {
         session_id: null,
         created_at: '2026-02-01T08:00:00Z',
         updated_at: '2026-02-01T08:00:00Z',
+        guest_count: null,
         sync_status: 'synced',
         server_id: 'server-order-already-synced', // Already has server_id
       };
@@ -197,6 +198,7 @@ describe('paymentSyncProcessor', () => {
         session_id: null,
         created_at: '2026-02-01T08:00:00Z',
         updated_at: '2026-02-01T08:00:00Z',
+        guest_count: null,
         sync_status: 'pending_sync', // NOT synced
         // No server_id
       };

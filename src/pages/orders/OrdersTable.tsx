@@ -96,10 +96,15 @@ const OrdersTable = ({
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                    {paginatedOrders.map(order => (
+                    {paginatedOrders.map(order => {
+                        const isVoided = order.status === 'cancelled' || order.status === 'voided';
+                        return (
                         <tr
                             key={order.id}
-                            className="cursor-pointer transition-colors hover:bg-white/[0.02]"
+                            className={cn(
+                                'cursor-pointer transition-colors hover:bg-white/[0.02]',
+                                isVoided && 'opacity-50 bg-red-500/[0.03] line-through decoration-white/20'
+                            )}
                             onClick={() => onSelectOrder(order)}
                         >
                             <td className="p-3 text-sm">
@@ -165,7 +170,8 @@ const OrdersTable = ({
                                 </button>
                             </td>
                         </tr>
-                    ))}
+                        );
+                    })}
                 </tbody>
             </table>
 

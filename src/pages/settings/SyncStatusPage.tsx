@@ -22,6 +22,7 @@ import { runSyncEngine } from '../../services/sync/syncEngine';
 import { getOfflinePeriods, getOfflinePeriodStats, type IOfflinePeriod } from '../../services/sync/offlinePeriod';
 import { logError } from '@/utils/logger';
 import { SyncStatusCards } from './sync-status/SyncStatusCards';
+import { SystemHealthCards } from './sync-status/SystemHealthCards';
 import { SyncQueueTable } from './sync-status/SyncQueueTable';
 import { OfflineHistorySection } from './sync-status/OfflineHistorySection';
 
@@ -178,6 +179,8 @@ export default function SyncStatusPage() {
           </button>
         </div>
       </div>
+
+      <SystemHealthCards />
 
       <SyncStatusCards
         syncStatus={syncStatus}

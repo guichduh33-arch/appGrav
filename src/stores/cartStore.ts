@@ -57,6 +57,7 @@ interface CartState {
     items: CartItem[]
     orderType: 'dine_in' | 'takeaway' | 'delivery'
     tableNumber: string | null
+    guestCount: number | null
     customerId: string | null
     customerName: string | null
     discountType: 'percent' | 'amount' | null
@@ -92,6 +93,7 @@ interface CartState {
     forceClearCart: () => void
     setOrderType: (type: 'dine_in' | 'takeaway' | 'delivery') => void
     setTableNumber: (table: string | null) => void
+    setGuestCount: (count: number | null) => void
     setCustomer: (id: string | null, name: string | null) => void
     setDiscount: (type: 'percent' | 'amount' | null, value: number, reason: string | null) => void
     setOrderNotes: (notes: string) => void
@@ -173,6 +175,7 @@ export const useCartStore = create<CartState>()(
     items: [],
     orderType: 'dine_in',
     tableNumber: null,
+    guestCount: null,
     customerId: null,
     customerName: null,
     customerCategorySlug: null,
@@ -313,6 +316,7 @@ export const useCartStore = create<CartState>()(
         set({
             items: [],
             tableNumber: null,
+            guestCount: null,
             customerId: null,
             customerName: null,
             customerCategorySlug: null,
@@ -340,6 +344,7 @@ export const useCartStore = create<CartState>()(
         set({
             items: [],
             tableNumber: null,
+            guestCount: null,
             customerId: null,
             customerName: null,
             customerCategorySlug: null,
@@ -363,6 +368,8 @@ export const useCartStore = create<CartState>()(
     setOrderType: (orderType) => set({ orderType }),
 
     setTableNumber: (tableNumber) => set({ tableNumber }),
+
+    setGuestCount: (guestCount) => set({ guestCount }),
 
     setCustomer: (customerId, customerName) => set({ customerId, customerName }),
 
@@ -555,6 +562,7 @@ export function initCartPersistence(): void {
             activeOrderNumber: state.activeOrderNumber,
             orderType: state.orderType,
             tableNumber: state.tableNumber,
+            guestCount: state.guestCount,
             customerId: state.customerId,
             customerName: state.customerName,
             customerCategorySlug: state.customerCategorySlug, // Story 6.2

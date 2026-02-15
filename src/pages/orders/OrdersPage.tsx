@@ -56,6 +56,8 @@ const OrdersPage = () => {
                     subtotal,
                     discount_amount,
                     tax_amount,
+                    service_charge,
+                    service_charge_type,
                     total,
                     payment_method,
                     cash_received,

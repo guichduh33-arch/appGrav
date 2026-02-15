@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
@@ -448,6 +448,17 @@ export default function LoginPage() {
         >
           {isLoading || authLoading ? 'Loading...' : 'Sign in'}
         </button>
+
+        {/* Footer Links */}
+        <div className="mt-xl text-center">
+          <Link
+            to="/login/reset"
+            className="text-sm font-medium transition-colors hover:opacity-80"
+            style={{ color: 'var(--color-gold-light)' }}
+          >
+            Forgot password?
+          </Link>
+        </div>
 
       </div>
 

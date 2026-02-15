@@ -554,6 +554,7 @@ function createMockOrderInput(
     notes: null,
     user_id: 'user-123',
     session_id: 'session-123',
+    guest_count: null,
     ...overrides,
   };
 }

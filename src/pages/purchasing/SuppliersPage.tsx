@@ -21,6 +21,7 @@ interface Supplier extends ISupplier {
     country: string | null
     tax_id: string | null
     payment_terms: string | null
+    category: string | null
     notes: string | null
 }
 
@@ -46,6 +47,7 @@ export default function SuppliersPage() {
         country: 'Indonesia',
         tax_id: '',
         payment_terms: 'net30',
+        category: null,
         notes: '',
         is_active: true
     })
@@ -67,6 +69,7 @@ export default function SuppliersPage() {
                 country: 'Indonesia',
                 tax_id: '',
                 payment_terms: 'net30',
+                category: null,
                 notes: '',
                 is_active: true
             })
@@ -120,11 +123,13 @@ export default function SuppliersPage() {
         }
     }
 
-    const filteredSuppliers = (suppliers as Supplier[]).filter(supplier =>
-        supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        supplier.contact_person?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        supplier.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    const filteredSuppliers = (suppliers as Supplier[]).filter(supplier => {
+        const q = searchTerm.toLowerCase()
+        return supplier.name.toLowerCase().includes(q) ||
+            supplier.contact_person?.toLowerCase().includes(q) ||
+            supplier.email?.toLowerCase().includes(q) ||
+            supplier.category?.toLowerCase().includes(q)
+    })
 
     const activeSuppliers = filteredSuppliers.filter(s => s.is_active)
     const inactiveSuppliers = filteredSuppliers.filter(s => !s.is_active)

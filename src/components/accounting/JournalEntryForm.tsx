@@ -2,12 +2,13 @@
  * JournalEntryForm - Manual journal entry creation (Epic 9 - Story 9.4)
  */
 
-import { useState } from 'react'
-import { X, Plus, AlertCircle } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { X, Plus, AlertCircle, Paperclip, Trash2 } from 'lucide-react'
 import { useCreateJournalEntry } from '@/hooks/accounting'
 import { useFiscalPeriods } from '@/hooks/accounting'
 import { validateJournalEntry } from '@/services/accounting/journalEntryValidation'
 import { calculateLineTotals } from '@/services/accounting/accountingService'
+import { supabase } from '@/lib/supabase'
 import { JournalLineTable } from './JournalLineTable'
 import type { IJournalLineInput } from '@/types/accounting'
 
@@ -29,6 +30,8 @@ export function JournalEntryForm({ onClose }: JournalEntryFormProps) {
   const [description, setDescription] = useState('')
   const [lines, setLines] = useState<IJournalLineInput[]>([emptyLine(), emptyLine()])
   const [errors, setErrors] = useState<{ field: string; message: string }[]>([])
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const { totalDebit, totalCredit, difference } = calculateLineTotals(lines)
 
@@ -43,7 +46,7 @@ export function JournalEntryForm({ onClose }: JournalEntryFormProps) {
     setLines(lines.map((line, i) => (i === index ? { ...line, ...updates } : line)))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const validationErrors = validateJournalEntry(entryDate, description, lines, periods)
     if (validationErrors.length > 0) {
@@ -52,8 +55,22 @@ export function JournalEntryForm({ onClose }: JournalEntryFormProps) {
     }
 
     setErrors([])
+    let attachment_url: string | null = null
+
+    if (attachmentFile) {
+      const ext = attachmentFile.name.split('.').pop()
+      const path = `journal-attachments/${Date.now()}.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from('documents')
+        .upload(path, attachmentFile)
+      if (!uploadError) {
+        const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path)
+        attachment_url = urlData.publicUrl
+      }
+    }
+
     createEntry.mutate(
-      { entry_date: entryDate, description, lines },
+      { entry_date: entryDate, description, lines, attachment_url },
       { onSuccess: () => onClose() }
     )
   }
@@ -89,6 +106,26 @@ export function JournalEntryForm({ onClose }: JournalEntryFormProps) {
                 placeholder="Entry description"
               />
             </div>
+          </div>
+
+          {/* Attachment */}
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] mb-1">Attachment</label>
+            <input ref={fileInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="hidden"
+              onChange={e => { if (e.target.files?.[0]) setAttachmentFile(e.target.files[0]) }} />
+            {attachmentFile ? (
+              <div className="flex items-center gap-2 px-3 py-2 bg-black/40 border border-white/10 rounded-xl text-sm text-white">
+                <Paperclip size={14} className="text-[var(--color-gold)]" />
+                <span className="flex-1 truncate">{attachmentFile.name}</span>
+                <button type="button" onClick={() => { setAttachmentFile(null); if (fileInputRef.current) fileInputRef.current.value = '' }}
+                  className="text-red-400/60 hover:text-red-400"><Trash2 size={14} /></button>
+              </div>
+            ) : (
+              <button type="button" onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-2 px-3 py-2 bg-black/40 border border-dashed border-white/10 rounded-xl text-sm text-[var(--theme-text-muted)] hover:border-[var(--color-gold)]/30 hover:text-white transition-all">
+                <Paperclip size={14} /> Attach receipt or invoice (PDF, image)
+              </button>
+            )}
           </div>
 
           <JournalLineTable

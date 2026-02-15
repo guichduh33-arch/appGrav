@@ -2,6 +2,7 @@ import React from 'react'
 import { Product, Category, Section } from '../../../types/database'
 import { Star, Factory, ShoppingCart, Warehouse, Check, Layers } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ProductPerformanceCard } from '../components/ProductPerformanceCard'
 
 // Extended ProductUOM with UI-specific fields
 interface ProductUOMLocal {
@@ -133,8 +134,9 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                     </div>
                 </section>
 
-                {/* Finance & POS */}
+                {/* Finance & POS + Performance */}
                 <section className="lg:col-span-2 flex flex-col gap-8">
+                    <ProductPerformanceCard productId={product.id} />
                     <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-sm shadow-2xl h-full flex flex-col">
                         <div className="p-8 border-b border-white/5">
                             <h3 className="text-xl font-bold text-white">Finance & POS</h3>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Save, Clock, AlertCircle } from 'lucide-react';
-import { useBusinessHours, useUpdateBusinessHours } from '../../hooks/settings';
+import { Save, Clock, AlertCircle, Plus, Trash2, CalendarDays, Zap } from 'lucide-react';
+import { useBusinessHours, useUpdateBusinessHours, useSettingsByCategory, useUpdateSetting } from '../../hooks/settings';
+import { useBusinessHolidays, useCreateHoliday, useDeleteHoliday } from '../../hooks/settings/useBusinessHolidays';
 import type { BusinessHours } from '../../types/settings';
 import { toast } from 'sonner';
 
@@ -16,10 +17,33 @@ const timeInputClass =
 const BusinessHoursPage = () => {
   const { data: businessHours, isLoading } = useBusinessHours();
   const updateHours = useUpdateBusinessHours();
+  const currentYear = new Date().getFullYear();
+  const { data: holidays = [] } = useBusinessHolidays(currentYear);
+  const createHoliday = useCreateHoliday();
+  const deleteHoliday = useDeleteHoliday();
+
+  const { data: posSettings } = useSettingsByCategory('pos_config');
+  const updateSetting = useUpdateSetting();
+
+  const peakEnabled = posSettings?.find(s => s.key === 'pos_config.peak_pricing_enabled')?.value === true;
+  const peakStart = String(posSettings?.find(s => s.key === 'pos_config.peak_time_start')?.value ?? '11:00');
+  const peakEnd = String(posSettings?.find(s => s.key === 'pos_config.peak_time_end')?.value ?? '14:00');
+  const peakMarkup = Number(posSettings?.find(s => s.key === 'pos_config.peak_pricing_markup_percent')?.value ?? 0);
+
+  const handlePeakChange = async (key: string, value: unknown) => {
+    try {
+      await updateSetting.mutateAsync({ key: `pos_config.${key}`, value });
+      toast.success('Peak pricing updated');
+    } catch { toast.error('Failed to update'); }
+  };
 
   const [localHours, setLocalHours] = useState<BusinessHours[]>([]);
   const [pendingChanges, setPendingChanges] = useState<Set<number>>(new Set());
   const [isSaving, setIsSaving] = useState(false);
+  const [showHolidayForm, setShowHolidayForm] = useState(false);
+  const [holidayName, setHolidayName] = useState('');
+  const [holidayDate, setHolidayDate] = useState('');
+  const [holidayRecurring, setHolidayRecurring] = useState(false);
 
   const dayNames = DAY_NAMES.en;
 
@@ -219,6 +243,147 @@ const BusinessHoursPage = () => {
           </span>
         </div>
       )}
+
+      {/* Holidays & Special Dates */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="text-lg font-display font-bold text-white flex items-center gap-2">
+              <CalendarDays size={20} className="text-[var(--color-gold)]" />
+              Holidays & Special Dates
+            </h2>
+            <p className="text-sm text-[var(--theme-text-muted)] mt-1">
+              Days your establishment will be closed or have modified hours
+            </p>
+          </div>
+          <button
+            onClick={() => setShowHolidayForm(!showHolidayForm)}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm bg-[var(--color-gold)] text-black font-bold rounded-xl hover:opacity-90 transition-opacity"
+          >
+            <Plus size={14} /> Add Holiday
+          </button>
+        </div>
+
+        {showHolidayForm && (
+          <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-4 mb-3 flex items-end gap-3 flex-wrap">
+            <div className="flex-1 min-w-[180px]">
+              <label className="block text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--theme-text-muted)] mb-1">Name</label>
+              <input
+                type="text"
+                value={holidayName}
+                onChange={e => setHolidayName(e.target.value)}
+                placeholder="e.g. Nyepi, Idul Fitri"
+                className="w-full h-8 px-2 bg-black/40 border border-white/10 rounded-xl text-sm text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
+              />
+            </div>
+            <div className="w-40">
+              <label className="block text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--theme-text-muted)] mb-1">Date</label>
+              <input
+                type="date"
+                value={holidayDate}
+                onChange={e => setHolidayDate(e.target.value)}
+                className="w-full h-8 px-2 bg-black/40 border border-white/10 rounded-xl text-sm text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none"
+              />
+            </div>
+            <label className="flex items-center gap-2 text-sm text-white/70 cursor-pointer py-1">
+              <input type="checkbox" checked={holidayRecurring} onChange={e => setHolidayRecurring(e.target.checked)} className="accent-[var(--color-gold)]" />
+              Recurring yearly
+            </label>
+            <button
+              onClick={async () => {
+                if (!holidayName.trim() || !holidayDate) { toast.error('Name and date required'); return; }
+                try {
+                  await createHoliday.mutateAsync({ name: holidayName.trim(), date: holidayDate, is_recurring: holidayRecurring, is_closed: true });
+                  toast.success('Holiday added');
+                  setHolidayName(''); setHolidayDate(''); setHolidayRecurring(false); setShowHolidayForm(false);
+                } catch { toast.error('Failed to add holiday'); }
+              }}
+              disabled={createHoliday.isPending}
+              className="h-8 px-4 bg-emerald-500 text-white font-bold text-sm rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity"
+            >
+              {createHoliday.isPending ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        )}
+
+        <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+          {holidays.length === 0 ? (
+            <div className="px-5 py-8 text-center text-[var(--theme-text-muted)] text-sm">
+              No holidays configured for {currentYear}
+            </div>
+          ) : (
+            holidays.map(h => (
+              <div key={h.id} className="flex items-center gap-4 px-5 py-3 border-b border-white/5 last:border-b-0 hover:bg-white/[0.02]">
+                <div className="w-24 text-sm text-white/70">
+                  {new Date(h.date + 'T00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </div>
+                <div className="flex-1 text-sm font-medium text-white">{h.name}</div>
+                {h.is_recurring && (
+                  <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-[var(--color-gold)]/10 text-[var(--color-gold)] rounded-full">
+                    Yearly
+                  </span>
+                )}
+                <span className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full ${
+                  h.is_closed ? 'bg-red-400/10 text-red-400' : 'bg-amber-400/10 text-amber-400'
+                }`}>
+                  {h.is_closed ? 'Closed' : 'Modified Hours'}
+                </span>
+                <button
+                  onClick={async () => {
+                    try { await deleteHoliday.mutateAsync(h.id); toast.success('Holiday removed'); }
+                    catch { toast.error('Failed to delete'); }
+                  }}
+                  className="p-1.5 hover:bg-red-400/10 rounded-lg text-red-400/60 hover:text-red-400 transition-colors"
+                  title="Remove"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Peak Pricing */}
+      <div>
+        <h2 className="text-lg font-display font-bold text-white flex items-center gap-2 mb-1">
+          <Zap size={20} className="text-[var(--color-gold)]" />
+          Peak Pricing
+        </h2>
+        <p className="text-sm text-[var(--theme-text-muted)] mb-3">
+          Automatically adjust prices during high-traffic hours
+        </p>
+        <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-white font-medium">Enable peak pricing</span>
+            <div
+              className={`w-9 h-5 rounded-full cursor-pointer transition-all relative shrink-0
+                after:content-[""] after:absolute after:top-[2px] after:left-[2px] after:w-4 after:h-4 after:rounded-full after:bg-white after:shadow-sm after:transition-all
+                ${peakEnabled ? 'bg-[var(--color-gold)] after:left-[18px]' : 'bg-white/10'}
+              `}
+              onClick={() => handlePeakChange('peak_pricing_enabled', !peakEnabled)}
+            />
+          </div>
+          {peakEnabled && (
+            <div className="grid grid-cols-3 gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--theme-text-muted)]">Start</label>
+                <input type="time" value={peakStart} onChange={e => handlePeakChange('peak_time_start', e.target.value)} className={timeInputClass} />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--theme-text-muted)]">End</label>
+                <input type="time" value={peakEnd} onChange={e => handlePeakChange('peak_time_end', e.target.value)} className={timeInputClass} />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--theme-text-muted)]">Markup %</label>
+                <input type="number" min={0} max={100} step={1} value={peakMarkup} onChange={e => handlePeakChange('peak_pricing_markup_percent', Number(e.target.value))}
+                  className="h-8 px-2 bg-black/40 border border-white/10 rounded-xl text-sm text-white focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none w-full"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

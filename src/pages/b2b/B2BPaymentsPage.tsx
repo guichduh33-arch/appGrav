@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
     ArrowLeft, CreditCard, Search,
     TrendingUp, Clock, CheckCircle, AlertCircle,
-    Download, BarChart3
+    Download, BarChart3, FileText
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -14,6 +14,7 @@ import {
     type IAgingReport, type IOutstandingOrder,
 } from '../../services/b2b/arService'
 import { useAuthStore } from '../../stores/authStore'
+import { exportToPDF, type PdfColumn } from '@/services/reports/pdfExport'
 import { logError } from '@/utils/logger'
 import B2BPaymentsReceivedTab from './B2BPaymentsReceivedTab'
 import B2BPaymentsOutstandingTab from './B2BPaymentsOutstandingTab'
@@ -127,6 +128,41 @@ export default function B2BPaymentsPage() {
         toast.success('CSV exported')
     }, [agingReport])
 
+    const handleBatchStatements = useCallback(async () => {
+        if (!agingReport) { toast.error('Load aging report first'); return }
+        const allOrders = agingReport.buckets.flatMap(b => b.orders)
+        const groups = allOrders.reduce<Record<string, { name: string; orders: IOutstandingOrder[]; totalDue: number }>>((acc, order) => {
+            if (!acc[order.customer_id]) acc[order.customer_id] = { name: order.company_name || order.customer_name, orders: [], totalDue: 0 }
+            acc[order.customer_id].orders.push(order); acc[order.customer_id].totalDue += order.amount_due
+            return acc
+        }, {})
+        const entries = Object.entries(groups)
+        if (entries.length === 0) { toast.error('No outstanding orders'); return }
+        const cols: PdfColumn<IOutstandingOrder>[] = [
+            { key: 'order_number', header: 'Order #', width: 35 },
+            { key: 'order_date', header: 'Date', width: 28, format: (v) => v ? new Date(v as string).toLocaleDateString() : '' },
+            { key: 'total', header: 'Total', align: 'right', format: (v) => formatCurrency(Number(v)) },
+            { key: 'paid_amount', header: 'Paid', align: 'right', format: (v) => formatCurrency(Number(v)) },
+            { key: 'amount_due', header: 'Due', align: 'right', format: (v) => formatCurrency(Number(v)) },
+            { key: 'days_overdue', header: 'Days', align: 'center', format: (v) => String(v) },
+        ]
+        let count = 0
+        for (const [, group] of entries) {
+            await exportToPDF(group.orders, cols, {
+                filename: `statement-${group.name.replace(/\s+/g, '_').toLowerCase()}`,
+                title: `Account Statement — ${group.name}`,
+                subtitle: 'The Breakery',
+                watermark: { text: 'The Breakery', showDate: true },
+                footerText: 'The Breakery — Lombok, Indonesia',
+            }, [
+                { label: 'Total Outstanding', value: formatCurrency(group.totalDue) },
+                { label: 'Open Orders', value: group.orders.length },
+            ])
+            count++
+        }
+        toast.success(`${count} statement(s) generated`)
+    }, [agingReport])
+
     const handleFIFOPayment = useCallback(async () => {
         if (!fifoCustomerId || !fifoAmount || Number(fifoAmount) <= 0) { toast.error('Please enter a valid amount'); return }
         setFifoProcessing(true)
@@ -216,13 +252,22 @@ export default function B2BPaymentsPage() {
                     </div>
                 </div>
                 {activeTab === 'aging' && agingReport && (
-                    <button
-                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--color-gold)] text-black font-bold rounded-xl text-sm transition-colors hover:brightness-110"
-                        onClick={handleExportCSV}
-                    >
-                        <Download size={16} />
-                        Export CSV
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            className="inline-flex items-center gap-2 px-4 py-2.5 bg-transparent border border-white/10 text-white rounded-xl text-sm transition-colors hover:border-white/20"
+                            onClick={handleBatchStatements}
+                        >
+                            <FileText size={16} />
+                            Batch Statements
+                        </button>
+                        <button
+                            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--color-gold)] text-black font-bold rounded-xl text-sm transition-colors hover:brightness-110"
+                            onClick={handleExportCSV}
+                        >
+                            <Download size={16} />
+                            Export CSV
+                        </button>
+                    </div>
                 )}
             </div>
 

@@ -26,6 +26,7 @@ import {
   type IPODetailItem,
   type IReturnFormState,
 } from '@/components/purchasing'
+import { usePOActivityLog } from '@/hooks/purchasing/usePOActivityLog'
 import PinVerificationModal from '@/components/pos/modals/PinVerificationModal'
 import { toast } from 'sonner'
 import { logError } from '@/utils/logger'
@@ -52,6 +53,7 @@ export default function PurchaseOrderDetailPage() {
   // Data hooks
   const { purchaseOrder, items, history, returns, isLoading, error, refetch } =
     usePurchaseOrderDetail(id || null)
+  const { data: activityLog = [] } = usePOActivityLog(id)
 
   // Mutation hooks
   const sendToSupplierMutation = useSendToSupplier()
@@ -299,6 +301,28 @@ export default function PurchaseOrderDetailPage() {
           <POReturnsSection returns={returns} />
 
           <POHistoryTimeline history={history} />
+
+          {/* Activity Log */}
+          {activityLog.length > 0 && (
+            <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-6">
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-[var(--color-gold)] mb-4 pb-3 border-b border-white/5">
+                Activity Log
+              </h2>
+              <div className="space-y-2">
+                {activityLog.map(entry => (
+                  <div key={entry.id} className="flex items-start gap-3 py-2 border-b border-white/5 last:border-b-0">
+                    <span className="text-[10px] text-[var(--muted-smoke)] whitespace-nowrap mt-0.5">
+                      {new Date(entry.created_at).toLocaleString('fr-FR')}
+                    </span>
+                    <span className="px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest rounded-full border border-white/10 text-white/60 shrink-0">
+                      {entry.action}
+                    </span>
+                    <span className="text-sm text-white/80 flex-1">{entry.description || '-'}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <POSummarySidebar

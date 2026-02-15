@@ -126,6 +126,7 @@ export function useCreateJournalEntry() {
           entry_date: input.entry_date,
           description: input.description,
           reference_type: input.reference_type || 'manual',
+          attachment_url: input.attachment_url || null,
           status: 'draft',
           total_debit: totalDebit,
           total_credit: totalCredit,

@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { logError } from '@/utils/logger';
 import { SmtpConfigSection } from './notifications/SmtpConfigSection';
 import { AlertPreferencesSection } from './notifications/AlertPreferencesSection';
+import { EventPreferencesSection } from './notifications/EventPreferencesSection';
 
 interface INotificationFormData {
   smtp_enabled: boolean; smtp_host: string; smtp_port: number;
@@ -274,6 +275,8 @@ const NotificationSettingsPage = () => {
           canEdit={canEdit}
           onChange={handleChange}
         />
+
+        <EventPreferencesSection canEdit={canEdit} />
       </div>
 
       {/* Unsaved changes notice */}

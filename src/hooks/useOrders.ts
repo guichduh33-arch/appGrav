@@ -11,7 +11,13 @@ export function useOrders() {
     const { items, orderType, tableNumber, customerId, customerName, subtotal, discountType, discountValue, discountAmount, total, clearCart } = useCartStore()
 
     const createOrderMutation = useMutation({
-        mutationFn: async (paymentData: { method: string, cashReceived?: number, changeGiven?: number }) => {
+        mutationFn: async (paymentData: {
+            method: string;
+            cashReceived?: number;
+            changeGiven?: number;
+            serviceCharge?: number;
+            serviceChargeType?: string;
+        }) => {
             if (!user) throw new Error('Utilisateur non connecté')
 
             // 1. Create Order
@@ -27,6 +33,8 @@ export function useOrders() {
                 discount_type: discountType === 'percent' ? 'percentage' : (discountType === 'amount' ? 'fixed' : null),
                 discount_value: discountValue,
                 discount_amount: discountAmount,
+                service_charge: paymentData.serviceCharge ?? 0,
+                service_charge_type: paymentData.serviceChargeType ?? 'percentage',
                 total: total,
                 payment_method: paymentData.method,
                 cash_received: paymentData.cashReceived,

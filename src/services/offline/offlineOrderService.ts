@@ -41,6 +41,7 @@ export interface ICartStateForOrder {
   items: CartItem[];
   orderType: 'dine_in' | 'takeaway' | 'delivery';
   tableNumber: string | null;
+  guestCount?: number | null;
   customerId: string | null;
   discountType: 'percent' | 'amount' | null;
   discountValue: number;
@@ -257,6 +258,7 @@ export async function createOfflineOrder(
     total: cartState.total,
     customer_id: cartState.customerId,
     table_number: cartState.tableNumber,
+    guest_count: cartState.guestCount ?? null,
     notes: cartState.discountReason, // Store discount reason as order note
     user_id: userId,
     session_id: sessionId,

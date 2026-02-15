@@ -80,6 +80,7 @@ describe('orderSyncProcessor', () => {
         session_id: 'server-session-uuid', // Already resolved
         created_at: '2026-02-01T08:00:00Z',
         updated_at: '2026-02-01T08:00:00Z',
+        guest_count: null,
         sync_status: 'pending_sync',
       };
       await db.offline_orders.add(localOrder);
@@ -165,6 +166,7 @@ describe('orderSyncProcessor', () => {
         session_id: 'LOCAL-SESSION-789', // Local session ID
         created_at: '2026-02-01T09:00:00Z',
         updated_at: '2026-02-01T09:00:00Z',
+        guest_count: null,
         sync_status: 'pending_sync',
       };
       await db.offline_orders.add(localOrder);
@@ -229,6 +231,7 @@ describe('orderSyncProcessor', () => {
         session_id: null,
         created_at: '2026-02-01T08:00:00Z',
         updated_at: '2026-02-01T08:00:00Z',
+        guest_count: null,
         sync_status: 'pending_sync',
       };
       await db.offline_orders.add(localOrder);

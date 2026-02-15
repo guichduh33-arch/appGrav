@@ -257,6 +257,10 @@ export const useAuthStore = create<IAuthState>()(
           must_change_password: false,
           created_by: null,
           updated_by: null,
+          default_module: null,
+          email: null,
+          mfa_enabled: false,
+          title: null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         } as UserProfile;

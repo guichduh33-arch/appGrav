@@ -193,6 +193,7 @@ describe('offlineSessionService', () => {
         session_id: session.id,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        guest_count: null,
         sync_status: 'pending_sync',
       };
 
@@ -295,6 +296,7 @@ describe('offlineSessionService', () => {
         session_id: 'different-session-id',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        guest_count: null,
         sync_status: 'pending_sync',
       };
 
@@ -361,6 +363,7 @@ describe('offlineSessionService', () => {
         session_id: session.id,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        guest_count: null,
         sync_status: 'pending_sync',
       });
 
@@ -414,6 +417,7 @@ describe('offlineSessionService', () => {
         session_id: session.id,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        guest_count: null,
         sync_status: 'pending_sync',
       });
 
@@ -466,6 +470,7 @@ describe('offlineSessionService', () => {
         session_id: session.id,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        guest_count: null,
         sync_status: 'pending_sync',
       });
 

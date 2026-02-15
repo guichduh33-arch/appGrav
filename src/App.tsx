@@ -17,6 +17,9 @@ import BackOfficeLayout from './layouts/BackOfficeLayout'
 // Critical paths loaded immediately
 import LoginPage from './pages/auth/LoginPage'
 import POSMainPage from './pages/pos/POSMainPage'
+
+// Auth pages (lazy)
+const PasswordResetPage = lazy(() => import('./pages/auth/PasswordResetPage'))
 import { logWarn } from '@/utils/logger'
 
 // Loading fallback component
@@ -251,6 +254,7 @@ function App() {
                 <Routes>
                     {/* Public Routes */}
                     <Route path="/login" element={<LoginPage />} />
+                    <Route path="/login/reset" element={<PasswordResetPage />} />
                     <Route path="/display" element={<CustomerDisplayPage />} />
                     <Route path="/mobile/login" element={<MobileLoginPage />} />
 

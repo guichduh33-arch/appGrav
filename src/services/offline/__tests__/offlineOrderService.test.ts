@@ -76,6 +76,8 @@ const mockComboCartItem: CartItem = {
     combo_price: 35000,
     is_active: true,
     available_at_pos: true,
+    available_from: null,
+    available_to: null,
     image_url: null,
     sort_order: null,
     created_at: '2026-01-01T00:00:00Z',
@@ -122,6 +124,7 @@ const mockCartState: ICartStateForOrder = {
   subtotal: 60000,
   discountAmount: 6000,
   total: 54000,
+  guestCount: null,
 };
 
 // =====================================================

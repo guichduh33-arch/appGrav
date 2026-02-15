@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect } from 'react'
-import { Edit2, AlertTriangle, Search, Package, FileText } from 'lucide-react'
+import { Edit2, Search, Package, FileText } from 'lucide-react'
 import type { Product } from '../../types/database'
 import { cn } from '@/lib/utils'
+import { StockStatusBadge } from '@/components/ui/StockStatusBadge'
 
 interface InventoryTableProps {
     items: (Product & { category: { name: string } | null })[]
@@ -103,12 +104,13 @@ export default function InventoryTable({ items, onAdjustStock, onViewDetails, is
                                                 >
                                                     {item.name}
                                                 </div>
-                                                {isLowStock && (
-                                                    <div className="inline-flex items-center gap-1 text-[0.7rem] font-semibold text-[var(--color-danger-text)] mt-1 px-2 py-0.5 bg-[var(--color-danger-bg)] rounded-full w-fit">
-                                                        <AlertTriangle size={12} />
-                                                        Low stock
-                                                    </div>
-                                                )}
+                                                <StockStatusBadge
+                                                    currentStock={item.current_stock ?? 0}
+                                                    lowThreshold={item.min_stock_level ?? 10}
+                                                    criticalThreshold={Math.max(1, Math.floor((item.min_stock_level ?? 10) / 2))}
+                                                    showLabel={isLowStock}
+                                                    className="mt-1"
+                                                />
                                             </div>
                                         </div>
                                     </td>

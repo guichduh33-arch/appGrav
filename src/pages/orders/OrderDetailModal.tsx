@@ -173,6 +173,12 @@ const OrderDetailModal = ({ order, recentlyUpdatedItems, onClose }: OrderDetailM
                                 <span>-{formatCurrency(order.discount_amount)}</span>
                             </div>
                         )}
+                        {(order.service_charge ?? 0) > 0 && (
+                            <div className="flex justify-between py-2 text-sm text-[var(--theme-text-muted)]">
+                                <span>Service Charge</span>
+                                <span>{formatCurrency(order.service_charge!)}</span>
+                            </div>
+                        )}
                         <div className="flex justify-between py-2 text-sm text-[var(--theme-text-muted)]">
                             <span>Tax (10%)</span>
                             <span>{formatCurrency(order.tax_amount)}</span>

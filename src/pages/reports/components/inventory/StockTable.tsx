@@ -1,5 +1,6 @@
 import { Search, ArrowUpDown, Package } from 'lucide-react';
 import { formatCurrency } from '@/utils/helpers';
+import { StockStatusBadge, type TStockLevel } from '@/components/ui/StockStatusBadge';
 
 type SortField = 'product_name' | 'current_stock' | 'cost_price' | 'stock_value';
 
@@ -50,19 +51,7 @@ export function StockTable({
     </th>
   );
 
-  const getStatusBadge = (status: string) => {
-    const styles: Record<string, string> = {
-      ok: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
-      low: 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
-      critical: 'bg-orange-500/10 text-orange-400 border border-orange-500/20',
-      out: 'bg-red-500/10 text-red-400 border border-red-500/20',
-    };
-    return (
-      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${styles[status] || styles.ok}`}>
-        {status === 'out' ? 'Out of Stock' : status.toUpperCase()}
-      </span>
-    );
-  };
+  // StockStatusBadge accepts direct status prop
 
   return (
     <div className="bg-[var(--onyx-surface)] rounded-xl border border-white/5 overflow-hidden">
@@ -139,7 +128,7 @@ export function StockTable({
                     {formatCurrency(item.stock_value)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-center">
-                    {getStatusBadge(item.status)}
+                    <StockStatusBadge status={item.status as TStockLevel} />
                   </td>
                 </tr>
               ))

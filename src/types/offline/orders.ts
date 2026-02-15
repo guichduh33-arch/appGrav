@@ -104,6 +104,9 @@ export interface IOfflineOrder {
   /** Table number for dine_in orders */
   table_number: string | null;
 
+  /** Number of guests (dine_in) */
+  guest_count: number | null;
+
   /** Order notes from cashier */
   notes: string | null;
 

@@ -30,6 +30,8 @@ export interface Order {
     subtotal: number;
     discount_amount: number;
     tax_amount: number;
+    service_charge: number | null;
+    service_charge_type: string | null;
     total: number;
     payment_method: string | null;
     cash_received: number | null;
@@ -176,16 +178,20 @@ export interface OrderStats {
     unpaid: number;
     paidAmount: number;
     unpaidAmount: number;
+    completionRate: number;
 }
 
 export const computeStats = (filteredOrders: Order[]): OrderStats => {
+    const total = filteredOrders.length;
+    const completed = filteredOrders.filter(o => o.status === 'completed').length;
     return {
-        total: filteredOrders.length,
+        total,
         totalAmount: filteredOrders.reduce((sum, o) => sum + o.total, 0),
         paid: filteredOrders.filter(o => o.payment_status === 'paid').length,
         unpaid: filteredOrders.filter(o => o.payment_status === 'unpaid' || o.payment_status === 'pending').length,
         paidAmount: filteredOrders.filter(o => o.payment_status === 'paid').reduce((sum, o) => sum + o.total, 0),
         unpaidAmount: filteredOrders.filter(o => o.payment_status === 'unpaid' || o.payment_status === 'pending').reduce((sum, o) => sum + o.total, 0),
+        completionRate: total > 0 ? Math.round((completed / total) * 100) : 0,
     };
 };
 

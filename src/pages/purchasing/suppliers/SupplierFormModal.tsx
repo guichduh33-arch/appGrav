@@ -9,6 +9,7 @@ interface Supplier {
     country: string | null
     tax_id: string | null
     payment_terms: string | null
+    category: string | null
     notes: string | null
     is_active: boolean
 }
@@ -151,6 +152,24 @@ export function SupplierFormModal({
                                     Business Information
                                 </h3>
                                 <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className={labelClass}>Category</label>
+                                        <select
+                                            value={formData.category || ''}
+                                            onChange={e => onFormChange({ ...formData, category: e.target.value || null })}
+                                            aria-label="Supplier category"
+                                            className={inputClass}
+                                        >
+                                            <option value="" className="bg-[var(--onyx-surface)]">No category</option>
+                                            <option value="bakery" className="bg-[var(--onyx-surface)]">Bakery Ingredients</option>
+                                            <option value="dairy" className="bg-[var(--onyx-surface)]">Dairy</option>
+                                            <option value="beverages" className="bg-[var(--onyx-surface)]">Beverages</option>
+                                            <option value="packaging" className="bg-[var(--onyx-surface)]">Packaging</option>
+                                            <option value="equipment" className="bg-[var(--onyx-surface)]">Equipment</option>
+                                            <option value="services" className="bg-[var(--onyx-surface)]">Services</option>
+                                            <option value="other" className="bg-[var(--onyx-surface)]">Other</option>
+                                        </select>
+                                    </div>
                                     <div className="flex flex-col gap-1.5">
                                         <label className={labelClass}>Tax ID</label>
                                         <input

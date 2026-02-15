@@ -1,11 +1,16 @@
 import { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { TrendBadge } from '@/components/ui/TrendBadge';
 
 interface DashboardKpiCardProps {
     label: string;
     value: string;
     icon: ReactNode;
     iconColor?: string;
+    /** Percentage change vs previous period */
+    trend?: number | null;
+    /** If true, negative trend is shown as positive (e.g., fewer alerts) */
+    invertTrend?: boolean;
     className?: string;
 }
 
@@ -18,6 +23,8 @@ export function DashboardKpiCard({
     value,
     icon,
     iconColor = 'var(--color-gold)',
+    trend,
+    invertTrend,
     className,
 }: DashboardKpiCardProps) {
     return (
@@ -51,10 +58,13 @@ export function DashboardKpiCard({
                 {label}
             </p>
 
-            {/* Value */}
-            <p className="text-3xl font-bold text-white tracking-tight">
-                {value}
-            </p>
+            {/* Value + Trend */}
+            <div className="flex items-end gap-2">
+                <p className="text-3xl font-bold text-white tracking-tight">
+                    {value}
+                </p>
+                <TrendBadge value={trend} invertColor={invertTrend} className="mb-1" />
+            </div>
         </div>
     );
 }

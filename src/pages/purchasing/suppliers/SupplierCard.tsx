@@ -1,4 +1,4 @@
-import { Edit2, Trash2, Mail, Phone, MapPin, CheckCircle, XCircle, Building2 } from 'lucide-react'
+import { Edit2, Trash2, Mail, Phone, MapPin, CheckCircle, XCircle, Building2, Tag } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface Supplier {
@@ -11,6 +11,7 @@ interface Supplier {
     city: string | null
     country: string | null
     payment_terms: string | null
+    category: string | null
 }
 
 interface ISupplierCardProps {
@@ -46,7 +47,15 @@ export function SupplierCard({ supplier, onEdit, onDelete, onToggleActive }: ISu
                         <Building2 size={18} />
                     </div>
                     <div>
-                        <h3 className="font-bold text-white text-sm">{supplier.name}</h3>
+                        <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-white text-sm">{supplier.name}</h3>
+                            {supplier.category && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--color-gold)]/10 text-[10px] font-semibold text-[var(--color-gold)] uppercase tracking-wider">
+                                    <Tag size={10} />
+                                    {supplier.category}
+                                </span>
+                            )}
+                        </div>
                         {supplier.contact_person && (
                             <p className="text-xs text-[var(--muted-smoke)]">{supplier.contact_person}</p>
                         )}

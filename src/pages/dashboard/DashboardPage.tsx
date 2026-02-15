@@ -60,7 +60,15 @@ export default function DashboardPage() {
   }, [kpis.dataUpdatedAt]);
 
   const todayKpi = kpis.data?.today;
+  const yesterdayKpi = kpis.data?.yesterday;
   const trendData = revenueTrend.data ?? [];
+
+  const calcTrend = (today: number | null | undefined, yesterday: number | null | undefined) => {
+    const t = today ?? 0;
+    const y = yesterday ?? 0;
+    if (y === 0) return t > 0 ? 100 : null;
+    return ((t - y) / y) * 100;
+  };
   const topProductsList = (topProducts.data ?? []).slice(0, 5);
   const paymentData = paymentMethods.data ?? [];
   const lowStockItems: InventoryItem[] = (lowStock.data ?? [])
@@ -102,24 +110,28 @@ export default function DashboardPage() {
             value={formatCurrency(todayKpi?.total_revenue ?? 0)}
             icon={<DollarSign size={18} className="text-[var(--color-gold)]" />}
             iconColor="var(--color-gold)"
+            trend={calcTrend(todayKpi?.total_revenue, yesterdayKpi?.total_revenue)}
           />
           <DashboardKpiCard
             label="Active Orders"
             value={String(todayKpi?.total_orders ?? 0)}
             icon={<ShoppingBag size={18} className="text-[var(--color-gold)]" />}
             iconColor="var(--color-gold)"
+            trend={calcTrend(todayKpi?.total_orders, yesterdayKpi?.total_orders)}
           />
           <DashboardKpiCard
             label="Stock Alerts"
             value={String(lowStockItems.length)}
             icon={<AlertTriangle size={18} className="text-[var(--color-gold)]" />}
             iconColor="var(--color-gold)"
+            invertTrend
           />
           <DashboardKpiCard
             label="Avg Order"
             value={formatCurrency(todayKpi?.avg_order_value ?? 0)}
             icon={<TrendingUp size={18} className="text-[var(--color-gold)]" />}
             iconColor="var(--color-gold)"
+            trend={calcTrend(todayKpi?.avg_order_value, yesterdayKpi?.avg_order_value)}
           />
         </div>
       )}

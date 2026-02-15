@@ -75,6 +75,7 @@ function createMockOrder(overrides?: Partial<IOfflineOrder>): IOfflineOrder {
     session_id: 'session-123',
     created_at: now,
     updated_at: now,
+    guest_count: null,
     sync_status: 'local',
     ...overrides,
   };

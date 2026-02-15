@@ -18,6 +18,7 @@ export interface ISupplierFormData {
   country?: string | null
   tax_id?: string | null
   payment_terms?: string | null
+  category?: string | null
   notes?: string | null
   is_active?: boolean
 }

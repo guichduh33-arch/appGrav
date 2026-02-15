@@ -93,6 +93,7 @@ export interface IJournalEntryInsert {
   entry_date: string
   description: string
   reference_type?: TJournalReferenceType
+  attachment_url?: string | null
   lines: IJournalLineInput[]
 }
 
