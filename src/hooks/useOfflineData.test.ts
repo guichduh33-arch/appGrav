@@ -51,8 +51,8 @@ describe('useOfflineData hooks', () => {
 
     it('should return only active products', async () => {
       await db.offline_products.bulkAdd([
-        { id: 'p1', category_id: 'c1', name: 'Active', sku: null, product_type: 'finished', retail_price: 1000, wholesale_price: null, cost_price: null, current_stock: null, is_active: true, pos_visible: true, available_for_sale: true, image_url: null, updated_at: '' },
-        { id: 'p2', category_id: 'c1', name: 'Inactive', sku: null, product_type: 'finished', retail_price: 2000, wholesale_price: null, cost_price: null, current_stock: null, is_active: false, pos_visible: true, available_for_sale: true, image_url: null, updated_at: '' }
+        { id: 'p1', category_id: 'c1', name: 'Active', sku: null, product_type: 'finished', retail_price: 1000, wholesale_price: null, cost_price: null, current_stock: null, is_active: true, pos_visible: true, available_for_sale: true, track_inventory: true, image_url: null, updated_at: '' },
+        { id: 'p2', category_id: 'c1', name: 'Inactive', sku: null, product_type: 'finished', retail_price: 2000, wholesale_price: null, cost_price: null, current_stock: null, is_active: false, pos_visible: true, available_for_sale: true, track_inventory: true, image_url: null, updated_at: '' }
       ]);
 
       const { result } = renderHook(() => useOfflineProducts());
@@ -87,6 +87,7 @@ describe('useOfflineData hooks', () => {
         is_active: true,
         pos_visible: true,
         available_for_sale: true,
+        track_inventory: true,
         image_url: null,
         updated_at: ''
       });
@@ -102,10 +103,10 @@ describe('useOfflineData hooks', () => {
   describe('useOfflineProductsByCategory', () => {
     beforeEach(async () => {
       await db.offline_products.bulkAdd([
-        { id: 'p1', category_id: 'cat-1', name: 'Product 1', sku: null, product_type: 'finished', retail_price: 1000, wholesale_price: null, cost_price: null, current_stock: null, is_active: true, pos_visible: true, available_for_sale: true, image_url: null, updated_at: '' },
-        { id: 'p2', category_id: 'cat-1', name: 'Product 2', sku: null, product_type: 'finished', retail_price: 2000, wholesale_price: null, cost_price: null, current_stock: null, is_active: true, pos_visible: true, available_for_sale: true, image_url: null, updated_at: '' },
-        { id: 'p3', category_id: 'cat-2', name: 'Product 3', sku: null, product_type: 'finished', retail_price: 3000, wholesale_price: null, cost_price: null, current_stock: null, is_active: true, pos_visible: true, available_for_sale: true, image_url: null, updated_at: '' },
-        { id: 'p4', category_id: 'cat-1', name: 'Inactive', sku: null, product_type: 'finished', retail_price: 4000, wholesale_price: null, cost_price: null, current_stock: null, is_active: false, pos_visible: true, available_for_sale: true, image_url: null, updated_at: '' }
+        { id: 'p1', category_id: 'cat-1', name: 'Product 1', sku: null, product_type: 'finished', retail_price: 1000, wholesale_price: null, cost_price: null, current_stock: null, is_active: true, pos_visible: true, available_for_sale: true, track_inventory: true, image_url: null, updated_at: '' },
+        { id: 'p2', category_id: 'cat-1', name: 'Product 2', sku: null, product_type: 'finished', retail_price: 2000, wholesale_price: null, cost_price: null, current_stock: null, is_active: true, pos_visible: true, available_for_sale: true, track_inventory: true, image_url: null, updated_at: '' },
+        { id: 'p3', category_id: 'cat-2', name: 'Product 3', sku: null, product_type: 'finished', retail_price: 3000, wholesale_price: null, cost_price: null, current_stock: null, is_active: true, pos_visible: true, available_for_sale: true, track_inventory: true, image_url: null, updated_at: '' },
+        { id: 'p4', category_id: 'cat-1', name: 'Inactive', sku: null, product_type: 'finished', retail_price: 4000, wholesale_price: null, cost_price: null, current_stock: null, is_active: false, pos_visible: true, available_for_sale: true, track_inventory: true, image_url: null, updated_at: '' }
       ]);
     });
 

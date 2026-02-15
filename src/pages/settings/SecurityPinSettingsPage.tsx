@@ -212,7 +212,6 @@ const SecurityPinSettingsPage = () => {
             <span className="text-xs text-red-400">{validationErrors['security.pin_cooldown_minutes']}</span>
           )}
         </div>
-      </div>
 
         <div className="border-t border-white/5" />
 

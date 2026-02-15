@@ -163,6 +163,7 @@ export default function ModifierModal({ product, onClose, editItem }: ModifierMo
                 updated_at: product.updated_at || new Date().toISOString(),
                 pos_visible: product.pos_visible ?? true,
                 available_for_sale: product.available_for_sale ?? true,
+                track_inventory: product.track_inventory ?? true,
             }
 
             try {

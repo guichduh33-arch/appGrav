@@ -103,6 +103,7 @@ const mockMaterials: IOfflineProduct[] = [
     is_active: true,
     pos_visible: false,
     available_for_sale: false,
+    track_inventory: true,
     updated_at: '2026-01-30T10:00:00Z',
   },
   {
@@ -119,6 +120,7 @@ const mockMaterials: IOfflineProduct[] = [
     is_active: true,
     pos_visible: false,
     available_for_sale: false,
+    track_inventory: true,
     updated_at: '2026-01-30T10:00:00Z',
   },
   {
@@ -135,6 +137,7 @@ const mockMaterials: IOfflineProduct[] = [
     is_active: true,
     pos_visible: false,
     available_for_sale: false,
+    track_inventory: true,
     updated_at: '2026-01-30T10:00:00Z',
   },
 ];

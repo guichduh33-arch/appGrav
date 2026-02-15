@@ -48,6 +48,7 @@ const mockProducts: IOfflineProduct[] = [
     is_active: true,
     pos_visible: true,
     available_for_sale: true,
+    track_inventory: true,
     updated_at: '2026-01-30T10:00:00Z',
   },
   {
@@ -64,6 +65,7 @@ const mockProducts: IOfflineProduct[] = [
     is_active: true,
     pos_visible: true,
     available_for_sale: true,
+    track_inventory: true,
     updated_at: '2026-01-30T10:00:00Z',
   },
   {
@@ -80,6 +82,7 @@ const mockProducts: IOfflineProduct[] = [
     is_active: true,
     pos_visible: true,
     available_for_sale: true,
+    track_inventory: true,
     updated_at: '2026-01-30T10:00:00Z',
   },
   {
@@ -96,6 +99,7 @@ const mockProducts: IOfflineProduct[] = [
     is_active: false,
     pos_visible: true,
     available_for_sale: true,
+    track_inventory: true,
     updated_at: '2026-01-30T10:00:00Z',
   },
   {
@@ -112,6 +116,7 @@ const mockProducts: IOfflineProduct[] = [
     is_active: true,
     pos_visible: false,
     available_for_sale: true,
+    track_inventory: true,
     updated_at: '2026-01-30T10:00:00Z',
   },
 ];
@@ -185,6 +190,7 @@ describe('productsCacheService', () => {
         is_active: true,
         pos_visible: true,
         available_for_sale: true,
+        track_inventory: true,
         updated_at: '2026-01-01T00:00:00Z',
       });
 

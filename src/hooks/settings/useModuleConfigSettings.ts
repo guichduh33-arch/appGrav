@@ -11,6 +11,7 @@ import type {
   ILoyaltySettings,
   ILoyaltyTierMap,
   ILoyaltyColorMap,
+  ILoyaltyTierStringMap,
   IAgingBucket,
   IB2BSettings,
   IKDSConfigSettings,
@@ -199,6 +200,7 @@ export function useLoyaltySettings(): ILoyaltySettings {
     tierDiscounts: getSetting<ILoyaltyTierMap>('loyalty.tier_discounts') ?? LOYALTY_DEFAULTS.tierDiscounts,
     tierThresholds: getSetting<ILoyaltyTierMap>('loyalty.tier_thresholds') ?? LOYALTY_DEFAULTS.tierThresholds,
     tierColors: getSetting<ILoyaltyColorMap>('loyalty.tier_colors') ?? LOYALTY_DEFAULTS.tierColors,
+    tierDescriptions: getSetting<ILoyaltyTierStringMap>('loyalty.tier_descriptions') ?? LOYALTY_DEFAULTS.tierDescriptions,
     pointsPerIdr: getSetting<number>('loyalty.points_per_idr') ?? LOYALTY_DEFAULTS.pointsPerIdr,
     defaultCustomerCategorySlug: getSetting<string>('loyalty.default_customer_category_slug') ?? LOYALTY_DEFAULTS.defaultCustomerCategorySlug,
   }

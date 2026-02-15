@@ -57,6 +57,7 @@ const createMockProduct = (id: string, name: string) => ({
   cost_price: null,
   current_stock: null,
   image_url: null,
+  track_inventory: true,
   updated_at: new Date().toISOString(),
 });
 
@@ -365,6 +366,7 @@ describe('cartPersistenceService', () => {
         cost_price: null,
         current_stock: null,
         image_url: null,
+        track_inventory: true,
         updated_at: new Date().toISOString(),
       });
 
@@ -407,6 +409,7 @@ describe('cartPersistenceService', () => {
         cost_price: null,
         current_stock: null,
         image_url: null,
+        track_inventory: true,
         updated_at: new Date().toISOString(),
       });
 
@@ -437,6 +440,7 @@ describe('cartPersistenceService', () => {
         cost_price: null,
         current_stock: null,
         image_url: null,
+        track_inventory: true,
         updated_at: new Date().toISOString(),
       });
 
@@ -468,6 +472,7 @@ describe('cartPersistenceService', () => {
         cost_price: null,
         current_stock: null,
         image_url: null,
+        track_inventory: true,
         updated_at: new Date().toISOString(),
       });
 
@@ -526,6 +531,7 @@ describe('cartPersistenceService', () => {
           cost_price: null,
           current_stock: null,
           image_url: null,
+          track_inventory: true,
           updated_at: new Date().toISOString(),
         },
         {
@@ -542,6 +548,7 @@ describe('cartPersistenceService', () => {
           cost_price: null,
           current_stock: null,
           image_url: null,
+          track_inventory: true,
           updated_at: new Date().toISOString(),
         },
       ]);
@@ -578,6 +585,7 @@ describe('cartPersistenceService', () => {
         cost_price: null,
         current_stock: null,
         image_url: null,
+        track_inventory: true,
         updated_at: new Date().toISOString(),
       });
 

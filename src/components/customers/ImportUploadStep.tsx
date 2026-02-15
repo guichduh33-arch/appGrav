@@ -2,7 +2,7 @@ import { Upload, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface ImportUploadStepProps {
-  fileRef: React.RefObject<HTMLInputElement | null>
+  fileRef: React.RefObject<HTMLInputElement>
   dragOver: boolean
   parseError: string
   onFile: (f: File) => void

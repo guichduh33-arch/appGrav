@@ -141,7 +141,7 @@ export function generateReportHtml(
       (row) =>
         '<tr>' +
         row
-          .map((cell, i) => {
+          .map((cell) => {
             const isNumeric = !isNaN(Number(cell?.replace(/[^\d.-]/g, '')))
             return `<td${isNumeric ? ' class="right"' : ''}>${escapeHtml(cell)}</td>`
           })

@@ -143,6 +143,7 @@ function createMockProduct(
     is_active: true,
     pos_visible: true,
     available_for_sale: true,
+    track_inventory: true,
     updated_at: new Date().toISOString(),
     ...overrides,
   };

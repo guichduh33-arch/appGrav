@@ -98,7 +98,7 @@ export async function syncProductsToOffline(): Promise<number> {
 
   let query = supabase
     .from('products')
-    .select('id, category_id, name, sku, retail_price, is_active, image_url, updated_at')
+    .select('id, category_id, name, sku, retail_price, is_active, image_url, track_inventory, updated_at')
     .eq('is_active', true)
     .eq('pos_visible', true)
     .eq('available_for_sale', true)
@@ -137,6 +137,7 @@ export async function syncProductsToOffline(): Promise<number> {
     is_active: p.is_active ?? true,
     pos_visible: true,
     available_for_sale: true,
+    track_inventory: p.track_inventory ?? true,
     updated_at: p.updated_at ?? now,
   }));
 

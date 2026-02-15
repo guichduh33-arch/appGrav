@@ -9,7 +9,7 @@ interface INotificationBellProps {
   className?: string
 }
 
-export function NotificationBell({ compact, className }: INotificationBellProps) {
+export function NotificationBell({ compact: _compact, className }: INotificationBellProps) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 

@@ -53,6 +53,7 @@ export default function VariantModal({ baseProduct, onClose }: VariantModalProps
                 updated_at: baseProduct.updated_at || new Date().toISOString(),
                 pos_visible: baseProduct.pos_visible ?? true,
                 available_for_sale: baseProduct.available_for_sale ?? true,
+                track_inventory: baseProduct.track_inventory ?? true,
             }
 
             try {

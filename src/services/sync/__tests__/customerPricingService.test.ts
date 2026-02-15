@@ -42,6 +42,7 @@ describe('customerPricingService', () => {
     product_type: 'finished',
     image_url: null,
     cost_price: 10000,
+    track_inventory: true,
     current_stock: null,
     updated_at: '2024-01-01T00:00:00Z',
   };
