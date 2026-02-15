@@ -4,6 +4,8 @@
 
 import { useState } from 'react'
 import { Plus, Lock, Unlock, Download, FileText, FileCheck, Loader2 } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { supabase } from '@/lib/supabase'
 import { useVATManagement, useFiscalPeriods } from '@/hooks/accounting'
 import { useVatFilings, useCreateVatFiling, useMarkVatFiled } from '@/hooks/accounting/useVatFilings'
 import { VATSummaryCard } from '@/components/accounting/VATSummaryCard'
@@ -34,6 +36,18 @@ export default function VATManagementPage() {
   const markFiled = useMarkVatFiled()
 
   const currentFiling = filings.find(f => f.filing_month === month)
+
+  // H7: VAT category breakdown
+  interface IVatCategory { category_name: string; total_sales: number; vat_collected: number; order_count: number; items_sold: number }
+  const { data: vatByCategory = [], isLoading: categoryLoading } = useQuery<IVatCategory[]>({
+    queryKey: ['vat-by-category', year, month],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_vat_by_category', { p_year: year, p_month: month })
+      if (error) throw error
+      return (data || []) as IVatCategory[]
+    },
+    staleTime: 5 * 60 * 1000,
+  })
 
   const handleCreateFiling = async () => {
     if (!vatSummary) return
@@ -155,6 +169,45 @@ export default function VATManagementPage() {
         month={month}
         isLoading={vatLoading}
       />
+
+      {/* H7: VAT Category Breakdown */}
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-white/5">
+          <h3 className="text-sm font-semibold uppercase tracking-widest text-[var(--color-gold)]">
+            VAT by Category
+          </h3>
+        </div>
+        {categoryLoading ? (
+          <div className="flex items-center gap-2 text-[var(--theme-text-muted)] text-sm p-5">
+            <Loader2 size={16} className="animate-spin" /> Loading breakdown...
+          </div>
+        ) : vatByCategory.length === 0 ? (
+          <div className="px-5 py-8 text-center text-[var(--theme-text-muted)] text-sm">No sales data for this period</div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-white/5">
+                <th className="text-left px-5 py-2.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Category</th>
+                <th className="text-right px-5 py-2.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Sales</th>
+                <th className="text-right px-5 py-2.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">VAT (10%)</th>
+                <th className="text-right px-5 py-2.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Orders</th>
+                <th className="text-right px-5 py-2.5 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Items</th>
+              </tr>
+            </thead>
+            <tbody>
+              {vatByCategory.map(cat => (
+                <tr key={cat.category_name} className="border-b border-white/5 hover:bg-white/[0.02]">
+                  <td className="px-5 py-2 font-medium text-white">{cat.category_name}</td>
+                  <td className="px-5 py-2 text-right font-mono text-white/80">{formatCurrency(cat.total_sales)}</td>
+                  <td className="px-5 py-2 text-right font-mono text-[var(--color-gold)]">{formatCurrency(cat.vat_collected)}</td>
+                  <td className="px-5 py-2 text-right text-white/60">{cat.order_count}</td>
+                  <td className="px-5 py-2 text-right text-white/60">{cat.items_sold}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
 
       {/* VAT Filing Status */}
       <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5">

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { TrendingUp, TrendingDown, DollarSign, Percent } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Percent, Trash2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ComparisonToggle } from '@/components/reports/ComparisonToggle';
 import { ComparisonKpiCard, ComparisonKpiGrid } from '@/components/reports/ComparisonKpiCard';
@@ -31,6 +32,22 @@ export function ProfitLossTab() {
     queryFn: () => ReportingService.getProfitLoss(comparisonRange!.from, comparisonRange!.to),
     staleTime: 5 * 60 * 1000,
     enabled: isComparisonEnabled && !!comparisonRange,
+  });
+
+  // H5: Waste cost for period
+  const { data: wasteCost = 0 } = useQuery({
+    queryKey: ['pl-waste-cost', dateRange.from, dateRange.to],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('stock_movements')
+        .select('quantity, unit_cost')
+        .eq('movement_type', 'waste')
+        .gte('created_at', dateRange.from.toISOString())
+        .lte('created_at', dateRange.to.toISOString())
+      if (error) throw error
+      return (data || []).reduce((sum, r) => sum + Math.abs(r.quantity) * (r.unit_cost || 0), 0)
+    },
+    staleTime: 5 * 60 * 1000,
   });
 
   const totals = useMemo(() => {
@@ -114,6 +131,21 @@ export function ProfitLossTab() {
           <ExportButtons config={exportConfig} />
         </div>
       </div>
+
+      {/* H5: Waste Cost Summary */}
+      {wasteCost > 0 && (
+        <div className="flex items-center gap-4 px-5 py-3 bg-red-500/5 border border-red-500/10 rounded-xl text-sm">
+          <Trash2 size={16} className="text-red-400 shrink-0" />
+          <span className="text-white/80">
+            Waste cost this period: <strong className="text-red-400">{formatCurrency(wasteCost)}</strong>
+          </span>
+          {totals.grossRevenue > 0 && (
+            <span className="text-white/50 ml-auto">
+              {((wasteCost / totals.grossRevenue) * 100).toFixed(1)}% of revenue
+            </span>
+          )}
+        </div>
+      )}
 
       {isComparisonEnabled && prevTotals ? (
         <ComparisonKpiGrid columns={4}>

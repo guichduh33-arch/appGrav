@@ -12,6 +12,7 @@ import { SyncIndicator } from '../components/ui/SyncIndicator';
 import { PendingSyncCounter } from '../components/sync/PendingSyncCounter';
 import { PostOfflineSyncReport } from '../components/sync/PostOfflineSyncReport';
 import { StockAlertsBadge } from '../components/inventory/StockAlertsBadge';
+import { NotificationBell } from '../components/ui/NotificationBell';
 import { useNetworkAlerts } from '../hooks/useNetworkAlerts';
 import { useSyncReport } from '../hooks/useSyncReport';
 import { cn } from '@/lib/utils';
@@ -76,6 +77,7 @@ const BackOfficeLayout: React.FC = () => {
                     <NetworkIndicator compact={isCollapsed} className="" />
                     <SyncIndicator compact={isCollapsed} className="" />
                     <PendingSyncCounter className="" />
+                    <NotificationBell compact={isCollapsed} className="" />
                 </div>
 
                 {/* Navigation */}
