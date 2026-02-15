@@ -70,11 +70,9 @@ export default function StockMovementsPage() {
         return counts
     }, [movements])
 
-    // Export to Excel
-    const handleExportExcel = async () => {
+    // Export to CSV
+    const handleExportExcel = () => {
         try {
-            const XLSX = await import('xlsx')
-
             const formatDate = (dateStr: string) => {
                 const date = new Date(dateStr)
                 return {
@@ -83,43 +81,34 @@ export default function StockMovementsPage() {
                 }
             }
 
-            // Prepare data for export
-            const exportData = filteredMovements.map((m: IStockMovement) => {
+            const headers = ['Date', 'Time', 'Product', 'SKU', 'Type', 'Quantity', 'Unit', 'Unit Price', 'Value', 'Stock Before', 'Stock After', 'Reason', 'Staff']
+            const rows = filteredMovements.map((m: IStockMovement) => {
                 const { date, time } = formatDate(m.created_at)
                 const style = getMovementStyle(m.movement_type)
-                return {
-                    'Date': date,
-                    'Time': time,
-                    'Product': m.product_name,
-                    'SKU': m.product_sku,
-                    'Type': style.label,
-                    'Quantity': m.quantity,
-                    'Unit': m.product_unit,
-                    'Unit Price': m.product_cost,
-                    'Value': Math.abs(m.quantity * m.product_cost),
-                    'Stock Before': m.stock_before || '-',
-                    'Stock After': m.stock_after || '-',
-                    'Reason': m.reason || '',
-                    'Staff': m.staff_name || ''
-                }
+                return [date, time, m.product_name, m.product_sku, style.label, m.quantity, m.product_unit, m.product_cost, Math.abs(m.quantity * m.product_cost), m.stock_before ?? '-', m.stock_after ?? '-', m.reason ?? '', m.staff_name ?? '']
             })
 
-            // Create workbook
-            const ws = XLSX.utils.json_to_sheet(exportData)
-            const wb = XLSX.utils.book_new()
-            XLSX.utils.book_append_sheet(wb, ws, 'Movements')
+            const escapeCell = (val: string | number) => {
+                const s = String(val)
+                return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s
+            }
+            const csv = [headers.join(','), ...rows.map(r => r.map(escapeCell).join(','))].join('\n')
 
-            // Generate filename with date
             const now = new Date()
-            const filename = `stock_movements_${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}.xlsx`
+            const filename = `stock_movements_${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}.csv`
 
-            // Save file
-            XLSX.writeFile(wb, filename)
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+            const url = URL.createObjectURL(blob)
+            const link = document.createElement('a')
+            link.href = url
+            link.download = filename
+            link.click()
+            URL.revokeObjectURL(url)
 
             toast.success(`Export successful: ${filteredMovements.length} movements exported`)
         } catch (error) {
-            logError('Error exporting to Excel:', error)
-            toast.error('Error exporting to Excel')
+            logError('Error exporting to CSV:', error)
+            toast.error('Error exporting data')
         }
     }
 
