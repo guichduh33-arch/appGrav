@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase'
 export interface IRawMaterial {
   id: string
   name: string
+  sku: string
   cost_price: number | null
   unit: string | null
   product_type?: string | null
@@ -20,7 +21,7 @@ export function useRawMaterials() {
     queryFn: async (): Promise<IRawMaterial[]> => {
       const { data, error } = await supabase
         .from('products')
-        .select('id, name, cost_price, product_type, unit')
+        .select('id, name, sku, cost_price, product_type, unit')
         .neq('is_active', false)
         .order('name')
 

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp, TrendingDown, DollarSign, ShoppingBag,
-  BarChart3, Receipt, Star, AlertTriangle, Landmark,
+  BarChart3, Receipt, Star, AlertTriangle, Landmark, Package,
 } from 'lucide-react';
 import { ReportingService } from '@/services/ReportingService';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
@@ -93,6 +93,7 @@ export function OverviewTab() {
 
   const revenueTrend = calcTrend(current?.total_revenue ?? 0, previous?.total_revenue ?? 0);
   const ordersTrend = calcTrend(current?.transaction_count ?? 0, previous?.transaction_count ?? 0);
+  const itemsSoldTrend = calcTrend(current?.items_sold ?? 0, previous?.items_sold ?? 0);
   const atvTrend = calcTrend(current?.avg_basket ?? 0, previous?.avg_basket ?? 0);
   const netRevenueTrend = calcTrend(current?.net_revenue ?? 0, previous?.net_revenue ?? 0);
 
@@ -104,6 +105,7 @@ export function OverviewTab() {
     data: [
       { label: 'Revenue', value: String(current?.total_revenue ?? 0), trend: `${revenueTrend.toFixed(1)}%` },
       { label: 'Orders', value: String(current?.transaction_count ?? 0), trend: `${ordersTrend.toFixed(1)}%` },
+      { label: 'Items Sold', value: String(current?.items_sold ?? 0), trend: `${itemsSoldTrend.toFixed(1)}%` },
       { label: 'ATV', value: String(current?.avg_basket ?? 0), trend: `${atvTrend.toFixed(1)}%` },
       { label: 'Net Revenue', value: String(current?.net_revenue ?? 0), trend: `${netRevenueTrend.toFixed(1)}%` },
       { label: 'Total Tax', value: String(Math.round(totalTax)), trend: `${taxTrend.toFixed(1)}%` },
@@ -118,7 +120,7 @@ export function OverviewTab() {
     filename: 'overview-report',
     title: 'Overview Report',
     dateRange: { from: dateRange.from, to: dateRange.to },
-  }), [current, summaryData, dateRange, revenueTrend, ordersTrend, atvTrend, netRevenueTrend]);
+  }), [current, summaryData, dateRange, revenueTrend, ordersTrend, itemsSoldTrend, atvTrend, netRevenueTrend]);
 
   if (error) {
     return (
@@ -165,6 +167,13 @@ export function OverviewTab() {
             icon={<ShoppingBag className="w-5 h-5 text-indigo-400" />}
           />
           <ComparisonKpiCard
+            label="Items Sold"
+            currentValue={current?.items_sold ?? 0}
+            previousValue={previous?.items_sold ?? null}
+            format="number"
+            icon={<Package className="w-5 h-5 text-cyan-400" />}
+          />
+          <ComparisonKpiCard
             label="Avg Transaction Value"
             currentValue={current?.avg_basket ?? 0}
             previousValue={previous?.avg_basket ?? null}
@@ -205,6 +214,16 @@ export function OverviewTab() {
           >
             <p className="text-2xl font-bold text-white">
               {(current?.transaction_count ?? 0).toLocaleString()}
+            </p>
+          </KpiCard>
+
+          <KpiCard
+            icon={<Package className="w-5 h-5 text-cyan-400" />}
+            iconBg="bg-cyan-500/10" label="Items Sold"
+            trend={itemsSoldTrend}
+          >
+            <p className="text-2xl font-bold text-white">
+              {(current?.items_sold ?? 0).toLocaleString()}
             </p>
           </KpiCard>
 

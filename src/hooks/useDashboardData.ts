@@ -15,6 +15,7 @@ interface TDailyKpiRow {
   total_tax: number | null;
   avg_order_value: number | null;
   unique_customers: number | null;
+  items_sold: number | null;
 }
 
 // Aggregated payment method for donut chart

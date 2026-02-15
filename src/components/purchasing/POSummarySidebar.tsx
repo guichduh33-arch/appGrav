@@ -43,6 +43,12 @@ export function POSummarySidebar({ purchaseOrder, isOnline, onMarkAsPaid }: IPOS
           <span>Tax</span>
           <span className="font-medium text-[var(--stone-text)]">{formatCurrency(parseFloat(purchaseOrder.tax_amount.toString()))}</span>
         </div>
+        {purchaseOrder.shipping_cost > 0 && (
+          <div className="flex justify-between items-center py-2.5 text-sm text-[var(--muted-smoke)]">
+            <span>Shipping</span>
+            <span className="font-medium text-[var(--stone-text)]">{formatCurrency(purchaseOrder.shipping_cost)}</span>
+          </div>
+        )}
         <div className="h-px bg-white/10 my-3"></div>
         <div className="flex justify-between items-center py-3">
           <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--muted-smoke)]">Total</span>

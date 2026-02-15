@@ -4,6 +4,7 @@
 
 import { useState } from 'react'
 import { Download } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { AccountPicker } from '@/components/accounting/AccountPicker'
 import { useGeneralLedger } from '@/hooks/accounting'
 import { formatIDR } from '@/services/accounting/accountingService'
@@ -21,9 +22,9 @@ export default function GeneralLedgerPage() {
   const exportCSV = () => {
     if (!data?.entries.length) return
     const rows = [
-      'Date,Entry #,Description,Debit,Credit,Balance',
+      'Date,Entry #,Description,Source,Debit,Credit,Balance',
       ...data.entries.map(e =>
-        `${e.date},${e.entry_number},"${e.description}",${e.debit},${e.credit},${e.balance}`
+        `${e.date},${e.entry_number},"${e.description}",${e.reference_type ?? ''},${e.debit},${e.credit},${e.balance}`
       ),
     ]
     const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
@@ -87,6 +88,7 @@ export default function GeneralLedgerPage() {
                   <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Date</th>
                   <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Entry #</th>
                   <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Description</th>
+                  <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Source</th>
                   <th className="text-right px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Debit</th>
                   <th className="text-right px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Credit</th>
                   <th className="text-right px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Balance</th>
@@ -95,7 +97,7 @@ export default function GeneralLedgerPage() {
               <tbody>
                 {data?.entries.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-[var(--theme-text-muted)]">
+                    <td colSpan={7} className="px-4 py-8 text-center text-[var(--theme-text-muted)]">
                       No movements in this period
                     </td>
                   </tr>
@@ -105,6 +107,16 @@ export default function GeneralLedgerPage() {
                       <td className="px-4 py-2 text-white/80">{entry.date}</td>
                       <td className="px-4 py-2 font-mono text-xs text-[var(--color-gold)]">{entry.entry_number}</td>
                       <td className="px-4 py-2 max-w-xs truncate text-white/80">{entry.description}</td>
+                      <td className="px-4 py-2">
+                        {entry.reference_type && (
+                          <span className={cn(
+                            'inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider',
+                            entry.reference_type === 'manual' ? 'bg-white/5 text-white/60' : 'bg-[var(--color-gold)]/10 text-[var(--color-gold)]'
+                          )}>
+                            {entry.reference_type === 'sale' ? 'Auto · Sale' : entry.reference_type === 'purchase' ? 'Auto · Purchase' : entry.reference_type}
+                          </span>
+                        )}
+                      </td>
                       <td className="px-4 py-2 text-right font-mono text-emerald-400">
                         {entry.debit > 0 ? formatIDR(entry.debit) : ''}
                       </td>

@@ -16,9 +16,20 @@ interface CountItemWithProduct {
     counted_quantity: number | null
     difference: number | null
     notes: string | null
+    reason: string | null
     product: Product
     unit?: string // Computed from product
 }
+
+const VARIANCE_REASONS = [
+    { value: '', label: '-' },
+    { value: 'breakage', label: 'Breakage' },
+    { value: 'expired', label: 'Expired' },
+    { value: 'theft', label: 'Theft' },
+    { value: 'miscount', label: 'Miscount' },
+    { value: 'damage', label: 'Damage' },
+    { value: 'other', label: 'Other' },
+]
 
 interface InventoryCountWithSection extends InventoryCount {
     section?: ISection | null
@@ -151,7 +162,6 @@ export default function StockOpnameForm() {
     }
 
     async function handleUpdateCount(itemId: string, actual: number | null) {
-        // Optimistic update
         const newItems = items.map(i => {
             if (i.id === itemId) {
                 const diff = actual !== null ? (actual - i.system_quantity) : null
@@ -160,6 +170,12 @@ export default function StockOpnameForm() {
             return i
         })
         setItems(newItems)
+    }
+
+    function handleReasonChange(itemId: string, reason: string) {
+        setItems(prev => prev.map(i =>
+            i.id === itemId ? { ...i, reason: reason || null } : i
+        ))
     }
 
     async function saveDraft() {
@@ -172,7 +188,8 @@ export default function StockOpnameForm() {
                 product_id: i.product_id,
                 system_quantity: i.system_quantity,
                 counted_quantity: i.counted_quantity,
-                difference: i.difference
+                difference: i.difference,
+                reason: i.reason,
             }))
 
             const { error } = await supabase
@@ -318,6 +335,7 @@ export default function StockOpnameForm() {
                                 <th className="px-6 py-4 text-right text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">System Stock</th>
                                 <th className="w-[180px] px-6 py-4 text-right text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--color-gold)]/70 bg-[var(--color-gold)]/5">Actual (Physical)</th>
                                 <th className="px-6 py-4 text-right text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">Variance</th>
+                                <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--muted-smoke)]">Reason</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
@@ -357,6 +375,23 @@ export default function StockOpnameForm() {
                                             )}>
                                                 {item.difference > 0 ? '+' : ''}{item.difference} {item.unit}
                                             </span>
+                                        ) : (
+                                            <span className="text-white/10">-</span>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {isLocked ? (
+                                            <span className="text-sm text-white/80">{item.reason ? VARIANCE_REASONS.find(r => r.value === item.reason)?.label ?? item.reason : '-'}</span>
+                                        ) : item.difference && item.difference !== 0 ? (
+                                            <select
+                                                className="w-full rounded-xl bg-black/40 border border-white/10 p-2 text-sm text-white outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20"
+                                                value={item.reason ?? ''}
+                                                onChange={e => handleReasonChange(item.id, e.target.value)}
+                                            >
+                                                {VARIANCE_REASONS.map(r => (
+                                                    <option key={r.value} value={r.value}>{r.label}</option>
+                                                ))}
+                                            </select>
                                         ) : (
                                             <span className="text-white/10">-</span>
                                         )}

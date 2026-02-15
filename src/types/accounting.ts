@@ -136,6 +136,7 @@ export interface IGeneralLedgerEntry {
   date: string
   entry_number: string
   description: string
+  reference_type: TJournalReferenceType | null
   debit: number
   credit: number
   balance: number
@@ -172,6 +173,24 @@ export interface IVATSummary {
   collected: number
   deductible: number
   payable: number
+}
+
+export type TVatFilingStatus = 'not_filed' | 'filed' | 'amended'
+
+export interface IVatFiling {
+  id: string
+  period_year: number
+  period_month: number
+  status: TVatFilingStatus
+  vat_collected: number | null
+  vat_deductible: number | null
+  vat_payable: number | null
+  filed_at: string | null
+  filed_by: string | null
+  djp_reference: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
 }
 
 // ============================================================================

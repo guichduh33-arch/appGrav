@@ -50,10 +50,18 @@ export interface ILoyaltyColorMap {
   platinum: string
 }
 
+export interface ILoyaltyTierStringMap {
+  bronze: string
+  silver: string
+  gold: string
+  platinum: string
+}
+
 export interface ILoyaltySettings {
   tierDiscounts: ILoyaltyTierMap
   tierThresholds: ILoyaltyTierMap
   tierColors: ILoyaltyColorMap
+  tierDescriptions: ILoyaltyTierStringMap
   pointsPerIdr: number
   defaultCustomerCategorySlug: string
 }

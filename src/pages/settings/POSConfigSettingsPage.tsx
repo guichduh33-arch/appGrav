@@ -152,6 +152,42 @@ const POSConfigSettingsPage = () => {
         </div>
       </div>
 
+      {/* Auto-print & KDS */}
+      <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5 space-y-4">
+        <h3 className="text-sm font-bold text-white mb-3">Order Automation</h3>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <label className="text-sm text-white font-medium">Auto-print receipt</label>
+            <p className="text-[11px] text-[var(--theme-text-muted)]">Automatically print receipt when order is completed</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={!!getVal('pos_config.auto_print_receipt', false)}
+            onClick={() => update('pos_config.auto_print_receipt', !getVal('pos_config.auto_print_receipt', false))}
+            className={`relative w-11 h-6 rounded-full transition-colors ${getVal('pos_config.auto_print_receipt', false) ? 'bg-[var(--color-gold)]' : 'bg-white/10'}`}
+          >
+            <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${getVal('pos_config.auto_print_receipt', false) ? 'translate-x-5' : ''}`} />
+          </button>
+        </div>
+        <div className="border-t border-white/5" />
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <label className="text-sm text-white font-medium">Send to KDS by default</label>
+            <p className="text-[11px] text-[var(--theme-text-muted)]">Automatically send items to kitchen display when order is placed</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={!!getVal('pos_config.send_to_kds', true)}
+            onClick={() => update('pos_config.send_to_kds', !getVal('pos_config.send_to_kds', true))}
+            className={`relative w-11 h-6 rounded-full transition-colors ${getVal('pos_config.send_to_kds', true) ? 'bg-[var(--color-gold)]' : 'bg-white/10'}`}
+          >
+            <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${getVal('pos_config.send_to_kds', true) ? 'translate-x-5' : ''}`} />
+          </button>
+        </div>
+      </div>
+
       {/* Required Roles */}
       <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5">
         <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-4">

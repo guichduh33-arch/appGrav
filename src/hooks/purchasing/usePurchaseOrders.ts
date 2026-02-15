@@ -25,6 +25,7 @@ export interface IPurchaseOrder {
   discount_amount: number
   discount_percentage: number | null
   tax_amount: number
+  shipping_cost: number
   total_amount: number
   payment_status: TPaymentStatus
   payment_date: string | null

@@ -1,4 +1,4 @@
-import { X, Save } from 'lucide-react'
+import { X, Save, Camera } from 'lucide-react'
 import type { IWasteProduct as Product } from '@/hooks/inventory/useWasteRecords'
 
 const WASTE_REASONS = [
@@ -15,6 +15,7 @@ interface WastageFormProps {
     quantity: string
     reason: string
     notes: string
+    photoUrl: string
     productSearch: string
     filteredProducts: Product[]
     isSaving: boolean
@@ -24,6 +25,7 @@ interface WastageFormProps {
     onQuantityChange: (value: string) => void
     onReasonChange: (value: string) => void
     onNotesChange: (value: string) => void
+    onPhotoUrlChange: (value: string) => void
     onSave: () => void
     onClose: () => void
 }
@@ -33,6 +35,7 @@ export default function WastageForm({
     quantity,
     reason,
     notes,
+    photoUrl,
     productSearch,
     filteredProducts,
     isSaving,
@@ -42,6 +45,7 @@ export default function WastageForm({
     onQuantityChange,
     onReasonChange,
     onNotesChange,
+    onPhotoUrlChange,
     onSave,
     onClose,
 }: WastageFormProps) {
@@ -161,6 +165,26 @@ export default function WastageForm({
                             rows={3}
                             className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none transition-all resize-none"
                         />
+                    </div>
+
+                    {/* Photo Evidence */}
+                    <div className="flex flex-col gap-2">
+                        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">
+                            <Camera size={12} className="inline mr-1" />
+                            Photo Evidence
+                        </label>
+                        <input
+                            type="url"
+                            value={photoUrl}
+                            onChange={(e) => onPhotoUrlChange(e.target.value)}
+                            placeholder="Paste image URL..."
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-[var(--theme-text-muted)] focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 focus:outline-none transition-all"
+                        />
+                        {photoUrl && (
+                            <div className="relative w-full h-32 rounded-lg overflow-hidden border border-white/10">
+                                <img src={photoUrl} alt="Waste evidence" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                            </div>
+                        )}
                     </div>
                 </div>
 

@@ -8,6 +8,7 @@ import {
     useLoyaltyTiers,
     useAddLoyaltyPoints,
     useRedeemLoyaltyPoints,
+    useCustomerCategoryPrices,
 } from '@/hooks/customers'
 import { formatCurrency } from '../../utils/helpers'
 import { toast } from 'sonner'
@@ -16,7 +17,7 @@ import { CustomerLoyaltyCard } from '@/components/customers/CustomerLoyaltyCard'
 import { CustomerDetailTabs } from '@/components/customers/CustomerDetailTabs'
 import { CustomerPointsModal } from '@/components/customers/CustomerPointsModal'
 
-type TabType = 'overview' | 'loyalty' | 'orders'
+type TabType = 'overview' | 'loyalty' | 'orders' | 'pricing'
 
 export default function CustomerDetailPage() {
     const navigate = useNavigate()
@@ -25,6 +26,7 @@ export default function CustomerDetailPage() {
     const { data: orders = [] } = useCustomerOrders(id)
     const { data: loyaltyTransactions = [] } = useLoyaltyTransactions(id)
     const { data: tiers = [] } = useLoyaltyTiers()
+    const { data: categoryPrices = [] } = useCustomerCategoryPrices(customer?.category_id)
     const addPointsMutation = useAddLoyaltyPoints()
     const redeemPointsMutation = useRedeemLoyaltyPoints()
 
@@ -158,6 +160,7 @@ export default function CustomerDetailPage() {
                 customer={customer}
                 loyaltyTransactions={loyaltyTransactions}
                 orders={orders}
+                categoryPrices={categoryPrices}
             />
 
             {showPointsModal && (

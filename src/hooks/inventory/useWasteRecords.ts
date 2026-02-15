@@ -129,6 +129,7 @@ export function useCreateWasteRecord() {
       currentStock: number
       costPrice: number
       staffId?: string
+      photoUrl?: string
     }) => {
       const movementId = `MV-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`
 
@@ -146,6 +147,7 @@ export function useCreateWasteRecord() {
           staff_id: params.staffId,
           unit_cost: params.costPrice,
           reference_type: 'manual_waste',
+          ...(params.photoUrl ? { photo_url: params.photoUrl } : {}),
         } as never)
 
       if (error) throw error

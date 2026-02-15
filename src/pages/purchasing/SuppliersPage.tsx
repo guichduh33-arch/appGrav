@@ -20,6 +20,9 @@ interface Supplier extends ISupplier {
     postal_code: string | null
     country: string | null
     tax_id: string | null
+    bank_account_number: string | null
+    bank_account_holder: string | null
+    bank_name: string | null
     payment_terms: string | null
     category: string | null
     notes: string | null
@@ -46,6 +49,9 @@ export default function SuppliersPage() {
         postal_code: '',
         country: 'Indonesia',
         tax_id: '',
+        bank_account_number: '',
+        bank_account_holder: '',
+        bank_name: '',
         payment_terms: 'net30',
         category: null,
         notes: '',

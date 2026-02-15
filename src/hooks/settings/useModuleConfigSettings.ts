@@ -62,6 +62,7 @@ export const LOYALTY_DEFAULTS: ILoyaltySettings = {
   tierDiscounts: { bronze: 0, silver: 5, gold: 8, platinum: 10 },
   tierThresholds: { bronze: 0, silver: 500, gold: 2000, platinum: 5000 },
   tierColors: { bronze: '#cd7f32', silver: '#c0c0c0', gold: '#ffd700', platinum: '#e5e4e2' },
+  tierDescriptions: { bronze: 'Welcome tier', silver: 'Regular customer', gold: 'Valued customer', platinum: 'VIP customer' },
   pointsPerIdr: 1000,
   defaultCustomerCategorySlug: 'retail',
 }

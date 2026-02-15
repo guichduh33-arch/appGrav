@@ -4,7 +4,7 @@ import type { IPOItem } from '@/hooks/purchasing/usePurchaseOrders'
 
 interface IPOFormItemsProps {
   items: IPOItem[]
-  products: Array<{ id: string; name: string; unit?: string | null; cost_price?: number | null }>
+  products: Array<{ id: string; name: string; sku: string; unit?: string | null; cost_price?: number | null }>
   isOnline: boolean
   onItemChange: (index: number, field: keyof IPOItem, value: string | number | null) => void
   onAddItem: () => void
@@ -64,7 +64,7 @@ export function POFormItems({
                     <option value="" className="bg-[var(--onyx-surface)]">Custom product</option>
                     {products.map(product => (
                       <option key={product.id} value={product.id} className="bg-[var(--onyx-surface)]">
-                        {product.name}
+                        {product.sku ? `[${product.sku}] ` : ''}{product.name}
                       </option>
                     ))}
                   </select>

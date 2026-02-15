@@ -19,6 +19,8 @@ interface FloorPlanDetailsPanelProps {
   onDelete: (id: string) => void
   onEditCapacity: (id: string, capacity: number) => void
   onEditSize: (id: string, width: number, height: number) => void
+  onEditRotation?: (id: string, rotation: number) => void
+  onEditColor?: (id: string, color: string) => void
 }
 
 export function FloorPlanDetailsPanel({
@@ -26,6 +28,8 @@ export function FloorPlanDetailsPanel({
   onDelete,
   onEditCapacity,
   onEditSize,
+  onEditRotation,
+  onEditColor,
 }: FloorPlanDetailsPanelProps) {
   return (
     <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5 flex flex-col gap-4 h-fit sticky top-4">
@@ -121,6 +125,40 @@ export function FloorPlanDetailsPanel({
             </div>
           </div>
         </div>
+        {onEditRotation && (
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Rotation</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="range"
+                aria-label="Rotation"
+                min="0"
+                max="360"
+                step="15"
+                value={item.rotation || 0}
+                onChange={(e) => onEditRotation(item.id, parseInt(e.target.value))}
+                className="flex-1 accent-[var(--color-gold)]"
+              />
+              <span className="text-xs text-white w-10 text-right">{item.rotation || 0}&deg;</span>
+            </div>
+          </div>
+        )}
+
+        {onEditColor && (
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Color</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                aria-label="Color"
+                value={item.color || (item.type === 'table' ? '#22c55e' : '#a855f7')}
+                onChange={(e) => onEditColor(item.id, e.target.value)}
+                className="w-8 h-8 rounded-lg border border-white/10 cursor-pointer bg-transparent"
+              />
+              <span className="text-xs text-[var(--theme-text-muted)]">{item.color || 'Default'}</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Hint */}

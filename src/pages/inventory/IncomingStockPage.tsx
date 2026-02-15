@@ -277,6 +277,7 @@ export default function IncomingStockPage() {
                                                                     <th className="text-right">Qty Received</th>
                                                                     <th className="text-right">Unit Price</th>
                                                                     <th className="text-right">Total</th>
+                                                                    <th className="text-center">QC</th>
                                                                     <th>Status</th>
                                                                 </tr>
                                                             </thead>
@@ -308,6 +309,19 @@ export default function IncomingStockPage() {
                                                                             </td>
                                                                             <td className="text-right font-semibold">
                                                                                 {formatCurrency(item.quantity * item.unit_price)}
+                                                                            </td>
+                                                                            <td className="text-center">
+                                                                                {item.qc_passed === true ? (
+                                                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                                                        <CheckCircle size={12} /> Pass
+                                                                                    </span>
+                                                                                ) : item.qc_passed === false ? (
+                                                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-red-500/10 text-red-400 border border-red-500/20">
+                                                                                        <AlertCircle size={12} /> Fail
+                                                                                    </span>
+                                                                                ) : (
+                                                                                    <span className="text-[var(--theme-text-muted)]">-</span>
+                                                                                )}
                                                                             </td>
                                                                             <td>
                                                                                 <div className="reception-progress">

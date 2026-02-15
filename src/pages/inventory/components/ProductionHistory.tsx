@@ -1,4 +1,4 @@
-import { Clock, Trash2, Eye, Lock } from 'lucide-react'
+import { Clock, Trash2, Eye, Lock, CheckCircle, PlayCircle } from 'lucide-react'
 import type { Product, ProductionRecord } from '../../../types/database'
 import type { ProductUOM } from '../StockProductionPage'
 
@@ -14,6 +14,12 @@ const getRecordUnit = (record: RecordWithProduct): string => {
     if (!product) return 'pcs'
     const consumptionUom = product.product_uoms?.find((u) => u.is_consumption_unit)
     return consumptionUom?.unit_name || product.unit || 'pcs'
+}
+
+const STATUS_CONFIG: Record<string, { label: string; icon: React.ReactNode; className: string }> = {
+    pending: { label: 'Pending', icon: <Clock size={10} />, className: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+    in_progress: { label: 'In Progress', icon: <PlayCircle size={10} />, className: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
+    completed: { label: 'Done', icon: <CheckCircle size={10} />, className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
 }
 
 interface ProductionHistoryProps {
@@ -65,6 +71,15 @@ export default function ProductionHistory({
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
+                                {(() => {
+                                    const status = (record as Record<string, unknown>).status as string || 'completed'
+                                    const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.completed
+                                    return (
+                                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${cfg.className}`}>
+                                            {cfg.icon} {cfg.label}
+                                        </span>
+                                    )
+                                })()}
                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-emerald-900/20 text-emerald-400 border border-emerald-900/30">
                                     +{formatNumber(record.quantity_produced)} {getRecordUnit(record as RecordWithProduct)}
                                 </span>

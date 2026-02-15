@@ -15,6 +15,9 @@ interface ICompanyFormData {
   address: string;
   phone: string;
   email: string;
+  website: string;
+  currency: string;
+  timezone: string;
   logo_url: string;
 }
 
@@ -33,10 +36,13 @@ const COMPANY_SETTINGS_KEYS = {
   phone: 'company.phone',
   email: 'company.email',
   logoUrl: 'company.logo_url',
+  website: 'company.website',
+  currency: 'company.currency',
+  timezone: 'company.timezone',
 } as const;
 
 const defaultFormData: ICompanyFormData = {
-  name: '', legal_name: '', npwp: '', address: '', phone: '', email: '', logo_url: '',
+  name: '', legal_name: '', npwp: '', address: '', phone: '', email: '', website: '', currency: 'IDR', timezone: 'Asia/Makassar', logo_url: '',
 };
 
 const parseSettingValue = (value: unknown): string => {
@@ -80,6 +86,9 @@ const CompanySettingsPage = () => {
           case COMPANY_SETTINGS_KEYS.address: newFormData.address = value; break;
           case COMPANY_SETTINGS_KEYS.phone: newFormData.phone = value; break;
           case COMPANY_SETTINGS_KEYS.email: newFormData.email = value; break;
+          case COMPANY_SETTINGS_KEYS.website: newFormData.website = value; break;
+          case COMPANY_SETTINGS_KEYS.currency: newFormData.currency = value || 'IDR'; break;
+          case COMPANY_SETTINGS_KEYS.timezone: newFormData.timezone = value || 'Asia/Makassar'; break;
           case COMPANY_SETTINGS_KEYS.logoUrl: newFormData.logo_url = value; break;
         }
       });
@@ -149,6 +158,9 @@ const CompanySettingsPage = () => {
         { key: COMPANY_SETTINGS_KEYS.address, value: formData.address },
         { key: COMPANY_SETTINGS_KEYS.phone, value: formData.phone },
         { key: COMPANY_SETTINGS_KEYS.email, value: formData.email },
+        { key: COMPANY_SETTINGS_KEYS.website, value: formData.website },
+        { key: COMPANY_SETTINGS_KEYS.currency, value: formData.currency },
+        { key: COMPANY_SETTINGS_KEYS.timezone, value: formData.timezone },
         { key: COMPANY_SETTINGS_KEYS.logoUrl, value: formData.logo_url },
       ];
       for (const setting of settingsToSave) {

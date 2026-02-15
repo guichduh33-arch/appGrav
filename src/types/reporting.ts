@@ -4,6 +4,7 @@ export interface SalesComparison {
     net_revenue: number;
     transaction_count: number;
     avg_basket: number;
+    items_sold: number;
 }
 
 export interface PaymentMethodStat {
@@ -45,6 +46,7 @@ export interface InventoryValuation {
 export interface DashboardSummary {
     period_sales: number;
     period_orders: number;
+    items_sold: number;
     top_product: {
         name: string;
         qty: number;

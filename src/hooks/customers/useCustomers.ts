@@ -216,6 +216,51 @@ export function useUpdateCustomer() {
     })
 }
 
+export interface ICategoryPrice {
+    id: string
+    product_id: string
+    product_name: string
+    product_sku: string
+    retail_price: number
+    custom_price: number
+}
+
+export function useCustomerCategoryPrices(categoryId: string | null | undefined) {
+    return useQuery({
+        queryKey: ['customer-category-prices', categoryId],
+        enabled: !!categoryId,
+        queryFn: async (): Promise<ICategoryPrice[]> => {
+            const { data, error } = await supabase
+                .from('product_category_prices')
+                .select(`
+                    id,
+                    product_id,
+                    custom_price,
+                    product:products(name, sku, retail_price)
+                `)
+                .eq('customer_category_id', categoryId!)
+                .eq('is_active', true)
+
+            if (error) throw error
+
+            type RawRow = {
+                id: string; product_id: string; custom_price: number
+                product: { name: string; sku: string; retail_price: number } | null
+            }
+
+            return ((data ?? []) as unknown as RawRow[]).map(d => ({
+                id: d.id,
+                product_id: d.product_id,
+                product_name: d.product?.name ?? '',
+                product_sku: d.product?.sku ?? '',
+                retail_price: d.product?.retail_price ?? 0,
+                custom_price: d.custom_price ?? 0,
+            }))
+        },
+        staleTime: 30_000,
+    })
+}
+
 export function useDeleteCustomer() {
     const queryClient = useQueryClient()
     return useMutation({

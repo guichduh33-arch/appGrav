@@ -1,6 +1,21 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Search } from 'lucide-react'
+import {
+    DndContext,
+    closestCenter,
+    PointerSensor,
+    KeyboardSensor,
+    useSensor,
+    useSensors,
+    type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    rectSortingStrategy,
+} from '@dnd-kit/sortable'
 import { supabase } from '../../lib/supabase'
 import {
     ProductCombo,
@@ -9,6 +24,7 @@ import {
     Product
 } from '../../types/database'
 import { logError } from '@/utils/logger'
+import { toast } from 'sonner'
 
 import CombosHeader from './combos-list/CombosHeader'
 import CombosStats from './combos-list/CombosStats'
@@ -157,6 +173,39 @@ export default function CombosPage() {
 
     const getSavings = (combo: ComboWithGroups) => getRegularPrice(combo) - getMinPrice(combo)
 
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    )
+
+    const isDraggable = !searchTerm
+
+    const handleDragEnd = async (event: DragEndEvent) => {
+        const { active, over } = event
+        if (!over || active.id === over.id) return
+
+        const oldIndex = combos.findIndex(c => c.id === active.id)
+        const newIndex = combos.findIndex(c => c.id === over.id)
+        const reordered = arrayMove(combos, oldIndex, newIndex)
+        setCombos(reordered)
+
+        try {
+            const updates = reordered.map((c, i) => ({ id: c.id, sort_order: i }))
+            for (const u of updates) {
+                const { error } = await supabase
+                    .from('product_combos')
+                    .update({ sort_order: u.sort_order })
+                    .eq('id', u.id)
+                if (error) throw error
+            }
+            toast.success('Order updated')
+        } catch (error) {
+            logError('Reorder error:', error)
+            toast.error('Failed to update order')
+            fetchCombos()
+        }
+    }
+
     return (
         <div className="min-h-screen bg-[var(--theme-bg-primary)] text-white p-8 max-w-[1600px] mx-auto max-md:p-4 font-body">
             <CombosHeader onCreateNew={() => navigate('/products/combos/new')} />
@@ -206,33 +255,38 @@ export default function CombosPage() {
                     )}
                 </div>
             ) : (
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(420px,1fr))] gap-8 max-md:grid-cols-1">
-                    {filteredCombos.map(combo => {
-                        const regularPrice = getRegularPrice(combo)
-                        const minPrice = getMinPrice(combo)
-                        const maxPrice = getMaxPrice(combo)
-                        const savings = getSavings(combo)
-                        const savingsPercentage = regularPrice > 0
-                            ? ((savings / regularPrice) * 100).toFixed(0)
-                            : 0
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext items={filteredCombos.map(c => c.id)} strategy={rectSortingStrategy}>
+                        <div className="grid grid-cols-[repeat(auto-fill,minmax(420px,1fr))] gap-8 max-md:grid-cols-1">
+                            {filteredCombos.map(combo => {
+                                const regularPrice = getRegularPrice(combo)
+                                const minPrice = getMinPrice(combo)
+                                const maxPrice = getMaxPrice(combo)
+                                const savings = getSavings(combo)
+                                const savingsPercentage = regularPrice > 0
+                                    ? ((savings / regularPrice) * 100).toFixed(0)
+                                    : 0
 
-                        return (
-                            <ComboCard
-                                key={combo.id}
-                                combo={combo}
-                                minPrice={minPrice}
-                                maxPrice={maxPrice}
-                                regularPrice={regularPrice}
-                                savings={savings}
-                                savingsPercentage={savingsPercentage}
-                                onView={(id) => navigate(`/products/combos/${id}`)}
-                                onEdit={(id) => navigate(`/products/combos/${id}/edit`)}
-                                onToggleActive={() => handleToggleActive(combo)}
-                                onDelete={handleDelete}
-                            />
-                        )
-                    })}
-                </div>
+                                return (
+                                    <ComboCard
+                                        key={combo.id}
+                                        combo={combo}
+                                        minPrice={minPrice}
+                                        maxPrice={maxPrice}
+                                        regularPrice={regularPrice}
+                                        savings={savings}
+                                        savingsPercentage={savingsPercentage}
+                                        onView={(id) => navigate(`/products/combos/${id}`)}
+                                        onEdit={(id) => navigate(`/products/combos/${id}/edit`)}
+                                        onToggleActive={() => handleToggleActive(combo)}
+                                        onDelete={handleDelete}
+                                        isDraggable={isDraggable}
+                                    />
+                                )
+                            })}
+                        </div>
+                    </SortableContext>
+                </DndContext>
             )}
         </div>
     )

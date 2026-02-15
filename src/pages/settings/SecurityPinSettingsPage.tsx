@@ -214,6 +214,56 @@ const SecurityPinSettingsPage = () => {
         </div>
       </div>
 
+        <div className="border-t border-white/5" />
+
+        {/* Auto Logout */}
+        <div className="space-y-2">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">Auto Logout</h3>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-sm text-[var(--theme-text-muted)]">Inactivity timeout before automatic logout</span>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                className="w-24 px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm outline-none transition-colors text-right focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20"
+                min={0} max={480}
+                value={getVal('security.auto_logout_minutes', 30)}
+                onChange={(e) => update('security.auto_logout_minutes', Number(e.target.value))}
+              />
+              <span className="text-xs text-[var(--theme-text-muted)]">minutes</span>
+            </div>
+          </div>
+          <span className="text-[11px] text-[var(--theme-text-muted)]">Set to 0 to disable auto-logout</span>
+        </div>
+
+        <div className="border-t border-white/5" />
+
+        {/* PIN Required Actions */}
+        <div className="space-y-3">
+          <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)]">PIN Required Actions</h3>
+          <p className="text-[11px] text-[var(--theme-text-muted)]">Operations that require manager PIN verification</p>
+          <div className="flex flex-wrap gap-2">
+            {['void', 'refund', 'discount_over_threshold', 'price_override', 'shift_close', 'delete_order'].map((action) => {
+              const current = getVal<string[]>('security.pin_required_actions', ['void', 'refund', 'discount_over_threshold']);
+              const checked = current.includes(action);
+              return (
+                <label key={action} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm text-white cursor-pointer hover:border-white/20 transition-colors capitalize">
+                  <input
+                    type="checkbox"
+                    className="accent-[var(--color-gold)]"
+                    checked={checked}
+                    onChange={() => {
+                      const next = checked ? current.filter(a => a !== action) : [...current, action];
+                      update('security.pin_required_actions', next);
+                    }}
+                  />
+                  {action.replace(/_/g, ' ')}
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
       {/* Unsaved notice */}
       {pending.size > 0 && (
         <div className="px-6 py-3 border-t border-white/5 bg-[var(--color-gold)]/5">

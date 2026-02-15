@@ -18,6 +18,9 @@ export interface FloorPlanItem {
     y: number
     width?: number
     height?: number
+    rotation?: number
+    color?: string
+    floor?: number
 }
 
 const TABLE_SHAPES = [
@@ -171,9 +174,21 @@ export default function FloorPlanEditor() {
         setItems(items.map(i => i.id === itemId ? { ...i, capacity: newCapacity } : i))
     }
 
-    const getItemStyle = (item: FloorPlanItem) => ({
+    const handleEditItemRotation = (itemId: string, rotation: number) => {
+        setItems(items.map(i => i.id === itemId ? { ...i, rotation } : i))
+        if (selectedItem && selectedItem.id === itemId) setSelectedItem({ ...selectedItem, rotation })
+    }
+
+    const handleEditItemColor = (itemId: string, color: string) => {
+        setItems(items.map(i => i.id === itemId ? { ...i, color } : i))
+        if (selectedItem && selectedItem.id === itemId) setSelectedItem({ ...selectedItem, color })
+    }
+
+    const getItemStyle = (item: FloorPlanItem): React.CSSProperties => ({
         left: `${item.x}%`, top: `${item.y}%`,
-        width: item.width ? `${item.width}px` : '80px', height: item.height ? `${item.height}px` : '80px'
+        width: item.width ? `${item.width}px` : '80px', height: item.height ? `${item.height}px` : '80px',
+        ...(item.rotation ? { transform: `translate(-50%, -50%) rotate(${item.rotation}deg)` } : {}),
+        ...(item.color ? { borderColor: item.color } : {}),
     })
 
     const tables = items.filter(i => i.type === 'table')
@@ -334,6 +349,8 @@ export default function FloorPlanEditor() {
                         onDelete={handleDeleteItem}
                         onEditCapacity={handleEditItemCapacity}
                         onEditSize={handleEditItemSize}
+                        onEditRotation={handleEditItemRotation}
+                        onEditColor={handleEditItemColor}
                     />
                 ) : (
                     <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-5 h-fit">

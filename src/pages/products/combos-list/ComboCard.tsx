@@ -1,4 +1,6 @@
-import { Box, Eye, Edit, Trash2, Package } from 'lucide-react'
+import { Box, Eye, Edit, Trash2, Package, GripVertical } from 'lucide-react'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/utils/helpers'
 
@@ -41,6 +43,7 @@ interface ComboCardProps {
     onEdit: (id: string) => void
     onToggleActive: () => void
     onDelete: (id: string) => void
+    isDraggable?: boolean
 }
 
 export default function ComboCard({
@@ -53,16 +56,45 @@ export default function ComboCard({
     onView,
     onEdit,
     onToggleActive,
-    onDelete
+    onDelete,
+    isDraggable = false,
 }: ComboCardProps) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: combo.id, disabled: !isDraggable })
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    }
+
     return (
         <div
+            ref={setNodeRef}
+            style={style}
             className={cn(
                 "bg-[var(--onyx-surface)] rounded-2xl border border-white/5 overflow-hidden cursor-pointer transition-all duration-[350ms] group relative shadow-sm hover:shadow-2xl hover:-translate-y-2 hover:border-white/10",
-                !combo.is_active && 'opacity-60 grayscale-[0.3]'
+                !combo.is_active && 'opacity-60 grayscale-[0.3]',
+                isDragging && 'z-50'
             )}
             onClick={() => onEdit(combo.id)}
         >
+            {isDraggable && (
+                <div
+                    className="absolute top-4 left-4 z-30 w-9 h-9 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white flex items-center justify-center cursor-grab active:cursor-grabbing hover:bg-white/20 transition-colors"
+                    {...attributes}
+                    {...listeners}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <GripVertical size={16} />
+                </div>
+            )}
             {combo.image_url ? (
                 <div className="w-full h-56 overflow-hidden relative">
                     <div className="absolute inset-0 bg-gradient-to-t from-[var(--onyx-surface)] via-transparent to-transparent z-10" />

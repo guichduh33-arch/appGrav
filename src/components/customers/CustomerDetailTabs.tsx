@@ -1,11 +1,12 @@
 import {
     User, Star, FileText, Phone, Mail, MapPin, Calendar, Clock,
-    Plus, Minus, History
+    Plus, Minus, History, DollarSign
 } from 'lucide-react'
 import { formatCurrency } from '@/utils/helpers'
 import { cn } from '@/lib/utils'
+import type { ICategoryPrice } from '@/hooks/customers'
 
-type TabType = 'overview' | 'loyalty' | 'orders'
+type TabType = 'overview' | 'loyalty' | 'orders' | 'pricing'
 
 interface LoyaltyTransaction {
     id: string
@@ -43,6 +44,7 @@ interface CustomerDetailTabsProps {
     customer: CustomerForTabs
     loyaltyTransactions: LoyaltyTransaction[]
     orders: Order[]
+    categoryPrices?: ICategoryPrice[]
 }
 
 function formatDate(dateString: string | null) {
@@ -68,12 +70,13 @@ function getStatusLabel(status: string) {
 }
 
 export function CustomerDetailTabs({
-    activeTab, onTabChange, customer, loyaltyTransactions, orders,
+    activeTab, onTabChange, customer, loyaltyTransactions, orders, categoryPrices = [],
 }: CustomerDetailTabsProps) {
     const tabs: { key: TabType; icon: React.ReactNode; label: string; count?: number }[] = [
         { key: 'overview', icon: <User size={14} />, label: 'Info' },
         { key: 'loyalty', icon: <Star size={14} />, label: 'Loyalty', count: loyaltyTransactions.length },
         { key: 'orders', icon: <FileText size={14} />, label: 'Orders', count: orders.length },
+        ...(customer.category ? [{ key: 'pricing' as TabType, icon: <DollarSign size={14} />, label: 'Pricing', count: categoryPrices.length }] : []),
     ]
 
     return (
@@ -239,6 +242,52 @@ export function CustomerDetailTabs({
                                         <span className="text-sm font-bold text-white">{formatCurrency(order.total_amount)}</span>
                                     </div>
                                 ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {activeTab === 'pricing' && (
+                    <div>
+                        {categoryPrices.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-12 px-8 text-center">
+                                <DollarSign size={48} className="text-white/10 mb-4" />
+                                <h3 className="m-0 mb-2 text-[var(--muted-smoke)] text-base font-display">No custom prices</h3>
+                                <p className="m-0 text-[var(--theme-text-muted)] text-sm">
+                                    Custom prices for the {customer.category?.name} category will appear here
+                                </p>
+                            </div>
+                        ) : (
+                            <div>
+                                <div className="grid grid-cols-[1fr_100px_100px_80px] gap-4 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--theme-text-muted)] border-b border-white/5">
+                                    <span>Product</span>
+                                    <span className="text-right">Base Price</span>
+                                    <span className="text-right">Custom Price</span>
+                                    <span className="text-right">Discount</span>
+                                </div>
+                                <div className="flex flex-col">
+                                    {categoryPrices.map(cp => {
+                                        const discount = cp.retail_price > 0
+                                            ? Math.round((1 - cp.custom_price / cp.retail_price) * 100)
+                                            : 0
+                                        return (
+                                            <div key={cp.id} className="grid grid-cols-[1fr_100px_100px_80px] gap-4 px-4 py-3 border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] transition-colors items-center">
+                                                <div>
+                                                    <span className="block text-sm font-medium text-white">{cp.product_name}</span>
+                                                    <span className="block text-xs text-[var(--theme-text-muted)] font-mono">{cp.product_sku}</span>
+                                                </div>
+                                                <span className="text-sm text-[var(--muted-smoke)] text-right font-mono">{formatCurrency(cp.retail_price)}</span>
+                                                <span className="text-sm font-bold text-[var(--color-gold)] text-right font-mono">{formatCurrency(cp.custom_price)}</span>
+                                                <span className={cn(
+                                                    'text-xs font-bold text-right',
+                                                    discount > 0 ? 'text-emerald-400' : discount < 0 ? 'text-red-400' : 'text-[var(--muted-smoke)]'
+                                                )}>
+                                                    {discount > 0 ? `-${discount}%` : discount < 0 ? `+${Math.abs(discount)}%` : '0%'}
+                                                </span>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
                             </div>
                         )}
                     </div>

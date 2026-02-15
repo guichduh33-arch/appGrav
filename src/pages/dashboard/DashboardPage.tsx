@@ -5,8 +5,7 @@ import {
   ShoppingBag,
   TrendingUp,
   AlertTriangle,
-
-
+  Package,
   RefreshCw,
 } from 'lucide-react';
 import {
@@ -100,11 +99,11 @@ export default function DashboardPage() {
 
       {/* ---- KPI Cards Row (Stitch-style) ---- */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-36 rounded-2xl bg-[var(--onyx-surface)]" />)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+          {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-36 rounded-2xl bg-[var(--onyx-surface)]" />)}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
           <DashboardKpiCard
             label="Total Sales"
             value={formatCurrency(todayKpi?.total_revenue ?? 0)}
@@ -118,6 +117,13 @@ export default function DashboardPage() {
             icon={<ShoppingBag size={18} className="text-[var(--color-gold)]" />}
             iconColor="var(--color-gold)"
             trend={calcTrend(todayKpi?.total_orders, yesterdayKpi?.total_orders)}
+          />
+          <DashboardKpiCard
+            label="Items Sold"
+            value={String(todayKpi?.items_sold ?? 0)}
+            icon={<Package size={18} className="text-[var(--color-gold)]" />}
+            iconColor="var(--color-gold)"
+            trend={calcTrend(todayKpi?.items_sold, yesterdayKpi?.items_sold)}
           />
           <DashboardKpiCard
             label="Stock Alerts"

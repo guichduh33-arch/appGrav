@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { useSettingsByCategory, useUpdateSetting } from '@/hooks/settings';
 import { LOYALTY_DEFAULTS } from '@/hooks/settings/useModuleConfigSettings';
-import type { ILoyaltyTierMap, ILoyaltyColorMap } from '@/types/settingsModuleConfig';
+import type { ILoyaltyTierMap, ILoyaltyColorMap, ILoyaltyTierStringMap } from '@/types/settingsModuleConfig';
 import { toast } from 'sonner';
 
 type TierName = 'bronze' | 'silver' | 'gold' | 'platinum';
@@ -15,6 +15,7 @@ interface ILocalState {
   tierThresholds: ILoyaltyTierMap;
   tierDiscounts: ILoyaltyTierMap;
   tierColors: ILoyaltyColorMap;
+  tierDescriptions: ILoyaltyTierStringMap;
   pointsPerIdr: number;
   defaultCustomerCategorySlug: string;
 }
@@ -23,6 +24,7 @@ const buildDefaults = (): ILocalState => ({
   tierThresholds: { ...LOYALTY_DEFAULTS.tierThresholds },
   tierDiscounts: { ...LOYALTY_DEFAULTS.tierDiscounts },
   tierColors: { ...LOYALTY_DEFAULTS.tierColors },
+  tierDescriptions: { ...LOYALTY_DEFAULTS.tierDescriptions },
   pointsPerIdr: LOYALTY_DEFAULTS.pointsPerIdr,
   defaultCustomerCategorySlug: LOYALTY_DEFAULTS.defaultCustomerCategorySlug,
 });
@@ -31,6 +33,7 @@ const KEY_MAP: Record<keyof ILocalState, string> = {
   tierThresholds: 'loyalty.tier_thresholds',
   tierDiscounts: 'loyalty.tier_discounts',
   tierColors: 'loyalty.tier_colors',
+  tierDescriptions: 'loyalty.tier_descriptions',
   pointsPerIdr: 'loyalty.points_per_idr',
   defaultCustomerCategorySlug: 'loyalty.default_customer_category_slug',
 };
@@ -52,6 +55,7 @@ const LoyaltySettingsPage = () => {
       tierThresholds: get<ILoyaltyTierMap>('loyalty.tier_thresholds', LOYALTY_DEFAULTS.tierThresholds),
       tierDiscounts: get<ILoyaltyTierMap>('loyalty.tier_discounts', LOYALTY_DEFAULTS.tierDiscounts),
       tierColors: get<ILoyaltyColorMap>('loyalty.tier_colors', LOYALTY_DEFAULTS.tierColors),
+      tierDescriptions: get<ILoyaltyTierStringMap>('loyalty.tier_descriptions', LOYALTY_DEFAULTS.tierDescriptions),
       pointsPerIdr: get<number>('loyalty.points_per_idr', LOYALTY_DEFAULTS.pointsPerIdr),
       defaultCustomerCategorySlug: get<string>('loyalty.default_customer_category_slug', LOYALTY_DEFAULTS.defaultCustomerCategorySlug),
     };
@@ -78,6 +82,11 @@ const LoyaltySettingsPage = () => {
   const handleTierColor = (tier: TierName, color: string) => {
     setForm((prev) => ({ ...prev, tierColors: { ...prev.tierColors, [tier]: color } }));
     markDirty('tierColors');
+  };
+
+  const handleTierDescription = (tier: TierName, desc: string) => {
+    setForm((prev) => ({ ...prev, tierDescriptions: { ...prev.tierDescriptions, [tier]: desc } }));
+    markDirty('tierDescriptions');
   };
 
   const handleSaveAll = async () => {
@@ -164,6 +173,7 @@ const LoyaltySettingsPage = () => {
                     <th className="text-left px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Tier</th>
                     <th className="text-left px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Points Threshold</th>
                     <th className="text-left px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Discount %</th>
+                    <th className="text-left px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Description</th>
                     <th className="text-left px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Color</th>
                     <th className="text-center px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--muted-smoke)]">Preview</th>
                   </tr>
@@ -180,6 +190,9 @@ const LoyaltySettingsPage = () => {
                           <input type="number" className="w-20 px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-white text-sm outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20" min={0} max={100} step={0.5} value={form.tierDiscounts[tier]} onChange={(e) => handleTierDiscount(tier, e.target.value)} />
                           <span className="text-xs text-[var(--theme-text-muted)]">%</span>
                         </div>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <input type="text" className="w-36 px-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-white text-xs outline-none transition-colors focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/20 placeholder:text-white/30" placeholder="Tier description..." value={form.tierDescriptions[tier]} onChange={(e) => handleTierDescription(tier, e.target.value)} />
                       </td>
                       <td className="px-4 py-2.5">
                         <div className="flex items-center gap-2">

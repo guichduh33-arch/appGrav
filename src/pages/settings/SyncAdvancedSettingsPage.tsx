@@ -23,6 +23,7 @@ const K = {
   lanMaxReconnect: 'sync_advanced.lan_max_reconnect_attempts',
   lanReconnectBase: 'sync_advanced.lan_reconnect_backoff_base_ms',
   lanReconnectMax: 'sync_advanced.lan_reconnect_backoff_max_ms',
+  cacheTtlImages: 'sync_advanced.cache_ttl_images_hours',
 } as const;
 
 const DEFAULTS: Record<string, unknown> = {
@@ -40,6 +41,7 @@ const DEFAULTS: Record<string, unknown> = {
   [K.lanMaxReconnect]: SYNC_ADVANCED_DEFAULTS.lanMaxReconnectAttempts,
   [K.lanReconnectBase]: SYNC_ADVANCED_DEFAULTS.lanReconnectBackoffBaseMs,
   [K.lanReconnectMax]: SYNC_ADVANCED_DEFAULTS.lanReconnectBackoffMaxMs,
+  [K.cacheTtlImages]: 48,
 };
 
 interface Preset {
@@ -248,6 +250,8 @@ const SyncAdvancedSettingsPage = () => {
             value={n(formValues[K.cacheTtlDefault])} onChange={(v) => handleChange(K.cacheTtlDefault, v)} />
           <NumericField label="Orders cache TTL" suffix="hours"
             value={n(formValues[K.cacheTtlOrders])} onChange={(v) => handleChange(K.cacheTtlOrders, v)} />
+          <NumericField label="Images cache TTL" suffix="hours"
+            value={n(formValues[K.cacheTtlImages])} onChange={(v) => handleChange(K.cacheTtlImages, v)} />
           <NumericField label="Cache refresh interval" suffix="hours"
             value={n(formValues[K.cacheRefresh])} onChange={(v) => handleChange(K.cacheRefresh, v)} />
         </SyncSettingsCard>

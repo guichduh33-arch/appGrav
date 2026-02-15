@@ -41,6 +41,7 @@ export default function WastedPage() {
     const [quantity, setQuantity] = useState('')
     const [reason, setReason] = useState('expired')
     const [notes, setNotes] = useState('')
+    const [photoUrl, setPhotoUrl] = useState('')
     const [productSearch, setProductSearch] = useState('')
 
     // React Query hooks
@@ -103,6 +104,7 @@ export default function WastedPage() {
                 currentStock,
                 costPrice: selectedProduct.cost_price || 0,
                 staffId: user?.id,
+                ...(photoUrl ? { photoUrl } : {}),
             })
 
             toast.success('Waste recorded successfully')
@@ -119,6 +121,7 @@ export default function WastedPage() {
         setQuantity('')
         setReason('expired')
         setNotes('')
+        setPhotoUrl('')
         setProductSearch('')
     }
 
@@ -235,6 +238,7 @@ export default function WastedPage() {
                     quantity={quantity}
                     reason={reason}
                     notes={notes}
+                    photoUrl={photoUrl}
                     productSearch={productSearch}
                     filteredProducts={filteredProducts}
                     isSaving={isSaving}
@@ -247,6 +251,7 @@ export default function WastedPage() {
                     onQuantityChange={setQuantity}
                     onReasonChange={setReason}
                     onNotesChange={setNotes}
+                    onPhotoUrlChange={setPhotoUrl}
                     onSave={handleSave}
                     onClose={() => { setShowModal(false); resetForm() }}
                 />

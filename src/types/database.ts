@@ -71,6 +71,7 @@ export type B2BPayment = Tables<'b2b_payments'>
 // Purchasing
 export type PurchaseOrder = Tables<'purchase_orders'>
 export type PurchaseOrderItem = Tables<'purchase_order_items'>
+export type POActivityLog = Tables<'po_activity_log'>
 
 // Backward compatibility alias (deprecated - use PurchaseOrderItem instead)
 /** @deprecated Use PurchaseOrderItem instead */
@@ -87,6 +88,13 @@ export type UserPermission = Tables<'user_permissions'>
 // System
 export type AuditLog = Tables<'audit_logs'>
 export type Setting = Tables<'settings'>
+
+// Phase 1: New tables
+export type ProductPriceHistory = Tables<'product_price_history'>
+export type VatFiling = Tables<'vat_filings'>
+export type BusinessHoliday = Tables<'business_holidays'>
+export type NotificationEvent = Tables<'notification_events'>
+export type NotificationPreference = Tables<'notification_preferences'>
 
 // Settings Module (manual types - not yet in generated types)
 // These tables were added in migration 20260128100000_settings_enhancements.sql

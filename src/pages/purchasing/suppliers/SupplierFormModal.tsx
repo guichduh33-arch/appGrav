@@ -8,6 +8,9 @@ interface Supplier {
     postal_code: string | null
     country: string | null
     tax_id: string | null
+    bank_account_number: string | null
+    bank_account_holder: string | null
+    bank_name: string | null
     payment_terms: string | null
     category: string | null
     notes: string | null
@@ -177,6 +180,37 @@ export function SupplierFormModal({
                                             value={formData.tax_id || ''}
                                             onChange={e => onFormChange({ ...formData, tax_id: e.target.value })}
                                             aria-label="Tax ID"
+                                            className={inputClass}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className={labelClass}>Bank Name</label>
+                                        <input
+                                            type="text"
+                                            value={formData.bank_name || ''}
+                                            onChange={e => onFormChange({ ...formData, bank_name: e.target.value })}
+                                            aria-label="Bank name"
+                                            placeholder="e.g. BCA, BNI, Mandiri"
+                                            className={inputClass}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className={labelClass}>Account Number</label>
+                                        <input
+                                            type="text"
+                                            value={formData.bank_account_number || ''}
+                                            onChange={e => onFormChange({ ...formData, bank_account_number: e.target.value })}
+                                            aria-label="Bank account number"
+                                            className={inputClass}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className={labelClass}>Account Holder</label>
+                                        <input
+                                            type="text"
+                                            value={formData.bank_account_holder || ''}
+                                            onChange={e => onFormChange({ ...formData, bank_account_holder: e.target.value })}
+                                            aria-label="Bank account holder"
                                             className={inputClass}
                                         />
                                     </div>

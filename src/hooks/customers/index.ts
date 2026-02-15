@@ -36,5 +36,7 @@ export {
   useCreateCustomer,
   useUpdateCustomer,
   useDeleteCustomer,
+  useCustomerCategoryPrices,
   type ICustomerWithCategory,
+  type ICategoryPrice,
 } from './useCustomers';

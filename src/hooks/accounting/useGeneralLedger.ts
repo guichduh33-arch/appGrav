@@ -5,7 +5,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
-import type { IGeneralLedgerEntry, TBalanceType } from '@/types/accounting'
+import type { IGeneralLedgerEntry, TBalanceType, TJournalReferenceType } from '@/types/accounting'
 
 interface IGeneralLedgerParams {
   accountId: string | undefined
@@ -55,7 +55,8 @@ export function useGeneralLedger({ accountId, startDate, endDate }: IGeneralLedg
             entry_number,
             entry_date,
             description,
-            status
+            status,
+            reference_type
           )
         `)
         .eq('account_id', accountId)
@@ -91,6 +92,7 @@ export function useGeneralLedger({ accountId, startDate, endDate }: IGeneralLedg
           date: je.entry_date as string,
           entry_number: je.entry_number as string,
           description: (line.description as string) || (je.description as string),
+          reference_type: (je.reference_type as TJournalReferenceType) ?? null,
           debit,
           credit,
           balance: runningBalance,

@@ -5,6 +5,9 @@ interface ICompanyFormData {
   address: string;
   phone: string;
   email: string;
+  website: string;
+  currency: string;
+  timezone: string;
   logo_url: string;
 }
 
@@ -121,6 +124,52 @@ const CompanyFormFields = ({
           disabled={!canEdit}
         />
         {errors.email && <span className="block text-xs text-red-400 mt-1">{errors.email}</span>}
+      </div>
+
+      {/* Website */}
+      <div>
+        <label className={LABEL_CLASS} htmlFor="website">Website</label>
+        <input
+          id="website"
+          type="url"
+          className={INPUT_CLASS}
+          value={formData.website}
+          onChange={(e) => onChange('website', e.target.value)}
+          placeholder="https://thebreakery.id"
+          disabled={!canEdit}
+        />
+      </div>
+
+      {/* Currency */}
+      <div>
+        <label className={LABEL_CLASS} htmlFor="currency">Currency</label>
+        <select
+          id="currency"
+          className={INPUT_CLASS}
+          value={formData.currency}
+          onChange={(e) => onChange('currency', e.target.value)}
+          disabled={!canEdit}
+        >
+          <option value="IDR">IDR - Indonesian Rupiah</option>
+          <option value="USD">USD - US Dollar</option>
+          <option value="EUR">EUR - Euro</option>
+        </select>
+      </div>
+
+      {/* Timezone */}
+      <div>
+        <label className={LABEL_CLASS} htmlFor="timezone">Timezone</label>
+        <select
+          id="timezone"
+          className={INPUT_CLASS}
+          value={formData.timezone}
+          onChange={(e) => onChange('timezone', e.target.value)}
+          disabled={!canEdit}
+        >
+          <option value="Asia/Jakarta">WIB (Jakarta, UTC+7)</option>
+          <option value="Asia/Makassar">WITA (Makassar/Lombok, UTC+8)</option>
+          <option value="Asia/Jayapura">WIT (Jayapura, UTC+9)</option>
+        </select>
       </div>
     </div>
   );
