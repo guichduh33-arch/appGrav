@@ -1,0 +1,332 @@
+import React from 'react';
+
+const Customer_Detail___CRM: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: \
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Customer Detail &amp; CRM</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#eebd2b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#0D0D0F",
+                        "card-dark": "#1A1A1D",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["'Playfair Display'", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0D0D0F;
+        }
+        .gold-gradient {
+            background: linear-gradient(90deg, #eebd2b 0%, #f4d06f 100%);
+        }
+    </style>
+</head>
+<body class="font-display text-white/90 bg-background-dark min-h-screen">
+<!-- Navigation Header -->
+<nav class="border-b border-primary/10 bg-card-dark/50 backdrop-blur-md sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+<div class="flex items-center gap-4">
+<span class="text-primary material-icons text-3xl">bakery_dining</span>
+<span class="font-serif italic text-xl tracking-wide">The Breakery</span>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-white/60 hover:text-primary transition-colors flex items-center gap-2">
+<span class="material-icons text-sm">arrow_back</span>
+                    Back to CRM
+                </button>
+<div class="h-8 w-[1px] bg-primary/20"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-xs text-white/40">Staff ID</p>
+<p class="text-sm font-medium">Michael B.</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary">
+<span class="material-icons">account_circle</span>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-6 py-8">
+<div class="grid grid-cols-1 lg:grid-cols-10 gap-8">
+<!-- LEFT COLUMN (65%) -->
+<div class="lg:col-span-6 space-y-8">
+<!-- Identity Card -->
+<div class="bg-card-dark border border-primary/10 p-8 rounded-xl flex items-center gap-8 shadow-2xl">
+<div class="relative">
+<div class="w-28 h-28 rounded-full border-2 border-primary p-1 bg-background-dark flex items-center justify-center">
+<div class="w-full h-full rounded-full bg-primary/20 flex items-center justify-center text-3xl font-serif text-primary">
+                                JS
+                            </div>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-primary text-background-dark text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                            VIP
+                        </div>
+</div>
+<div>
+<h1 class="font-serif text-4xl mb-2 text-white">Jane Smith</h1>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full border border-primary/20">Gold Tier</span>
+<span class="px-3 py-1 bg-white/5 text-white/60 text-xs font-semibold rounded-full border border-white/10">Retail Account</span>
+</div>
+</div>
+</div>
+<!-- Contact Details Card -->
+<div class="bg-card-dark border border-primary/10 p-8 rounded-xl shadow-lg">
+<h2 class="text-lg font-semibold mb-6 flex items-center gap-2">
+<span class="material-icons text-primary text-sm">contact_page</span>
+                        Contact Information
+                    </h2>
+<div class="grid grid-cols-2 gap-6 mb-8">
+<div class="space-y-2 group">
+<label class="text-xs text-white/40 uppercase tracking-widest font-bold">Phone Number</label>
+<div class="relative">
+<input class="w-full bg-background-dark/50 border border-white/5 rounded-lg py-3 px-4 focus:border-primary/50 focus:ring-0 transition-all text-white/80" type="text" value="+62 812-3456-7890"/>
+<span class="material-icons absolute right-3 top-3 text-white/20 group-hover:text-primary cursor-pointer text-sm">edit</span>
+</div>
+</div>
+<div class="space-y-2 group">
+<label class="text-xs text-white/40 uppercase tracking-widest font-bold">Email Address</label>
+<div class="relative">
+<input class="w-full bg-background-dark/50 border border-white/5 rounded-lg py-3 px-4 focus:border-primary/50 focus:ring-0 transition-all text-white/80" type="email" value="jane.smith@email.com"/>
+<span class="material-icons absolute right-3 top-3 text-white/20 group-hover:text-primary cursor-pointer text-sm">edit</span>
+</div>
+</div>
+<div class="col-span-2 space-y-2 group">
+<label class="text-xs text-white/40 uppercase tracking-widest font-bold">Delivery Address</label>
+<div class="relative">
+<input class="w-full bg-background-dark/50 border border-white/5 rounded-lg py-3 px-4 focus:border-primary/50 focus:ring-0 transition-all text-white/80" type="text" value="Jl. Senopati No. 45, Kebayoran Baru, Jakarta Selatan"/>
+<span class="material-icons absolute right-3 top-3 text-white/20 group-hover:text-primary cursor-pointer text-sm">edit</span>
+</div>
+</div>
+<div class="col-span-2 space-y-2">
+<label class="text-xs text-white/40 uppercase tracking-widest font-bold">Internal Notes</label>
+<textarea class="w-full bg-background-dark/50 border border-white/5 rounded-lg py-3 px-4 focus:border-primary/50 focus:ring-0 transition-all text-white/80 resize-none" placeholder="Add specific delivery instructions or preferences..." rows="4">Prefers sourdough loaves sliced medium. Always orders extra croissants for weekend pickup. High value retail customer since 2021.</textarea>
+</div>
+</div>
+<div class="flex justify-end gap-4">
+<button class="px-6 py-2 rounded-lg text-white/60 hover:bg-white/5 transition-colors font-medium">Cancel Changes</button>
+<button class="px-8 py-2 rounded-lg bg-primary text-background-dark font-bold hover:brightness-110 transition-all shadow-lg shadow-primary/20">Save Changes</button>
+</div>
+</div>
+<!-- Custom Pricing Card -->
+<div class="bg-card-dark border border-primary/10 p-8 rounded-xl shadow-lg">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-lg font-semibold flex items-center gap-2">
+<span class="material-icons text-primary text-sm">payments</span>
+                            Custom Pricing Overrides
+                        </h2>
+<button class="text-xs text-primary font-bold uppercase tracking-wider flex items-center gap-1 hover:underline">
+<span class="material-icons text-xs">add</span> Add Product
+                        </button>
+</div>
+<div class="overflow-hidden rounded-lg border border-white/5">
+<table class="w-full text-left border-collapse">
+<thead class="bg-background-dark/50">
+<tr>
+<th class="p-4 text-xs font-bold text-white/40 uppercase">Product</th>
+<th class="p-4 text-xs font-bold text-white/40 uppercase">Standard Price</th>
+<th class="p-4 text-xs font-bold text-white/40 uppercase text-primary">Customer Price</th>
+<th class="p-4 text-xs font-bold text-white/40 uppercase text-center">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="hover:bg-white/5 transition-colors">
+<td class="p-4 font-medium">Artisanal Sourdough</td>
+<td class="p-4 text-white/40">Rp 65.000</td>
+<td class="p-4 text-primary font-bold">Rp 58.500</td>
+<td class="p-4 text-center">
+<button class="material-icons text-sm text-white/20 hover:text-red-400">delete_outline</button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors">
+<td class="p-4 font-medium">Butter Croissant (Bulk)</td>
+<td class="p-4 text-white/40">Rp 25.000</td>
+<td class="p-4 text-primary font-bold">Rp 22.000</td>
+<td class="p-4 text-center">
+<button class="material-icons text-sm text-white/20 hover:text-red-400">delete_outline</button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors">
+<td class="p-4 font-medium">Almond Pain au Chocolat</td>
+<td class="p-4 text-white/40">Rp 42.000</td>
+<td class="p-4 text-primary font-bold">Rp 38.000</td>
+<td class="p-4 text-center">
+<button class="material-icons text-sm text-white/20 hover:text-red-400">delete_outline</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN (35%) -->
+<div class="lg:col-span-4 space-y-8">
+<!-- Loyalty Card -->
+<div class="bg-card-dark border border-primary/10 p-8 rounded-xl relative overflow-hidden shadow-lg group">
+<div class="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+<span class="material-icons text-8xl text-primary">stars</span>
+</div>
+<div class="relative z-10">
+<p class="text-xs text-white/40 uppercase tracking-widest font-bold mb-1">Loyalty Rewards</p>
+<h3 class="font-serif text-5xl text-primary mb-4 italic tracking-tight">2,450 <span class="text-lg font-display not-italic font-medium text-white/60">pts</span></h3>
+<div class="space-y-3">
+<div class="flex justify-between text-xs font-semibold">
+<span class="text-white/60">Tier Progress: Gold to Platinum</span>
+<span class="text-primary">82%</span>
+</div>
+<div class="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-white/5">
+<div class="gold-gradient h-full w-[82%] rounded-full shadow-[0_0_10px_rgba(238,189,43,0.3)]"></div>
+</div>
+<p class="text-[10px] text-white/40 italic">Next reward: 550 pts to go for a free Afternoon Tea Box</p>
+</div>
+</div>
+</div>
+<!-- Purchase Stats Card -->
+<div class="bg-card-dark border border-primary/10 p-8 rounded-xl shadow-lg">
+<h2 class="text-lg font-semibold mb-6 flex items-center gap-2">
+<span class="material-icons text-primary text-sm">insights</span>
+                        Purchase Analytics
+                    </h2>
+<div class="space-y-6">
+<div>
+<p class="text-xs text-white/40 uppercase tracking-widest font-bold mb-1">Lifetime Spent</p>
+<p class="font-serif text-2xl text-white">Rp 24.500.000</p>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+<div>
+<p class="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Avg. Order</p>
+<p class="text-lg font-medium">Rp 480.000</p>
+</div>
+<div>
+<p class="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Frequency</p>
+<p class="text-lg font-medium">3.2/week</p>
+</div>
+</div>
+<div class="pt-4 border-t border-white/5">
+<p class="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-3">Favorite Items</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-primary/5 border border-primary/20 text-[10px] font-medium rounded uppercase">Butter Croissant</span>
+<span class="px-2 py-1 bg-primary/5 border border-primary/20 text-[10px] font-medium rounded uppercase">Sourdough Loaf</span>
+<span class="px-2 py-1 bg-primary/5 border border-primary/20 text-[10px] font-medium rounded uppercase">Cinnamon Roll</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Orders -->
+<div class="bg-card-dark border border-primary/10 p-8 rounded-xl shadow-lg">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-lg font-semibold flex items-center gap-2">
+<span class="material-icons text-primary text-sm">history</span>
+                            Recent Activity
+                        </h2>
+<button class="text-[10px] text-white/40 hover:text-primary underline">View All</button>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between group cursor-pointer hover:bg-white/5 p-2 -m-2 rounded-lg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center justify-center text-green-500">
+<span class="material-icons text-lg">check_circle</span>
+</div>
+<div>
+<p class="text-sm font-medium">Order #BK-9281</p>
+<p class="text-[10px] text-white/40">12 Oct 2023 • 09:45 AM</p>
+</div>
+</div>
+<p class="text-sm font-bold">Rp 650.000</p>
+</div>
+<div class="flex items-center justify-between group cursor-pointer hover:bg-white/5 p-2 -m-2 rounded-lg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary/10 border border-primary/20 rounded-lg flex items-center justify-center text-primary">
+<span class="material-icons text-lg">pending</span>
+</div>
+<div>
+<p class="text-sm font-medium">Order #BK-9174</p>
+<p class="text-[10px] text-white/40">08 Oct 2023 • 02:15 PM</p>
+</div>
+</div>
+<p class="text-sm font-bold">Rp 420.000</p>
+</div>
+<div class="flex items-center justify-between group cursor-pointer hover:bg-white/5 p-2 -m-2 rounded-lg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center justify-center text-green-500">
+<span class="material-icons text-lg">check_circle</span>
+</div>
+<div>
+<p class="text-sm font-medium">Order #BK-8852</p>
+<p class="text-[10px] text-white/40">05 Oct 2023 • 11:30 AM</p>
+</div>
+</div>
+<p class="text-sm font-bold">Rp 1.250.000</p>
+</div>
+<div class="flex items-center justify-between group cursor-pointer hover:bg-white/5 p-2 -m-2 rounded-lg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center justify-center text-green-500">
+<span class="material-icons text-lg">check_circle</span>
+</div>
+<div>
+<p class="text-sm font-medium">Order #BK-8721</p>
+<p class="text-[10px] text-white/40">01 Oct 2023 • 10:20 AM</p>
+</div>
+</div>
+<p class="text-sm font-bold">Rp 320.000</p>
+</div>
+<div class="flex items-center justify-between group cursor-pointer hover:bg-white/5 p-2 -m-2 rounded-lg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center justify-center text-red-500">
+<span class="material-icons text-lg">cancel</span>
+</div>
+<div>
+<p class="text-sm font-medium text-white/60">Order #BK-8640</p>
+<p class="text-[10px] text-white/40">28 Sep 2023 • 04:00 PM</p>
+</div>
+</div>
+<p class="text-sm font-bold text-white/40 line-through">Rp 180.000</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="max-w-7xl mx-auto px-6 py-12 border-t border-white/5 mt-12 flex justify-between items-center text-white/20 text-xs">
+<p>© 2023 The Breakery Management System v2.4.0</p>
+<div class="flex gap-6">
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Help Desk</a>
+<a class="hover:text-primary transition-colors" href="#">Audit Logs</a>
+</div>
+</footer>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    \ }} />
+  );
+};
+
+export default Customer_Detail___CRM;

@@ -1,0 +1,304 @@
+import React from 'react';
+
+const Profit___Loss_Statement: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: \
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Profit &amp; Loss Statement</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,700;1,700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#c8a45b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#0d0d0f",
+                        "surface": "#1a1a1d",
+                        "muted": "#252529"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Custom scrollbar for dark theme */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0d0d0f; }
+        ::-webkit-scrollbar-thumb { background: #c8a45b33; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c8a45b55; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display">
+<div class="max-w-[1920px] mx-auto p-8 xl:p-12">
+<!-- Top Navigation / Header -->
+<header class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 gap-6">
+<div class="space-y-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded-lg">
+<span class="material-icons text-background-dark">bakery_dining</span>
+</div>
+<h2 class="text-sm font-semibold uppercase tracking-widest text-primary/80">The Breakery Management</h2>
+</div>
+<h1 class="text-4xl lg:text-5xl font-serif text-slate-100">Profit &amp; Loss Statement<span class="text-primary">.</span></h1>
+</div>
+<div class="flex flex-wrap items-center gap-4 bg-surface p-2 rounded-xl border border-primary/10">
+<!-- Period Selector -->
+<div class="flex items-center gap-2 px-4 py-2 bg-background-dark rounded-lg border border-primary/20">
+<span class="material-icons text-primary text-sm">calendar_today</span>
+<span class="text-sm font-medium">February 2026</span>
+<span class="material-icons text-primary/50 text-sm">expand_more</span>
+</div>
+<!-- Comparison Toggle -->
+<div class="flex items-center gap-3 px-4 border-l border-primary/20">
+<span class="text-xs text-slate-400 uppercase tracking-tighter">vs Previous Month</span>
+<button class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary/20 transition-colors focus:outline-none ring-1 ring-primary/40">
+<span class="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-primary transition-transform"></span>
+</button>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-2 pl-4 border-l border-primary/20">
+<button class="p-2 hover:bg-primary/10 rounded-lg transition-all group">
+<span class="material-icons text-primary group-hover:scale-110">file_download</span>
+</button>
+<button class="p-2 hover:bg-primary/10 rounded-lg transition-all group">
+<span class="material-icons text-primary group-hover:scale-110">print</span>
+</button>
+</div>
+</div>
+</header>
+<main class="grid grid-cols-12 gap-8">
+<!-- Left Column: Detailed Statement -->
+<div class="col-span-12 xl:col-span-8">
+<div class="bg-surface rounded-xl border border-primary/10 overflow-hidden shadow-2xl">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-primary/10">
+<th class="py-6 px-8 text-xs uppercase tracking-widest text-primary font-semibold">Account Description</th>
+<th class="py-6 px-8 text-xs uppercase tracking-widest text-primary font-semibold text-right">Current Period</th>
+<th class="py-6 px-8 text-xs uppercase tracking-widest text-primary font-semibold text-right">Variance</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-primary/5">
+<!-- REVENUE SECTION -->
+<tr class="bg-primary/5">
+<td class="py-4 px-8 text-xs font-bold uppercase tracking-wider text-slate-300" colspan="3">Revenue</td>
+</tr>
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="py-4 px-10 text-sm">Retail Sales: Pastries &amp; Bread</td>
+<td class="py-4 px-8 text-sm font-mono text-primary text-right">$ 142,500.00</td>
+<td class="py-4 px-8 text-xs font-mono text-emerald-500 text-right">+12.4%</td>
+</tr>
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="py-4 px-10 text-sm">Wholesale Distribution</td>
+<td class="py-4 px-8 text-sm font-mono text-primary text-right">$ 38,200.00</td>
+<td class="py-4 px-8 text-xs font-mono text-emerald-500 text-right">+4.1%</td>
+</tr>
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="py-4 px-10 text-sm">Returns &amp; Allowances</td>
+<td class="py-4 px-8 text-sm font-mono text-primary text-right">( $ 1,450.00 )</td>
+<td class="py-4 px-8 text-xs font-mono text-rose-500 text-right">-2.1%</td>
+</tr>
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="py-4 px-10 text-sm">Member Discounts</td>
+<td class="py-4 px-8 text-sm font-mono text-primary text-right">( $ 4,250.00 )</td>
+<td class="py-4 px-8 text-xs font-mono text-slate-400 text-right">0.0%</td>
+</tr>
+<!-- COGS SECTION -->
+<tr class="bg-primary/5">
+<td class="py-4 px-8 text-xs font-bold uppercase tracking-wider text-slate-300" colspan="3">Cost of Goods Sold (COGS)</td>
+</tr>
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="py-4 px-10 text-sm">Raw Materials: Flour &amp; Grains</td>
+<td class="py-4 px-8 text-sm font-mono text-primary text-right">$ 32,400.00</td>
+<td class="py-4 px-8 text-xs font-mono text-rose-500 text-right">+5.2%</td>
+</tr>
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="py-4 px-10 text-sm">Dairy &amp; Perishables</td>
+<td class="py-4 px-8 text-sm font-mono text-primary text-right">$ 21,150.00</td>
+<td class="py-4 px-8 text-xs font-mono text-emerald-500 text-right">-1.2%</td>
+</tr>
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="py-4 px-10 text-sm">Packaging Supplies</td>
+<td class="py-4 px-8 text-sm font-mono text-primary text-right">$ 8,900.00</td>
+<td class="py-4 px-8 text-xs font-mono text-rose-500 text-right">+2.4%</td>
+</tr>
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="py-4 px-10 text-sm">Production Waste</td>
+<td class="py-4 px-8 text-sm font-mono text-primary text-right">( $ 3,120.00 )</td>
+<td class="py-4 px-8 text-xs font-mono text-rose-500 text-right">+8.4%</td>
+</tr>
+<!-- GROSS PROFIT HIGHLIGHT -->
+<tr class="bg-primary/10 border-y-2 border-primary">
+<td class="py-6 px-8 text-md font-bold text-slate-100 uppercase tracking-widest">Gross Profit</td>
+<td class="py-6 px-8 text-lg font-mono text-primary font-bold text-right">$ 111,230.00</td>
+<td class="py-6 px-8 text-xs font-mono text-emerald-500 text-right">+6.2%</td>
+</tr>
+<!-- OPERATING EXPENSES -->
+<tr class="bg-primary/5">
+<td class="py-4 px-8 text-xs font-bold uppercase tracking-wider text-slate-300" colspan="3">Operating Expenses</td>
+</tr>
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="py-4 px-10 text-sm">Bakery Personnel (Labor)</td>
+<td class="py-4 px-8 text-sm font-mono text-primary text-right">$ 42,500.00</td>
+<td class="py-4 px-8 text-xs font-mono text-slate-400 text-right">0.0%</td>
+</tr>
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="py-4 px-10 text-sm">Facility Rent &amp; Insurance</td>
+<td class="py-4 px-8 text-sm font-mono text-primary text-right">$ 12,000.00</td>
+<td class="py-4 px-8 text-xs font-mono text-slate-400 text-right">0.0%</td>
+</tr>
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="py-4 px-10 text-sm">Marketing &amp; Boutique Branding</td>
+<td class="py-4 px-8 text-sm font-mono text-primary text-right">$ 5,500.00</td>
+<td class="py-4 px-8 text-xs font-mono text-rose-500 text-right">+15.0%</td>
+</tr>
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="py-4 px-10 text-sm">Utilities (Gas/Water/Electric)</td>
+<td class="py-4 px-8 text-sm font-mono text-primary text-right">$ 3,850.00</td>
+<td class="py-4 px-8 text-xs font-mono text-emerald-500 text-right">-4.2%</td>
+</tr>
+<!-- NET PROFIT HIGHLIGHT -->
+<tr class="bg-primary border-t-4 border-background-dark">
+<td class="py-10 px-8 text-2xl font-serif text-background-dark font-bold italic">Net Profit</td>
+<td class="py-10 px-8 text-3xl font-serif text-background-dark font-bold text-right">$ 47,380.00</td>
+<td class="py-10 px-8 text-sm font-mono text-background-dark/80 font-bold text-right">MAR 27.1%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Right Column: Analytics & Summaries -->
+<div class="col-span-12 xl:col-span-4 space-y-8">
+<!-- Performance Overview Card -->
+<div class="bg-surface p-8 rounded-xl border border-primary/10 shadow-xl">
+<h3 class="text-xs uppercase tracking-widest text-primary font-bold mb-8">Performance Snapshot</h3>
+<div class="space-y-6">
+<!-- Progress Bar 1 -->
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span class="text-slate-400">COGS Ratio</span>
+<span class="text-primary font-mono">42.0%</span>
+</div>
+<div class="w-full bg-background-dark h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 42%"></div>
+</div>
+</div>
+<!-- Progress Bar 2 -->
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span class="text-slate-400">Operating Expense Ratio</span>
+<span class="text-primary font-mono">30.9%</span>
+</div>
+<div class="w-full bg-background-dark h-2 rounded-full overflow-hidden">
+<div class="bg-primary/60 h-full" style="width: 30.9%"></div>
+</div>
+</div>
+<!-- Progress Bar 3 -->
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span class="text-slate-400">Net Margin Efficiency</span>
+<span class="text-primary font-mono">27.1%</span>
+</div>
+<div class="w-full bg-background-dark h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 27.1%"></div>
+</div>
+</div>
+</div>
+<div class="mt-12 p-6 bg-background-dark rounded-lg border border-primary/5">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-emerald-500/10 rounded-full">
+<span class="material-icons text-emerald-500">trending_up</span>
+</div>
+<div>
+<p class="text-xs text-slate-400">Monthly Growth</p>
+<p class="text-lg font-serif text-slate-100 italic">+8.4% <span class="text-sm font-display not-italic text-slate-500 ml-1">v. Jan</span></p>
+</div>
+</div>
+</div>
+</div>
+<!-- Expense Distribution -->
+<div class="bg-surface p-8 rounded-xl border border-primary/10 shadow-xl overflow-hidden relative">
+<h3 class="text-xs uppercase tracking-widest text-primary font-bold mb-8">Expense Distribution</h3>
+<div class="flex items-end justify-between gap-2 h-48">
+<div class="w-full bg-primary/20 hover:bg-primary/40 transition-all rounded-t-sm relative group h-[80%]" title="Labor">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-mono">65%</span>
+</div>
+<div class="w-full bg-primary/40 hover:bg-primary/60 transition-all rounded-t-sm relative group h-[40%]" title="Materials">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-mono">32%</span>
+</div>
+<div class="w-full bg-primary/60 hover:bg-primary/80 transition-all rounded-t-sm relative group h-[20%]" title="Rent">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-mono">18%</span>
+</div>
+<div class="w-full bg-primary hover:bg-primary/100 transition-all rounded-t-sm relative group h-[15%]" title="Utilities">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-mono">6%</span>
+</div>
+<div class="w-full bg-primary/30 hover:bg-primary/50 transition-all rounded-t-sm relative group h-[30%]" title="Marketing">
+<span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] opacity-0 group-hover:opacity-100 transition-opacity font-mono">11%</span>
+</div>
+</div>
+<div class="flex justify-between mt-4 text-[10px] text-slate-500 uppercase tracking-tighter font-semibold">
+<span>Lab</span>
+<span>Mat</span>
+<span>Rnt</span>
+<span>Utl</span>
+<span>Mkt</span>
+</div>
+</div>
+<!-- Quick Insights -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface p-6 rounded-xl border border-primary/10 text-center">
+<span class="material-icons text-primary/40 mb-2">restaurant</span>
+<p class="text-[10px] uppercase text-slate-500 tracking-widest">Avg Ticket</p>
+<p class="text-xl font-mono text-primary">$28.50</p>
+</div>
+<div class="bg-surface p-6 rounded-xl border border-primary/10 text-center">
+<span class="material-icons text-primary/40 mb-2">inventory_2</span>
+<p class="text-[10px] uppercase text-slate-500 tracking-widest">Waste %</p>
+<p class="text-xl font-mono text-primary">2.14%</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Statement Footer -->
+<footer class="mt-12 flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-500 uppercase tracking-[0.2em] border-t border-primary/10 pt-8">
+<p>© 2026 The Breakery Boutique. Internal use only.</p>
+<div class="flex gap-8 mt-4 md:mt-0">
+<span>Generated: Feb 28, 2026 11:59 PM</span>
+<span class="text-primary/60 italic font-serif lowercase tracking-normal text-sm">Artisanal Financial Management</span>
+</div>
+</footer>
+</div>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    \ }} />
+  );
+};
+
+export default Profit___Loss_Statement;

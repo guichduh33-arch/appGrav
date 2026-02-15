@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery Production &amp; Batching Logs</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#eead2b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#1A1A1D",
+                        "card-dark": "#222226",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1A1A1D; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #eead2b; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header Section -->
+<header class="border-b border-primary/10 bg-background-light dark:bg-background-dark sticky top-0 z-50">
+<div class="max-w-[1920px] mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-8">
+<h1 class="font-serif text-2xl text-primary tracking-wide">Production Logs &amp; Batching</h1>
+<nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-500 dark:text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">Overview</a>
+<a class="text-primary border-b-2 border-primary pb-1" href="#">Live Batches</a>
+<a class="hover:text-primary transition-colors" href="#">Inventory</a>
+<a class="hover:text-primary transition-colors" href="#">Yield Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/30 text-primary hover:bg-primary/10 transition-all text-sm font-medium">
+<span class="material-icons text-sm">analytics</span>
+                    Yield Analysis
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/30 text-primary hover:bg-primary/10 transition-all text-sm font-medium">
+<span class="material-icons text-sm">print</span>
+                    Print Schedule
+                </button>
+<button class="flex items-center gap-2 px-6 py-2.5 bg-primary text-background-dark rounded-lg font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+<span class="material-icons text-sm">add</span>
+                    Start New Batch
+                </button>
+</div>
+</div>
+</header>
+<main class="max-w-[1920px] mx-auto w-full flex flex-1 overflow-hidden">
+<!-- Main Content Area -->
+<div class="flex-1 overflow-y-auto p-6 space-y-8">
+<!-- Ongoing Batches Grid -->
+<section>
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-lg font-semibold flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                        Ongoing Batches
+                    </h2>
+<span class="text-xs text-slate-500 uppercase tracking-widest">3 Active Runs</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Card: Croissants -->
+<div class="bg-card-dark border border-white/5 rounded-xl p-5 hover:border-primary/40 transition-all group cursor-pointer ring-1 ring-inset ring-transparent hover:ring-primary/20">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-xl font-bold text-white group-hover:text-primary transition-colors">Butter Croissants</h3>
+<p class="text-xs text-slate-500 mt-1">Batch #104 • 240 Units</p>
+</div>
+<span class="px-2.5 py-1 bg-amber-500/10 text-amber-500 text-[10px] font-bold uppercase tracking-wider rounded border border-amber-500/20">Proofing</span>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between text-xs text-slate-400">
+<span>Progress</span>
+<span>65%</span>
+</div>
+<div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full w-[65%] shadow-[0_0_8px_rgba(238,173,43,0.4)]"></div>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-2 border-t border-white/5">
+<div>
+<p class="text-[10px] text-slate-500 uppercase">Started</p>
+<p class="text-sm font-medium">04:30 AM</p>
+</div>
+<div>
+<p class="text-[10px] text-slate-500 uppercase">Est. Finish</p>
+<p class="text-sm font-medium">09:15 AM</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Card: Sourdough -->
+<div class="bg-card-dark border border-white/5 rounded-xl p-5 hover:border-primary/40 transition-all group cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-xl font-bold text-white group-hover:text-primary transition-colors">Signature Sourdough</h3>
+<p class="text-xs text-slate-500 mt-1">Batch #105 • 80 Loaves</p>
+</div>
+<span class="px-2.5 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider rounded border border-primary/20">Baking</span>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between text-xs text-slate-400">
+<span>Progress</span>
+<span>88%</span>
+</div>
+<div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full w-[88%] shadow-[0_0_8px_rgba(238,173,43,0.4)]"></div>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-2 border-t border-white/5">
+<div>
+<p class="text-[10px] text-slate-500 uppercase">Started</p>
+<p class="text-sm font-medium">03:00 AM</p>
+</div>
+<div>
+<p class="text-[10px] text-slate-500 uppercase">Est. Finish</p>
+<p class="text-sm font-medium">07:45 AM</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Card: Pain au Chocolat -->
+<div class="bg-card-dark border border-white/5 rounded-xl p-5 hover:border-primary/40 transition-all group cursor-pointer">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-xl font-bold text-white group-hover:text-primary transition-colors">Pain au Chocolat</h3>
+<p class="text-xs text-slate-500 mt-1">Batch #106 • 120 Units</p>
+</div>
+<span class="px-2.5 py-1 bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider rounded border border-blue-500/20">Cooling</span>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between text-xs text-slate-400">
+<span>Progress</span>
+<span>95%</span>
+</div>
+<div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full w-[95%] shadow-[0_0_8px_rgba(238,173,43,0.4)]"></div>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-2 border-t border-white/5">
+<div>
+<p class="text-[10px] text-slate-500 uppercase">Started</p>
+<p class="text-sm font-medium">05:15 AM</p>
+</div>
+<div>
+<p class="text-[10px] text-slate-500 uppercase">Est. Finish</p>
+<p class="text-sm font-medium">08:30 AM</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Daily Yield Chart -->
+<section class="flex-1">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-lg font-semibold">Daily Production Yield</h2>
+<div class="flex items-center gap-4 text-xs">
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-3 bg-primary rounded-sm"></span>
+<span class="text-slate-400">Actual Yield</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-3 bg-white/10 rounded-sm"></span>
+<span class="text-slate-400">Target Batch</span>
+</div>
+</div>
+</div>
+<div class="bg-card-dark border border-white/5 rounded-xl p-8">
+<div class="h-64 flex items-end justify-between gap-4">
+<!-- Monday -->
+<div class="flex-1 flex flex-col items-center gap-4 group">
+<div class="relative w-full flex flex-col items-center justify-end h-full gap-1">
+<div class="w-full max-w-[40px] bg-white/10 rounded-t h-[95%]"></div>
+<div class="absolute bottom-0 w-full max-w-[40px] bg-primary rounded-t h-[90%] transition-all group-hover:bg-primary/80"></div>
+</div>
+<span class="text-xs text-slate-500">Mon</span>
+</div>
+<!-- Tuesday -->
+<div class="flex-1 flex flex-col items-center gap-4 group">
+<div class="relative w-full flex flex-col items-center justify-end h-full gap-1">
+<div class="w-full max-w-[40px] bg-white/10 rounded-t h-[90%]"></div>
+<div class="absolute bottom-0 w-full max-w-[40px] bg-primary rounded-t h-[88%] transition-all group-hover:bg-primary/80"></div>
+</div>
+<span class="text-xs text-slate-500">Tue</span>
+</div>
+<!-- Wednesday -->
+<div class="flex-1 flex flex-col items-center gap-4 group">
+<div class="relative w-full flex flex-col items-center justify-end h-full gap-1">
+<div class="w-full max-w-[40px] bg-white/10 rounded-t h-[100%]"></div>
+<div class="absolute bottom-0 w-full max-w-[40px] bg-primary rounded-t h-[98%] transition-all group-hover:bg-primary/80"></div>
+</div>
+<span class="text-xs text-slate-500">Wed</span>
+</div>
+<!-- Thursday -->
+<div class="flex-1 flex flex-col items-center gap-4 group">
+<div class="relative w-full flex flex-col items-center justify-end h-full gap-1">
+<div class="w-full max-w-[40px] bg-white/10 rounded-t h-[85%]"></div>
+<div class="absolute bottom-0 w-full max-w-[40px] bg-primary rounded-t h-[82%] transition-all group-hover:bg-primary/80"></div>
+</div>
+<span class="text-xs text-slate-500">Thu</span>
+</div>
+<!-- Friday -->
+<div class="flex-1 flex flex-col items-center gap-4 group">
+<div class="relative w-full flex flex-col items-center justify-end h-full gap-1">
+<div class="w-full max-w-[40px] bg-white/10 rounded-t h-[100%]"></div>
+<div class="absolute bottom-0 w-full max-w-[40px] bg-primary rounded-t h-[92%] transition-all group-hover:bg-primary/80"></div>
+</div>
+<span class="text-xs text-slate-500">Fri</span>
+</div>
+<!-- Saturday -->
+<div class="flex-1 flex flex-col items-center gap-4 group">
+<div class="relative w-full flex flex-col items-center justify-end h-full gap-1">
+<div class="w-full max-w-[40px] bg-white/10 rounded-t h-[100%]"></div>
+<div class="absolute bottom-0 w-full max-w-[40px] bg-primary rounded-t h-[100%] transition-all group-hover:bg-primary/80"></div>
+</div>
+<span class="text-xs text-slate-500">Sat</span>
+</div>
+<!-- Sunday -->
+<div class="flex-1 flex flex-col items-center gap-4 group">
+<div class="relative w-full flex flex-col items-center justify-end h-full gap-1">
+<div class="w-full max-w-[40px] bg-white/10 rounded-t h-[70%]"></div>
+<div class="absolute bottom-0 w-full max-w-[40px] bg-primary rounded-t h-[65%] transition-all group-hover:bg-primary/80"></div>
+</div>
+<span class="text-xs text-slate-500">Sun</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Sidebar: Recipe Requirements -->
+<aside class="w-96 border-l border-white/5 bg-card-dark p-6 flex flex-col gap-6">
+<div>
+<h2 class="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-1">Current Selection</h2>
+<h3 class="text-2xl font-serif text-white">Batch #104 Recipe</h3>
+<p class="text-sm text-slate-500">Butter Croissants (12:1 Dough)</p>
+</div>
+<div class="flex-1 space-y-4 overflow-y-auto">
+<div class="flex items-center justify-between pb-2 border-b border-white/5">
+<span class="text-xs text-slate-400 font-medium">Ingredient</span>
+<span class="text-xs text-slate-400 font-medium">Status</span>
+</div>
+<!-- Ingredient Item -->
+<div class="flex items-center justify-between group">
+<div>
+<p class="text-sm font-medium text-slate-200">T55 Pastry Flour</p>
+<p class="text-xs text-slate-500">50.0 kg required</p>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/20 text-green-500">
+<span class="material-icons text-sm">check_circle</span>
+<span class="text-[10px] font-bold uppercase">Reserved</span>
+</div>
+</div>
+<!-- Ingredient Item -->
+<div class="flex items-center justify-between group">
+<div>
+<p class="text-sm font-medium text-slate-200">Normandy Butter</p>
+<p class="text-xs text-slate-500">20.0 kg required</p>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500">
+<span class="material-icons text-sm">warning</span>
+<span class="text-[10px] font-bold uppercase">Low Stock</span>
+</div>
+</div>
+<!-- Ingredient Item -->
+<div class="flex items-center justify-between group">
+<div>
+<p class="text-sm font-medium text-slate-200">Whole Milk (Cold)</p>
+<p class="text-xs text-slate-500">12.5 L required</p>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/20 text-green-500">
+<span class="material-icons text-sm">check_circle</span>
+<span class="text-[10px] font-bold uppercase">Reserved</span>
+</div>
+</div>
+<!-- Ingredient Item -->
+<div class="flex items-center justify-between group">
+<div>
+<p class="text-sm font-medium text-slate-200">Granulated Sugar</p>
+<p class="text-xs text-slate-500">4.2 kg required</p>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/20 text-green-500">
+<span class="material-icons text-sm">check_circle</span>
+<span class="text-[10px] font-bold uppercase">Reserved</span>
+</div>
+</div>
+<!-- Ingredient Item -->
+<div class="flex items-center justify-between group">
+<div>
+<p class="text-sm font-medium text-slate-200">Fresh Yeast</p>
+<p class="text-xs text-slate-500">1.8 kg required</p>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/20 text-green-500">
+<span class="material-icons text-sm">check_circle</span>
+<span class="text-[10px] font-bold uppercase">Reserved</span>
+</div>
+</div>
+<!-- Ingredient Item -->
+<div class="flex items-center justify-between group">
+<div>
+<p class="text-sm font-medium text-slate-200">Sea Salt</p>
+<p class="text-xs text-slate-500">0.9 kg required</p>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/20 text-green-500">
+<span class="material-icons text-sm">check_circle</span>
+<span class="text-[10px] font-bold uppercase">Reserved</span>
+</div>
+</div>
+</div>
+<div class="pt-6 border-t border-white/5 space-y-4">
+<button class="w-full py-3 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2">
+<span class="material-icons text-sm">edit_note</span>
+                    Adjust Quantities
+                </button>
+<div class="p-4 rounded-lg bg-primary/5 border border-primary/20">
+<p class="text-xs text-primary font-bold uppercase tracking-wider mb-2">Note for Head Baker</p>
+<p class="text-xs text-slate-400 italic">"Ensure butter temperature is precisely 14°C before laminating to prevent shattering."</p>
+</div>
+</div>
+</aside>
+</main>
+<!-- Footer Stats -->
+<footer class="bg-background-dark border-t border-white/5 py-3 px-6">
+<div class="max-w-[1920px] mx-auto flex items-center justify-between text-[11px] text-slate-500 uppercase tracking-widest">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+<span>System Online: 05:42:11</span>
+</div>
+<div>Server: Lon-04 Production</div>
+</div>
+<div class="flex items-center gap-4">
+<span>© 2024 THE BREAKERY CO.</span>
+<span class="text-primary/50">V2.4.0-PROD</span>
+</div>
+</div>
+</footer>
+</body></html><!-- Images metadata --><!-- No specific images used, only UI components, icons and layout elements. 
+     If images were added, they would have data-alt attributes. -->

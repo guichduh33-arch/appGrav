@@ -1,0 +1,275 @@
+import React from 'react';
+
+const Promotions_Management: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: \
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery Promotions Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Work+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f9d406",
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#0D0D0F",
+                        "card-dark": "#1A1A1D",
+                        "border-dark": "#2A2A30",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans"],
+                        "serif": ["Playfair Display"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+        }
+        .serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        .backdrop-blur-custom {
+            backdrop-filter: blur(8px);
+            background-color: rgba(13, 13, 15, 0.85);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 min-h-screen">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full w-20 flex flex-col items-center py-8 bg-[#0D0D0F] border-r border-border-dark z-10">
+<div class="mb-10 text-primary">
+<span class="material-icons text-4xl">bakery_dining</span>
+</div>
+<nav class="flex flex-col gap-8 text-slate-500">
+<a class="hover:text-primary transition-colors" href="#"><span class="material-icons">dashboard</span></a>
+<a class="hover:text-primary transition-colors" href="#"><span class="material-icons">restaurant_menu</span></a>
+<a class="text-primary" href="#"><span class="material-icons">percent</span></a>
+<a class="hover:text-primary transition-colors" href="#"><span class="material-icons">analytics</span></a>
+<a class="hover:text-primary transition-colors" href="#"><span class="material-icons">settings</span></a>
+</nav>
+</aside>
+<!-- Main Content -->
+<main class="ml-20 p-8 lg:p-12">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-primary/10 rounded-xl">
+<span class="material-icons text-primary text-3xl">percent</span>
+</div>
+<div>
+<h1 class="serif-title text-3xl font-bold dark:text-white">Promotions</h1>
+<p class="text-slate-500 text-sm mt-1">Manage discount campaigns and marketing offers</p>
+</div>
+</div>
+<button class="flex items-center gap-2 bg-primary hover:bg-yellow-500 text-black px-6 py-3 rounded-lg font-semibold transition-all">
+<span class="material-icons text-xl">add</span>
+                New Promotion
+            </button>
+</header>
+<!-- Promotion Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Card 1: Active -->
+<div class="bg-card-dark border border-border-dark p-6 rounded-xl hover:border-primary/50 transition-all group">
+<div class="flex justify-between items-start mb-4">
+<span class="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-xs font-bold uppercase tracking-wider rounded-full">Active</span>
+<button class="text-slate-500 hover:text-white"><span class="material-icons">more_vert</span></button>
+</div>
+<h3 class="text-xl font-semibold mb-2 dark:text-white">Happy Hour 20% Off</h3>
+<div class="flex items-center gap-2 text-slate-400 text-sm mb-4">
+<span class="material-icons text-sm">schedule</span>
+<span>14:00 — 17:00 only</span>
+</div>
+<div class="mb-6">
+<div class="flex justify-between text-xs mb-2">
+<span class="text-slate-400 uppercase tracking-tighter">Usage</span>
+<span class="text-white font-medium">47 / 100 uses</span>
+</div>
+<div class="w-full bg-border-dark h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 47%"></div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-2 py-1 bg-primary/20 text-primary text-[10px] font-bold rounded uppercase tracking-widest border border-primary/20">Percentage</span>
+<span class="px-2 py-1 bg-slate-800 text-slate-400 text-[10px] font-bold rounded uppercase tracking-widest border border-slate-700">Dine-in</span>
+</div>
+</div>
+<!-- Card 2: Scheduled -->
+<div class="bg-card-dark border border-border-dark p-6 rounded-xl hover:border-primary/50 transition-all group">
+<div class="flex justify-between items-start mb-4">
+<span class="px-3 py-1 bg-blue-500/10 text-blue-500 text-xs font-bold uppercase tracking-wider rounded-full">Scheduled</span>
+<button class="text-slate-500 hover:text-white"><span class="material-icons">more_vert</span></button>
+</div>
+<h3 class="text-xl font-semibold mb-2 dark:text-white">Morning Croissant Deal</h3>
+<div class="flex items-center gap-2 text-slate-400 text-sm mb-4">
+<span class="material-icons text-sm">schedule</span>
+<span>07:00 — 09:00 only</span>
+</div>
+<div class="mb-6">
+<div class="flex justify-between text-xs mb-2">
+<span class="text-slate-400 uppercase tracking-tighter">Usage</span>
+<span class="text-white font-medium">12 / 50 uses</span>
+</div>
+<div class="w-full bg-border-dark h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 24%"></div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-2 py-1 bg-primary/20 text-primary text-[10px] font-bold rounded uppercase tracking-widest border border-primary/20">Fixed Amount</span>
+<span class="px-2 py-1 bg-slate-800 text-slate-400 text-[10px] font-bold rounded uppercase tracking-widest border border-slate-700">Early Bird</span>
+</div>
+</div>
+<!-- Card 3: Active -->
+<div class="bg-card-dark border border-border-dark p-6 rounded-xl hover:border-primary/50 transition-all group">
+<div class="flex justify-between items-start mb-4">
+<span class="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-xs font-bold uppercase tracking-wider rounded-full">Active</span>
+<button class="text-slate-500 hover:text-white"><span class="material-icons">more_vert</span></button>
+</div>
+<h3 class="text-xl font-semibold mb-2 dark:text-white">Weekend BOGO</h3>
+<div class="flex items-center gap-2 text-slate-400 text-sm mb-4">
+<span class="material-icons text-sm">calendar_today</span>
+<span>Sat — Sun only</span>
+</div>
+<div class="mb-6">
+<div class="flex justify-between text-xs mb-2">
+<span class="text-slate-400 uppercase tracking-tighter">Usage</span>
+<span class="text-white font-medium">80 / 200 uses</span>
+</div>
+<div class="w-full bg-border-dark h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 40%"></div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-2 py-1 bg-primary/20 text-primary text-[10px] font-bold rounded uppercase tracking-widest border border-primary/20">BOGO</span>
+<span class="px-2 py-1 bg-slate-800 text-slate-400 text-[10px] font-bold rounded uppercase tracking-widest border border-slate-700">Pastry</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-custom">
+<div class="bg-card-dark border border-border-dark w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl">
+<div class="sticky top-0 bg-card-dark/80 backdrop-blur-md px-8 py-6 border-b border-border-dark flex items-center justify-between z-20">
+<h2 class="serif-title text-2xl dark:text-white">New Promotion</h2>
+<button class="text-slate-500 hover:text-white"><span class="material-icons">close</span></button>
+</div>
+<div class="p-8 space-y-8">
+<!-- Discount Type -->
+<section>
+<label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Discount Type</label>
+<div class="grid grid-cols-3 gap-4">
+<button class="flex flex-col items-center gap-2 p-4 rounded-lg bg-primary text-black font-semibold border border-primary">
+<span class="material-icons">percent</span>
+<span class="text-sm">Percentage</span>
+</button>
+<button class="flex flex-col items-center gap-2 p-4 rounded-lg bg-background-dark text-slate-400 hover:text-primary transition-all border border-border-dark">
+<span class="material-icons">attach_money</span>
+<span class="text-sm">Fixed Amount</span>
+</button>
+<button class="flex flex-col items-center gap-2 p-4 rounded-lg bg-background-dark text-slate-400 hover:text-primary transition-all border border-border-dark">
+<span class="material-icons">card_giftcard</span>
+<span class="text-sm">BOGO Deal</span>
+</button>
+</div>
+</section>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Value & Usage -->
+<div class="space-y-6">
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Value</label>
+<div class="relative">
+<input class="w-full bg-background-dark border border-border-dark rounded-lg py-3 px-4 focus:ring-1 focus:ring-primary focus:border-primary text-white" type="number" value="20"/>
+<span class="absolute right-4 top-3 text-slate-500">%</span>
+</div>
+</div>
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Usage Limit</label>
+<input class="w-full bg-background-dark border border-border-dark rounded-lg py-3 px-4 focus:ring-1 focus:ring-primary focus:border-primary text-white" placeholder="e.g. 100" type="number"/>
+</div>
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Priority</label>
+<input class="w-full bg-background-dark border border-border-dark rounded-lg py-3 px-4 focus:ring-1 focus:ring-primary focus:border-primary text-white" type="number" value="1"/>
+</div>
+</div>
+<!-- Conditions -->
+<div class="space-y-6">
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Time Range</label>
+<div class="grid grid-cols-2 gap-2">
+<input class="bg-background-dark border border-border-dark rounded-lg py-3 px-2 focus:ring-1 focus:ring-primary focus:border-primary text-white text-sm" type="time" value="14:00"/>
+<input class="bg-background-dark border border-border-dark rounded-lg py-3 px-2 focus:ring-1 focus:ring-primary focus:border-primary text-white text-sm" type="time" value="17:00"/>
+</div>
+</div>
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Active Days</label>
+<div class="flex flex-wrap gap-2">
+<button class="w-9 h-9 flex items-center justify-center rounded-full border border-primary bg-primary text-black font-bold text-xs">M</button>
+<button class="w-9 h-9 flex items-center justify-center rounded-full border border-primary bg-primary text-black font-bold text-xs">T</button>
+<button class="w-9 h-9 flex items-center justify-center rounded-full border border-primary bg-primary text-black font-bold text-xs">W</button>
+<button class="w-9 h-9 flex items-center justify-center rounded-full border border-primary bg-primary text-black font-bold text-xs">T</button>
+<button class="w-9 h-9 flex items-center justify-center rounded-full border border-primary bg-primary text-black font-bold text-xs">F</button>
+<button class="w-9 h-9 flex items-center justify-center rounded-full border border-border-dark text-slate-500 hover:border-primary font-bold text-xs">S</button>
+<button class="w-9 h-9 flex items-center justify-center rounded-full border border-border-dark text-slate-500 hover:border-primary font-bold text-xs">S</button>
+</div>
+</div>
+<div>
+<label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Min Purchase</label>
+<div class="relative">
+<span class="absolute left-4 top-3 text-slate-500">$</span>
+<input class="w-full bg-background-dark border border-border-dark rounded-lg py-3 pl-8 pr-4 focus:ring-1 focus:ring-primary focus:border-primary text-white" placeholder="0.00" type="number"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Scope -->
+<section>
+<label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Product Scope</label>
+<div class="relative">
+<span class="absolute left-4 top-3 text-slate-500 material-icons text-xl">search</span>
+<input class="w-full bg-background-dark border border-border-dark rounded-lg py-3 pl-12 pr-4 focus:ring-1 focus:ring-primary focus:border-primary text-white" placeholder="Search products..." type="text"/>
+</div>
+<div class="flex flex-wrap gap-2 mt-4">
+<span class="flex items-center gap-1 px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs border border-slate-700">
+                            Artisan Sourdough <span class="material-icons text-xs cursor-pointer hover:text-white">close</span>
+</span>
+<span class="flex items-center gap-1 px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs border border-slate-700">
+                            French Baguette <span class="material-icons text-xs cursor-pointer hover:text-white">close</span>
+</span>
+<span class="flex items-center gap-1 px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs border border-slate-700">
+                            Cinnamon Rolls <span class="material-icons text-xs cursor-pointer hover:text-white">close</span>
+</span>
+</div>
+</section>
+<!-- Footer Actions -->
+<div class="flex items-center justify-end gap-4 pt-4 border-t border-border-dark">
+<button class="px-6 py-3 text-slate-400 font-semibold hover:text-white transition-colors">Discard</button>
+<button class="px-8 py-3 bg-primary hover:bg-yellow-500 text-black font-bold rounded-lg transition-all shadow-lg shadow-primary/20">Save Promotion</button>
+</div>
+</div>
+</div>
+</div>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    \ }} />
+  );
+};
+
+export default Promotions_Management;

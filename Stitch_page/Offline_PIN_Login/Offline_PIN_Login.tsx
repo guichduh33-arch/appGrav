@@ -1,0 +1,122 @@
+import React from 'react';
+
+const Offline_PIN_Login: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: \
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Playfair+Display:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f2a60d",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#0D0D0F", // Deep Onyx
+                        "charcoal": "#1A1A1D",
+                        "button-bg": "#1E1E22",
+                        "border-dark": "#2A2A30",
+                        "taupe-muted": "#8B8680",
+                        "cream": "#F5F5F0"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0D0D0F;
+        }
+    </style>
+</head>
+<body class="font-display text-cream antialiased min-h-screen flex items-center justify-center overflow-hidden">
+<!-- Top-Right Offline Badge -->
+<div class="fixed top-8 right-8 flex items-center gap-2 bg-primary/10 border border-primary/30 px-4 py-2 rounded-full">
+<span class="material-icons-outlined text-primary text-sm">wifi_off</span>
+<span class="text-primary text-xs font-semibold uppercase tracking-widest">Offline Mode</span>
+</div>
+<!-- Main Entry Card -->
+<main class="w-full max-w-[400px] bg-charcoal border border-border-dark rounded-xl shadow-2xl p-8 relative">
+<!-- Header Section -->
+<header class="text-center mb-8">
+<h1 class="font-serif text-3xl text-primary mb-2">Staff PIN Access</h1>
+<p class="text-taupe-muted text-sm font-light">Enter your 4-6 digit PIN</p>
+</header>
+<!-- User Greeting -->
+<div class="text-center mb-6">
+<div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3 border border-primary/40">
+<span class="material-icons-outlined text-primary text-3xl">person</span>
+</div>
+<h2 class="text-lg font-medium text-cream">Welcome back, Sarah</h2>
+</div>
+<!-- PIN Visualizer -->
+<div class="flex justify-center gap-4 mb-10">
+<!-- Filled Dot -->
+<div class="w-4 h-4 rounded-full bg-primary shadow-[0_0_12px_rgba(242,166,13,0.6)]"></div>
+<!-- Empty Dots -->
+<div class="w-4 h-4 rounded-full border-2 border-border-dark"></div>
+<div class="w-4 h-4 rounded-full border-2 border-border-dark"></div>
+<div class="w-4 h-4 rounded-full border-2 border-border-dark"></div>
+<div class="w-4 h-4 rounded-full border-2 border-border-dark"></div>
+<div class="w-4 h-4 rounded-full border-2 border-border-dark"></div>
+</div>
+<!-- Numeric Grid -->
+<div class="grid grid-cols-3 gap-3 mb-8">
+<button class="h-[72px] bg-button-bg border border-border-dark rounded-lg flex items-center justify-center text-2xl hover:bg-white/5 active:scale-95 transition-all">1</button>
+<button class="h-[72px] bg-button-bg border border-border-dark rounded-lg flex items-center justify-center text-2xl hover:bg-white/5 active:scale-95 transition-all">2</button>
+<button class="h-[72px] bg-button-bg border border-border-dark rounded-lg flex items-center justify-center text-2xl hover:bg-white/5 active:scale-95 transition-all">3</button>
+<button class="h-[72px] bg-button-bg border border-border-dark rounded-lg flex items-center justify-center text-2xl hover:bg-white/5 active:scale-95 transition-all">4</button>
+<button class="h-[72px] bg-button-bg border border-border-dark rounded-lg flex items-center justify-center text-2xl hover:bg-white/5 active:scale-95 transition-all">5</button>
+<button class="h-[72px] bg-button-bg border border-border-dark rounded-lg flex items-center justify-center text-2xl hover:bg-white/5 active:scale-95 transition-all">6</button>
+<button class="h-[72px] bg-button-bg border border-border-dark rounded-lg flex items-center justify-center text-2xl hover:bg-white/5 active:scale-95 transition-all">7</button>
+<button class="h-[72px] bg-button-bg border border-border-dark rounded-lg flex items-center justify-center text-2xl hover:bg-white/5 active:scale-95 transition-all">8</button>
+<button class="h-[72px] bg-button-bg border border-border-dark rounded-lg flex items-center justify-center text-2xl hover:bg-white/5 active:scale-95 transition-all">9</button>
+<div class="h-[72px]"></div>
+<button class="h-[72px] bg-button-bg border border-border-dark rounded-lg flex items-center justify-center text-2xl hover:bg-white/5 active:scale-95 transition-all">0</button>
+<button class="h-[72px] bg-button-bg border border-border-dark rounded-lg flex items-center justify-center text-2xl hover:bg-white/5 active:scale-95 transition-all text-primary/80">
+<span class="material-icons-outlined">backspace</span>
+</button>
+</div>
+<!-- Error Message -->
+<div class="flex items-center justify-center gap-2 mb-8 bg-red-500/10 py-3 px-4 rounded-lg border border-red-500/20">
+<span class="material-icons-outlined text-red-400 text-sm">report_problem</span>
+<p class="text-red-400 text-xs leading-tight">
+                Too many attempts. Try again in 15 minutes.
+            </p>
+</div>
+<!-- Footer Action -->
+<div class="text-center">
+<a class="text-sm text-primary/70 hover:text-primary transition-colors border-b border-primary/20 pb-0.5" href="#">
+                Switch to Email Login
+            </a>
+</div>
+</main>
+<!-- Background Decoration -->
+<div class="fixed -bottom-24 -left-24 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="fixed -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    \ }} />
+  );
+};
+
+export default Offline_PIN_Login;

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PO-2026-091 | The Breakery Purchase Order Details</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f2d00d",
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#1a1a1d", // Specific dark card base from request
+                        "page-dark": "#121214",      // Slightly darker page background
+                        "accent-blue": "#3b82f6",
+                        "accent-success": "#10b981",
+                        "accent-warning": "#f59e0b",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans"],
+                        "serif": ["Playfair Display"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+        }
+        .font-playfair {
+            font-family: 'Playfair Display', serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-page-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<!-- Header Section -->
+<header class="border-b border-primary/10 bg-white dark:bg-background-dark sticky top-0 z-10">
+<div class="max-w-[1920px] mx-auto px-8 py-6 flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3">
+<span class="material-icons text-primary text-3xl">bakery_dining</span>
+<h1 class="text-2xl font-playfair font-bold">PO-2026-091</h1>
+</div>
+<span class="px-3 py-1 bg-accent-blue/10 text-accent-blue border border-accent-blue/20 rounded-full text-xs font-bold tracking-wider">SENT</span>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-5 py-2.5 rounded-lg border border-primary/20 text-slate-600 dark:text-slate-300 hover:bg-primary/10 transition-colors font-medium flex items-center gap-2">
+<span class="material-icons text-sm">edit</span> Edit
+                </button>
+<button class="px-5 py-2.5 rounded-lg border border-primary/20 text-slate-600 dark:text-slate-300 hover:bg-primary/10 transition-colors font-medium flex items-center gap-2">
+<span class="material-icons text-sm">print</span> Print
+                </button>
+<button class="px-5 py-2.5 rounded-lg border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors font-medium flex items-center gap-2">
+<span class="material-icons text-sm">cancel</span> Cancel PO
+                </button>
+<button class="ml-4 px-6 py-2.5 rounded-lg bg-primary text-background-dark hover:bg-primary/90 transition-colors font-bold flex items-center gap-2 shadow-lg shadow-primary/10">
+<span class="material-icons text-xl">inventory_2</span> Receive Goods
+                </button>
+</div>
+</div>
+</header>
+<main class="max-w-[1920px] mx-auto p-8">
+<div class="grid grid-cols-1 lg:grid-cols-10 gap-8">
+<!-- LEFT COLUMN (65%) -->
+<div class="lg:col-span-6.5 space-y-8 flex flex-col">
+<!-- Info Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- PO Information -->
+<div class="bg-white dark:bg-background-dark p-6 rounded-xl border border-primary/5 shadow-sm">
+<div class="flex items-center gap-2 mb-4 text-primary">
+<span class="material-icons text-xl">info</span>
+<h3 class="font-semibold uppercase tracking-wider text-xs">PO Information</h3>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between">
+<span class="text-slate-500 dark:text-slate-400 text-sm">Order Date</span>
+<span class="font-medium">Feb 10, 2026</span>
+</div>
+<div class="flex justify-between">
+<span class="text-slate-500 dark:text-slate-400 text-sm">Expected Delivery</span>
+<span class="font-medium">Feb 20, 2026</span>
+</div>
+<div class="flex justify-between">
+<span class="text-slate-500 dark:text-slate-400 text-sm">Warehouse Location</span>
+<span class="font-medium">Central Distribution</span>
+</div>
+</div>
+</div>
+<!-- Supplier Information -->
+<div class="bg-white dark:bg-background-dark p-6 rounded-xl border border-primary/5 shadow-sm">
+<div class="flex items-center gap-2 mb-4 text-primary">
+<span class="material-icons text-xl">store</span>
+<h3 class="font-semibold uppercase tracking-wider text-xs">Supplier Information</h3>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between">
+<span class="text-slate-500 dark:text-slate-400 text-sm">Vendor</span>
+<span class="font-medium">Flour Mill Co.</span>
+</div>
+<div class="flex justify-between">
+<span class="text-slate-500 dark:text-slate-400 text-sm">Payment Terms</span>
+<span class="font-medium">NET 30</span>
+</div>
+<div class="flex justify-between">
+<span class="text-slate-500 dark:text-slate-400 text-sm">Contact</span>
+<span class="font-medium">James Baker</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Items Table -->
+<div class="bg-white dark:bg-background-dark rounded-xl border border-primary/5 shadow-sm overflow-hidden">
+<div class="p-6 border-b border-primary/5 flex justify-between items-center">
+<h3 class="font-playfair text-xl font-bold">Order Items</h3>
+<span class="text-xs text-slate-500 uppercase tracking-widest">3 Line Items</span>
+</div>
+<table class="w-full text-left">
+<thead>
+<tr class="bg-slate-50 dark:bg-page-dark/50 border-b border-primary/5 text-xs font-bold uppercase tracking-wider text-slate-500">
+<th class="px-6 py-4">Product</th>
+<th class="px-6 py-4 text-center">Qty Ordered</th>
+<th class="px-6 py-4 text-center">Qty Received</th>
+<th class="px-6 py-4 text-right">Unit Price</th>
+<th class="px-6 py-4 text-right">Total</th>
+<th class="px-6 py-4 text-center">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-primary/5">
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-icons">grain</span>
+</div>
+<div>
+<div class="font-semibold text-sm">Organic Bread Flour</div>
+<div class="text-xs text-slate-500">SKU: OBF-202</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 text-center font-medium">500 kg</td>
+<td class="px-6 py-5 text-center font-medium">500 kg</td>
+<td class="px-6 py-5 text-right text-slate-500">$2.45</td>
+<td class="px-6 py-5 text-right font-semibold">$1,225.00</td>
+<td class="px-6 py-5 text-center">
+<span class="material-icons text-accent-success text-lg" title="Fully Received">check_circle</span>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-icons">science</span>
+</div>
+<div>
+<div class="font-semibold text-sm">Artisan Yeast</div>
+<div class="text-xs text-slate-500">SKU: AY-991</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 text-center font-medium">50 units</td>
+<td class="px-6 py-5 text-center font-medium">25 units</td>
+<td class="px-6 py-5 text-right text-slate-500">$12.00</td>
+<td class="px-6 py-5 text-right font-semibold">$600.00</td>
+<td class="px-6 py-5 text-center">
+<span class="material-icons text-accent-warning text-lg" title="Partially Received">warning</span>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-icons">waves</span>
+</div>
+<div>
+<div class="font-semibold text-sm">Sea Salt (Fine)</div>
+<div class="text-xs text-slate-500">SKU: SS-102</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 text-center font-medium">100 kg</td>
+<td class="px-6 py-5 text-center font-medium">0 kg</td>
+<td class="px-6 py-5 text-right text-slate-500">$1.50</td>
+<td class="px-6 py-5 text-right font-semibold">$150.00</td>
+<td class="px-6 py-5 text-center">
+<span class="material-icons text-slate-400 text-lg" title="Pending">hourglass_empty</span>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Totals Summary -->
+<div class="bg-slate-50 dark:bg-page-dark/30 p-8 flex justify-end">
+<div class="w-full max-w-xs space-y-3">
+<div class="flex justify-between text-sm text-slate-500">
+<span>Subtotal</span>
+<span>$1,975.00</span>
+</div>
+<div class="flex justify-between text-sm text-slate-500">
+<span>Tax (5%)</span>
+<span>$98.75</span>
+</div>
+<div class="flex justify-between text-sm text-slate-500 pb-3 border-b border-primary/10">
+<span>Shipping</span>
+<span>$45.00</span>
+</div>
+<div class="flex justify-between items-center pt-2">
+<span class="font-bold text-lg uppercase tracking-wider">Grand Total</span>
+<span class="text-2xl font-bold text-primary">$2,118.75</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN (35%) -->
+<div class="lg:col-span-3.5 space-y-8">
+<!-- PO Timeline Card -->
+<div class="bg-white dark:bg-background-dark p-8 rounded-xl border border-primary/5 shadow-sm">
+<h3 class="font-playfair text-xl font-bold mb-8">PO Timeline</h3>
+<div class="relative space-y-12">
+<!-- Vertical Line -->
+<div class="absolute left-[15px] top-2 bottom-2 w-0.5 bg-primary/10"></div>
+<!-- Timeline Item 3 (Latest) -->
+<div class="relative flex gap-6">
+<div class="z-10 w-8 h-8 rounded-full bg-accent-warning/20 border-2 border-accent-warning flex items-center justify-center">
+<span class="material-icons text-sm text-accent-warning">local_shipping</span>
+</div>
+<div>
+<h4 class="font-bold text-sm">Partially Received</h4>
+<p class="text-xs text-slate-500 mt-1 italic">"Received first batch of flour and half the yeast. Missing salt."</p>
+<div class="flex items-center gap-2 mt-2">
+<div class="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of Mike the warehouse staff" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCm261dJmhPC8ckFrVF7OceMnfEIEbAdM_fhKNYt2my-CwTCU3kqh9BON_vtNF_WH1yOg5Yl_hajipbXVMPBk7fU-925YV-MqPSB_q2aQJqgzJU3ID2PqR6rHZE2z0-sPxQCcT7t3O74MxPGoIXNzkDi7IiBE3yNVxokchAb2s3go0176RGLl0mIkfNweGOmFGknRJ8TvsSaJvK8Eg-M2HPePILGgVTHL9TDkazGJT5BIoWZBKXMo9Crb89ZUdfKO4AlG49oCiF10Ol"/>
+</div>
+<span class="text-xs font-medium">Mike R. • Feb 15, 2:30 PM</span>
+</div>
+</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative flex gap-6">
+<div class="z-10 w-8 h-8 rounded-full bg-accent-blue/20 border-2 border-accent-blue flex items-center justify-center">
+<span class="material-icons text-sm text-accent-blue">send</span>
+</div>
+<div>
+<h4 class="font-bold text-sm">Sent to Supplier</h4>
+<p class="text-xs text-slate-500 mt-1">Order transmitted via EDI system to Flour Mill Co.</p>
+<div class="flex items-center gap-2 mt-2">
+<div class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-icons text-[10px] text-primary">dns</span>
+</div>
+<span class="text-xs font-medium">System Auto • Feb 10, 9:15 AM</span>
+</div>
+</div>
+</div>
+<!-- Timeline Item 1 -->
+<div class="relative flex gap-6">
+<div class="z-10 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center">
+<span class="material-icons text-sm">add</span>
+</div>
+<div>
+<h4 class="font-bold text-sm text-slate-400">PO Created</h4>
+<p class="text-xs text-slate-500 mt-1">Initial draft and approval workflow completed.</p>
+<div class="flex items-center gap-2 mt-2">
+<div class="w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of Sarah the manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfnU3dQVfVR9FSWTWSVyAUuAfSS0ZsA0I00LaES-AFyRtb77-MJEjipQjy2mSuSjsrhjHgSxnaFANU8-xg7QWX6xtXdTVK7HuKe85RJNjZWkk4iXa-5-vPgBLOT_N_35Em26uwkGMpQMl3dKOb3nVeto5IiD-yJ7CjJWeBCJRz-c6ex7ltVWMsNDM244ndMzPLJ8y3_b-2UFHY_mitCF694NgbBQetXiraWEfo2nBrMDeImNdvZUL1KESUKUalmLQpeWrJOfU2osFU"/>
+</div>
+<span class="text-xs font-medium">Sarah W. • Feb 10, 8:45 AM</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Warehouse View Shortcut -->
+<div class="relative group rounded-xl overflow-hidden aspect-video border border-primary/10 shadow-lg">
+<img class="absolute inset-0 w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500" data-alt="Aerial view of a clean modern warehouse interior" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDf6zbrh2zxeHDrfeUtGUTj4lLul0xe477T_lBCtsauf7oB7sl7WJk2DduHvyxXq2o1TqZcuoI6L9aD1_Yeg-H7ydK1lLpx0AaidEMgKo5o8ptV4XmgU-ioz1r8FFpNvzKDwfYWlo8ni9OjdRto_tsq4ap_Bfd4gRG4wkCoM3udmwTZc3BTcO8fDqW3M-nJyG5fG_q9vlNua9TT6-lKk1RJ1S3Cip3qCAP5peMRjt4A99c2NdeHQvQCZlwYR9JE65D-fyVwiKwGAF0p"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/60 to-transparent"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<p class="text-[10px] uppercase tracking-[0.2em] font-bold text-primary mb-1">Assigned Warehouse</p>
+<h4 class="text-lg font-bold">Central Distribution Center</h4>
+<div class="flex items-center gap-2 mt-2">
+<span class="material-icons text-xs">location_on</span>
+<span class="text-xs text-slate-300" data-location="Chicago, USA">1200 Logistics Way, Chicago IL</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Meta -->
+<footer class="max-w-[1920px] mx-auto px-8 py-12 flex justify-between items-center border-t border-primary/5 text-slate-500 text-xs">
+<p>© 2026 The Breakery Luxe Management System</p>
+<div class="flex gap-6">
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-primary transition-colors" href="#">Support Portal</a>
+</div>
+</footer>
+</body></html>

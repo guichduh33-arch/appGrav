@@ -1,0 +1,385 @@
+import React from 'react';
+
+const Advanced_B2B_Order_Form: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: \
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery | Advanced B2B Order Form</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#eead2b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#120f0a",
+                        "surface-dark": "#221c10",
+                        "border-gold": "rgba(238, 173, 43, 0.2)",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #120f0a;
+            color: #f8f7f6;
+        }
+        .serif-header {
+            font-family: 'Playfair Display', serif;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none !important;
+            border-color: #eead2b !important;
+            box-shadow: 0 0 0 1px #eead2b !important;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #221c10;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3d3421;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #eead2b;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col">
+<!-- Header / Brand Area -->
+<header class="h-16 border-b border-border-gold px-8 flex items-center justify-between bg-surface-dark/50 backdrop-blur-md sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-background-dark">
+<span class="material-icons">bakery_dining</span>
+</div>
+<div>
+<h1 class="serif-header text-xl font-bold tracking-tight text-primary">The Breakery</h1>
+<p class="text-[10px] uppercase tracking-[0.2em] opacity-60">Wholesale Portal</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right">
+<p class="text-xs opacity-50">Logged in as</p>
+<p class="text-sm font-medium">Marcus Vane (Admin)</p>
+</div>
+<img alt="Profile" class="w-10 h-10 rounded-full border border-primary/30" data-alt="Portrait of a male admin user" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_OsepdO1fHPu87BKe4nkBqLcL_TZMhF23nYLz_Rli9jcGbad97wb6lQ_RFbl9S5q9k-bUqnQP0Z85_-TKzP70gM5jxURJe51MBf_MxqAMJBHmPxbt9SY0ZLEc9xIIhi2RrFlN7X94b3J-HOJGSBh-ujN6T01bzITPfOzRdhXfyg3fPy93FphLewiKnQNB4_tcQrBYid1eiTqWA438TV3ZtZAfzC-qMhBbWfz9My1Z1O6MLr3WtftHnRDXLq5vstsH4RFm_46W_lcl"/>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-72 border-r border-border-gold bg-surface-dark flex flex-col pt-8">
+<nav class="flex-1 space-y-1 px-4">
+<!-- Step 1: Active -->
+<div class="relative group cursor-pointer bg-primary/10 rounded-lg p-4 border-l-4 border-primary">
+<div class="flex items-center gap-4">
+<span class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-background-dark font-bold text-sm">1</span>
+<div>
+<p class="text-sm font-bold text-primary">Client &amp; Delivery</p>
+<p class="text-[11px] opacity-60">Logistics &amp; Partners</p>
+</div>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="relative group cursor-pointer hover:bg-white/5 rounded-lg p-4 border-l-4 border-transparent">
+<div class="flex items-center gap-4">
+<span class="w-8 h-8 rounded-full border border-primary/40 flex items-center justify-center text-primary font-bold text-sm">2</span>
+<div>
+<p class="text-sm font-medium opacity-80 group-hover:opacity-100">Order Items</p>
+<p class="text-[11px] opacity-40">Bulk SKU Entry</p>
+</div>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="relative group cursor-pointer hover:bg-white/5 rounded-lg p-4 border-l-4 border-transparent opacity-50">
+<div class="flex items-center gap-4">
+<span class="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white/50 font-bold text-sm">3</span>
+<div>
+<p class="text-sm font-medium">Discounts &amp; Adjustments</p>
+<p class="text-[11px] opacity-60">Wholesale Tier Pricing</p>
+</div>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="relative group cursor-pointer hover:bg-white/5 rounded-lg p-4 border-l-4 border-transparent opacity-50">
+<div class="flex items-center gap-4">
+<span class="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-white/50 font-bold text-sm">4</span>
+<div>
+<p class="text-sm font-medium">Payment &amp; Terms</p>
+<p class="text-[11px] opacity-60">Net-30 Invoice Setup</p>
+</div>
+</div>
+</div>
+</nav>
+<div class="p-6 border-t border-border-gold">
+<div class="bg-primary/5 rounded-xl p-4 border border-border-gold">
+<p class="text-[10px] uppercase font-bold text-primary/70 mb-2">System Status</p>
+<div class="flex items-center gap-2 mb-1">
+<div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+<span class="text-xs">Inventory Sync Live</span>
+</div>
+<p class="text-[10px] opacity-40 italic">Last sync: 2 mins ago</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark/40 pb-32">
+<div class="max-w-5xl mx-auto p-10">
+<header class="mb-10">
+<h2 class="serif-header text-4xl font-bold mb-2">Create Wholesale Order</h2>
+<p class="text-slate-400">Step 1 of 4: Logistic configuration and partner identification.</p>
+</header>
+<div class="grid grid-cols-12 gap-8">
+<!-- Left Column: Form Fields -->
+<div class="col-span-8 space-y-8">
+<!-- Client Search -->
+<section class="bg-surface-dark border border-border-gold p-6 rounded-xl shadow-xl">
+<label class="block text-sm font-semibold text-primary/80 mb-3 uppercase tracking-wider">Client Search</label>
+<div class="relative">
+<span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-primary/50">search</span>
+<input class="w-full bg-background-dark border border-white/10 rounded-lg py-4 pl-12 pr-4 text-white focus:border-primary transition-all" placeholder="Search by partner name or tax ID..." type="text" value="Morning Glow Café &amp; Bakery"/>
+<!-- Dropdown Preview (Absolute) -->
+<div class="mt-2 bg-surface-dark border border-border-gold rounded-lg shadow-2xl overflow-hidden">
+<div class="px-4 py-2 bg-white/5 border-b border-border-gold/50">
+<p class="text-[10px] font-bold text-primary/60 uppercase">Recent Wholesale Partners</p>
+</div>
+<div class="divide-y divide-white/5">
+<div class="px-4 py-3 flex items-center justify-between hover:bg-primary/10 cursor-pointer group">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary/20 flex items-center justify-center text-primary">MG</div>
+<div>
+<p class="text-sm font-medium">Morning Glow Café &amp; Bakery</p>
+<p class="text-[11px] opacity-50">Downtown • Tier A Account</p>
+</div>
+</div>
+<span class="material-icons text-primary opacity-0 group-hover:opacity-100">check_circle</span>
+</div>
+<div class="px-4 py-3 flex items-center justify-between hover:bg-primary/10 cursor-pointer group">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-white/10 flex items-center justify-center">RH</div>
+<div>
+<p class="text-sm font-medium">Riverside Hotel Group</p>
+<p class="text-[11px] opacity-50">West Side • Tier B Account</p>
+</div>
+</div>
+<span class="material-icons text-primary opacity-0 group-hover:opacity-100">check_circle</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Logistics Route Selection -->
+<section class="bg-surface-dark border border-border-gold p-6 rounded-xl shadow-xl">
+<label class="block text-sm font-semibold text-primary/80 mb-4 uppercase tracking-wider">Route Selection</label>
+<div class="grid grid-cols-2 gap-4">
+<label class="cursor-pointer group">
+<input checked="" class="hidden peer" name="route" type="radio"/>
+<div class="h-full p-4 border-2 border-white/5 rounded-xl bg-background-dark peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+<div class="flex items-center justify-between mb-2">
+<span class="material-icons text-primary">delivery_dining</span>
+<div class="w-4 h-4 rounded-full border-2 border-white/20 flex items-center justify-center peer-checked:border-primary">
+<div class="w-2 h-2 rounded-full bg-primary scale-0 transition-transform peer-checked:scale-100"></div>
+</div>
+</div>
+<p class="font-bold text-lg">Downtown Zone</p>
+<p class="text-xs opacity-60">Daily route, leaves at 05:30 AM. Standard $15 fee.</p>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="hidden peer" name="route" type="radio"/>
+<div class="h-full p-4 border-2 border-white/5 rounded-xl bg-background-dark peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+<div class="flex items-center justify-between mb-2">
+<span class="material-icons opacity-40">map</span>
+<div class="w-4 h-4 rounded-full border-2 border-white/20 flex items-center justify-center"></div>
+</div>
+<p class="font-bold text-lg">West Side Zone</p>
+<p class="text-xs opacity-60">Mon/Wed/Fri route, leaves 06:15 AM. Standard $22 fee.</p>
+</div>
+</label>
+</div>
+</section>
+<!-- Order Items Preview Table -->
+<section class="bg-surface-dark border border-border-gold p-6 rounded-xl shadow-xl">
+<div class="flex items-center justify-between mb-6">
+<label class="text-sm font-semibold text-primary/80 uppercase tracking-wider">Quick Add: Order Items</label>
+<div class="relative w-64">
+<span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-xs opacity-40">add</span>
+<input class="w-full bg-background-dark/50 border border-white/10 rounded-full py-1.5 pl-9 pr-4 text-xs" placeholder="Type SKU or Product..." type="text"/>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm">
+<thead class="bg-white/5">
+<tr>
+<th class="py-3 px-4 font-bold text-[10px] uppercase opacity-40">SKU</th>
+<th class="py-3 px-4 font-bold text-[10px] uppercase opacity-40">Product</th>
+<th class="py-3 px-4 font-bold text-[10px] uppercase opacity-40 text-center">Qty</th>
+<th class="py-3 px-4 font-bold text-[10px] uppercase opacity-40 text-right">Unit Price</th>
+<th class="py-3 px-4 font-bold text-[10px] uppercase opacity-40 text-right">Subtotal</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="py-4 px-4 font-mono text-primary/70">BK-SOUR-01</td>
+<td class="py-4 px-4 font-medium">Artisan Sourdough - Bulk</td>
+<td class="py-4 px-4 text-center">
+<input class="w-16 bg-background-dark border border-white/10 rounded px-2 py-1 text-center text-primary" step="0.1" type="number" value="10.3"/>
+</td>
+<td class="py-4 px-4 text-right opacity-60">$4.50</td>
+<td class="py-4 px-4 text-right font-bold text-primary">$46.35</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="py-4 px-4 font-mono text-primary/70">BK-CROIS-04</td>
+<td class="py-4 px-4 font-medium">Butter Croissant (Large)</td>
+<td class="py-4 px-4 text-center">
+<input class="w-16 bg-background-dark border border-white/10 rounded px-2 py-1 text-center text-primary" type="number" value="24"/>
+</td>
+<td class="py-4 px-4 text-right opacity-60">$2.10</td>
+<td class="py-4 px-4 text-right font-bold text-primary">$50.40</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="py-4 px-4 font-mono text-primary/70">BK-BAG-12</td>
+<td class="py-4 px-4 font-medium">Sesame Bagel - Dozen Pack</td>
+<td class="py-4 px-4 text-center">
+<input class="w-16 bg-background-dark border border-white/10 rounded px-2 py-1 text-center text-primary" type="number" value="5"/>
+</td>
+<td class="py-4 px-4 text-right opacity-60">$18.00</td>
+<td class="py-4 px-4 text-right font-bold text-primary">$90.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- Right Column: Calendar Widget -->
+<div class="col-span-4 space-y-6">
+<section class="bg-surface-dark border border-border-gold p-6 rounded-xl shadow-xl overflow-hidden relative">
+<label class="block text-sm font-semibold text-primary/80 mb-6 uppercase tracking-wider">Delivery Date</label>
+<!-- Custom Calendar Grid -->
+<div class="text-center">
+<div class="flex items-center justify-between mb-4">
+<button class="material-icons text-primary/50 hover:text-primary">chevron_left</button>
+<span class="font-bold serif-header text-lg">October 2023</span>
+<button class="material-icons text-primary/50 hover:text-primary">chevron_right</button>
+</div>
+<div class="grid grid-cols-7 gap-1 text-[10px] uppercase font-bold opacity-30 mb-2">
+<div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+</div>
+<div class="grid grid-cols-7 gap-1">
+<!-- Prev Month -->
+<div class="py-2 text-xs opacity-10">29</div>
+<div class="py-2 text-xs opacity-10">30</div>
+<!-- Current Month -->
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">1</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">2</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">3</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">4</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">5</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">6</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">7</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">8</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">9</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">10</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">11</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer font-bold bg-primary text-background-dark rounded-md">12</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">13</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">14</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">15</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">16</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">17</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">18</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">19</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">20</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">21</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">22</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">23</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">24</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">25</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">26</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">27</div>
+<div class="py-2 text-xs hover:bg-primary/10 rounded-md cursor-pointer">28</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-white/5 space-y-3">
+<div class="flex justify-between text-xs">
+<span class="opacity-60">Selected Date:</span>
+<span class="text-primary font-bold uppercase">Oct 12, 2023</span>
+</div>
+<div class="flex justify-between text-xs">
+<span class="opacity-60">Estimated ETA:</span>
+<span class="font-medium">06:45 AM - 07:15 AM</span>
+</div>
+</div>
+</section>
+<div class="p-6 bg-primary/10 border border-primary/20 rounded-xl">
+<h4 class="text-primary font-bold text-sm mb-2 flex items-center gap-2">
+<span class="material-icons text-base">info</span>
+                                Logistics Note
+                            </h4>
+<p class="text-xs leading-relaxed opacity-80">
+                                This client requires delivery to the back alley entrance after 6:00 AM. Key code is stored in encrypted vault.
+                            </p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Sticky Footer Actions -->
+<footer class="fixed bottom-0 left-0 right-0 bg-surface-dark border-t border-border-gold px-8 py-4 z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+<div class="max-w-7xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-12">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-bold opacity-40">Subtotal (3 items)</span>
+<span class="text-xl font-bold serif-header">$186.75</span>
+</div>
+<div class="flex flex-col border-l border-white/10 pl-12">
+<span class="text-[10px] uppercase font-bold opacity-40">Delivery Fee</span>
+<span class="text-xl font-bold serif-header">$15.00</span>
+</div>
+<div class="flex flex-col border-l border-white/10 pl-12">
+<span class="text-[10px] uppercase font-bold text-primary/80">Est. Total</span>
+<span class="text-2xl font-bold serif-header text-primary">$201.75</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-sm font-medium hover:text-primary transition-colors">Save as Draft</button>
+<button class="bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 px-8 rounded-lg flex items-center gap-2 transition-all transform hover:translate-y-[-1px] active:translate-y-[1px]">
+<span>Next: Item Customization</span>
+<span class="material-icons text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</footer>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    \ }} />
+  );
+};
+
+export default Advanced_B2B_Order_Form;

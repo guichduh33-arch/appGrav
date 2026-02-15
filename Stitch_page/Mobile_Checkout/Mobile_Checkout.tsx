@@ -1,0 +1,211 @@
+import React from 'react';
+
+const Mobile_Checkout: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: \
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery Mobile Checkout</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f2a60d",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#0D0D0F",
+                        "surface-dark": "#1A1A1D",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            overscroll-behavior-y: contain;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased flex justify-center items-center min-h-screen">
+<!-- Mobile Container (390x844) -->
+<div class="relative w-[390px] h-[844px] bg-background-light dark:bg-background-dark overflow-hidden flex flex-col shadow-2xl border border-slate-200 dark:border-white/5">
+<!-- Header -->
+<header class="flex items-center justify-between px-6 pt-12 pb-4 bg-background-light dark:bg-background-dark sticky top-0 z-30">
+<button class="w-10 h-10 flex items-center justify-start text-slate-400 hover:text-primary transition-colors">
+<span class="material-icons-round">chevron_left</span>
+</button>
+<h1 class="text-lg font-semibold tracking-tight">Your Order</h1>
+<button class="text-sm font-medium text-slate-500 hover:text-red-500 transition-colors">
+                Clear
+            </button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto hide-scrollbar px-5 pb-8">
+<!-- Items List -->
+<div class="space-y-4 mb-8">
+<!-- Item 1 -->
+<div class="flex items-center justify-between group">
+<div class="flex-1">
+<h3 class="font-medium text-slate-900 dark:text-slate-100">Pain au Chocolat</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">Freshly Baked</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center border border-primary/40 rounded-lg p-1">
+<button class="w-8 h-8 flex items-center justify-center text-primary">
+<span class="material-icons-round text-sm">remove</span>
+</button>
+<span class="w-8 text-center text-sm font-semibold">2</span>
+<button class="w-8 h-8 flex items-center justify-center text-primary">
+<span class="material-icons-round text-sm">add</span>
+</button>
+</div>
+<span class="text-sm font-semibold w-20 text-right">Rp 64.000</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center justify-between">
+<div class="flex-1">
+<h3 class="font-medium text-slate-900 dark:text-slate-100">Iced Latte</h3>
+<p class="text-xs text-primary font-medium italic">Oat Milk</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center border border-primary/40 rounded-lg p-1">
+<button class="w-8 h-8 flex items-center justify-center text-primary">
+<span class="material-icons-round text-sm">remove</span>
+</button>
+<span class="w-8 text-center text-sm font-semibold">1</span>
+<button class="w-8 h-8 flex items-center justify-center text-primary">
+<span class="material-icons-round text-sm">add</span>
+</button>
+</div>
+<span class="text-sm font-semibold w-20 text-right">Rp 45.000</span>
+</div>
+</div>
+<!-- Item 3 (Swipe to Delete State) -->
+<div class="relative h-16 rounded-lg overflow-hidden flex items-center">
+<!-- Swipe Action Background -->
+<div class="absolute inset-0 bg-red-600 flex items-center justify-end px-6">
+<span class="material-icons-round text-white">delete_outline</span>
+</div>
+<!-- Card Foreground (Swiped Left) -->
+<div class="absolute inset-0 bg-background-light dark:bg-background-dark translate-x-[-80px] flex items-center justify-between border-b border-slate-100 dark:border-white/5">
+<div class="flex-1">
+<h3 class="font-medium text-slate-900 dark:text-slate-100">Sourdough Loaf</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">Whole Grain</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center border border-primary/40 rounded-lg p-1">
+<button class="w-8 h-8 flex items-center justify-center text-primary">
+<span class="material-icons-round text-sm">remove</span>
+</button>
+<span class="w-8 text-center text-sm font-semibold">1</span>
+<button class="w-8 h-8 flex items-center justify-center text-primary">
+<span class="material-icons-round text-sm">add</span>
+</button>
+</div>
+<span class="text-sm font-semibold w-20 text-right">Rp 38.000</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Order Options -->
+<div class="space-y-6">
+<!-- Segmented Control -->
+<div class="p-1 bg-slate-100 dark:bg-white/5 rounded-xl flex">
+<button class="flex-1 py-2 text-xs font-semibold bg-white dark:bg-primary text-slate-900 dark:text-background-dark rounded-lg shadow-sm transition-all">
+                        Dine-in
+                    </button>
+<button class="flex-1 py-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                        Takeaway
+                    </button>
+<button class="flex-1 py-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                        Delivery
+                    </button>
+</div>
+<!-- Form Inputs -->
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="text-[10px] uppercase tracking-wider font-bold text-slate-500">Table No.</label>
+<input class="w-full bg-slate-100 dark:bg-white/5 border-none rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-primary text-slate-900 dark:text-white" placeholder="12" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] uppercase tracking-wider font-bold text-slate-500">Guest Count</label>
+<input class="w-full bg-slate-100 dark:bg-white/5 border-none rounded-lg px-4 py-3 text-sm focus:ring-1 focus:ring-primary text-slate-900 dark:text-white" placeholder="2" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-[10px] uppercase tracking-wider font-bold text-slate-500">Customer</label>
+<div class="relative">
+<span class="material-icons-round absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm">search</span>
+<input class="w-full bg-slate-100 dark:bg-white/5 border-none rounded-lg pl-11 pr-4 py-3 text-sm focus:ring-1 focus:ring-primary text-slate-900 dark:text-white placeholder:text-slate-600" placeholder="Search Customer..." type="text"/>
+</div>
+</div>
+</div>
+</main>
+<!-- Sticky Totals Card -->
+<footer class="bg-slate-100 dark:bg-surface-dark border-t-2 border-primary/20 dark:border-primary px-6 pt-6 pb-10 rounded-t-xl">
+<div class="space-y-2 mb-6">
+<div class="flex justify-between items-center text-sm">
+<span class="text-slate-500">Subtotal</span>
+<span class="font-medium">Rp 230.000</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-slate-500">Discount (Staff 10%)</span>
+<span class="font-medium text-primary">- Rp 23.000</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-slate-500">Tax &amp; Service (10%)</span>
+<span class="font-medium">Rp 23.000</span>
+</div>
+<div class="flex justify-between items-center pt-3 mt-2 border-t border-slate-200 dark:border-white/5">
+<span class="text-base font-bold">Total</span>
+<span class="text-xl font-bold text-primary tracking-tight">Rp 256.500</span>
+</div>
+</div>
+<button class="w-full h-14 bg-primary text-background-dark font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span>Place Order</span>
+<span class="opacity-30">—</span>
+<span>Rp 256.500</span>
+</button>
+</footer>
+<!-- iOS Indicator -->
+<div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-slate-300 dark:bg-white/10 rounded-full"></div>
+</div>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    \ }} />
+  );
+};
+
+export default Mobile_Checkout;

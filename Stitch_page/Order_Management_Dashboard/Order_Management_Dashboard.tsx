@@ -1,0 +1,305 @@
+import React from 'react';
+
+const Order_Management_Dashboard: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: \
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery Order Management Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#eebd2b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#0D0D0F", // Specific request
+                        "surface-dark": "#1A1A1D",    // Specific request
+                    },
+                    fontFamily: {
+                        "display": ["Epilogue"],
+                        "serif": ["Playfair Display"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Epilogue', sans-serif; }
+        .serif-font { font-family: 'Playfair Display', serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .voided-row { background-color: rgba(239, 68, 68, 0.05) !important; text-decoration: line-through; color: #9ca3af; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<!-- Sidebar (Optional but helpful for context) -->
+<div class="fixed left-0 top-0 h-full w-20 bg-surface-dark border-r border-primary/10 flex flex-col items-center py-8 gap-10">
+<div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-background-dark font-bold text-xl serif-font">B</div>
+<nav class="flex flex-col gap-8">
+<span class="material-icons-outlined text-primary">dashboard</span>
+<span class="material-icons-outlined text-slate-500 hover:text-primary cursor-pointer">shopping_bag</span>
+<span class="material-icons-outlined text-slate-500 hover:text-primary cursor-pointer">inventory_2</span>
+<span class="material-icons-outlined text-slate-500 hover:text-primary cursor-pointer">people</span>
+<span class="material-icons-outlined text-slate-500 hover:text-primary cursor-pointer">settings</span>
+</nav>
+</div>
+<!-- Main Content -->
+<main class="ml-20 p-8 max-w-7xl mx-auto">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+<div>
+<h1 class="serif-font text-4xl font-bold dark:text-white">Orders</h1>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Manage your bakery operations efficiently.</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center bg-surface-dark border border-white/10 rounded-lg px-3 py-2 text-sm">
+<span class="material-icons-outlined text-slate-400 text-lg mr-2">calendar_today</span>
+<span class="dark:text-slate-200">Oct 24, 2023 - Oct 30, 2023</span>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-background-dark font-semibold px-6 py-2.5 rounded-lg flex items-center gap-2 transition-all">
+<span class="material-icons-outlined text-lg">file_download</span>
+                    Export CSV
+                </button>
+</div>
+</header>
+<!-- KPI Cards Section -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+<div class="bg-surface-dark p-6 rounded-xl border border-white/5 shadow-xl">
+<p class="text-slate-400 text-sm font-medium mb-2 uppercase tracking-wider">Today's Orders</p>
+<div class="flex items-end justify-between">
+<span class="text-3xl font-bold">47</span>
+<div class="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded-full">+12%</div>
+</div>
+</div>
+<div class="bg-surface-dark p-6 rounded-xl border border-white/5 shadow-xl">
+<p class="text-slate-400 text-sm font-medium mb-2 uppercase tracking-wider">Revenue</p>
+<div class="flex items-end justify-between">
+<span class="text-3xl font-bold serif-font">Rp 4.125k</span>
+<div class="bg-emerald-500/10 text-emerald-500 text-xs font-bold px-2 py-1 rounded-full">+8%</div>
+</div>
+</div>
+<div class="bg-surface-dark p-6 rounded-xl border border-white/5 shadow-xl">
+<p class="text-slate-400 text-sm font-medium mb-2 uppercase tracking-wider">Average Ticket</p>
+<div class="flex items-end justify-between">
+<span class="text-3xl font-bold serif-font">Rp 87.7k</span>
+<div class="bg-slate-500/10 text-slate-400 text-xs font-bold px-2 py-1 rounded-full">0%</div>
+</div>
+</div>
+<div class="bg-surface-dark p-6 rounded-xl border border-white/5 shadow-xl">
+<p class="text-slate-400 text-sm font-medium mb-2 uppercase tracking-wider">Completion Rate</p>
+<div class="flex items-end justify-between">
+<span class="text-3xl font-bold">94.5%</span>
+<div class="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded-full">+2.4%</div>
+</div>
+</div>
+</section>
+<!-- Filter & Table Section -->
+<div class="bg-surface-dark rounded-xl border border-white/5 shadow-2xl overflow-hidden">
+<!-- Filters & Search -->
+<div class="p-6 border-b border-white/5">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+<div class="flex border-b border-white/10 no-scrollbar overflow-x-auto">
+<button class="px-4 py-3 text-sm font-semibold border-b-2 border-primary text-primary whitespace-nowrap">All</button>
+<button class="px-4 py-3 text-sm font-medium text-slate-400 hover:text-white transition-colors whitespace-nowrap">Pending</button>
+<button class="px-4 py-3 text-sm font-medium text-slate-400 hover:text-white transition-colors whitespace-nowrap">Preparing</button>
+<button class="px-4 py-3 text-sm font-medium text-slate-400 hover:text-white transition-colors whitespace-nowrap">Ready</button>
+<button class="px-4 py-3 text-sm font-medium text-slate-400 hover:text-white transition-colors whitespace-nowrap">Completed</button>
+<button class="px-4 py-3 text-sm font-medium text-slate-400 hover:text-white transition-colors whitespace-nowrap">Voided</button>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative group">
+<span class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary">search</span>
+<input class="bg-background-dark border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm w-64 focus:ring-1 focus:ring-primary focus:border-primary transition-all text-slate-200" placeholder="Search orders..." type="text"/>
+</div>
+</div>
+</div>
+<!-- Order Type Chips -->
+<div class="flex flex-wrap gap-2 mt-6">
+<button class="px-4 py-1.5 rounded-full bg-primary/20 text-primary border border-primary/30 text-xs font-bold">All Types</button>
+<button class="px-4 py-1.5 rounded-full bg-background-dark text-slate-400 border border-white/10 text-xs font-bold hover:border-primary/50 transition-colors flex items-center gap-1.5">
+<span class="material-icons-outlined text-sm">restaurant</span> Dine-in
+                    </button>
+<button class="px-4 py-1.5 rounded-full bg-background-dark text-slate-400 border border-white/10 text-xs font-bold hover:border-primary/50 transition-colors flex items-center gap-1.5">
+<span class="material-icons-outlined text-sm">local_mall</span> Takeaway
+                    </button>
+<button class="px-4 py-1.5 rounded-full bg-background-dark text-slate-400 border border-white/10 text-xs font-bold hover:border-primary/50 transition-colors flex items-center gap-1.5">
+<span class="material-icons-outlined text-sm">delivery_dining</span> Delivery
+                    </button>
+</div>
+</div>
+<!-- Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-white/5 uppercase text-[10px] tracking-widest text-slate-500 font-bold">
+<tr>
+<th class="px-6 py-4">Order #</th>
+<th class="px-6 py-4">Time</th>
+<th class="px-6 py-4">Type</th>
+<th class="px-6 py-4">Customer</th>
+<th class="px-6 py-4">Items</th>
+<th class="px-6 py-4">Total Price</th>
+<th class="px-6 py-4">Payment</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<!-- Row 1: Ready -->
+<tr class="hover:bg-white/5 transition-colors cursor-pointer group">
+<td class="px-6 py-4 font-bold text-primary">#BRK-8921</td>
+<td class="px-6 py-4 text-sm text-slate-400">14:20</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2 text-sm">
+<span class="material-icons-outlined text-slate-500 text-lg">restaurant</span>
+                                    Dine-in
+                                </div>
+</td>
+<td class="px-6 py-4 font-medium">Aria Sterling</td>
+<td class="px-6 py-4 text-sm text-slate-400">3 Items</td>
+<td class="px-6 py-4 font-bold serif-font">Rp 124.000</td>
+<td class="px-6 py-4">
+<span class="material-icons-outlined text-slate-400" title="Credit Card">credit_card</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wide">Ready</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="material-icons-outlined text-slate-600 group-hover:text-white transition-colors">more_horiz</span>
+</td>
+</tr>
+<!-- Row 2: Preparing -->
+<tr class="hover:bg-white/5 transition-colors cursor-pointer group">
+<td class="px-6 py-4 font-bold text-primary">#BRK-8920</td>
+<td class="px-6 py-4 text-sm text-slate-400">14:15</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2 text-sm">
+<span class="material-icons-outlined text-slate-500 text-lg">local_mall</span>
+                                    Takeaway
+                                </div>
+</td>
+<td class="px-6 py-4 font-medium">Julian Drax</td>
+<td class="px-6 py-4 text-sm text-slate-400">1 Item</td>
+<td class="px-6 py-4 font-bold serif-font">Rp 45.500</td>
+<td class="px-6 py-4">
+<span class="material-icons-outlined text-slate-400" title="QR Payment">qr_code_2</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full bg-amber-500/10 text-amber-500 text-[10px] font-bold uppercase tracking-wide">Preparing</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="material-icons-outlined text-slate-600 group-hover:text-white transition-colors">more_horiz</span>
+</td>
+</tr>
+<!-- Row 3: Completed -->
+<tr class="hover:bg-white/5 transition-colors cursor-pointer group">
+<td class="px-6 py-4 font-bold text-primary">#BRK-8919</td>
+<td class="px-6 py-4 text-sm text-slate-400">13:55</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2 text-sm">
+<span class="material-icons-outlined text-slate-500 text-lg">delivery_dining</span>
+                                    Delivery
+                                </div>
+</td>
+<td class="px-6 py-4 font-medium">Elena Thorne</td>
+<td class="px-6 py-4 text-sm text-slate-400">6 Items</td>
+<td class="px-6 py-4 font-bold serif-font">Rp 312.000</td>
+<td class="px-6 py-4">
+<span class="material-icons-outlined text-slate-400" title="Credit Card">credit_card</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-wide">Completed</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="material-icons-outlined text-slate-600 group-hover:text-white transition-colors">more_horiz</span>
+</td>
+</tr>
+<!-- Row 4: Voided (Special Styling) -->
+<tr class="voided-row cursor-not-allowed">
+<td class="px-6 py-4 font-bold">#BRK-8918</td>
+<td class="px-6 py-4 text-sm">13:40</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2 text-sm opacity-50">
+<span class="material-icons-outlined text-lg">restaurant</span>
+                                    Dine-in
+                                </div>
+</td>
+<td class="px-6 py-4 font-medium">Marcus Vane</td>
+<td class="px-6 py-4 text-sm">2 Items</td>
+<td class="px-6 py-4 font-bold serif-font text-slate-600">Rp 88.000</td>
+<td class="px-6 py-4">
+<span class="material-icons-outlined opacity-30">credit_card</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full bg-red-500/10 text-red-500 text-[10px] font-bold uppercase tracking-wide line-through decoration-transparent">Voided</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="material-icons-outlined opacity-20">more_horiz</span>
+</td>
+</tr>
+<!-- Row 5: Pending -->
+<tr class="hover:bg-white/5 transition-colors cursor-pointer group">
+<td class="px-6 py-4 font-bold text-primary">#BRK-8917</td>
+<td class="px-6 py-4 text-sm text-slate-400">13:30</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2 text-sm">
+<span class="material-icons-outlined text-slate-500 text-lg">local_mall</span>
+                                    Takeaway
+                                </div>
+</td>
+<td class="px-6 py-4 font-medium">Lila Chen</td>
+<td class="px-6 py-4 text-sm text-slate-400">4 Items</td>
+<td class="px-6 py-4 font-bold serif-font">Rp 156.000</td>
+<td class="px-6 py-4">
+<span class="material-icons-outlined text-slate-400" title="Cash">payments</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full bg-slate-500/10 text-slate-400 text-[10px] font-bold uppercase tracking-wide">Pending</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="material-icons-outlined text-slate-600 group-hover:text-white transition-colors">more_horiz</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-6 border-t border-white/5 flex items-center justify-between">
+<span class="text-sm text-slate-500">Showing 1 to 5 of 47 orders</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-background-dark border border-white/10 text-slate-500 hover:text-white transition-colors">
+<span class="material-icons-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-background-dark font-bold">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-background-dark border border-white/10 text-slate-400 hover:text-white transition-colors">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-background-dark border border-white/10 text-slate-400 hover:text-white transition-colors">3</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-background-dark border border-white/10 text-slate-400 hover:text-white transition-colors">
+<span class="material-icons-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Footer Info -->
+<footer class="mt-12 text-center text-slate-600 text-xs">
+            © 2023 The Breakery Bakery Management System. All rights reserved.
+        </footer>
+</main>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    \ }} />
+  );
+};
+
+export default Order_Management_Dashboard;

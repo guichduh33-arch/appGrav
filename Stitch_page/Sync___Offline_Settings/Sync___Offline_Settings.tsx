@@ -1,0 +1,282 @@
+import React from 'react';
+
+const Sync___Offline_Settings: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: \
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Sync &amp; Offline Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#c8a45b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#0d0d0f",
+                        "surface-dark": "#1a1a1d",
+                        "warning-gold": "#d97706",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0d0d0f; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c8a45b33; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #c8a45b66; }
+        
+        /* Hide accordion content by default */
+        .accordion-content { display: none; }
+        .accordion-item:focus-within .accordion-content { display: block; }
+        .accordion-item:focus-within .chevron-icon { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-zinc-800 dark:text-zinc-200 min-h-screen flex flex-col">
+<!-- Header Section -->
+<header class="border-b border-primary/10 bg-background-light/50 dark:bg-background-dark/50 backdrop-blur-md sticky top-0 z-50">
+<div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-icons text-primary text-3xl">refresh</span>
+<h1 class="font-serif text-2xl tracking-wide">Sync &amp; Offline</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-xs font-semibold text-primary uppercase tracking-widest">
+                    Advanced Console
+                </div>
+</div>
+</div>
+</header>
+<!-- Warning Banner -->
+<div class="bg-amber-950/30 border-b border-amber-500/20 py-3">
+<div class="max-w-6xl mx-auto px-6 flex items-center gap-3">
+<span class="material-icons text-amber-500 text-xl">warning</span>
+<p class="text-amber-200/80 text-sm font-medium">
+                Advanced Settings: Changes to sync parameters may affect data consistency across baking terminals and inventory systems.
+            </p>
+</div>
+</div>
+<!-- Main Content Area -->
+<main class="flex-grow max-w-6xl mx-auto w-full px-6 py-10 pb-32">
+<!-- Presets Grid -->
+<section class="mb-12">
+<h2 class="text-xs font-bold text-primary uppercase tracking-widest mb-6">Connection Presets</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Stable Connection (Active) -->
+<button class="relative text-left group border-2 border-primary bg-primary/5 p-6 rounded-xl transition-all">
+<div class="absolute -top-3 left-6 bg-primary text-background-dark text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-tighter">Recommended</div>
+<div class="flex items-center gap-4 mb-3">
+<div class="p-2 bg-primary/20 rounded-lg text-primary">
+<span class="material-icons">wifi</span>
+</div>
+<h3 class="font-semibold text-zinc-100">Stable Connection</h3>
+</div>
+<p class="text-sm text-zinc-400 leading-relaxed">Optimized for high-speed fiber. Real-time updates and full asset caching enabled.</p>
+</button>
+<!-- Unstable Connection -->
+<button class="text-left group border border-primary/10 bg-surface-dark hover:border-primary/40 p-6 rounded-xl transition-all">
+<div class="flex items-center gap-4 mb-3">
+<div class="p-2 bg-zinc-800 rounded-lg text-zinc-400 group-hover:text-primary transition-colors">
+<span class="material-icons">signal_wifi_off</span>
+</div>
+<h3 class="font-semibold text-zinc-300">Unstable Connection</h3>
+</div>
+<p class="text-sm text-zinc-500 leading-relaxed">Aggressive retries and smaller packet sizes for fluctuating kitchen networks.</p>
+</button>
+<!-- Battery Saver -->
+<button class="text-left group border border-primary/10 bg-surface-dark hover:border-primary/40 p-6 rounded-xl transition-all">
+<div class="flex items-center gap-4 mb-3">
+<div class="p-2 bg-zinc-800 rounded-lg text-zinc-400 group-hover:text-primary transition-colors">
+<span class="material-icons">battery_saver</span>
+</div>
+<h3 class="font-semibold text-zinc-300">Battery Saver</h3>
+</div>
+<p class="text-sm text-zinc-500 leading-relaxed">Minimal background activity for mobile inventory tablets. Sync only on action.</p>
+</button>
+</div>
+</section>
+<!-- Configuration Accordions -->
+<section class="space-y-4">
+<h2 class="text-xs font-bold text-primary uppercase tracking-widest mb-6">Detailed Configuration</h2>
+<!-- Sync Timing -->
+<div class="accordion-item outline-none group bg-surface-dark border border-primary/10 rounded-xl overflow-hidden" tabindex="1">
+<div class="flex items-center justify-between p-5 cursor-pointer hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-4">
+<span class="material-icons text-primary/60">schedule</span>
+<span class="font-medium">Sync Timing</span>
+</div>
+<span class="material-icons chevron-icon text-zinc-500 transition-transform">expand_more</span>
+</div>
+<div class="accordion-content p-6 pt-0 border-t border-primary/5">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div>
+<label class="block text-sm font-medium text-zinc-400 mb-2">Auto-sync Interval (seconds)</label>
+<input class="w-full bg-background-dark border-primary/20 rounded-lg text-primary focus:ring-primary focus:border-primary" type="number" value="30"/>
+<p class="mt-2 text-xs text-zinc-500 italic">Frequency of background data reconciliation.</p>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<label class="block text-sm font-medium text-zinc-300">Background Syncing</label>
+<p class="text-xs text-zinc-500">Sync data while app is in background</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Queue Management -->
+<div class="accordion-item outline-none group bg-surface-dark border border-primary/10 rounded-xl overflow-hidden" tabindex="2">
+<div class="flex items-center justify-between p-5 cursor-pointer hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-4">
+<span class="material-icons text-primary/60">reorder</span>
+<span class="font-medium">Queue Management</span>
+</div>
+<span class="material-icons chevron-icon text-zinc-500 transition-transform">expand_more</span>
+</div>
+<div class="accordion-content p-6 pt-0 border-t border-primary/5">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div>
+<label class="block text-sm font-medium text-zinc-400 mb-2">Max Retry Attempts</label>
+<div class="flex items-center gap-4">
+<input class="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-primary" type="range"/>
+<span class="text-primary font-bold w-4">5</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<label class="block text-sm font-medium text-zinc-300">Priority Overriding</label>
+<p class="text-xs text-zinc-500">Prioritize orders over stock updates</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Cache TTL -->
+<div class="accordion-item outline-none group bg-surface-dark border border-primary/10 rounded-xl overflow-hidden" tabindex="3">
+<div class="flex items-center justify-between p-5 cursor-pointer hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-4">
+<span class="material-icons text-primary/60">storage</span>
+<span class="font-medium">Cache TTL (Time to Live)</span>
+</div>
+<span class="material-icons chevron-icon text-zinc-500 transition-transform">expand_more</span>
+</div>
+<div class="accordion-content p-6 pt-0 border-t border-primary/5">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div>
+<label class="block text-sm font-medium text-zinc-400 mb-2">Product Images (Hours)</label>
+<input class="w-full bg-background-dark border-primary/20 rounded-lg text-primary focus:ring-primary focus:border-primary" type="number" value="24"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-zinc-400 mb-2">Inventory Lists (Minutes)</label>
+<input class="w-full bg-background-dark border-primary/20 rounded-lg text-primary focus:ring-primary focus:border-primary" type="number" value="15"/>
+</div>
+</div>
+</div>
+</div>
+<!-- LAN Settings -->
+<div class="accordion-item outline-none group bg-surface-dark border border-primary/10 rounded-xl overflow-hidden" tabindex="4">
+<div class="flex items-center justify-between p-5 cursor-pointer hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-4">
+<span class="material-icons text-primary/60">lan</span>
+<span class="font-medium">LAN Settings</span>
+</div>
+<span class="material-icons chevron-icon text-zinc-500 transition-transform">expand_more</span>
+</div>
+<div class="accordion-content p-6 pt-0 border-t border-primary/5">
+<div class="bg-primary/5 p-4 rounded-lg flex items-center gap-4">
+<span class="material-icons text-primary">info</span>
+<p class="text-sm text-zinc-300">Peer-to-peer syncing allows terminal sync without an active internet connection if on the same router.</p>
+</div>
+<div class="mt-6">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-zinc-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+<span class="ml-3 text-sm font-medium text-zinc-300">Enable Local Mesh Sync</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Debug -->
+<div class="accordion-item outline-none group bg-surface-dark border border-primary/10 rounded-xl overflow-hidden" tabindex="5">
+<div class="flex items-center justify-between p-5 cursor-pointer hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-4">
+<span class="material-icons text-primary/60">bug_report</span>
+<span class="font-medium text-zinc-400 italic">Advanced: Debug Options</span>
+</div>
+<span class="material-icons chevron-icon text-zinc-500 transition-transform">expand_more</span>
+</div>
+<div class="accordion-content p-6 pt-0 border-t border-primary/5">
+<div class="space-y-4">
+<button class="w-full text-left p-3 rounded bg-zinc-800/50 text-xs text-red-400 border border-red-900/30 hover:bg-red-900/20 transition-colors">
+                            CLEAR ALL CACHED DATA &amp; REBOOT
+                        </button>
+<button class="w-full text-left p-3 rounded bg-zinc-800/50 text-xs text-zinc-400 border border-zinc-700/30">
+                            DOWNLOAD LOG FILES (.TXT)
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Fixed Sync Status Panel -->
+<footer class="fixed bottom-0 left-0 right-0 bg-surface-dark border-t border-primary h-20 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] z-50">
+<div class="max-w-6xl mx-auto h-full px-6 flex items-center justify-between">
+<div class="flex items-center gap-8">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-tighter text-zinc-500 font-bold">Queue Status</span>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+<span class="text-sm font-medium">3 Items Pending</span>
+</div>
+</div>
+<div class="h-8 w-px bg-zinc-800"></div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-tighter text-zinc-500 font-bold">Last Sync</span>
+<span class="text-sm font-medium">2 mins ago</span>
+</div>
+<div class="h-8 w-px bg-zinc-800 hidden md:block"></div>
+<div class="flex-col hidden md:flex">
+<span class="text-[10px] uppercase tracking-tighter text-zinc-500 font-bold">Endpoint</span>
+<span class="text-sm font-medium text-zinc-400">api.thebreakery.internal</span>
+</div>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-background-dark px-6 py-3 rounded-lg font-bold flex items-center gap-2 transition-transform active:scale-95">
+<span class="material-icons text-sm">sync</span>
+                Force Sync Now
+            </button>
+</div>
+</footer>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    \ }} />
+  );
+};
+
+export default Sync___Offline_Settings;

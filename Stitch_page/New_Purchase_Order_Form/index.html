@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - New Purchase Order</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f2d00d",
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#12110a",
+                        "charcoal": "#1A1A1D",
+                        "surface": "#221f10",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans"],
+                        "serif": ["Playfair Display"],
+                        "mono": ["JetBrains Mono"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #12110a; }
+        ::-webkit-scrollbar-thumb { background: #221f10; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f2d00d33; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<!-- Header Section -->
+<header class="sticky top-0 z-30 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10 px-8 py-6">
+<div class="max-w-7xl mx-auto flex justify-between items-end">
+<div>
+<nav class="flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400 mb-2">
+<span>Procurement</span>
+<span class="material-icons text-xs">chevron_right</span>
+<span>Purchase Orders</span>
+</nav>
+<h1 class="text-4xl font-playfair font-bold text-slate-900 dark:text-white">New Purchase Order</h1>
+</div>
+<div class="text-right">
+<span class="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400 block mb-1">PO Reference</span>
+<span class="text-2xl font-mono text-primary">PO-2026-092</span>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-8 py-10 pb-32">
+<div class="grid grid-cols-12 gap-8">
+<!-- Left Column: Supplier & Logistics -->
+<div class="col-span-12 lg:col-span-8 space-y-8">
+<!-- Supplier Selection -->
+<section class="bg-charcoal rounded-xl border border-primary/5 p-6 shadow-2xl">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-lg font-semibold flex items-center">
+<span class="material-icons text-primary mr-2">storefront</span>
+                            Supplier Details
+                        </h2>
+</div>
+<div class="space-y-6">
+<div class="relative">
+<label class="block text-xs font-medium text-slate-400 uppercase tracking-tighter mb-2">Search Vendor</label>
+<div class="relative">
+<span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">search</span>
+<input class="w-full bg-background-dark/50 border border-slate-700 rounded-lg pl-12 pr-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none" type="text" value="Gourmet Mills Co."/>
+</div>
+</div>
+<!-- Info Card -->
+<div class="grid grid-cols-2 gap-6 bg-background-dark/30 rounded-lg p-5 border border-slate-800">
+<div>
+<p class="text-xs text-slate-500 uppercase mb-1">Contact Person</p>
+<p class="text-sm font-medium">Marcello Valentino</p>
+<p class="text-xs text-slate-400 mt-1">m.valentino@gourmetmills.it</p>
+</div>
+<div>
+<p class="text-xs text-slate-500 uppercase mb-1">Warehouse Address</p>
+<p class="text-sm font-medium leading-relaxed">Via delle Farine 82, Industrial District<br/>Milan, IT 20121</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Logistics Grid -->
+<section class="grid grid-cols-2 gap-6">
+<div class="bg-charcoal rounded-xl border border-primary/5 p-6">
+<label class="block text-xs font-medium text-slate-400 uppercase tracking-tighter mb-2">PO Date</label>
+<div class="relative">
+<input class="w-full bg-background-dark/50 border border-slate-700 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary outline-none" type="date" value="2026-09-12"/>
+</div>
+</div>
+<div class="bg-charcoal rounded-xl border border-primary/5 p-6">
+<label class="block text-xs font-medium text-slate-400 uppercase tracking-tighter mb-2">Expected Delivery</label>
+<div class="relative">
+<input class="w-full bg-background-dark/50 border border-slate-700 rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary outline-none" type="date" value="2026-09-15"/>
+</div>
+</div>
+</section>
+<!-- Items Table -->
+<section class="bg-charcoal rounded-xl border border-primary/5 overflow-hidden shadow-2xl">
+<div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center">
+<h2 class="text-lg font-semibold">Order Items</h2>
+<span class="text-xs text-slate-500">2 Items Selected</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-background-dark/50 text-[10px] uppercase tracking-widest text-slate-400">
+<th class="px-6 py-4 font-medium">Product / SKU</th>
+<th class="px-4 py-4 font-medium">Stock</th>
+<th class="px-4 py-4 font-medium text-center">Qty</th>
+<th class="px-4 py-4 font-medium">Unit</th>
+<th class="px-4 py-4 font-medium">Price</th>
+<th class="px-6 py-4 font-medium text-right">Total</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-800">
+<!-- Row 1 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="font-medium">Bread Flour (High Protein)</div>
+<div class="text-[10px] font-mono text-slate-500">SKU-BF-001</div>
+</td>
+<td class="px-4 py-4">
+<span class="inline-block px-2 py-0.5 rounded bg-red-500/10 text-red-400 text-[10px] font-bold uppercase">Critical: 15kg</span>
+</td>
+<td class="px-4 py-4">
+<input class="w-16 bg-background-dark border border-slate-700 rounded text-center py-1 text-sm" type="number" value="25"/>
+</td>
+<td class="px-4 py-4 text-sm text-slate-400">Bag (1kg)</td>
+<td class="px-4 py-4 font-mono text-sm">$ 2.40</td>
+<td class="px-6 py-4 text-right font-mono font-bold">$ 60.00</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="font-medium">Cultured Butter (Salted)</div>
+<div class="text-[10px] font-mono text-slate-500">SKU-BT-092</div>
+</td>
+<td class="px-4 py-4 text-sm text-slate-400">12kg</td>
+<td class="px-4 py-4">
+<input class="w-16 bg-background-dark border border-slate-700 rounded text-center py-1 text-sm" type="number" value="10"/>
+</td>
+<td class="px-4 py-4 text-sm text-slate-400">Block (1kg)</td>
+<td class="px-4 py-4 font-mono text-sm">$ 12.50</td>
+<td class="px-6 py-4 text-right font-mono font-bold">$ 125.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-background-dark/20">
+<button class="w-full py-3 border-2 border-dashed border-slate-700 rounded-lg text-sm text-slate-400 hover:border-primary/50 hover:text-primary transition-all flex items-center justify-center space-x-2">
+<span class="material-icons text-sm">add</span>
+<span>Add Item</span>
+</button>
+</div>
+</section>
+</div>
+<!-- Right Column: Summary & Notes -->
+<div class="col-span-12 lg:col-span-4 space-y-8">
+<!-- Totals Card -->
+<section class="bg-charcoal rounded-xl border-l-4 border-primary p-8 shadow-2xl">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Order Summary</h3>
+<div class="space-y-4 mb-8">
+<div class="flex justify-between text-sm">
+<span class="text-slate-500">Subtotal</span>
+<span class="font-mono">$ 185.00</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-slate-500">PPN (10%)</span>
+<span class="font-mono">$ 18.50</span>
+</div>
+<div class="pt-4 border-t border-slate-800 flex justify-between items-baseline">
+<span class="text-base font-bold text-slate-200">Grand Total</span>
+<span class="text-3xl font-mono text-primary font-bold">$ 203.50</span>
+</div>
+</div>
+<div class="bg-primary/5 rounded-lg p-4 border border-primary/10">
+<div class="flex items-start space-x-3">
+<span class="material-icons text-primary text-sm mt-0.5">info</span>
+<p class="text-[11px] text-slate-400 leading-relaxed italic">
+                                Prices are locked based on the current master vendor agreement valid until December 2026.
+                            </p>
+</div>
+</div>
+</section>
+<!-- Notes Section -->
+<section class="bg-charcoal rounded-xl border border-primary/5 p-6 shadow-2xl">
+<label class="block text-xs font-medium text-slate-400 uppercase tracking-tighter mb-3">Delivery Instructions &amp; Notes</label>
+<textarea class="w-full bg-background-dark/50 border border-slate-700 rounded-lg p-4 text-sm focus:ring-1 focus:ring-primary outline-none transition-all resize-none" placeholder="e.g., Deliver to back loading dock. Ring bell for chef." rows="4"></textarea>
+<div class="mt-6 space-y-4">
+<div class="flex items-center space-x-3 text-xs text-slate-400">
+<span class="material-icons text-sm text-slate-600">verified_user</span>
+<span>Auto-approval active for POs under $500</span>
+</div>
+<div class="flex items-center space-x-3 text-xs text-slate-400">
+<span class="material-icons text-sm text-slate-600">visibility</span>
+<span>Vendor will receive email notification</span>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Sticky Bottom Bar -->
+<footer class="fixed bottom-0 left-0 right-0 z-40 bg-charcoal/90 backdrop-blur-xl border-t border-slate-800 px-8 py-5">
+<div class="max-w-7xl mx-auto flex justify-between items-center">
+<div class="flex items-center space-x-4">
+<button class="px-6 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+                    Cancel
+                </button>
+<div class="h-6 w-px bg-slate-800"></div>
+<div class="flex items-center text-xs text-slate-500">
+<span class="material-icons text-[10px] mr-1 text-primary">circle</span>
+                    Last autosaved 2m ago
+                </div>
+</div>
+<div class="flex items-center space-x-4">
+<button class="px-6 py-2.5 rounded-lg text-sm font-medium border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all">
+                    Save as Draft
+                </button>
+<button class="px-10 py-2.5 bg-primary text-background-dark font-bold rounded-lg shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center">
+<span>Send to Supplier</span>
+<span class="material-icons ml-2 text-base">send</span>
+</button>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery Main Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Work+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f9a806",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#111113",
+                        "surface-dark": "#1A1A1D",
+                        "border-dark": "#2D2D30",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        .chart-gradient {
+            background: linear-gradient(180deg, rgba(249, 168, 6, 0.15) 0%, rgba(249, 168, 6, 0) 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 min-h-screen flex">
+<!-- Sidebar -->
+<aside class="w-[260px] h-screen fixed left-0 top-0 border-r border-border-dark bg-[#111113] flex flex-col z-50">
+<div class="p-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons-round text-background-dark">bakery_dining</span>
+</div>
+<h1 class="serif-title text-xl font-bold tracking-tight text-white">The Breakery</h1>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-lg" href="#">
+<span class="material-icons-round text-[20px]">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-icons-round text-[20px]">shopping_basket</span>
+<span class="font-medium">Orders</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-icons-round text-[20px]">inventory_2</span>
+<span class="font-medium">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-icons-round text-[20px]">groups</span>
+<span class="font-medium">Customers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-icons-round text-[20px]">auto_graph</span>
+<span class="font-medium">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors" href="#">
+<span class="material-icons-round text-[20px]">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-4 mt-auto">
+<div class="bg-surface-dark border border-border-dark p-4 rounded-xl">
+<div class="flex items-center gap-3 mb-3">
+<img alt="User Profile" class="w-10 h-10 rounded-full object-cover" data-alt="Headshot of a professional male chef" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBv6I_DwXL9l-yEfcaGa5XnyosLpXJlVVooMjDFNTUtjnWtEOJE21IqeKHwd1yhzZ4h2d7UBzKWBhfz3cT9PDPbnhzJKNLWsOi3nsiu6yk89pXV5C_5CtybbGPHQYT0ZIfE7VLHc1vk1vtrEABd7W1DQVXT-0VkXZcjsApVtnw7m-xgaLO04k5_7aMsmA4q4m7Kj0t2NIqRjC02FbPUcnB02sHpitCvYeZ-P3q6oNd4qEo7Fr0Y-vmpIyX-IMEOVmASm00P0ZeQ5tuU"/>
+<div>
+<p class="text-sm font-semibold text-white">Chef Julian</p>
+<p class="text-xs text-slate-500">Head Baker</p>
+</div>
+</div>
+<button class="w-full text-xs py-2 bg-white/5 hover:bg-white/10 text-slate-300 rounded-lg transition-colors flex items-center justify-center gap-2">
+<span class="material-icons-round text-[14px]">logout</span> Sign Out
+                </button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-[260px] flex-1 flex flex-col min-h-screen pb-12">
+<!-- Header -->
+<header class="h-20 border-b border-border-dark px-10 flex items-center justify-between sticky top-0 bg-background-dark/80 backdrop-blur-md z-40">
+<div>
+<h2 class="serif-title text-[28px] text-white leading-tight">Dashboard</h2>
+<p class="text-sm text-slate-500 font-display">Saturday, February 15, 2026</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[20px]">search</span>
+<input class="bg-surface-dark border-border-dark rounded-lg pl-10 pr-4 py-2 w-64 text-sm focus:ring-primary focus:border-primary transition-all text-white" placeholder="Search orders, stock..." type="text"/>
+</div>
+<button class="bg-white/5 hover:bg-white/10 text-white px-4 py-2 rounded-lg text-sm font-medium border border-border-dark transition-colors flex items-center gap-2">
+<span class="material-icons-round text-[18px]">inventory</span> Quick Stock Check
+                </button>
+<button class="bg-primary hover:bg-amber-500 text-background-dark px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 shadow-lg shadow-primary/20">
+<span class="material-icons-round text-[18px]">add</span> New Order
+                </button>
+</div>
+</header>
+<!-- Content Body -->
+<div class="px-10 py-8 space-y-8">
+<!-- KPI Row -->
+<div class="grid grid-cols-4 gap-6">
+<!-- KPI 1 -->
+<div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:border-primary/30 transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-primary/10 rounded-lg text-primary">
+<span class="material-icons-round text-[20px]">payments</span>
+</div>
+<span class="px-2 py-1 bg-green-500/10 text-green-500 text-[10px] font-bold rounded flex items-center gap-1 uppercase tracking-wider">
+<span class="material-icons-round text-[12px]">trending_up</span> 12%
+                        </span>
+</div>
+<p class="text-slate-500 text-xs font-medium uppercase tracking-widest mb-1">Today's Revenue</p>
+<h3 class="text-2xl font-bold text-white">Rp 4.125.000</h3>
+</div>
+<!-- KPI 2 -->
+<div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:border-primary/30 transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-primary/10 rounded-lg text-primary">
+<span class="material-icons-round text-[20px]">shopping_cart</span>
+</div>
+<span class="px-2 py-1 bg-white/5 text-slate-400 text-[10px] font-bold rounded uppercase tracking-wider">
+                            Avg: 42
+                        </span>
+</div>
+<p class="text-slate-500 text-xs font-medium uppercase tracking-widest mb-1">Today's Orders</p>
+<h3 class="text-2xl font-bold text-white">47</h3>
+</div>
+<!-- KPI 3 -->
+<div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:border-primary/30 transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-primary/10 rounded-lg text-primary">
+<span class="material-icons-round text-[20px]">confirmation_number</span>
+</div>
+<span class="px-2 py-1 bg-red-500/10 text-red-500 text-[10px] font-bold rounded flex items-center gap-1 uppercase tracking-wider">
+<span class="material-icons-round text-[12px]">trending_down</span> 3%
+                        </span>
+</div>
+<p class="text-slate-500 text-xs font-medium uppercase tracking-widest mb-1">Average Ticket</p>
+<h3 class="text-2xl font-bold text-white">Rp 87.766</h3>
+</div>
+<!-- KPI 4 -->
+<div class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:border-primary/30 transition-all group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-primary/10 rounded-lg text-primary">
+<span class="material-icons-round text-[20px]">inventory_2</span>
+</div>
+<span class="px-2 py-1 bg-green-500/10 text-green-500 text-[10px] font-bold rounded flex items-center gap-1 uppercase tracking-wider">
+<span class="material-icons-round text-[12px]">check</span> Healthy
+                        </span>
+</div>
+<p class="text-slate-500 text-xs font-medium uppercase tracking-widest mb-1">Items Sold</p>
+<h3 class="text-2xl font-bold text-white">234</h3>
+</div>
+</div>
+<!-- Middle Row: Charts -->
+<div class="grid grid-cols-3 gap-6">
+<!-- Sales Overview Chart Placeholder -->
+<div class="col-span-2 bg-surface-dark border border-border-dark p-6 rounded-xl">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h4 class="text-lg font-bold text-white">Sales Overview</h4>
+<p class="text-xs text-slate-500">Hourly performance tracking</p>
+</div>
+<select class="bg-white/5 border-border-dark text-slate-400 text-xs rounded px-2 py-1 outline-none">
+<option>Last 24 Hours</option>
+<option>Last 7 Days</option>
+</select>
+</div>
+<div class="h-[280px] w-full relative flex items-end justify-between px-2 pt-10">
+<!-- Chart Mock SVG -->
+<div class="absolute inset-0 pt-16 flex flex-col justify-between px-2 pointer-events-none opacity-10">
+<div class="border-t border-slate-500 w-full"></div>
+<div class="border-t border-slate-500 w-full"></div>
+<div class="border-t border-slate-500 w-full"></div>
+<div class="border-t border-slate-500 w-full"></div>
+</div>
+<div class="absolute inset-x-0 bottom-0 h-48 chart-gradient"></div>
+<svg class="absolute inset-0 h-[280px] w-full px-6 pt-16" preserveaspectratio="none" viewbox="0 0 1000 280">
+<path d="M0,200 Q150,180 300,220 T600,100 T1000,150" fill="none" stroke="#f9f7f0" stroke-width="3"></path>
+<circle cx="0" cy="200" fill="#f9a806" r="4"></circle>
+<circle cx="300" cy="220" fill="#f9a806" r="4"></circle>
+<circle cx="600" cy="100" fill="#f9a806" r="4"></circle>
+<circle cx="1000" cy="150" fill="#f9a806" r="4"></circle>
+</svg>
+<div class="flex w-full justify-between text-[10px] text-slate-500 mt-2 z-10 px-6">
+<span>08:00</span><span>10:00</span><span>12:00</span><span>14:00</span><span>16:00</span><span>18:00</span><span>20:00</span>
+</div>
+</div>
+</div>
+<!-- Donut Chart Placeholder -->
+<div class="bg-surface-dark border border-border-dark p-6 rounded-xl flex flex-col">
+<h4 class="text-lg font-bold text-white mb-1">Revenue by Category</h4>
+<p class="text-xs text-slate-500 mb-8">Product performance breakdown</p>
+<div class="flex-1 flex flex-col items-center justify-center">
+<div class="relative w-44 h-44">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<circle cx="18" cy="18" fill="transparent" r="16" stroke="#2D2D30" stroke-width="4"></circle>
+<circle cx="18" cy="18" fill="transparent" r="16" stroke="#f9a806" stroke-dasharray="40 100" stroke-dashoffset="0" stroke-width="4"></circle>
+<circle cx="18" cy="18" fill="transparent" r="16" stroke="#d97706" stroke-dasharray="25 100" stroke-dashoffset="-40" stroke-width="4"></circle>
+<circle cx="18" cy="18" fill="transparent" r="16" stroke="#0d9488" stroke-dasharray="20 100" stroke-dashoffset="-65" stroke-width="4"></circle>
+<circle cx="18" cy="18" fill="transparent" r="16" stroke="#e11d48" stroke-dasharray="15 100" stroke-dashoffset="-85" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-xs text-slate-500">Total</span>
+<span class="text-lg font-bold text-white">100%</span>
+</div>
+</div>
+<div class="mt-8 grid grid-cols-2 gap-4 w-full">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-[11px] text-slate-400">Bread (40%)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-amber-600"></span>
+<span class="text-[11px] text-slate-400">Pastries (25%)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-teal-600"></span>
+<span class="text-[11px] text-slate-400">Coffee (20%)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-rose-600"></span>
+<span class="text-[11px] text-slate-400">Cakes (15%)</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Row: Tables & Activity -->
+<div class="grid grid-cols-3 gap-6">
+<!-- Top Products -->
+<div class="bg-surface-dark border border-border-dark p-6 rounded-xl">
+<div class="flex items-center justify-between mb-6">
+<h4 class="font-bold text-white">Top Products</h4>
+<span class="text-primary text-xs font-medium cursor-pointer">View All</span>
+</div>
+<div class="space-y-5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-white/5 overflow-hidden">
+<img alt="Product" class="w-full h-full object-cover" data-alt="Fresh sourdough bread on a wooden table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7t6onzPHV3FUz_1fHHR-3lmbNhiTKfYAux8nujgXWVZqJaeOrFvTaBb8fqV5oei-QmuPyRTRraJh1CqTtCfjhTbtqBU1Of4_0XlzPiNg0ks7_L8YJ8aNXiRB8VnQN9crxoNfxEyJOiRp8f2cF-fw1PO38j2ZlPg2tEn8buNRkJZ5nWAp8Hv_9L1zqdz0RaawDZGNwDNhPHtJeVjOBAgnNKazvck6XNyeskZfD-XNQt1-ePiGPQxC6uJTK3f-ChLn54Vp9tqU8m-LT"/>
+</div>
+<div>
+<p class="text-sm font-medium text-white">Sourdough Classic</p>
+<p class="text-[10px] text-slate-500">82 sold today</p>
+</div>
+</div>
+<span class="text-sm font-bold text-white">Rp 3.690k</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-white/5 overflow-hidden">
+<img alt="Product" class="w-full h-full object-cover" data-alt="Golden butter croissants stacked together" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBf7YoSLVxR_OCXRUzK8UH3Y3pF8-SpjuyIiP7XlSZ9WWxA19kdfvCnar4jXDIuiIOAJbz-7pPLYjwUjxFY0ZRjRNq6fNvO-cdsqxNdTDyQgPqgJn1RoRrB-2bBMkZpM4iPXqUwrteB5toLdLQ166ISDDnPgEn_jBVMgzLkkdCCtEmZ-P8VIbpgYvl2u8a4K8WTBJL_NS98dyqpYgVCV6LAtycnOl5Y7V7AOf4RBmxSupCgXGTUOxn-Fy26H0vNyxNS06vR3dKNsheM"/>
+</div>
+<div>
+<p class="text-sm font-medium text-white">Butter Croissant</p>
+<p class="text-[10px] text-slate-500">64 sold today</p>
+</div>
+</div>
+<span class="text-sm font-bold text-white">Rp 1.920k</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-white/5 overflow-hidden">
+<img alt="Product" class="w-full h-full object-cover" data-alt="Artistic latte art in a white cup" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBioFAn20YGR-ot5TMXVXCLn5XsmwHUJLxb3Si1zkZX5oa5TJ9mEdtfLER3DqUB3TeiuYOQSdd8MbERuQh9DR0Uc9N4ScQ6dq7KqeUWRZlWmsdpCHT81RdX03dZP4kbvIAorX-0fx3px5U7z_mssI-_KIgwnmsPrneWMT3WXJs8Btc7EbK7pK2rOzqKtl1c78bpxnJSXHzMUuFoUH6ymxmWB9bX_9PMWvV0DIOPu0tA_lrBvgl_ng82HwCOwshPvXpOkKv4ygSf6pdE"/>
+</div>
+<div>
+<p class="text-sm font-medium text-white">Flat White</p>
+<p class="text-[10px] text-slate-500">41 sold today</p>
+</div>
+</div>
+<span class="text-sm font-bold text-white">Rp 1.435k</span>
+</div>
+</div>
+</div>
+<!-- Inventory Alerts -->
+<div class="bg-surface-dark border border-border-dark p-6 rounded-xl">
+<div class="flex items-center justify-between mb-6">
+<h4 class="font-bold text-white">Inventory Alerts</h4>
+<span class="px-2 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full">3 Actions</span>
+</div>
+<div class="space-y-4">
+<div class="p-3 border border-red-500/20 bg-red-500/5 rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-icons-round text-red-500 text-xl">error</span>
+<div>
+<p class="text-sm font-medium text-white">Organic Flour</p>
+<p class="text-[10px] text-slate-500">Current: 5.2kg / Min: 25kg</p>
+</div>
+</div>
+<button class="bg-red-500 hover:bg-red-600 text-white p-1 rounded transition-colors">
+<span class="material-icons-round text-xs">shopping_cart</span>
+</button>
+</div>
+<div class="p-3 border border-amber-500/20 bg-amber-500/5 rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-icons-round text-amber-500 text-xl">warning</span>
+<div>
+<p class="text-sm font-medium text-white">Arabica Beans</p>
+<p class="text-[10px] text-slate-500">Current: 2kg / Min: 5kg</p>
+</div>
+</div>
+<button class="bg-amber-500 hover:bg-amber-600 text-white p-1 rounded transition-colors">
+<span class="material-icons-round text-xs">shopping_cart</span>
+</button>
+</div>
+<div class="p-3 border border-amber-500/20 bg-amber-500/5 rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-icons-round text-amber-500 text-xl">warning</span>
+<div>
+<p class="text-sm font-medium text-white">Unsalted Butter</p>
+<p class="text-[10px] text-slate-500">Current: 12kg / Min: 20kg</p>
+</div>
+</div>
+<button class="bg-amber-500 hover:bg-amber-600 text-white p-1 rounded transition-colors">
+<span class="material-icons-round text-xs">shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Recent Activity -->
+<div class="bg-surface-dark border border-border-dark p-6 rounded-xl">
+<h4 class="font-bold text-white mb-6">Recent Activity</h4>
+<div class="relative pl-6 space-y-6 before:absolute before:left-[11px] before:top-1 before:bottom-1 before:w-[1px] before:bg-border-dark">
+<div class="relative">
+<span class="absolute -left-[19px] top-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-surface-dark"></span>
+<p class="text-sm font-medium text-white">New Delivery Received</p>
+<p class="text-[10px] text-slate-500 mb-1">Stock Updated • 14:22</p>
+<div class="text-[10px] text-primary bg-primary/5 p-2 rounded inline-block">Ref: #DEL-9022</div>
+</div>
+<div class="relative">
+<span class="absolute -left-[19px] top-1 w-2.5 h-2.5 rounded-full bg-slate-500 border-2 border-surface-dark"></span>
+<p class="text-sm font-medium text-white">Cash Register Closed</p>
+<p class="text-[10px] text-slate-500">Shift End • 13:45</p>
+</div>
+<div class="relative">
+<span class="absolute -left-[19px] top-1 w-2.5 h-2.5 rounded-full bg-slate-500 border-2 border-surface-dark"></span>
+<p class="text-sm font-medium text-white">Custom Order #9822 Paid</p>
+<p class="text-[10px] text-slate-500">Transaction • 12:10</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Footer -->
+<footer class="h-10 mt-auto bg-surface-dark border-t border-border-dark px-10 flex items-center justify-between text-[11px] text-slate-500">
+<div class="flex items-center gap-6">
+<span class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
+                    Terminal: Online
+                </span>
+<span>Current Shift: Morning (07:00 - 15:00)</span>
+</div>
+<div class="flex items-center gap-6">
+<span>Drawer Balance: <span class="text-white font-bold">Rp 1.200.000</span></span>
+<span>v2.4.0-Stable</span>
+</div>
+</footer>
+</main>
+</body></html>

@@ -1,0 +1,350 @@
+import React from 'react';
+
+const Customer_Management_CRM: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: \
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Customer Management CRM</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#eebd2b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#0D0D0F",
+                        "card-dark": "#1A1A1D",
+                        "input-dark": "#111113",
+                        "hover-dark": "#222226",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "playfair": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0D0D0F;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #222226;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="font-display text-slate-200 antialiased min-h-screen">
+<div class="flex flex-col lg:flex-row min-h-screen">
+<!-- Navigation Sidebar -->
+<aside class="w-full lg:w-64 bg-card-dark border-r border-white/5 p-6 flex flex-col shrink-0">
+<div class="flex items-center gap-3 mb-10">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded-lg text-background-dark">
+<span class="material-icons">bakery_dining</span>
+</div>
+<h1 class="font-playfair text-xl font-bold text-white tracking-wide">The Breakery</h1>
+</div>
+<nav class="space-y-2 flex-grow">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-primary hover:bg-white/5 transition-all" href="#">
+<span class="material-icons text-xl">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary border border-primary/20 transition-all" href="#">
+<span class="material-icons text-xl">group</span>
+<span class="font-medium">Customers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-primary hover:bg-white/5 transition-all" href="#">
+<span class="material-icons text-xl">inventory_2</span>
+<span class="font-medium">Products</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-primary hover:bg-white/5 transition-all" href="#">
+<span class="material-icons text-xl">shopping_bag</span>
+<span class="font-medium">Orders</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-primary hover:bg-white/5 transition-all" href="#">
+<span class="material-icons text-xl">loyalty</span>
+<span class="font-medium">Loyalty Program</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-primary hover:bg-white/5 transition-all" href="#">
+<span class="material-icons text-xl">insights</span>
+<span class="font-medium">Reports</span>
+</a>
+</nav>
+<div class="pt-6 border-t border-white/5">
+<div class="flex items-center gap-3 p-2 rounded-lg bg-white/5">
+<div class="w-8 h-8 rounded-full overflow-hidden">
+<img alt="User" class="w-full h-full object-cover" data-alt="Profile photo of a bakery manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkGZonK6q3bXpVkFCm9aQIfXO0vmZexvOGp_oWf_6IAaKR8apAQSLa6ZOPLsJpbTgJEi4mGI2S_Jfs2rbdSHLLsyP-HKGKHfg-2SNhFGKe_9QAPH1fmgw_CEBw2DZoIgGy4L9Dvp4nRsMqzNA8ac0yBdgiIQ69mLeK5_OV8TwJ-izoqMq1oNv8IbV5k89GWd5L7UXlQCRe0Fg7iNbdwaF1ecKT6OqTCKhHD9cUH_IqbIlgILA9ITi3wB9CuVSRFr8IUIoAZVjek9YY"/>
+</div>
+<div class="flex-grow min-w-0">
+<p class="text-sm font-semibold text-white truncate">Marcus Rossi</p>
+<p class="text-xs text-slate-500 truncate">Manager</p>
+</div>
+<span class="material-icons text-slate-500 text-lg">settings</span>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-grow p-4 lg:p-10 bg-background-dark overflow-y-auto">
+<!-- Header -->
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+<div>
+<h2 class="font-playfair text-3xl font-bold text-white mb-1">Customers</h2>
+<p class="text-slate-500 text-sm">Manage your bakery's customer relationships and loyalty tiers.</p>
+</div>
+<button class="bg-primary text-background-dark hover:bg-primary/90 transition-all px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 w-fit">
+<span class="material-icons text-xl">person_add</span>
+                    New Customer
+                </button>
+</header>
+<!-- KPI Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+<div class="bg-card-dark p-6 rounded-xl border border-white/5 shadow-xl">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-400 text-sm font-medium uppercase tracking-wider">Total Customers</span>
+<div class="p-2 bg-primary/10 rounded-lg text-primary">
+<span class="material-icons">people_alt</span>
+</div>
+</div>
+<p class="text-3xl font-bold text-white">1,247</p>
+<p class="text-xs text-slate-500 mt-2 flex items-center gap-1">
+<span class="text-emerald-400 flex items-center"><span class="material-icons text-xs">trending_up</span> 4.5%</span> from last month
+                    </p>
+</div>
+<div class="bg-card-dark p-6 rounded-xl border border-white/5 shadow-xl">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-400 text-sm font-medium uppercase tracking-wider">Active This Month</span>
+<div class="p-2 bg-emerald-400/10 rounded-lg text-emerald-400">
+<span class="material-icons">bolt</span>
+</div>
+</div>
+<div class="flex items-end gap-3">
+<p class="text-3xl font-bold text-white">342</p>
+<span class="mb-1 px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold rounded-full border border-emerald-500/30">+12%</span>
+</div>
+<p class="text-xs text-slate-500 mt-2">Unique visits recorded</p>
+</div>
+<div class="bg-card-dark p-6 rounded-xl border border-white/5 shadow-xl">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-400 text-sm font-medium uppercase tracking-wider">Loyalty Members</span>
+<div class="p-2 bg-indigo-400/10 rounded-lg text-indigo-400">
+<span class="material-icons">card_membership</span>
+</div>
+</div>
+<p class="text-3xl font-bold text-white">856</p>
+<p class="text-xs text-slate-500 mt-2">68% of total base</p>
+</div>
+<div class="bg-card-dark p-6 rounded-xl border border-white/5 shadow-xl">
+<div class="flex items-center justify-between mb-4">
+<span class="text-slate-400 text-sm font-medium uppercase tracking-wider">Outstanding B2B</span>
+<div class="p-2 bg-rose-400/10 rounded-lg text-rose-400">
+<span class="material-icons">payments</span>
+</div>
+</div>
+<p class="text-3xl font-bold text-white font-display">Rp 4.250.000</p>
+<p class="text-xs text-slate-500 mt-2">12 unpaid wholesale invoices</p>
+</div>
+</div>
+<!-- Filters and Search -->
+<div class="bg-card-dark p-4 rounded-xl border border-white/5 mb-6 flex flex-col md:flex-row gap-4 items-center">
+<div class="relative w-full md:w-96 group">
+<span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-input-dark border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-200 focus:border-primary focus:ring-0 transition-all" placeholder="Search by name, email or phone..." type="text"/>
+</div>
+<div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+<select class="bg-input-dark border-white/10 rounded-lg text-sm text-slate-400 px-4 py-2 focus:border-primary focus:ring-0 cursor-pointer">
+<option>Category: All</option>
+<option>Retail</option>
+<option>Wholesale</option>
+<option>Custom</option>
+</select>
+<select class="bg-input-dark border-white/10 rounded-lg text-sm text-slate-400 px-4 py-2 focus:border-primary focus:ring-0 cursor-pointer">
+<option>Loyalty Tier: All</option>
+<option>Platinum</option>
+<option>Gold</option>
+<option>Silver</option>
+<option>Bronze</option>
+</select>
+<select class="bg-input-dark border-white/10 rounded-lg text-sm text-slate-400 px-4 py-2 focus:border-primary focus:ring-0 cursor-pointer">
+<option>Sort by: Last Visit</option>
+<option>Sort by: Total Spent</option>
+<option>Sort by: Points</option>
+<option>Sort by: Name (A-Z)</option>
+</select>
+<button class="p-2 bg-input-dark border border-white/10 rounded-lg text-slate-400 hover:text-white transition-colors">
+<span class="material-icons text-xl">tune</span>
+</button>
+</div>
+</div>
+<!-- Table Container -->
+<div class="bg-card-dark rounded-xl border border-white/5 overflow-hidden shadow-2xl">
+<div class="overflow-x-auto custom-scrollbar">
+<table class="w-full text-left">
+<thead>
+<tr class="border-b border-white/5 bg-white/[0.02]">
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Customer Name</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Category</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Loyalty Tier</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Points</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Total Spent</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Last Visit</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="hover:bg-hover-dark transition-colors cursor-pointer group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm">
+                                            JS
+                                        </div>
+<div>
+<p class="text-sm font-semibold text-white">Julianne Smith</p>
+<p class="text-xs text-slate-500">+62 812-4567-890</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white/5 text-slate-400 border border-white/10 uppercase">Retail</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-slate-400/10 text-slate-300 border border-slate-400/30 uppercase">Platinum</span>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-slate-300">12,450</td>
+<td class="px-6 py-4 text-sm font-semibold text-white">Rp 8.240.000</td>
+<td class="px-6 py-4 text-sm text-slate-500 text-right">Oct 24, 2023</td>
+</tr>
+<tr class="hover:bg-hover-dark transition-colors cursor-pointer group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-sm">
+                                            BB
+                                        </div>
+<div>
+<p class="text-sm font-semibold text-white">Bake &amp; Brew Café</p>
+<p class="text-xs text-slate-500">+62 821-9988-776</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-primary/20 text-primary border border-primary/30 uppercase">Wholesale</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-primary/10 text-primary border border-primary/40 uppercase">Gold</span>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-slate-300">4,820</td>
+<td class="px-6 py-4 text-sm font-semibold text-white">Rp 24.150.000</td>
+<td class="px-6 py-4 text-sm text-slate-500 text-right">Today</td>
+</tr>
+<tr class="hover:bg-hover-dark transition-colors cursor-pointer group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm">
+                                            DM
+                                        </div>
+<div>
+<p class="text-sm font-semibold text-white">David Miller</p>
+<p class="text-xs text-slate-500">+62 815-5556-444</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white/5 text-slate-400 border border-white/10 uppercase">Custom</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-slate-500/10 text-slate-400 border border-slate-500/20 uppercase">Silver</span>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-slate-300">2,100</td>
+<td class="px-6 py-4 text-sm font-semibold text-white">Rp 1.450.000</td>
+<td class="px-6 py-4 text-sm text-slate-500 text-right">Oct 20, 2023</td>
+</tr>
+<tr class="hover:bg-hover-dark transition-colors cursor-pointer group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-400 font-bold text-sm">
+                                            SL
+                                        </div>
+<div>
+<p class="text-sm font-semibold text-white">Sarah Lopez</p>
+<p class="text-xs text-slate-500">+62 819-2223-111</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-white/5 text-slate-400 border border-white/10 uppercase">Retail</span>
+</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-orange-800/20 text-orange-400 border border-orange-800/40 uppercase">Bronze</span>
+</td>
+<td class="px-6 py-4 text-sm font-medium text-slate-300">840</td>
+<td class="px-6 py-4 text-sm font-semibold text-white">Rp 520.000</td>
+<td class="px-6 py-4 text-sm text-slate-500 text-right">Oct 18, 2023</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="px-6 py-4 border-t border-white/5 bg-white/[0.01] flex flex-col sm:flex-row items-center justify-between gap-4">
+<p class="text-sm text-slate-500">Showing <span class="text-white font-medium">1-10</span> of <span class="text-white font-medium">1,247</span> customers</p>
+<div class="flex items-center gap-2">
+<button class="p-2 border border-white/10 rounded-lg text-slate-400 hover:bg-white/5 disabled:opacity-30" disabled="">
+<span class="material-icons text-xl leading-none">chevron_left</span>
+</button>
+<button class="w-9 h-9 rounded-lg bg-primary text-background-dark font-bold text-sm">1</button>
+<button class="w-9 h-9 rounded-lg hover:bg-white/5 text-slate-400 font-bold text-sm">2</button>
+<button class="w-9 h-9 rounded-lg hover:bg-white/5 text-slate-400 font-bold text-sm">3</button>
+<span class="text-slate-600 px-2">...</span>
+<button class="w-9 h-9 rounded-lg hover:bg-white/5 text-slate-400 font-bold text-sm">125</button>
+<button class="p-2 border border-white/10 rounded-lg text-slate-400 hover:bg-white/5">
+<span class="material-icons text-xl leading-none">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Empty State Visualization (Hidden for demo, but present in structure) -->
+<div class="hidden mt-12 bg-card-dark/50 border-2 border-dashed border-white/10 rounded-2xl p-16 flex flex-col items-center text-center">
+<div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6">
+<span class="material-icons text-4xl text-slate-600">person_add_disabled</span>
+</div>
+<h3 class="font-playfair text-2xl font-bold text-white mb-2">No customers yet</h3>
+<p class="text-slate-500 max-w-sm mb-8">Start building your community. Add your first customer or import a contact list to begin tracking loyalty.</p>
+<div class="flex gap-4">
+<button class="bg-primary text-background-dark px-6 py-3 rounded-lg font-bold flex items-center gap-2">
+<span class="material-icons">person_add</span>
+                        Add Your First Customer
+                    </button>
+<button class="bg-white/5 text-white border border-white/10 px-6 py-3 rounded-lg font-bold">
+                        Import CSV
+                    </button>
+</div>
+</div>
+</main>
+</div>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    \ }} />
+  );
+};
+
+export default Customer_Management_CRM;

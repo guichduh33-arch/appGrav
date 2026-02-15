@@ -159,7 +159,19 @@
       "WebFetch(domain:contribution.usercontent.google.com)",
       "mcp__stitch__get_screen",
       "mcp__claude_ai_Supabase__list_migrations",
-      "Bash(npx skills add:*)"
+      "Bash(npx skills add:*)",
+      "WebSearch",
+      "Bash(npx @_davideast/stitch-mcp init)",
+      "Bash(npx @_davideast/stitch-mcp init:*)",
+      "Bash(claude mcp list:*)",
+      "Bash(cmd /c \"set CLAUDECODE= && claude mcp list\")",
+      "Bash(cmd /c \"type C:\\\\Users\\\\guich\\\\.claude\\\\mcp.json 2>nul || echo NOT_FOUND\")",
+      "Bash(npx @_davideast/stitch-mcp doctor:*)",
+      "WebFetch(domain:stitch.withgoogle.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Skill(design-md)",
+      "Bash(awk:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

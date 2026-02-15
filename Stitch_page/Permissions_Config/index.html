@@ -1,0 +1,280 @@
+<html class="dark"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f2cc0d",
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#0D0D0F",
+                        "panel-dark": "#1A1A1D",
+                        "surface-dark": "#252529",
+                        "border-dark": "#2A2A2D",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2A2A2D;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #f2cc0d;
+        }
+        input[type="checkbox"]:checked {
+            background-color: #f2cc0d;
+            border-color: #f2cc0d;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen overflow-hidden font-display">
+<!-- App Header -->
+<header class="h-16 border-b border-border-dark flex items-center justify-between px-8 bg-panel-dark">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-background-dark">
+<span class="material-icons text-xl font-bold">bakery_dining</span>
+</div>
+<h1 class="text-xl font-extrabold tracking-tight uppercase">The Breakery</h1>
+<div class="h-4 w-[1px] bg-border-dark mx-4"></div>
+<nav class="flex items-center gap-6 text-sm font-medium text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="hover:text-primary transition-colors" href="#">Orders</a>
+<a class="text-primary border-b-2 border-primary pb-1" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-surface-dark transition-colors">
+<span class="material-icons text-slate-400">notifications</span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-border-dark">
+<div class="text-right">
+<p class="text-xs font-bold">Master Baker</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-widest">Admin</p>
+</div>
+<img alt="Profile" class="w-9 h-9 rounded-full object-cover" data-alt="Headshot of a professional bakery manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXty1or6333NNbo1izNbVd2waUZUUkrQpWBXvxv_xMzEpl7e9BPJxQTm-iweL1ILT6kxQfYuicGxVFCogjc56kZGh7B5ABSd3VgRxIJwUxdtv6o3y7QQnObySozhgQTu2WKoaFezSs_XFWNzVwwzsGDgtyizstcBvWvmkldnSDkbxkfvG28l7pPtNwWwLbvmABTvjUxIB-ub3bbucFVLZh1R5_naw5vEG5rHUYVa5dx2oa_e0eZDmAm3BNeo9ptsNdch5MF702ypTf"/>
+</div>
+</div>
+</header>
+<main class="flex h-[calc(100vh-64px)]">
+<!-- Left Panel: Role List -->
+<aside class="w-[40%] bg-panel-dark border-r border-border-dark flex flex-col">
+<div class="p-6">
+<h2 class="text-2xl font-bold mb-1">Roles &amp; Teams</h2>
+<p class="text-slate-500 text-sm">Manage access levels and permissions for staff.</p>
+<div class="mt-6 flex items-center bg-background-dark/50 rounded-lg px-4 py-2 border border-border-dark">
+<span class="material-icons text-slate-500 text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-slate-600" placeholder="Search roles..." type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-6 space-y-3 custom-scrollbar">
+<!-- Role Card: Owner -->
+<div class="p-4 rounded-lg bg-surface-dark/40 border border-border-dark cursor-pointer hover:border-slate-700 transition-all group">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-slate-200 group-hover:text-white">Owner</h3>
+<span class="px-2 py-0.5 bg-slate-800 text-[10px] font-bold uppercase rounded tracking-wider text-slate-400">Full Access</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-xs text-slate-500">Global control over all locations</p>
+<span class="text-xs font-mono text-slate-400 bg-black/30 px-2 py-1 rounded">1 User</span>
+</div>
+</div>
+<!-- Role Card: Manager -->
+<div class="p-4 rounded-lg bg-surface-dark/40 border border-border-dark cursor-pointer hover:border-slate-700 transition-all group">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-slate-200 group-hover:text-white">Manager</h3>
+<span class="px-2 py-0.5 bg-slate-800 text-[10px] font-bold uppercase rounded tracking-wider text-slate-400">Limited Admin</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-xs text-slate-500">Can manage staff and view reports</p>
+<span class="text-xs font-mono text-slate-400 bg-black/30 px-2 py-1 rounded">3 Users</span>
+</div>
+</div>
+<!-- Role Card: Cashier (ACTIVE) -->
+<div class="p-4 rounded-lg bg-primary/10 border-l-4 border-primary border-t border-r border-b border-border-dark cursor-pointer transition-all">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-primary">Cashier</h3>
+<span class="px-2 py-0.5 bg-primary text-background-dark text-[10px] font-bold uppercase rounded tracking-wider">Active</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-xs text-slate-400">Front-of-house and POS handling</p>
+<span class="text-xs font-mono text-primary bg-primary/20 px-2 py-1 rounded">8 Users</span>
+</div>
+</div>
+<!-- Role Card: Kitchen Staff -->
+<div class="p-4 rounded-lg bg-surface-dark/40 border border-border-dark cursor-pointer hover:border-slate-700 transition-all group">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-slate-200 group-hover:text-white">Kitchen Staff</h3>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-xs text-slate-500">Order processing and inventory</p>
+<span class="text-xs font-mono text-slate-400 bg-black/30 px-2 py-1 rounded">12 Users</span>
+</div>
+</div>
+<!-- Role Card: Delivery -->
+<div class="p-4 rounded-lg bg-surface-dark/40 border border-border-dark cursor-pointer hover:border-slate-700 transition-all group">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-slate-200 group-hover:text-white">Delivery</h3>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-xs text-slate-500">External logistics and dispatch</p>
+<span class="text-xs font-mono text-slate-400 bg-black/30 px-2 py-1 rounded">4 Users</span>
+</div>
+</div>
+</div>
+<div class="p-6 border-t border-border-dark bg-background-dark/30">
+<button class="w-full bg-primary hover:bg-primary/90 text-background-dark font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-transform active:scale-[0.98]">
+<span class="material-icons text-sm">add</span>
+                    Create New Role
+                </button>
+</div>
+</aside>
+<!-- Right Panel: Permission Matrix -->
+<section class="w-[60%] flex flex-col relative bg-background-dark">
+<div class="p-8 border-b border-border-dark flex items-end justify-between">
+<div>
+<div class="flex items-center gap-2 text-slate-500 text-sm mb-2">
+<span>Roles</span>
+<span class="material-icons text-[14px]">chevron_right</span>
+<span class="text-primary font-medium">Cashier Permissions</span>
+</div>
+<h2 class="text-3xl font-extrabold">Permission Matrix</h2>
+</div>
+<div class="flex gap-3">
+<div class="flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-background-dark object-cover" data-alt="Staff member profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwc7gaJig0myEaZfV00LbyfRsiurMRdGYQCRagOPtS_icCKzmCdplQnrfz6kZd7ORCS0IEUaGVCpTGRfguMWPIBC19Arh3Q1ivOtDyKcZbF76dTySIfKoTJ1tx87GSl-Z8Cd64JvvM5zaPgoDebUN9F3k_nvjD1Bsv3TRSWB_8IqM_Y0vhYpRnWgyOSWp6mrlX8xYgGLkN4e_G7hJlNomXQSfGanG5DBekOlqJ-JkZUghykNSYS4HzZdyOV9AW3m8eCAQwQinpThEN"/>
+<img class="w-8 h-8 rounded-full border-2 border-background-dark object-cover" data-alt="Staff member profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3MxcALBfOZG5WhKiA16zHKM_fqvPw4x0CwI8KsF0iWrOJDYnU_cTt_OeZnX1d8dx6z6yPtPUjlM-nCmXW6MiteNVpBkOQfn5UoeRdJnCju5r-dp4vkl03XcnvjaJynjhgBLWO4S10aKvxakallrXlB7bo7B2nCayfJgIMIoD4pteS4h0MjIikp9KTC575RohulDenMrpS3R4noLkjeIMrSvv8kS-t1Az5LeLP5gRGhpxi5IZQs3xbYFj6w3qrJyqxuFuop4J7mqgn"/>
+<img class="w-8 h-8 rounded-full border-2 border-background-dark object-cover" data-alt="Staff member profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDicyHPk2-4C8TuZhCTePJ1qOc1CDEN1MTuXTe9UpJ7Sc8w2vTI-ohlb5Dr975XDXKWs6xb_y6LYDT7LEUEplZIcZsXinhN4NmVKa9crof7QWVqU-LxFmrrOKpRUzWrgny7BUpqICaVnLdbnnYp5TX9R4lXV933E322Fapmr9GRflMpdeiBzMRw2K-6st3oQnre1neJcWhdFQHqGerjrzwFP8oOh77jAqj47XKmm8GcJY3yxyQh_3bkq6iNGesmszCdPg5qLRtx0OXh"/>
+<div class="w-8 h-8 rounded-full border-2 border-background-dark bg-surface-dark flex items-center justify-center text-[10px] font-bold text-slate-400">+5</div>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar pb-32">
+<!-- Group: Sales & POS -->
+<div>
+<div class="flex items-center justify-between mb-4 pb-2 border-b border-border-dark">
+<div class="flex items-center gap-3">
+<span class="material-icons text-primary">point_of_sale</span>
+<h3 class="font-bold text-lg">Sales &amp; POS</h3>
+</div>
+<span class="material-icons text-slate-500 cursor-pointer">expand_more</span>
+</div>
+<div class="grid grid-cols-1 gap-4 ml-9">
+<label class="flex items-center justify-between group cursor-pointer">
+<span class="text-slate-300 group-hover:text-white transition-colors">View active orders</span>
+<input checked="" class="w-5 h-5 rounded border-border-dark bg-surface-dark text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between group cursor-pointer">
+<span class="text-slate-300 group-hover:text-white transition-colors">Create new sales/orders</span>
+<input checked="" class="w-5 h-5 rounded border-border-dark bg-surface-dark text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between group cursor-pointer">
+<span class="text-slate-300 group-hover:text-white transition-colors">Process terminal payments</span>
+<input checked="" class="w-5 h-5 rounded border-border-dark bg-surface-dark text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-2">
+<span class="text-slate-500 italic">Void completed transactions</span>
+<span class="material-icons text-primary/40 text-[16px]">lock</span>
+</div>
+<input class="w-5 h-5 rounded border-border-dark bg-surface-dark/50 text-slate-600" disabled="" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Group: Products & Catalogue -->
+<div>
+<div class="flex items-center justify-between mb-4 pb-2 border-b border-border-dark">
+<div class="flex items-center gap-3">
+<span class="material-icons text-primary">restaurant_menu</span>
+<h3 class="font-bold text-lg">Products &amp; Catalogue</h3>
+</div>
+<span class="material-icons text-slate-500 cursor-pointer">expand_more</span>
+</div>
+<div class="grid grid-cols-1 gap-4 ml-9">
+<label class="flex items-center justify-between group cursor-pointer">
+<span class="text-slate-300 group-hover:text-white transition-colors">View menu items &amp; pricing</span>
+<input checked="" class="w-5 h-5 rounded border-border-dark bg-surface-dark text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between group cursor-pointer opacity-50">
+<div class="flex items-center gap-2">
+<span class="text-slate-300 transition-colors">Edit product pricing</span>
+<span class="material-icons text-primary text-[16px]">lock</span>
+</div>
+<input class="w-5 h-5 rounded border-border-dark bg-surface-dark text-primary focus:ring-primary" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between group cursor-pointer opacity-50">
+<div class="flex items-center gap-2">
+<span class="text-slate-300 transition-colors">Add new products to catalogue</span>
+<span class="material-icons text-primary text-[16px]">lock</span>
+</div>
+<input class="w-5 h-5 rounded border-border-dark bg-surface-dark text-primary focus:ring-primary" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Group: Inventory -->
+<div>
+<div class="flex items-center justify-between mb-4 pb-2 border-b border-border-dark">
+<div class="flex items-center gap-3">
+<span class="material-icons text-primary">inventory_2</span>
+<h3 class="font-bold text-lg">Inventory</h3>
+</div>
+<span class="material-icons text-slate-500 cursor-pointer">expand_more</span>
+</div>
+<div class="grid grid-cols-1 gap-4 ml-9">
+<label class="flex items-center justify-between group cursor-pointer">
+<span class="text-slate-300 group-hover:text-white transition-colors">View real-time stock levels</span>
+<input checked="" class="w-5 h-5 rounded border-border-dark bg-surface-dark text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between group cursor-pointer">
+<span class="text-slate-300 group-hover:text-white transition-colors">Mark items as 'Out of Stock'</span>
+<input checked="" class="w-5 h-5 rounded border-border-dark bg-surface-dark text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between group cursor-pointer">
+<span class="text-slate-300 group-hover:text-white transition-colors">Adjust inventory quantities</span>
+<input class="w-5 h-5 rounded border-border-dark bg-surface-dark text-primary focus:ring-primary focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+</div>
+</div>
+</div>
+<!-- Sticky Footer Actions -->
+<div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background-dark via-background-dark to-transparent border-t border-border-dark">
+<div class="flex justify-end items-center gap-4">
+<p class="text-xs text-slate-500 mr-auto">Last updated: Today at 09:42 AM by Admin</p>
+<button class="px-6 py-2.5 rounded-lg text-slate-400 hover:text-white font-bold transition-colors">
+                        Reset to Default
+                    </button>
+<button class="px-8 py-2.5 bg-primary hover:bg-primary/90 text-background-dark font-bold rounded-lg shadow-lg shadow-primary/10 transition-transform active:scale-95">
+                        Save Changes
+                    </button>
+</div>
+</div>
+</section>
+</main>
+
+```</body></html>

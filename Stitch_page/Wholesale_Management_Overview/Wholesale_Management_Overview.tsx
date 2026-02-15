@@ -1,0 +1,471 @@
+import React from 'react';
+
+const Wholesale_Management_Overview: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: \
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Wholesale Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#eead2b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#0D0D0F",
+                        "card-dark": "#1A1A1D",
+                        "sidebar-dark": "#111113",
+                        "neutral-muted": "#2A2A2D",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .serif-font {
+            font-family: 'Playfair Display', serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2A2A2D;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+<!-- Sidebar -->
+<aside class="w-[260px] bg-sidebar-dark border-r border-primary/10 flex-shrink-0 hidden lg:flex flex-col h-screen sticky top-0">
+<div class="p-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons text-background-dark">bakery_dining</span>
+</div>
+<div>
+<h1 class="serif-font text-xl font-bold tracking-tight text-primary">The Breakery</h1>
+<p class="text-[10px] uppercase tracking-widest text-primary/60 font-medium">B2B Wholesale</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary border border-primary/20" href="#">
+<span class="material-icons text-[20px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-white/5 transition-all" href="#">
+<span class="material-icons text-[20px]">groups</span>
+<span class="text-sm font-medium">Wholesale Clients</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-white/5 transition-all" href="#">
+<span class="material-icons text-[20px]">receipt_long</span>
+<span class="text-sm font-medium">Orders &amp; POs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-white/5 transition-all" href="#">
+<span class="material-icons text-[20px]">local_shipping</span>
+<span class="text-sm font-medium">Delivery Logistics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-white/5 transition-all" href="#">
+<span class="material-icons text-[20px]">account_balance</span>
+<span class="text-sm font-medium">Accounts Receivable</span>
+</a>
+</nav>
+<div class="p-4 mt-auto border-t border-white/5">
+<div class="bg-primary/5 rounded-xl p-4 mb-4">
+<p class="text-xs text-primary/80 mb-1">Production Status</p>
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs font-semibold">Active Batches</span>
+<span class="text-xs text-primary">88%</span>
+</div>
+<div class="w-full bg-white/10 rounded-full h-1.5">
+<div class="bg-primary h-1.5 rounded-full" style="width: 88%"></div>
+</div>
+</div>
+<div class="flex items-center gap-3 px-2">
+<img alt="Admin" class="w-8 h-8 rounded-full border border-primary/30" data-alt="Portrait of the dashboard administrator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoeikgrG1caVNf9zQ7lhpvOEnnQfyqztwh2LtCpE25G8XczUrpJzYapknJpLkxmPnRbq5qNzh43gzYyviMuOM86zhqByTY2DrEqMUrv-Q3eL0ui8u2Bo2jbpbzLQ_Fj9rfMrlPRLpK5i1EtmJnIvOD8KIoMYsPoG5RDbBMdcP4dmgKj7x7n9R-hUj3w-umYZMYE2ZizsWkULSW3rUvMlDoOkuO42aThMggK9D3YiTolrA9w6G1nWU8Mn68c11dg_IHii3e5XzR8P6x"/>
+<div class="overflow-hidden">
+<p class="text-xs font-semibold truncate">Julian March</p>
+<p class="text-[10px] text-slate-500 truncate">Wholesale Director</p>
+</div>
+<span class="material-icons text-slate-500 text-sm ml-auto">settings</span>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+<!-- Header Section -->
+<header class="h-20 flex items-center justify-between px-8 border-b border-white/5 sticky top-0 bg-background-dark/80 backdrop-blur-md z-10">
+<div>
+<nav class="flex items-center gap-2 text-xs text-slate-500 mb-1">
+<span>Settings</span>
+<span class="material-icons text-[12px]">chevron_right</span>
+<span class="text-primary/70">B2B Management</span>
+</nav>
+<h2 class="serif-font text-2xl font-bold tracking-tight">Wholesale Management</h2>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 text-slate-300 hover:bg-white/5 transition-all text-sm font-medium">
+<span class="material-icons text-sm">contact_page</span>
+                    Client CRM
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 text-slate-300 hover:bg-white/5 transition-all text-sm font-medium">
+<span class="material-icons text-sm">description</span>
+                    Generate Statement
+                </button>
+<button class="flex items-center gap-2 px-5 py-2 rounded-lg bg-primary text-background-dark hover:brightness-110 transition-all text-sm font-bold shadow-lg shadow-primary/10">
+<span class="material-icons text-sm">add_shopping_cart</span>
+                    Create Wholesale Order
+                </button>
+</div>
+</header>
+<div class="p-8 space-y-8">
+<!-- KPI Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+<!-- KPI 1 -->
+<div class="bg-card-dark p-6 rounded-xl border border-white/5 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-icons text-5xl">groups</span>
+</div>
+<p class="text-sm text-slate-400 font-medium mb-2">Active Wholesale Clients</p>
+<div class="flex items-end gap-2">
+<span class="text-3xl font-bold text-primary">42</span>
+<span class="text-xs text-green-500 font-medium mb-1.5 flex items-center">
+<span class="material-icons text-xs">trending_up</span> +3 this mo
+                        </span>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="bg-card-dark p-6 rounded-xl border border-white/5 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-icons text-5xl">account_balance_wallet</span>
+</div>
+<p class="text-sm text-slate-400 font-medium mb-2">Total Receivables (AR)</p>
+<div class="flex items-end gap-2">
+<span class="text-3xl font-bold">$124,500.00</span>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="bg-card-dark p-6 rounded-xl border border-white/10 relative overflow-hidden group ring-1 ring-amber-500/20">
+<div class="absolute top-0 right-0 p-4 opacity-20">
+<span class="material-icons text-5xl text-amber-500">warning</span>
+</div>
+<p class="text-sm text-slate-400 font-medium mb-2">Overdue (30+ days)</p>
+<div class="flex items-end gap-2">
+<span class="text-3xl font-bold text-amber-500">$18,200.00</span>
+<span class="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 uppercase font-bold mb-2">Critical</span>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="bg-card-dark p-6 rounded-xl border border-white/5 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-icons text-5xl">shopping_bag</span>
+</div>
+<p class="text-sm text-slate-400 font-medium mb-2">Open POs</p>
+<div class="flex items-end gap-2">
+<span class="text-3xl font-bold text-slate-100">15</span>
+<span class="text-xs text-slate-500 mb-1.5">Awaiting production</span>
+</div>
+</div>
+</div>
+<!-- Middle Section: Clients & Trends -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Top Wholesale Clients Table -->
+<div class="lg:col-span-2 bg-card-dark rounded-xl border border-white/5 flex flex-col h-[400px]">
+<div class="p-5 border-b border-white/5 flex justify-between items-center">
+<h3 class="serif-font text-lg font-bold">Top Wholesale Clients</h3>
+<button class="text-primary text-xs font-semibold hover:underline">View All Clients</button>
+</div>
+<div class="overflow-x-auto flex-1 custom-scrollbar">
+<table class="w-full text-left text-sm">
+<thead class="bg-white/[0.02] sticky top-0">
+<tr>
+<th class="px-5 py-4 font-semibold text-slate-400">Client Name</th>
+<th class="px-5 py-4 font-semibold text-slate-400">Contract Type</th>
+<th class="px-5 py-4 font-semibold text-slate-400">Credit Limit</th>
+<th class="px-5 py-4 font-semibold text-slate-400">Current Balance</th>
+<th class="px-5 py-4 font-semibold text-slate-400">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="px-5 py-4 font-medium">Grand Horizon Hotels</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 rounded bg-primary/10 text-primary text-[10px] uppercase font-bold tracking-wider border border-primary/20">Standing Order</span>
+</td>
+<td class="px-5 py-4 text-slate-300">$25,000</td>
+<td class="px-5 py-4 text-slate-100 font-semibold">$12,420</td>
+<td class="px-5 py-4"><span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-2"></span>Active</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="px-5 py-4 font-medium">Artisan Coffee Co.</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 rounded bg-slate-800 text-slate-400 text-[10px] uppercase font-bold tracking-wider border border-white/10">On-Demand</span>
+</td>
+<td class="px-5 py-4 text-slate-300">$10,000</td>
+<td class="px-5 py-4 text-amber-500 font-semibold">$8,900</td>
+<td class="px-5 py-4"><span class="w-2 h-2 rounded-full bg-amber-500 inline-block mr-2"></span>Review</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="px-5 py-4 font-medium">Metro Bistro Group</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 rounded bg-primary/10 text-primary text-[10px] uppercase font-bold tracking-wider border border-primary/20">Standing Order</span>
+</td>
+<td class="px-5 py-4 text-slate-300">$50,000</td>
+<td class="px-5 py-4 text-slate-100 font-semibold">$21,050</td>
+<td class="px-5 py-4"><span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-2"></span>Active</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="px-5 py-4 font-medium">Summit Catering</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 rounded bg-slate-800 text-slate-400 text-[10px] uppercase font-bold tracking-wider border border-white/10">On-Demand</span>
+</td>
+<td class="px-5 py-4 text-slate-300">$5,000</td>
+<td class="px-5 py-4 text-slate-100 font-semibold">$1,200</td>
+<td class="px-5 py-4"><span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-2"></span>Active</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="px-5 py-4 font-medium">Boulangerie Local</td>
+<td class="px-5 py-4">
+<span class="px-2 py-1 rounded bg-primary/10 text-primary text-[10px] uppercase font-bold tracking-wider border border-primary/20">Standing Order</span>
+</td>
+<td class="px-5 py-4 text-slate-300">$15,000</td>
+<td class="px-5 py-4 text-red-400 font-semibold">$14,800</td>
+<td class="px-5 py-4"><span class="w-2 h-2 rounded-full bg-red-500 inline-block mr-2"></span>On Hold</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- B2B Sales Trend Multi-line Chart Area -->
+<div class="bg-card-dark rounded-xl border border-white/5 flex flex-col">
+<div class="p-5 border-b border-white/5">
+<h3 class="serif-font text-lg font-bold">B2B Sales Trend</h3>
+<p class="text-[10px] text-slate-500 mt-1 uppercase tracking-widest">Monthly Growth vs Retail</p>
+</div>
+<div class="p-6 flex-1 flex flex-col justify-between">
+<div class="flex items-center gap-6 mb-6">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary shadow-lg shadow-primary/20"></span>
+<span class="text-xs text-slate-400">Bulk Wholesale</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-slate-100 shadow-lg shadow-white/10"></span>
+<span class="text-xs text-slate-400">Retail Revenue</span>
+</div>
+</div>
+<!-- Pseudo Chart Visualization -->
+<div class="h-48 w-full relative group">
+<!-- Grid lines -->
+<div class="absolute inset-0 flex flex-col justify-between opacity-5 pointer-events-none">
+<div class="w-full h-px bg-white"></div>
+<div class="w-full h-px bg-white"></div>
+<div class="w-full h-px bg-white"></div>
+<div class="w-full h-px bg-white"></div>
+</div>
+<!-- Mock Lines using SVG -->
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none">
+<!-- Bulk Line (Gold) -->
+<path d="M0,160 Q80,140 160,110 T320,80 T480,40" fill="none" stroke="#eead2b" stroke-width="3"></path>
+<!-- Retail Line (Cream) -->
+<path d="M0,180 Q80,175 160,170 T320,150 T480,140" fill="none" stroke="#f8f7f6" stroke-dasharray="4" stroke-width="2"></path>
+<!-- Data points -->
+<circle cx="480" cy="40" fill="#eead2b" r="4"></circle>
+<circle cx="480" cy="140" fill="#f8f7f6" r="4"></circle>
+</svg>
+</div>
+<div class="flex justify-between mt-4">
+<span class="text-[10px] text-slate-600 font-bold uppercase">Jan</span>
+<span class="text-[10px] text-slate-600 font-bold uppercase">Feb</span>
+<span class="text-[10px] text-slate-600 font-bold uppercase">Mar</span>
+<span class="text-[10px] text-slate-600 font-bold uppercase">Apr</span>
+<span class="text-[10px] text-slate-600 font-bold uppercase">May</span>
+<span class="text-[10px] text-slate-600 font-bold uppercase">Jun</span>
+</div>
+</div>
+<div class="p-5 bg-white/[0.02] border-t border-white/5 text-center">
+<p class="text-xs text-slate-500 italic">Wholesale volume up 24% from Q1</p>
+</div>
+</div>
+</div>
+<!-- Bottom Section: Recent Deliveries -->
+<div class="bg-card-dark rounded-xl border border-white/5">
+<div class="p-5 border-b border-white/5 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-icons text-primary">local_shipping</span>
+<h3 class="serif-font text-lg font-bold">Recent Deliveries</h3>
+</div>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-white/5 rounded text-[10px] font-bold text-slate-400">TODAY: 12 DELIVERIES</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm">
+<thead class="bg-white/[0.02]">
+<tr>
+<th class="px-5 py-4 font-semibold text-slate-400">Order #</th>
+<th class="px-5 py-4 font-semibold text-slate-400">Client</th>
+<th class="px-5 py-4 font-semibold text-slate-400">Route</th>
+<th class="px-5 py-4 font-semibold text-slate-400">ETD</th>
+<th class="px-5 py-4 font-semibold text-slate-400">Status</th>
+<th class="px-5 py-4"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="px-5 py-4 text-primary font-mono font-bold tracking-tight">#WH-8901</td>
+<td class="px-5 py-4">Grand Horizon Hotels</td>
+<td class="px-5 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-blue-500"></span>
+<span class="font-medium">North Route</span>
+</div>
+</td>
+<td class="px-5 py-4 text-slate-400">04:30 AM</td>
+<td class="px-5 py-4">
+<span class="text-xs font-semibold py-1 px-3 rounded-full bg-green-500/10 text-green-500 border border-green-500/20">Delivered</span>
+</td>
+<td class="px-5 py-4 text-right">
+<button class="material-icons text-slate-600 hover:text-white transition-colors">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="px-5 py-4 text-primary font-mono font-bold tracking-tight">#WH-8902</td>
+<td class="px-5 py-4">Artisan Coffee Co.</td>
+<td class="px-5 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-purple-500"></span>
+<span class="font-medium">Central Route</span>
+</div>
+</td>
+<td class="px-5 py-4 text-slate-400">05:15 AM</td>
+<td class="px-5 py-4">
+<span class="text-xs font-semibold py-1 px-3 rounded-full bg-primary/10 text-primary border border-primary/20">In Transit</span>
+</td>
+<td class="px-5 py-4 text-right">
+<button class="material-icons text-slate-600 hover:text-white transition-colors">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors">
+<td class="px-5 py-4 text-primary font-mono font-bold tracking-tight">#WH-8903</td>
+<td class="px-5 py-4">Metro Bistro Group</td>
+<td class="px-5 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-orange-500"></span>
+<span class="font-medium">South Route</span>
+</div>
+</td>
+<td class="px-5 py-4 text-slate-400">06:00 AM</td>
+<td class="px-5 py-4">
+<span class="text-xs font-semibold py-1 px-3 rounded-full bg-slate-800 text-slate-500 border border-white/5">Queued</span>
+</td>
+<td class="px-5 py-4 text-right">
+<button class="material-icons text-slate-600 hover:text-white transition-colors">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<footer class="p-8 mt-auto border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-xs text-slate-600 gap-4">
+<p>© 2024 The Breakery Premium Systems. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="hover:text-primary transition-colors" href="#">System Health</a>
+<a class="hover:text-primary transition-colors" href="#">API Documentation</a>
+<a class="hover:text-primary transition-colors" href="#">B2B Support</a>
+</div>
+</footer>
+</main>
+<!-- Right Side Sidebar (Floating Stats / Mini Map) -->
+<aside class="w-[300px] border-l border-white/5 hidden xl:flex flex-col p-6 bg-sidebar-dark/40 overflow-y-auto custom-scrollbar">
+<h4 class="serif-font font-bold mb-6 flex items-center gap-2">
+<span class="material-icons text-primary text-sm">map</span>
+            Delivery Map
+        </h4>
+<div class="w-full aspect-square bg-neutral-muted rounded-xl mb-6 relative overflow-hidden group">
+<img alt="Logistics Map" class="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity grayscale" data-alt="Digital map of the city delivery routes" data-location="New York City" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDz8QOXxkav-WDWwrUzHm19rtPWrRmjVdABgPiQfp6qVaa4wOBymvYZ95Xe_-Zzymeo3RmluxG4zPxYXi2QTwI4f96PgEKWTHQbdsZjA_4fgxOQdNkei1MfXEYVM595tk9adz06IM13CrdqXeA6lssJul6TjW93W7Zmv2H_lqRAAnD51LUKu9Jclk6UDSf0r-ZZhBEeE7r2R4nNbXwG0ZniX9SrfRv6Ds9F0rHcTVthl7KlBNjGBf3IqKSt32d6UgabYrxmwkv2ITgn"/>
+<div class="absolute inset-0 p-4 flex flex-col justify-between pointer-events-none">
+<div class="flex justify-between items-start">
+<span class="px-2 py-1 bg-primary text-background-dark text-[8px] font-bold rounded">LIVE</span>
+<div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+</div>
+<div class="space-y-2">
+<div class="w-2 h-2 rounded-full bg-primary absolute top-1/2 left-1/3 ring-4 ring-primary/20"></div>
+<div class="w-2 h-2 rounded-full bg-white absolute top-1/4 right-1/4"></div>
+<div class="w-2 h-2 rounded-full bg-white absolute bottom-1/3 left-1/2"></div>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div>
+<h5 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Route Performance</h5>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-blue-500"></span>
+<span class="text-xs font-medium">North Route</span>
+</div>
+<span class="text-xs text-primary">On Time</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-purple-500"></span>
+<span class="text-xs font-medium">Central Route</span>
+</div>
+<span class="text-xs text-amber-500">Delayed (+12m)</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-orange-500"></span>
+<span class="text-xs font-medium">South Route</span>
+</div>
+<span class="text-xs text-primary">On Time</span>
+</div>
+</div>
+</div>
+<div class="bg-primary/5 p-4 rounded-xl border border-primary/20">
+<h5 class="text-[10px] font-bold text-primary uppercase tracking-widest mb-2">Production Queue</h5>
+<p class="text-sm font-semibold mb-4 text-slate-100">842 Artisan Loaves remaining for morning delivery.</p>
+<div class="flex -space-x-2">
+<img alt="Baker 1" class="w-7 h-7 rounded-full border-2 border-background-dark" data-alt="Baker team member 1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTgkylYIVdve4GjndWu7EWYS7FKwkuTtxLPoeghLbyXXwbP8CTMxM-xOVxIcLFwffFfu5pOqzx0QWGAcK_IG2XgonrcN0nnTKTlWwWO3elbTGJI-C3vptSL4RwRY50sWhi-e4r1-EbadkYoBW_eDh1k0QXfGusXq4qdtvmFypzjNtxKTozjkQUlZEkZvp_pd18JCtaN5s2Pt7IytmBtg89nY5Mm0MJhWhM4tFXXRaf5ouEsfvIUymDMGdBTpSIe9zwBl9tFONzUAH6"/>
+<img alt="Baker 2" class="w-7 h-7 rounded-full border-2 border-background-dark" data-alt="Baker team member 2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHcNQZD0B4E6gVY8FDVNP02Ztp8hj71YnE4HsoKf7SbsS2X6sMEE9a4IYhtmZMCkqbgIeiij1ekIRIr7SBZdUMmoEJT9PUQ8nzmis1XnHu7ntjOwQc_ISA7F3mhdLi1JSN6Snt_koAkqPDsL9IrLMzUyuuquH8_Yme3Pd0nXGTaBlRKOsGJudflC9jdJkH-NZmzqRnVgS6vzg_aqKmcd02JzaJWc6_vICxPOA4l9CAuf2oz2sO4gV9_9gRmOs3H_tDwxVVHUXe4RFA"/>
+<img alt="Baker 3" class="w-7 h-7 rounded-full border-2 border-background-dark" data-alt="Baker team member 3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAq-KSLBE9b2abc1bfUJEXPxn7JIPZgQAekNAdE5sPuv7UONvI2fez38scvNMMxnkjUNAZmdz9--SWmPrbtwWZZhNmghrNqMT_fvp3ECkZJUqPuisD3lVCe1p_TyF5Y-xpsUz_LRd03SQleJfb2qat08GomZcw5BGuDxg8uJGyt6GoaRJTKotuDfw9emv68ukm-S9sSyThmwYlDCq2qVEcoGRs80YN0eAZ3ih3V7xri8rBmikgPTWBszbqxUowHDJio0rN7TRrFt8Kd"/>
+<div class="w-7 h-7 rounded-full bg-neutral-muted border-2 border-background-dark flex items-center justify-center text-[8px] font-bold">+5</div>
+</div>
+</div>
+</div>
+</aside>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    \ }} />
+  );
+};
+
+export default Wholesale_Management_Overview;

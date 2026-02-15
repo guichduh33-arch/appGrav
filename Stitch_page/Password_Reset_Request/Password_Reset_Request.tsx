@@ -1,0 +1,152 @@
+import React from 'react';
+
+const Password_Reset_Request: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: \
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Password Reset</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#c8a45b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#0D0D0F",
+                        "charcoal": "#1A1A1D",
+                        "taupe-muted": "#A19B8F",
+                        "border-subtle": "#2A2A2D",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .serif-heading {
+            font-family: 'Playfair Display', serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-6 selection:bg-primary/30 selection:text-primary">
+<div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+<!-- State A: Request Form -->
+<div class="flex flex-col items-center">
+<div class="w-full max-w-[480px] bg-charcoal border border-border-subtle p-10 rounded-xl shadow-2xl">
+<div class="flex flex-col items-center text-center mb-8">
+<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+<span class="material-icons-round text-primary text-4xl">vpn_key</span>
+</div>
+<h1 class="serif-heading text-3xl font-bold text-white mb-3">Reset Password</h1>
+<p class="text-taupe-muted text-sm leading-relaxed max-w-[280px]">
+                        Enter your email and we'll send a password reset link to your inbox.
+                    </p>
+</div>
+<form action="#" class="space-y-6" method="POST">
+<div>
+<label class="block text-xs font-semibold text-primary uppercase tracking-widest mb-2 ml-1" for="email">Email Address</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-icons-round text-taupe-muted group-focus-within:text-primary transition-colors text-xl">mail</span>
+</div>
+<input class="block w-full pl-11 pr-4 py-3.5 bg-background-dark border border-border-subtle rounded-lg text-white placeholder-taupe-muted/50 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all text-sm" id="email" name="email" placeholder="bakery@example.com" type="email"/>
+</div>
+</div>
+<button class="w-full bg-primary hover:bg-primary/90 text-charcoal font-bold py-4 rounded-lg transition-all transform active:scale-[0.98] shadow-lg shadow-primary/10" type="button">
+                        Send Reset Link
+                    </button>
+</form>
+<div class="mt-8 pt-8 border-t border-border-subtle/50 text-center">
+<a class="inline-flex items-center text-sm text-primary hover:text-primary/80 transition-colors font-medium" href="#">
+<span class="material-icons-round text-lg mr-2">arrow_back</span>
+                        Back to Sign In
+                    </a>
+</div>
+</div>
+<div class="mt-8 text-taupe-muted/30 text-[10px] uppercase tracking-[0.2em]">
+                State: Initial Request
+            </div>
+</div>
+<!-- State B: Success Notification -->
+<div class="flex flex-col items-center relative">
+<!-- Decorative background element for the success side -->
+<div class="absolute -z-10 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -top-20"></div>
+<div class="w-full max-w-[480px] bg-charcoal border border-border-subtle p-10 rounded-xl shadow-2xl relative overflow-hidden">
+<!-- Subtle gold accent bar at top -->
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
+<div class="flex flex-col items-center text-center py-4">
+<div class="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mb-8">
+<span class="material-icons-round text-green-400 text-5xl">check_circle</span>
+</div>
+<h2 class="serif-heading text-3xl font-bold text-white mb-4">Check Your Email</h2>
+<p class="text-taupe-muted text-sm leading-relaxed mb-8">
+                        We've sent a password reset link to <span class="text-white font-medium">s***@bakery.com</span>. Please check your spam folder if you don't see it.
+                    </p>
+<div class="space-y-4 w-full">
+<button class="w-full bg-border-subtle hover:bg-border-subtle/80 text-white font-medium py-3.5 rounded-lg transition-all text-sm">
+                            Open Email App
+                        </button>
+<div class="flex flex-col items-center space-y-2 pt-2">
+<p class="text-xs text-taupe-muted">Didn't receive the link?</p>
+<button class="text-primary hover:underline font-semibold text-sm transition-all tracking-wide">
+                                Resend Email
+                            </button>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-8 border-t border-border-subtle/50 text-center">
+<div class="flex justify-center space-x-1">
+<div class="w-1.5 h-1.5 rounded-full bg-primary/20"></div>
+<div class="w-4 h-1.5 rounded-full bg-primary"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-primary/20"></div>
+</div>
+</div>
+</div>
+<div class="mt-8 text-taupe-muted/30 text-[10px] uppercase tracking-[0.2em]">
+                State: Success Confirmation
+            </div>
+</div>
+</div>
+<!-- Branding Footer -->
+<div class="fixed bottom-8 left-0 right-0 text-center">
+<div class="flex items-center justify-center space-x-2">
+<span class="serif-heading italic text-primary text-xl font-bold">The Breakery</span>
+<span class="h-4 w-px bg-border-subtle"></span>
+<span class="text-taupe-muted text-xs tracking-widest uppercase">Artisan Management</span>
+</div>
+</div>
+<!-- Background Decoration Images -->
+<div class="fixed top-0 right-0 -z-20 opacity-20 pointer-events-none overflow-hidden h-full w-full">
+<div class="absolute -top-40 -right-40 w-96 h-96 bg-primary rounded-full blur-[150px]"></div>
+<div class="absolute bottom-1/4 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-[120px]"></div>
+</div>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    \ }} />
+  );
+};
+
+export default Password_Reset_Request;

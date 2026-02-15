@@ -1,0 +1,357 @@
+import React from 'react';
+
+const Product_Catalog_Management: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: \
+      <!-- STITCH_HTML_START -->
+      <html class="dark" lang="en"><head>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head><body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex overflow-hidden">\`\`\`html
+
+
+
+
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Product Catalog Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;family=Playfair+Display:wght@700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f2d00d",
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#0D0D0F",
+                        "surface-dark": "#111113",
+                        "card-dark": "#1A1A1D",
+                        "onyx-black": "#0D0D0F"
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "playfair": ["Playfair Display", "serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #0D0D0F;
+            color: #E2E2E7;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .custom-shadow {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+<!-- Sidebar -->
+<aside class="w-[260px] bg-surface-dark border-r border-primary/10 flex flex-col h-screen">
+<div class="p-6">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+<span class="material-icons-round text-background-dark font-bold">bakery_dining</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-white uppercase">The Breakery</h1>
+</div>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary border-l-2 border-primary" href="#">
+<span class="material-icons-round text-[20px]">inventory_2</span>
+<span class="font-semibold">Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white/60 hover:bg-white/5 hover:text-white transition-colors" href="#">
+<span class="material-icons-round text-[20px]">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white/60 hover:bg-white/5 hover:text-white transition-colors" href="#">
+<span class="material-icons-round text-[20px]">shopping_basket</span>
+<span>Orders</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white/60 hover:bg-white/5 hover:text-white transition-colors" href="#">
+<span class="material-icons-round text-[20px]">people</span>
+<span>Customers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white/60 hover:bg-white/5 hover:text-white transition-colors" href="#">
+<span class="material-icons-round text-[20px]">bar_chart</span>
+<span>Reports</span>
+</a>
+</nav>
+<div class="p-4 mt-auto border-t border-white/5">
+<div class="flex items-center gap-3 px-2">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Headshot of the bakery manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCAF18EE-8qqhKncGUFqWFm35T-o_sqx19VLLAnvQGnKl58XnqBcQ3UDexZ3U1E6BtV0OgKPf0ok-_fsol9RvGI8x5rKvWA55JeL9-IAN7-O4Kzy8RNoW7ui-fE1EVgDO2rnpi9XS-FSVDu9dqcI4fxmVBJZb9Y4yyNOOFRbFi0mLMJ5pQsVpOEfqWXoBSYWqmKV_I3jCu0GA8qhdkEmhhJa-8-fm1VUBez3W3ClWiOoGnMG2UO68Re3mpnXfP43g66Oj4Tt0hdMCB"/>
+</div>
+<div class="flex flex-col overflow-hidden">
+<span class="text-sm font-bold text-white truncate">Marcus Gold</span>
+<span class="text-xs text-white/40 truncate">Master Baker</span>
+</div>
+<span class="material-icons-round text-white/20 ml-auto">settings</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-screen overflow-y-auto hide-scrollbar">
+<!-- Tab Navigation Bar -->
+<header class="bg-surface-dark/50 backdrop-blur-md border-b border-white/5 sticky top-0 z-30">
+<div class="px-8 flex items-center justify-between">
+<div class="flex gap-8">
+<button class="py-4 border-b-2 border-primary text-primary font-bold text-sm uppercase tracking-wider">Products</button>
+<button class="py-4 border-b-2 border-transparent text-white/40 hover:text-white/60 font-bold text-sm uppercase tracking-wider transition-all">Combos</button>
+<button class="py-4 border-b-2 border-transparent text-white/40 hover:text-white/60 font-bold text-sm uppercase tracking-wider transition-all">Promotions</button>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-icons-round text-white/40 cursor-pointer">notifications</span>
+<span class="material-icons-round text-white/40 cursor-pointer">help_outline</span>
+</div>
+</div>
+</header>
+<div class="p-8 space-y-8">
+<!-- Header Section -->
+<div class="flex items-center justify-between">
+<div>
+<h2 class="font-playfair text-4xl text-white">Products</h2>
+<p class="text-white/40 text-sm mt-1">Manage your bakery's inventory and artisanal catalog</p>
+</div>
+<button class="bg-primary text-background-dark font-bold px-6 py-2.5 rounded-lg flex items-center gap-2 hover:brightness-110 transition-all custom-shadow">
+<span class="material-icons-round text-xl">add</span>
+                    New Product
+                </button>
+</div>
+<!-- KPI Row -->
+<div class="grid grid-cols-4 gap-4">
+<div class="bg-card-dark p-5 rounded-xl border border-white/5 flex flex-col justify-between">
+<span class="text-white/40 text-xs font-bold uppercase tracking-widest">Total Products</span>
+<div class="flex items-end justify-between mt-2">
+<span class="text-3xl font-mono text-white">156</span>
+<span class="material-icons-round text-primary/40">inventory_2</span>
+</div>
+</div>
+<div class="bg-card-dark p-5 rounded-xl border border-white/5 flex flex-col justify-between">
+<span class="text-white/40 text-xs font-bold uppercase tracking-widest">Active</span>
+<div class="flex items-end justify-between mt-2">
+<span class="text-3xl font-mono text-white">142</span>
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mb-2"></span>
+</div>
+</div>
+<div class="bg-card-dark p-5 rounded-xl border border-white/5 flex flex-col justify-between">
+<span class="text-white/40 text-xs font-bold uppercase tracking-widest">Low Stock</span>
+<div class="flex items-end justify-between mt-2">
+<span class="text-3xl font-mono text-amber-500">7</span>
+<span class="material-icons-round text-amber-500/40">warning</span>
+</div>
+</div>
+<div class="bg-card-dark p-5 rounded-xl border border-white/5 flex flex-col justify-between">
+<span class="text-white/40 text-xs font-bold uppercase tracking-widest">Out of Stock</span>
+<div class="flex items-end justify-between mt-2">
+<span class="text-3xl font-mono text-red-500">3</span>
+<span class="material-icons-round text-red-500/40">error_outline</span>
+</div>
+</div>
+</div>
+<!-- Filters and Controls -->
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-3 flex-1">
+<div class="relative flex-1 max-w-md">
+<span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-xl">search</span>
+<input class="w-full bg-card-dark border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder:text-white/20 focus:outline-none focus:border-primary/50" placeholder="Search by name, SKU..." type="text"/>
+</div>
+<select class="bg-card-dark border border-white/10 rounded-lg px-4 py-2.5 text-white/60 text-sm focus:border-primary/50 focus:outline-none appearance-none cursor-pointer">
+<option>Category: All</option>
+<option>Pastries</option>
+<option>Breads</option>
+<option>Cakes</option>
+</select>
+<select class="bg-card-dark border border-white/10 rounded-lg px-4 py-2.5 text-white/60 text-sm focus:border-primary/50 focus:outline-none appearance-none cursor-pointer">
+<option>Type: All</option>
+<option>Retail</option>
+<option>Wholesale</option>
+</select>
+<select class="bg-card-dark border border-white/10 rounded-lg px-4 py-2.5 text-white/60 text-sm focus:border-primary/50 focus:outline-none appearance-none cursor-pointer">
+<option>Status: All</option>
+<option>In Stock</option>
+<option>Low Stock</option>
+</select>
+</div>
+<div class="flex items-center bg-card-dark rounded-lg p-1 border border-white/10">
+<button class="p-2 bg-primary/20 text-primary rounded-md flex items-center justify-center">
+<span class="material-icons-round text-[20px]">grid_view</span>
+</button>
+<button class="p-2 text-white/30 hover:text-white/60 rounded-md flex items-center justify-center">
+<span class="material-icons-round text-[20px]">list</span>
+</button>
+</div>
+</div>
+<!-- Product Grid Area -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Product Card 1 -->
+<div class="group relative bg-card-dark rounded-xl border border-white/5 overflow-hidden hover:border-primary/30 transition-all duration-300">
+<div class="h-48 overflow-hidden relative">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Artisanal sourdough bread loaf" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAr68lhHSQIRYZuRG2rdJAFPKsMO1L9YCJ1ZlQrfUjE-Lh1fDNwEJv94PKIRqiu_FktAiDYihwbMprzm4GHw1vnoZSGnq3zXbZ8B9Q4ZyJKI2WkiTOLbI4jwCA6UgcNUDe7lS_S1FA7UkfQnv8-CNL-UnRNIhWVkcsg2NaEmdifwc-qKIm5wUFmQN8qzD717xbyow1y3h713LDVrB5cU1jtsaxfImWJx76vYlsLNh34o4-rtP8mntOuA71wh15W4mynNt5wx2DDta04"/>
+<div class="absolute top-3 left-3">
+<span class="bg-onyx-black/80 backdrop-blur-md text-white/80 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">Breads</span>
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+<button class="w-10 h-10 bg-primary text-background-dark rounded-full flex items-center justify-center"><span class="material-icons-round text-[20px]">edit</span></button>
+<button class="w-10 h-10 bg-white/10 text-white rounded-full backdrop-blur-md flex items-center justify-center"><span class="material-icons-round text-[20px]">content_copy</span></button>
+</div>
+</div>
+<div class="p-4 space-y-2">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-white text-lg leading-tight">Rustic Sourdough Loaf</h3>
+<div class="w-2 h-2 rounded-full bg-emerald-500 mt-1.5"></div>
+</div>
+<p class="font-mono text-[11px] text-white/40 tracking-tighter uppercase">SKU: BREAD-SOUR-001</p>
+<div class="flex items-center justify-between pt-2 border-t border-white/5">
+<span class="font-mono text-primary font-bold text-lg">$8.50</span>
+<span class="text-[10px] text-white/30">In Stock: <span class="text-white/80">42</span></span>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="group relative bg-card-dark rounded-xl border border-white/5 overflow-hidden hover:border-primary/30 transition-all duration-300">
+<div class="h-48 overflow-hidden relative">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Assorted French macarons" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2pzzFKv_n2q4w9PbEq4ONjp0ZElzLSQp30c46BokCvsmSK87q4e8uM8W3AXgkXHMhJ8Rt4Mch29Ra7rtDQzN6sqtx7GHT279ADOpVFHy-xPwo-caYn2rFKk6phdA-Zjua4gtr9kQmzHQSbLTB0yzNWG34RU--6EiJv6Ed0xLnyCYrWZLT9ZLERErIosHzB_WJ2o-Szxp8aehFsK4B7ozGEmjLdLJXsMW9P-plb2suw3bZNwmkR4AQUt-rVsdaL0-3JNkOyolhC8qQ"/>
+<div class="absolute top-3 left-3">
+<span class="bg-onyx-black/80 backdrop-blur-md text-white/80 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">Pastries</span>
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+<button class="w-10 h-10 bg-primary text-background-dark rounded-full flex items-center justify-center"><span class="material-icons-round text-[20px]">edit</span></button>
+<button class="w-10 h-10 bg-white/10 text-white rounded-full backdrop-blur-md flex items-center justify-center"><span class="material-icons-round text-[20px]">content_copy</span></button>
+</div>
+</div>
+<div class="p-4 space-y-2">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-white text-lg leading-tight">Parisian Macaron Box (12)</h3>
+<div class="w-2 h-2 rounded-full bg-amber-500 mt-1.5"></div>
+</div>
+<p class="font-mono text-[11px] text-white/40 tracking-tighter uppercase">SKU: PAST-MAC-BOX</p>
+<div class="flex items-center justify-between pt-2 border-t border-white/5">
+<span class="font-mono text-primary font-bold text-lg">$24.00</span>
+<span class="text-[10px] text-amber-500/80">Low Stock: <span class="font-bold">7</span></span>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="group relative bg-card-dark rounded-xl border border-white/5 overflow-hidden hover:border-primary/30 transition-all duration-300">
+<div class="h-48 overflow-hidden relative opacity-60">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Chocolate ganache layered cake" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTYZ8HqgAi0AD4p4PdfzTMXX-7TXf5Vd55l9026Inw6h9e3iMIl1UTw7QzlGFKp9BTr8FcbRAWHmk82AKnqfIO_sRiGeoPYIb9fvqX2wB2i7Y38RzGfAvAxqzk0GozQYLiOKnWgmOnDvBDFI8l6Fm_XNEamuuepjLvDfV6vCAlhZhGJNHttw19KtCnVWZIbUnEy3f560DqM2YNXqm8CUyD8e4BjodorkUx5jIHtA8cuWT3VDwlfJHs9IIOwbQukGpii2VQlNu1pojx"/>
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+<span class="text-white text-xs font-bold uppercase tracking-widest bg-red-600/80 px-3 py-1 rounded">Sold Out</span>
+</div>
+<div class="absolute top-3 left-3">
+<span class="bg-onyx-black/80 backdrop-blur-md text-white/80 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">Cakes</span>
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+<button class="w-10 h-10 bg-primary text-background-dark rounded-full flex items-center justify-center"><span class="material-icons-round text-[20px]">edit</span></button>
+<button class="w-10 h-10 bg-white/10 text-white rounded-full backdrop-blur-md flex items-center justify-center"><span class="material-icons-round text-[20px]">content_copy</span></button>
+</div>
+</div>
+<div class="p-4 space-y-2">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-white/50 text-lg leading-tight">Dark Chocolate Velvet</h3>
+<div class="w-2 h-2 rounded-full bg-red-500 mt-1.5"></div>
+</div>
+<p class="font-mono text-[11px] text-white/20 tracking-tighter uppercase">SKU: CAKE-CHO-098</p>
+<div class="flex items-center justify-between pt-2 border-t border-white/5">
+<span class="font-mono text-primary/50 font-bold text-lg">$45.00</span>
+<span class="text-[10px] text-red-500/80">Stock: <span class="font-bold">0</span></span>
+</div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="group relative bg-card-dark rounded-xl border border-white/5 overflow-hidden hover:border-primary/30 transition-all duration-300">
+<div class="h-48 overflow-hidden relative">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="Fresh flaky butter croissants" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDE3DZLIWoyL7oN55vKb-H4gkLbwTp4ht0R6PpKmiZ_ZW2BFWnh514oeGr0CyLgPtOHSswz5sbVciVBHMWJ2Y--BNCA8uDUUD2uFbYSge4XZr5XYqG3hi1hR_2BrYKTttmDhl-f7VhtBhPbt0HoieT2T_atYoGi_RQp0RCuGaQ79201JTmu3-pGAk9mcP6oALXCxN7LvxLhrGBK3-5UZjdNZpF1z6d3jtiQI17XJ-dCxUgyHuLvdf2tipNzCuWLhCcq3ppdBdNSEty"/>
+<div class="absolute top-3 left-3">
+<span class="bg-onyx-black/80 backdrop-blur-md text-white/80 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded">Pastries</span>
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+<button class="w-10 h-10 bg-primary text-background-dark rounded-full flex items-center justify-center"><span class="material-icons-round text-[20px]">edit</span></button>
+<button class="w-10 h-10 bg-white/10 text-white rounded-full backdrop-blur-md flex items-center justify-center"><span class="material-icons-round text-[20px]">content_copy</span></button>
+</div>
+</div>
+<div class="p-4 space-y-2">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-white text-lg leading-tight">Traditional Butter Croissant</h3>
+<div class="w-2 h-2 rounded-full bg-emerald-500 mt-1.5"></div>
+</div>
+<p class="font-mono text-[11px] text-white/40 tracking-tighter uppercase">SKU: PAST-CRO-REG</p>
+<div class="flex items-center justify-between pt-2 border-t border-white/5">
+<span class="font-mono text-primary font-bold text-lg">$4.25</span>
+<span class="text-[10px] text-white/30">In Stock: <span class="text-white/80">114</span></span>
+</div>
+</div>
+</div>
+</div>
+<!-- List View Table (Hidden for Desktop grid but ready as requested) -->
+<div class="hidden bg-card-dark rounded-xl border border-white/5 overflow-hidden">
+<table class="w-full text-left text-sm">
+<thead>
+<tr class="bg-surface-dark border-b border-white/5 uppercase text-[10px] font-bold tracking-widest text-white/40">
+<th class="px-6 py-4">Name</th>
+<th class="px-6 py-4">SKU</th>
+<th class="px-6 py-4">Category</th>
+<th class="px-6 py-4">Price</th>
+<th class="px-6 py-4">Cost</th>
+<th class="px-6 py-4">Margin</th>
+<th class="px-6 py-4">Stock</th>
+<th class="px-6 py-4"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="hover:bg-white/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Small thumbnail of sourdough loaf" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrJkfSSe0VTXAmrKL_HxzIo-Co10iIx2vGOxgZithg-o38Ez8ymSanhh74B___8RPl9XZqONVo22FCcPFlOUHQaOnPX4ACLC04hIb9nu5wqXnxguFQs07fEeD_zpBqqyFhUPWYHBGCg71kxKQ0w7qc0iaqifkblWM9apXzoEpCX35EaKJSoGGj6T2iPJkYiU1jeE-XdFzOdXkbKKCXJZkwb06xjeS5OzeNuR9sgT7oeX2mPMFFZusP93nO07G9618othaJvr8bKoFU"/>
+</div>
+<span class="font-semibold text-white">Rustic Sourdough Loaf</span>
+</div>
+</td>
+<td class="px-6 py-4 font-mono text-white/40">BREAD-SOUR-001</td>
+<td class="px-6 py-4"><span class="text-white/60">Breads</span></td>
+<td class="px-6 py-4 font-mono text-primary">$8.50</td>
+<td class="px-6 py-4 font-mono text-white/40">$2.10</td>
+<td class="px-6 py-4"><span class="text-emerald-500 font-bold">75.3%</span></td>
+<td class="px-6 py-4">42</td>
+<td class="px-6 py-4 text-right">
+<button class="text-white/30 hover:text-white"><span class="material-icons-round">more_vert</span></button>
+</td>
+</tr>
+<!-- More rows would follow -->
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="flex items-center justify-between pt-4 border-t border-white/5">
+<span class="text-xs text-white/40 font-mono">Showing 1-12 of 156 products</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-white/40 hover:bg-white/5"><span class="material-icons-round">chevron_left</span></button>
+<button class="w-10 h-10 rounded-lg bg-primary text-background-dark font-bold flex items-center justify-center">1</button>
+<button class="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-white/40 hover:bg-white/5">2</button>
+<button class="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-white/40 hover:bg-white/5">3</button>
+<button class="w-10 h-10 rounded-lg border border-white/10 flex items-center justify-center text-white/40 hover:bg-white/5"><span class="material-icons-round">chevron_right</span></button>
+</div>
+</div>
+</div>
+</main>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    \ }} />
+  );
+};
+
+export default Product_Catalog_Management;

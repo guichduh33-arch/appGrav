@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Company Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600&amp;family=Playfair+Display:wght@600&amp;family=Material+Icons&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#c8a45b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#111113", // Deep Onyx per instructions
+                        "surface-dark": "#1e1b14", // Theme background-dark
+                        "border-charcoal": "#2A2A30",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; }
+        .serif-heading { font-family: 'Playfair Display', serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111113; }
+        ::-webkit-scrollbar-thumb { background: #2A2A30; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c8a45b; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-stone-800 dark:text-stone-200 min-h-screen flex flex-col font-display">
+<!-- Top Navigation / Header (Optional context) -->
+<header class="h-16 border-b border-border-charcoal flex items-center justify-between px-8 bg-background-dark/50 backdrop-blur-md sticky top-0 z-30">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-icons text-background-dark text-xl">bakery_dining</span>
+</div>
+<span class="text-xl font-serif tracking-wide text-primary">The Breakery</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-full bg-border-charcoal overflow-hidden border border-primary/30">
+<img class="w-full h-full object-cover" data-alt="User profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5CFGG1WBa-6V1XcL2_8Ws8DAiFEkHZf6rfs0m1eCysBdOK1gXAEzjOcKUHfVbZcrsTfB8LA0fkNTqAnT6hOg1O_07X1BWSZlGTZFehUeLbXu4OwgoqkNtH-iuBKabTSFVAOtDiNSI4YOw1IufbeoOCWIUvSmktGjCh9eOksedUoz9zJYMwoOZoMgsMd1b_PrgxkGJRapAo88gR4jtTfVan3GJYiNFz5EMxjG6JufFblm01IB-RsvTU8r0Q_nwQB0_Kjq4TEch4Jal"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-border-charcoal bg-background-dark/30 hidden lg:block">
+<nav class="p-6 space-y-2">
+<div class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-4 px-2">Settings</div>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary border-l-2 border-primary" href="#">
+<span class="material-icons text-xl">business</span>
+<span class="font-medium">Company Info</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-stone-400 hover:bg-stone-800/50 transition-colors" href="#">
+<span class="material-icons text-xl">people</span>
+<span class="font-medium">Staff &amp; Permissions</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-stone-400 hover:bg-stone-800/50 transition-colors" href="#">
+<span class="material-icons text-xl">inventory_2</span>
+<span class="font-medium">Inventory Config</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-stone-400 hover:bg-stone-800/50 transition-colors" href="#">
+<span class="material-icons text-xl">payments</span>
+<span class="font-medium">Billing &amp; Tax</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-stone-400 hover:bg-stone-800/50 transition-colors" href="#">
+<span class="material-icons text-xl">notifications</span>
+<span class="font-medium">Notifications</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto bg-background-dark/20 pb-24">
+<div class="max-w-4xl mx-auto px-8 py-10">
+<h1 class="serif-heading text-3xl mb-8 text-stone-100">Company Information</h1>
+<form class="space-y-12">
+<!-- Section: Business Details -->
+<section class="space-y-6">
+<div class="flex items-center gap-2 border-b border-border-charcoal pb-2">
+<span class="material-icons text-primary/70">info</span>
+<h2 class="text-lg font-medium text-stone-300">Business Details</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-sm text-stone-400 ml-1">Business Name</label>
+<input class="w-full bg-background-dark border border-border-charcoal rounded-lg px-4 py-3 text-stone-100 focus:ring-1 focus:ring-primary focus:border-primary transition-all" type="text" value="The Breakery"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm text-stone-400 ml-1">Legal Name</label>
+<input class="w-full bg-background-dark border border-border-charcoal rounded-lg px-4 py-3 text-stone-100 focus:ring-1 focus:ring-primary focus:border-primary transition-all" type="text" value="The Breakery Artisanal Goods LLC"/>
+</div>
+<div class="space-y-2 md:col-span-2">
+<label class="text-sm text-stone-400 ml-1">Tax ID / VAT Number</label>
+<input class="w-full md:w-1/2 bg-background-dark border border-border-charcoal rounded-lg px-4 py-3 text-stone-100 focus:ring-1 focus:ring-primary focus:border-primary transition-all" type="text" value="TX-990-234-551"/>
+</div>
+</div>
+</section>
+<!-- Section: Contact Information -->
+<section class="space-y-6">
+<div class="flex items-center gap-2 border-b border-border-charcoal pb-2">
+<span class="material-icons text-primary/70">contact_support</span>
+<h2 class="text-lg font-medium text-stone-300">Contact Information</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-sm text-stone-400 ml-1">Phone Number</label>
+<input class="w-full bg-background-dark border border-border-charcoal rounded-lg px-4 py-3 text-stone-100 focus:ring-1 focus:ring-primary focus:border-primary transition-all" type="tel" value="+1 (555) 123-4567"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm text-stone-400 ml-1">Business Email</label>
+<input class="w-full bg-background-dark border border-border-charcoal rounded-lg px-4 py-3 text-stone-100 focus:ring-1 focus:ring-primary focus:border-primary transition-all" type="email" value="hello@thebreakery.com"/>
+</div>
+<div class="space-y-2 md:col-span-2">
+<label class="text-sm text-stone-400 ml-1">Website URL</label>
+<input class="w-full bg-background-dark border border-border-charcoal rounded-lg px-4 py-3 text-stone-100 focus:ring-1 focus:ring-primary focus:border-primary transition-all" type="url" value="https://www.thebreakery.com"/>
+</div>
+<div class="space-y-2 md:col-span-2">
+<label class="text-sm text-stone-400 ml-1">Street Address</label>
+<textarea class="w-full bg-background-dark border border-border-charcoal rounded-lg px-4 py-3 text-stone-100 focus:ring-1 focus:ring-primary focus:border-primary transition-all" rows="3">1204 Sourdough Lane, Artisan District
+San Francisco, CA 94107
+United States</textarea>
+</div>
+</div>
+</section>
+<!-- Section: Branding -->
+<section class="space-y-6">
+<div class="flex items-center gap-2 border-b border-border-charcoal pb-2">
+<span class="material-icons text-primary/70">palette</span>
+<h2 class="text-lg font-medium text-stone-300">Branding</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="md:col-span-2">
+<label class="text-sm text-stone-400 block mb-3 ml-1">Company Logo</label>
+<div class="border-2 border-dashed border-primary/50 rounded-xl p-8 flex flex-col items-center justify-center bg-primary/5 hover:bg-primary/10 transition-colors cursor-pointer">
+<div class="w-24 h-24 mb-4 flex items-center justify-center bg-background-dark rounded-full border border-primary/20 p-4">
+<img class="w-full opacity-90 brightness-110" data-alt="Gold wheat bakery logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZPYZ9ffqvztmKsCWJw456zdUue-1k3-1H5kN0-I_oNuc_AEE4L890Dia3uCNOIMqxG0i_xTFdQF2BH4cadwCTJ4Ex_GibsOF-aHNFzfMV3UEVf9zHBLUy5anM87uGF8PfBTris97ufYADv4tgSegiP9CH6XD54aShfqSzB3BW-e1jNNkhfe5lX9f_T2nLJye7zXLo8L6LV_lwwDKaaHexGerDirmDs9_3s73nVaK_k54J-cuVYBoUcichAeA60gBEZ4C55mdVg_KO"/>
+</div>
+<p class="text-stone-300 text-sm font-medium">Drag and drop or <span class="text-primary">browse files</span></p>
+<p class="text-stone-500 text-xs mt-1">PNG, SVG or JPEG up to 5MB (Recommended 400x400px)</p>
+</div>
+</div>
+<div>
+<label class="text-sm text-stone-400 block mb-3 ml-1">Brand Primary Color</label>
+<div class="bg-background-dark border border-border-charcoal rounded-xl p-4">
+<div class="w-full h-24 rounded-lg bg-primary mb-3 shadow-lg shadow-primary/10"></div>
+<div class="flex items-center justify-between">
+<span class="text-stone-100 font-mono font-medium">#C9A55C</span>
+<button class="text-primary text-sm hover:underline" type="button">Change</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Operating Hours -->
+<section class="space-y-6">
+<div class="flex items-center gap-2 border-b border-border-charcoal pb-2">
+<span class="material-icons text-primary/70">schedule</span>
+<h2 class="text-lg font-medium text-stone-300">Operating Hours</h2>
+</div>
+<div class="bg-background-dark border border-border-charcoal rounded-xl overflow-hidden">
+<table class="w-full text-left">
+<thead class="bg-stone-800/30 text-stone-400 text-xs uppercase tracking-wider">
+<tr>
+<th class="px-6 py-4 font-semibold">Day</th>
+<th class="px-6 py-4 font-semibold">Status</th>
+<th class="px-6 py-4 font-semibold">Open</th>
+<th class="px-6 py-4 font-semibold">Close</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-charcoal">
+<!-- Monday -->
+<tr class="hover:bg-stone-800/20 transition-colors">
+<td class="px-6 py-4 text-stone-300 font-medium">Monday</td>
+<td class="px-6 py-4">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-border-charcoal bg-stone-900 text-primary focus:ring-primary/50" type="checkbox"/>
+<span class="text-sm text-stone-400">Open</span>
+</label>
+</td>
+<td class="px-6 py-4">
+<input class="bg-stone-900/50 border border-border-charcoal rounded px-2 py-1 text-sm text-stone-100" type="time" value="06:00"/>
+</td>
+<td class="px-6 py-4">
+<input class="bg-stone-900/50 border border-border-charcoal rounded px-2 py-1 text-sm text-stone-100" type="time" value="18:00"/>
+</td>
+</tr>
+<!-- Tuesday -->
+<tr class="hover:bg-stone-800/20 transition-colors">
+<td class="px-6 py-4 text-stone-300 font-medium">Tuesday</td>
+<td class="px-6 py-4">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-border-charcoal bg-stone-900 text-primary focus:ring-primary/50" type="checkbox"/>
+<span class="text-sm text-stone-400">Open</span>
+</label>
+</td>
+<td class="px-6 py-4">
+<input class="bg-stone-900/50 border border-border-charcoal rounded px-2 py-1 text-sm text-stone-100" type="time" value="06:00"/>
+</td>
+<td class="px-6 py-4">
+<input class="bg-stone-900/50 border border-border-charcoal rounded px-2 py-1 text-sm text-stone-100" type="time" value="18:00"/>
+</td>
+</tr>
+<!-- Wednesday -->
+<tr class="hover:bg-stone-800/20 transition-colors">
+<td class="px-6 py-4 text-stone-300 font-medium">Wednesday</td>
+<td class="px-6 py-4">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-border-charcoal bg-stone-900 text-primary focus:ring-primary/50" type="checkbox"/>
+<span class="text-sm text-stone-400">Open</span>
+</label>
+</td>
+<td class="px-6 py-4">
+<input class="bg-stone-900/50 border border-border-charcoal rounded px-2 py-1 text-sm text-stone-100" type="time" value="06:00"/>
+</td>
+<td class="px-6 py-4">
+<input class="bg-stone-900/50 border border-border-charcoal rounded px-2 py-1 text-sm text-stone-100" type="time" value="18:00"/>
+</td>
+</tr>
+<!-- Thursday -->
+<tr class="hover:bg-stone-800/20 transition-colors">
+<td class="px-6 py-4 text-stone-300 font-medium">Thursday</td>
+<td class="px-6 py-4">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-border-charcoal bg-stone-900 text-primary focus:ring-primary/50" type="checkbox"/>
+<span class="text-sm text-stone-400">Open</span>
+</label>
+</td>
+<td class="px-6 py-4">
+<input class="bg-stone-900/50 border border-border-charcoal rounded px-2 py-1 text-sm text-stone-100" type="time" value="06:00"/>
+</td>
+<td class="px-6 py-4">
+<input class="bg-stone-900/50 border border-border-charcoal rounded px-2 py-1 text-sm text-stone-100" type="time" value="18:00"/>
+</td>
+</tr>
+<!-- Friday -->
+<tr class="hover:bg-stone-800/20 transition-colors">
+<td class="px-6 py-4 text-stone-300 font-medium">Friday</td>
+<td class="px-6 py-4">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-border-charcoal bg-stone-900 text-primary focus:ring-primary/50" type="checkbox"/>
+<span class="text-sm text-stone-400">Open</span>
+</label>
+</td>
+<td class="px-6 py-4">
+<input class="bg-stone-900/50 border border-border-charcoal rounded px-2 py-1 text-sm text-stone-100" type="time" value="06:00"/>
+</td>
+<td class="px-6 py-4">
+<input class="bg-stone-900/50 border border-border-charcoal rounded px-2 py-1 text-sm text-stone-100" type="time" value="20:00"/>
+</td>
+</tr>
+<!-- Saturday -->
+<tr class="hover:bg-stone-800/20 transition-colors">
+<td class="px-6 py-4 text-stone-300 font-medium">Saturday</td>
+<td class="px-6 py-4">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-border-charcoal bg-stone-900 text-primary focus:ring-primary/50" type="checkbox"/>
+<span class="text-sm text-stone-400">Open</span>
+</label>
+</td>
+<td class="px-6 py-4">
+<input class="bg-stone-900/50 border border-border-charcoal rounded px-2 py-1 text-sm text-stone-100" type="time" value="08:00"/>
+</td>
+<td class="px-6 py-4">
+<input class="bg-stone-900/50 border border-border-charcoal rounded px-2 py-1 text-sm text-stone-100" type="time" value="20:00"/>
+</td>
+</tr>
+<!-- Sunday -->
+<tr class="hover:bg-stone-800/20 bg-primary/5 transition-colors">
+<td class="px-6 py-4 text-stone-300 font-medium">Sunday</td>
+<td class="px-6 py-4">
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="rounded border-border-charcoal bg-stone-900 text-primary focus:ring-primary/50" type="checkbox"/>
+<span class="text-sm text-primary font-medium">Closed</span>
+</label>
+</td>
+<td class="px-6 py-4 opacity-30 pointer-events-none">
+<input class="bg-stone-900/50 border border-border-charcoal rounded px-2 py-1 text-sm text-stone-100" disabled="" type="time" value="00:00"/>
+</td>
+<td class="px-6 py-4 opacity-30 pointer-events-none">
+<input class="bg-stone-900/50 border border-border-charcoal rounded px-2 py-1 text-sm text-stone-100" disabled="" type="time" value="00:00"/>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</form>
+</div>
+</main>
+</div>
+<!-- Sticky Footer -->
+<footer class="fixed bottom-0 left-0 right-0 h-20 border-t border-border-charcoal bg-background-dark/80 backdrop-blur-xl z-40 flex items-center justify-end px-8">
+<div class="flex items-center gap-4">
+<button class="px-6 py-2.5 rounded-lg border border-border-charcoal text-stone-400 hover:text-stone-200 hover:bg-stone-800 transition-all font-medium">Discard Changes</button>
+<button class="px-8 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-background-dark font-semibold shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">Save Changes</button>
+</div>
+</footer>
+</body></html>

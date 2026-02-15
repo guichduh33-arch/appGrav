@@ -1,0 +1,319 @@
+import React from 'react';
+
+const Chart_of_Accounts: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: \
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Chart of Accounts</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f2cc0d",
+                        "background-light": "#f8f8f5",
+                        "background-dark": "#0D0D0F", // Deep Onyx specified in prompt
+                        "card-dark": "#1A1A1D",
+                        "border-dark": "#2A2A30",
+                        "hover-dark": "#222226"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0D0D0F;
+        }
+        .account-tree-line {
+            position: absolute;
+            left: -1.25rem;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background-color: #2A2A30;
+        }
+        .account-tree-branch {
+            position: absolute;
+            left: -1.25rem;
+            top: 50%;
+            width: 1rem;
+            height: 1px;
+            background-color: #2A2A30;
+        }
+    </style>
+</head>
+<body class="font-display text-gray-200 antialiased min-h-screen">
+<!-- Navigation Bar (Top) -->
+<nav class="border-b border-border-dark bg-background-dark/50 backdrop-blur-md sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-background-dark">
+<span class="material-icons-round">bakery_dining</span>
+</div>
+<span class="text-xl font-bold tracking-tight">The Breakery</span>
+</div>
+<div class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
+<a class="hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-primary border-b-2 border-primary py-7" href="#">Accounting</a>
+<a class="hover:text-primary transition-colors" href="#">Inventory</a>
+<a class="hover:text-primary transition-colors" href="#">Reports</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-gray-400 hover:text-white transition-colors">
+<span class="material-icons-round">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-border-dark flex items-center justify-center border border-gray-700 overflow-hidden">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRU0WS3Y3vcfWRZzZh0M2weoog-tmu3zddT4MF9vT879YdrabtwAHieSgbxDC7vz3VUgQ2eIz5lia6h7QOZ5RYwOAiJdoH9j8GrVYOXG6QYYr0kkMehcNNlrWuA7EHI6-SCPPUez6sglBNZ4RwGn3wHyqmjOR8mFYwoNWtAbmG56OZIa4wMArNLhtPHLPYJcVbLvZ9mu-xtwX9sF3xcocl0K9VoeO4MX8d7nGm3MUMvVyngBD3LJl5sV421yuc0CxwctIa5dB1KcI7"/>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-6 py-10">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+<div class="flex items-center gap-5">
+<div class="p-3 bg-border-dark rounded-xl text-primary">
+<span class="material-icons-round text-3xl leading-none">calculate</span>
+</div>
+<div>
+<h1 class="font-serif text-3xl text-white mb-1">Chart of Accounts</h1>
+<p class="text-gray-500 text-sm">Managing Indonesian SME Accounting Standards</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative group">
+<span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">search</span>
+<input class="bg-card-dark border-border-dark rounded-lg pl-10 pr-4 py-2.5 text-sm w-64 focus:ring-primary focus:border-primary transition-all" placeholder="Search account code or name..." type="text"/>
+</div>
+<button class="flex items-center gap-2 bg-primary hover:bg-yellow-500 text-background-dark font-bold px-6 py-2.5 rounded-lg transition-all transform active:scale-95 shadow-lg shadow-primary/10">
+<span class="material-icons-round text-sm">add</span>
+<span>New Account</span>
+</button>
+</div>
+</header>
+<!-- Main Content Card -->
+<div class="bg-card-dark border border-border-dark rounded-xl overflow-hidden shadow-2xl">
+<!-- Table Header -->
+<div class="grid grid-cols-12 gap-4 px-8 py-4 bg-background-dark/30 border-b border-border-dark text-xs font-bold uppercase tracking-widest text-gray-500">
+<div class="col-span-2">Account Code</div>
+<div class="col-span-7">Account Name</div>
+<div class="col-span-3 text-right">Balance (IDR)</div>
+</div>
+<!-- Scrollable Content -->
+<div class="divide-y divide-border-dark/50">
+<!-- Category: Assets -->
+<div class="group">
+<div class="grid grid-cols-12 gap-4 px-8 py-5 hover:bg-hover-dark transition-colors cursor-pointer items-center">
+<div class="col-span-2 font-mono text-primary font-medium">1000</div>
+<div class="col-span-7 flex items-center gap-3">
+<span class="material-icons-round text-gray-400">folder</span>
+<span class="text-white font-bold text-lg">Assets</span>
+</div>
+<div class="col-span-3 text-right font-mono font-medium text-gray-300 text-lg">
+                            48.250.000
+                        </div>
+</div>
+<!-- Nested: Current Assets -->
+<div class="grid grid-cols-12 gap-4 px-8 py-4 hover:bg-hover-dark transition-colors cursor-pointer items-center pl-16 relative">
+<div class="account-tree-line ml-8"></div>
+<div class="account-tree-branch ml-8"></div>
+<div class="col-span-2 font-mono text-primary/80">1100</div>
+<div class="col-span-7 flex items-center gap-3">
+<span class="material-icons-round text-gray-500 text-sm">folder_open</span>
+<span class="text-gray-300 font-semibold">Current Assets</span>
+</div>
+<div class="col-span-3 text-right font-mono text-gray-400">
+                            22.500.000
+                        </div>
+</div>
+<!-- Nested: Cash on Hand -->
+<div class="grid grid-cols-12 gap-4 px-8 py-4 hover:bg-hover-dark transition-colors cursor-pointer items-center pl-24 relative">
+<div class="account-tree-line ml-16"></div>
+<div class="account-tree-branch ml-16"></div>
+<div class="col-span-2 font-mono text-primary/70">1110</div>
+<div class="col-span-7 flex items-center gap-3">
+<span class="material-icons-round text-gray-600 text-sm">description</span>
+<span class="text-gray-400">Cash on Hand</span>
+</div>
+<div class="col-span-3 text-right font-mono text-gray-400">
+                            5.000.000
+                        </div>
+</div>
+<!-- Nested: Bank Account -->
+<div class="grid grid-cols-12 gap-4 px-8 py-4 hover:bg-hover-dark transition-colors cursor-pointer items-center pl-24 relative">
+<div class="account-tree-line ml-16 h-1/2 bottom-auto"></div>
+<div class="account-tree-branch ml-16"></div>
+<div class="col-span-2 font-mono text-primary/70">1120</div>
+<div class="col-span-7 flex items-center gap-3">
+<span class="material-icons-round text-gray-600 text-sm">description</span>
+<span class="text-gray-400">Bank Account (BCA)</span>
+</div>
+<div class="col-span-3 text-right font-mono text-gray-400">
+                            17.500.000
+                        </div>
+</div>
+</div>
+<!-- Category: Liabilities -->
+<div class="group">
+<div class="grid grid-cols-12 gap-4 px-8 py-5 hover:bg-hover-dark transition-colors cursor-pointer items-center">
+<div class="col-span-2 font-mono text-primary font-medium">2000</div>
+<div class="col-span-7 flex items-center gap-3">
+<span class="material-icons-round text-gray-400">folder</span>
+<span class="text-white font-bold text-lg">Liabilities</span>
+</div>
+<div class="col-span-3 text-right font-mono font-medium text-gray-300 text-lg">
+                            (12.400.000)
+                        </div>
+</div>
+<!-- Nested: Accounts Payable -->
+<div class="grid grid-cols-12 gap-4 px-8 py-4 hover:bg-hover-dark transition-colors cursor-pointer items-center pl-16 relative">
+<div class="account-tree-line ml-8 h-1/2 bottom-auto"></div>
+<div class="account-tree-branch ml-8"></div>
+<div class="col-span-2 font-mono text-primary/80">2110</div>
+<div class="col-span-7 flex items-center gap-3">
+<span class="material-icons-round text-gray-600 text-sm">description</span>
+<span class="text-gray-300 font-semibold">Accounts Payable</span>
+</div>
+<div class="col-span-3 text-right font-mono text-primary">
+                            (6.800.000)
+                        </div>
+</div>
+</div>
+<!-- Category: Equity -->
+<div class="group">
+<div class="grid grid-cols-12 gap-4 px-8 py-5 hover:bg-hover-dark transition-colors cursor-pointer items-center">
+<div class="col-span-2 font-mono text-primary font-medium">3000</div>
+<div class="col-span-7 flex items-center gap-3">
+<span class="material-icons-round text-gray-400">folder</span>
+<span class="text-white font-bold text-lg">Equity</span>
+</div>
+<div class="col-span-3 text-right font-mono font-medium text-gray-300 text-lg">
+                            (35.850.000)
+                        </div>
+</div>
+</div>
+<!-- Category: Revenue -->
+<div class="group">
+<div class="grid grid-cols-12 gap-4 px-8 py-5 hover:bg-hover-dark transition-colors cursor-pointer items-center">
+<div class="col-span-2 font-mono text-primary font-medium">4000</div>
+<div class="col-span-7 flex items-center gap-3">
+<span class="material-icons-round text-gray-400">folder</span>
+<span class="text-white font-bold text-lg">Revenue</span>
+</div>
+<div class="col-span-3 text-right font-mono font-medium text-gray-300 text-lg">
+                            (15.200.000)
+                        </div>
+</div>
+<!-- Nested: Sales Revenue -->
+<div class="grid grid-cols-12 gap-4 px-8 py-4 hover:bg-hover-dark transition-colors cursor-pointer items-center pl-16 relative">
+<div class="account-tree-line ml-8 h-1/2 bottom-auto"></div>
+<div class="account-tree-branch ml-8"></div>
+<div class="col-span-2 font-mono text-primary/80">4100</div>
+<div class="col-span-7 flex items-center gap-3">
+<span class="material-icons-round text-gray-600 text-sm">description</span>
+<span class="text-gray-300 font-semibold">Sales Revenue</span>
+</div>
+<div class="col-span-3 text-right font-mono text-primary">
+                            (15.200.000)
+                        </div>
+</div>
+</div>
+<!-- Category: Expenses -->
+<div class="group">
+<div class="grid grid-cols-12 gap-4 px-8 py-5 hover:bg-hover-dark transition-colors cursor-pointer items-center">
+<div class="col-span-2 font-mono text-primary font-medium">5000</div>
+<div class="col-span-7 flex items-center gap-3">
+<span class="material-icons-round text-gray-400">folder</span>
+<span class="text-white font-bold text-lg">Expenses</span>
+</div>
+<div class="col-span-3 text-right font-mono font-medium text-gray-300 text-lg">
+                            4.500.000
+                        </div>
+</div>
+</div>
+</div>
+<!-- Table Footer -->
+<div class="px-8 py-6 bg-background-dark/50 border-t border-border-dark flex items-center justify-between">
+<div class="text-sm text-gray-500">
+                    Showing <span class="text-white font-medium">8</span> accounts in total
+                </div>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded bg-border-dark text-gray-400 hover:text-white transition-colors">
+<span class="material-icons-round text-sm">chevron_left</span>
+</button>
+<button class="px-3 py-1.5 rounded bg-primary text-background-dark font-bold text-sm">1</button>
+<button class="px-3 py-1.5 rounded bg-border-dark text-gray-400 hover:text-white transition-colors text-sm font-medium">2</button>
+<button class="px-3 py-1.5 rounded bg-border-dark text-gray-400 hover:text-white transition-colors">
+<span class="material-icons-round text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Summary Widgets (Bottom) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+<div class="bg-card-dark border border-border-dark p-6 rounded-xl flex items-center gap-5">
+<div class="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center text-green-500">
+<span class="material-icons-round">trending_up</span>
+</div>
+<div>
+<p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Total Assets</p>
+<p class="text-xl font-mono text-white mt-1">Rp 48.250.000</p>
+</div>
+</div>
+<div class="bg-card-dark border border-border-dark p-6 rounded-xl flex items-center gap-5">
+<div class="w-12 h-12 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500">
+<span class="material-icons-round">trending_down</span>
+</div>
+<div>
+<p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Total Liabilities</p>
+<p class="text-xl font-mono text-white mt-1">Rp 12.400.000</p>
+</div>
+</div>
+<div class="bg-card-dark border border-border-dark p-6 rounded-xl flex items-center gap-5">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-icons-round">account_balance_wallet</span>
+</div>
+<div>
+<p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Net Equity</p>
+<p class="text-xl font-mono text-white mt-1">Rp 35.850.000</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual Action (Float Edit - Concept) -->
+<div class="fixed bottom-10 right-10">
+<button class="w-14 h-14 bg-background-dark border-2 border-primary text-primary rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
+<span class="material-icons-round text-2xl">history</span>
+</button>
+</div>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    \ }} />
+  );
+};
+
+export default Chart_of_Accounts;
