@@ -10,6 +10,7 @@ import { useLanHub } from '../../hooks/lan'
 import { useCartPriceRecalculation } from '../../hooks/pricing'
 import { createOfflineOrder } from '@/services/offline/offlineOrderService'
 import { saveOfflinePayment } from '@/services/offline/offlinePaymentService'
+import { dispatchOrderToKitchen } from '@/services/offline/kitchenDispatchService'
 import { toast } from 'sonner'
 import logger from '@/utils/logger'
 import { usePOSModals, usePOSShift, usePOSOrders, useCartPromotions, useOrderStatusSubscription } from '../../hooks/pos'
@@ -257,7 +258,7 @@ export default function POSMainPage() {
                         try {
                             // 1. Create the offline order
                             const cartState = useCartStore.getState();
-                            const { order } = await createOfflineOrder(
+                            const { order, items } = await createOfflineOrder(
                                 {
                                     items: cartState.items,
                                     orderType: cartState.orderType,
@@ -284,9 +285,12 @@ export default function POSMainPage() {
                                 session_id: currentSession?.id || null,
                             });
 
+                            // 3. Dispatch to kitchen/barista stations
+                            await dispatchOrderToKitchen(order, items);
+
                             toast.success(`Order ${order.order_number} completed!`);
 
-                            // 3. Clear cart and close modal
+                            // 4. Clear cart and close modal
                             useCartStore.getState().clearCart();
                             closeModal('payment');
                         } catch (err: any) {
