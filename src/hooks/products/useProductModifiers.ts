@@ -119,7 +119,7 @@ export function useProductModifiersForPOS(
             // Fetch product-specific modifiers
             const { data: productMods, error: pError } = await supabase
                 .from('product_modifiers')
-                .select('*')
+                .select('id, group_name, group_type, group_required, group_sort_order, option_id, option_label, option_icon, price_adjustment, is_default, option_sort_order, category_id, created_at, is_active, materials, product_id')
                 .eq('product_id', productId)
                 .eq('is_active', true)
                 .order('group_sort_order')
@@ -132,7 +132,7 @@ export function useProductModifiersForPOS(
             if (categoryId) {
                 const { data, error: cError } = await supabase
                     .from('product_modifiers')
-                    .select('*')
+                    .select('id, group_name, group_type, group_required, group_sort_order, option_id, option_label, option_icon, price_adjustment, is_default, option_sort_order, category_id, created_at, is_active, materials, product_id')
                     .eq('category_id', categoryId)
                     .eq('is_active', true)
                     .order('group_sort_order')
@@ -169,7 +169,7 @@ export function useProductModifiersAdmin(productId: string | undefined) {
             // Fetch product-specific modifiers
             const { data: productMods, error: pError } = await supabase
                 .from('product_modifiers')
-                .select('*')
+                .select('id, group_name, group_type, group_required, group_sort_order, option_id, option_label, option_icon, price_adjustment, is_default, option_sort_order, category_id, created_at, is_active, materials, product_id')
                 .eq('product_id', productId)
                 .eq('is_active', true)
                 .order('group_sort_order')
@@ -191,7 +191,7 @@ export function useProductModifiersAdmin(productId: string | undefined) {
             if (product?.category_id) {
                 const { data, error: cError } = await supabase
                     .from('product_modifiers')
-                    .select('*')
+                    .select('id, group_name, group_type, group_required, group_sort_order, option_id, option_label, option_icon, price_adjustment, is_default, option_sort_order, category_id, created_at, is_active, materials, product_id')
                     .eq('category_id', product.category_id)
                     .eq('is_active', true)
                     .order('group_sort_order')

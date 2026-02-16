@@ -7,31 +7,13 @@ import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
 import { useDateRange } from '@/hooks/reports/useDateRange';
 import { formatCurrency as formatCurrencyPdf } from '@/services/reports/pdfExport';
-
-interface PurchaseDetail {
-  id: string;
-  created_at: string;
-  quantity: number;
-  reference_id: string | null;
-  product?: {
-    name?: string;
-    sku?: string;
-    unit?: string;
-    cost_price?: number;
-  };
-  supplier?: {
-    name?: string;
-  };
-  staff?: {
-    name?: string;
-  };
-}
+import { IPurchaseDetail } from '@/types/reporting';
 
 export const PurchaseDetailsTab = () => {
   const { dateRange } = useDateRange({ defaultPreset: 'last30days' });
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data = [], isLoading, error } = useQuery<PurchaseDetail[]>({
+  const { data = [], isLoading, error } = useQuery<IPurchaseDetail[]>({
     queryKey: ['purchase-details', dateRange.from, dateRange.to],
     queryFn: () => ReportingService.getPurchaseDetails(dateRange.from, dateRange.to),
     staleTime: 5 * 60 * 1000,
@@ -61,7 +43,7 @@ export const PurchaseDetailsTab = () => {
     return { totalCost, totalQuantity, itemCount: filteredData.length, uniqueProducts };
   }, [filteredData]);
 
-  const exportConfig: ExportConfig<PurchaseDetail> = useMemo(() => ({
+  const exportConfig: ExportConfig<IPurchaseDetail> = useMemo(() => ({
     data: filteredData,
     columns: [
       { key: 'created_at', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('en-US') },

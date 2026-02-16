@@ -15,7 +15,7 @@ export function useCategories() {
             try {
                 const { data, error } = await supabase
                     .from('categories')
-                    .select('*')
+                    .select('id, name, icon, color, dispatch_station, sort_order, created_at, is_active, is_raw_material, show_in_pos, updated_at')
                     .eq('show_in_pos', true)
                     .eq('is_active', true)
                     .order('sort_order')

@@ -258,3 +258,25 @@ export interface ICancellationsReport {
     cancel_reason: string | null;
     items_count: number;
 }
+
+/**
+ * Purchase Details (stock_movements with type=purchase)
+ */
+export interface IPurchaseDetail {
+    id: string;
+    created_at: string;
+    quantity: number;
+    reference_id: string | null;
+    product?: {
+        name?: string;
+        sku?: string;
+        unit?: string;
+        cost_price?: number;
+    };
+    supplier?: {
+        name?: string;
+    };
+    staff?: {
+        name?: string;
+    };
+}

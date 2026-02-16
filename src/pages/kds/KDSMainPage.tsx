@@ -11,9 +11,10 @@ import { useKdsUrgentAlertLoop } from '../../hooks/kds/useKdsUrgentAlertLoop'
 import { KDSHeader } from '../../components/kds/KDSHeader'
 import { KDSOrderGrid } from '../../components/kds/KDSOrderGrid'
 import { KDSAllDayCount } from '../../components/kds/KDSAllDayCount'
-import { playNewOrderSound, playUrgentSound } from '../../utils/audio'
+import { kdsSoundService } from '../../services/KdsSoundService'
 import { logError } from '@/utils/logger'
 import type { IKdsNewOrderPayload, TKitchenStation } from '../../types/offline'
+import { cn } from '@/lib/utils'
 
 const STATION_CONFIG: Record<string, { name: string; icon: React.ReactNode; color: string; dbStation: string }> = {
     hot_kitchen: {
@@ -52,6 +53,7 @@ export default function KDSMainPage() {
     const [showAllDayCount, setShowAllDayCount] = useState(false)
     const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
     const lastOrderCountRef = useRef(0)
+    const [newOrderAlert, setNewOrderAlert] = useState(false)
 
     const stationConfig = station ? STATION_CONFIG[station] : null
 
@@ -62,7 +64,7 @@ export default function KDSMainPage() {
         urgentThresholdSeconds: kdsConfig.urgencyCriticalSeconds,
         onOrderBecameUrgent: () => {
             if (soundEnabled) {
-                playUrgentSound()
+                kdsSoundService.playUrgent()
             }
         },
     })
@@ -106,15 +108,25 @@ export default function KDSMainPage() {
         }
         addOrder(newOrder)
         lastOrderCountRef.current += 1
+
+        // Show visual alert and play sound
+        setNewOrderAlert(true)
+        setTimeout(() => setNewOrderAlert(false), 3000)
+        kdsSoundService.playNewOrder()
     }, [addOrder])
 
     useKdsOrderReceiver({
         station: (stationConfig?.dbStation as TKitchenStation) || 'kitchen',
         soundEnabled,
-        playSound: playNewOrderSound,
+        playSound: () => kdsSoundService.playNewOrder(),
         onNewOrder: handleLanOrder,
         existingOrderIds,
     })
+
+    // Sync sound setting to service
+    useEffect(() => {
+        kdsSoundService.setEnabled(soundEnabled)
+    }, [soundEnabled])
 
     // Update time every second
     useEffect(() => {
@@ -189,7 +201,9 @@ export default function KDSMainPage() {
                 .filter((order) => order.items.length > 0)
 
             if (soundEnabled && transformedOrders.length > lastOrderCountRef.current && lastOrderCountRef.current > 0) {
-                playNewOrderSound()
+                kdsSoundService.playNewOrder()
+                setNewOrderAlert(true)
+                setTimeout(() => setNewOrderAlert(false), 3000)
             }
             lastOrderCountRef.current = transformedOrders.length
             setOrders(transformedOrders)
@@ -239,7 +253,21 @@ export default function KDSMainPage() {
     )
 
     return (
-        <div data-kds className="flex flex-col h-screen overflow-hidden bg-[#0D0D0F] text-white" style={{ '--station-color': stationConfig.color } as React.CSSProperties}>
+        <div
+            data-kds
+            className={cn(
+                "flex flex-col h-screen overflow-hidden bg-[#0D0D0F] text-white transition-all duration-500",
+                newOrderAlert && "ring-8 ring-inset ring-[var(--kds-accent)]/30 scale-[0.99]"
+            )}
+            style={{ '--station-color': stationConfig.color } as React.CSSProperties}
+        >
+            {newOrderAlert && (
+                <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center bg-[var(--kds-accent)]/5 animate-pulse">
+                    <div className="bg-[var(--kds-accent)] text-white py-3 px-8 rounded-full font-bold text-xl shadow-2xl animate-bounce">
+                        NEW ORDER RECEIVED
+                    </div>
+                </div>
+            )}
             <KDSHeader
                 stationConfig={stationConfig}
                 urgentCount={urgentCount}

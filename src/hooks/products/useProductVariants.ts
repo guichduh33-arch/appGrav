@@ -32,7 +32,7 @@ export function useProductVariants(productId: string | null) {
 
       const { data, error } = await supabase
         .from('product_modifiers')
-        .select('*')
+        .select('group_name, group_type, group_required, materials, option_id, option_label, price_adjustment, is_default')
         .eq('product_id', productId)
         .eq('is_active', true)
         .order('group_name')

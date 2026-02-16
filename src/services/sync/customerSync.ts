@@ -92,8 +92,8 @@ export async function syncCustomersToOffline(): Promise<number> {
   // Fetch loyalty tiers to calculate tier for each customer
   const { data: loyaltyTiers, error: tiersError } = await supabase
     .from('loyalty_tiers')
-    .select('name, min_points')
-    .order('min_points', { ascending: false });
+    .select('name, min_lifetime_points')
+    .order('min_lifetime_points', { ascending: false });
 
   if (tiersError) {
     logError('[CustomerSync] Error fetching loyalty tiers:', tiersError);
@@ -105,7 +105,7 @@ export async function syncCustomersToOffline(): Promise<number> {
     if (!loyaltyTiers || loyaltyTiers.length === 0) return null;
 
     for (const tier of loyaltyTiers) {
-      if (points >= tier.min_points) {
+      if (points >= tier.min_lifetime_points) {
         return tier.name;
       }
     }

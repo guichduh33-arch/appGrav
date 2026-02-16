@@ -1,5 +1,4 @@
 import { supabase, untypedRpc, untypedFrom } from '../lib/supabase';
-import { StockMovement } from '../types/database';
 import {
     SalesComparison,
     PaymentMethodStat,
@@ -22,6 +21,7 @@ import {
     IUnsoldProductsReport,
     ICancellationsReport,
     IKdsServiceSpeedStat,
+    IPurchaseDetail,
 } from '../types/reporting';
 
 export const ReportingService = {
@@ -183,7 +183,7 @@ export const ReportingService = {
         return result.sort((a, b) => b.total_revenue - a.total_revenue);
     },
 
-    async getStockMovements(startDate: Date, endDate: Date): Promise<StockMovement[]> {
+    async getStockMovements(startDate: Date, endDate: Date) {
         const { data, error } = await supabase
             .from('stock_movements')
             .select(`
@@ -338,7 +338,7 @@ export const ReportingService = {
     /**
      * Get Purchase Details
      */
-    async getPurchaseDetails(startDate: Date, endDate: Date) {
+    async getPurchaseDetails(startDate: Date, endDate: Date): Promise<IPurchaseDetail[]> {
         const { data, error } = await supabase
             .from('stock_movements')
             .select(`
@@ -369,7 +369,23 @@ export const ReportingService = {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        return data || [];
+
+        // Transform Supabase relations (arrays/objects) to simple objects
+        return (data || []).map((row) => {
+            const productRaw = row.product as unknown;
+            const staffRaw = row.staff as unknown;
+            const supplierRaw = row.supplier as unknown;
+
+            return {
+                id: row.id,
+                created_at: row.created_at,
+                quantity: row.quantity,
+                reference_id: row.reference_id,
+                product: Array.isArray(productRaw) ? productRaw[0] : productRaw,
+                staff: Array.isArray(staffRaw) ? staffRaw[0] : staffRaw,
+                supplier: Array.isArray(supplierRaw) ? supplierRaw[0] : supplierRaw,
+            };
+        });
     },
 
     /**

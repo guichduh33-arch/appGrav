@@ -90,8 +90,8 @@ export default function CustomerDetailPage() {
         const nextTier = getNextTier()
         if (!nextTier) return 100
         const currentTier = tiers.find(t => t.name.toLowerCase() === customer.loyalty_tier)
-        const minPoints = currentTier?.min_points || 0
-        const maxPoints = nextTier.min_points
+        const minPoints = currentTier?.min_lifetime_points || 0
+        const maxPoints = nextTier.min_lifetime_points
         const progress = ((customer.lifetime_points - minPoints) / (maxPoints - minPoints)) * 100
         return Math.min(Math.max(progress, 0), 100)
     }

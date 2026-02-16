@@ -39,7 +39,7 @@ export function useCustomers() {
             const { data, error } = await supabase
                 .from('customers')
                 .select(`
-                    *,
+                    id, name, company_name, phone, email, address, customer_type, category_id, loyalty_points, lifetime_points, loyalty_tier, total_spent, total_visits, is_active, membership_number, loyalty_qr_code, date_of_birth, created_at, last_visit_at,
                     category:customer_categories(id, name, slug, color, price_modifier_type, discount_percentage)
                 `)
                 .order('created_at', { ascending: false })
@@ -59,7 +59,7 @@ export function useCustomerById(id: string | undefined) {
             const { data, error } = await supabase
                 .from('customers')
                 .select(`
-                    *,
+                    id, name, company_name, phone, email, address, customer_type, category_id, loyalty_points, lifetime_points, loyalty_tier, total_spent, total_visits, is_active, membership_number, loyalty_qr_code, date_of_birth, created_at, last_visit_at,
                     category:customer_categories(id, name, slug, color, price_modifier_type, discount_percentage)
                 `)
                 .eq('id', id!)
@@ -103,7 +103,7 @@ export function useLoyaltyTransactions(customerId: string | undefined) {
         queryFn: async () => {
             const { data, error } = await supabase
                 .from('loyalty_transactions')
-                .select('*')
+                .select('id, customer_id, order_id, transaction_type, points, points_balance_after, order_amount, description, created_at')
                 .eq('customer_id', customerId!)
                 .order('created_at', { ascending: false })
                 .limit(50)
@@ -120,9 +120,9 @@ export function useLoyaltyTiers() {
         queryFn: async () => {
             const { data, error } = await supabase
                 .from('loyalty_tiers')
-                .select('*')
+                .select('id, name, slug, min_lifetime_points, color, icon, points_multiplier, discount_percentage, is_active')
                 .eq('is_active', true)
-                .order('min_points')
+                .order('min_lifetime_points')
 
             if (error) throw error
             return data ?? []

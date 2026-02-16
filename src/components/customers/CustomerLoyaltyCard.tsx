@@ -12,7 +12,7 @@ interface CustomerLoyaltyCardProps {
     membershipNumber?: string | null
     loyaltyPoints: number
     lifetimePoints: number
-    nextTier: { name: string; min_points: number } | null
+    nextTier: { name: string; min_lifetime_points: number } | null
     progressPercent: number
     onAddPoints: () => void
     onRedeemPoints: () => void
@@ -63,7 +63,7 @@ export function CustomerLoyaltyCard({
                 <div className="mb-6">
                     <div className="flex justify-between text-sm mb-2 opacity-80">
                         <span>Next tier: {nextTier.name}</span>
-                        <span>{nextTier.min_points - lifetimePoints} pts remaining</span>
+                        <span>{nextTier.min_lifetime_points - lifetimePoints} pts remaining</span>
                     </div>
                     <div className="h-2 bg-black/30 rounded-full overflow-hidden">
                         <div
