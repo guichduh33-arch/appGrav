@@ -16,6 +16,7 @@ export interface IPOSConfigSettings {
   voidRequiredRoles: string[]
   refundRequiredRoles: string[]
   shiftRequiredRoles: string[]
+  modifierSelectionBehaviour?: Record<string, any>
 }
 
 export interface IFinancialSettings {

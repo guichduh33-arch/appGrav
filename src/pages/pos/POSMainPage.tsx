@@ -12,7 +12,8 @@ import { createOfflineOrder } from '@/services/offline/offlineOrderService'
 import { saveOfflinePayment } from '@/services/offline/offlinePaymentService'
 import { toast } from 'sonner'
 import logger from '@/utils/logger'
-import { usePOSModals, usePOSShift, usePOSOrders, useCartPromotions } from '../../hooks/pos'
+import { usePOSModals, usePOSShift, usePOSOrders, useCartPromotions, useOrderStatusSubscription } from '../../hooks/pos'
+import { useOrderStore } from '../../stores/orderStore'
 import { PostOfflineSyncReport } from '../../components/sync/PostOfflineSyncReport'
 import Cart from '../../components/pos/Cart'
 import POSMenu from '../../components/pos/POSMenu'
@@ -49,6 +50,16 @@ export default function POSMainPage() {
 
     // Enable automatic promotion evaluation on cart changes (Story 6.5)
     useCartPromotions()
+
+    // Enable order status subscription for real-time updates (Story Real-time Status)
+    useOrderStatusSubscription()
+
+    const { syncHeldOrders, heldOrders } = useOrderStore()
+
+    // Load held orders from IndexDB on mount (Story Held Orders Persistence)
+    useEffect(() => {
+        syncHeldOrders()
+    }, [syncHeldOrders])
 
     // Enable LAN Hub for KDS communication (Story 4.1)
     const { isRunning: lanHubRunning, error: lanHubError } = useLanHub({
@@ -181,6 +192,9 @@ export default function POSMainPage() {
                 selectedCategoryId={selectedCategory}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
+                onOpenMenu={() => openModal('menu')}
+                onShowHeldOrders={() => openModal('heldOrders')}
+                heldOrdersCount={heldOrders.length}
                 cartComponent={
                     <Cart
                         onCheckout={handleCheckout}

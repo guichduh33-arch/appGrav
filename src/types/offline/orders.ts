@@ -13,6 +13,43 @@
  */
 
 import type { TDispatchStation } from './products';
+import type { CartItem } from '../cart';
+
+// =====================================================
+// Held Orders Types (Story: Held Orders Persistence)
+// =====================================================
+
+/**
+ * Cached held order for offline POS operations
+ * Stored in Dexie table: offline_held_orders
+ */
+export interface IOfflineHeldOrder {
+  /** Local UUID */
+  id: string;
+  /** Display number (#XXXX) */
+  order_number: string;
+  /** Order type */
+  order_type: TOrderType;
+  /** Table number (dine_in) */
+  table_number?: string | null;
+  /** Customer ID */
+  customer_id?: string | null;
+  /** Customer name */
+  customer_name?: string | null;
+  /** Full cart snapshot */
+  items: CartItem[];
+  /** Financial totals */
+  subtotal: number;
+  discount_amount: number;
+  total: number;
+  /** Order notes */
+  notes?: string | null;
+  /** Metadata */
+  created_at: string;
+  created_by: string;
+  terminal_id: string;
+  session_id?: string | null;
+}
 
 // =====================================================
 // Orders Cache Types (Story 3.1)

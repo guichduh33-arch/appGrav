@@ -29,3 +29,4 @@ export type {
 } from './useFloorPlan'
 
 export { useKdsStatusListener } from './useKdsStatusListener'
+export { useOrderStatusSubscription } from './useOrderStatusSubscription'

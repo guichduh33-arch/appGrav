@@ -101,8 +101,8 @@ function Cart({ onCheckout, onSendToKitchen, onItemClick }: CartProps) {
     return (
         <aside className="w-[480px] bg-[#1C1C1E] border-l border-white/5 flex flex-col flex-shrink-0 z-[15] shadow-[-8px_0_32px_rgba(0,0,0,0.5)] text-[#E5E7EB]">
             {/* Header / Active Order Info */}
-            <div className="p-8 border-b border-white/5 bg-[var(--onyx-surface)]">
-                <div className="flex items-center justify-between mb-4">
+            <div className="p-6 border-b border-white/5 bg-[var(--onyx-surface)]">
+                <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
                         <h2 className="text-base font-bold text-white uppercase tracking-[0.15em]">Active Order</h2>
                         <span className="px-3 py-1 rounded-full bg-[#cab06d]/10 text-[#cab06d] text-xs font-bold tracking-wide">
@@ -121,12 +121,12 @@ function Cart({ onCheckout, onSendToKitchen, onItemClick }: CartProps) {
                     </button>
                 </div>
                 {/* Order type subtitle */}
-                <p className="text-[11px] text-[#8E8E93] tracking-wide mb-4">
+                <p className="text-[11px] text-[#8E8E93] tracking-wide mb-3">
                     {orderType === 'dine_in' ? 'Dine-in' : orderType === 'takeaway' ? 'Take-out' : 'Delivery'}
                 </p>
 
                 {/* Order Type Selector */}
-                <div className="flex bg-black/20 p-1 rounded-xl border border-white/5 mb-6">
+                <div className="flex bg-black/20 p-1 rounded-xl border border-white/5 mb-4">
                     {(['dine_in', 'takeaway', 'delivery'] as const).map((type) => (
                         <button
                             key={type}
@@ -145,7 +145,7 @@ function Cart({ onCheckout, onSendToKitchen, onItemClick }: CartProps) {
                 </div>
 
                 {/* Customer Selection */}
-                <div className="mt-2">
+                <div>
                     {selectedCustomer || customerId ? (
                         <button
                             type="button"
@@ -182,7 +182,7 @@ function Cart({ onCheckout, onSendToKitchen, onItemClick }: CartProps) {
             </div>
 
             {/* Cart Items Area */}
-            <div className="flex-1 overflow-y-auto px-8 py-4 custom-scrollbar bg-transparent">
+            <div className="flex-1 min-h-[120px] overflow-y-auto px-6 py-3 custom-scrollbar bg-transparent">
                 {items.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center opacity-30">
                         <ShoppingCart size={48} strokeWidth={1} className="mb-4" />
@@ -205,7 +205,7 @@ function Cart({ onCheckout, onSendToKitchen, onItemClick }: CartProps) {
 
             {/* Order Notes / Meta */}
             {items.length > 0 && (
-                <div className="px-8 py-4 border-t border-white/5">
+                <div className="px-6 py-3 border-t border-white/5">
                     <button
                         type="button"
                         className={cn(

@@ -20,14 +20,13 @@ export function useOrders() {
         }) => {
             if (!user) throw new Error('Utilisateur non connecté')
 
-            // 1. Create Order
             const orderData = {
-                order_number: `ORD-${Date.now()}`, // Will be overwritten by trigger if setup
+                order_number: `ORD-${Date.now()}`,
                 order_type: orderType,
                 table_number: tableNumber,
                 customer_id: customerId,
                 customer_name: customerName,
-                status: 'new', // Start as 'new' for KDS workflow (new → preparing → ready → served)
+                status: 'new',
                 payment_status: 'paid',
                 subtotal: subtotal,
                 discount_type: discountType === 'percent' ? 'percentage' : (discountType === 'amount' ? 'fixed' : null),
@@ -44,48 +43,63 @@ export function useOrders() {
                 completed_at: new Date().toISOString()
             }
 
-            const { data: order, error: orderError } = await supabase
-                .from('orders')
-                .insert(orderData as Insertable<'orders'>)
-                .select('id')
-                .single()
+            try {
+                // Try online first
+                const { data: order, error: orderError } = await supabase
+                    .from('orders')
+                    .insert(orderData as Insertable<'orders'>)
+                    .select('id')
+                    .single()
 
-            if (orderError) {
-                logger.error('Supabase Order Error:', orderError)
-                throw orderError
+                if (orderError) throw orderError
+
+                const itemsData = items.map(item => ({
+                    order_id: order.id,
+                    product_id: item.product?.id || item.combo?.id,
+                    product_name: item.product?.name || item.combo?.name || 'Unknown',
+                    product_sku: item.product?.sku || `COMBO-${item.combo?.id?.slice(0, 8) || 'UNKNOWN'}`,
+                    quantity: item.quantity,
+                    unit_price: item.unitPrice,
+                    total_price: item.totalPrice,
+                    modifiers: item.modifiers,
+                    modifiers_total: item.modifiersTotal,
+                    notes: item.notes,
+                    selected_variants: item.selectedVariants ? { variants: item.selectedVariants } : null,
+                    dispatch_station: (item.product as { category?: { dispatch_station?: string } })?.category?.dispatch_station || 'none',
+                    item_status: 'new' as const
+                })) as unknown as Insertable<'order_items'>[]
+
+                const { error: itemsError } = await supabase
+                    .from('order_items')
+                    .insert(itemsData)
+
+                if (itemsError) throw itemsError
+
+                return order
+            } catch (error) {
+                logger.warn('[POS] Online order creation failed, falling back to offline storage', error)
+
+                // Offline fallback
+                const { createOfflineOrder } = await import('@/services/offline/offlineOrderService')
+                const { order } = await createOfflineOrder({
+                    items,
+                    orderType: orderType as 'dine_in' | 'takeaway' | 'delivery',
+                    tableNumber,
+                    customerId,
+                    discountType: discountType as 'percent' | 'amount' | null,
+                    discountValue,
+                    discountReason: null, // Could add if needed
+                    subtotal,
+                    discountAmount,
+                    total
+                }, user.id, sessionId)
+
+                return { id: order.id }
             }
-
-            // 2. Create Order Items
-            const itemsData = items.map(item => ({
-                order_id: order.id,
-                product_id: item.product?.id || item.combo?.id,
-                product_name: item.product?.name || item.combo?.name || 'Unknown',
-                product_sku: item.product?.sku || `COMBO-${item.combo?.id?.slice(0, 8) || 'UNKNOWN'}`,
-                quantity: item.quantity,
-                unit_price: item.unitPrice,
-                total_price: item.totalPrice,
-                modifiers: item.modifiers,
-                modifiers_total: item.modifiersTotal,
-                notes: item.notes,
-                selected_variants: item.selectedVariants ? { variants: item.selectedVariants } : null,
-                dispatch_station: (item.product as { category?: { dispatch_station?: string } })?.category?.dispatch_station || 'none',
-                item_status: 'new' as const
-            })) as unknown as Insertable<'order_items'>[]
-
-            const { error: itemsError } = await supabase
-                .from('order_items')
-                .insert(itemsData)
-
-            if (itemsError) {
-                logger.error('Supabase Items Error:', itemsError)
-                throw itemsError
-            }
-
-            return order
         },
         onSuccess: () => {
             clearCart()
-            queryClient.invalidateQueries({ queryKey: ['products'] }) // Refresh stock
+            queryClient.invalidateQueries({ queryKey: ['products'] })
             queryClient.invalidateQueries({ queryKey: ['orders'] })
         }
     })

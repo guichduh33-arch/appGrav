@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreditCard, Banknote, Gift, X } from 'lucide-react';
+import { CreditCard, Banknote, QrCode, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CartItem } from '@/stores/cartStore';
 
@@ -20,7 +20,7 @@ const POSCheckoutWrapper: React.FC<POSCheckoutWrapperProps> = ({
     onComplete,
     onCancel
 }) => {
-    const [selectedMethod, setSelectedMethod] = useState<'card' | 'cash' | 'gift'>('cash');
+    const [selectedMethod, setSelectedMethod] = useState<'card' | 'cash' | 'qris' | 'store_credit'>('cash');
     const [entryAmount, setEntryAmount] = useState<string>(total.toString());
 
     const handleNumpad = (val: string) => {
@@ -121,14 +121,14 @@ const POSCheckoutWrapper: React.FC<POSCheckoutWrapperProps> = ({
                                 <span className={cn("text-xs font-semibold tracking-widest uppercase", selectedMethod === 'cash' ? "text-[#c8a45b]" : "text-[#E5E7EB]/60")}>Cash</span>
                             </button>
                             <button
-                                onClick={() => setSelectedMethod('gift')}
+                                onClick={() => setSelectedMethod('qris')}
                                 className={cn(
                                     "h-32 border flex flex-col items-center justify-center transition-all group",
-                                    selectedMethod === 'gift' ? "border-[#c8a45b] bg-[#c8a45b]/10 ring-1 ring-[#c8a45b]/50" : "border-[#c8a45b]/20 bg-[#1A1A1C] hover:border-[#c8a45b]"
+                                    selectedMethod === 'qris' ? "border-[#c8a45b] bg-[#c8a45b]/10 ring-1 ring-[#c8a45b]/50" : "border-[#c8a45b]/20 bg-[#1A1A1C] hover:border-[#c8a45b]"
                                 )}
                             >
-                                <Gift size={24} className={cn("mb-2", selectedMethod === 'gift' ? "text-[#c8a45b]" : "text-[#E5E7EB]/40")} />
-                                <span className={cn("text-xs font-semibold tracking-widest uppercase", selectedMethod === 'gift' ? "text-[#c8a45b]" : "text-[#E5E7EB]/60")}>Gift Card</span>
+                                <QrCode size={24} className={cn("mb-2", selectedMethod === 'qris' ? "text-[#c8a45b]" : "text-[#E5E7EB]/40")} />
+                                <span className={cn("text-xs font-semibold tracking-widest uppercase", selectedMethod === 'qris' ? "text-[#c8a45b]" : "text-[#E5E7EB]/60")}>QRIS</span>
                             </button>
                         </div>
 

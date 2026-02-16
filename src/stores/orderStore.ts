@@ -1,6 +1,10 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { CartItem } from './cartStore'
+import { heldOrdersService } from '@/services/offline/heldOrdersService'
+import { useAuthStore } from './authStore'
+import { useTerminalStore } from './terminalStore'
+import logger from '@/utils/logger'
 
 export type OrderStatus = 'pending' | 'preparing' | 'ready' | 'completed' | 'cancelled'
 export type OrderType = 'dine_in' | 'takeaway' | 'delivery'
@@ -101,6 +105,8 @@ interface OrderState {
     ) => HeldOrder
     // NEW: Remove item from held order (for PIN-verified deletion)
     removeItemFromHeldOrder: (heldOrderId: string, itemId: string) => void
+    // NEW: Sync with IndexedDB
+    syncHeldOrders: () => Promise<void>
 }
 
 export const useOrderStore = create<OrderState>()(
@@ -201,6 +207,30 @@ export const useOrderStore = create<OrderState>()(
                     }
                 })
 
+                // Persist to IndexedDB
+                const user = useAuthStore.getState().user
+                const deviceId = useTerminalStore.getState().deviceId
+                const sessionId = useAuthStore.getState().sessionId
+
+                if (user && deviceId) {
+                    heldOrdersService.saveHeldOrder({
+                        id: heldOrder.id,
+                        order_number: heldOrder.orderNumber,
+                        order_type: heldOrder.orderType as any,
+                        table_number: heldOrder.tableNumber,
+                        customer_id: heldOrder.customerId,
+                        customer_name: heldOrder.customerName,
+                        items: heldOrder.items,
+                        subtotal: heldOrder.subtotal,
+                        discount_amount: heldOrder.discountAmount,
+                        total: heldOrder.total,
+                        notes: reason,
+                        created_by: user.id,
+                        terminal_id: deviceId,
+                        session_id: sessionId
+                    }).catch(err => logger.error('[POS] Failed to persist held order to IndexedDB:', err))
+                }
+
                 return heldOrder
             },
 
@@ -210,6 +240,9 @@ export const useOrderStore = create<OrderState>()(
                     set(state => ({
                         heldOrders: state.heldOrders.filter(o => o.id !== heldOrderId)
                     }))
+                    // Remove from IndexedDB
+                    heldOrdersService.deleteHeldOrder(heldOrderId)
+                        .catch(err => logger.error('[POS] Failed to delete restored held order from IndexedDB:', err))
                     return heldOrder
                 }
                 return null
@@ -219,6 +252,9 @@ export const useOrderStore = create<OrderState>()(
                 set(state => ({
                     heldOrders: state.heldOrders.filter(o => o.id !== heldOrderId)
                 }))
+                // Remove from IndexedDB
+                heldOrdersService.deleteHeldOrder(heldOrderId)
+                    .catch(err => logger.error('[POS] Failed to remove held order from IndexedDB:', err))
             },
 
             updateOrderStatus: (orderId, status) => {
@@ -287,6 +323,30 @@ export const useOrderStore = create<OrderState>()(
                     heldOrders: [...state.heldOrders, heldOrder]
                 }))
 
+                // Persist to IndexedDB
+                const user = useAuthStore.getState().user
+                const deviceId = useTerminalStore.getState().deviceId
+                const sessionId = useAuthStore.getState().sessionId
+
+                if (user && deviceId) {
+                    heldOrdersService.saveHeldOrder({
+                        id: heldOrder.id,
+                        order_number: heldOrder.orderNumber,
+                        order_type: heldOrder.orderType as any,
+                        table_number: heldOrder.tableNumber,
+                        customer_id: heldOrder.customerId,
+                        customer_name: heldOrder.customerName,
+                        items: heldOrder.items,
+                        subtotal: heldOrder.subtotal,
+                        discount_amount: heldOrder.discountAmount,
+                        total: heldOrder.total,
+                        notes: 'En cuisine',
+                        created_by: user.id,
+                        terminal_id: deviceId,
+                        session_id: sessionId
+                    }).catch(err => logger.error('[POS] Failed to persist held order to IndexedDB:', err))
+                }
+
                 return heldOrder
             },
 
@@ -316,6 +376,50 @@ export const useOrderStore = create<OrderState>()(
                         }
                     })
                 }))
+            },
+
+            syncHeldOrders: async () => {
+                const deviceId = useTerminalStore.getState().deviceId
+                if (!deviceId) return
+
+                try {
+                    const offlineHeldOrders = await heldOrdersService.getHeldOrders(deviceId)
+                    if (offlineHeldOrders.length > 0) {
+                        const mappedHeldOrders: HeldOrder[] = offlineHeldOrders.map(o => ({
+                            id: o.id,
+                            orderNumber: o.order_number,
+                            items: o.items,
+                            orderType: o.order_type as any,
+                            tableNumber: o.table_number || null,
+                            customerId: o.customer_id || null,
+                            customerName: o.customer_name || null,
+                            subtotal: o.subtotal,
+                            discountAmount: o.discount_amount,
+                            total: o.total,
+                            heldAt: new Date(o.created_at),
+                            reason: o.notes || '',
+                            sentToKitchen: false, // Default for restored offline orders
+                            kitchenSentAt: null,
+                            lockedItemIds: []
+                        }))
+
+                        set(state => {
+                            // Merge with existing held orders, prioritizing IndexedDB
+                            const existingIds = new Set(state.heldOrders.map(ho => ho.id))
+                            const newHeldOrders = [...state.heldOrders]
+
+                            mappedHeldOrders.forEach(mho => {
+                                if (!existingIds.has(mho.id)) {
+                                    newHeldOrders.push(mho)
+                                }
+                            })
+
+                            return { heldOrders: newHeldOrders }
+                        })
+                    }
+                } catch (error) {
+                    logger.error('[POS] Failed to sync held orders:', error)
+                }
             },
         }),
         {

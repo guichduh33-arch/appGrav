@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, ShoppingBag, Settings, UserCircle, Coffee, Cake, Utensils } from 'lucide-react';
+import { Search, ShoppingBag, Settings, UserCircle, Coffee, Cake, Utensils, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Product, Category } from '@/types/database';
 
@@ -12,6 +12,9 @@ interface POSTerminalWrapperProps {
     searchQuery: string;
     onSearchChange: (query: string) => void;
     cartComponent: React.ReactNode;
+    onOpenMenu?: () => void;
+    onShowHeldOrders?: () => void;
+    heldOrdersCount?: number;
 }
 
 const POSTerminalWrapper: React.FC<POSTerminalWrapperProps> = ({
@@ -22,7 +25,10 @@ const POSTerminalWrapper: React.FC<POSTerminalWrapperProps> = ({
     selectedCategoryId,
     searchQuery,
     onSearchChange,
-    cartComponent
+    cartComponent,
+    onOpenMenu,
+    onShowHeldOrders,
+    heldOrdersCount = 0
 }) => {
     // Map category icons/slugs to material-like icons (using lucide)
     const getCategoryIcon = (slug: string | null) => {
@@ -42,7 +48,7 @@ const POSTerminalWrapper: React.FC<POSTerminalWrapperProps> = ({
                 <div className="mb-12">
                     <span className="font-['Playfair_Display'] italic text-[#cab06d] text-3xl select-none">B</span>
                 </div>
-                <nav className="flex flex-col gap-8 flex-1 w-full">
+                <nav className="flex flex-col gap-6 flex-1 h-0 w-full overflow-y-auto custom-scrollbar">
                     <button
                         onClick={() => onCategorySelect(null)}
                         className={cn(
@@ -68,8 +74,28 @@ const POSTerminalWrapper: React.FC<POSTerminalWrapperProps> = ({
                     ))}
                 </nav>
                 <div className="mt-auto flex flex-col gap-6 text-[#8E8E93]">
-                    <button className="hover:text-[#cab06d] transition-colors"><Settings size={20} /></button>
-                    <button className="hover:text-[#cab06d] transition-colors"><UserCircle size={20} /></button>
+                    <button
+                        className="relative hover:text-[#cab06d] transition-colors"
+                        onClick={onShowHeldOrders}
+                        title="Held Orders"
+                    >
+                        <Clock size={20} />
+                        {heldOrdersCount > 0 && (
+                            <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#cab06d] text-black text-[10px] font-bold rounded-full flex items-center justify-center">
+                                {heldOrdersCount}
+                            </span>
+                        )}
+                    </button>
+                    <button
+                        className="hover:text-[#cab06d] transition-colors"
+                        onClick={onOpenMenu}
+                        title="Menu"
+                    >
+                        <Settings size={20} />
+                    </button>
+                    <button className="hover:text-[#cab06d] transition-colors" title="Account">
+                        <UserCircle size={20} />
+                    </button>
                 </div>
             </aside>
 

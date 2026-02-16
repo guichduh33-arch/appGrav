@@ -9,6 +9,7 @@ import type { IOfflineProduct } from '@/lib/db'
 import type { ICustomerPriceResult } from '@/types/offline'
 import { cn } from '@/lib/utils'
 import { logError } from '@/utils/logger'
+import { usePOSConfigSettings } from '@/hooks/settings'
 
 interface ModifierModalProps {
     product: Product & { category?: { name: string } | null }
@@ -99,13 +100,14 @@ interface ModifierOption {
 
 export default function ModifierModal({ product, onClose, editItem }: ModifierModalProps) {
     const { addItem, addItemWithPricing, updateItem, customerCategorySlug } = useCartStore()
+    const { modifierSelectionBehaviour } = usePOSConfigSettings()
 
     // Story 6.2: Customer pricing state
     const [customerPriceResult, setCustomerPriceResult] = useState<ICustomerPriceResult | null>(null)
 
-    // Get modifiers for this product's category
+    // Get modifiers for this product's category - prefer DB settings over hardcoded fallback
     const categoryName = (product.category as { name?: string } | null)?.name || 'default'
-    const modifierGroups = MODIFIER_CONFIG[categoryName] || []
+    const modifierGroups = (modifierSelectionBehaviour?.[categoryName] || MODIFIER_CONFIG[categoryName] || []) as ModifierGroup[]
 
     // Initialize selections
     const [selections, setSelections] = useState<Record<string, string | string[]>>(() => {

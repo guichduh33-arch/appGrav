@@ -42,6 +42,7 @@ export const POS_CONFIG_DEFAULTS: IPOSConfigSettings = {
   voidRequiredRoles: ['manager', 'admin'],
   refundRequiredRoles: ['manager', 'admin'],
   shiftRequiredRoles: ['cashier', 'manager', 'admin', 'barista'],
+  modifierSelectionBehaviour: {},
 }
 
 export const FINANCIAL_DEFAULTS: IFinancialSettings = {
@@ -162,6 +163,7 @@ export function usePOSConfigSettings(): IPOSConfigSettings {
     voidRequiredRoles: getSetting<string[]>('pos_config.void_required_roles') ?? POS_CONFIG_DEFAULTS.voidRequiredRoles,
     refundRequiredRoles: getSetting<string[]>('pos_config.refund_required_roles') ?? POS_CONFIG_DEFAULTS.refundRequiredRoles,
     shiftRequiredRoles: getSetting<string[]>('pos_config.shift_required_roles') ?? POS_CONFIG_DEFAULTS.shiftRequiredRoles,
+    modifierSelectionBehaviour: getSetting<Record<string, any>>('pos_config.modifier_selection_behaviour') ?? POS_CONFIG_DEFAULTS.modifierSelectionBehaviour,
   }
 }
 
