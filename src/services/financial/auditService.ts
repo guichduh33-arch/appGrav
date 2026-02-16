@@ -280,7 +280,7 @@ export async function getAuditLogsForEntity(
 ): Promise<IAuditLogEntry[]> {
   const { data, error } = await supabase
     .from('audit_logs')
-    .select('*')
+    .select('id, action, entity_type, entity_id, user_id, severity, details, created_at, ip_address, user_agent')
     .eq('entity_type', entityType)
     .eq('entity_id', entityId)
     .order('created_at', { ascending: false });
@@ -304,7 +304,7 @@ export async function getRecentFinancialOperations(
 ): Promise<IAuditLogEntry[]> {
   const { data, error } = await supabase
     .from('audit_logs')
-    .select('*')
+    .select('id, action, entity_type, entity_id, user_id, severity, details, created_at, ip_address, user_agent')
     .eq('severity', FINANCIAL_OPERATION_SEVERITY)
     .in('action', ['order_voided', 'order_refunded'])
     .order('created_at', { ascending: false })

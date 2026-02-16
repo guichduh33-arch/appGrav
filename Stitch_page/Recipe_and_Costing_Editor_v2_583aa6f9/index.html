@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery | Enterprise Recipe Editor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "artisan-gold": "#C9A55C",
+                        "deep-onyx": "#0D0D0F",
+                        "warm-charcoal": "#1A1A1D",
+                        "stone-text": "#E5E7EB",
+                    },
+                    fontFamily: {
+                        "inter": ["Inter", "sans-serif"],
+                        "playfair": ["Playfair Display", "serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-deep-onyx text-stone-text font-inter antialiased;
+            }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        input[type=range] {
+            @apply appearance-none bg-white/10 h-1 rounded-full;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            @apply appearance-none h-4 w-4 rounded-full bg-artisan-gold cursor-pointer border-2 border-deep-onyx shadow-lg;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+<nav class="border-b border-white/5 bg-warm-charcoal/80 backdrop-blur-xl sticky top-0 z-50">
+<div class="max-w-[1440px] mx-auto px-8 h-16 flex items-center justify-between">
+<div class="flex items-center gap-12">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 bg-artisan-gold flex items-center justify-center rounded-sm">
+<span class="material-symbols-outlined text-deep-onyx text-lg">bakery_dining</span>
+</div>
+<span class="font-bold tracking-[0.2em] text-artisan-gold text-sm uppercase">The Breakery</span>
+</div>
+<div class="hidden md:flex items-center gap-8 text-[11px] font-semibold uppercase tracking-[0.15em] text-stone-text/50">
+<a class="hover:text-artisan-gold transition-colors" href="#">Dashboard</a>
+<a class="text-artisan-gold" href="#">Products</a>
+<a class="hover:text-artisan-gold transition-colors" href="#">Inventory</a>
+<a class="hover:text-artisan-gold transition-colors" href="#">Suppliers</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative p-1 text-stone-text/60 hover:text-artisan-gold transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 w-1.5 h-1.5 bg-artisan-gold rounded-full"></span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-white/10">
+<div class="text-right hidden sm:block">
+<p class="text-[10px] font-bold text-stone-text uppercase tracking-wider">Chef de Cuisine</p>
+<p class="text-[9px] text-stone-text/40 uppercase">Shift Manager</p>
+</div>
+<div class="w-9 h-9 rounded-full border border-artisan-gold/30 p-0.5 overflow-hidden">
+<img alt="Chef profile portrait" class="w-full h-full rounded-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMbDnSciO_HJ8LsXGORaOsI2aYIc6JvEjn6_zJ9e1pZv-NZpPb0nwc43ws8xf-Vcm5AaaCO2o9a20XOE8m_PPg9yON81fgAvnKrO0OwWWgPKTzAXIx1RAn2hsR40TiCMN6zmwL049Mleh1HwnEYGMobdN7vPU7I0ZlVgoAsT8rnIoxh2HOXfEvK9xx7D79iB9rknSZePDKfNRF2BXrfmO5OmQBiypvN7Dn7eNOEpkSH6y9uRvVwR6e6bGhAVp0GFo9xsFKQlulxNE"/>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-[1440px] mx-auto px-8 py-10">
+<header class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
+<div>
+<nav class="flex items-center gap-2 text-[10px] text-artisan-gold/60 mb-3 uppercase tracking-[0.2em] font-bold">
+<a class="hover:text-artisan-gold" href="#">Products</a>
+<span class="material-symbols-outlined text-[12px]">chevron_right</span>
+<a class="hover:text-artisan-gold" href="#">Pastries</a>
+</nav>
+<h1 class="font-playfair text-5xl text-stone-text tracking-tight mb-3">Raspberry Mille-feuille</h1>
+<div class="flex items-center gap-4 text-[11px] text-stone-text/40 uppercase tracking-widest font-medium">
+<span class="px-2 py-0.5 border border-white/10 rounded">SKU: BF-0092</span>
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]">history</span>
+                        Last Modified: 4 hours ago
+                    </span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-8 py-3 rounded text-[11px] font-bold uppercase tracking-widest border border-white/10 hover:border-artisan-gold/40 hover:text-artisan-gold transition-all">
+                    Discard Changes
+                </button>
+<button class="px-10 py-3 rounded text-[11px] font-bold uppercase tracking-widest bg-artisan-gold text-deep-onyx hover:bg-artisan-gold/90 transition-all shadow-xl shadow-artisan-gold/10">
+                    Save Recipe
+                </button>
+</div>
+</header>
+<div class="grid grid-cols-12 gap-8">
+<section class="col-span-12 lg:col-span-8 space-y-8">
+<div class="bg-warm-charcoal border border-white/5 rounded-sm overflow-hidden shadow-2xl">
+<div class="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+<h2 class="text-xs font-bold uppercase tracking-[0.2em] flex items-center gap-3">
+<span class="w-1.5 h-6 bg-artisan-gold rounded-full"></span>
+                            Recipe Components
+                        </h2>
+<span class="text-[10px] font-bold text-artisan-gold bg-artisan-gold/10 px-3 py-1 rounded-full uppercase tracking-widest">Batch Size: 24 Units</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[10px] uppercase tracking-[0.2em] text-stone-text/40 border-b border-white/5">
+<th class="px-8 py-5 font-bold">Ingredient</th>
+<th class="px-6 py-5 font-bold">Quantity</th>
+<th class="px-6 py-5 font-bold">Unit</th>
+<th class="px-6 py-5 font-bold text-right">Unit Cost</th>
+<th class="px-8 py-5 font-bold text-right">Total</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="hover:bg-white/[0.02] transition-colors group">
+<td class="px-8 py-5">
+<div class="font-medium text-sm text-stone-text">Organic Flour T55</div>
+<div class="text-[9px] text-stone-text/30 font-bold uppercase tracking-widest mt-1">Dry Goods</div>
+</td>
+<td class="px-6 py-5">
+<input class="w-24 bg-deep-onyx/50 border-white/10 rounded-sm text-sm focus:border-artisan-gold focus:ring-0 text-stone-text" type="number" value="500"/>
+</td>
+<td class="px-6 py-5 text-xs text-stone-text/50">grams</td>
+<td class="px-6 py-5 text-xs text-right text-stone-text/50 font-mono">$0.002 /g</td>
+<td class="px-8 py-5 text-sm text-right font-bold text-stone-text font-mono">$1.00</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors group">
+<td class="px-8 py-5">
+<div class="font-medium text-sm text-stone-text">AOP Cultured Butter</div>
+<div class="text-[9px] text-blue-400/60 font-bold uppercase tracking-widest mt-1">Dairy</div>
+</td>
+<td class="px-6 py-5">
+<input class="w-24 bg-deep-onyx/50 border-white/10 rounded-sm text-sm focus:border-artisan-gold focus:ring-0 text-stone-text" type="number" value="350"/>
+</td>
+<td class="px-6 py-5 text-xs text-stone-text/50">grams</td>
+<td class="px-6 py-5 text-xs text-right text-stone-text/50 font-mono">$0.022 /g</td>
+<td class="px-8 py-5 text-sm text-right font-bold text-stone-text font-mono">$7.70</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors group">
+<td class="px-8 py-5">
+<div class="font-medium text-sm text-stone-text">Fresh Heritage Raspberries</div>
+<div class="text-[9px] text-red-400/60 font-bold uppercase tracking-widest mt-1">Fruit</div>
+</td>
+<td class="px-6 py-5">
+<input class="w-24 bg-deep-onyx/50 border-white/10 rounded-sm text-sm focus:border-artisan-gold focus:ring-0 text-stone-text" type="number" value="200"/>
+</td>
+<td class="px-6 py-5 text-xs text-stone-text/50">grams</td>
+<td class="px-6 py-5 text-xs text-right text-stone-text/50 font-mono">$0.045 /g</td>
+<td class="px-8 py-5 text-sm text-right font-bold text-stone-text font-mono">$9.00</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors group">
+<td class="px-8 py-5">
+<div class="font-medium text-sm text-stone-text">Madagascar Vanilla Bean</div>
+<div class="text-[9px] text-stone-text/30 font-bold uppercase tracking-widest mt-1">Dry Goods</div>
+</td>
+<td class="px-6 py-5">
+<input class="w-24 bg-deep-onyx/50 border-white/10 rounded-sm text-sm focus:border-artisan-gold focus:ring-0 text-stone-text" type="number" value="1"/>
+</td>
+<td class="px-6 py-5 text-xs text-stone-text/50">unit</td>
+<td class="px-6 py-5 text-xs text-right text-stone-text/50 font-mono">$3.50 /unit</td>
+<td class="px-8 py-5 text-sm text-right font-bold text-stone-text font-mono">$3.50</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-8 bg-deep-onyx/30">
+<button class="w-full flex items-center justify-center gap-3 py-4 border border-dashed border-white/10 rounded-sm text-[11px] font-bold uppercase tracking-[0.2em] text-stone-text/40 hover:border-artisan-gold/40 hover:text-artisan-gold transition-all group">
+<span class="material-symbols-outlined text-lg">add_circle</span>
+                            Add Ingredient
+                        </button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="bg-warm-charcoal p-8 rounded-sm border border-white/5 shadow-xl md:col-span-1">
+<h3 class="text-[10px] font-bold text-stone-text/40 uppercase tracking-[0.2em] mb-6">Yield Adjustment</h3>
+<div class="space-y-6">
+<div>
+<label class="text-[9px] uppercase tracking-widest text-stone-text/30 block mb-2">Target Units</label>
+<input class="w-full bg-deep-onyx border-white/10 rounded-sm text-xl font-bold text-artisan-gold focus:border-artisan-gold focus:ring-0" type="number" value="24"/>
+</div>
+<div>
+<label class="text-[9px] uppercase tracking-widest text-stone-text/30 block mb-1">Expected Yield Weight</label>
+<div class="text-xl font-bold font-mono">4,440<span class="text-stone-text/30 text-xs ml-1 font-inter">g</span></div>
+</div>
+</div>
+</div>
+<div class="bg-warm-charcoal p-8 rounded-sm border border-white/5 shadow-xl md:col-span-2">
+<h3 class="text-[10px] font-bold text-stone-text/40 uppercase tracking-[0.2em] mb-6">Recipe Instructions</h3>
+<div class="space-y-4 text-xs text-stone-text/70 leading-relaxed font-light">
+<div class="flex gap-4">
+<span class="text-artisan-gold font-bold">01.</span>
+<p>Laminate the détrempe with AOP butter using 5 single folds, resting for 45 minutes between each cycle at 4°C.</p>
+</div>
+<div class="flex gap-4">
+<span class="text-artisan-gold font-bold">02.</span>
+<p>Roll to 2.5mm and bake between two perforated mats at 175°C for 22 minutes until deeply golden brown.</p>
+</div>
+<div class="flex gap-4">
+<span class="text-artisan-gold font-bold">03.</span>
+<p>Dust with icing sugar and caramelize at 230°C for 2 minutes. Cool completely before assembly.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<aside class="col-span-12 lg:col-span-4 space-y-8">
+<div class="bg-warm-charcoal border border-white/5 rounded-sm shadow-2xl overflow-hidden sticky top-24">
+<div class="bg-artisan-gold/5 p-8 border-b border-white/5">
+<h3 class="text-[10px] font-bold text-artisan-gold uppercase tracking-[0.2em] mb-6">Costing Analysis</h3>
+<div class="flex flex-col gap-1 mb-6">
+<span class="text-stone-text/40 text-[10px] uppercase tracking-widest">Total Recipe Cost</span>
+<span class="text-4xl font-bold tracking-tight text-stone-text font-mono">$116.40</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-deep-onyx/50 rounded border border-white/5">
+<span class="text-stone-text/40 text-[10px] uppercase tracking-widest">Unit Production Cost</span>
+<span class="text-2xl font-bold text-artisan-gold font-mono">$4.85</span>
+</div>
+</div>
+<div class="p-8 space-y-10">
+<div>
+<div class="flex items-center justify-between mb-6">
+<h4 class="text-[10px] font-bold text-stone-text/40 uppercase tracking-[0.2em]">Category Distribution</h4>
+<span class="material-symbols-outlined text-stone-text/20 text-lg">monitoring</span>
+</div>
+<div class="flex items-center gap-10">
+<div class="relative w-28 h-28">
+<svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+<circle class="stroke-white/5" cx="18" cy="18" fill="none" r="16" stroke-width="3"></circle>
+<circle class="stroke-artisan-gold" cx="18" cy="18" fill="none" r="16" stroke-dasharray="45, 100" stroke-width="3"></circle>
+<circle class="stroke-artisan-gold/60" cx="18" cy="18" fill="none" r="16" stroke-dasharray="30, 100" stroke-dashoffset="-45" stroke-width="3"></circle>
+<circle class="stroke-artisan-gold/20" cx="18" cy="18" fill="none" r="16" stroke-dasharray="25, 100" stroke-dashoffset="-75" stroke-width="3"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center flex-col">
+<span class="text-[8px] font-bold text-artisan-gold uppercase tracking-tighter">COGS</span>
+</div>
+</div>
+<div class="space-y-3 flex-1">
+<div class="flex items-center justify-between text-[10px] uppercase tracking-widest font-bold">
+<span class="flex items-center gap-2 text-stone-text/60"><span class="w-1.5 h-1.5 rounded-full bg-artisan-gold"></span> Fruit</span>
+<span class="text-stone-text font-mono">45%</span>
+</div>
+<div class="flex items-center justify-between text-[10px] uppercase tracking-widest font-bold">
+<span class="flex items-center gap-2 text-stone-text/60"><span class="w-1.5 h-1.5 rounded-full bg-artisan-gold/60"></span> Dairy</span>
+<span class="text-stone-text font-mono">30%</span>
+</div>
+<div class="flex items-center justify-between text-[10px] uppercase tracking-widest font-bold">
+<span class="flex items-center gap-2 text-stone-text/60"><span class="w-1.5 h-1.5 rounded-full bg-artisan-gold/20"></span> Dry Goods</span>
+<span class="text-stone-text font-mono">25%</span>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-8">
+<div>
+<div class="flex justify-between mb-4">
+<label class="text-[10px] font-bold text-stone-text/40 uppercase tracking-[0.2em]">Labor &amp; Overhead</label>
+<span class="text-xs font-bold text-artisan-gold">25%</span>
+</div>
+<input class="w-full cursor-pointer" max="100" min="0" type="range" value="25"/>
+</div>
+<div class="pt-8 border-t border-white/5">
+<div class="grid grid-cols-2 gap-8">
+<div>
+<label class="text-[9px] font-bold uppercase tracking-widest text-stone-text/30 block mb-2">Target Margin</label>
+<div class="text-xl font-bold font-mono">75.0%</div>
+</div>
+<div>
+<label class="text-[9px] font-bold uppercase tracking-widest text-stone-text/30 block mb-2">Actual Margin</label>
+<div class="text-xl font-bold font-mono text-red-500">73.1%</div>
+</div>
+</div>
+<div class="mt-4 w-full bg-white/5 h-1 rounded-full overflow-hidden">
+<div class="bg-red-500 h-full" style="width: 73.1%"></div>
+</div>
+</div>
+</div>
+<div class="pt-8 border-t border-white/5 space-y-6">
+<div class="bg-deep-onyx p-6 rounded-sm border border-white/5">
+<div class="flex items-center justify-between mb-6">
+<div>
+<div class="text-[9px] uppercase tracking-[0.2em] text-stone-text/30 font-bold mb-1">Suggested Retail</div>
+<div class="text-2xl font-bold text-artisan-gold font-mono">$19.50</div>
+</div>
+<div class="text-right">
+<div class="text-[9px] uppercase tracking-[0.2em] text-stone-text/30 font-bold mb-1">Current Price</div>
+<div class="text-2xl font-bold text-stone-text/50 font-mono">$18.00</div>
+</div>
+</div>
+<div class="flex items-center gap-3 text-[10px] font-bold text-red-400 bg-red-400/5 p-3 rounded-sm border border-red-400/10 uppercase tracking-widest">
+<span class="material-symbols-outlined text-sm">warning</span>
+                                    Price is $1.50 below margin target
+                                </div>
+</div>
+<button class="w-full bg-artisan-gold/10 border border-artisan-gold/40 text-artisan-gold py-4 rounded-sm font-bold text-[11px] hover:bg-artisan-gold hover:text-deep-onyx transition-all uppercase tracking-[0.2em]">
+                                Update Store Price
+                            </button>
+</div>
+</div>
+</div>
+<div class="bg-warm-charcoal border border-white/5 rounded-sm p-6 flex items-center gap-5 shadow-xl">
+<div class="relative group">
+<img alt="Plated Raspberry Mille-feuille" class="w-20 h-20 rounded-sm object-cover grayscale group-hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAG_Y6qICIMU_012VaK-Cnrxw-zMQFLp2lHRF2ccn5GrUnDHqzUU5zMWkHiBg3gJfefdR1PIw0s-sc9fBT1A8v5veA5IHpbMfm2W3gcraCrXuOFdhfxGUlhssyiEMq3vNWYHcTglr8KPAVqK2x0kfUtshKYuXxG8HZn7TWM7SoanYFBzdLRx11-sszQbLfo8ppe2nxUaJIi-MX8dxEM4cKrQLCb1sMnmqt0zmjF1tCTLHdOFz2hbxb0CpGlXDaAS0qT1foPDFLW-yI"/>
+<div class="absolute inset-0 bg-artisan-gold/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="flex-1">
+<div class="text-[9px] font-bold text-stone-text/30 uppercase tracking-[0.2em] mb-1">Live Preview</div>
+<div class="text-sm font-playfair italic mb-1">The "Grand Framboise"</div>
+<div class="text-[9px] text-artisan-gold font-bold uppercase tracking-widest">Catalog: Signature Series</div>
+</div>
+<button class="p-2 bg-white/5 rounded-sm hover:bg-artisan-gold/20 hover:text-artisan-gold transition-all">
+<span class="material-symbols-outlined text-lg">open_in_new</span>
+</button>
+</div>
+</aside>
+</div>
+</main>
+<footer class="max-w-[1440px] mx-auto px-8 py-16 border-t border-white/5 mt-20">
+<div class="flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-6">
+<div class="text-artisan-gold text-[10px] uppercase tracking-[0.3em] font-bold">The Breakery OS v2.4</div>
+<div class="h-4 w-px bg-white/10 hidden md:block"></div>
+<div class="text-stone-text/30 text-[9px] uppercase tracking-[0.2em] font-medium hidden md:block">Enterprise Back-Office Management</div>
+</div>
+<div class="flex items-center gap-10 text-[10px] uppercase tracking-[0.2em] text-stone-text/40 font-bold">
+<a class="hover:text-artisan-gold transition-colors" href="#">Audit Logs</a>
+<a class="hover:text-artisan-gold transition-colors" href="#">Permissions</a>
+<a class="hover:text-artisan-gold transition-colors" href="#">System Status</a>
+<a class="hover:text-artisan-gold transition-colors" href="#">Support</a>
+</div>
+</div>
+</footer>
+
+</body></html>

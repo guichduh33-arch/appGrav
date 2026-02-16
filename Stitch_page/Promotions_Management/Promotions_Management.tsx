@@ -2,7 +2,7 @@ import React from 'react';
 
 const Promotions_Management: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -233,7 +233,7 @@ const Promotions_Management: React.FC = () => {
 <div>
 <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Min Purchase</label>
 <div class="relative">
-<span class="absolute left-4 top-3 text-slate-500">$</span>
+<span class="absolute left-4 top-3 text-slate-500">\\$</span>
 <input class="w-full bg-background-dark border border-border-dark rounded-lg py-3 pl-8 pr-4 focus:ring-1 focus:ring-primary focus:border-primary text-white" placeholder="0.00" type="number"/>
 </div>
 </div>
@@ -268,7 +268,7 @@ const Promotions_Management: React.FC = () => {
 </div>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

@@ -2,7 +2,7 @@ import React from 'react';
 
 const Mobile_Orders_History: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -113,7 +113,7 @@ const Mobile_Orders_History: React.FC = () => {
                     </div>
 </div>
 <div class="flex justify-between items-center pt-4 border-t border-white/5">
-<div class="text-xl font-bold text-white">$24.50</div>
+<div class="text-xl font-bold text-white">\\$24.50</div>
 <a class="text-primary font-bold text-sm uppercase tracking-widest flex items-center hover:opacity-80" href="#">
                         View Details
                         <span class="material-icons-round text-base ml-1">chevron_right</span>
@@ -139,7 +139,7 @@ const Mobile_Orders_History: React.FC = () => {
                     </div>
 </div>
 <div class="flex justify-between items-center pt-4 border-t border-white/5">
-<div class="text-xl font-bold text-white">$8.00</div>
+<div class="text-xl font-bold text-white">\\$8.00</div>
 <a class="text-primary font-bold text-sm uppercase tracking-widest flex items-center hover:opacity-80" href="#">
                         View Details
                         <span class="material-icons-round text-base ml-1">chevron_right</span>
@@ -165,7 +165,7 @@ const Mobile_Orders_History: React.FC = () => {
                     </div>
 </div>
 <div class="flex justify-between items-center pt-4 border-t border-white/5">
-<div class="text-xl font-bold text-white">$42.25</div>
+<div class="text-xl font-bold text-white">\\$42.25</div>
 <a class="text-primary font-bold text-sm uppercase tracking-widest flex items-center hover:opacity-80" href="#">
                         View Details
                         <span class="material-icons-round text-base ml-1">chevron_right</span>
@@ -191,7 +191,7 @@ const Mobile_Orders_History: React.FC = () => {
                     </div>
 </div>
 <div class="flex justify-between items-center pt-4 border-t border-white/5">
-<div class="text-xl font-bold text-white">$15.50</div>
+<div class="text-xl font-bold text-white">\\$15.50</div>
 <a class="text-primary font-bold text-sm uppercase tracking-widest flex items-center hover:opacity-80" href="#">
                         View Details
                         <span class="material-icons-round text-base ml-1">chevron_right</span>
@@ -224,7 +224,7 @@ const Mobile_Orders_History: React.FC = () => {
 </div>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

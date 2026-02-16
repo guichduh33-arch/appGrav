@@ -37,11 +37,11 @@ export const CartItemRow = memo(function CartItemRow({
         >
             <div className="mb-1.5 flex-1">
                 <div className={cn(
-                    'font-medium text-sm text-[var(--stone-text)] flex items-center gap-1.5 leading-[1.4]',
-                    isLocked && 'text-warning-text'
+                    'font-medium text-sm text-[#E5E7EB] flex items-center gap-1.5 leading-[1.4]',
+                    isLocked && 'text-[#F59E0B]'
                 )}>
                     {isLocked && <Lock size={12} />}
-                    <span className="text-gold-light font-bold mr-1">{item.quantity}x</span>
+                    <span className="text-[#cab06d] font-bold mr-1">{item.quantity}x</span>
                     {item.type === 'combo' ? item.combo?.name : item.product?.name}
                 </div>
                 {/* Combo selections (Story 6.6) */}
@@ -51,7 +51,7 @@ export const CartItemRow = memo(function CartItemRow({
                             <div key={sel.item_id} className="flex items-center gap-1 text-[11px] text-zinc-300 leading-[1.5]">
                                 <span className="opacity-85">{sel.product_name}</span>
                                 {sel.price_adjustment !== 0 && (
-                                    <span className="text-gold-light font-medium text-[10px]">
+                                    <span className="text-[#cab06d] font-medium text-[10px]">
                                         {sel.price_adjustment > 0 ? '+' : ''}{formatPrice(sel.price_adjustment)}
                                     </span>
                                 )}
@@ -81,7 +81,7 @@ export const CartItemRow = memo(function CartItemRow({
                 <div className="flex items-center gap-1.5">
                     <button
                         type="button"
-                        className="w-6 h-6 flex items-center justify-center bg-transparent border border-white/10 rounded-full text-xs text-zinc-400 cursor-pointer transition-all duration-300 hover:enabled:border-[var(--color-gold)] hover:enabled:text-[var(--color-gold)] hover:enabled:bg-[var(--color-gold)]/5 disabled:opacity-30"
+                        className="w-6 h-6 flex items-center justify-center bg-transparent border border-white/10 rounded-full text-xs text-[#8E8E93] cursor-pointer transition-all duration-300 hover:enabled:border-[#cab06d] hover:enabled:text-[#cab06d] hover:enabled:bg-[#cab06d]/5 disabled:opacity-30"
                         onClick={(e) => {
                             e.stopPropagation()
                             onQuantityChange(item.id, item.quantity - 1)
@@ -94,7 +94,7 @@ export const CartItemRow = memo(function CartItemRow({
                     <span className="text-sm font-bold min-w-[20px] text-center text-white">{item.quantity}</span>
                     <button
                         type="button"
-                        className="w-6 h-6 flex items-center justify-center bg-transparent border border-white/10 rounded-full text-xs text-zinc-400 cursor-pointer transition-all duration-300 hover:enabled:border-[var(--color-gold)] hover:enabled:text-[var(--color-gold)] hover:enabled:bg-[var(--color-gold)]/5 disabled:opacity-30"
+                        className="w-6 h-6 flex items-center justify-center bg-transparent border border-white/10 rounded-full text-xs text-[#8E8E93] cursor-pointer transition-all duration-300 hover:enabled:border-[#cab06d] hover:enabled:text-[#cab06d] hover:enabled:bg-[#cab06d]/5 disabled:opacity-30"
                         onClick={(e) => {
                             e.stopPropagation()
                             onQuantityChange(item.id, item.quantity + 1)
@@ -120,14 +120,14 @@ export const CartItemRow = memo(function CartItemRow({
 
                     <div className={cn(
                         'font-semibold text-sm text-white min-w-[70px] text-right',
-                        isLocked && 'text-warning-text'
+                        isLocked && 'text-[#F59E0B]'
                     )}>
                         {totalPromoDiscount > 0 ? (
                             <>
-                                <span style={{ textDecoration: 'line-through', color: '#94a3b8', fontSize: '11px' }}>
+                                <span style={{ textDecoration: 'line-through', color: '#8E8E93', fontSize: '11px' }}>
                                     {formatPrice(item.totalPrice)}
                                 </span>
-                                <span style={{ color: '#059669', fontWeight: 600 }}>
+                                <span style={{ color: '#10B981', fontWeight: 600 }}>
                                     {formatPrice(item.totalPrice - totalPromoDiscount)}
                                 </span>
                             </>
@@ -167,7 +167,7 @@ export const CartItemRow = memo(function CartItemRow({
 
                     <button
                         type="button"
-                        className="w-6 h-6 flex items-center justify-center border border-transparent bg-transparent text-zinc-400 cursor-pointer rounded-sm transition-all duration-200 hover:bg-[rgba(239,68,68,0.1)] hover:border-danger hover:text-danger"
+                        className="w-6 h-6 flex items-center justify-center border border-transparent bg-transparent text-[#8E8E93] cursor-pointer rounded-sm transition-all duration-200 hover:bg-[rgba(239,68,68,0.1)] hover:border-[#EF4444] hover:text-[#EF4444]"
                         onClick={(e) => {
                             e.stopPropagation()
                             onDeleteClick(item.id)
@@ -192,9 +192,9 @@ const PromotionBadge = memo(function PromotionBadge({ discount }: { discount: II
                 gap: '3px',
                 fontSize: '9px',
                 fontWeight: 600,
-                color: '#ea580c',
-                backgroundColor: '#fff7ed',
-                border: '1px solid #fed7aa',
+                color: '#EA580C',
+                backgroundColor: 'rgba(234, 88, 12, 0.1)',
+                border: '1px solid rgba(234, 88, 12, 0.2)',
                 borderRadius: '4px',
                 padding: '1px 5px',
                 marginRight: '4px',

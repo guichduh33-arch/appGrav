@@ -2,7 +2,7 @@ import React from 'react';
 
 const Password_Reset_Request: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -145,7 +145,7 @@ const Password_Reset_Request: React.FC = () => {
 </div>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

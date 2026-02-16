@@ -2,7 +2,7 @@ import React from 'react';
 
 const Loyalty_Tiers_Config: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -103,7 +103,7 @@ const Loyalty_Tiers_Config: React.FC = () => {
 <p class="text-sm text-primary/60 uppercase tracking-wider font-semibold mb-1">Points Earning Rate</p>
 <div class="flex items-center gap-3">
 <span class="text-2xl font-bold">1.5</span>
-<span class="text-slate-400">points per $1.00 spent</span>
+<span class="text-slate-400">points per \\$1.00 spent</span>
 </div>
 </div>
 <div class="h-12 w-[1px] bg-primary/20"></div>
@@ -379,7 +379,7 @@ const Loyalty_Tiers_Config: React.FC = () => {
 </footer>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

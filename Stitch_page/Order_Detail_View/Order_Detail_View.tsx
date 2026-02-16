@@ -2,7 +2,7 @@ import React from 'react';
 
 const Order_Detail_View: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -325,7 +325,7 @@ const Order_Detail_View: React.FC = () => {
 </footer>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

@@ -1,0 +1,231 @@
+import React from 'react';
+
+const Production_Entry: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: `
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Production Entry</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#C9A55C", // Aged Gold
+                        "background-light": "#F9FAFB",
+                        "background-dark": "#0D0D0F", // Deep Onyx
+                        "panel-dark": "#161618",
+                        "muted-smoke": "#8E8E93",
+                    },
+                    fontFamily: {
+                        display: ["Playfair Display", "serif"],
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.625rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        .sidebar-item-active {
+            background: rgba(201, 165, 92, 0.1);
+            border-left: 3px solid #C9A55C;
+            color: #C9A55C;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2D2D2F;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+<aside class="w-64 border-r border-slate-200 dark:border-white/5 bg-white dark:bg-background-dark flex flex-col sticky top-0 h-screen z-20">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full border-2 border-primary flex items-center justify-center">
+<span class="text-primary font-bold">B</span>
+</div>
+<div>
+<h1 class="font-display text-lg leading-none tracking-tight">The Breakery</h1>
+<span class="text-[10px] uppercase tracking-widest text-muted-smoke">Back Office</span>
+</div>
+</div>
+<div class="px-4 py-2">
+<div class="bg-emerald-500/10 text-emerald-500 text-[11px] font-bold px-3 py-1.5 rounded-full flex items-center gap-2 w-fit">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+</span>
+                ONLINE
+            </div>
+</div>
+<nav class="flex-1 mt-6 px-3 space-y-1 overflow-y-auto custom-scrollbar">
+<div class="text-[10px] font-bold text-muted-smoke uppercase tracking-wider px-3 mb-2">Operations</div>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-icons-outlined text-xl">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-icons-outlined text-xl">point_of_sale</span>
+                POS Terminal
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-icons-outlined text-xl">restaurant</span>
+                Kitchen Display
+            </a>
+<div class="text-[10px] font-bold text-muted-smoke uppercase tracking-wider px-3 mb-2 mt-6">Management</div>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-icons-outlined text-xl">inventory_2</span>
+                Products
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm sidebar-item-active font-medium rounded-r-lg" href="#">
+<span class="material-icons-outlined text-xl">layers</span>
+                Stock &amp; Inventory
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-icons-outlined text-xl">history</span>
+                Order History
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-icons-outlined text-xl">business</span>
+                B2B Wholesale
+            </a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-white/5">
+<div class="flex items-center gap-3 p-2 bg-slate-50 dark:bg-panel-dark rounded-xl">
+<div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary font-bold">M</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold truncate">Mamat</p>
+<p class="text-xs text-muted-smoke">Admin</p>
+</div>
+<button class="text-muted-smoke hover:text-white">
+<span class="material-icons-outlined">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<main class="flex-1 bg-background-light dark:bg-background-dark overflow-y-auto">
+<header class="p-8 pb-0">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h2 class="serif-title text-4xl text-slate-900 dark:text-slate-50">Stock &amp; Inventory</h2>
+<p class="text-muted-smoke mt-1">Manage stock, track movements, and monitor inventory</p>
+</div>
+</div>
+<div class="flex gap-8 border-b border-slate-200 dark:border-white/5">
+<button class="pb-4 text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-2">
+<span class="material-icons-outlined text-lg">inventory</span> Stock
+                </button>
+<button class="pb-4 text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-2">
+<span class="material-icons-outlined text-lg">local_shipping</span> Incoming
+                </button>
+<button class="pb-4 text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-2">
+<span class="material-icons-outlined text-lg">sync_alt</span> Transfers
+                </button>
+<button class="pb-4 text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-2">
+<span class="material-icons-outlined text-lg">delete_outline</span> Wastage
+                </button>
+<button class="pb-4 text-sm font-medium text-primary border-b-2 border-primary flex items-center gap-2">
+<span class="material-icons-outlined text-lg">precision_manufacturing</span> Production
+                </button>
+<button class="pb-4 text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-2">
+<span class="material-icons-outlined text-lg">fact_check</span> Opname
+                </button>
+<button class="pb-4 text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-2">
+<span class="material-icons-outlined text-lg">analytics</span> Movements
+                </button>
+</div>
+</header>
+<div class="p-8 space-y-6">
+<div class="grid grid-cols-12 gap-6">
+<div class="col-span-8 bg-white dark:bg-panel-dark p-1 rounded-2xl flex border border-slate-200 dark:border-white/5">
+<button class="flex-1 py-3 px-4 text-sm font-medium rounded-xl bg-primary/10 text-primary border border-primary/30">Viennoiserie</button>
+<button class="flex-1 py-3 px-4 text-sm font-medium text-muted-smoke hover:text-slate-200 transition-colors">Pastry</button>
+<button class="flex-1 py-3 px-4 text-sm font-medium text-muted-smoke hover:text-slate-200 transition-colors">Bakery</button>
+<button class="flex-1 py-3 px-4 text-sm font-medium text-muted-smoke hover:text-slate-200 transition-colors">Hot Kitchen</button>
+</div>
+<div class="col-span-4 bg-white dark:bg-panel-dark p-1 rounded-2xl flex border border-slate-200 dark:border-white/5 items-center px-4">
+<button class="text-muted-smoke hover:text-slate-200"><span class="material-icons-outlined">chevron_left</span></button>
+<div class="flex-1 text-center">
+<span class="text-sm font-semibold text-primary">Today</span>
+<p class="text-[10px] text-muted-smoke uppercase tracking-wider">Feb 11, 2026</p>
+</div>
+<button class="text-muted-smoke hover:text-slate-200"><span class="material-icons-outlined">chevron_right</span></button>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-6">
+<div class="col-span-8 space-y-6">
+<div class="bg-white dark:bg-panel-dark rounded-3xl p-8 border border-slate-200 dark:border-white/5 h-[600px] flex flex-col">
+<div class="flex items-center justify-between mb-8">
+<h3 class="serif-title text-2xl">Production Entry</h3>
+<div class="relative w-72">
+<span class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted-smoke">search</span>
+<input class="w-full bg-slate-100 dark:bg-background-dark border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-1 focus:ring-primary transition-all" placeholder="Search for a product..." type="text"/>
+</div>
+</div>
+<div class="flex-1 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-3xl flex flex-col items-center justify-center text-center p-12">
+<div class="w-20 h-20 rounded-full bg-slate-50 dark:bg-background-dark flex items-center justify-center mb-6">
+<span class="material-icons-outlined text-4xl text-muted-smoke/50">inventory_2</span>
+</div>
+<h4 class="text-lg font-medium mb-2">No product added</h4>
+<p class="text-muted-smoke text-sm max-w-xs">Search for a product from the Viennoiserie section to start recording today's production.</p>
+</div>
+</div>
+</div>
+<div class="col-span-4 space-y-6">
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 p-6 rounded-3xl text-center">
+<p class="text-[10px] uppercase tracking-widest text-emerald-500 font-bold mb-1">Produced</p>
+<h4 class="text-4xl font-display text-emerald-500">0</h4>
+</div>
+<div class="bg-rose-500/5 dark:bg-rose-500/10 border border-rose-500/20 p-6 rounded-3xl text-center">
+<p class="text-[10px] uppercase tracking-widest text-rose-500 font-bold mb-1">Waste</p>
+<h4 class="text-4xl font-display text-rose-500">0</h4>
+</div>
+</div>
+<div class="bg-white dark:bg-panel-dark rounded-3xl p-6 border border-slate-200 dark:border-white/5 flex-1 min-h-[448px] flex flex-col">
+<h3 class="text-xs uppercase tracking-widest font-bold text-muted-smoke mb-6">Today's Production (0)</h3>
+<div class="flex-1 flex flex-col items-center justify-center text-center">
+<span class="material-icons-outlined text-4xl text-muted-smoke/20 mb-4">schedule</span>
+<p class="text-sm text-muted-smoke italic">No production recorded yet</p>
+</div>
+<div class="pt-6 border-t border-slate-100 dark:border-white/5">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+<span class="material-icons-outlined">save</span>
+                                SUBMIT PRODUCTION
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>
+      <!-- STITCH_HTML_END -->
+    ` }} />
+  );
+};
+
+export default Production_Entry;

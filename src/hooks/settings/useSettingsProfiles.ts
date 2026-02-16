@@ -8,7 +8,7 @@ export function useSettingsProfiles() {
     queryKey: settingsKeys.profiles(),
     queryFn: async (): Promise<ISettingsProfile[]> => {
       const { data, error } = await untypedFrom('settings_profiles')
-        .select('*')
+        .select('id, name, description, profile_type, settings_snapshot, terminal_settings_snapshot, is_active, is_system, created_by, created_at, updated_at')
         .order('name')
         .returns<ISettingsProfile[]>()
 
@@ -23,7 +23,7 @@ export function useSettingsProfile(id: string) {
     queryKey: settingsKeys.profile(id),
     queryFn: async (): Promise<ISettingsProfile | null> => {
       const { data, error } = await untypedFrom('settings_profiles')
-        .select('*')
+        .select('id, name, description, profile_type, settings_snapshot, terminal_settings_snapshot, is_active, is_system, created_by, created_at, updated_at')
         .eq('id', id)
         .returns<ISettingsProfile>()
         .single()
@@ -45,7 +45,7 @@ export function useCreateSettingsProfile() {
     mutationFn: async (profile: Omit<ISettingsProfile, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await untypedFrom('settings_profiles')
         .insert(profile)
-        .select()
+        .select('id, name, description, profile_type, settings_snapshot, terminal_settings_snapshot, is_active, is_system, created_by, created_at, updated_at')
         .returns<ISettingsProfile>()
         .single()
 

@@ -19,7 +19,7 @@ export function useBusinessHolidays(year?: number) {
         queryFn: async () => {
             let query = supabase
                 .from('business_holidays')
-                .select('*')
+                .select('id, name, date, is_recurring, is_closed, modified_hours, notes, created_at, updated_at')
                 .order('date', { ascending: true })
 
             if (year) {
@@ -55,7 +55,7 @@ export function useCreateHoliday() {
                     is_closed: holiday.is_closed ?? true,
                     notes: holiday.notes ?? null,
                 })
-                .select()
+                .select('id, name, date, is_recurring, is_closed, modified_hours, notes, created_at, updated_at')
                 .single()
 
             if (error) throw error

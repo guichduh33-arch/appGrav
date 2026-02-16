@@ -16,7 +16,10 @@ export const useBusinessHoursStore = create<BusinessHoursState>()((set, get) => 
   loadBusinessHours: async () => {
     const { data, error } = await supabase
       .from('business_hours')
-      .select('*')
+      .select(`
+        id, break_end, break_start, close_time, created_at, day_of_week, 
+        is_closed, is_open, open_time, updated_at
+      `)
       .order('day_of_week');
 
     if (error) throw error;

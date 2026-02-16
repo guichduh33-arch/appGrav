@@ -5,7 +5,7 @@ import {
     FileText, Building2,
     ShoppingCart, BarChart3, Users, Settings, Store, Utensils,
     ChevronLeft, ChevronRight, LogOut, Truck, UserCircle, Coffee, Boxes,
-    Shield, ScrollText, CloudCog, Calculator, LayoutDashboard
+    Shield, ScrollText, CloudCog, Calculator, LayoutDashboard, Receipt
 } from 'lucide-react';
 import { NetworkIndicator } from '../components/ui/NetworkIndicator';
 import { SyncIndicator } from '../components/ui/SyncIndicator';
@@ -132,6 +132,10 @@ const BackOfficeLayout: React.FC = () => {
                         <NavLink to="/purchasing/suppliers" className="bo-nav-item" title={isCollapsed ? "Suppliers" : ""} data-collapsed={isCollapsed || undefined}>
                             <Truck size={20} strokeWidth={1.8} />
                             {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Suppliers</span>}
+                        </NavLink>
+                        <NavLink to="/expenses" className="bo-nav-item" title={isCollapsed ? "Expenses" : ""} data-collapsed={isCollapsed || undefined}>
+                            <Receipt size={20} strokeWidth={1.8} />
+                            {!isCollapsed && <span className="animate-[sidebarFadeIn_0.3s_ease-in-out_forwards]">Expenses</span>}
                         </NavLink>
                         <NavLink to="/customers" className="bo-nav-item" title={isCollapsed ? "Customers" : ""} data-collapsed={isCollapsed || undefined}>
                             <UserCircle size={20} strokeWidth={1.8} />

@@ -82,7 +82,7 @@ async function syncOrder(item: ISyncQueueItem): Promise<void> {
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert(orderData as never)
-    .select()
+    .select('id')
     .single();
 
   if (orderError) {

@@ -2,7 +2,7 @@ import React from 'react';
 
 const Staff_Home_Mobile: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -276,7 +276,7 @@ const Staff_Home_Mobile: React.FC = () => {
 </div>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

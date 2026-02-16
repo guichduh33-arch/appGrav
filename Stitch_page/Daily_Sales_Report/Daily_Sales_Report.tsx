@@ -2,7 +2,7 @@ import React from 'react';
 
 const Daily_Sales_Report: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -312,7 +312,7 @@ const Daily_Sales_Report: React.FC = () => {
 </main>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

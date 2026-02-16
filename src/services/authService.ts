@@ -474,7 +474,7 @@ export const authService = {
           role: 'cashier', // Default legacy role
           is_active: true,
         })
-        .select()
+        .select('id, name, display_name, employee_code, phone, preferred_language, role, is_active, avatar_url')
         .single();
 
       if (userError) {
@@ -673,7 +673,7 @@ export const authService = {
   async getRoles(includeInactive = false): Promise<Role[]> {
     let query = supabase
       .from('roles')
-      .select('*')
+      .select('id, code, name_fr, name_en, name_id, hierarchy_level, is_active')
       .order('hierarchy_level', { ascending: false });
 
     if (!includeInactive) {
@@ -696,7 +696,7 @@ export const authService = {
   async getPermissions(): Promise<Record<string, EffectivePermission[]>> {
     const { data, error } = await supabase
       .from('permissions')
-      .select('*')
+      .select('code, module, action, is_sensitive')
       .order('module')
       .order('action');
 

@@ -131,7 +131,10 @@ export async function updateDeviceLastSeen(deviceId: string): Promise<void> {
 export async function getDeviceInfo(deviceId: string): Promise<ISyncDevice | null> {
   try {
     const { data, error } = await untypedFrom('sync_devices')
-      .select('*')
+      .select(`
+        id, device_id, device_type, device_name, capabilities, 
+        last_sync_at, status, sync_version, created_at, updated_at
+      `)
       .eq('device_id', deviceId)
       .single();
 
@@ -197,7 +200,10 @@ export async function regenerateDeviceToken(
 export async function getActiveDevices(): Promise<ISyncDevice[]> {
   try {
     const { data, error } = await untypedFrom('sync_devices')
-      .select('*')
+      .select(`
+        id, device_id, device_type, device_name, capabilities, 
+        last_sync_at, status, sync_version, created_at, updated_at
+      `)
       .eq('is_active', true)
       .order('last_seen', { ascending: false });
 

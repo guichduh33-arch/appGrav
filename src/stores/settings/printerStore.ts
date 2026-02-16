@@ -18,7 +18,10 @@ export const usePrinterStore = create<PrinterState>()((set, get) => ({
   loadPrinters: async () => {
     const { data, error } = await supabase
       .from('printer_configurations')
-      .select('*')
+      .select(`
+        id, connection_string, connection_type, created_at, is_active, is_default, 
+        name, paper_width, printer_type, settings, updated_at
+      `)
       .order('name');
 
     if (error) throw error;
@@ -30,7 +33,10 @@ export const usePrinterStore = create<PrinterState>()((set, get) => ({
       const { data, error } = await supabase
         .from('printer_configurations')
         .insert(printer)
-        .select()
+        .select(`
+          id, connection_string, connection_type, created_at, is_active, is_default, 
+          name, paper_width, printer_type, settings, updated_at
+        `)
         .single();
 
       if (error) throw error;

@@ -2,7 +2,7 @@ import React from 'react';
 
 const Purchase_Order_Details: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -159,8 +159,8 @@ const Purchase_Order_Details: React.FC = () => {
 </td>
 <td class="px-6 py-5 text-center font-medium">500 kg</td>
 <td class="px-6 py-5 text-center font-medium">500 kg</td>
-<td class="px-6 py-5 text-right text-slate-500">$2.45</td>
-<td class="px-6 py-5 text-right font-semibold">$1,225.00</td>
+<td class="px-6 py-5 text-right text-slate-500">\\$2.45</td>
+<td class="px-6 py-5 text-right font-semibold">\\$1,225.00</td>
 <td class="px-6 py-5 text-center">
 <span class="material-icons text-accent-success text-lg" title="Fully Received">check_circle</span>
 </td>
@@ -179,8 +179,8 @@ const Purchase_Order_Details: React.FC = () => {
 </td>
 <td class="px-6 py-5 text-center font-medium">50 units</td>
 <td class="px-6 py-5 text-center font-medium">25 units</td>
-<td class="px-6 py-5 text-right text-slate-500">$12.00</td>
-<td class="px-6 py-5 text-right font-semibold">$600.00</td>
+<td class="px-6 py-5 text-right text-slate-500">\\$12.00</td>
+<td class="px-6 py-5 text-right font-semibold">\\$600.00</td>
 <td class="px-6 py-5 text-center">
 <span class="material-icons text-accent-warning text-lg" title="Partially Received">warning</span>
 </td>
@@ -199,8 +199,8 @@ const Purchase_Order_Details: React.FC = () => {
 </td>
 <td class="px-6 py-5 text-center font-medium">100 kg</td>
 <td class="px-6 py-5 text-center font-medium">0 kg</td>
-<td class="px-6 py-5 text-right text-slate-500">$1.50</td>
-<td class="px-6 py-5 text-right font-semibold">$150.00</td>
+<td class="px-6 py-5 text-right text-slate-500">\\$1.50</td>
+<td class="px-6 py-5 text-right font-semibold">\\$150.00</td>
 <td class="px-6 py-5 text-center">
 <span class="material-icons text-slate-400 text-lg" title="Pending">hourglass_empty</span>
 </td>
@@ -212,19 +212,19 @@ const Purchase_Order_Details: React.FC = () => {
 <div class="w-full max-w-xs space-y-3">
 <div class="flex justify-between text-sm text-slate-500">
 <span>Subtotal</span>
-<span>$1,975.00</span>
+<span>\\$1,975.00</span>
 </div>
 <div class="flex justify-between text-sm text-slate-500">
 <span>Tax (5%)</span>
-<span>$98.75</span>
+<span>\\$98.75</span>
 </div>
 <div class="flex justify-between text-sm text-slate-500 pb-3 border-b border-primary/10">
 <span>Shipping</span>
-<span>$45.00</span>
+<span>\\$45.00</span>
 </div>
 <div class="flex justify-between items-center pt-2">
 <span class="font-bold text-lg uppercase tracking-wider">Grand Total</span>
-<span class="text-2xl font-bold text-primary">$2,118.75</span>
+<span class="text-2xl font-bold text-primary">\\$2,118.75</span>
 </div>
 </div>
 </div>
@@ -315,7 +315,7 @@ const Purchase_Order_Details: React.FC = () => {
 </footer>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

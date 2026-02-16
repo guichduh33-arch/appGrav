@@ -2,7 +2,7 @@ import React from 'react';
 
 const Mobile_Login: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -135,7 +135,7 @@ const Mobile_Login: React.FC = () => {
 </div>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

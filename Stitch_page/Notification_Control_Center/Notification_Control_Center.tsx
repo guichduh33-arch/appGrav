@@ -2,7 +2,7 @@ import React from 'react';
 
 const Notification_Control_Center: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -157,7 +157,7 @@ const Notification_Control_Center: React.FC = () => {
 <span class="material-icons text-primary/60">monetization_on</span>
 <div>
 <p class="font-medium text-stone-200">Large Discount Voided</p>
-<p class="text-xs text-stone-500 italic">Overrides on orders exceeding $100.00</p>
+<p class="text-xs text-stone-500 italic">Overrides on orders exceeding \\$100.00</p>
 </div>
 </div>
 </td>
@@ -273,7 +273,7 @@ const Notification_Control_Center: React.FC = () => {
 </div>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

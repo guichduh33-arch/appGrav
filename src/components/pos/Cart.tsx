@@ -99,20 +99,20 @@ function Cart({ onCheckout, onSendToKitchen, onItemClick }: CartProps) {
     }
 
     return (
-        <aside className="w-[480px] bg-[var(--onyx-surface)] border-l border-white/5 flex flex-col flex-shrink-0 z-[15] shadow-[-8px_0_32px_rgba(0,0,0,0.5)] text-[var(--stone-text)]">
+        <aside className="w-[480px] bg-[#1C1C1E] border-l border-white/5 flex flex-col flex-shrink-0 z-[15] shadow-[-8px_0_32px_rgba(0,0,0,0.5)] text-[#E5E7EB]">
             {/* Header / Active Order Info */}
             <div className="p-8 border-b border-white/5 bg-[var(--onyx-surface)]">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                         <h2 className="text-base font-bold text-white uppercase tracking-[0.15em]">Active Order</h2>
-                        <span className="px-3 py-1 rounded-full bg-[var(--color-gold)]/10 text-[var(--color-gold)] text-xs font-bold tracking-wide">
+                        <span className="px-3 py-1 rounded-full bg-[#cab06d]/10 text-[#cab06d] text-xs font-bold tracking-wide">
                             {displayOrderNumber}
                         </span>
                         {hasLockedItems && <Lock size={14} className="text-warning opacity-80" />}
                     </div>
                     <button
                         type="button"
-                        className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 text-[var(--muted-smoke)] hover:text-white hover:bg-white/10 transition-all border-none cursor-pointer"
+                        className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 text-[#8E8E93] hover:text-white hover:bg-white/10 transition-all border-none cursor-pointer"
                         title="Clear cart"
                         onClick={clearCart}
                         disabled={items.length === 0}
@@ -121,7 +121,7 @@ function Cart({ onCheckout, onSendToKitchen, onItemClick }: CartProps) {
                     </button>
                 </div>
                 {/* Order type subtitle */}
-                <p className="text-[11px] text-[var(--muted-smoke)] tracking-wide mb-4">
+                <p className="text-[11px] text-[#8E8E93] tracking-wide mb-4">
                     {orderType === 'dine_in' ? 'Dine-in' : orderType === 'takeaway' ? 'Take-out' : 'Delivery'}
                 </p>
 
@@ -134,8 +134,8 @@ function Cart({ onCheckout, onSendToKitchen, onItemClick }: CartProps) {
                             className={cn(
                                 'flex-1 py-2 rounded-lg text-[10px] uppercase tracking-widest font-black transition-all duration-300 border-none cursor-pointer',
                                 orderType === type
-                                    ? 'bg-[var(--color-gold)] text-black shadow-lg shadow-[var(--color-gold)]/10'
-                                    : 'text-[var(--muted-smoke)] hover:text-white hover:bg-white/5'
+                                    ? 'bg-[#cab06d] text-black shadow-lg shadow-[#cab06d]/10'
+                                    : 'text-[#8E8E93] hover:text-white hover:bg-white/5'
                             )}
                             onClick={() => handleOrderTypeChange(type)}
                         >
@@ -149,7 +149,7 @@ function Cart({ onCheckout, onSendToKitchen, onItemClick }: CartProps) {
                     {selectedCustomer || customerId ? (
                         <button
                             type="button"
-                            className="w-full flex items-center gap-4 px-4 py-3 bg-white/5 border border-[var(--color-gold)]/30 rounded-xl cursor-pointer transition-all duration-300 hover:bg-white/10 group"
+                            className="w-full flex items-center gap-4 px-4 py-3 bg-white/5 border border-[#cab06d]/30 rounded-xl cursor-pointer transition-all duration-300 hover:bg-white/10 group"
                             onClick={() => setShowCustomerModal(true)}
                         >
                             <div
@@ -161,7 +161,7 @@ function Cart({ onCheckout, onSendToKitchen, onItemClick }: CartProps) {
                             <div className="flex-1 min-w-0 flex flex-col text-left">
                                 <span className="text-sm font-semibold text-white truncate">{selectedCustomer?.company_name || selectedCustomer?.name || customerName}</span>
                                 <div className="flex items-center gap-2 mt-0.5">
-                                    <span className="text-[10px] uppercase tracking-widest font-bold text-[var(--muted-smoke)] group-hover:text-[var(--color-gold)] transition-colors">VIP Client</span>
+                                    <span className="text-[10px] uppercase tracking-widest font-bold text-[#8E8E93] group-hover:text-[#cab06d] transition-colors">VIP Client</span>
                                     {selectedCustomer?.loyalty_points && (
                                         <span className="text-[10px] text-success font-bold">· {selectedCustomer.loyalty_points} pts</span>
                                     )}
@@ -171,7 +171,7 @@ function Cart({ onCheckout, onSendToKitchen, onItemClick }: CartProps) {
                     ) : (
                         <button
                             type="button"
-                            className="w-full flex items-center justify-center gap-3 py-4 bg-transparent border-2 border-dashed border-white/10 rounded-xl text-[var(--muted-smoke)] text-[10px] uppercase tracking-[0.2em] font-black cursor-pointer transition-all duration-300 hover:border-[var(--color-gold)]/50 hover:text-white hover:bg-white/5"
+                            className="w-full flex items-center justify-center gap-3 py-4 bg-transparent border-2 border-dashed border-white/10 rounded-xl text-[#8E8E93] text-[10px] uppercase tracking-[0.2em] font-black cursor-pointer transition-all duration-300 hover:border-[#cab06d]/50 hover:text-white hover:bg-white/5"
                             onClick={() => setShowCustomerModal(true)}
                         >
                             <User size={14} strokeWidth={2.5} />
@@ -209,8 +209,8 @@ function Cart({ onCheckout, onSendToKitchen, onItemClick }: CartProps) {
                     <button
                         type="button"
                         className={cn(
-                            'w-full flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg text-[var(--muted-smoke)] text-[10px] uppercase tracking-widest font-bold cursor-pointer transition-all border-none',
-                            (showOrderNotes || orderNotes) && 'text-[var(--color-gold)] bg-[var(--color-gold)]/5'
+                            'w-full flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg text-[#8E8E93] text-[10px] uppercase tracking-widest font-bold cursor-pointer transition-all border-none',
+                            (showOrderNotes || orderNotes) && 'text-[#cab06d] bg-[#cab06d]/5'
                         )}
                         onClick={() => setShowOrderNotes(!showOrderNotes)}
                     >
@@ -219,7 +219,7 @@ function Cart({ onCheckout, onSendToKitchen, onItemClick }: CartProps) {
                     </button>
                     {showOrderNotes && (
                         <textarea
-                            className="w-full mt-3 px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-white text-sm font-[inherit] resize-none focus:outline-none focus:border-[var(--color-gold)]/50 placeholder:text-[var(--muted-smoke)]/50"
+                            className="w-full mt-3 px-4 py-3 bg-black/20 border border-white/5 rounded-xl text-white text-sm font-[inherit] resize-none focus:outline-none focus:border-[#cab06d]/50 placeholder:text-[#8E8E93]/50"
                             placeholder="Type instructions here..."
                             value={orderNotes}
                             onChange={(e) => setOrderNotes(e.target.value)}

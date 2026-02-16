@@ -2,7 +2,7 @@ import React from 'react';
 
 const Manager_Financial_Dashboard: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -445,7 +445,7 @@ const Manager_Financial_Dashboard: React.FC = () => {
 </footer>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

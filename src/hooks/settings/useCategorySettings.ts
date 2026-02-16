@@ -28,7 +28,7 @@ export function useCategoryList() {
     queryFn: async (): Promise<Category[]> => {
       const { data, error } = await supabase
         .from('categories')
-        .select('*')
+        .select('id, name, color, icon, dispatch_station, show_in_pos, is_raw_material, is_active, sort_order, created_at, updated_at')
         .order('sort_order', { ascending: true })
         .order('name', { ascending: true })
 
@@ -92,7 +92,7 @@ export function useCreateCategory() {
           is_active: category.is_active,
           sort_order: nextSortOrder,
         })
-        .select()
+        .select('id, name, color, icon, dispatch_station, show_in_pos, is_raw_material, is_active, sort_order, created_at, updated_at')
         .single()
 
       if (error) throw error
@@ -128,7 +128,7 @@ export function useUpdateCategory() {
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
-        .select()
+        .select('id, name, color, icon, dispatch_station, show_in_pos, is_raw_material, is_active, sort_order, created_at, updated_at')
 
       logger.debug('[useUpdateCategory] Response:', { data, error })
 

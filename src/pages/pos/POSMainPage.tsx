@@ -1,25 +1,25 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
-import { Search, Clock, Users, CheckCircle } from 'lucide-react'
+import { Clock, Users, CheckCircle } from 'lucide-react'
 
 import { useCartStore, CartItem } from '../../stores/cartStore'
 import { useAuthStore } from '../../stores/authStore'
-import { useOrderStore } from '../../stores/orderStore'
 import { useProducts, useCategories, usePOSCombos } from '../../hooks/products'
 import { useNetworkAlerts } from '../../hooks/useNetworkAlerts'
 import { useSyncReport } from '../../hooks/useSyncReport'
 import { useLanHub } from '../../hooks/lan'
 import { useCartPriceRecalculation } from '../../hooks/pricing'
+import { createOfflineOrder } from '@/services/offline/offlineOrderService'
+import { saveOfflinePayment } from '@/services/offline/offlinePaymentService'
+import { toast } from 'sonner'
 import logger from '@/utils/logger'
 import { usePOSModals, usePOSShift, usePOSOrders, useCartPromotions } from '../../hooks/pos'
 import { PostOfflineSyncReport } from '../../components/sync/PostOfflineSyncReport'
-import CategoryNav from '../../components/pos/CategoryNav'
-import ProductGrid from '../../components/pos/ProductGrid'
-import ComboGrid from '../../components/pos/ComboGrid'
 import Cart from '../../components/pos/Cart'
 import POSMenu from '../../components/pos/POSMenu'
+import POSTerminalWrapper from '../../components/pos/POSTerminalWrapper'
+import POSCheckoutWrapper from '../../components/pos/POSCheckoutWrapper'
 import {
     ModifierModal,
-    PaymentModal,
     VariantModal,
     HeldOrdersModal,
     PinVerificationModal,
@@ -34,7 +34,7 @@ import {
     ShiftHistoryModal,
     ShiftStatsModal,
 } from '../../components/pos/shift'
-import type { Product, ProductCombo } from '../../types/database'
+import type { Product } from '../../types/database'
 import './POSMainPage.css'
 
 export default function POSMainPage() {
@@ -104,12 +104,11 @@ export default function POSMainPage() {
 
     // Order management
     const { handleSendToKitchen, handleRestoreHeldOrder } = usePOSOrders()
-    const heldOrdersCount = useOrderStore(s => s.heldOrders.length)
 
     // Data fetching
-    const { data: categories = [], isLoading: categoriesLoading } = useCategories()
-    const { data: products = [], isLoading: productsLoading } = useProducts(selectedCategory)
-    const { data: combos = [], isLoading: combosLoading } = usePOSCombos()
+    const { data: categories = [] } = useCategories()
+    const { data: products = [] } = useProducts(selectedCategory)
+    const { data: combos = [] } = usePOSCombos()
 
     // Filter products by search
     const filteredProducts = useMemo(() =>
@@ -139,11 +138,6 @@ export default function POSMainPage() {
         setSelectedProduct(null)
     }, [closeModal])
 
-    // Combo handlers (Story 6.6)
-    const handleComboClick = useCallback((combo: ProductCombo) => {
-        setSelectedComboId(combo.id)
-        openModal('combo')
-    }, [openModal])
 
     const handleComboConfirm = useCallback((_combo: any, selectedItems: any[], totalPrice: number) => {
         const combo = combos.find(c => c.id === selectedComboId)
@@ -179,78 +173,22 @@ export default function POSMainPage() {
 
     return (
         <div className="pos-app">
-            <main className="pos-main bg-[var(--theme-bg-primary)]">
-                {/* Category Navigation */}
-                <CategoryNav
-                    categories={categories}
-                    selectedCategory={selectedCategory}
-                    onSelectCategory={setSelectedCategory}
-                    isLoading={categoriesLoading}
-                    onOpenMenu={() => openModal('menu')}
-                />
-
-                <div className="flex-1 flex flex-col overflow-hidden relative">
-                    <div className="px-10 pt-10 pb-4 flex flex-col gap-6 border-b border-[var(--color-gold)]/5">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 text-sm">
-                                <span className="text-[var(--muted-smoke)]">Catalogue</span>
-                                {selectedCategory && (
-                                    <>
-                                        <span className="text-[var(--muted-smoke)]/40">/</span>
-                                        <span className="text-white font-medium">{categories.find(c => c.id === selectedCategory)?.name ?? ''}</span>
-                                    </>
-                                )}
-                            </div>
-                            <div className="flex items-center gap-4">
-                                {heldOrdersCount > 0 && (
-                                    <button
-                                        type="button"
-                                        className="h-11 px-6 flex items-center gap-3 bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 rounded-full text-[var(--color-gold)] text-[10px] uppercase tracking-widest font-black cursor-pointer transition-all hover:bg-[var(--color-gold)]/20 group"
-                                        onClick={() => openModal('heldOrders')}
-                                    >
-                                        <Clock size={16} className="group-hover:rotate-12 transition-transform" />
-                                        <span>{heldOrdersCount} Pending {heldOrdersCount === 1 ? 'Order' : 'Orders'}</span>
-                                    </button>
-                                )}
-                                <div className="pos-products__search w-80 relative">
-                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted-smoke)]" size={16} />
-                                    <input
-                                        type="text"
-                                        placeholder="Search excellence..."
-                                        className="w-full bg-[var(--onyx-surface)] border-none rounded-lg py-3 pl-12 pr-6 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-gold)]/50 transition-all placeholder:text-[var(--muted-smoke)]/50"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto px-10 pb-10 custom-scrollbar">
-                        {/* Combo deals (Story 6.6) */}
-                        {!selectedCategory && combos.length > 0 && (
-                            <ComboGrid
-                                combos={combos}
-                                onComboClick={handleComboClick}
-                                isLoading={combosLoading}
-                            />
-                        )}
-
-                        <ProductGrid
-                            products={filteredProducts}
-                            onProductClick={handleProductClick}
-                            isLoading={productsLoading}
-                        />
-                    </div>
-                </div>
-
-                {/* Active Order Sidebar */}
-                <Cart
-                    onCheckout={handleCheckout}
-                    onSendToKitchen={() => handleSendToKitchen(hasOpenShift, () => openModal('noShift'))}
-                    onItemClick={handleCartItemClick}
-                />
-            </main>
+            <POSTerminalWrapper
+                categories={categories}
+                products={filteredProducts}
+                onCategorySelect={setSelectedCategory}
+                onProductSelect={handleProductClick}
+                selectedCategoryId={selectedCategory}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                cartComponent={
+                    <Cart
+                        onCheckout={handleCheckout}
+                        onSendToKitchen={() => handleSendToKitchen(hasOpenShift, () => openModal('noShift'))}
+                        onItemClick={handleCartItemClick}
+                    />
+                }
+            />
 
             <POSMenu
                 isOpen={modals.menu}
@@ -289,7 +227,61 @@ export default function POSMainPage() {
                 />
             )}
 
-            {modals.payment && <PaymentModal onClose={() => closeModal('payment')} />}
+            {modals.payment && (
+                <POSCheckoutWrapper
+                    cartItems={useCartStore.getState().items}
+                    subtotal={useCartStore.getState().subtotal}
+                    total={useCartStore.getState().total}
+                    tax={Math.round(useCartStore.getState().total * 10 / 110)}
+                    onCancel={() => closeModal('payment')}
+                    onComplete={async (method, amount) => {
+                        if (!user?.id) {
+                            toast.error('User not authenticated');
+                            return;
+                        }
+
+                        try {
+                            // 1. Create the offline order
+                            const cartState = useCartStore.getState();
+                            const { order } = await createOfflineOrder(
+                                {
+                                    items: cartState.items,
+                                    orderType: cartState.orderType,
+                                    tableNumber: cartState.tableNumber,
+                                    customerId: cartState.customerId,
+                                    discountType: cartState.discountType,
+                                    discountValue: cartState.discountValue,
+                                    discountReason: cartState.discountReason,
+                                    subtotal: cartState.subtotal,
+                                    discountAmount: cartState.discountAmount,
+                                    total: cartState.total,
+                                },
+                                user.id,
+                                currentSession?.id || null
+                            );
+
+                            // 2. Save the payment
+                            await saveOfflinePayment({
+                                order_id: order.id,
+                                method: method as any,
+                                amount: amount,
+                                cash_received: method === 'cash' ? amount : undefined,
+                                user_id: user.id,
+                                session_id: currentSession?.id || null,
+                            });
+
+                            toast.success(`Order ${order.order_number} completed!`);
+
+                            // 3. Clear cart and close modal
+                            useCartStore.getState().clearCart();
+                            closeModal('payment');
+                        } catch (err: any) {
+                            logger.error('[POS] Checkout failed:', err);
+                            toast.error(err.message || 'Checkout failed');
+                        }
+                    }}
+                />
+            )}
 
             {modals.heldOrders && (
                 <HeldOrdersModal

@@ -1,0 +1,269 @@
+import React from 'react';
+
+const POSTerminal: React.FC = () => {
+    return (
+        <div dangerouslySetInnerHTML={{
+            __html: `
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery POS Terminal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@1,500;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#cab06d",
+                "background-light": "#f8f7f6",
+                "background-dark": "#0D0D0F",
+                "onyx-surface": "#161618",
+                "muted-smoke": "#8E8E93",
+                "stone-text": "#E5E7EB"
+              },
+              fontFamily: {
+                "display": ["Inter", "sans-serif"],
+                "script": ["Playfair Display", "serif"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+      </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0D0D0F;
+            color: #E5E7EB;
+            overflow: hidden;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2a2a2c;
+            border-radius: 10px;
+        }
+        .active-nav {
+            background-color: rgba(202, 176, 109, 0.1);
+            color: #cab06d;
+            border-right: 2px solid #cab06d;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display h-screen flex overflow-hidden">
+<!-- Left Column: Navigation Bar -->
+<aside class="w-24 flex flex-col items-center py-8 border-r border-primary/10 bg-background-dark">
+<div class="mb-12">
+<span class="font-script italic text-primary text-3xl select-none">B</span>
+</div>
+<nav class="flex flex-col gap-8 flex-1 w-full">
+<button class="flex flex-col items-center gap-1 w-full py-4 active-nav">
+<span class="material-icons-outlined">bakery_dining</span>
+<span class="text-[10px] uppercase tracking-widest font-medium">Boulangerie</span>
+</button>
+<button class="flex flex-col items-center gap-1 w-full py-4 text-muted-smoke hover:text-primary transition-colors">
+<span class="material-icons-outlined">cake</span>
+<span class="text-[10px] uppercase tracking-widest font-medium">Pâtisserie</span>
+</button>
+<button class="flex flex-col items-center gap-1 w-full py-4 text-muted-smoke hover:text-primary transition-colors">
+<span class="material-icons-outlined">local_cafe</span>
+<span class="text-[10px] uppercase tracking-widest font-medium">Café</span>
+</button>
+<button class="flex flex-col items-center gap-1 w-full py-4 text-muted-smoke hover:text-primary transition-colors">
+<span class="material-icons-outlined">shopping_bag</span>
+<span class="text-[10px] uppercase tracking-widest font-medium">Merch</span>
+</button>
+</nav>
+<div class="mt-auto flex flex-col gap-6 text-muted-smoke">
+<button class="hover:text-primary transition-colors"><span class="material-icons-outlined">settings</span></button>
+<button class="hover:text-primary transition-colors"><span class="material-icons-outlined">account_circle</span></button>
+</div>
+</aside>
+<!-- Center Column: Product Grid -->
+<main class="flex-1 flex flex-col bg-background-dark/50">
+<!-- Header -->
+<header class="h-20 flex items-center justify-between px-10 border-b border-primary/5">
+<h1 class="text-xl font-medium tracking-tight">Boulangerie <span class="text-muted-smoke font-normal text-sm ml-2">/ Morning Pastries</span></h1>
+<div class="relative w-64">
+<span class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted-smoke text-sm">search</span>
+<input class="w-full bg-onyx-surface border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-1 focus:ring-primary/50 text-stone-text" placeholder="Search item..." type="text"/>
+</div>
+</header>
+<!-- Grid -->
+<div class="flex-1 overflow-y-auto p-10 custom-scrollbar">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Product Card 1 -->
+<button class="group relative flex flex-col text-left bg-onyx-surface border border-white/5 rounded-xl overflow-hidden transition-all hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/5">
+<div class="aspect-square relative overflow-hidden bg-neutral-900">
+<img class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" data-alt="Golden flaky french butter croissant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKLulXp25WV5tIxwH-OTEWxXhvao1nsRUS-NkVmwO_W8tBuvG8dQNXjM5v8eLkg-TGuz5ZT6H9Jwpm7Fbv-ZF-5lkY1Bv4BdrRZj4thsQtH53uBMrf3NS0GRp_JnzguDeX7bB9ybYzmIuKkRMqCGGTSRAaQUMqCR7oaoTVDy1-rcVQWgrVVM91v1cGn97i2Ys2orZCYIuvu4m9KNndwoZxUEXxe8hYH96zgtljuKY13doo0G0h9_x3MZ8Zz2UbQ3L8JCmPUzWw4_A"/>
+</div>
+<div class="p-5">
+<h3 class="text-stone-text font-medium text-sm mb-1">Butter Croissant</h3>
+<p class="text-primary text-sm font-semibold tracking-wider">$4.50</p>
+</div>
+</button>
+<!-- Product Card 2 -->
+<button class="group relative flex flex-col text-left bg-onyx-surface border border-white/5 rounded-xl overflow-hidden transition-all hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/5">
+<div class="aspect-square relative overflow-hidden bg-neutral-900">
+<img class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" data-alt="Traditional french baguette on wooden table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeC69ciEFnJF5EfKXIOJdd6SL8NzfR6HiaL6hRntBTSrobSwjcth1GSNw2rS-EKQetB5gjSO6VC7CTYGmtfP9VwMsemM9_SDCbqlUNLA95svSERHGkaSjwP8rpfU1XJ3_vwYx0VyDQLgfk9R9s8r9DDO4nsLcalsznwnC2U7UgR7FLMFWWuCKcYdE97bvGX75v8yGbkGmujq2z5sRRnWwolu34E1YjSiEmVqtnPNPvDSihIuurSCtBygidCEiFaUXolPBjv8jmU6U"/>
+</div>
+<div class="p-5">
+<h3 class="text-stone-text font-medium text-sm mb-1">Baguette Tradition</h3>
+<p class="text-primary text-sm font-semibold tracking-wider">$3.75</p>
+</div>
+</button>
+<!-- Product Card 3 -->
+<button class="group relative flex flex-col text-left bg-onyx-surface border border-white/5 rounded-xl overflow-hidden transition-all hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/5">
+<div class="aspect-square relative overflow-hidden bg-neutral-900">
+<img class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" data-alt="Pain au chocolat with chocolate pieces" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAQlHf6yFxaniT5AgUYjgdwjtE151ftMHalU0h5iCGKLWxEuLqbSUeXX68dLIIjufGRPrEn77vKXI4GFHqQyaYpcZ3nMWZQWFBOK4JAfCWDA5EAjVE2giK1ltKspYTKCuMS0J3Wa_gXRwelJKmHUFGfhORzX8-8lGlUJb_j3SJ4ytMWaPly_DdK-hsSxJNyFbDpw0zRN5ibhmFTWL2RaTZhb4JOLr_Bgx_8jovuM9Zb9n6W4H56wv-XhWtRyosJDWPZuZFSuegpCY"/>
+</div>
+<div class="p-5">
+<h3 class="text-stone-text font-medium text-sm mb-1">Pain au Chocolat</h3>
+<p class="text-primary text-sm font-semibold tracking-wider">$5.25</p>
+</div>
+</button>
+<!-- Product Card 4 -->
+<button class="group relative flex flex-col text-left bg-onyx-surface border border-white/5 rounded-xl overflow-hidden transition-all hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/5">
+<div class="aspect-square relative overflow-hidden bg-neutral-900">
+<img class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" data-alt="Almond croissant topped with sliced almonds" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCf_MjHp2umyP6njU-jh_aKfvAI3aI0YWVz9NnzUkA-bJ15TZarChFb8bY1VGVVPDUjU7hxeYZI-LtYWMlNOQYCfLttA3aPebSXc0Xpwmlc_bpSxnq_69sxsnfqkfNEMPA76rm4WJDNMpMk7GDo9OeW8xcS1NDqrh9D4A8---htWfg2DFOE93l4zde_-iJI7uy39y5iJW0gXsvfdhqkUcBWvTgV6CYI8yVDKaXFqC_gwP1FTjbPka3eI5aq9A1xlyyJLx0eQ9y6GpI"/>
+</div>
+<div class="p-5">
+<h3 class="text-stone-text font-medium text-sm mb-1">Almond Croissant</h3>
+<p class="text-primary text-sm font-semibold tracking-wider">$5.50</p>
+</div>
+</button>
+<!-- Product Card 5 -->
+<button class="group relative flex flex-col text-left bg-onyx-surface border border-white/5 rounded-xl overflow-hidden transition-all hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/5">
+<div class="aspect-square relative overflow-hidden bg-neutral-900">
+<img class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" data-alt="Artisanal sourdough bread loaf" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByjA6EEfrI3vB9owSq5x9mVHqgqia9d80VzPJUjCaYW3rMvhRq9ZB25wZvA9q8R3zMcxtCBJYJphWdrkE49-1vo9j_cIp4O2rcLelG7yxKTv1G4sMNyvmkdDwPF9H7BgEdR8p-TOOXBwN6bFnSUfZZsB8pmtcd0DKhbCM08ZQagCdJhBpcEhFHtslnwDWGiojFABc_yx9mZSSi64mPFjMstAQr3r00dYMvCIZLUipSrgPkrizvv27LgjOt3R-qqvEkkjrgdTQkQ3Q"/>
+</div>
+<div class="p-5">
+<h3 class="text-stone-text font-medium text-sm mb-1">Country Sourdough</h3>
+<p class="text-primary text-sm font-semibold tracking-wider">$8.00</p>
+</div>
+</button>
+<!-- Product Card 6 -->
+<button class="group relative flex flex-col text-left bg-onyx-surface border border-white/5 rounded-xl overflow-hidden transition-all hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/5">
+<div class="aspect-square relative overflow-hidden bg-neutral-900">
+<img class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" data-alt="Assorted sweet brioche buns" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1nh-z6DgfU3WjV0faUFbpYq1b3UiDBdb6_2E_EPUUXn7UjbLQh7GEoX-M-YHARKrJI0rJt9aA7XJWNJbRZRloIU1UK3jpBIVgfg69oTcD6zLZ-7QUbDAZOJcOZoTByR4q4YcVRpm--griyiEZS2uXRsbsooLysZovII4cQn7VA4aQ7XF_1mEY4e6fl7SD9jagqD9JtrHltXMs-0y7zpuTa0fN0My10kXpiEZnvNAnnIHB5ncanl-rxQDcv4_WTwf5V_yd2weRgKg"/>
+</div>
+<div class="p-5">
+<h3 class="text-stone-text font-medium text-sm mb-1">Brioche Nanterre</h3>
+<p class="text-primary text-sm font-semibold tracking-wider">$6.50</p>
+</div>
+</button>
+</div>
+</div>
+</main>
+<!-- Right Column: Active Order Sidebar -->
+<aside class="w-[400px] flex flex-col bg-onyx-surface border-l border-primary/10">
+<!-- Order Header -->
+<div class="p-8 border-b border-white/5">
+<div class="flex justify-between items-center mb-2">
+<h2 class="text-lg font-semibold text-stone-text">Active Order</h2>
+<span class="text-xs font-medium px-2 py-1 bg-primary/10 text-primary rounded">#1204</span>
+</div>
+<p class="text-muted-smoke text-xs">Dine-in • Table 04</p>
+</div>
+<!-- Ticket Items -->
+<div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+<table class="w-full text-sm">
+<thead class="text-muted-smoke text-[10px] uppercase tracking-widest border-b border-white/5">
+<tr>
+<th class="text-left font-medium pb-4">Item</th>
+<th class="text-center font-medium pb-4">Qty</th>
+<th class="text-right font-medium pb-4">Price</th>
+</tr>
+</thead>
+<tbody class="text-stone-text">
+<tr class="group">
+<td class="py-5">
+<span class="block font-medium">Butter Croissant</span>
+<span class="text-[10px] text-muted-smoke">+ Salted Butter</span>
+</td>
+<td class="py-5 text-center">
+<div class="flex items-center justify-center gap-3">
+<button class="w-6 h-6 rounded-full border border-white/10 flex items-center justify-center text-muted-smoke hover:bg-white/5 text-xs">-</button>
+<span>2</span>
+<button class="w-6 h-6 rounded-full border border-white/10 flex items-center justify-center text-muted-smoke hover:bg-white/5 text-xs">+</button>
+</div>
+</td>
+<td class="py-5 text-right font-medium">$9.00</td>
+</tr>
+<tr class="group">
+<td class="py-5">
+<span class="block font-medium">Baguette Tradition</span>
+</td>
+<td class="py-5 text-center">
+<div class="flex items-center justify-center gap-3">
+<button class="w-6 h-6 rounded-full border border-white/10 flex items-center justify-center text-muted-smoke hover:bg-white/5 text-xs">-</button>
+<span>1</span>
+<button class="w-6 h-6 rounded-full border border-white/10 flex items-center justify-center text-muted-smoke hover:bg-white/5 text-xs">+</button>
+</div>
+</td>
+<td class="py-5 text-right font-medium">$3.75</td>
+</tr>
+<tr class="group">
+<td class="py-5">
+<span class="block font-medium">Latte Macchiato</span>
+<span class="text-[10px] text-muted-smoke">Oat Milk, Large</span>
+</td>
+<td class="py-5 text-center">
+<div class="flex items-center justify-center gap-3">
+<button class="w-6 h-6 rounded-full border border-white/10 flex items-center justify-center text-muted-smoke hover:bg-white/5 text-xs">-</button>
+<span>1</span>
+<button class="w-6 h-6 rounded-full border border-white/10 flex items-center justify-center text-muted-smoke hover:bg-white/5 text-xs">+</button>
+</div>
+</td>
+<td class="py-5 text-right font-medium">$6.25</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Order Summary & Checkout -->
+<div class="p-8 bg-black/20 border-t border-primary/20">
+<div class="space-y-3 mb-8">
+<div class="flex justify-between text-sm text-muted-smoke">
+<span>Subtotal</span>
+<span>$19.00</span>
+</div>
+<div class="flex justify-between text-sm text-muted-smoke">
+<span>Tax (8.5%)</span>
+<span>$1.62</span>
+</div>
+<div class="flex justify-between text-xl font-semibold text-stone-text pt-3 border-t border-white/5">
+<span>Total</span>
+<span class="text-primary">$20.62</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-4">
+<button class="flex items-center justify-center gap-2 py-3 border border-white/10 rounded-lg text-xs font-medium text-stone-text hover:bg-white/5 transition-colors">
+<span class="material-icons-outlined text-sm">print</span> Receipt
+                </button>
+<button class="flex items-center justify-center gap-2 py-3 border border-white/10 rounded-lg text-xs font-medium text-stone-text hover:bg-white/5 transition-colors">
+<span class="material-icons-outlined text-sm">discount</span> Promo
+                </button>
+</div>
+<button class="w-full bg-primary py-4 rounded-xl text-background-dark font-bold uppercase tracking-[0.2em] text-sm hover:brightness-110 active:scale-[0.98] transition-all shadow-xl shadow-primary/10">
+                Checkout
+            </button>
+</div>
+</aside>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    ` }} />
+    );
+};
+
+export default POSTerminal;

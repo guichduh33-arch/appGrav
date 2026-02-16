@@ -8,7 +8,12 @@ import type { Role } from '../../types/auth';
 import { useNetworkStatus, useOfflineAuth } from '../../hooks/offline';
 import { useActiveUsers } from '@/hooks/useActiveUsers';
 import { logError } from '@/utils/logger';
-import { WifiOff } from 'lucide-react';
+import {
+  WifiOff,
+  ChevronRight,
+  AlertCircle,
+  Loader2
+} from 'lucide-react';
 import { BreakeryLogo } from '@/components/ui/BreakeryLogo';
 import { cn } from '@/lib/utils';
 
@@ -30,8 +35,6 @@ export default function LoginPage() {
   const [pin, setPin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
-  const [lockedUntil, setLockedUntil] = useState<string | null>(null);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -42,7 +45,6 @@ export default function LoginPage() {
 
   const handleNumpadKey = (key: string) => {
     setError('');
-    setAttemptsRemaining(null);
 
     if (key === 'clear') {
       setPin('');
@@ -72,8 +74,6 @@ export default function LoginPage() {
     setIsLoading(true);
     setError('');
     clearOfflineError();
-    setAttemptsRemaining(null);
-    setLockedUntil(null);
 
     // OFFLINE MODE: Use offline authentication (Story 1.2)
     if (isOffline) {
@@ -114,7 +114,6 @@ export default function LoginPage() {
 
       // Handle specific errors
       if (result.error === 'account_locked') {
-        setLockedUntil(result.error);
         setError('Account locked. Try again in 15 minutes.');
       } else {
         // Fallback to legacy login for all other errors (demo mode)
@@ -232,334 +231,197 @@ export default function LoginPage() {
 
   const selectedUserData = users.find(u => u.id === selectedUser);
 
-  return (
-    <div className="login-page min-h-screen flex items-center justify-center p-xl relative max-[480px]:p-lg"
-      style={{ background: 'radial-gradient(ellipse at center, #2d2a24 0%, #1a1816 100%)' }}
-    >
-      <div
-        className="login-card relative z-[1] w-full max-w-[420px] rounded-2xl p-2xl max-[480px]:p-xl max-[480px]:rounded-xl"
-        style={{
-          background: 'linear-gradient(180deg, rgba(61,52,40,0.9) 0%, rgba(45,42,36,0.95) 100%)',
-          backdropFilter: 'blur(16px)',
-          border: '1px solid rgba(201,165,92,0.2)',
-          boxShadow: '0 25px 50px -12px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.05)',
-        }}
-      >
-        {/* Logo */}
-        <div className="text-center mb-2xl">
-          <div className="flex justify-center mb-md" style={{ filter: 'drop-shadow(0 4px 12px rgba(201,165,92,0.3))' }}>
-            <BreakeryLogo size="xl" variant="gold" showText={false} />
-          </div>
-          <h1 className="font-display text-3xl font-semibold text-white m-0 tracking-[-0.02em] max-[480px]:text-2xl">
-            The Breakery
-          </h1>
-          <p className="font-display italic text-sm text-gold mt-xs tracking-[0.05em]">
-            Login
-          </p>
-        </div>
+  // VIEW 1: USER SELECTION GRID
+  if (!selectedUser) {
+    return (
+      <div className="bg-[#0D0D0F] min-h-screen flex flex-col items-center justify-center font-sans antialiased text-white relative overflow-hidden">
+        {/* Background Decoration */}
+        <div className="fixed -bottom-24 -left-24 w-96 h-96 bg-[#c8a45b]/5 rounded-full blur-[100px] pointer-events-none text-[#c8a45b]"></div>
+        <div className="fixed -top-24 -right-24 w-96 h-96 bg-[#c8a45b]/5 rounded-full blur-[100px] pointer-events-none"></div>
 
-        {/* Offline Mode Indicator (Story 1.2) */}
-        {isOffline && (
-          <div className="bg-gray-500 text-white py-sm px-lg rounded-md mb-lg flex items-center justify-center gap-sm text-sm font-body">
-            <WifiOff size={16} />
-            <span>Offline Mode</span>
-          </div>
-        )}
+        <main className="w-full max-w-[800px] bg-[#1A1A1D] border border-[#2A2A30] rounded-xl shadow-2xl p-8 relative z-10">
+          <header className="text-center mb-10">
+            <div className="inline-block mb-4">
+              <BreakeryLogo className="w-16 h-16 text-[#c8a45b]" />
+            </div>
+            <h1 className="font-serif text-3xl text-[#c8a45b] mb-2">Select Staff Member</h1>
+            <p className="text-[#A09B8E] text-sm font-light">Choose your profile to enter PIN</p>
+          </header>
 
-        {/* Rate Limit Cooldown Display (Story 1.2) */}
-        {isRateLimited && (
-          <div
-            className="text-center font-body text-sm mb-lg py-md px-lg rounded-lg"
-            style={{
-              color: 'var(--color-gold-light)',
-              background: 'rgba(201,165,92,0.1)',
-              border: '1px solid rgba(201,165,92,0.3)',
-            }}
-          >
-            <span>Please wait...</span>
-            <span className="text-xl font-bold block mt-xs">{cooldownSeconds}s</span>
-          </div>
-        )}
-
-        {/* User Selection */}
-        <div className="mb-xl">
-          <label
-            className="block font-body text-xs font-semibold mb-sm uppercase tracking-[0.08em]"
-            style={{ color: 'var(--color-gold-light)' }}
-          >
-            Select a user
-          </label>
-          <select
-            className="login-select w-full h-14 font-body text-base text-white cursor-pointer rounded-lg transition-all duration-[250ms]"
-            style={{
-              padding: '0 var(--space-xl) 0 var(--space-lg)',
-              background: 'rgba(26,24,22,0.6)',
-              border: '2px solid rgba(201,165,92,0.3)',
-              appearance: 'none',
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23c9a55c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right var(--space-lg) center',
-            }}
-            value={selectedUser}
-            onChange={(e) => {
-              setSelectedUser(e.target.value);
-              setPin('');
-              setError('');
-              setAttemptsRemaining(null);
-              setLockedUntil(null);
-            }}
-            title="Select a user"
-            aria-label="User profile selection"
-          >
-            <option value="">-- Choose --</option>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
             {users.map(user => (
-              <option key={user.id} value={user.id}>
-                {user.display_name || user.name}
-                {user.employee_code ? ` (${user.employee_code})` : ` (${user.role})`}
-              </option>
+              <button
+                key={user.id}
+                onClick={() => setSelectedUser(user.id)}
+                className="flex flex-col items-center p-4 rounded-xl bg-[#1E1E22] border border-[#2A2A30] hover:border-[#c8a45b]/50 hover:bg-[#c8a45b]/5 transition-all group"
+              >
+                <div className="w-16 h-16 rounded-full bg-[#c8a45b]/10 flex items-center justify-center mb-3 border border-[#c8a45b]/20 group-hover:scale-105 transition-transform overflow-hidden">
+                  {user.avatar_url ? (
+                    <img src={user.avatar_url} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-[#c8a45b] text-xl font-bold">
+                      {(user.display_name || user.name).charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <span className="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors text-center line-clamp-1">
+                  {user.display_name || user.name}
+                </span>
+                <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">
+                  {user.role}
+                </span>
+              </button>
             ))}
-          </select>
+          </div>
+
+          <div className="mt-10 pt-6 border-t border-[#2A2A30] flex justify-center">
+            <Link
+              to="/login/email"
+              className="text-sm text-[#A09B8E] hover:text-[#c8a45b] transition-colors flex items-center gap-2"
+            >
+              Management Email Login
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // VIEW 2: PIN PAD (STITCH A2)
+  return (
+    <div className="bg-[#0D0D0F] min-h-screen flex flex-col items-center justify-center font-sans antialiased text-white relative overflow-hidden">
+      {/* Background Decoration */}
+      <div className="fixed -bottom-24 -left-24 w-96 h-96 bg-[#c8a45b]/5 rounded-full blur-[100px] pointer-events-none"></div>
+      <div className="fixed -top-24 -right-24 w-96 h-96 bg-[#c8a45b]/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+      {/* Top-Right Offline Badge */}
+      {isOffline && (
+        <div className="fixed top-8 right-8 flex items-center gap-2 bg-[#c8a45b]/10 border border-[#c8a45b]/30 px-4 py-2 rounded-full z-20">
+          <WifiOff className="text-[#c8a45b] w-4 h-4" />
+          <span className="text-[#c8a45b] text-xs font-semibold uppercase tracking-widest">Offline Mode</span>
+        </div>
+      )}
+
+      <main className="w-full max-w-[400px] bg-[#1A1A1D] border border-[#2A2A30] rounded-xl shadow-2xl p-8 relative z-10">
+        {/* Header Section */}
+        <header className="text-center mb-8">
+          <h1 className="font-serif text-3xl text-[#c8a45b] mb-2">Staff PIN Access</h1>
+          <p className="text-[#A09B8E] text-sm font-light">Enter your 4-6 digit PIN</p>
+        </header>
+
+        {/* User Greeting */}
+        <div className="text-center mb-6">
+          <button
+            onClick={() => { setSelectedUser(''); setPin(''); setError(''); }}
+            className="group flex flex-col items-center mx-auto"
+          >
+            <div className="w-16 h-16 bg-[#c8a45b]/10 rounded-full flex items-center justify-center mb-3 border border-[#c8a45b]/20 group-hover:border-[#c8a45b]/50 transition-colors overflow-hidden">
+              {selectedUserData?.avatar_url ? (
+                <img src={selectedUserData.avatar_url} alt={selectedUserData.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-[#c8a45b] text-2xl font-bold">
+                  {(selectedUserData?.display_name || selectedUserData?.name || '?').charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
+            <h2 className="text-lg font-medium text-[#F5F5F0] group-hover:text-[#c8a45b] transition-colors flex items-center gap-2">
+              Welcome, {selectedUserData?.display_name || selectedUserData?.name}
+              <span className="text-xs text-[#A09B8E] border border-[#2A2A30] px-2 py-0.5 rounded uppercase tracking-tighter">Switch</span>
+            </h2>
+          </button>
         </div>
 
-        {/* Selected User Avatar */}
-        {selectedUserData && (
-          <div className="flex flex-col items-center gap-sm mb-xl">
-            {selectedUserData.avatar_url ? (
-              <img
-                src={selectedUserData.avatar_url}
-                alt={selectedUserData.name}
-                className="w-[72px] h-[72px] rounded-full object-cover"
-                style={{
-                  border: '3px solid var(--color-gold)',
-                  boxShadow: '0 4px 12px rgba(201,165,92,0.3)',
-                }}
-              />
-            ) : (
-              <div
-                className="w-[72px] h-[72px] rounded-full flex items-center justify-center font-display text-2xl font-semibold text-white"
-                style={{
-                  background: 'linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-dark) 100%)',
-                  boxShadow: '0 4px 12px rgba(201,165,92,0.3)',
-                }}
-              >
-                {(selectedUserData.display_name || selectedUserData.name).charAt(0).toUpperCase()}
-              </div>
-            )}
-            <span className="font-display text-xl font-semibold text-white">
-              {selectedUserData.display_name || selectedUserData.name}
-            </span>
-          </div>
-        )}
+        {/* PIN Visualizer */}
+        <div className="flex justify-center gap-4 mb-10">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className={cn(
+                "w-4 h-4 rounded-full transition-all duration-200",
+                i < pin.length
+                  ? "bg-[#c8a45b] shadow-[0_0_12px_rgba(200,164,91,0.6)]"
+                  : "border-2 border-[#2A2A30]"
+              )}
+            />
+          ))}
+        </div>
 
-        {/* PIN Entry */}
-        {selectedUser && (
-          <div className="mb-xl">
-            <label
-              className="block font-body text-xs font-semibold mb-sm uppercase tracking-[0.08em]"
-              style={{ color: 'var(--color-gold-light)' }}
+        {/* Numeric Grid */}
+        <div className="grid grid-cols-3 gap-3 mb-8">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+            <button
+              key={num}
+              onClick={() => handleNumpadKey(num.toString())}
+              disabled={isLoading || authLoading}
+              className="h-[72px] bg-[#1E1E22] border border-[#2A2A30] rounded-lg flex items-center justify-center text-2xl hover:bg-white/5 active:scale-95 transition-all disabled:opacity-50"
             >
-              PIN Code
-            </label>
-            <div className="flex justify-center gap-lg mb-xl">
-              {[...Array(6)].map((_, i) => (
-                <span
-                  key={i}
-                  className={cn(
-                    'w-[18px] h-[18px] rounded-full transition-all duration-200',
-                    i < pin.length
-                      ? 'bg-gold border-2 border-gold-light shadow-[0_0_12px_rgba(201,165,92,0.5)]'
-                      : 'border-2'
-                  )}
-                  style={i >= pin.length ? {
-                    background: 'rgba(45,42,36,0.6)',
-                    borderColor: 'rgba(201,165,92,0.4)',
-                  } : undefined}
-                />
-              ))}
-            </div>
+              {num}
+            </button>
+          ))}
+          <div className="h-[72px]"></div>
+          <button
+            onClick={() => handleNumpadKey('0')}
+            disabled={isLoading || authLoading}
+            className="h-[72px] bg-[#1E1E22] border border-[#2A2A30] rounded-lg flex items-center justify-center text-2xl hover:bg-white/5 active:scale-95 transition-all disabled:opacity-50"
+          >
+            0
+          </button>
+          <button
+            onClick={() => handleNumpadKey('backspace')}
+            disabled={isLoading || authLoading}
+            className="h-[72px] bg-[#1E1E22] border border-[#2A2A30] rounded-lg flex items-center justify-center text-2xl hover:bg-white/5 active:scale-95 transition-all text-[#c8a45b]/80 disabled:opacity-50"
+          >
+            <span className="material-icons-outlined">backspace</span>
+          </button>
+        </div>
 
-            {/* Numpad */}
-            <div className="max-w-[320px] mx-auto">
-              <div className="grid grid-cols-3 gap-md">
-                {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'clear', '0', 'backspace'].map(key => (
-                  <button
-                    key={key}
-                    className={cn(
-                      'numpad-key h-[68px] max-[480px]:h-[60px] flex items-center justify-center text-white rounded-lg',
-                      'font-display text-[1.75rem] max-[480px]:text-[1.5rem] font-semibold cursor-pointer',
-                      'transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]',
-                      key === 'clear' && 'numpad-key--clear',
-                      key === 'backspace' && 'numpad-key--backspace'
-                    )}
-                    onClick={() => handleNumpadKey(key)}
-                    disabled={isLoading || authLoading}
-                  >
-                    {key === 'clear' ? 'C' : key === 'backspace' ? '\u232B' : key}
-                  </button>
-                ))}
-              </div>
-            </div>
+        {/* Error/Locked Message */}
+        {(error || isRateLimited) && (
+          <div className="flex items-center justify-center gap-2 mb-8 bg-red-500/10 py-3 px-4 rounded-lg border border-red-500/20 animate-in fade-in slide-in-from-top-1">
+            <AlertCircle className="text-red-400 w-4 h-4 shrink-0" />
+            <p className="text-red-400 text-xs leading-tight">
+              {isRateLimited ? `Too many attempts. Try again in ${cooldownSeconds} seconds.` : error}
+            </p>
           </div>
         )}
 
-        {/* Error Message */}
-        {error && (
-          <div
-            className="text-center text-sm font-body mb-lg p-md rounded-lg"
-            style={{
-              color: '#e9827a',
-              background: 'rgba(181,68,43,0.15)',
-              border: '1px solid rgba(181,68,43,0.3)',
-            }}
+        {/* Footer Action */}
+        <div className="text-center">
+          <button
+            onClick={handleLogin}
+            disabled={pin.length < 4 || isLoading || authLoading}
+            className="w-full bg-[#c8a45b] hover:bg-[#b8944b] disabled:opacity-50 disabled:cursor-not-allowed text-[#0D0D0F] font-bold py-3.5 rounded-lg transition-all transform active:scale-[0.98] shadow-lg shadow-[#c8a45b]/10 mb-6 flex items-center justify-center gap-2"
           >
-            {error}
-            {attemptsRemaining !== null && attemptsRemaining > 0 && (
-              <span className="block mt-xs text-xs opacity-80">
-                {' '}({attemptsRemaining} attempts remaining)
-              </span>
+            {isLoading || authLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              'SIGN IN'
             )}
-          </div>
-        )}
+          </button>
 
-        {/* Locked Message */}
-        {lockedUntil && (
-          <div
-            className="text-center font-body text-sm mb-lg py-md px-lg rounded-lg"
-            style={{
-              color: 'var(--color-gold-light)',
-              background: 'rgba(201,165,92,0.1)',
-              border: '1px solid rgba(201,165,92,0.3)',
-            }}
-          >
-            Account temporarily locked
-          </div>
-        )}
-
-        {/* Login Button */}
-        <button
-          type="button"
-          className="btn btn-primary btn-block login-btn mt-lg w-full h-14 max-[480px]:h-[52px] font-body text-lg max-[480px]:text-base font-bold text-white border-none rounded-lg cursor-pointer transition-all duration-[250ms]"
-          style={{
-            background: 'linear-gradient(180deg, var(--color-gold) 0%, var(--color-gold-dark) 100%)',
-            boxShadow: '0 4px 12px rgba(201,165,92,0.3), inset 0 1px 0 rgba(255,255,255,0.15)',
-          }}
-          onClick={handleLogin}
-          disabled={!selectedUser || pin.length < 4 || isLoading || authLoading}
-        >
-          {isLoading || authLoading ? 'Loading...' : 'Sign in'}
-        </button>
-
-        {/* Footer Links */}
-        <div className="mt-xl text-center">
           <Link
-            to="/login/reset"
-            className="text-sm font-medium transition-colors hover:opacity-80"
-            style={{ color: 'var(--color-gold-light)' }}
+            to="/login/email"
+            className="text-sm text-[#c8a45b]/70 hover:text-[#c8a45b] transition-colors border-b border-[#c8a45b]/20 pb-0.5"
           >
-            Forgot password?
+            Switch to Email Login
           </Link>
         </div>
+      </main>
 
-      </div>
-
-      {/* Scoped styles for pseudo-elements and complex states */}
       <style>{`
-        .login-page::before {
-          content: '';
-          position: fixed;
-          inset: 0;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-          opacity: 0.04;
-          pointer-events: none;
-          z-index: 0;
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
         }
-        .login-page::after {
-          content: '';
-          position: fixed;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 600px;
-          height: 600px;
-          background: radial-gradient(circle, rgba(201,165,92,0.03) 0%, transparent 70%);
-          pointer-events: none;
-          z-index: 0;
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #1A1A1D;
         }
-        .login-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 120px;
-          height: 3px;
-          background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
-          border-radius: 0 0 2px 2px;
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #2A2A30;
+          border-radius: 10px;
         }
-        .login-select:focus {
-          outline: none;
-          border-color: var(--color-gold);
-          box-shadow: 0 0 0 3px rgba(201,165,92,0.2);
-          background-color: rgba(26,24,22,0.8);
-        }
-        .login-select option {
-          background: #2d2a24;
-          color: #FFFFFF;
-        }
-        .numpad-key {
-          background: rgba(26,24,22,0.5);
-          border: 1px solid rgba(201,165,92,0.2);
-          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
-        }
-        .numpad-key:hover {
-          background: rgba(201,165,92,0.15);
-          border-color: var(--color-gold);
-          transform: translateY(-2px);
-          box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-        }
-        .numpad-key:active {
-          transform: translateY(0) scale(0.96);
-        }
-        .numpad-key--clear {
-          background: rgba(181,68,43,0.15);
-          color: #e9827a;
-          border-color: rgba(181,68,43,0.3);
-        }
-        .numpad-key--clear:hover {
-          background: rgba(181,68,43,0.25);
-          border-color: rgba(181,68,43,0.5);
-        }
-        .numpad-key--backspace {
-          background: rgba(201,165,92,0.1);
-          color: var(--color-gold-light);
-          border-color: rgba(201,165,92,0.3);
-        }
-        .numpad-key--backspace:hover {
-          background: rgba(201,165,92,0.2);
-          border-color: var(--color-gold);
-        }
-        .numpad-key:disabled {
-          opacity: 0.4;
-          cursor: not-allowed;
-          transform: none;
-        }
-        .numpad-key:disabled:hover {
-          background: rgba(26,24,22,0.5);
-          border-color: rgba(201,165,92,0.2);
-          transform: none;
-          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
-        }
-        .login-btn:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(201,165,92,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
-        }
-        .login-btn:active:not(:disabled) {
-          transform: translateY(0);
-        }
-        .login-btn:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-          transform: none;
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #c8a45b/30;
         }
       `}</style>
     </div>

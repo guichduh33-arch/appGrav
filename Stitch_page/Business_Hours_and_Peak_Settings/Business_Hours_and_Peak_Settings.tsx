@@ -1,0 +1,411 @@
+import React from 'react';
+
+const Business_Hours_and_Peak_Settings: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: `
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Operating Hours &amp; Peak Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&amp;family=Work+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#f2d00d",
+                "background-light": "#f8f8f5",
+                "background-dark": "#0D0D0F", // Customized per user request for deeper onyx
+                "card-dark": "#1A1A1D",
+                "sidebar-dark": "#111113",
+              },
+              fontFamily: {
+                "display": ["Work Sans", "sans-serif"],
+                "serif": ["Playfair Display", "serif"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+        }
+        .header-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Custom scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111113;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a2e;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f2d00d;
+        }
+        .gold-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #f2d00d;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .gold-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #f2d00d;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex">
+<!-- Sidebar -->
+<aside class="w-[260px] bg-sidebar-dark border-r border-primary/10 flex-shrink-0 flex flex-col hidden lg:flex">
+<div class="p-8">
+<h1 class="header-serif text-primary text-2xl tracking-tight italic">The Breakery</h1>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-primary/10 hover:text-primary transition-all duration-200" href="#">
+<span class="material-icons text-xl">dashboard</span>
+<span class="font-medium">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-primary/10 hover:text-primary transition-all duration-200" href="#">
+<span class="material-icons text-xl">restaurant_menu</span>
+<span class="font-medium">Menu Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary transition-all duration-200" href="#">
+<span class="material-icons text-xl">schedule</span>
+<span class="font-medium">Operating Hours</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-primary/10 hover:text-primary transition-all duration-200" href="#">
+<span class="material-icons text-xl">trending_up</span>
+<span class="font-medium">Peak Pricing</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-primary/10 hover:text-primary transition-all duration-200" href="#">
+<span class="material-icons text-xl">settings</span>
+<span class="font-medium">General Settings</span>
+</a>
+</nav>
+<div class="p-6 border-t border-primary/5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+<span class="material-icons text-primary">account_circle</span>
+</div>
+<div>
+<p class="text-sm font-semibold">Admin User</p>
+<p class="text-xs text-slate-500">Manager Access</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 h-screen overflow-y-auto bg-background-light dark:bg-background-dark">
+<!-- Sticky Header -->
+<header class="sticky top-0 z-20 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-8 py-6 border-b border-primary/10 flex justify-between items-center">
+<h2 class="header-serif text-2xl font-semibold tracking-wide text-slate-900 dark:text-slate-100">Operating Hours &amp; Peak Settings</h2>
+<div class="flex items-center gap-4">
+<button class="px-6 py-2.5 bg-primary text-background-dark font-semibold rounded hover:bg-primary/90 transition-all flex items-center gap-2">
+<span class="material-icons text-sm">save</span>
+                    Save Hours Configuration
+                </button>
+</div>
+</header>
+<div class="p-8 max-w-7xl mx-auto space-y-8">
+<!-- Grid Layout -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+<!-- Weekly Schedule Table -->
+<div class="xl:col-span-2 space-y-6">
+<div class="bg-card-dark border border-primary/10 rounded-xl overflow-hidden shadow-2xl">
+<div class="p-6 border-b border-primary/10 flex justify-between items-center bg-sidebar-dark/50">
+<div>
+<h3 class="text-lg font-semibold flex items-center gap-2">
+<span class="material-icons text-primary">calendar_today</span>
+                                    Weekly Schedule
+                                </h3>
+<p class="text-slate-400 text-sm">Configure standard opening and closing times</p>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-sidebar-dark text-slate-400 text-xs uppercase tracking-widest border-b border-primary/5">
+<th class="px-6 py-4 font-semibold">Day</th>
+<th class="px-6 py-4 font-semibold">Status</th>
+<th class="px-6 py-4 font-semibold">Opening Time</th>
+<th class="px-6 py-4 font-semibold">Closing Time</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-primary/5">
+<!-- Monday -->
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-medium">Monday</td>
+<td class="px-6 py-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</td>
+<td class="px-6 py-4">
+<input class="bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none" type="time" value="07:00"/>
+</td>
+<td class="px-6 py-4">
+<input class="bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none" type="time" value="20:00"/>
+</td>
+</tr>
+<!-- Tuesday -->
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-medium">Tuesday</td>
+<td class="px-6 py-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</td>
+<td class="px-6 py-4">
+<input class="bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none" type="time" value="07:00"/>
+</td>
+<td class="px-6 py-4">
+<input class="bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none" type="time" value="20:00"/>
+</td>
+</tr>
+<!-- Wednesday -->
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-medium">Wednesday</td>
+<td class="px-6 py-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</td>
+<td class="px-6 py-4">
+<input class="bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none" type="time" value="07:00"/>
+</td>
+<td class="px-6 py-4">
+<input class="bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none" type="time" value="20:00"/>
+</td>
+</tr>
+<!-- Thursday -->
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-medium">Thursday</td>
+<td class="px-6 py-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</td>
+<td class="px-6 py-4">
+<input class="bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none" type="time" value="07:00"/>
+</td>
+<td class="px-6 py-4">
+<input class="bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none" type="time" value="20:00"/>
+</td>
+</tr>
+<!-- Friday -->
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-medium">Friday</td>
+<td class="px-6 py-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</td>
+<td class="px-6 py-4">
+<input class="bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none" type="time" value="07:00"/>
+</td>
+<td class="px-6 py-4">
+<input class="bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none" type="time" value="22:00"/>
+</td>
+</tr>
+<!-- Saturday -->
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4 font-medium text-primary">Saturday</td>
+<td class="px-6 py-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</td>
+<td class="px-6 py-4">
+<input class="bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none" type="time" value="08:00"/>
+</td>
+<td class="px-6 py-4">
+<input class="bg-background-dark border border-primary/20 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none" type="time" value="23:00"/>
+</td>
+</tr>
+<!-- Sunday -->
+<tr class="opacity-75 bg-slate-900/40">
+<td class="px-6 py-4 font-medium text-slate-500 italic">Sunday</td>
+<td class="px-6 py-4">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</td>
+<td class="px-6 py-4">
+<input class="bg-background-dark/30 border border-white/5 rounded-lg px-3 py-2 text-sm text-slate-600 cursor-not-allowed" disabled="" type="time" value="00:00"/>
+</td>
+<td class="px-6 py-4">
+<input class="bg-background-dark/30 border border-white/5 rounded-lg px-3 py-2 text-sm text-slate-600 cursor-not-allowed" disabled="" type="time" value="00:00"/>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Holiday & Special Events -->
+<div class="bg-card-dark border border-primary/10 rounded-xl overflow-hidden shadow-2xl">
+<div class="p-6 border-b border-primary/10 flex justify-between items-center bg-sidebar-dark/50">
+<div>
+<h3 class="text-lg font-semibold flex items-center gap-2">
+<span class="material-icons text-primary">event_busy</span>
+                                    Holiday &amp; Special Events
+                                </h3>
+<p class="text-slate-400 text-sm">Override regular hours for specific dates</p>
+</div>
+<button class="text-primary hover:bg-primary/10 px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 border border-primary/30">
+<span class="material-icons text-sm">add</span> Add Custom Date
+                            </button>
+</div>
+<div class="p-4">
+<div class="space-y-3">
+<div class="flex items-center justify-between p-4 bg-background-dark/50 rounded-lg border border-primary/5">
+<div class="flex items-center gap-4">
+<div class="p-2 bg-primary/10 rounded-lg text-primary">
+<span class="material-icons">cake</span>
+</div>
+<div>
+<p class="font-medium">Lombok Anniversary</p>
+<p class="text-xs text-slate-500">October 14th, 2024</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="text-xs font-semibold bg-primary/20 text-primary px-3 py-1 rounded-full uppercase tracking-widest">Modified Hours</span>
+<div class="text-sm font-medium">08:00 AM - 10:00 PM</div>
+<button class="text-slate-500 hover:text-red-400 transition-colors"><span class="material-icons text-lg">delete</span></button>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 bg-background-dark/50 rounded-lg border border-primary/5">
+<div class="flex items-center gap-4">
+<div class="p-2 bg-red-500/10 rounded-lg text-red-500">
+<span class="material-icons">celebration</span>
+</div>
+<div>
+<p class="font-medium">Christmas Day</p>
+<p class="text-xs text-slate-500">December 25th, 2024</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="text-xs font-semibold bg-red-500/20 text-red-500 px-3 py-1 rounded-full uppercase tracking-widest">Closed</span>
+<div class="text-sm font-medium italic text-slate-500">All Day</div>
+<button class="text-slate-500 hover:text-red-400 transition-colors"><span class="material-icons text-lg">delete</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Peak Time Optimization Card -->
+<div class="space-y-6">
+<div class="bg-card-dark border border-primary/10 rounded-xl overflow-hidden shadow-2xl sticky top-[112px]">
+<div class="p-6 border-b border-primary/10 bg-sidebar-dark/50">
+<h3 class="text-lg font-semibold flex items-center gap-2">
+<span class="material-icons text-primary">trending_up</span>
+                                Peak Optimization
+                            </h3>
+<p class="text-slate-400 text-sm mt-1">Dynamic markup based on high demand</p>
+</div>
+<div class="p-6 space-y-8">
+<!-- Toggle -->
+<div class="flex items-center justify-between p-4 bg-primary/5 rounded-xl border border-primary/20">
+<div>
+<p class="font-medium">Enable Peak Pricing</p>
+<p class="text-xs text-slate-500">Applied automatically</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-14 h-7 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Slider Markup -->
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<label class="text-sm font-medium text-slate-300 uppercase tracking-wider">Markup Percentage</label>
+<span class="text-2xl font-bold text-primary">+10%</span>
+</div>
+<input class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer gold-slider" max="50" min="0" type="range" value="10"/>
+<div class="flex justify-between text-[10px] text-slate-500 font-bold">
+<span>+0% (NONE)</span>
+<span>+50% (MAX)</span>
+</div>
+</div>
+<!-- Peak Hours Range -->
+<div class="space-y-4">
+<label class="text-sm font-medium text-slate-300 uppercase tracking-wider block">Target Time Range</label>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-1">
+<p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Peak Start</p>
+<input class="w-full bg-background-dark border border-primary/20 rounded-lg px-3 py-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none" type="time" value="08:00"/>
+</div>
+<div class="space-y-1">
+<p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Peak End</p>
+<input class="w-full bg-background-dark border border-primary/20 rounded-lg px-3 py-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none" type="time" value="11:30"/>
+</div>
+</div>
+</div>
+<!-- Insight Box -->
+<div class="p-4 bg-sidebar-dark rounded-lg border border-primary/5 flex gap-3">
+<span class="material-icons text-primary/60">info</span>
+<p class="text-xs text-slate-400 leading-relaxed">
+                                    Peak hour pricing typically increases revenue by <span class="text-primary font-bold">12-18%</span> during busy breakfast windows.
+                                </p>
+</div>
+</div>
+<div class="px-6 py-4 bg-sidebar-dark border-t border-primary/10">
+<button class="w-full py-3 text-sm font-bold uppercase tracking-widest text-slate-400 hover:text-primary transition-colors">
+                                Reset to Default
+                            </button>
+</div>
+</div>
+<!-- Visual Accent Card -->
+<div class="relative h-48 rounded-xl overflow-hidden group">
+<img alt="Fresh bread on bakery shelf" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Gourmet sourdough bread loaves on dark bakery shelves" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMGoZIz-i8S03_Dlyw2wz7mRLV9oU8yEZn-g84Dur5KMF8sMOOyGbQaIgHPG3VXFIlNN6pQXodfTV5jIBeg5uOgtgzjrcjMfIpCRIldCI8PQ43cPb-kOi4bVMgF7UfPgOeVJZDuqMfvTo-g0s0lr63BAjFup_N7LEcB98G399nBAHeMEYcOvgfNOKCysaAbUKDlkkBKkDKrWOB5iABbVKdeD10wPAX0uwCLlCuhCSOb_kf9RoEKtnBDPE-qEvmJu9b8h8shufrXO5W"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/40 to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<p class="header-serif text-primary text-lg italic">Premium Service Quality</p>
+<p class="text-xs text-slate-300">Maintain operational excellence during all active hours.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Success Message (Float) -->
+<div class="fixed bottom-8 right-8 z-50 pointer-events-none opacity-0 translate-y-4 flex items-center gap-3 bg-primary text-background-dark px-6 py-4 rounded-xl shadow-2xl font-bold">
+<span class="material-icons">check_circle</span>
+            Settings Updated Successfully
+        </div>
+</main>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    ` }} />
+  );
+};
+
+export default Business_Hours_and_Peak_Settings;

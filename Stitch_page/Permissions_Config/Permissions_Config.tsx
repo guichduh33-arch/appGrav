@@ -2,7 +2,7 @@ import React from 'react';
 
 const Permissions_Config: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <html class="dark"><head>
 <meta charset="utf-8"/>
@@ -283,9 +283,9 @@ const Permissions_Config: React.FC = () => {
 </section>
 </main>
 
-\`\`\`</body></html>
+\\`\\`\\`</body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

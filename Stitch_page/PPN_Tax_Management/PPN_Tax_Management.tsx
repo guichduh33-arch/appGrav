@@ -2,7 +2,7 @@ import React from 'react';
 
 const PPN_Tax_Management: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -272,7 +272,7 @@ const PPN_Tax_Management: React.FC = () => {
 <div class="fixed bottom-0 left-0 -z-10 w-[300px] h-[300px] bg-primary/5 blur-[80px] rounded-full pointer-events-none"></div>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

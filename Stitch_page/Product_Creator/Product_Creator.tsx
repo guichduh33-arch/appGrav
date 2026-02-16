@@ -2,7 +2,7 @@ import React from 'react';
 
 const Product_Creator: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -135,14 +135,14 @@ const Product_Creator: React.FC = () => {
 <div class="space-y-1">
 <label class="block text-xs font-semibold text-primary/80 uppercase tracking-wider">Selling Price</label>
 <div class="flex items-center">
-<span class="text-4xl font-bold text-primary mr-2">$</span>
+<span class="text-4xl font-bold text-primary mr-2">\\$</span>
 <input class="bg-transparent text-5xl font-bold text-primary border-none focus:ring-0 w-32 p-0" type="text" value="8.50"/>
 </div>
 </div>
 <div class="h-16 w-[1px] bg-primary/20"></div>
 <div class="text-center px-8">
 <label class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1">Total Cost (COGS)</label>
-<p class="text-2xl font-semibold text-white">$2.15</p>
+<p class="text-2xl font-semibold text-white">\\$2.15</p>
 </div>
 <div class="h-16 w-[1px] bg-primary/20"></div>
 <div class="text-right">
@@ -211,7 +211,7 @@ const Product_Creator: React.FC = () => {
 <input class="w-16 bg-white/10 border-none rounded text-center text-white py-1 text-sm focus:ring-1 focus:ring-primary" type="text" value="500"/>
 </td>
 <td class="px-6 py-4 text-white/60 text-sm">g</td>
-<td class="px-6 py-4 text-right text-white font-mono">$1.12</td>
+<td class="px-6 py-4 text-right text-white font-mono">\\$1.12</td>
 <td class="px-6 py-4">
 <button class="text-white/20 group-hover:text-red-400 transition-colors">
 <span class="material-icons-outlined text-lg">delete</span>
@@ -224,7 +224,7 @@ const Product_Creator: React.FC = () => {
 <input class="w-16 bg-white/10 border-none rounded text-center text-white py-1 text-sm focus:ring-1 focus:ring-primary" type="text" value="350"/>
 </td>
 <td class="px-6 py-4 text-white/60 text-sm">ml</td>
-<td class="px-6 py-4 text-right text-white font-mono">$0.05</td>
+<td class="px-6 py-4 text-right text-white font-mono">\\$0.05</td>
 <td class="px-6 py-4">
 <button class="text-white/20 group-hover:text-red-400 transition-colors">
 <span class="material-icons-outlined text-lg">delete</span>
@@ -237,7 +237,7 @@ const Product_Creator: React.FC = () => {
 <input class="w-16 bg-white/10 border-none rounded text-center text-white py-1 text-sm focus:ring-1 focus:ring-primary" type="text" value="10"/>
 </td>
 <td class="px-6 py-4 text-white/60 text-sm">g</td>
-<td class="px-6 py-4 text-right text-white font-mono">$0.18</td>
+<td class="px-6 py-4 text-right text-white font-mono">\\$0.18</td>
 <td class="px-6 py-4">
 <button class="text-white/20 group-hover:text-red-400 transition-colors">
 <span class="material-icons-outlined text-lg">delete</span>
@@ -250,7 +250,7 @@ const Product_Creator: React.FC = () => {
 <input class="w-16 bg-white/10 border-none rounded text-center text-white py-1 text-sm focus:ring-1 focus:ring-primary" type="text" value="100"/>
 </td>
 <td class="px-6 py-4 text-white/60 text-sm">g</td>
-<td class="px-6 py-4 text-right text-white font-mono">$0.80</td>
+<td class="px-6 py-4 text-right text-white font-mono">\\$0.80</td>
 <td class="px-6 py-4">
 <button class="text-white/20 group-hover:text-red-400 transition-colors">
 <span class="material-icons-outlined text-lg">delete</span>
@@ -284,7 +284,7 @@ const Product_Creator: React.FC = () => {
 <div class="p-6 space-y-4">
 <div class="flex justify-between items-start">
 <h4 class="heading-font text-2xl text-white">Sourdough Baguette</h4>
-<span class="text-primary font-bold text-2xl">$8.50</span>
+<span class="text-primary font-bold text-2xl">\\$8.50</span>
 </div>
 <p class="text-white/40 text-sm line-clamp-2 italic font-serif leading-relaxed">
                             Stone-baked sourdough with a signature crispy crust and a light, airy crumb structure. Made with 100% organic flour.
@@ -338,7 +338,7 @@ const Product_Creator: React.FC = () => {
 </footer>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

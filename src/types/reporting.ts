@@ -110,6 +110,8 @@ export interface IProfitLossReport {
     cogs: number;
     gross_profit: number;
     margin_percentage: number;
+    operating_expenses?: number;
+    net_profit?: number;
 }
 
 /**

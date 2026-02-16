@@ -2,7 +2,7 @@ import React from 'react';
 
 const Advanced_B2B_Order_Form: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -207,7 +207,7 @@ const Advanced_B2B_Order_Form: React.FC = () => {
 </div>
 </div>
 <p class="font-bold text-lg">Downtown Zone</p>
-<p class="text-xs opacity-60">Daily route, leaves at 05:30 AM. Standard $15 fee.</p>
+<p class="text-xs opacity-60">Daily route, leaves at 05:30 AM. Standard \\$15 fee.</p>
 </div>
 </label>
 <label class="cursor-pointer group">
@@ -218,7 +218,7 @@ const Advanced_B2B_Order_Form: React.FC = () => {
 <div class="w-4 h-4 rounded-full border-2 border-white/20 flex items-center justify-center"></div>
 </div>
 <p class="font-bold text-lg">West Side Zone</p>
-<p class="text-xs opacity-60">Mon/Wed/Fri route, leaves 06:15 AM. Standard $22 fee.</p>
+<p class="text-xs opacity-60">Mon/Wed/Fri route, leaves 06:15 AM. Standard \\$22 fee.</p>
 </div>
 </label>
 </div>
@@ -250,8 +250,8 @@ const Advanced_B2B_Order_Form: React.FC = () => {
 <td class="py-4 px-4 text-center">
 <input class="w-16 bg-background-dark border border-white/10 rounded px-2 py-1 text-center text-primary" step="0.1" type="number" value="10.3"/>
 </td>
-<td class="py-4 px-4 text-right opacity-60">$4.50</td>
-<td class="py-4 px-4 text-right font-bold text-primary">$46.35</td>
+<td class="py-4 px-4 text-right opacity-60">\\$4.50</td>
+<td class="py-4 px-4 text-right font-bold text-primary">\\$46.35</td>
 </tr>
 <tr class="hover:bg-primary/5 transition-colors">
 <td class="py-4 px-4 font-mono text-primary/70">BK-CROIS-04</td>
@@ -259,8 +259,8 @@ const Advanced_B2B_Order_Form: React.FC = () => {
 <td class="py-4 px-4 text-center">
 <input class="w-16 bg-background-dark border border-white/10 rounded px-2 py-1 text-center text-primary" type="number" value="24"/>
 </td>
-<td class="py-4 px-4 text-right opacity-60">$2.10</td>
-<td class="py-4 px-4 text-right font-bold text-primary">$50.40</td>
+<td class="py-4 px-4 text-right opacity-60">\\$2.10</td>
+<td class="py-4 px-4 text-right font-bold text-primary">\\$50.40</td>
 </tr>
 <tr class="hover:bg-primary/5 transition-colors">
 <td class="py-4 px-4 font-mono text-primary/70">BK-BAG-12</td>
@@ -268,8 +268,8 @@ const Advanced_B2B_Order_Form: React.FC = () => {
 <td class="py-4 px-4 text-center">
 <input class="w-16 bg-background-dark border border-white/10 rounded px-2 py-1 text-center text-primary" type="number" value="5"/>
 </td>
-<td class="py-4 px-4 text-right opacity-60">$18.00</td>
-<td class="py-4 px-4 text-right font-bold text-primary">$90.00</td>
+<td class="py-4 px-4 text-right opacity-60">\\$18.00</td>
+<td class="py-4 px-4 text-right font-bold text-primary">\\$90.00</td>
 </tr>
 </tbody>
 </table>
@@ -356,15 +356,15 @@ const Advanced_B2B_Order_Form: React.FC = () => {
 <div class="flex items-center gap-12">
 <div class="flex flex-col">
 <span class="text-[10px] uppercase font-bold opacity-40">Subtotal (3 items)</span>
-<span class="text-xl font-bold serif-header">$186.75</span>
+<span class="text-xl font-bold serif-header">\\$186.75</span>
 </div>
 <div class="flex flex-col border-l border-white/10 pl-12">
 <span class="text-[10px] uppercase font-bold opacity-40">Delivery Fee</span>
-<span class="text-xl font-bold serif-header">$15.00</span>
+<span class="text-xl font-bold serif-header">\\$15.00</span>
 </div>
 <div class="flex flex-col border-l border-white/10 pl-12">
 <span class="text-[10px] uppercase font-bold text-primary/80">Est. Total</span>
-<span class="text-2xl font-bold serif-header text-primary">$201.75</span>
+<span class="text-2xl font-bold serif-header text-primary">\\$201.75</span>
 </div>
 </div>
 <div class="flex items-center gap-6">
@@ -378,7 +378,7 @@ const Advanced_B2B_Order_Form: React.FC = () => {
 </footer>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

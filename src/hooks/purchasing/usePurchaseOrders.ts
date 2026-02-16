@@ -172,7 +172,9 @@ export function usePurchaseOrders(filters?: IPurchaseOrderFilters) {
       let query = supabase
         .from('purchase_orders')
         .select(`
-          *,
+          id, po_number, supplier_id, status, order_date, expected_delivery_date, actual_delivery_date,
+          subtotal, discount_amount, discount_percentage, tax_amount, shipping_cost, total_amount,
+          payment_status, payment_date, notes, created_at, updated_at,
           supplier:suppliers(name)
         `)
         .order('order_date', { ascending: false })
@@ -204,7 +206,10 @@ export function usePurchaseOrders(filters?: IPurchaseOrderFilters) {
         throw error
       }
 
-      return (data || []) as IPurchaseOrder[]
+      return (data || []).map(po => ({
+        ...po,
+        supplier: Array.isArray(po.supplier) ? po.supplier[0] : po.supplier
+      })) as IPurchaseOrder[]
     },
     staleTime: PURCHASE_ORDERS_STALE_TIME,
   })
@@ -227,7 +232,9 @@ export function usePurchaseOrder(purchaseOrderId: string | null) {
       const { data: po, error: poError } = await supabase
         .from('purchase_orders')
         .select(`
-          *,
+          id, po_number, supplier_id, status, order_date, expected_delivery_date, actual_delivery_date,
+          subtotal, discount_amount, discount_percentage, tax_amount, shipping_cost, total_amount,
+          payment_status, payment_date, notes, created_at, updated_at,
           supplier:suppliers(name)
         `)
         .eq('id', purchaseOrderId)
@@ -238,13 +245,14 @@ export function usePurchaseOrder(purchaseOrderId: string | null) {
       // Fetch PO items
       const { data: items, error: itemsError } = await supabase
         .from('purchase_order_items')
-        .select('*')
+        .select('id, purchase_order_id, product_id, product_name, description, quantity, unit, unit_price, discount_amount, discount_percentage, tax_rate, line_total')
         .eq('purchase_order_id', purchaseOrderId)
 
       if (itemsError) throw itemsError
 
       return {
         ...po,
+        supplier: Array.isArray(po.supplier) ? po.supplier[0] : po.supplier,
         items: (items || []) as IPOItem[]
       } as IPurchaseOrder
     },
@@ -299,7 +307,7 @@ export function useCreatePurchaseOrder() {
           payment_status: 'unpaid',
           notes: params.notes || null,
         })
-        .select()
+        .select('id, po_number, supplier_id, status, order_date, expected_delivery_date, actual_delivery_date, subtotal, discount_amount, discount_percentage, tax_amount, total_amount, payment_status, notes, created_at, updated_at')
         .single()
 
       if (poError) throw poError
@@ -383,7 +391,7 @@ export function useUpdatePurchaseOrder() {
           updated_at: new Date().toISOString(),
         })
         .eq('id', params.id)
-        .select()
+        .select('id, po_number, supplier_id, status, order_date, expected_delivery_date, actual_delivery_date, subtotal, discount_amount, discount_percentage, tax_amount, total_amount, payment_status, notes, created_at, updated_at')
         .single()
 
       if (poError) throw poError
@@ -573,7 +581,7 @@ export function useUpdatePurchaseOrderStatus() {
         .from('purchase_orders')
         .update(updateData)
         .eq('id', purchaseOrderId)
-        .select()
+        .select('id, po_number, supplier_id, status, order_date, expected_delivery_date, actual_delivery_date, subtotal, discount_amount, discount_percentage, tax_amount, total_amount, payment_status, notes, created_at, updated_at')
         .single()
 
       if (error) throw error

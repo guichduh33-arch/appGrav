@@ -1,16 +1,16 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Receipt } from 'lucide-react';
 import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { ExportButtons, ExportConfig } from '@/components/reports/ExportButtons';
 import { useDateRange } from '@/hooks/reports/useDateRange';
 import { formatCurrency as formatCurrencyPdf } from '@/services/reports/pdfExport';
+import { useExpenseSummary } from '@/hooks/expenses';
+import { useExpenses } from '@/hooks/expenses';
 import { ExpensesKpis } from './expenses/ExpensesKpis';
 import { ExpensesCharts } from './expenses/ExpensesCharts';
 import { ExpensesTable } from './expenses/ExpensesTable';
 
-interface Expense {
+interface ExpenseRow {
   id: string;
   expense_date: string;
   category: string;
@@ -20,59 +20,51 @@ interface Expense {
   created_by: string;
 }
 
-// Note: expenses table doesn't exist yet - this is a placeholder
-async function getExpenses(_from: Date, _to: Date): Promise<Expense[]> {
-  return [];
-}
-
 export function ExpensesTab() {
   const { dateRange } = useDateRange({ defaultPreset: 'thisMonth' });
 
-  // Feature not yet available - expenses table doesn't exist
-  const isFeatureAvailable = false;
+  const { data: summary, isLoading: summaryLoading } = useExpenseSummary(dateRange.from, dateRange.to);
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['expenses', dateRange.from, dateRange.to],
-    queryFn: () => getExpenses(dateRange.from, dateRange.to),
-    staleTime: 5 * 60 * 1000,
-    enabled: isFeatureAvailable,
+  const { data: expenses, isLoading: expensesLoading, error } = useExpenses({
+    from: dateRange.from,
+    to: dateRange.to,
+    status: 'approved',
   });
 
+  const isLoading = summaryLoading || expensesLoading;
+
   const categoryData = useMemo(() => {
-    if (!data || data.length === 0) return [];
-    const categoryMap = new Map<string, { total: number; count: number }>();
-    data.forEach((d) => {
-      const existing = categoryMap.get(d.category) || { total: 0, count: 0 };
-      categoryMap.set(d.category, { total: existing.total + d.amount, count: existing.count + 1 });
-    });
-    return Array.from(categoryMap.entries())
-      .map(([category, stats]) => ({ category, total: stats.total, count: stats.count }))
-      .sort((a, b) => b.total - a.total);
-  }, [data]);
+    if (!summary?.by_category) return [];
+    return summary.by_category.map(c => ({
+      category: c.name,
+      total: c.total,
+      count: c.count,
+    }));
+  }, [summary]);
 
   const dailyData = useMemo(() => {
-    if (!data || data.length === 0) return [];
-    const dayMap = new Map<string, number>();
-    data.forEach((d) => {
-      const date = d.expense_date.split('T')[0];
-      dayMap.set(date, (dayMap.get(date) || 0) + d.amount);
-    });
-    return Array.from(dayMap.entries())
-      .sort(([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime())
-      .map(([date, amount]) => ({
-        date: new Date(date).toLocaleDateString('en-US', { day: '2-digit', month: 'short' }),
-        amount,
-      }));
-  }, [data]);
+    if (!summary?.by_day) return [];
+    return summary.by_day.map(d => ({
+      date: new Date(d.date).toLocaleDateString('en-US', { day: '2-digit', month: 'short' }),
+      amount: d.amount,
+    }));
+  }, [summary]);
 
-  const summary = useMemo(() => {
-    if (!data || data.length === 0) return { totalExpenses: 0, totalAmount: 0, avgExpense: 0 };
-    const totalAmount = data.reduce((sum, d) => sum + d.amount, 0);
-    return { totalExpenses: data.length, totalAmount, avgExpense: totalAmount / data.length };
-  }, [data]);
+  const tableData: ExpenseRow[] | undefined = useMemo(() => {
+    if (!expenses) return undefined;
+    return expenses.map(e => ({
+      id: e.id,
+      expense_date: e.expense_date,
+      category: e.category_name,
+      description: e.description,
+      amount: e.amount,
+      payment_method: e.payment_method,
+      created_by: e.creator_name || 'Unknown',
+    }));
+  }, [expenses]);
 
-  const exportConfig: ExportConfig<Expense> = useMemo(() => ({
-    data: data || [],
+  const exportConfig: ExportConfig<ExpenseRow> = useMemo(() => ({
+    data: tableData || [],
     columns: [
       { key: 'expense_date', header: 'Date', format: (v) => new Date(v as string).toLocaleDateString('en-US') },
       { key: 'category', header: 'Category' },
@@ -85,10 +77,10 @@ export function ExpensesTab() {
     title: 'Expenses Report',
     dateRange,
     summaries: [
-      { label: 'Total Expenses', value: formatCurrencyPdf(summary.totalAmount) },
-      { label: 'Number of Expenses', value: summary.totalExpenses.toString() },
+      { label: 'Total Expenses', value: formatCurrencyPdf(summary?.total ?? 0) },
+      { label: 'Number of Expenses', value: (summary?.count ?? 0).toString() },
     ],
-  }), [data, dateRange, summary]);
+  }), [tableData, dateRange, summary]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value) + ' IDR';
@@ -102,27 +94,6 @@ export function ExpensesTab() {
     return <ReportSkeleton />;
   }
 
-  // Show feature not available message
-  if (!isFeatureAvailable) {
-    return (
-      <div className="space-y-6">
-        <div className="bg-[var(--onyx-surface)] border border-white/5 rounded-xl p-6 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="p-3 bg-amber-500/10 rounded-full">
-              <Receipt className="w-8 h-8 text-amber-400" />
-            </div>
-          </div>
-          <h3 className="text-lg font-semibold text-white mb-2">
-            Expenses Module - Coming Soon
-          </h3>
-          <p className="text-[var(--theme-text-muted)]">
-            Expense tracking will be available in an upcoming version. This feature will allow you to manage and track all operational expenses.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -131,9 +102,9 @@ export function ExpensesTab() {
       </div>
 
       <ExpensesKpis
-        totalAmount={summary.totalAmount}
-        totalExpenses={summary.totalExpenses}
-        avgExpense={summary.avgExpense}
+        totalAmount={summary?.total ?? 0}
+        totalExpenses={summary?.count ?? 0}
+        avgExpense={summary?.avg ?? 0}
         formatCurrency={formatCurrency}
       />
 
@@ -143,7 +114,7 @@ export function ExpensesTab() {
         formatCurrency={formatCurrency}
       />
 
-      <ExpensesTable data={data} formatCurrency={formatCurrency} />
+      <ExpensesTable data={tableData} formatCurrency={formatCurrency} />
     </div>
   );
 }

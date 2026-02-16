@@ -250,9 +250,7 @@ export const REPORT_CATEGORIES: ReportCategory[] = [
                 id: 'expenses',
                 title: 'Expenses by Date',
                 description: 'Operational expenses',
-                icon: TrendingDown,
-                hidden: true,
-                placeholder: 'Expenses tracking will be available when the Accounting module (Epic 9) is implemented.'
+                icon: TrendingDown
             },
             {
                 id: 'discounts_voids',

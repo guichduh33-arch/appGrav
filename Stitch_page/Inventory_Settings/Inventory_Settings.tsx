@@ -2,7 +2,7 @@ import React from 'react';
 
 const Inventory_Settings: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -283,7 +283,7 @@ const Inventory_Settings: React.FC = () => {
 <div class="flex items-center justify-between">
 <div>
 <p class="text-sm font-medium">Photo requirement</p>
-<p class="text-xs text-slate-500">Mandatory photo for items over $20 value.</p>
+<p class="text-xs text-slate-500">Mandatory photo for items over \\$20 value.</p>
 </div>
 <label class="relative inline-flex items-center cursor-pointer scale-90">
 <input checked="" class="sr-only peer" type="checkbox"/>
@@ -320,7 +320,7 @@ const Inventory_Settings: React.FC = () => {
 </div>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

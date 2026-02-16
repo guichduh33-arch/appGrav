@@ -1,0 +1,215 @@
+import React from 'react';
+
+const POSCheckout: React.FC = () => {
+    return (
+        <div dangerouslySetInnerHTML={{
+            __html: `
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - POS Checkout</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#c8a45b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#0D0D0F",
+                        "surface": "#1A1A1C",
+                        "stone-text": "#E5E7EB",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .numeric-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background-color: rgba(200, 164, 91, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-stone-text font-display min-h-screen flex flex-col">
+<!-- Header / Navigation Bar -->
+<header class="h-16 border-b border-primary/20 flex items-center justify-between px-8 bg-surface/50">
+<div class="flex items-center gap-4">
+<span class="text-primary tracking-widest uppercase font-semibold text-lg">The Breakery</span>
+<div class="h-4 w-px bg-primary/30"></div>
+<span class="text-stone-text/60 text-sm">Station 04 • Terminal 12</span>
+</div>
+<div class="text-sm font-medium">
+<span class="text-stone-text/60">Server:</span>
+<span class="text-stone-text ml-2">Jean-Luc B.</span>
+</div>
+</header>
+<main class="flex-1 flex overflow-hidden">
+<!-- Left Column: Order Summary -->
+<section class="w-[450px] border-r border-primary/20 flex flex-col bg-surface/20">
+<div class="p-6 border-b border-primary/10">
+<h2 class="text-xs uppercase tracking-[0.2em] text-primary/80 font-bold">Current Order</h2>
+</div>
+<div class="flex-1 overflow-y-auto p-6">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[10px] uppercase tracking-widest text-stone-text/40 border-b border-primary/10">
+<th class="pb-3 font-semibold">Item</th>
+<th class="pb-3 font-semibold text-center w-12">Qty</th>
+<th class="pb-3 font-semibold text-right w-24">Price</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-primary/5">
+<tr>
+<td class="py-4">
+<p class="text-stone-text font-medium">Butter Croissant</p>
+<p class="text-[10px] text-stone-text/40">French AOP Butter</p>
+</td>
+<td class="py-4 text-center">3</td>
+<td class="py-4 text-right">13.50</td>
+</tr>
+<tr>
+<td class="py-4">
+<p class="text-stone-text font-medium">Pain au Chocolat</p>
+</td>
+<td class="py-4 text-center">2</td>
+<td class="py-4 text-right">10.00</td>
+</tr>
+<tr>
+<td class="py-4">
+<p class="text-stone-text font-medium">Pistachio Éclair</p>
+</td>
+<td class="py-4 text-center">1</td>
+<td class="py-4 text-right">7.50</td>
+</tr>
+<tr>
+<td class="py-4">
+<p class="text-stone-text font-medium">Café au Lait</p>
+<p class="text-[10px] text-stone-text/40">Oat Milk</p>
+</td>
+<td class="py-4 text-center">2</td>
+<td class="py-4 text-right">11.00</td>
+</tr>
+<tr>
+<td class="py-4">
+<p class="text-stone-text font-medium">Fruit Tartlet</p>
+</td>
+<td class="py-4 text-center">1</td>
+<td class="py-4 text-right">8.50</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Totals Section -->
+<div class="p-8 bg-surface border-t border-primary/20 space-y-3">
+<div class="flex justify-between text-sm text-stone-text/60">
+<span>Subtotal</span>
+<span>50.50</span>
+</div>
+<div class="flex justify-between text-sm text-stone-text/60">
+<span>Tax (8.5%)</span>
+<span>4.29</span>
+</div>
+<div class="pt-4 flex justify-between items-baseline">
+<span class="text-xs uppercase tracking-widest font-bold text-primary">Total Amount</span>
+<span class="text-4xl font-light text-primary tracking-tight">54.79</span>
+</div>
+</div>
+</section>
+<!-- Right Column: Payment Methods & Keypad -->
+<section class="flex-1 flex flex-col p-8 bg-background-dark">
+<div class="max-w-4xl mx-auto w-full flex flex-col h-full">
+<h2 class="text-xs uppercase tracking-[0.2em] text-primary/80 font-bold mb-6">Select Payment Method</h2>
+<!-- Payment Tiles -->
+<div class="grid grid-cols-3 gap-4 mb-8">
+<button class="h-32 border border-primary/20 bg-surface flex flex-col items-center justify-center transition-all hover:border-primary active:bg-primary/10 group">
+<span class="text-sm font-semibold tracking-widest uppercase group-hover:text-primary">Credit Card</span>
+<div class="w-8 h-px bg-primary/20 mt-4 group-hover:w-12 group-hover:bg-primary transition-all"></div>
+</button>
+<button class="h-32 border border-primary bg-primary/10 flex flex-col items-center justify-center ring-1 ring-primary/50">
+<span class="text-sm font-semibold tracking-widest uppercase text-primary">Cash</span>
+<div class="w-12 h-px bg-primary mt-4"></div>
+</button>
+<button class="h-32 border border-primary/20 bg-surface flex flex-col items-center justify-center transition-all hover:border-primary active:bg-primary/10 group">
+<span class="text-sm font-semibold tracking-widest uppercase group-hover:text-primary">Gift Card</span>
+<div class="w-8 h-px bg-primary/20 mt-4 group-hover:w-12 group-hover:bg-primary transition-all"></div>
+</button>
+</div>
+<!-- Center Focus: Keypad & Input -->
+<div class="flex-1 flex flex-col items-center justify-center space-y-8">
+<div class="w-full max-w-md">
+<div class="text-center mb-4">
+<span class="text-[10px] uppercase tracking-[0.3em] text-stone-text/40">Enter Amount</span>
+</div>
+<div class="bg-surface/50 border border-primary/20 rounded-xl p-6 text-center mb-8">
+<span class="text-5xl font-light tracking-tight text-stone-text">54.79</span>
+</div>
+<!-- Numeric Keypad -->
+<div class="grid grid-cols-3 gap-px bg-primary/10 border border-primary/10 rounded-xl overflow-hidden shadow-2xl shadow-primary/5">
+<button class="bg-surface h-20 text-2xl font-light hover:bg-primary hover:text-background-dark transition-colors">1</button>
+<button class="bg-surface h-20 text-2xl font-light hover:bg-primary hover:text-background-dark transition-colors">2</button>
+<button class="bg-surface h-20 text-2xl font-light hover:bg-primary hover:text-background-dark transition-colors">3</button>
+<button class="bg-surface h-20 text-2xl font-light hover:bg-primary hover:text-background-dark transition-colors">4</button>
+<button class="bg-surface h-20 text-2xl font-light hover:bg-primary hover:text-background-dark transition-colors">5</button>
+<button class="bg-surface h-20 text-2xl font-light hover:bg-primary hover:text-background-dark transition-colors">6</button>
+<button class="bg-surface h-20 text-2xl font-light hover:bg-primary hover:text-background-dark transition-colors">7</button>
+<button class="bg-surface h-20 text-2xl font-light hover:bg-primary hover:text-background-dark transition-colors">8</button>
+<button class="bg-surface h-20 text-2xl font-light hover:bg-primary hover:text-background-dark transition-colors">9</button>
+<button class="bg-surface/80 h-20 text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary hover:text-background-dark transition-colors">Clear</button>
+<button class="bg-surface h-20 text-2xl font-light hover:bg-primary hover:text-background-dark transition-colors">0</button>
+<button class="bg-surface/80 h-20 text-xs font-bold uppercase tracking-widest text-primary hover:bg-primary hover:text-background-dark transition-colors">Del</button>
+</div>
+</div>
+</div>
+<!-- Primary Action Button -->
+<div class="mt-auto pt-8">
+<div class="flex gap-4 mb-4">
+<button class="flex-1 border border-primary/20 py-4 text-[10px] uppercase tracking-widest font-bold hover:bg-primary/5 transition-colors">Split Bill</button>
+<button class="flex-1 border border-primary/20 py-4 text-[10px] uppercase tracking-widest font-bold hover:bg-primary/5 transition-colors">Apply Discount</button>
+</div>
+<button class="w-full bg-primary hover:bg-primary/90 text-background-dark py-6 rounded-lg text-sm font-bold uppercase tracking-[0.25em] transition-all shadow-lg shadow-primary/20">
+                        Process Payment
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Stats -->
+<footer class="h-10 border-t border-primary/20 flex items-center justify-between px-8 bg-surface/50 text-[10px] uppercase tracking-widest text-stone-text/40">
+<div class="flex gap-6">
+<span>Terminal: T-481</span>
+<span>Uptime: 08:42:15</span>
+</div>
+<div class="flex gap-6">
+<span>Server Sync: Active</span>
+<span class="text-primary/60">Version 4.2.0-Luxe</span>
+</div>
+</footer>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    ` }} />
+    );
+};
+
+export default POSCheckout;

@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { TrendingUp, TrendingDown, DollarSign, Percent, Trash2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Percent, Trash2, Receipt } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { ReportSkeleton } from '@/components/reports/ReportSkeleton';
 import { ComparisonToggle } from '@/components/reports/ComparisonToggle';
@@ -50,9 +50,25 @@ export function ProfitLossTab() {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Operating expenses for period (approved only)
+  const { data: opExpenses = 0 } = useQuery({
+    queryKey: ['pl-op-expenses', dateRange.from, dateRange.to],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('expenses')
+        .select('amount')
+        .eq('status', 'approved')
+        .gte('expense_date', dateRange.from.toISOString().split('T')[0])
+        .lte('expense_date', dateRange.to.toISOString().split('T')[0])
+      if (error) throw error
+      return (data || []).reduce((sum: number, r: { amount: number }) => sum + r.amount, 0)
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   const totals = useMemo(() => {
     if (!data || data.length === 0) {
-      return { grossRevenue: 0, cogs: 0, grossProfit: 0, marginPercentage: 0, taxCollected: 0, totalDiscounts: 0 };
+      return { grossRevenue: 0, cogs: 0, grossProfit: 0, marginPercentage: 0, taxCollected: 0, totalDiscounts: 0, operatingExpenses: opExpenses, netProfit: -opExpenses };
     }
     const grossRevenue = data.reduce((sum, d) => sum + (d.gross_revenue || 0), 0);
     const cogs = data.reduce((sum, d) => sum + (d.cogs || 0), 0);
@@ -60,8 +76,10 @@ export function ProfitLossTab() {
     const taxCollected = data.reduce((sum, d) => sum + (d.tax_collected || 0), 0);
     const totalDiscounts = data.reduce((sum, d) => sum + (d.total_discounts || 0), 0);
     const marginPercentage = grossRevenue > 0 ? (grossProfit / grossRevenue) * 100 : 0;
-    return { grossRevenue, cogs, grossProfit, marginPercentage, taxCollected, totalDiscounts };
-  }, [data]);
+    const operatingExpenses = opExpenses;
+    const netProfit = grossProfit - operatingExpenses;
+    return { grossRevenue, cogs, grossProfit, marginPercentage, taxCollected, totalDiscounts, operatingExpenses, netProfit };
+  }, [data, opExpenses]);
 
   const prevTotals = useMemo(() => {
     if (!comparisonPLData || comparisonPLData.length === 0 || !isComparisonEnabled) return null;
@@ -132,17 +150,38 @@ export function ProfitLossTab() {
         </div>
       </div>
 
-      {/* H5: Waste Cost Summary */}
-      {wasteCost > 0 && (
-        <div className="flex items-center gap-4 px-5 py-3 bg-red-500/5 border border-red-500/10 rounded-xl text-sm">
-          <Trash2 size={16} className="text-red-400 shrink-0" />
-          <span className="text-white/80">
-            Waste cost this period: <strong className="text-red-400">{formatCurrency(wasteCost)}</strong>
-          </span>
-          {totals.grossRevenue > 0 && (
-            <span className="text-white/50 ml-auto">
-              {((wasteCost / totals.grossRevenue) * 100).toFixed(1)}% of revenue
-            </span>
+      {/* H5: Waste & Expenses Cost Summary */}
+      {(wasteCost > 0 || totals.operatingExpenses > 0) && (
+        <div className="flex flex-col gap-2">
+          {wasteCost > 0 && (
+            <div className="flex items-center gap-4 px-5 py-3 bg-red-500/5 border border-red-500/10 rounded-xl text-sm">
+              <Trash2 size={16} className="text-red-400 shrink-0" />
+              <span className="text-white/80">
+                Waste cost: <strong className="text-red-400">{formatCurrency(wasteCost)}</strong>
+              </span>
+              {totals.grossRevenue > 0 && (
+                <span className="text-white/50 ml-auto">
+                  {((wasteCost / totals.grossRevenue) * 100).toFixed(1)}% of revenue
+                </span>
+              )}
+            </div>
+          )}
+          {totals.operatingExpenses > 0 && (
+            <div className="flex items-center gap-4 px-5 py-3 bg-amber-500/5 border border-amber-500/10 rounded-xl text-sm">
+              <Receipt size={16} className="text-amber-400 shrink-0" />
+              <span className="text-white/80">
+                Op. Expenses: <strong className="text-amber-400">{formatCurrency(totals.operatingExpenses)}</strong>
+              </span>
+              <span className="text-white/80 mx-2">|</span>
+              <span className="text-white/80">
+                Net Profit: <strong className={totals.netProfit >= 0 ? 'text-emerald-400' : 'text-red-400'}>{formatCurrency(totals.netProfit)}</strong>
+              </span>
+              {totals.grossRevenue > 0 && (
+                <span className="text-white/50 ml-auto">
+                  {((totals.netProfit / totals.grossRevenue) * 100).toFixed(1)}% net margin
+                </span>
+              )}
+            </div>
           )}
         </div>
       )}

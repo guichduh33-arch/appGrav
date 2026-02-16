@@ -2,10 +2,10 @@ import React from 'react';
 
 const Product_Catalog_Management: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <html class="dark" lang="en"><head>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head><body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex overflow-hidden">\`\`\`html
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head><body class="bg-background-light dark:bg-background-dark font-display min-h-screen flex overflow-hidden">\\`\\`\\`html
 
 
 
@@ -215,7 +215,7 @@ const Product_Catalog_Management: React.FC = () => {
 </div>
 <p class="font-mono text-[11px] text-white/40 tracking-tighter uppercase">SKU: BREAD-SOUR-001</p>
 <div class="flex items-center justify-between pt-2 border-t border-white/5">
-<span class="font-mono text-primary font-bold text-lg">$8.50</span>
+<span class="font-mono text-primary font-bold text-lg">\\$8.50</span>
 <span class="text-[10px] text-white/30">In Stock: <span class="text-white/80">42</span></span>
 </div>
 </div>
@@ -239,7 +239,7 @@ const Product_Catalog_Management: React.FC = () => {
 </div>
 <p class="font-mono text-[11px] text-white/40 tracking-tighter uppercase">SKU: PAST-MAC-BOX</p>
 <div class="flex items-center justify-between pt-2 border-t border-white/5">
-<span class="font-mono text-primary font-bold text-lg">$24.00</span>
+<span class="font-mono text-primary font-bold text-lg">\\$24.00</span>
 <span class="text-[10px] text-amber-500/80">Low Stock: <span class="font-bold">7</span></span>
 </div>
 </div>
@@ -266,7 +266,7 @@ const Product_Catalog_Management: React.FC = () => {
 </div>
 <p class="font-mono text-[11px] text-white/20 tracking-tighter uppercase">SKU: CAKE-CHO-098</p>
 <div class="flex items-center justify-between pt-2 border-t border-white/5">
-<span class="font-mono text-primary/50 font-bold text-lg">$45.00</span>
+<span class="font-mono text-primary/50 font-bold text-lg">\\$45.00</span>
 <span class="text-[10px] text-red-500/80">Stock: <span class="font-bold">0</span></span>
 </div>
 </div>
@@ -290,7 +290,7 @@ const Product_Catalog_Management: React.FC = () => {
 </div>
 <p class="font-mono text-[11px] text-white/40 tracking-tighter uppercase">SKU: PAST-CRO-REG</p>
 <div class="flex items-center justify-between pt-2 border-t border-white/5">
-<span class="font-mono text-primary font-bold text-lg">$4.25</span>
+<span class="font-mono text-primary font-bold text-lg">\\$4.25</span>
 <span class="text-[10px] text-white/30">In Stock: <span class="text-white/80">114</span></span>
 </div>
 </div>
@@ -323,8 +323,8 @@ const Product_Catalog_Management: React.FC = () => {
 </td>
 <td class="px-6 py-4 font-mono text-white/40">BREAD-SOUR-001</td>
 <td class="px-6 py-4"><span class="text-white/60">Breads</span></td>
-<td class="px-6 py-4 font-mono text-primary">$8.50</td>
-<td class="px-6 py-4 font-mono text-white/40">$2.10</td>
+<td class="px-6 py-4 font-mono text-primary">\\$8.50</td>
+<td class="px-6 py-4 font-mono text-white/40">\\$2.10</td>
 <td class="px-6 py-4"><span class="text-emerald-500 font-bold">75.3%</span></td>
 <td class="px-6 py-4">42</td>
 <td class="px-6 py-4 text-right">
@@ -350,7 +350,7 @@ const Product_Catalog_Management: React.FC = () => {
 </main>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

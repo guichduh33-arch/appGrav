@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Security &amp; PIN Settings | The Breakery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&amp;family=Work+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#eead2b",
+                "background-light": "#f8f7f6",
+                "background-dark": "#0D0D0F", // As requested in description
+                "card-dark": "#1A1A1D",
+                "border-dark": "#2A2A30",
+              },
+              fontFamily: {
+                "display": ["Work Sans", "sans-serif"],
+                "serif": ["Playfair Display", "serif"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+      </script>
+<style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+        }
+        .serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Custom Checkbox Style */
+        .custom-checkbox:checked {
+            background-color: #eead2b;
+            border-color: #eead2b;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 min-h-screen">
+<div class="max-w-7xl mx-auto px-6 py-8">
+<!-- Header -->
+<header class="flex items-center justify-between mb-8 border-b border-border-dark pb-6">
+<div class="flex items-center gap-3">
+<span class="material-icons text-primary text-3xl">shield</span>
+<h1 class="serif-title text-2xl font-semibold tracking-wide dark:text-white">Security &amp; PIN Settings</h1>
+</div>
+<div class="text-sm text-slate-500 dark:text-slate-400">
+                Last updated: Oct 24, 2023 • 14:20
+            </div>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: PIN & Session -->
+<div class="lg:col-span-5 space-y-8">
+<!-- Section 1: PIN Authentication -->
+<section class="bg-card-dark border border-border-dark rounded-lg p-6">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-icons text-primary/80 text-xl">pin</span>
+<h2 class="text-lg font-medium text-white">PIN Authentication</h2>
+</div>
+<div class="space-y-6">
+<!-- Toggle: Enable Offline PIN -->
+<div class="flex items-center justify-between">
+<div>
+<p class="font-medium text-slate-200">Enable offline PIN</p>
+<p class="text-xs text-slate-500">Allow access during internet outages</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Toggle: PIN Complexity -->
+<div class="flex items-center justify-between">
+<div>
+<p class="font-medium text-slate-200">Complexity requirements</p>
+<p class="text-xs text-slate-500">Disallow repetitive digits (e.g. 1111)</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Numeric: PIN Length -->
+<div class="flex items-center justify-between">
+<label class="font-medium text-slate-200">PIN Length</label>
+<select class="bg-background-dark border border-border-dark text-slate-300 rounded px-3 py-1 focus:ring-1 focus:ring-primary outline-none">
+<option>4 digits</option>
+<option selected="">6 digits</option>
+</select>
+</div>
+<!-- Numeric: Lockout -->
+<div class="flex items-center justify-between">
+<div>
+<p class="font-medium text-slate-200">Failed attempts lockout</p>
+<p class="text-xs text-slate-500">Number of tries before device lock</p>
+</div>
+<input class="w-16 bg-background-dark border border-border-dark text-slate-300 rounded px-3 py-1 focus:ring-1 focus:ring-primary outline-none" type="number" value="3"/>
+</div>
+</div>
+</section>
+<!-- Section 3: Session Security -->
+<section class="bg-card-dark border border-border-dark rounded-lg p-6">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-icons text-primary/80 text-xl">timer</span>
+<h2 class="text-lg font-medium text-white">Session Security</h2>
+</div>
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-medium text-slate-200">Auto-logout delay</p>
+<p class="text-xs text-slate-500">Duration of inactivity before logout</p>
+</div>
+<select class="bg-background-dark border border-border-dark text-slate-300 rounded px-3 py-1 focus:ring-1 focus:ring-primary outline-none text-sm">
+<option>15 minutes</option>
+<option selected="">30 minutes</option>
+<option>1 hour</option>
+<option>4 hours</option>
+</select>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-medium text-slate-200">Concurrent sessions</p>
+<p class="text-xs text-slate-500">Max active devices per user</p>
+</div>
+<input class="w-16 bg-background-dark border border-border-dark text-slate-300 rounded px-3 py-1 focus:ring-1 focus:ring-primary outline-none" type="number" value="1"/>
+</div>
+</div>
+</section>
+<!-- Section 4: Data Protection -->
+<section class="bg-card-dark border border-border-dark rounded-lg p-6">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-icons text-primary/80 text-xl">lock</span>
+<h2 class="text-lg font-medium text-white">Data Protection</h2>
+</div>
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-medium text-slate-200">PII Masking</p>
+<p class="text-xs text-slate-500">Mask customer phone/email in reports</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-medium text-slate-200">Local DB Encryption</p>
+<p class="text-xs text-slate-500">Encrypt local cache for offline work</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Action Verification -->
+<div class="lg:col-span-7">
+<section class="bg-card-dark border border-border-dark rounded-lg p-8 h-full">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-icons text-primary/80 text-xl">verified_user</span>
+<h2 class="text-xl font-medium text-white">Action Verification</h2>
+</div>
+<p class="text-sm text-slate-500 mb-8 border-b border-border-dark pb-4">Define which high-sensitivity actions require staff to re-enter their PIN for authorization.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
+<h3 class="col-span-full text-xs font-semibold uppercase tracking-widest text-primary/60 mb-2">Order Management</h3>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-5 h-5 rounded border-border-dark bg-background-dark text-primary focus:ring-primary custom-checkbox" type="checkbox"/>
+<span class="text-slate-300 group-hover:text-white transition-colors">Void orders</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-5 h-5 rounded border-border-dark bg-background-dark text-primary focus:ring-primary custom-checkbox" type="checkbox"/>
+<span class="text-slate-300 group-hover:text-white transition-colors">Apply discounts &gt; 15%</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-5 h-5 rounded border-border-dark bg-background-dark text-primary focus:ring-primary custom-checkbox" type="checkbox"/>
+<span class="text-slate-300 group-hover:text-white transition-colors">Process refunds</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 rounded border-border-dark bg-background-dark text-primary focus:ring-primary custom-checkbox" type="checkbox"/>
+<span class="text-slate-300 group-hover:text-white transition-colors">Manual price override</span>
+</label>
+<h3 class="col-span-full text-xs font-semibold uppercase tracking-widest text-primary/60 mt-6 mb-2">Inventory &amp; Stock</h3>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-5 h-5 rounded border-border-dark bg-background-dark text-primary focus:ring-primary custom-checkbox" type="checkbox"/>
+<span class="text-slate-300 group-hover:text-white transition-colors">Stock adjustments</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 rounded border-border-dark bg-background-dark text-primary focus:ring-primary custom-checkbox" type="checkbox"/>
+<span class="text-slate-300 group-hover:text-white transition-colors">Waste logging</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-5 h-5 rounded border-border-dark bg-background-dark text-primary focus:ring-primary custom-checkbox" type="checkbox"/>
+<span class="text-slate-300 group-hover:text-white transition-colors">Bulk order export</span>
+</label>
+<h3 class="col-span-full text-xs font-semibold uppercase tracking-widest text-primary/60 mt-6 mb-2">Administrative</h3>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-5 h-5 rounded border-border-dark bg-background-dark text-primary focus:ring-primary custom-checkbox" type="checkbox"/>
+<span class="text-slate-300 group-hover:text-white transition-colors">Access shift reports</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 rounded border-border-dark bg-background-dark text-primary focus:ring-primary custom-checkbox" type="checkbox"/>
+<span class="text-slate-300 group-hover:text-white transition-colors">Change printer settings</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-5 h-5 rounded border-border-dark bg-background-dark text-primary focus:ring-primary custom-checkbox" type="checkbox"/>
+<span class="text-slate-300 group-hover:text-white transition-colors">End of day till reconcile</span>
+</label>
+</div>
+<div class="mt-12 p-4 rounded-lg bg-primary/5 border border-primary/20 flex gap-4">
+<span class="material-icons text-primary text-xl">info</span>
+<p class="text-sm text-slate-400">Settings configured here apply to all terminal devices linked to this branch. Individual staff overrides can be managed in the <span class="text-primary hover:underline cursor-pointer">Staff Roles</span> module.</p>
+</div>
+</section>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="mt-10 flex items-center justify-end gap-4 border-t border-border-dark pt-8">
+<button class="px-6 py-2.5 text-slate-400 hover:text-white font-medium transition-colors">
+                Discard Changes
+            </button>
+<button class="bg-primary hover:bg-primary/90 text-background-dark px-8 py-2.5 rounded-lg font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/10">
+<span class="material-icons text-xl">save</span>
+                Save Security Settings
+            </button>
+</div>
+</div>
+</body></html>

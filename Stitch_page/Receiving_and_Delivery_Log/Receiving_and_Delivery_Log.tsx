@@ -1,0 +1,328 @@
+import React from 'react';
+
+const Receiving_and_Delivery_Log: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: `
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Enterprise Receiving Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "artisan-gold": "#C9A55C",
+                        "deep-onyx": "#0D0D0F",
+                        "surface-onyx": "#141417",
+                        "stone-white": "#E5E7EB",
+                    },
+                    fontFamily: {
+                        "sans": ["Inter", "sans-serif"],
+                        "display": ["Playfair Display", "serif"],
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-deep-onyx text-stone-white antialiased;
+            }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0D0D0F; }
+        ::-webkit-scrollbar-thumb { background: #C9A55C33; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #C9A55C66; }
+        .active-card-border {
+            border: 1px solid #C9A55C;
+            box-shadow: 0 0 15px rgba(201, 165, 92, 0.1);
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+<aside class="w-64 border-r border-white/5 bg-deep-onyx flex flex-col py-8 shrink-0">
+<div class="px-8 mb-12">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-artisan-gold flex items-center justify-center">
+<span class="material-symbols-outlined text-deep-onyx text-xl">bakery_dining</span>
+</div>
+<span class="text-lg font-display tracking-widest text-artisan-gold font-bold">THE BREAKERY</span>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-4 px-4 py-3 text-stone-white/40 hover:text-artisan-gold transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
+<span class="text-sm font-medium tracking-wide">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-stone-white/40 hover:text-artisan-gold transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">inventory</span>
+<span class="text-sm font-medium tracking-wide">Inventory</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 bg-artisan-gold/5 text-artisan-gold border-r-2 border-artisan-gold transition-all" href="#">
+<span class="material-symbols-outlined">local_shipping</span>
+<span class="text-sm font-bold tracking-wide">Receiving</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-stone-white/40 hover:text-artisan-gold transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">shopping_bag</span>
+<span class="text-sm font-medium tracking-wide">Orders</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-stone-white/40 hover:text-artisan-gold transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">insights</span>
+<span class="text-sm font-medium tracking-wide">Reports</span>
+</a>
+</nav>
+<div class="mt-auto px-6">
+<div class="p-4 bg-white/5 border border-white/5 rounded mb-4">
+<p class="text-[10px] text-stone-white/30 uppercase tracking-[0.2em] mb-1">Station 01</p>
+<p class="text-sm font-medium text-stone-white">Chef Laurent</p>
+</div>
+<a class="flex items-center gap-4 px-2 py-3 text-stone-white/40 hover:text-red-400 transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="text-sm font-medium">System Logout</span>
+</a>
+</div>
+</aside>
+<div class="flex-1 flex flex-col min-w-0">
+<header class="h-24 border-b border-white/5 flex items-center justify-between px-10 bg-deep-onyx shrink-0">
+<h1 class="text-3xl font-display italic">
+<span class="text-stone-white">Receive</span>
+<span class="text-artisan-gold ml-2">Shipment</span>
+</h1>
+<div class="flex items-center gap-6 flex-1 max-w-2xl px-12">
+<div class="relative w-full group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-stone-white/30 group-focus-within:text-artisan-gold transition-colors">search</span>
+<input class="w-full bg-white/5 border border-white/10 rounded-none py-3 pl-12 pr-4 focus:ring-0 focus:border-artisan-gold outline-none transition-all placeholder:text-stone-white/20 text-sm" placeholder="Enter Order ID or Vendor SKU..." type="text"/>
+</div>
+</div>
+<button class="flex items-center gap-3 bg-artisan-gold hover:bg-[#B8944B] text-deep-onyx font-bold px-6 py-3 transition-all">
+<span class="material-symbols-outlined text-xl">barcode_scanner</span>
+<span class="uppercase tracking-widest text-xs">Scan Invoice</span>
+</button>
+</header>
+<div class="flex-1 flex overflow-hidden">
+<section class="w-96 border-r border-white/5 flex flex-col bg-deep-onyx">
+<div class="p-6 border-b border-white/5 flex items-center justify-between">
+<h2 class="text-[10px] font-bold tracking-[0.3em] uppercase text-stone-white/40">Queue / Pending (4)</h2>
+<span class="material-symbols-outlined text-stone-white/20 text-sm">filter_list</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<div class="p-5 bg-white/5 active-card-border cursor-pointer relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-16 h-16 bg-artisan-gold/5 -rotate-45 translate-x-8 -translate-y-8"></div>
+<div class="flex justify-between items-start mb-3">
+<span class="text-[10px] font-bold tracking-widest uppercase text-artisan-gold bg-artisan-gold/10 px-2 py-0.5">Priority</span>
+<span class="text-[10px] text-stone-white/40 font-mono">09:15 AM</span>
+</div>
+<h3 class="font-display text-xl text-stone-white mb-1">Moulin de Provence</h3>
+<p class="text-[11px] text-stone-white/40 font-mono tracking-wider">#BRK-2023-001</p>
+<div class="mt-4 flex items-center justify-between">
+<span class="text-[10px] text-stone-white/60">8 Essential Grains</span>
+<span class="material-symbols-outlined text-artisan-gold text-lg group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+<div class="p-5 bg-transparent border border-white/5 hover:border-white/20 cursor-pointer transition-all group">
+<div class="flex justify-between items-start mb-3">
+<span class="text-[10px] font-bold tracking-widest uppercase text-stone-white/20">Standard</span>
+<span class="text-[10px] text-stone-white/40 font-mono">11:30 AM</span>
+</div>
+<h3 class="font-display text-xl text-stone-white/60 group-hover:text-stone-white transition-colors">L'Artisan Flour</h3>
+<p class="text-[11px] text-stone-white/20 font-mono tracking-wider">#BRK-2023-042</p>
+<div class="mt-4 flex items-center justify-between">
+<span class="text-[10px] text-stone-white/40">12 Stock Items</span>
+<span class="material-symbols-outlined text-stone-white/10 text-lg">chevron_right</span>
+</div>
+</div>
+<div class="p-5 bg-transparent border border-white/5 hover:border-white/20 cursor-pointer transition-all group">
+<div class="flex justify-between items-start mb-3">
+<span class="text-[10px] font-bold tracking-widest uppercase text-stone-white/20">Standard</span>
+<span class="text-[10px] text-stone-white/40 font-mono">01:45 PM</span>
+</div>
+<h3 class="font-display text-xl text-stone-white/60 group-hover:text-stone-white transition-colors">Beurre de Charentes</h3>
+<p class="text-[11px] text-stone-white/20 font-mono tracking-wider">#BRK-2023-067</p>
+<div class="mt-4 flex items-center justify-between">
+<span class="text-[10px] text-stone-white/40">5 Dairy Crates</span>
+<span class="material-symbols-outlined text-stone-white/10 text-lg">chevron_right</span>
+</div>
+</div>
+<div class="p-5 bg-transparent border border-white/5 hover:border-white/20 cursor-pointer transition-all group">
+<div class="flex justify-between items-start mb-3">
+<span class="text-[10px] font-bold tracking-widest uppercase text-stone-white/20">Scheduled</span>
+<span class="text-[10px] text-stone-white/40 font-mono">04:00 PM</span>
+</div>
+<h3 class="font-display text-xl text-stone-white/60 group-hover:text-stone-white transition-colors">Parisian Orchards</h3>
+<p class="text-[11px] text-stone-white/20 font-mono tracking-wider">#BRK-2023-089</p>
+<div class="mt-4 flex items-center justify-between">
+<span class="text-[10px] text-stone-white/40">15 Produce Boxes</span>
+<span class="material-symbols-outlined text-stone-white/10 text-lg">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<section class="flex-1 flex flex-col bg-surface-onyx overflow-hidden">
+<div class="p-10 pb-6 shrink-0">
+<div class="flex items-end justify-between mb-8 border-b border-white/5 pb-8">
+<div>
+<div class="flex items-center gap-2 text-artisan-gold text-[10px] uppercase tracking-[0.4em] font-bold mb-3">
+<span class="material-symbols-outlined text-base">receipt</span>
+                            Active Receipt Manifest
+                        </div>
+<h2 class="text-4xl font-display text-stone-white italic">Order <span class="text-artisan-gold font-bold not-italic">#BRK-2023-001</span></h2>
+<div class="flex items-center gap-4 mt-3">
+<span class="text-xs text-stone-white/60">Vendor: <span class="text-stone-white font-medium">Moulin de Provence</span></span>
+<span class="w-1 h-1 bg-white/20 rounded-full"></span>
+<span class="text-xs text-stone-white/60">Carrier: <span class="text-stone-white font-medium">Trans-Loire Express</span></span>
+</div>
+</div>
+<button class="text-[10px] text-stone-white/40 hover:text-artisan-gold uppercase tracking-[0.2em] transition-colors font-bold border-b border-white/10 pb-1">
+                        Mark all as Received
+                    </button>
+</div>
+<div class="relative overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-white/10">
+<th class="px-4 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-stone-white/40">Manifest Item</th>
+<th class="px-4 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-stone-white/40 text-center w-24">Expected</th>
+<th class="px-4 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-stone-white/40 text-center w-24">Received</th>
+<th class="px-4 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-stone-white/40 w-36">Condition</th>
+<th class="px-4 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-stone-white/40">Manifest Notes</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="hover:bg-white/[0.02] transition-colors group">
+<td class="px-4 py-5">
+<div class="font-medium text-stone-white text-sm">Organic T55 Flour</div>
+<div class="text-[10px] text-stone-white/30 font-mono mt-1">25KG BAG • SKU: FL-01-T55</div>
+</td>
+<td class="px-4 py-5 text-center font-mono text-stone-white/60">10</td>
+<td class="px-4 py-5">
+<input class="w-16 mx-auto block bg-deep-onyx border border-white/10 rounded-none py-1.5 text-center focus:border-artisan-gold ring-0 outline-none text-sm transition-all" type="number" value="10"/>
+</td>
+<td class="px-4 py-5">
+<select class="w-full bg-deep-onyx border border-white/10 rounded-none text-[10px] uppercase font-bold tracking-widest py-1.5 px-2 focus:border-artisan-gold ring-0 outline-none transition-all">
+<option selected="">Perfect</option>
+<option>Damaged</option>
+<option>Missing</option>
+</select>
+</td>
+<td class="px-4 py-5">
+<input class="w-full bg-transparent border-b border-transparent group-hover:border-white/10 focus:border-artisan-gold text-xs py-1.5 outline-none transition-all" placeholder="Enter notes..." type="text"/>
+</td>
+</tr>
+<tr class="bg-red-500/5 hover:bg-red-500/10 transition-colors group">
+<td class="px-4 py-5">
+<div class="font-medium text-red-200 text-sm">Guerande Sea Salt</div>
+<div class="text-[10px] text-red-400/40 font-mono mt-1">5KG BUCKET • SKU: SLT-GR-05</div>
+</td>
+<td class="px-4 py-5 text-center font-mono text-red-200/60">4</td>
+<td class="px-4 py-5">
+<input class="w-16 mx-auto block bg-deep-onyx border-2 border-red-500 rounded-none py-1.5 text-center focus:ring-0 outline-none text-sm text-red-200" type="number" value="3"/>
+</td>
+<td class="px-4 py-5">
+<select class="w-full bg-deep-onyx border border-red-500/50 rounded-none text-[10px] uppercase font-bold tracking-widest py-1.5 px-2 text-red-400 ring-0 outline-none">
+<option>Perfect</option>
+<option>Damaged</option>
+<option selected="">Missing</option>
+</select>
+</td>
+<td class="px-4 py-5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-red-500 text-base">error</span>
+<input class="w-full bg-transparent border-b border-red-500/30 text-xs py-1.5 outline-none text-red-200" type="text" value="1 unit short on delivery pallet"/>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors group">
+<td class="px-4 py-5">
+<div class="font-medium text-stone-white text-sm">Dry Yeast (Saf-Instant)</div>
+<div class="text-[10px] text-stone-white/30 font-mono mt-1">500G VAC • SKU: YST-44</div>
+</td>
+<td class="px-4 py-5 text-center font-mono text-stone-white/60">24</td>
+<td class="px-4 py-5">
+<input class="w-16 mx-auto block bg-deep-onyx border border-white/10 rounded-none py-1.5 text-center focus:border-artisan-gold ring-0 outline-none text-sm transition-all" type="number" value="24"/>
+</td>
+<td class="px-4 py-5">
+<select class="w-full bg-deep-onyx border border-white/10 rounded-none text-[10px] uppercase font-bold tracking-widest py-1.5 px-2 focus:border-artisan-gold ring-0 outline-none transition-all">
+<option selected="">Perfect</option>
+<option>Damaged</option>
+<option>Missing</option>
+</select>
+</td>
+<td class="px-4 py-5">
+<input class="w-full bg-transparent border-b border-transparent group-hover:border-white/10 focus:border-artisan-gold text-xs py-1.5 outline-none transition-all" placeholder="Enter notes..." type="text"/>
+</td>
+</tr>
+<tr class="hover:bg-white/[0.02] transition-colors group">
+<td class="px-4 py-5">
+<div class="font-medium text-stone-white text-sm">Whole Rye Flour (T130)</div>
+<div class="text-[10px] text-stone-white/30 font-mono mt-1">20KG BAG • SKU: FL-05-R130</div>
+</td>
+<td class="px-4 py-5 text-center font-mono text-stone-white/60">5</td>
+<td class="px-4 py-5">
+<input class="w-16 mx-auto block bg-deep-onyx border border-white/10 rounded-none py-1.5 text-center focus:border-artisan-gold ring-0 outline-none text-sm transition-all" type="number" value="5"/>
+</td>
+<td class="px-4 py-5">
+<select class="w-full bg-deep-onyx border border-white/10 rounded-none text-[10px] uppercase font-bold tracking-widest py-1.5 px-2 focus:border-artisan-gold ring-0 outline-none transition-all">
+<option selected="">Perfect</option>
+<option>Damaged</option>
+<option>Missing</option>
+</select>
+</td>
+<td class="px-4 py-5">
+<input class="w-full bg-transparent border-b border-transparent group-hover:border-white/10 focus:border-artisan-gold text-xs py-1.5 outline-none transition-all" placeholder="Enter notes..." type="text"/>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<footer class="mt-auto p-10 border-t border-white/5 bg-deep-onyx flex items-center justify-between">
+<div class="flex items-center gap-8">
+<div class="flex flex-col">
+<span class="text-[10px] text-stone-white/30 uppercase tracking-[0.2em] font-bold mb-1">Items Processed</span>
+<div class="flex items-baseline gap-1">
+<span class="text-2xl font-mono text-stone-white">43</span>
+<span class="text-xs text-stone-white/20">/ 44 TOTAL</span>
+</div>
+</div>
+<div class="h-10 w-px bg-white/10"></div>
+<div class="flex flex-col">
+<span class="text-[10px] text-stone-white/30 uppercase tracking-[0.2em] font-bold mb-1">Discrepancies</span>
+<div class="flex items-center gap-2">
+<span class="text-2xl font-mono text-red-500">01</span>
+<span class="flex h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-6 py-4 border border-artisan-gold/30 text-artisan-gold hover:bg-artisan-gold/5 transition-all text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-base">warning</span>
+                        Report Discrepancy
+                    </button>
+<button class="px-10 py-4 bg-artisan-gold hover:bg-[#B8944B] text-deep-onyx text-xs font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-2xl shadow-artisan-gold/10">
+<span class="material-symbols-outlined text-lg">check_circle</span>
+                        Confirm Receipt
+                    </button>
+</div>
+</footer>
+</section>
+</div>
+</div>
+
+</body></html>
+      <!-- STITCH_HTML_END -->
+    ` }} />
+  );
+};
+
+export default Receiving_and_Delivery_Log;

@@ -2,7 +2,7 @@ import React from 'react';
 
 const Internal_Stock_Transfers: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -380,7 +380,7 @@ const Internal_Stock_Transfers: React.FC = () => {
 </aside>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

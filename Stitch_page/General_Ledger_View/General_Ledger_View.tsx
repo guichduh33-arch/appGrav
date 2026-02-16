@@ -2,10 +2,10 @@ import React from 'react';
 
 const General_Ledger_View: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <html class="dark" lang="en"><head>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head><body class="bg-background-light dark:bg-background-dark text-slate-200 min-h-screen flex flex-col">\`\`\`html
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head><body class="bg-background-light dark:bg-background-dark text-slate-200 min-h-screen flex flex-col">\\`\\`\\`html
 
 
 
@@ -229,7 +229,7 @@ const General_Ledger_View: React.FC = () => {
 </footer>
 </body></html><!-- End of generated code -->
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

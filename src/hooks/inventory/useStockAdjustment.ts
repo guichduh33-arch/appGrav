@@ -30,7 +30,7 @@ export function useSuppliers() {
     queryFn: async (): Promise<ISupplier[]> => {
       const { data, error } = await supabase
         .from('suppliers')
-        .select('*')
+        .select('id, name, is_active')
         .eq('is_active', true)
         .order('name')
         .returns<ISupplier[]>()
@@ -83,7 +83,7 @@ export function useStockAdjustment() {
       const { data, error } = await supabase
         .from('stock_movements')
         .insert(movementData)
-        .select()
+        .select('id, movement_id, product_id, movement_type, quantity, reason, reference_id, stock_before, stock_after, unit, notes, created_by, supplier_id, created_at')
         .single()
 
       if (error) throw error

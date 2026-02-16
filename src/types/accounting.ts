@@ -10,7 +10,7 @@
 export type TAccountType = 'asset' | 'liability' | 'equity' | 'revenue' | 'expense'
 export type TBalanceType = 'debit' | 'credit'
 export type TJournalStatus = 'draft' | 'posted' | 'locked'
-export type TJournalReferenceType = 'sale' | 'purchase' | 'manual' | 'void' | 'refund' | 'adjustment'
+export type TJournalReferenceType = 'sale' | 'purchase' | 'manual' | 'void' | 'refund' | 'adjustment' | 'expense'
 export type TFiscalPeriodStatus = 'open' | 'closed' | 'locked'
 
 // ============================================================================

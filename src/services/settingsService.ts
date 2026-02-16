@@ -22,7 +22,10 @@ import type {
 export async function fetchSettingsCategories(): Promise<SettingsCategory[]> {
   const { data, error } = await supabase
     .from('settings_categories')
-    .select('*')
+    .select(`
+      id, code, name_en, name_fr, name_id, description_en, description_fr, 
+      description_id, icon, sort_order, is_active, required_permission, created_at
+    `)
     .eq('is_active', true)
     .order('sort_order')
 
@@ -37,7 +40,11 @@ export async function fetchSettingsCategories(): Promise<SettingsCategory[]> {
 export async function fetchAllSettings(): Promise<Setting[]> {
   const { data, error } = await supabase
     .from('settings')
-    .select('*')
+    .select(`
+      id, category_id, key, name_en, name_fr, name_id, description_en, description_fr, 
+      description_id, value, value_type, default_value, validation_rules, is_system, 
+      is_readonly, is_sensitive, requires_restart, sort_order, updated_at, updated_by, created_at
+    `)
     .order('sort_order')
 
   if (error) throw error
@@ -96,7 +103,10 @@ export async function resetCategorySettings(categoryCode: string): Promise<numbe
 export async function fetchTaxRates(): Promise<TaxRate[]> {
   const { data, error } = await supabase
     .from('tax_rates')
-    .select('*')
+    .select(`
+      id, applies_to, code, created_at, is_active, is_default, is_inclusive, 
+      name, name_en, name_fr, name_id, rate, updated_at, valid_from, valid_until
+    `)
     .order('rate')
 
   if (error) throw error
@@ -107,7 +117,10 @@ export async function createTaxRate(taxRate: Omit<TaxRate, 'id' | 'created_at' |
   const { data, error } = await supabase
     .from('tax_rates')
     .insert(taxRate)
-    .select()
+    .select(`
+      id, applies_to, code, created_at, is_active, is_default, is_inclusive, 
+      name, name_en, name_fr, name_id, rate, updated_at, valid_from, valid_until
+    `)
     .single()
 
   if (error) throw error
@@ -139,7 +152,10 @@ export async function deleteTaxRate(id: string): Promise<void> {
 export async function fetchPaymentMethods(): Promise<PaymentMethod[]> {
   const { data, error } = await supabase
     .from('payment_methods')
-    .select('*')
+    .select(`
+      id, code, created_at, icon, is_active, is_default, name, name_en, name_fr, 
+      name_id, payment_type, requires_reference, settings, sort_order, type, updated_at
+    `)
     .order('sort_order')
 
   if (error) throw error
@@ -150,7 +166,10 @@ export async function createPaymentMethod(method: Omit<PaymentMethod, 'id' | 'cr
   const { data, error } = await supabase
     .from('payment_methods')
     .insert(method)
-    .select()
+    .select(`
+      id, code, created_at, icon, is_active, is_default, name, name_en, name_fr, 
+      name_id, payment_type, requires_reference, settings, sort_order, type, updated_at
+    `)
     .single()
 
   if (error) throw error
@@ -182,7 +201,10 @@ export async function deletePaymentMethod(id: string): Promise<void> {
 export async function fetchBusinessHours(): Promise<BusinessHours[]> {
   const { data, error } = await supabase
     .from('business_hours')
-    .select('*')
+    .select(`
+      id, break_end, break_start, close_time, created_at, day_of_week, 
+      is_closed, is_open, open_time, updated_at
+    `)
     .order('day_of_week')
 
   if (error) throw error
@@ -205,7 +227,10 @@ export async function updateBusinessHours(dayOfWeek: number, updates: Partial<Bu
 export async function fetchPrinters(): Promise<PrinterConfiguration[]> {
   const { data, error } = await supabase
     .from('printer_configurations')
-    .select('*')
+    .select(`
+      id, connection_string, connection_type, created_at, is_active, is_default, 
+      name, paper_width, printer_type, settings, updated_at
+    `)
     .order('name')
 
   if (error) throw error
@@ -216,7 +241,10 @@ export async function createPrinter(printer: Omit<PrinterConfiguration, 'id' | '
   const { data, error } = await supabase
     .from('printer_configurations')
     .insert(printer)
-    .select()
+    .select(`
+      id, connection_string, connection_type, created_at, is_active, is_default, 
+      name, paper_width, printer_type, settings, updated_at
+    `)
     .single()
 
   if (error) throw error

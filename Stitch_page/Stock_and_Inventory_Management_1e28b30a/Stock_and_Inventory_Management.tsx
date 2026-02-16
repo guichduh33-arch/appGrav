@@ -1,0 +1,342 @@
+import React from 'react';
+
+const Stock_and_Inventory_Management: React.FC = () => {
+  return (
+    <div dangerouslySetInnerHTML={{ __html: `
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Stock &amp; Inventory Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#c8a45b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#0D0D0F",
+                        "stone-text": "#E5E7EB",
+                        "muted-smoke": "#9CA3AF",
+                        "muted-orange": "#A6634B",
+                        "muted-red": "#991B1B"
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e1b14;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c8a45b33;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #c8a45b55;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-stone-text font-display min-h-screen flex overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 border-r border-primary/10 flex flex-col h-full bg-background-dark/50 backdrop-blur-sm">
+<div class="p-8 border-b border-primary/10">
+<h1 class="text-xl font-bold tracking-widest text-primary flex items-center gap-2 uppercase">
+<span class="material-icons">bakery_dining</span>
+                The Breakery
+            </h1>
+</div>
+<nav class="flex-1 py-6 px-4 space-y-2 overflow-y-auto custom-scrollbar">
+<a class="flex items-center gap-3 px-4 py-3 rounded text-muted-smoke hover:bg-primary/5 hover:text-stone-text transition-all group" href="#">
+<span class="material-icons text-xl">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-muted-smoke hover:bg-primary/5 hover:text-stone-text transition-all group" href="#">
+<span class="material-icons text-xl">point_of_sale</span>
+<span class="text-sm font-medium">POS</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-muted-smoke hover:bg-primary/5 hover:text-stone-text transition-all group" href="#">
+<span class="material-icons text-xl">restaurant_menu</span>
+<span class="text-sm font-medium">Kitchen</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded bg-primary/10 text-primary border border-primary/20 transition-all" href="#">
+<span class="material-icons text-xl">inventory_2</span>
+<span class="text-sm font-medium">Stock &amp; Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-muted-smoke hover:bg-primary/5 hover:text-stone-text transition-all group" href="#">
+<span class="material-icons text-xl">shopping_cart</span>
+<span class="text-sm font-medium">Orders</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded text-muted-smoke hover:bg-primary/5 hover:text-stone-text transition-all group" href="#">
+<span class="material-icons text-xl">local_shipping</span>
+<span class="text-sm font-medium">Suppliers</span>
+</a>
+</nav>
+<div class="p-4 border-t border-primary/10">
+<div class="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/5">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary border border-primary/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Headshot of the bakery manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ13ECLvo8Gn28Tkj56JDFKV30XGGN3av6PFmipxO5Wq_Ok1_Y9qwAf-wpfy3c0qsMJegx8L29UP1ihPd4lqwNNAHv4rvdum40dZz028K0BtjuMIboms114_0Pj7LlVVeCWMsf79zhZoRCN5sqQ2Pb8Op4NlqSCvznvUKdTP_B7EHJdHjWZXlkBhD6l3kKULJiXqh7M3aczZykK-4LcQN2COFSowsRvEwPzYZqutWLcdwIa98G-Poi269wkQKYjqGiaR0oLEywx94"/>
+</div>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-semibold truncate">Julien Vernier</p>
+<p class="text-[10px] text-muted-smoke truncate uppercase tracking-tighter">Inventory Head</p>
+</div>
+<button class="text-muted-smoke hover:text-primary transition-colors">
+<span class="material-icons text-lg">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="flex-1 flex flex-col min-w-0 bg-background-dark/20 overflow-hidden">
+<!-- Header -->
+<header class="h-20 border-b border-primary/10 px-8 flex items-center justify-between bg-background-dark/80 backdrop-blur-md sticky top-0 z-10">
+<h2 class="text-2xl font-light tracking-tight text-stone-text uppercase">
+                Inventory <span class="font-bold text-primary">Management</span>
+</h2>
+<div class="flex items-center gap-4 flex-1 max-w-2xl justify-end">
+<div class="relative w-full max-w-sm">
+<span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-smoke text-lg">search</span>
+<input class="w-full bg-background-dark border border-primary/20 rounded py-2 pl-10 pr-4 text-sm text-stone-text placeholder:text-muted-smoke/50 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Search ingredients, batches, SKUs..." type="text"/>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-background-dark font-semibold px-5 py-2 rounded flex items-center gap-2 text-sm transition-all whitespace-nowrap">
+<span class="material-icons text-lg">add</span>
+                    Add New Item
+                </button>
+</div>
+</header>
+<!-- Content Area -->
+<section class="flex-1 overflow-y-auto custom-scrollbar p-8">
+<div class="mb-6 flex items-center justify-between">
+<div class="flex gap-4">
+<button class="px-4 py-1.5 rounded-full border border-primary/30 text-xs font-medium text-primary bg-primary/5">All Items</button>
+<button class="px-4 py-1.5 rounded-full border border-primary/10 text-xs font-medium text-muted-smoke hover:border-primary/20 transition-all">Grains</button>
+<button class="px-4 py-1.5 rounded-full border border-primary/10 text-xs font-medium text-muted-smoke hover:border-primary/20 transition-all">Dairy</button>
+<button class="px-4 py-1.5 rounded-full border border-primary/10 text-xs font-medium text-muted-smoke hover:border-primary/20 transition-all">Produce</button>
+<button class="px-4 py-1.5 rounded-full border border-primary/10 text-xs font-medium text-muted-smoke hover:border-primary/20 transition-all">Packaging</button>
+</div>
+<div class="text-[11px] text-muted-smoke uppercase tracking-widest font-medium">
+                    Last updated: 14 Oct 2023, 09:22 AM
+                </div>
+</div>
+<div class="bg-background-dark border border-primary/10 rounded overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-primary/5 text-[11px] uppercase tracking-[0.15em] text-muted-smoke font-bold border-b border-primary/10">
+<th class="px-6 py-4">Item Name</th>
+<th class="px-6 py-4">Category</th>
+<th class="px-6 py-4 text-right">Current Stock</th>
+<th class="px-6 py-4">Unit</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4 w-10"></th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<!-- Standard Row -->
+<tr class="border-b border-primary/5 hover:bg-primary/5 transition-colors group cursor-pointer">
+<td class="px-6 py-4 font-medium text-stone-text">French T55 Patisserie Flour</td>
+<td class="px-6 py-4 text-muted-smoke">Grains</td>
+<td class="px-6 py-4 text-right font-mono text-primary">150.00</td>
+<td class="px-6 py-4 text-muted-smoke italic">kg</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded bg-green-900/20 text-green-500 text-[10px] font-bold uppercase tracking-wider">In Stock</span>
+</td>
+<td class="px-6 py-4 text-muted-smoke"><span class="material-icons text-lg group-hover:text-primary transition-colors">more_vert</span></td>
+</tr>
+<!-- Expanded Row Container -->
+<tr class="border-b border-primary/10 bg-primary/5">
+<td class="p-0" colspan="6">
+<div class="flex items-center px-6 py-4 border-l-4 border-primary bg-primary/10">
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-1">
+<span class="font-bold text-stone-text">Organic Cultured Butter (Charente-Poitou)</span>
+<span class="px-2 py-0.5 rounded bg-muted-orange/20 text-muted-orange text-[9px] font-bold uppercase tracking-widest">Low Stock Warning</span>
+</div>
+<div class="text-xs text-muted-smoke">SKU: BUT-EXP-2023-V01</div>
+</div>
+<div class="text-right">
+<div class="text-lg font-mono text-muted-orange font-bold">12.50 / 45.00</div>
+<div class="text-[10px] text-muted-smoke uppercase">Current / Threshold</div>
+</div>
+<div class="pl-8 flex gap-2">
+<button class="bg-primary/20 text-primary p-2 rounded hover:bg-primary/30 transition-colors">
+<span class="material-icons text-lg">edit</span>
+</button>
+<button class="bg-primary/20 text-primary p-2 rounded hover:bg-primary/30 transition-colors">
+<span class="material-icons text-lg">history</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-8 p-8 border-l-4 border-primary bg-background-dark/40">
+<!-- Supplier Details -->
+<div class="space-y-4">
+<h4 class="text-[11px] uppercase tracking-widest text-primary font-bold border-b border-primary/10 pb-2 flex items-center gap-2">
+<span class="material-icons text-xs">local_shipping</span>
+                                            Supplier Details
+                                        </h4>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-[10px] text-muted-smoke uppercase">Primary Vendor</p>
+<p class="text-sm font-medium">L'Artisan Dairy Coop</p>
+</div>
+<div>
+<p class="text-[10px] text-muted-smoke uppercase">Lead Time</p>
+<p class="text-sm font-medium">3-5 Business Days</p>
+</div>
+<div class="col-span-2">
+<p class="text-[10px] text-muted-smoke uppercase">Primary Contact</p>
+<p class="text-sm font-medium">Jean-Luc Moreau (+33 1 23 45 67 89)</p>
+</div>
+</div>
+</div>
+<!-- Restock History -->
+<div class="space-y-4">
+<h4 class="text-[11px] uppercase tracking-widest text-primary font-bold border-b border-primary/10 pb-2 flex items-center gap-2">
+<span class="material-icons text-xs">history</span>
+                                            Restock History
+                                        </h4>
+<div class="space-y-2">
+<div class="flex justify-between items-center text-xs py-1 border-b border-primary/5">
+<span class="text-muted-smoke">Oct 02, 2023</span>
+<span class="font-mono">+25.00 kg</span>
+<span class="text-stone-text/80">€14.50/kg</span>
+</div>
+<div class="flex justify-between items-center text-xs py-1 border-b border-primary/5">
+<span class="text-muted-smoke">Sep 15, 2023</span>
+<span class="font-mono">+25.00 kg</span>
+<span class="text-stone-text/80">€14.20/kg</span>
+</div>
+<div class="flex justify-between items-center text-xs py-1">
+<span class="text-muted-smoke">Aug 28, 2023</span>
+<span class="font-mono">+50.00 kg</span>
+<span class="text-stone-text/80">€13.80/kg</span>
+</div>
+</div>
+</div>
+</div>
+</td>
+</tr>
+<!-- Out of Stock Row -->
+<tr class="border-b-2 border-muted-red bg-muted-red/5 hover:bg-muted-red/10 transition-colors group cursor-pointer">
+<td class="px-6 py-4 font-medium text-stone-text">Madagascar Vanilla Beans (A Grade)</td>
+<td class="px-6 py-4 text-muted-smoke">Flavors</td>
+<td class="px-6 py-4 text-right font-mono text-muted-red">0.00</td>
+<td class="px-6 py-4 text-muted-smoke italic">kg</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded bg-muted-red/20 text-muted-red text-[10px] font-bold uppercase tracking-wider">Out of Stock</span>
+</td>
+<td class="px-6 py-4 text-muted-smoke"><span class="material-icons text-lg group-hover:text-primary transition-colors">more_vert</span></td>
+</tr>
+<!-- More Standard Rows -->
+<tr class="border-b border-primary/5 hover:bg-primary/5 transition-colors group cursor-pointer">
+<td class="px-6 py-4 font-medium text-stone-text">Fleur de Sel de Guérande</td>
+<td class="px-6 py-4 text-muted-smoke">Pantry</td>
+<td class="px-6 py-4 text-right font-mono text-primary">8.45</td>
+<td class="px-6 py-4 text-muted-smoke italic">kg</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded bg-green-900/20 text-green-500 text-[10px] font-bold uppercase tracking-wider">In Stock</span>
+</td>
+<td class="px-6 py-4 text-muted-smoke"><span class="material-icons text-lg group-hover:text-primary transition-colors">more_vert</span></td>
+</tr>
+<tr class="border-b border-primary/5 hover:bg-primary/5 transition-colors group cursor-pointer">
+<td class="px-6 py-4 font-medium text-stone-text">Whole Pasteurized Eggs</td>
+<td class="px-6 py-4 text-muted-smoke">Dairy</td>
+<td class="px-6 py-4 text-right font-mono text-muted-orange">15.00</td>
+<td class="px-6 py-4 text-muted-smoke italic">L</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded bg-muted-orange/20 text-muted-orange text-[10px] font-bold uppercase tracking-wider">Low Stock</span>
+</td>
+<td class="px-6 py-4 text-muted-smoke"><span class="material-icons text-lg group-hover:text-primary transition-colors">more_vert</span></td>
+</tr>
+<tr class="border-b border-primary/5 hover:bg-primary/5 transition-colors group cursor-pointer">
+<td class="px-6 py-4 font-medium text-stone-text">70% Dark Couverture Chocolate</td>
+<td class="px-6 py-4 text-muted-smoke">Flavors</td>
+<td class="px-6 py-4 text-right font-mono text-primary">42.00</td>
+<td class="px-6 py-4 text-muted-smoke italic">kg</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded bg-green-900/20 text-green-500 text-[10px] font-bold uppercase tracking-wider">In Stock</span>
+</td>
+<td class="px-6 py-4 text-muted-smoke"><span class="material-icons text-lg group-hover:text-primary transition-colors">more_vert</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Dashboard Summary Widgets -->
+<div class="grid grid-cols-4 gap-6 mt-8">
+<div class="p-6 bg-background-dark border border-primary/10 rounded-lg">
+<div class="text-[10px] text-muted-smoke uppercase tracking-widest font-bold mb-1">Total SKU Value</div>
+<div class="text-2xl font-light text-primary">€12,450.80</div>
+<div class="mt-2 flex items-center text-[10px] text-green-500 gap-1">
+<span class="material-icons text-xs">trending_up</span>
+                        2.4% vs last month
+                    </div>
+</div>
+<div class="p-6 bg-background-dark border border-primary/10 rounded-lg">
+<div class="text-[10px] text-muted-smoke uppercase tracking-widest font-bold mb-1">Critical Stock Alerts</div>
+<div class="text-2xl font-light text-muted-orange">04</div>
+<div class="mt-2 text-[10px] text-muted-smoke">Requires immediate attention</div>
+</div>
+<div class="p-6 bg-background-dark border border-primary/10 rounded-lg">
+<div class="text-[10px] text-muted-smoke uppercase tracking-widest font-bold mb-1">Incoming Shipments</div>
+<div class="text-2xl font-light text-stone-text">02</div>
+<div class="mt-2 text-[10px] text-muted-smoke">Arriving in next 48 hours</div>
+</div>
+<div class="p-6 bg-background-dark border border-primary/10 rounded-lg">
+<div class="text-[10px] text-muted-smoke uppercase tracking-widest font-bold mb-1">Inventory Turnover</div>
+<div class="text-2xl font-light text-stone-text">4.2<span class="text-xs text-muted-smoke ml-1">x</span></div>
+<div class="mt-2 text-[10px] text-muted-smoke">Monthly average</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Side Actions Panel (Condensed) -->
+<aside class="w-16 border-l border-primary/10 flex flex-col items-center py-8 gap-6 bg-background-dark/30 backdrop-blur-sm">
+<button class="w-10 h-10 rounded flex items-center justify-center text-muted-smoke hover:text-primary hover:bg-primary/10 transition-all" title="Notifications">
+<span class="material-icons">notifications</span>
+<span class="absolute top-8 right-4 w-2 h-2 bg-muted-orange rounded-full border border-background-dark"></span>
+</button>
+<button class="w-10 h-10 rounded flex items-center justify-center text-muted-smoke hover:text-primary hover:bg-primary/10 transition-all" title="Print Inventory">
+<span class="material-icons">print</span>
+</button>
+<button class="w-10 h-10 rounded flex items-center justify-center text-muted-smoke hover:text-primary hover:bg-primary/10 transition-all" title="Export CSV">
+<span class="material-icons">download</span>
+</button>
+<div class="flex-1"></div>
+<button class="w-10 h-10 rounded flex items-center justify-center text-muted-smoke hover:text-primary hover:bg-primary/10 transition-all" title="Help &amp; Support">
+<span class="material-icons">help_outline</span>
+</button>
+<button class="w-10 h-10 rounded flex items-center justify-center text-muted-smoke hover:text-primary hover:bg-primary/10 transition-all" title="Settings">
+<span class="material-icons">settings</span>
+</button>
+</aside>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    ` }} />
+  );
+};
+
+export default Stock_and_Inventory_Management;

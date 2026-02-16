@@ -73,7 +73,7 @@ export function useTerminal() {
   ) => {
     // Check if terminal already exists in database
     const { data: existing } = await untypedFrom('pos_terminals')
-      .select('*')
+      .select('id, device_id, terminal_name, is_hub, location, status, mode, default_printer_id, kitchen_printer_id, kds_station, allowed_payment_methods, default_order_type, floor_plan_id, auto_logout_timeout, created_at, updated_at')
       .eq('device_id', deviceId)
       .maybeSingle();
 
@@ -86,7 +86,7 @@ export function useTerminal() {
           location: location || null,
         })
         .eq('device_id', deviceId)
-        .select()
+        .select('id, device_id, terminal_name, is_hub, location, status, mode, default_printer_id, kitchen_printer_id, kds_station, allowed_payment_methods, default_order_type, floor_plan_id, auto_logout_timeout, created_at, updated_at')
         .single();
 
       if (error) throw error;
@@ -101,7 +101,7 @@ export function useTerminal() {
           location: location || null,
           status: 'active',
         })
-        .select()
+        .select('id, device_id, terminal_name, is_hub, location, status, mode, default_printer_id, kitchen_printer_id, kds_station, allowed_payment_methods, default_order_type, floor_plan_id, auto_logout_timeout, created_at, updated_at')
         .single();
 
       if (error) throw error;
@@ -165,7 +165,7 @@ export function useTerminal() {
 
     try {
       const { data, error } = await untypedFrom('pos_terminals')
-        .select('*')
+        .select('id, device_id, terminal_name, is_hub, location, status, mode, default_printer_id, kitchen_printer_id, kds_station, allowed_payment_methods, default_order_type, floor_plan_id, auto_logout_timeout, created_at, updated_at')
         .eq('device_id', store.deviceId)
         .single();
 

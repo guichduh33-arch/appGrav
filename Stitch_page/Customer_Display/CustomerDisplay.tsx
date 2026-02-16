@@ -1,0 +1,211 @@
+import React from 'react';
+
+const CustomerDisplay: React.FC = () => {
+    return (
+        <div dangerouslySetInnerHTML={{
+            __html: `
+      <!-- STITCH_HTML_START -->
+      <!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Breakery - Customer Display</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#c8a45b",
+            "background-light": "#f8f7f6",
+            "background-dark": "#1e1b14", // Deep Onyx derived
+            "stone-white": "#E5E7EB",
+            "muted-smoke": "#9CA3AF",
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "1rem",
+            "xl": "1.5rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    .order-list-mask {
+      mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-stone-white h-screen w-full flex flex-col font-display">
+<!-- Main Layout Container -->
+<main class="flex flex-1 overflow-hidden">
+<!-- Left Side: Order Summary (60%) -->
+<section class="w-[60%] flex flex-col p-12 relative border-r border-primary/10">
+<!-- Header / Logo -->
+<header class="flex items-center justify-between mb-16">
+<div class="flex flex-col">
+<h1 class="text-3xl font-bold tracking-tight text-primary">THE BREAKERY</h1>
+<p class="text-muted-smoke text-sm uppercase tracking-[0.2em] mt-1">Artisan Boulangerie</p>
+</div>
+<div class="flex items-center gap-3 px-4 py-2 bg-primary/10 rounded-full border border-primary/20">
+<span class="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-xs font-medium text-primary uppercase tracking-wider">Processing Order</span>
+</div>
+</header>
+<!-- Order List Content -->
+<div class="flex-1 overflow-y-auto pr-8 order-list-mask">
+<div class="space-y-8">
+<!-- Item Row (Previous) -->
+<div class="flex items-center justify-between py-2 group">
+<div class="flex items-center gap-6">
+<span class="text-xl font-medium text-muted-smoke w-8">1x</span>
+<div class="flex flex-col">
+<span class="text-2xl font-medium text-stone-white">Pain au Chocolat</span>
+<span class="text-xs text-muted-smoke uppercase tracking-wide mt-1">Standard Size</span>
+</div>
+</div>
+<span class="text-xl tabular-nums text-muted-smoke">Rp 32.000</span>
+</div>
+<!-- Item Row (Previous) -->
+<div class="flex items-center justify-between py-2">
+<div class="flex items-center gap-6">
+<span class="text-xl font-medium text-muted-smoke w-8">2x</span>
+<div class="flex flex-col">
+<span class="text-2xl font-medium text-stone-white">Iced Americano</span>
+<span class="text-xs text-muted-smoke uppercase tracking-wide mt-1">Arabica Blend • Large</span>
+</div>
+</div>
+<span class="text-xl tabular-nums text-muted-smoke">Rp 56.000</span>
+</div>
+<!-- Item Row (Most Recent / Highlighted) -->
+<div class="flex items-center justify-between py-6 px-6 bg-primary/5 rounded-xl border-l-4 border-primary shadow-2xl">
+<div class="flex items-center gap-6">
+<span class="text-2xl font-bold text-primary w-8">1x</span>
+<div class="flex flex-col">
+<span class="text-3xl font-bold text-stone-white">Sourdough Croissant</span>
+<span class="text-sm text-primary/80 uppercase tracking-widest mt-1 font-semibold">Just Added</span>
+</div>
+</div>
+<span class="text-2xl font-bold tabular-nums text-stone-white">Rp 22.000</span>
+</div>
+<!-- Item Row (Previous) -->
+<div class="flex items-center justify-between py-2 opacity-50">
+<div class="flex items-center gap-6">
+<span class="text-xl font-medium text-muted-smoke w-8">1x</span>
+<div class="flex flex-col">
+<span class="text-2xl font-medium text-stone-white">Almond Danish</span>
+<span class="text-xs text-muted-smoke uppercase tracking-wide mt-1">Extra Glaze</span>
+</div>
+</div>
+<span class="text-xl tabular-nums text-muted-smoke">Rp 28.000</span>
+</div>
+</div>
+</div>
+<!-- Footer Total Bar -->
+<footer class="mt-auto pt-12 border-t border-primary/20">
+<div class="flex items-end justify-between">
+<div class="flex flex-col">
+<span class="text-muted-smoke uppercase tracking-widest text-sm font-semibold mb-2">Grand Total</span>
+<div class="flex items-baseline gap-4">
+<span class="text-6xl font-bold tabular-nums text-primary">Rp 138.000</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-muted-smoke text-sm mb-2 italic">Taxes &amp; Service Included</span>
+<div class="flex gap-2">
+<div class="w-10 h-6 bg-stone-white/10 rounded flex items-center justify-center">
+<i class="material-icons text-xs text-muted-smoke">credit_card</i>
+</div>
+<div class="w-10 h-6 bg-stone-white/10 rounded flex items-center justify-center">
+<i class="material-icons text-xs text-muted-smoke">qr_code_2</i>
+</div>
+</div>
+</div>
+</div>
+</footer>
+</section>
+<!-- Right Side: Visuals (40%) -->
+<section class="w-[40%] bg-black relative overflow-hidden">
+<!-- Background Image Overlay for Texture -->
+<div class="absolute inset-0 z-0 opacity-40">
+<img alt="Freshly baked pastries on a rustic wooden table" class="w-full h-full object-cover" data-alt="Close up shot of golden flaky croissants on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBW_58fpgvAg00BEVmxohwECNNMCyS2ftlHWjipbq-CKNbbVEJ3iIQXuBhO5sQxzrnXYV0Tu8JZz-p0po6ePVEGh-k1z7SLDiGJmP3C82JmpvBoj3TGfpblct0EuyFNLD2FDK2YwN_kkUxSI8LVlM_3-ZGVChW8vIc9lWNSqfUZg2kZs28IDyTOE_pwzd-YZ40AivPMR9WUJtKqQsBGwfUoVM4ox21ezF6Q4UX6UrlyYGnBO7znV4nhEtcJtry_y15-8jzCy8gXr0"/>
+</div>
+<!-- Gradient Overlays for Depth -->
+<div class="absolute inset-0 z-10 bg-gradient-to-t from-background-dark via-transparent to-background-dark/20"></div>
+<div class="absolute inset-0 z-10 bg-gradient-to-r from-background-dark to-transparent"></div>
+<!-- Product Showcase Content -->
+<div class="relative z-20 h-full flex flex-col justify-end p-16">
+<div class="space-y-6">
+<div class="inline-block px-4 py-1.5 bg-primary rounded-full">
+<span class="text-xs font-bold text-background-dark uppercase tracking-widest">Recommended Pairing</span>
+</div>
+<div class="space-y-2">
+<h2 class="text-5xl font-bold text-stone-white leading-tight">Freshly Baked Sourdough Croissant</h2>
+<p class="text-xl text-muted-smoke max-w-sm leading-relaxed">
+              Crafted with premium French butter and our 48-hour fermented natural sourdough starter.
+            </p>
+</div>
+<div class="flex items-center gap-4 pt-4">
+<div class="flex -space-x-3">
+<div class="w-12 h-12 rounded-full border-2 border-background-dark overflow-hidden bg-primary/20 flex items-center justify-center">
+<i class="material-symbols-outlined text-primary">stars</i>
+</div>
+<div class="w-12 h-12 rounded-full border-2 border-background-dark overflow-hidden bg-primary/20 flex items-center justify-center">
+<i class="material-symbols-outlined text-primary">eco</i>
+</div>
+</div>
+<span class="text-sm font-medium text-stone-white/80 uppercase tracking-widest">Award Winning • Organic Ingredients</span>
+</div>
+</div>
+</div>
+<!-- Floating Price Tag on Image -->
+<div class="absolute top-12 right-12 z-30">
+<div class="bg-background-dark/80 backdrop-blur-md border border-primary/30 p-6 rounded-2xl flex flex-col items-center">
+<span class="text-primary text-xs font-bold uppercase tracking-widest mb-1">Price</span>
+<span class="text-3xl font-bold text-stone-white tabular-nums">Rp 22.000</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Interactive Status Bar -->
+<aside class="h-16 bg-primary flex items-center justify-between px-12 z-40">
+<div class="flex items-center gap-4">
+<i class="material-icons text-background-dark">loyalty</i>
+<span class="text-background-dark font-bold uppercase tracking-[0.15em] text-sm">Member: JONATHAN K. (840 Points)</span>
+</div>
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<i class="material-icons text-background-dark/60 text-sm">schedule</i>
+<span class="text-background-dark font-bold text-sm">Est. Wait: 8-10 Mins</span>
+</div>
+<div class="h-6 w-[1px] bg-background-dark/20"></div>
+<div class="flex items-center gap-2">
+<i class="material-icons text-background-dark">shopping_bag</i>
+<span class="text-background-dark font-black text-sm uppercase">Total Items: 5</span>
+</div>
+</div>
+</aside>
+</body></html>
+      <!-- STITCH_HTML_END -->
+    ` }} />
+    );
+};
+
+export default CustomerDisplay;

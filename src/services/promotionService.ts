@@ -94,7 +94,14 @@ export async function getApplicablePromotions(
         // Fetch all active promotions
         const { data: promotions, error } = await supabase
             .from('promotions')
-            .select('*')
+            .select(`
+                id, code, name, description, promotion_type, is_active, is_stackable, 
+                priority, min_purchase_amount, min_quantity, discount_percentage, 
+                discount_amount, buy_quantity, get_quantity, max_uses_total, 
+                max_uses_per_customer, current_uses, start_date, end_date, 
+                start_time, end_time, time_start, time_end, days_of_week, 
+                active_days, created_at, updated_at
+            `)
             .eq('is_active', true)
             .order('priority', { ascending: false })
 
@@ -116,7 +123,7 @@ export async function getApplicablePromotions(
             // Check if promotion applies to any cart items
             const { data: promotionProducts } = await supabase
                 .from('promotion_products')
-                .select('*')
+                .select('id, promotion_id, product_id, category_id, created_at')
                 .eq('promotion_id', promotion.id)
 
             // If no specific products/categories, promotion applies to all
@@ -158,7 +165,7 @@ export async function calculatePromotionDiscount(
         // Get promotion products
         const { data: promotionProducts } = await supabase
             .from('promotion_products')
-            .select('*')
+            .select('id, promotion_id, product_id, category_id, created_at')
             .eq('promotion_id', promotion.id)
 
         // Filter applicable items
@@ -347,7 +354,14 @@ export async function validatePromotionCode(
     try {
         const { data: promotion, error } = await supabase
             .from('promotions')
-            .select('*')
+            .select(`
+                id, code, name, description, promotion_type, is_active, is_stackable, 
+                priority, min_purchase_amount, min_quantity, discount_percentage, 
+                discount_amount, buy_quantity, get_quantity, max_uses_total, 
+                max_uses_per_customer, current_uses, start_date, end_date, 
+                start_time, end_time, time_start, time_end, days_of_week, 
+                active_days, created_at, updated_at
+            `)
             .eq('code', code.toUpperCase())
             .single()
 

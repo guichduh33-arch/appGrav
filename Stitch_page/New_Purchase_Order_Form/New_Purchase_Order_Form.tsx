@@ -2,7 +2,7 @@ import React from 'react';
 
 const New_Purchase_Order_Form: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -145,8 +145,8 @@ const New_Purchase_Order_Form: React.FC = () => {
 <input class="w-16 bg-background-dark border border-slate-700 rounded text-center py-1 text-sm" type="number" value="25"/>
 </td>
 <td class="px-4 py-4 text-sm text-slate-400">Bag (1kg)</td>
-<td class="px-4 py-4 font-mono text-sm">$ 2.40</td>
-<td class="px-6 py-4 text-right font-mono font-bold">$ 60.00</td>
+<td class="px-4 py-4 font-mono text-sm">\\$ 2.40</td>
+<td class="px-6 py-4 text-right font-mono font-bold">\\$ 60.00</td>
 </tr>
 <!-- Row 2 -->
 <tr class="hover:bg-primary/5 transition-colors group">
@@ -159,8 +159,8 @@ const New_Purchase_Order_Form: React.FC = () => {
 <input class="w-16 bg-background-dark border border-slate-700 rounded text-center py-1 text-sm" type="number" value="10"/>
 </td>
 <td class="px-4 py-4 text-sm text-slate-400">Block (1kg)</td>
-<td class="px-4 py-4 font-mono text-sm">$ 12.50</td>
-<td class="px-6 py-4 text-right font-mono font-bold">$ 125.00</td>
+<td class="px-4 py-4 font-mono text-sm">\\$ 12.50</td>
+<td class="px-6 py-4 text-right font-mono font-bold">\\$ 125.00</td>
 </tr>
 </tbody>
 </table>
@@ -181,15 +181,15 @@ const New_Purchase_Order_Form: React.FC = () => {
 <div class="space-y-4 mb-8">
 <div class="flex justify-between text-sm">
 <span class="text-slate-500">Subtotal</span>
-<span class="font-mono">$ 185.00</span>
+<span class="font-mono">\\$ 185.00</span>
 </div>
 <div class="flex justify-between text-sm">
 <span class="text-slate-500">PPN (10%)</span>
-<span class="font-mono">$ 18.50</span>
+<span class="font-mono">\\$ 18.50</span>
 </div>
 <div class="pt-4 border-t border-slate-800 flex justify-between items-baseline">
 <span class="text-base font-bold text-slate-200">Grand Total</span>
-<span class="text-3xl font-mono text-primary font-bold">$ 203.50</span>
+<span class="text-3xl font-mono text-primary font-bold">\\$ 203.50</span>
 </div>
 </div>
 <div class="bg-primary/5 rounded-lg p-4 border border-primary/10">
@@ -208,7 +208,7 @@ const New_Purchase_Order_Form: React.FC = () => {
 <div class="mt-6 space-y-4">
 <div class="flex items-center space-x-3 text-xs text-slate-400">
 <span class="material-icons text-sm text-slate-600">verified_user</span>
-<span>Auto-approval active for POs under $500</span>
+<span>Auto-approval active for POs under \\$500</span>
 </div>
 <div class="flex items-center space-x-3 text-xs text-slate-400">
 <span class="material-icons text-sm text-slate-600">visibility</span>
@@ -245,7 +245,7 @@ const New_Purchase_Order_Form: React.FC = () => {
 </footer>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

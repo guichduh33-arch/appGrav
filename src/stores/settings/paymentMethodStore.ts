@@ -20,7 +20,10 @@ export const usePaymentMethodStore = create<PaymentMethodState>()((set, get) => 
   loadPaymentMethods: async () => {
     const { data, error } = await supabase
       .from('payment_methods')
-      .select('*')
+      .select(`
+        id, code, created_at, icon, is_active, is_default, name, name_en, name_fr, 
+        name_id, payment_type, requires_reference, settings, sort_order, type, updated_at
+      `)
       .order('sort_order');
 
     if (error) throw error;
@@ -40,7 +43,10 @@ export const usePaymentMethodStore = create<PaymentMethodState>()((set, get) => 
       const { data, error } = await supabase
         .from('payment_methods')
         .insert(method)
-        .select()
+        .select(`
+          id, code, created_at, icon, is_active, is_default, name, name_en, name_fr, 
+          name_id, payment_type, requires_reference, settings, sort_order, type, updated_at
+        `)
         .single();
 
       if (error) throw error;

@@ -2,7 +2,7 @@ import React from 'react';
 
 const Main_Settings: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -292,7 +292,7 @@ const Main_Settings: React.FC = () => {
 <div class="fixed bottom-0 left-[260px] -z-10 w-[400px] h-[400px] bg-primary/5 blur-[100px] rounded-full pointer-events-none"></div>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

@@ -238,6 +238,13 @@ export type PermissionCode =
   | 'accounting.journal.create'
   | 'accounting.journal.update'
   | 'accounting.vat.manage'
+  // Expenses
+  | 'expenses.view'
+  | 'expenses.create'
+  | 'expenses.update'
+  | 'expenses.delete'
+  | 'expenses.approve'
+  | 'expenses.categories'
   // Settings
   | 'settings.view'
   | 'settings.update'

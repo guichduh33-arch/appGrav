@@ -2,7 +2,7 @@ import React from 'react';
 
 const Pricing_Matrix: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -149,23 +149,23 @@ const Pricing_Matrix: React.FC = () => {
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-primary font-bold relative flex items-center justify-between">
-                                    $4.50
+                                    \\$4.50
                                     <div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
 </div>
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-taupe">
-                                    $3.15
+                                    \\$3.15
                                 </div>
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-taupe">
-                                    $4.05
+                                    \\$4.05
                                 </div>
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-primary font-bold relative flex items-center justify-between">
-                                    $2.80
+                                    \\$2.80
                                     <div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
 </div>
 </td>
@@ -179,24 +179,24 @@ const Pricing_Matrix: React.FC = () => {
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-primary font-bold relative flex items-center justify-between">
-                                    $5.25
+                                    \\$5.25
                                     <div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
 </div>
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-taupe">
-                                    $3.68
+                                    \\$3.68
                                 </div>
 </td>
 <td class="p-0 border-r border-primary/5 border-2 border-primary">
 <div class="p-6 font-mono text-primary font-bold bg-primary/10 h-full flex items-center justify-between">
-                                    $4.75
+                                    \\$4.75
                                     <div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
 </div>
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-taupe">
-                                    $3.50
+                                    \\$3.50
                                 </div>
 </td>
 </tr>
@@ -218,23 +218,23 @@ const Pricing_Matrix: React.FC = () => {
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-primary font-bold relative flex items-center justify-between">
-                                    $8.00
+                                    \\$8.00
                                     <div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
 </div>
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-taupe">
-                                    $5.60
+                                    \\$5.60
                                 </div>
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-taupe">
-                                    $7.20
+                                    \\$7.20
                                 </div>
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-taupe">
-                                    $5.00
+                                    \\$5.00
                                 </div>
 </td>
 </tr>
@@ -247,24 +247,24 @@ const Pricing_Matrix: React.FC = () => {
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-primary font-bold relative flex items-center justify-between">
-                                    $7.50
+                                    \\$7.50
                                     <div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
 </div>
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-primary font-bold flex items-center justify-between">
-                                    $4.80
+                                    \\$4.80
                                     <div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
 </div>
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-taupe">
-                                    $6.75
+                                    \\$6.75
                                 </div>
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-taupe">
-                                    $4.70
+                                    \\$4.70
                                 </div>
 </td>
 </tr>
@@ -286,23 +286,23 @@ const Pricing_Matrix: React.FC = () => {
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-primary font-bold relative flex items-center justify-between">
-                                    $65.00
+                                    \\$65.00
                                     <div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
 </div>
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-taupe">
-                                    $45.50
+                                    \\$45.50
                                 </div>
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-taupe">
-                                    $58.50
+                                    \\$58.50
                                 </div>
 </td>
 <td class="p-0 border-r border-primary/5">
 <div class="p-6 font-mono text-primary font-bold flex items-center justify-between">
-                                    $40.00
+                                    \\$40.00
                                     <div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
 </div>
 </td>
@@ -334,7 +334,7 @@ const Pricing_Matrix: React.FC = () => {
 </footer>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

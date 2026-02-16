@@ -47,7 +47,7 @@ export function useOrders() {
             const { data: order, error: orderError } = await supabase
                 .from('orders')
                 .insert(orderData as Insertable<'orders'>)
-                .select()
+                .select('id')
                 .single()
 
             if (orderError) {

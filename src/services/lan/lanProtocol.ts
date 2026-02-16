@@ -318,7 +318,8 @@ export async function getHubConnectionInfo(): Promise<IHubConnectionInfo> {
 export async function getNodesByType(deviceType: TSyncDeviceType): Promise<ILanNode[]> {
   try {
     const { data, error } = await untypedFrom('lan_nodes')
-      .select('*')
+      .select('id, device_id, device_name, device_type, ip_address, port, status, is_hub, capabilities, last_heartbeat, created_at, updated_at')
+
       .eq('device_type', deviceType)
       .eq('status', 'online')
       .order('last_heartbeat', { ascending: false });

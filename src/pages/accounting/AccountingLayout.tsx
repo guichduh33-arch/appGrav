@@ -5,7 +5,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import {
   BookOpen, FileText, ScrollText, Scale,
-  BarChart3, Receipt, Calendar,
+  BarChart3, Receipt, Calendar, Clock,
 } from 'lucide-react'
 
 const navItems = [
@@ -16,6 +16,7 @@ const navItems = [
   { to: '/accounting/balance-sheet', label: 'Balance Sheet', icon: BarChart3 },
   { to: '/accounting/income-statement', label: 'Income Statement', icon: Receipt },
   { to: '/accounting/vat', label: 'VAT Management', icon: Calendar },
+  { to: '/accounting/ar-aging', label: 'AR & Aging', icon: Clock },
 ]
 
 export default function AccountingLayout() {

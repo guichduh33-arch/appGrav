@@ -63,70 +63,145 @@
 
 ## Edge Functions (supabase/functions/)
 
-### Authentification
+> **Total: 14 Edge Functions** | Deployed on Supabase project `ekkrzngauxqruvhhstjw`
+
+### Authentification (7 functions)
+
+#### create-admin-user
+```
+POST /functions/v1/create-admin-user
+JWT Required: No
+Body: { email, password, user_profile_id }
+Response: { success, user_id, message }
+Description: Creates Supabase Auth user and links to existing user_profile
+```
+
+#### set-user-pin
+```
+POST /functions/v1/set-user-pin
+JWT Required: No
+Body: { user_profile_id, pin }
+Response: { success, message }
+Description: Sets PIN (4-6 digits) with bcrypt hash for offline auth
+```
 
 #### auth-verify-pin
 ```
 POST /functions/v1/auth-verify-pin
+JWT Required: No
 Body: { user_id, pin, device_type, device_name }
 Response: { success, user, session, roles, permissions }
+Description: Validates PIN and creates session with user data
 ```
 
 #### auth-logout
 ```
 POST /functions/v1/auth-logout
+JWT Required: Yes
 Body: { session_id, user_id, reason }
+Response: { success }
+Description: Terminates user session and logs logout event
 ```
 
 #### auth-change-pin
 ```
 POST /functions/v1/auth-change-pin
+JWT Required: Yes
 Body: { user_id, current_pin?, new_pin, admin_override? }
+Response: { success }
+Description: Changes user PIN (requires current or admin override)
 ```
 
 #### auth-get-session
 ```
 POST /functions/v1/auth-get-session
+JWT Required: No
 Body: { session_token }
 Response: { user, permissions, roles }
+Description: Validates session and returns user context
 ```
 
 #### auth-user-management
 ```
 POST /functions/v1/auth-user-management
+JWT Required: Yes
+Body: { action, user_id?, data? }
 Actions: create, update, delete, toggle_active
+Description: Full CRUD for user management (admin only)
 ```
 
-### Rapports
+### Rapports (2 functions)
 
 #### generate-invoice
 ```
 POST /functions/v1/generate-invoice
+JWT Required: Yes
 Body: { order_id }
-Response: text/html (facture B2B)
+Response: text/html (B2B invoice)
+Description: Generates printable HTML invoice for B2B orders
 ```
 
 #### calculate-daily-report
 ```
 POST /functions/v1/calculate-daily-report
+JWT Required: Yes
 Body: { date? }
 Response: { summary, payment_breakdown, category_performance, top_products }
+Description: Aggregates daily sales data for dashboard
 ```
 
-### Impression
+### Impression (1 function)
 
 #### send-to-printer
 ```
 POST /functions/v1/send-to-printer
+JWT Required: Yes
 Body: { type: receipt|kitchen|label, printer?, data }
+Response: { success, job_id? }
+Description: Sends print job to configured thermal printer
 ```
 
-### Achats
+### Inventaire (1 function)
+
+#### intersection_stock_movements
+```
+POST /functions/v1/intersection_stock_movements
+JWT Required: Yes
+Body: { product_id, movement_type, quantity, ... }
+Response: { success, movement_id }
+Description: Creates stock movements with validation
+```
+
+### Achats (1 function)
 
 #### purchase_order_module
 ```
 POST /functions/v1/purchase_order_module?resource=suppliers|orders
+JWT Required: Yes
 Methods: GET, POST, PATCH
+Description: RESTful API for purchase orders and suppliers
+```
+
+### AI Integration (1 function)
+
+#### claude-proxy
+```
+POST /functions/v1/claude-proxy
+JWT Required: Yes
+Body: { prompt, model?, max_tokens? }
+Response: { response, usage }
+Description: Proxies requests to Claude API (secure key management)
+```
+
+### Email (1 function)
+
+#### send-test-email
+```
+POST /functions/v1/send-test-email
+JWT Required: Yes
+Body: { to, subject, body }
+Response: { success }
+Description: Sends test email via configured SMTP/Resend
 ```
 
 ## Hooks React Personnalisés

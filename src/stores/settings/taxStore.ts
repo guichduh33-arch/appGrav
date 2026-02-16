@@ -20,7 +20,10 @@ export const useTaxStore = create<TaxState>()((set, get) => ({
   loadTaxRates: async () => {
     const { data, error } = await supabase
       .from('tax_rates')
-      .select('*')
+      .select(`
+        id, applies_to, code, created_at, is_active, is_default, is_inclusive, 
+        name, name_en, name_fr, name_id, rate, updated_at, valid_from, valid_until
+      `)
       .order('rate');
 
     if (error) throw error;
@@ -40,7 +43,10 @@ export const useTaxStore = create<TaxState>()((set, get) => ({
       const { data, error } = await supabase
         .from('tax_rates')
         .insert(taxRate)
-        .select()
+        .select(`
+          id, applies_to, code, created_at, is_active, is_default, is_inclusive, 
+          name, name_en, name_fr, name_id, rate, updated_at, valid_from, valid_until
+        `)
         .single();
 
       if (error) throw error;

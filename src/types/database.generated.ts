@@ -1361,6 +1361,184 @@ export type Database = {
         }
         Relationships: []
       }
+      expense_categories: {
+        Row: {
+          account_id: string | null
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          parent_id: string | null
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string | null
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          parent_id?: string | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string | null
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          parent_id?: string | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expense_categories_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expense_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "expense_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expenses: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          category_id: string
+          created_at: string
+          created_by: string
+          description: string
+          expense_date: string
+          expense_number: string
+          id: string
+          journal_entry_id: string | null
+          notes: string | null
+          payment_method: string
+          receipt_url: string | null
+          rejected_reason: string | null
+          status: Database["public"]["Enums"]["expense_status"]
+          supplier_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          category_id: string
+          created_at?: string
+          created_by: string
+          description: string
+          expense_date: string
+          expense_number: string
+          id?: string
+          journal_entry_id?: string | null
+          notes?: string | null
+          payment_method: string
+          receipt_url?: string | null
+          rejected_reason?: string | null
+          status?: Database["public"]["Enums"]["expense_status"]
+          supplier_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          category_id?: string
+          created_at?: string
+          created_by?: string
+          description?: string
+          expense_date?: string
+          expense_number?: string
+          id?: string
+          journal_entry_id?: string | null
+          notes?: string | null
+          payment_method?: string
+          receipt_url?: string | null
+          rejected_reason?: string | null
+          status?: Database["public"]["Enums"]["expense_status"]
+          supplier_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "view_staff_performance"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "expenses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "expense_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "view_staff_performance"
+            referencedColumns: ["staff_id"]
+          },
+          {
+            foreignKeyName: "expenses_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fiscal_periods: {
         Row: {
           created_at: string
@@ -1909,12 +2087,14 @@ export type Database = {
       }
       journal_entries: {
         Row: {
+          attachment_url: string | null
           created_at: string
           created_by: string | null
           description: string
           entry_date: string
           entry_number: string
           id: string
+          memo: string | null
           reference_id: string | null
           reference_type: Database["public"]["Enums"]["journal_reference_type"]
           source: string | null
@@ -1924,12 +2104,14 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          attachment_url?: string | null
           created_at?: string
           created_by?: string | null
           description: string
           entry_date?: string
           entry_number: string
           id?: string
+          memo?: string | null
           reference_id?: string | null
           reference_type?: Database["public"]["Enums"]["journal_reference_type"]
           source?: string | null
@@ -1939,12 +2121,14 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          attachment_url?: string | null
           created_at?: string
           created_by?: string | null
           description?: string
           entry_date?: string
           entry_number?: string
           id?: string
+          memo?: string | null
           reference_id?: string | null
           reference_type?: Database["public"]["Enums"]["journal_reference_type"]
           source?: string | null
@@ -4816,7 +5000,7 @@ export type Database = {
           retail_price: number | null
           section_id: string | null
           sku: string
-          track_inventory: boolean | null
+          track_inventory: boolean
           unit: string | null
           updated_at: string | null
           wholesale_price: number | null
@@ -4841,7 +5025,7 @@ export type Database = {
           retail_price?: number | null
           section_id?: string | null
           sku: string
-          track_inventory?: boolean | null
+          track_inventory?: boolean
           unit?: string | null
           updated_at?: string | null
           wholesale_price?: number | null
@@ -4866,7 +5050,7 @@ export type Database = {
           retail_price?: number | null
           section_id?: string | null
           sku?: string
-          track_inventory?: boolean | null
+          track_inventory?: boolean
           unit?: string | null
           updated_at?: string | null
           wholesale_price?: number | null
@@ -7840,7 +8024,6 @@ export type Database = {
           card_sales: number | null
           cash_sales: number | null
           completed_orders: number | null
-          completion_rate: number | null
           edc_sales: number | null
           items_sold: number | null
           qris_sales: number | null
@@ -8375,6 +8558,7 @@ export type Database = {
         }
         Returns: {
           avg_basket: number
+          items_sold: number
           net_revenue: number
           period_label: string
           total_revenue: number
@@ -8477,6 +8661,16 @@ export type Database = {
           source: string
         }[]
       }
+      get_vat_by_category: {
+        Args: { p_month: number; p_year: number }
+        Returns: {
+          category_name: string
+          items_sold: number
+          order_count: number
+          total_sales: number
+          vat_collected: number
+        }[]
+      }
       is_admin: { Args: { p_user_id: string }; Returns: boolean }
       mobile_verify_pin: {
         Args: { p_pin: string }
@@ -8487,6 +8681,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      next_expense_number: { Args: never; Returns: string }
       next_journal_entry_number: {
         Args: { p_prefix?: string }
         Returns: string
@@ -8572,6 +8767,7 @@ export type Database = {
       customer_type: "retail" | "wholesale"
       discount_type: "percentage" | "fixed" | "free"
       dispatch_station: "barista" | "kitchen" | "display" | "none"
+      expense_status: "pending" | "approved" | "rejected"
       expense_type: "cogs" | "general"
       fiscal_period_status: "open" | "closed" | "locked"
       item_status: "new" | "preparing" | "ready" | "served"
@@ -8582,6 +8778,7 @@ export type Database = {
         | "void"
         | "refund"
         | "adjustment"
+        | "expense"
       journal_status: "draft" | "posted" | "locked"
       lan_node_status: "online" | "offline" | "connecting"
       location_type: "main_warehouse" | "section" | "kitchen" | "storage"
@@ -8604,6 +8801,7 @@ export type Database = {
         | "preparing"
         | "ready"
         | "served"
+        | "dispatched"
         | "completed"
         | "cancelled"
         | "voided"
@@ -8613,7 +8811,7 @@ export type Database = {
       payment_terms: "cod" | "net15" | "net30" | "net60"
       po_status: "draft" | "sent" | "partial" | "received" | "cancelled"
       product_type: "finished" | "semi_finished" | "raw_material"
-      session_status: "open" | "closed"
+      session_status: "open" | "recounting" | "closed"
       sync_device_type: "pos" | "kds" | "display" | "mobile"
       transfer_status:
         | "draft"
@@ -8771,6 +8969,7 @@ export const Constants = {
       customer_type: ["retail", "wholesale"],
       discount_type: ["percentage", "fixed", "free"],
       dispatch_station: ["barista", "kitchen", "display", "none"],
+      expense_status: ["pending", "approved", "rejected"],
       expense_type: ["cogs", "general"],
       fiscal_period_status: ["open", "closed", "locked"],
       item_status: ["new", "preparing", "ready", "served"],
@@ -8781,6 +8980,7 @@ export const Constants = {
         "void",
         "refund",
         "adjustment",
+        "expense",
       ],
       journal_status: ["draft", "posted", "locked"],
       lan_node_status: ["online", "offline", "connecting"],
@@ -8805,6 +9005,7 @@ export const Constants = {
         "preparing",
         "ready",
         "served",
+        "dispatched",
         "completed",
         "cancelled",
         "voided",
@@ -8815,7 +9016,7 @@ export const Constants = {
       payment_terms: ["cod", "net15", "net30", "net60"],
       po_status: ["draft", "sent", "partial", "received", "cancelled"],
       product_type: ["finished", "semi_finished", "raw_material"],
-      session_status: ["open", "closed"],
+      session_status: ["open", "recounting", "closed"],
       sync_device_type: ["pos", "kds", "display", "mobile"],
       transfer_status: [
         "draft",

@@ -45,7 +45,8 @@ export async function getSystemAlerts(options?: {
 }): Promise<ISystemAlert[]> {
     let query = supabase
         .from('system_alerts')
-        .select('*')
+        .select('id, alert_type, severity, title, description, reference_type, reference_id, is_read, is_resolved, resolved_by, resolved_at, resolution_notes, created_at')
+
         .order('created_at', { ascending: false })
 
     if (options?.unreadOnly) {

@@ -2,7 +2,7 @@ import React from 'react';
 
 const Wholesale_Management_Overview: React.FC = () => {
   return (
-    <div dangerouslySetInnerHTML={{ __html: \
+    <div dangerouslySetInnerHTML={{ __html: `
       <!-- STITCH_HTML_START -->
       <!DOCTYPE html>
 
@@ -168,7 +168,7 @@ const Wholesale_Management_Overview: React.FC = () => {
 </div>
 <p class="text-sm text-slate-400 font-medium mb-2">Total Receivables (AR)</p>
 <div class="flex items-end gap-2">
-<span class="text-3xl font-bold">$124,500.00</span>
+<span class="text-3xl font-bold">\\$124,500.00</span>
 </div>
 </div>
 <!-- KPI 3 -->
@@ -178,7 +178,7 @@ const Wholesale_Management_Overview: React.FC = () => {
 </div>
 <p class="text-sm text-slate-400 font-medium mb-2">Overdue (30+ days)</p>
 <div class="flex items-end gap-2">
-<span class="text-3xl font-bold text-amber-500">$18,200.00</span>
+<span class="text-3xl font-bold text-amber-500">\\$18,200.00</span>
 <span class="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 uppercase font-bold mb-2">Critical</span>
 </div>
 </div>
@@ -219,8 +219,8 @@ const Wholesale_Management_Overview: React.FC = () => {
 <td class="px-5 py-4">
 <span class="px-2 py-1 rounded bg-primary/10 text-primary text-[10px] uppercase font-bold tracking-wider border border-primary/20">Standing Order</span>
 </td>
-<td class="px-5 py-4 text-slate-300">$25,000</td>
-<td class="px-5 py-4 text-slate-100 font-semibold">$12,420</td>
+<td class="px-5 py-4 text-slate-300">\\$25,000</td>
+<td class="px-5 py-4 text-slate-100 font-semibold">\\$12,420</td>
 <td class="px-5 py-4"><span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-2"></span>Active</td>
 </tr>
 <tr class="hover:bg-white/[0.02] transition-colors">
@@ -228,8 +228,8 @@ const Wholesale_Management_Overview: React.FC = () => {
 <td class="px-5 py-4">
 <span class="px-2 py-1 rounded bg-slate-800 text-slate-400 text-[10px] uppercase font-bold tracking-wider border border-white/10">On-Demand</span>
 </td>
-<td class="px-5 py-4 text-slate-300">$10,000</td>
-<td class="px-5 py-4 text-amber-500 font-semibold">$8,900</td>
+<td class="px-5 py-4 text-slate-300">\\$10,000</td>
+<td class="px-5 py-4 text-amber-500 font-semibold">\\$8,900</td>
 <td class="px-5 py-4"><span class="w-2 h-2 rounded-full bg-amber-500 inline-block mr-2"></span>Review</td>
 </tr>
 <tr class="hover:bg-white/[0.02] transition-colors">
@@ -237,8 +237,8 @@ const Wholesale_Management_Overview: React.FC = () => {
 <td class="px-5 py-4">
 <span class="px-2 py-1 rounded bg-primary/10 text-primary text-[10px] uppercase font-bold tracking-wider border border-primary/20">Standing Order</span>
 </td>
-<td class="px-5 py-4 text-slate-300">$50,000</td>
-<td class="px-5 py-4 text-slate-100 font-semibold">$21,050</td>
+<td class="px-5 py-4 text-slate-300">\\$50,000</td>
+<td class="px-5 py-4 text-slate-100 font-semibold">\\$21,050</td>
 <td class="px-5 py-4"><span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-2"></span>Active</td>
 </tr>
 <tr class="hover:bg-white/[0.02] transition-colors">
@@ -246,8 +246,8 @@ const Wholesale_Management_Overview: React.FC = () => {
 <td class="px-5 py-4">
 <span class="px-2 py-1 rounded bg-slate-800 text-slate-400 text-[10px] uppercase font-bold tracking-wider border border-white/10">On-Demand</span>
 </td>
-<td class="px-5 py-4 text-slate-300">$5,000</td>
-<td class="px-5 py-4 text-slate-100 font-semibold">$1,200</td>
+<td class="px-5 py-4 text-slate-300">\\$5,000</td>
+<td class="px-5 py-4 text-slate-100 font-semibold">\\$1,200</td>
 <td class="px-5 py-4"><span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-2"></span>Active</td>
 </tr>
 <tr class="hover:bg-white/[0.02] transition-colors">
@@ -255,8 +255,8 @@ const Wholesale_Management_Overview: React.FC = () => {
 <td class="px-5 py-4">
 <span class="px-2 py-1 rounded bg-primary/10 text-primary text-[10px] uppercase font-bold tracking-wider border border-primary/20">Standing Order</span>
 </td>
-<td class="px-5 py-4 text-slate-300">$15,000</td>
-<td class="px-5 py-4 text-red-400 font-semibold">$14,800</td>
+<td class="px-5 py-4 text-slate-300">\\$15,000</td>
+<td class="px-5 py-4 text-red-400 font-semibold">\\$14,800</td>
 <td class="px-5 py-4"><span class="w-2 h-2 rounded-full bg-red-500 inline-block mr-2"></span>On Hold</td>
 </tr>
 </tbody>
@@ -464,7 +464,7 @@ const Wholesale_Management_Overview: React.FC = () => {
 </aside>
 </body></html>
       <!-- STITCH_HTML_END -->
-    \ }} />
+    ` }} />
   );
 };
 

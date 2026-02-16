@@ -19,6 +19,7 @@ import LoginPage from './pages/auth/LoginPage'
 import POSMainPage from './pages/pos/POSMainPage'
 
 // Auth pages (lazy)
+const EmailLoginPage = lazy(() => import('./pages/auth/EmailLoginPage'))
 const PasswordResetPage = lazy(() => import('./pages/auth/PasswordResetPage'))
 import { logWarn } from '@/utils/logger'
 
@@ -126,6 +127,13 @@ const CustomerFormPage = lazy(() => import('./pages/customers/CustomerFormPage')
 const CustomerDetailPage = lazy(() => import('./pages/customers/CustomerDetailPage'))
 const CustomerCategoriesPage = lazy(() => import('./pages/customers/CustomerCategoriesPage'))
 
+// Expenses Module
+const ExpensesLayout = lazy(() => import('./pages/expenses/ExpensesLayout'))
+const ExpensesListPage = lazy(() => import('./pages/expenses/ExpensesListPage'))
+const ExpenseFormPage = lazy(() => import('./pages/expenses/ExpenseFormPage'))
+const ExpenseDetailPage = lazy(() => import('./pages/expenses/ExpenseDetailPage'))
+const ExpenseCategoriesPage = lazy(() => import('./pages/expenses/ExpenseCategoriesPage'))
+
 // Accounting Module
 const AccountingLayout = lazy(() => import('./pages/accounting/AccountingLayout'))
 const ChartOfAccountsPage = lazy(() => import('./pages/accounting/ChartOfAccountsPage'))
@@ -135,6 +143,7 @@ const TrialBalancePage = lazy(() => import('./pages/accounting/TrialBalancePage'
 const BalanceSheetPage = lazy(() => import('./pages/accounting/BalanceSheetPage'))
 const IncomeStatementPage = lazy(() => import('./pages/accounting/IncomeStatementPage'))
 const VATManagementPage = lazy(() => import('./pages/accounting/VATManagementPage'))
+const ARAgingPage = lazy(() => import('./pages/accounting/ARAgingPage'))
 
 // Products Module
 const ProductsLayout = lazy(() => import('./pages/products/ProductsLayout'))
@@ -254,6 +263,7 @@ function App() {
                 <Routes>
                     {/* Public Routes */}
                     <Route path="/login" element={<LoginPage />} />
+                    <Route path="/login/email" element={<EmailLoginPage />} />
                     <Route path="/login/reset" element={<PasswordResetPage />} />
                     <Route path="/display" element={<CustomerDisplayPage />} />
                     <Route path="/mobile/login" element={<MobileLoginPage />} />
@@ -358,6 +368,15 @@ function App() {
                         <Route path="/purchasing/purchase-orders/:id" element={<RouteGuard permission="inventory.view"><PurchaseOrderDetailPage /></RouteGuard>} />
                         <Route path="/purchasing/purchase-orders/:id/edit" element={<RouteGuard permission="inventory.update"><PurchaseOrderFormPage /></RouteGuard>} />
 
+                        {/* Expenses Module Routes */}
+                        <Route path="/expenses" element={<RouteGuard permission="expenses.view"><ExpensesLayout /></RouteGuard>}>
+                            <Route index element={<ExpensesListPage />} />
+                            <Route path="categories" element={<ExpenseCategoriesPage />} />
+                        </Route>
+                        <Route path="/expenses/new" element={<RouteGuard permission="expenses.create"><ExpenseFormPage /></RouteGuard>} />
+                        <Route path="/expenses/:id" element={<RouteGuard permission="expenses.view"><ExpenseDetailPage /></RouteGuard>} />
+                        <Route path="/expenses/:id/edit" element={<RouteGuard permission="expenses.update"><ExpenseFormPage /></RouteGuard>} />
+
                         {/* Customers Module Routes */}
                         <Route path="/customers" element={<RouteGuard permission="customers.view"><CustomersPage /></RouteGuard>} />
                         <Route path="/customers/new" element={<RouteGuard permission="customers.create"><CustomerFormPage /></RouteGuard>} />
@@ -396,6 +415,7 @@ function App() {
                             <Route path="balance-sheet" element={<BalanceSheetPage />} />
                             <Route path="income-statement" element={<IncomeStatementPage />} />
                             <Route path="vat" element={<VATManagementPage />} />
+                            <Route path="ar-aging" element={<ARAgingPage />} />
                         </Route>
 
                         <Route path="/reports" element={<RouteGuard permission="reports.sales"><ModuleErrorBoundary moduleName="Reports"><ReportsPage /></ModuleErrorBoundary></RouteGuard>} />
